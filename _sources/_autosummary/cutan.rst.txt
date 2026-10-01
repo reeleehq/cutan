@@ -1,0 +1,17 @@
+﻿cutan
+=====
+
+.. automodule:: cutan
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      GENRE_NAME
+      ENTRY_POINT_GROUP
+      ENTRY_POINT_NAME
+      ENTRY_POINT_VALUE
+      RENDERER_NAME
+      LIBRARY_NAME
+   

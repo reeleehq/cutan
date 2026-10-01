@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "built_at": "2026-10-01T20:26:50Z",
+  "package": {
+    "name": "cutan",
+    "version": "0.0.1",
+    "display_name": "cutan",
+    "source": "pyproject.toml"
+  },
+  "git": {
+    "available": true,
+    "commit": "a17fb7c03c316853ce30708c216a8a56c8cee7be",
+    "short_commit": "a17fb7c",
+    "branch": "main",
+    "tags": [],
+    "dirty": false,
+    "remote_url": "https://github.com/thorwhalen/cutan",
+    "commit_url": "https://github.com/thorwhalen/cutan/commit/a17fb7c03c316853ce30708c216a8a56c8cee7be",
+    "error": null
+  },
+  "ci": {
+    "provider": "github",
+    "repository": "thorwhalen/cutan",
+    "sha": "a17fb7c03c316853ce30708c216a8a56c8cee7be",
+    "sha_in_history": true,
+    "ref": "refs/heads/main",
+    "ref_name": "main",
+    "run_id": "36921393045",
+    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/36921393045",
+    "server_url": "https://github.com"
+  },
+  "tools": {
+    "epythet": "0.2.12",
+    "sphinx": "9.1.0",
+    "docutils": "0.22.4",
+    "python": "3.12.14"
+  },
+  "config": {
+    "theme": "auto",
+    "html_theme": "sphinxawesome_theme",
+    "accent": "#703e8c",
+    "mode": "auto",
+    "api_generator": "autosummary",
+    "ignore": [
+      "tests/",
+      "scrap/",
+      "examples/"
+    ],
+    "agent_outputs": true,
+    "aggregates": [
+      "md"
+    ],
+    "ai_artifacts": true,
+    "provenance": true,
+    "docs_dir": "docsrc"
+  },
+  "site": {
+    "modules_documented": 1,
+    "objects_documented": 6
+  },
+  "pypi": {
+    "checked": true,
+    "latest": null,
+    "relation": "unknown",
+    "error": null
+  },
+  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout a17fb7c03c316853ce30708c216a8a56c8cee7be\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "warnings": [],
+  "alignment": {
+    "aligned": true,
+    "notes": []
+  }
+}

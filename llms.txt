@@ -1,0 +1,20 @@
+# cutan
+
+> Cut-out animation for an: rigged characters, faces, lip-sync and styles, as a genre package on the an core.
+
+
+## Pages
+
+- [cutan](index.html.md): Cut-out animation for &#96;an&#96;: rigged characters, faces and expressions, lip-sync, swap sets and views,...
+- [API reference](api.html.md): | &#96;cutan&#96;   | cutan: cut-out animation, as a genre package on the &#96;an&#96; core.   |
+- [cutan](_autosummary/cutan.html.md): cutan: cut-out animation, as a genre package on the &#96;an&#96; core.
+- [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-01 20:26 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+
+## Optional
+
+- [cutan.md](cutan.md): Complete documentation in a single file.
+
+## Build
+
+- [build_info.json](build_info.json): build provenance (commit, version, tool versions, whether the docs match the package)
