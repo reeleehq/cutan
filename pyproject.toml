@@ -126,10 +126,9 @@ project_name = ""
 [tool.wads.ci.install]
 extras = "dev"
 
-# cutan needs the `an` that has the seams (API level REQUIRED_AN_API_LEVEL). Until that `an`
-# is on PyPI its CI cannot be green: the reusable workflow installs dependencies from
-# PyPI before it exports any env, and does not run `pre_test`. The move therefore merges
-# `an` first (see the PR). The rendering lane (browser-tests.yml) installs `an` from git.
+# cutan needs an `an` with `an.genres.API_LEVEL >= REQUIRED_AN_API_LEVEL` (cutan.require_an) and its CI
+# installs `an` from PyPI: a change that needs a newer `an` merges `an` first. The rendering lane
+# (browser-tests.yml) installs `an` from main.
 [tool.wads.ci.commands]
 pre_test = []
 post_test = []
