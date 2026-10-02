@@ -23,14 +23,15 @@ def test_the_genre_is_discoverable_once_by_its_reserved_name():
     assert len(found) == 1, found
 
 
-def test_cutan_declares_no_genre_until_the_genre_object_moves():
-    """Flip this test in the batch that moves `CUTOUT` here (an#225): from then on
-    this distribution declares exactly `ENTRY_POINT_NAME = ENTRY_POINT_VALUE`."""
+def test_cutan_declares_exactly_the_genre_entry_point():
+    """This distribution registers the genre under the name `an` used to declare
+    (`cutout_animation`), pointing at `cutan.genre:CUTOUT` -- and nothing else."""
     try:
         eps = distribution("cutan").entry_points
     except PackageNotFoundError:  # running from a source tree that is not installed
         pytest.skip("cutan is not installed, so it has no entry points to inspect")
-    assert [ep for ep in eps if ep.group == cutan.ENTRY_POINT_GROUP] == []
+    declared = {ep.name: ep.value for ep in eps if ep.group == cutan.ENTRY_POINT_GROUP}
+    assert declared == {cutan.ENTRY_POINT_NAME: cutan.ENTRY_POINT_VALUE}
 
 
 def test_library_root_is_cutan_s_own():
