@@ -1,0 +1,15 @@
+cutan.characters.drawn
+======================
+
+.. automodule:: cutan.characters.drawn
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      drawing
+      write_bytes
+      write_derived_text
+      write_text
+   

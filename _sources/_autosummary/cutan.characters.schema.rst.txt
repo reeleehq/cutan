@@ -1,0 +1,45 @@
+cutan.characters.schema
+=======================
+
+.. automodule:: cutan.characters.schema
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      CHARACTER_DOCUMENT_KIND
+      MOUTH_SHAPES
+      DEFAULT_VISEME_MAP
+      VISEME_CHANNEL
+      EYELID_CHANNEL
+      DEFAULT_EYELID_MAP
+      VIEW_CHANNEL
+      VIEWS
+      DFLT_VIEW
+      VIEW_VARIANT_SEP
+      REQUIRED_PARTS
+      SLOT_POSE_OFFSETS
+      LEG_LENGTH
+      HEAD_ANCHOR
+      REFERENCE_HEAD_HEIGHT
+      FACE_OFFSETS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      bones_from_pivots
+      default_asset_sets
+      view_variant_set
+      view_variant_sets
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AnimationTrack
+      CharacterDescriptor
+      IdleAnimation
+      SlotPose
+   

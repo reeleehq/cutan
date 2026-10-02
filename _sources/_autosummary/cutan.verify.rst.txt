@@ -1,0 +1,13 @@
+cutan.verify
+============
+
+.. automodule:: cutan.verify
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   style

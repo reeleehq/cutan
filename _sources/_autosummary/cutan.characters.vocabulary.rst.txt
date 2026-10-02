@@ -1,0 +1,14 @@
+cutan.characters.vocabulary
+===========================
+
+.. automodule:: cutan.characters.vocabulary
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      PRESET_ASPECTS
+      EXPRESSION_PRESET_VERSIONS
+      CUTOUT_VOCABULARY
+   

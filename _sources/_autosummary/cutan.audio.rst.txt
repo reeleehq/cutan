@@ -1,0 +1,34 @@
+cutan.audio
+===========
+
+.. automodule:: cutan.audio
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      offline_factory
+      rhubarb_factory
+      whisper_factory
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      OfflineLipSync
+      RhubarbLipSync
+      StaticWordTimings
+      WhisperLipSync
+      WordTimingsLipSync
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   injectable_lipsync
+   offline_lipsync
+   rhubarb_lipsync
+   whisper_lipsync

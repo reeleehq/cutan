@@ -1,0 +1,12 @@
+cutan.audio.whisper\_lipsync
+============================
+
+.. automodule:: cutan.audio.whisper_lipsync
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      WhisperLipSync
+   

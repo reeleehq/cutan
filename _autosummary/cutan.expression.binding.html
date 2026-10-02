@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+<html :class="{ 'dark' : darkMode === true }" data-content_root="../" lang="en" x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}">
+<head>
+<script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="cutan.expression.binding.html.md" rel="alternate" type="text/markdown"/>
+<link href="../llms.txt" rel="describedby" type="text/markdown"/>
+<link href="cutan.expression.binding.html.md" rel="alternate" type="text/markdown"/>
+<link href="llms.txt" rel="describedby"/>
+<title>cutan.expression.binding | cutan</title>
+<meta content="cutan.expression.binding | cutan" property="og:title"/>
+<meta content="cutan.expression.binding | cutan" name="twitter:title"/>
+<link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="cutan.expression.blendshapes.html" rel="next" title="cutan.expression.blendshapes"/>
+<link href="cutan.expression.axes.html" rel="prev" title="cutan.expression.axes"/>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">cutan</span>
+</a><nav class="flex items-center gap-6 text-sm font-medium">
+<a class="transition-colors hover:text-foreground/80 text-foreground/60" href="https://github.com/thorwhalen/cutan" rel="noopener nofollow">GitHub</a>
+</nav></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center gap-1">
+<button @click="darkMode = !darkMode" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" title="Toggle color scheme" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="justify-start text-sm md:!hidden bg-background" href="../index.html"><span class="font-bold text-clip whitespace-nowrap">cutan</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="flex md:hidden flex-col font-medium mt-4">
+<a href="https://github.com/thorwhalen/cutan" rel="nofollow noopener">GitHub</a>
+</nav><nav class="table w-full min-w-full my-6 lg:my-8">
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="cutan.html">cutan<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="cutan.audio.html">cutan.audio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.bench.html">cutan.bench</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.characters.html">cutan.characters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.compile.html">cutan.compile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.conftest.html">cutan.conftest</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="cutan.expression.html">cutan.expression</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.genre.html">cutan.genre</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.impacts.html">cutan.impacts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.library.html">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.runtime.html">cutan.runtime</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.verify.html">cutan.verify</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">cutan</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="../api.html">API reference</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="cutan.html">cutan</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="cutan.expression.html">cutan.expression</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">cutan.expression.binding</span>
+</nav>
+<div id="content" role="main">
+<section id="module-cutan.expression.binding">
+<span id="cutan-expression-binding"></span><h1>cutan.expression.binding<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-cutan.expression.binding">¶</a></h1>
+<p>How the axes reach a character: the binding and the mouth-set resolver (an#98).</p>
+<p>Renderer-free, like <a class="reference internal" href="cutan.characters.play.html#module-cutan.characters.play" title="cutan.characters.play"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cutan.characters.play</span></code></a> — <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code>,
+<code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span> <span class="pre">validate</span></code> and the cutout face solver all call the same
+functions here, so the three cannot disagree about whether an expression can
+resolve on a character.</p>
+<ul>
+<li><p>A <strong>channel binding</strong> maps a numeric axis onto <code class="docutils literal notranslate"><span class="pre">(slot,</span> <span class="pre">property,</span> <span class="pre">gain)</span></code>:
+the solver emits <code class="docutils literal notranslate"><span class="pre">rest</span> <span class="pre">+</span> <span class="pre">Σ</span> <span class="pre">axis·gain</span></code> on that slot’s node. The brow angle’s
+per-side sign lives in the gain — the two sides rotate in opposite screen
+directions for one axis sign.</p></li>
+<li><p>A <strong>set binding</strong> maps a lid axis onto a slot’s swap set (<code class="docutils literal notranslate"><span class="pre">eyelid</span></code>); the
+solver reads a key off the ladder in <a class="reference internal" href="cutan.expression.axes.html#module-cutan.expression.axes" title="cutan.expression.axes"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cutan.expression.axes</span></code></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">resolve_mouth_set</span></code> is the ONE chain for “which mouth set does this line
+use”: <code class="docutils literal notranslate"><span class="pre">viseme@&lt;form&gt;</span></code> if declared <strong>and</strong> it covers the keys the line
+uses, else <code class="docutils literal notranslate"><span class="pre">viseme</span></code> with a warning naming the missing keys, else an
+<a class="reference internal" href="#cutan.expression.binding.ExpressionResolutionError" title="cutan.expression.binding.ExpressionResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionResolutionError</span></code></a> (a speaking overlay face with no neutral</p>
+<blockquote>
+<div><p>mouth set).</p>
+</div></blockquote>
+</li>
+</ul>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterDescriptor</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">desc</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"m"</span><span class="p">)</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">({</span><span class="n">b</span><span class="o">.</span><span class="n">axis</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">default_binding</span><span class="p">(</span><span class="n">desc</span><span class="p">)})</span>
+</span><span id="line-4"><span class="go">['brow_angle_l', 'brow_angle_r', 'brow_height_l', 'brow_height_r', 'lid_open_l', 'lid_open_r']</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="n">resolve_mouth_set</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">keys_used</span><span class="o">=</span><span class="p">[</span><span class="s2">"A"</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">])</span>
+</span><span id="line-6"><span class="go">'viseme'</span>
+</span><span id="line-7"><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+</span><span id="line-8"><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
+</span><span id="line-9"><span class="gp">... </span>    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">"always"</span><span class="p">)</span>
+</span><span id="line-10"><span class="gp">... </span>    <span class="n">resolve_mouth_set</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="s2">"happy"</span><span class="p">,</span> <span class="n">keys_used</span><span class="o">=</span><span class="p">[</span><span class="s2">"A"</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">])</span>
+</span><span id="line-11"><span class="go">'viseme'</span>
+</span><span id="line-12"><span class="gp">&gt;&gt;&gt; </span><span class="s2">"viseme@happy"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</span><span id="line-13"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.binding.BROW_HEIGHT_TRAVEL" title="cutan.expression.binding.BROW_HEIGHT_TRAVEL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BROW_HEIGHT_TRAVEL</span></code></a></p></td>
+<td><p>Brow travel per unit of <code class="code docutils literal notranslate"><span class="pre">brow_height_*</span></code>, in the rig's view-box units (scaled to scene pixels by the entity's rig factor).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.expression.binding.BROW_ANGLE_TRAVEL" title="cutan.expression.binding.BROW_ANGLE_TRAVEL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BROW_ANGLE_TRAVEL</span></code></a></p></td>
+<td><p>Brow rotation per unit of <code class="code docutils literal notranslate"><span class="pre">brow_angle_*</span></code>, radians.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.binding.GAZE_TRAVEL" title="cutan.expression.binding.GAZE_TRAVEL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GAZE_TRAVEL</span></code></a></p></td>
+<td><p>Pupil travel per unit of <code class="code docutils literal notranslate"><span class="pre">gaze_*</span></code>, in view-box units — the default when a descriptor declares no travel of its own (<code class="code docutils literal notranslate"><span class="pre">add_gaze</span></code> writes <code class="code docutils literal notranslate"><span class="pre">gaze_travel</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.expression.binding.LID_SQUASH_GAIN" title="cutan.expression.binding.LID_SQUASH_GAIN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LID_SQUASH_GAIN</span></code></a></p></td>
+<td><p>On a rig whose eye squashes instead of swapping art, a lid offset scales the eye by this much per unit.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.binding.binding_for" title="cutan.expression.binding.binding_for"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binding_for</span></code></a>(desc)</p></td>
+<td><p>The descriptor's declared <code class="docutils literal notranslate"><span class="pre">expression_binding</span></code> (additive field), else the default.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.expression.binding.declared_mouth_variants" title="cutan.expression.binding.declared_mouth_variants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">declared_mouth_variants</span></code></a>(desc)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{form:</span> <span class="pre">set</span> <span class="pre">name}</span></code> for every <code class="docutils literal notranslate"><span class="pre">viseme@&lt;form&gt;</span></code> set the descriptor declares.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.binding.default_binding" title="cutan.expression.binding.default_binding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_binding</span></code></a>(desc)</p></td>
+<td><p>The binding the default rig implies, from the slots it actually has.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.expression.binding.expression_problems" title="cutan.expression.binding.expression_problems"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expression_problems</span></code></a>(desc, *, preset[, axes])</p></td>
+<td><p>Every reason an expression cannot resolve on <code class="docutils literal notranslate"><span class="pre">desc</span></code> — empty means it can.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.binding.preset_axes" title="cutan.expression.binding.preset_axes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preset_axes</span></code></a>(preset, *[, axes, intensity])</p></td>
+<td><p>The numeric axis offsets an expression asks for: the preset's, with <code class="docutils literal notranslate"><span class="pre">axes</span></code> layered over them, scaled by <code class="docutils literal notranslate"><span class="pre">intensity</span></code> and clamped.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.expression.binding.resolve_mouth_set" title="cutan.expression.binding.resolve_mouth_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_mouth_set</span></code></a>(desc, preset, *, keys_used)</p></td>
+<td><p>Which mouth set a line under <code class="docutils literal notranslate"><span class="pre">preset</span></code> uses — the one chain, shared.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.binding.touches_gaze" title="cutan.expression.binding.touches_gaze"><code class="xref py py-obj docutils literal notranslate"><span class="pre">touches_gaze</span></code></a>(axes)</p></td>
+<td><p>Whether any of <code class="docutils literal notranslate"><span class="pre">axes</span></code> is a gaze axis (a no-op on a rig without pupils).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.expression.binding.variant_set_name" title="cutan.expression.binding.variant_set_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variant_set_name</span></code></a>(form)</p></td>
+<td><p>The swap-set name for a mouth form (<code class="docutils literal notranslate"><span class="pre">@</span></code> is a legal set-name character).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.binding.ChannelBinding" title="cutan.expression.binding.ChannelBinding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChannelBinding</span></code></a>(axis, slot, property, gain[, ...])</p></td>
+<td><p>A numeric axis driving one transform property of one slot's node.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.expression.binding.SetBinding" title="cutan.expression.binding.SetBinding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SetBinding</span></code></a>(axis, slot[, set_family])</p></td>
+<td><p>A lid axis driving one slot's swap set through the ladder.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Exceptions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.binding.ExpressionResolutionError" title="cutan.expression.binding.ExpressionResolutionError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExpressionResolutionError</span></code></a>(who, problems)</p></td>
+<td><p>An expression that cannot resolve on a character; <code class="docutils literal notranslate"><span class="pre">problems</span></code> says why.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.expression.binding.BROW_ANGLE_TRAVEL">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">BROW_ANGLE_TRAVEL</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.35</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.BROW_ANGLE_TRAVEL" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.BROW_ANGLE_TRAVEL'">¶</a></dt>
+<dd><p>Brow rotation per unit of <code class="code docutils literal notranslate"><span class="pre">brow_angle_*</span></code>, radians. Art direction.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.expression.binding.BROW_HEIGHT_TRAVEL">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">BROW_HEIGHT_TRAVEL</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.BROW_HEIGHT_TRAVEL" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.BROW_HEIGHT_TRAVEL'">¶</a></dt>
+<dd><p>Brow travel per unit of <code class="code docutils literal notranslate"><span class="pre">brow_height_*</span></code>, in the rig’s view-box units
+(scaled to scene pixels by the entity’s rig factor). Art direction; about
+the synthesized eye’s half-height.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.expression.binding.ChannelBinding">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">ChannelBinding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rig_scaled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/binding.html#ChannelBinding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.ChannelBinding" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.ChannelBinding'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A numeric axis driving one transform property of one slot’s node.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cutan.expression.binding.ChannelBinding.rig_scaled">
+<span class="sig-name descname"><span class="pre">rig_scaled</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">bool</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.ChannelBinding.rig_scaled" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.ChannelBinding.rig_scaled'">¶</a></dt>
+<dd><p>Whether the gain is a view-box length (scaled by the rig factor).</p>
+</dd></dl>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="cutan.expression.binding.ExpressionResolutionError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">ExpressionResolutionError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">who</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">problems</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/binding.html#ExpressionResolutionError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.ExpressionResolutionError" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.ExpressionResolutionError'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>An expression that cannot resolve on a character; <code class="docutils literal notranslate"><span class="pre">problems</span></code> says why.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.expression.binding.GAZE_TRAVEL">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">GAZE_TRAVEL</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.GAZE_TRAVEL" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.GAZE_TRAVEL'">¶</a></dt>
+<dd><p>Pupil travel per unit of <code class="code docutils literal notranslate"><span class="pre">gaze_*</span></code>, in view-box units — the default when a
+descriptor declares no travel of its own (<code class="code docutils literal notranslate"><span class="pre">add_gaze</span></code> writes <code class="code docutils literal notranslate"><span class="pre">gaze_travel</span></code>).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.expression.binding.LID_SQUASH_GAIN">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">LID_SQUASH_GAIN</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.LID_SQUASH_GAIN" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.LID_SQUASH_GAIN'">¶</a></dt>
+<dd><p>On a rig whose eye squashes instead of swapping art, a lid offset scales
+the eye by this much per unit.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.expression.binding.SetBinding">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">SetBinding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_family</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eyelid'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/binding.html#SetBinding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.SetBinding" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.SetBinding'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A lid axis driving one slot’s swap set through the ladder.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.expression.binding.binding_for">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">binding_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">desc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/binding.html#binding_for"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.binding_for" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.binding_for'">¶</a></dt>
+<dd><p>The descriptor’s declared <code class="docutils literal notranslate"><span class="pre">expression_binding</span></code> (additive field), else the default.</p>
+<p>A declared binding is a list of dicts in the two dataclasses’ shapes
+(<code class="docutils literal notranslate"><span class="pre">{"axis",</span> <span class="pre">"slot",</span> <span class="pre">"property",</span> <span class="pre">"gain"[,</span> <span class="pre">"rig_scaled"]}</span></code> or
+<code class="docutils literal notranslate"><span class="pre">{"axis",</span> <span class="pre">"slot",</span> <span class="pre">"set_family"}</span></code>). An unknown axis in it is an error.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="#cutan.expression.binding.ChannelBinding" title="cutan.expression.binding.ChannelBinding"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChannelBinding</span></code></a>, <a class="reference internal" href="#cutan.expression.binding.SetBinding" title="cutan.expression.binding.SetBinding"><code class="xref py py-class docutils literal notranslate"><span class="pre">SetBinding</span></code></a>]]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.expression.binding.declared_mouth_variants">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">declared_mouth_variants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">desc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/binding.html#declared_mouth_variants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.declared_mouth_variants" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.declared_mouth_variants'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">{form:</span> <span class="pre">set</span> <span class="pre">name}</span></code> for every <code class="docutils literal notranslate"><span class="pre">viseme@&lt;form&gt;</span></code> set the descriptor declares.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">declared_mouth_variants</span><span class="p">(</span><span class="n">CharacterDescriptor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"m"</span><span class="p">))</span>
+</span><span id="line-2"><span class="go">{}</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.expression.binding.default_binding">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">default_binding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">desc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/binding.html#default_binding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.default_binding" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.default_binding'">¶</a></dt>
+<dd><p>The binding the default rig implies, from the slots it actually has.</p>
+<p>The brow angle’s screen sign: PixiJS rotation is clockwise-positive with y
+down, so on the LEFT brow (screen-left) a clockwise turn drops the inner
+end while on the RIGHT brow it lifts it — the axis says “+ = inner end
+up”, hence <code class="docutils literal notranslate"><span class="pre">-travel</span></code> on the left and <code class="docutils literal notranslate"><span class="pre">+travel</span></code> on the right.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="#cutan.expression.binding.ChannelBinding" title="cutan.expression.binding.ChannelBinding"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChannelBinding</span></code></a>, <a class="reference internal" href="#cutan.expression.binding.SetBinding" title="cutan.expression.binding.SetBinding"><code class="xref py py-class docutils literal notranslate"><span class="pre">SetBinding</span></code></a>]]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.expression.binding.expression_problems">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">expression_problems</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">desc</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">preset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">who</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/binding.html#expression_problems"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.expression_problems" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.expression_problems'">¶</a></dt>
+<dd><p>Every reason an expression cannot resolve on <code class="docutils literal notranslate"><span class="pre">desc</span></code> — empty means it can.</p>
+<p>Shared by <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code> (each becomes an error Finding) and the compiler
+(which raises <a class="reference internal" href="#cutan.expression.binding.ExpressionResolutionError" title="cutan.expression.binding.ExpressionResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionResolutionError</span></code></a> with the same list).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">expression_problems</span><span class="p">(</span><span class="n">CharacterDescriptor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"m"</span><span class="p">),</span> <span class="n">preset</span><span class="o">=</span><span class="s2">"joyful"</span><span class="p">,</span> <span class="n">who</span><span class="o">=</span><span class="s2">"m"</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">expression_problems</span><span class="p">(</span><span class="n">CharacterDescriptor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"m"</span><span class="p">,</span> <span class="n">face_overlay</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">preset</span><span class="o">=</span><span class="s2">"happy"</span><span class="p">,</span> <span class="n">who</span><span class="o">=</span><span class="s2">"m"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"'m' has its face baked"</span><span class="p">)</span>
+</span><span id="line-4"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.expression.binding.preset_axes">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">preset_axes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preset</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/presets.html#preset_axes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.preset_axes" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.preset_axes'">¶</a></dt>
+<dd><p>The numeric axis offsets an expression asks for: the preset’s, with
+<code class="docutils literal notranslate"><span class="pre">axes</span></code> layered over them, scaled by <code class="docutils literal notranslate"><span class="pre">intensity</span></code> and clamped. Only
+non-zero offsets are returned, so a neutral expression is <code class="docutils literal notranslate"><span class="pre">{}</span></code>.</p>
+<p>An unknown preset or axis is a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> — validate reports it as an
+error, the compiler refuses it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.expression.binding.resolve_mouth_set">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">resolve_mouth_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">desc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preset</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys_used</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">who</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/binding.html#resolve_mouth_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.resolve_mouth_set" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.resolve_mouth_set'">¶</a></dt>
+<dd><p>Which mouth set a line under <code class="docutils literal notranslate"><span class="pre">preset</span></code> uses — the one chain, shared.</p>
+<p><code class="docutils literal notranslate"><span class="pre">viseme@&lt;form&gt;</span></code> if the preset prefers a form the descriptor declares and
+that set covers <code class="docutils literal notranslate"><span class="pre">keys_used</span></code>; else <code class="docutils literal notranslate"><span class="pre">viseme</span></code> with a warning naming what
+was missing; else <a class="reference internal" href="#cutan.expression.binding.ExpressionResolutionError" title="cutan.expression.binding.ExpressionResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionResolutionError</span></code></a>. A descriptor with no
+<code class="docutils literal notranslate"><span class="pre">viseme</span></code> set and no covering variant cannot speak at all — that is the
+error, not a fallback.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.expression.binding.touches_gaze">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">touches_gaze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/binding.html#touches_gaze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.touches_gaze" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.touches_gaze'">¶</a></dt>
+<dd><p>Whether any of <code class="docutils literal notranslate"><span class="pre">axes</span></code> is a gaze axis (a no-op on a rig without pupils).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">touches_gaze</span><span class="p">([</span><span class="s2">"gaze_x"</span><span class="p">]),</span> <span class="n">touches_gaze</span><span class="p">([</span><span class="s2">"brow_angle_l"</span><span class="p">])</span>
+</span><span id="line-2"><span class="go">(True, False)</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.expression.binding.variant_set_name">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.binding.</span></span><span class="sig-name descname"><span class="pre">variant_set_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/binding.html#variant_set_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.binding.variant_set_name" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.binding.variant_set_name'">¶</a></dt>
+<dd><p>The swap-set name for a mouth form (<code class="docutils literal notranslate"><span class="pre">@</span></code> is a legal set-name character).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">variant_set_name</span><span class="p">(</span><span class="s2">"happy"</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">'viseme@happy'</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#cutan.expression.binding.BROW_ANGLE_TRAVEL'" class="reference internal" href="#cutan.expression.binding.BROW_ANGLE_TRAVEL"><code class="docutils literal notranslate"><span class="pre">BROW_ANGLE_TRAVEL</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.BROW_HEIGHT_TRAVEL'" class="reference internal" href="#cutan.expression.binding.BROW_HEIGHT_TRAVEL"><code class="docutils literal notranslate"><span class="pre">BROW_HEIGHT_TRAVEL</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.ChannelBinding'" class="reference internal" href="#cutan.expression.binding.ChannelBinding"><code class="docutils literal notranslate"><span class="pre">ChannelBinding</span></code></a><ul>
+<li><a :data-current="activeSection === '#cutan.expression.binding.ChannelBinding.rig_scaled'" class="reference internal" href="#cutan.expression.binding.ChannelBinding.rig_scaled"><code class="docutils literal notranslate"><span class="pre">ChannelBinding.rig_scaled</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.ExpressionResolutionError'" class="reference internal" href="#cutan.expression.binding.ExpressionResolutionError"><code class="docutils literal notranslate"><span class="pre">ExpressionResolutionError</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.GAZE_TRAVEL'" class="reference internal" href="#cutan.expression.binding.GAZE_TRAVEL"><code class="docutils literal notranslate"><span class="pre">GAZE_TRAVEL</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.LID_SQUASH_GAIN'" class="reference internal" href="#cutan.expression.binding.LID_SQUASH_GAIN"><code class="docutils literal notranslate"><span class="pre">LID_SQUASH_GAIN</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.SetBinding'" class="reference internal" href="#cutan.expression.binding.SetBinding"><code class="docutils literal notranslate"><span class="pre">SetBinding</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.binding_for'" class="reference internal" href="#cutan.expression.binding.binding_for"><code class="docutils literal notranslate"><span class="pre">binding_for()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.declared_mouth_variants'" class="reference internal" href="#cutan.expression.binding.declared_mouth_variants"><code class="docutils literal notranslate"><span class="pre">declared_mouth_variants()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.default_binding'" class="reference internal" href="#cutan.expression.binding.default_binding"><code class="docutils literal notranslate"><span class="pre">default_binding()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.expression_problems'" class="reference internal" href="#cutan.expression.binding.expression_problems"><code class="docutils literal notranslate"><span class="pre">expression_problems()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.preset_axes'" class="reference internal" href="#cutan.expression.binding.preset_axes"><code class="docutils literal notranslate"><span class="pre">preset_axes()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.resolve_mouth_set'" class="reference internal" href="#cutan.expression.binding.resolve_mouth_set"><code class="docutils literal notranslate"><span class="pre">resolve_mouth_set()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.touches_gaze'" class="reference internal" href="#cutan.expression.binding.touches_gaze"><code class="docutils literal notranslate"><span class="pre">touches_gaze()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.binding.variant_set_name'" class="reference internal" href="#cutan.expression.binding.variant_set_name"><code class="docutils literal notranslate"><span class="pre">variant_set_name()</span></code></a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left"></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=d45e8c67"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=fd10adb8"></script>
+<script defer="defer" src="../_static/theme.js?v=5db23cf8"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+cutan.audio.offline\_lipsync
+============================
+
+.. automodule:: cutan.audio.offline_lipsync
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      OfflineLipSync
+   

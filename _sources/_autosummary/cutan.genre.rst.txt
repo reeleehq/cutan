@@ -1,0 +1,12 @@
+cutan.genre
+===========
+
+.. automodule:: cutan.genre
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      CUTOUT_GENRE_NAME
+   

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html :class="{ 'dark' : darkMode === true }" data-content_root="../" lang="en" x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}">
+<head>
+<script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="cutan.characters.registration.html.md" rel="alternate" type="text/markdown"/>
+<link href="../llms.txt" rel="describedby" type="text/markdown"/>
+<link href="cutan.characters.registration.html.md" rel="alternate" type="text/markdown"/>
+<link href="llms.txt" rel="describedby"/>
+<title>cutan.characters.registration | cutan</title>
+<meta content="cutan.characters.registration | cutan" property="og:title"/>
+<meta content="cutan.characters.registration | cutan" name="twitter:title"/>
+<link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="cutan.characters.schema.html" rel="next" title="cutan.characters.schema"/>
+<link href="cutan.characters.record.html" rel="prev" title="cutan.characters.record"/>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">cutan</span>
+</a><nav class="flex items-center gap-6 text-sm font-medium">
+<a class="transition-colors hover:text-foreground/80 text-foreground/60" href="https://github.com/thorwhalen/cutan" rel="noopener nofollow">GitHub</a>
+</nav></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center gap-1">
+<button @click="darkMode = !darkMode" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" title="Toggle color scheme" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="justify-start text-sm md:!hidden bg-background" href="../index.html"><span class="font-bold text-clip whitespace-nowrap">cutan</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="flex md:hidden flex-col font-medium mt-4">
+<a href="https://github.com/thorwhalen/cutan" rel="nofollow noopener">GitHub</a>
+</nav><nav class="table w-full min-w-full my-6 lg:my-8">
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="cutan.html">cutan<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="cutan.audio.html">cutan.audio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.bench.html">cutan.bench</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="cutan.characters.html">cutan.characters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.compile.html">cutan.compile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.conftest.html">cutan.conftest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.expression.html">cutan.expression</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.genre.html">cutan.genre</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.impacts.html">cutan.impacts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.library.html">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.runtime.html">cutan.runtime</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.verify.html">cutan.verify</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">cutan</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="../api.html">API reference</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="cutan.html">cutan</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="cutan.characters.html">cutan.characters</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">cutan.characters.registration</span>
+</nav>
+<div id="content" role="main">
+<section id="module-cutan.characters.registration">
+<span id="cutan-characters-registration"></span><h1>cutan.characters.registration<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-cutan.characters.registration">¶</a></h1>
+<p>The character side of the cut-out genre, as declarations: <code class="docutils literal notranslate"><span class="pre">play</span></code> and <code class="docutils literal notranslate"><span class="pre">character</span></code>.</p>
+<p>What the cut-out genre (<a class="reference internal" href="cutan.genre.html#module-cutan.genre" title="cutan.genre"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cutan.genre</span></code></a>) registers from here (ADR 0001
+§First slice):</p>
+<ul class="simple">
+<li><p>the <strong>``play`` action kind</strong> — <a class="reference internal" href="#cutan.characters.registration.PlayAction" title="cutan.characters.registration.PlayAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlayAction</span></code></a>, how long a
+duration-less play occupies a <code class="docutils literal notranslate"><span class="pre">sequence</span></code> (its natural length, through the
+caller’s extent resolver), and its <code class="docutils literal notranslate"><span class="pre">scene.md</span></code> spelling;</p></li>
+<li><p>the <strong>``character`` entity kind</strong> — a rigged character, whose nodes are
+nodes of the 2D stage engine (the <code class="docutils literal notranslate"><span class="pre">stage.node</span></code> property space).</p></li>
+</ul>
+<p>Plain declarations: importing this module registers nothing.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">PLAY</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">CHARACTER</span><span class="o">.</span><span class="n">space</span>
+</span><span id="line-2"><span class="go">('play', 'stage.node')</span>
+</span></code></pre></div>
+</div>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.registration.default_play_extent" title="cutan.characters.registration.default_play_extent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_play_extent</span></code></a>(action)</p></td>
+<td><p>A duration-less play's extent when no descriptor is known: a motion preset's natural length over <code class="docutils literal notranslate"><span class="pre">speed</span></code>, else <code class="docutils literal notranslate"><span class="pre">0.0</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.registration.play" title="cutan.characters.registration.play"><code class="xref py py-obj docutils literal notranslate"><span class="pre">play</span></code></a>(target, animation, *[, duration, ...])</p></td>
+<td><p>Play a named animation of the target entity's descriptor (an#7).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.registration.play_duration" title="cutan.characters.registration.play_duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">play_duration</span></code></a>(action, extent)</p></td>
+<td><p>The span a <code class="docutils literal notranslate"><span class="pre">play</span></code> occupies: its <code class="docutils literal notranslate"><span class="pre">duration</span></code>, else its natural extent.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.registration.read_play_md" title="cutan.characters.registration.read_play_md"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_play_md</span></code></a>(item, *, index)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{kind:</span> <span class="pre">play,</span> <span class="pre">target,</span> <span class="pre">animation,</span> <span class="pre">[duration],</span> <span class="pre">[speed],</span> <span class="pre">[loop],</span> <span class="pre">[args]}</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.registration.write_play_md" title="cutan.characters.registration.write_play_md"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_play_md</span></code></a>(leaf)</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">scene.md</span></code> entry for <code class="docutils literal notranslate"><span class="pre">leaf</span></code> (<code class="docutils literal notranslate"><span class="pre">read_play_md</span></code>'s inverse).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.registration.PlayAction" title="cutan.characters.registration.PlayAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PlayAction</span></code></a>(**data)</p></td>
+<td><p>Play a named animation of the target entity's descriptor (an#7).</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.characters.registration.PlayAction">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.characters.registration.</span></span><span class="sig-name descname"><span class="pre">PlayAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/registration.html#PlayAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.registration.PlayAction" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.registration.PlayAction'">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ExtensionAction</span></code></p>
+<p>Play a named animation of the target entity’s descriptor (an#7).</p>
+<p><code class="docutils literal notranslate"><span class="pre">animation</span></code> names an entry of <code class="docutils literal notranslate"><span class="pre">CharacterDescriptor.animations</span></code> (the
+seeded <code class="docutils literal notranslate"><span class="pre">idle_breath</span></code> and <code class="docutils literal notranslate"><span class="pre">blink</span></code>, or anything an author adds); the
+compiler resolves its tracks into channels on the entity’s nodes. A name
+the descriptor does NOT declare — or any name on an entity with no
+descriptor (a procedural rig, a prop) — falls back to the motion presets
+of <code class="xref py py-data docutils literal notranslate"><span class="pre">an.motion.PRESETS</span></code> (<code class="docutils literal notranslate"><span class="pre">hop</span></code>, <code class="docutils literal notranslate"><span class="pre">nod</span></code>, …), which expand to
+ordinary tweens at the target’s built rest pose; a descriptor animation of
+the same name wins (an#166). Both halves are decided by
+<a class="reference internal" href="cutan.characters.play.html#cutan.characters.play.play_problems" title="cutan.characters.play.play_problems"><code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.characters.play.play_problems()</span></code></a>, the one resolver <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code>
+and the compiler share. For a preset, <code class="docutils literal notranslate"><span class="pre">args</span></code> are its parameters,
+<code class="docutils literal notranslate"><span class="pre">duration</span></code> stretches the whole move to that length, <code class="docutils literal notranslate"><span class="pre">speed</span></code> divides
+it, and <code class="docutils literal notranslate"><span class="pre">loop:</span> <span class="pre">true</span></code> is refused (a preset is a one-shot).
+<code class="docutils literal notranslate"><span class="pre">duration</span></code> widens/narrows the placement window; <code class="docutils literal notranslate"><span class="pre">None</span></code> means the
+animation’s own duration — or, when the resolved <code class="docutils literal notranslate"><span class="pre">loop</span></code> is true, the
+rest of the shot, because a loop bounded by its own natural duration
+never loops. <code class="docutils literal notranslate"><span class="pre">loop</span></code> overrides the animation’s declared <code class="docutils literal notranslate"><span class="pre">loop</span></code>
+(<code class="docutils literal notranslate"><span class="pre">None</span></code> = use the descriptor’s). Inside a <code class="docutils literal notranslate"><span class="pre">sequence</span></code> a play with
+<code class="docutils literal notranslate"><span class="pre">duration=None</span></code> occupies its NATURAL length — a motion preset’s own
+length, a non-looping descriptor animation’s <code class="docutils literal notranslate"><span class="pre">duration</span></code>, both over
+<code class="docutils literal notranslate"><span class="pre">speed</span></code> — so the next sibling starts when it ends; a looping one runs to
+the shot end and occupies ZERO (<code class="xref py py-func docutils literal notranslate"><span class="pre">an.characters.play.play_extent()</span></code>).</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cutan.characters.registration.PlayAction.args">
+<span class="sig-name descname"><span class="pre">args</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">dict</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">Any</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">None</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.registration.PlayAction.args" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.registration.PlayAction.args'">¶</a></dt>
+<dd><p>Parameters of a MOTION PRESET (an#166) — <code class="docutils literal notranslate"><span class="pre">{"height":</span> <span class="pre">30}</span></code> for a
+<code class="docutils literal notranslate"><span class="pre">hop</span></code> — passed to its <code class="xref py py-data docutils literal notranslate"><span class="pre">an.motion.PRESETS</span></code> function as keyword
+arguments. <code class="docutils literal notranslate"><span class="pre">None</span></code> (the default, omitted from JSON) means the preset’s
+own defaults. A descriptor animation takes none, and one given to it is
+refused; <code class="docutils literal notranslate"><span class="pre">rest</span></code> is never one — it is read off the built scene.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cutan.characters.registration.PlayAction.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">ClassVar</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'allow',</span> <span class="pre">'populate_by_name':</span> <span class="pre">True,</span> <span class="pre">'validate_by_alias':</span> <span class="pre">True,</span> <span class="pre">'validate_by_name':</span> <span class="pre">True}</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.registration.PlayAction.model_config" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.registration.PlayAction.model_config'">¶</a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<code class="code docutils literal notranslate"><span class="pre">ConfigDict</span></code>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.registration.default_play_extent">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.registration.</span></span><span class="sig-name descname"><span class="pre">default_play_extent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/registration.html#default_play_extent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.registration.default_play_extent" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.registration.default_play_extent'">¶</a></dt>
+<dd><p>A duration-less play’s extent when no descriptor is known: a motion
+preset’s natural length over <code class="docutils literal notranslate"><span class="pre">speed</span></code>, else <code class="docutils literal notranslate"><span class="pre">0.0</span></code>.</p>
+<p>The one resolver is <code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.characters.play.play_extent()</span></code>; this is it with
+<code class="docutils literal notranslate"><span class="pre">desc=None</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">default_play_extent</span><span class="p">(</span><span class="n">PlayAction</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">animation</span><span class="o">=</span><span class="s2">"hop"</span><span class="p">))</span>
+</span><span id="line-2"><span class="go">0.5</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">default_play_extent</span><span class="p">(</span><span class="n">PlayAction</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">animation</span><span class="o">=</span><span class="s2">"not_a_preset"</span><span class="p">))</span>
+</span><span id="line-4"><span class="go">0.0</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.registration.play">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.registration.</span></span><span class="sig-name descname"><span class="pre">play</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animation</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/registration.html#play"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.registration.play" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.registration.play'">¶</a></dt>
+<dd><p>Play a named animation of the target entity’s descriptor (an#7).</p>
+<p><code class="docutils literal notranslate"><span class="pre">duration=None</span></code> fills the animation’s natural length — or the shot’s
+remainder for a looping one. In a <code class="docutils literal notranslate"><span class="pre">sequence</span></code> a play with no <code class="docutils literal notranslate"><span class="pre">duration</span></code>
+occupies its <strong>natural</strong> length (a motion preset’s own length divided by
+<code class="docutils literal notranslate"><span class="pre">speed</span></code>; a non-looping descriptor animation’s likewise), so the sibling
+after it starts when it ends; a looping one runs to the shot end and
+occupies <strong>zero</strong>:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#cutan.characters.registration.PlayAction" title="cutan.characters.registration.PlayAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlayAction</span></code></a></span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">start</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">sequence</span><span class="p">(</span><span class="n">play</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"idle_breath"</span><span class="p">),</span> <span class="n">delay</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">play</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"blink"</span><span class="p">)))]</span>
+</span><span id="line-2"><span class="go">[0.0, 1.0]</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">start</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">sequence</span><span class="p">(</span><span class="n">play</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"idle_breath"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span> <span class="n">play</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"blink"</span><span class="p">)))]</span>
+</span><span id="line-4"><span class="go">[0.0, 2.0]</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">start</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">sequence</span><span class="p">(</span><span class="n">play</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"hop"</span><span class="p">),</span> <span class="n">play</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"nod"</span><span class="p">)))]</span>
+</span><span id="line-6"><span class="go">[0.0, 0.5]</span>
+</span><span id="line-7"><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">start</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">sequence</span><span class="p">(</span><span class="n">play</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"hop"</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span> <span class="n">play</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"nod"</span><span class="p">)))]</span>
+</span><span id="line-8"><span class="go">[0.0, 0.25]</span>
+</span></code></pre></div>
+</div>
+<p>(Bare <code class="docutils literal notranslate"><span class="pre">flatten</span></code> knows only the presets, by name; <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code> and the
+compiler pass the entity’s descriptor too — <code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.characters.play.play_extent()</span></code>
+— so a descriptor animation that shares a preset’s name is measured as the
+descriptor’s.)</p>
+<p>A name the descriptor does not declare falls back to a motion preset of
+<code class="xref py py-data docutils literal notranslate"><span class="pre">an.motion.PRESETS</span></code>, with <code class="docutils literal notranslate"><span class="pre">args</span></code> as its parameters (an#166):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">play</span><span class="p">(</span><span class="s2">"charlie"</span><span class="p">,</span> <span class="s2">"hop"</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s2">"height"</span><span class="p">:</span> <span class="mi">30</span><span class="p">})</span><span class="o">.</span><span class="n">args</span>
+</span><span id="line-2"><span class="go">{'height': 30}</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.registration.play_duration">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.registration.</span></span><span class="sig-name descname"><span class="pre">play_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/registration.html#play_duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.registration.play_duration" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.registration.play_duration'">¶</a></dt>
+<dd><p>The span a <code class="docutils literal notranslate"><span class="pre">play</span></code> occupies: its <code class="docutils literal notranslate"><span class="pre">duration</span></code>, else its natural extent.</p>
+<p><code class="docutils literal notranslate"><span class="pre">extent</span></code> is the caller’s resolver (the compiler and <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code> pass
+one bound to the entity’s descriptor); without one, a motion preset’s own
+length (<a class="reference internal" href="#cutan.characters.registration.default_play_extent" title="cutan.characters.registration.default_play_extent"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_play_extent()</span></code></a>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">play_duration</span><span class="p">(</span><span class="n">PlayAction</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">animation</span><span class="o">=</span><span class="s2">"hop"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">2.0</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">play_duration</span><span class="p">(</span><span class="n">PlayAction</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">animation</span><span class="o">=</span><span class="s2">"hop"</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-4"><span class="go">0.5</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.registration.read_play_md">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.registration.</span></span><span class="sig-name descname"><span class="pre">read_play_md</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/registration.html#read_play_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.registration.read_play_md" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.registration.read_play_md'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">{kind:</span> <span class="pre">play,</span> <span class="pre">target,</span> <span class="pre">animation,</span> <span class="pre">[duration],</span> <span class="pre">[speed],</span> <span class="pre">[loop],</span> <span class="pre">[args]}</span></code>.</p>
+<p>Resolved at compile against the target entity’s descriptor <code class="docutils literal notranslate"><span class="pre">animations</span></code>
+(an#7), falling back to the motion presets of <code class="docutils literal notranslate"><span class="pre">an.motion.PRESETS</span></code> for a
+name the descriptor does not declare, with <code class="docutils literal notranslate"><span class="pre">args</span></code> as the preset’s
+parameters (an#166). <code class="docutils literal notranslate"><span class="pre">loop</span></code> omitted means the animation’s own. This
+reader accepted the shape from the start, then #24 made it refuse (nothing
+resolved a play) while the writer kept emitting it — three days of a
+project’s own scene.md failing to parse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#cutan.characters.registration.PlayAction" title="cutan.characters.registration.PlayAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlayAction</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.registration.write_play_md">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.registration.</span></span><span class="sig-name descname"><span class="pre">write_play_md</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leaf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/registration.html#write_play_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.registration.write_play_md" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.registration.write_play_md'">¶</a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">scene.md</span></code> entry for <code class="docutils literal notranslate"><span class="pre">leaf</span></code> (<code class="docutils literal notranslate"><span class="pre">read_play_md</span></code>’s inverse).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#cutan.characters.registration.PlayAction'" class="reference internal" href="#cutan.characters.registration.PlayAction"><code class="docutils literal notranslate"><span class="pre">PlayAction</span></code></a><ul>
+<li><a :data-current="activeSection === '#cutan.characters.registration.PlayAction.args'" class="reference internal" href="#cutan.characters.registration.PlayAction.args"><code class="docutils literal notranslate"><span class="pre">PlayAction.args</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.registration.PlayAction.model_config'" class="reference internal" href="#cutan.characters.registration.PlayAction.model_config"><code class="docutils literal notranslate"><span class="pre">PlayAction.model_config</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#cutan.characters.registration.default_play_extent'" class="reference internal" href="#cutan.characters.registration.default_play_extent"><code class="docutils literal notranslate"><span class="pre">default_play_extent()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.registration.play'" class="reference internal" href="#cutan.characters.registration.play"><code class="docutils literal notranslate"><span class="pre">play()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.registration.play_duration'" class="reference internal" href="#cutan.characters.registration.play_duration"><code class="docutils literal notranslate"><span class="pre">play_duration()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.registration.read_play_md'" class="reference internal" href="#cutan.characters.registration.read_play_md"><code class="docutils literal notranslate"><span class="pre">read_play_md()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.registration.write_play_md'" class="reference internal" href="#cutan.characters.registration.write_play_md"><code class="docutils literal notranslate"><span class="pre">write_play_md()</span></code></a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left"></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=d45e8c67"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=fd10adb8"></script>
+<script defer="defer" src="../_static/theme.js?v=5db23cf8"></script>
+</body>
+</html>

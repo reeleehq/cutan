@@ -1,0 +1,16 @@
+cutan.characters.svg\_utils
+===========================
+
+.. automodule:: cutan.characters.svg_utils
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      extract_part
+      extract_pivots
+      normalize_svg
+      promote_inkscape_labels_to_ids
+      write_svg
+   

@@ -1,0 +1,12 @@
+cutan.expression.blendshapes
+============================
+
+.. automodule:: cutan.expression.blendshapes
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      from_blendshapes
+   

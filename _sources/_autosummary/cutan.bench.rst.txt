@@ -1,0 +1,19 @@
+cutan.bench
+===========
+
+.. automodule:: cutan.bench
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      REPO_ROOT
+      CUTOUT_FIXTURES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      run_bench
+   

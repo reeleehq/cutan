@@ -1,0 +1,21 @@
+cutan.characters.cli
+====================
+
+.. automodule:: cutan.characters.cli
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      add_gaze
+      add_views
+      capabilities
+      contract
+      mouths
+      new
+      preview
+      record
+      silhouette
+      validate
+   

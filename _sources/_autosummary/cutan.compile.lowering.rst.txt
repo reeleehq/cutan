@@ -1,0 +1,25 @@
+cutan.compile.lowering
+======================
+
+.. automodule:: cutan.compile.lowering
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      CHARACTERS_STORE
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      character_swap_declaration
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ExpressionLowering
+      PlayLowering
+   

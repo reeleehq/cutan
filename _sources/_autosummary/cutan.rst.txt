@@ -14,4 +14,29 @@
       ENTRY_POINT_VALUE
       RENDERER_NAME
       LIBRARY_NAME
+      REQUIRED_AN_API_LEVEL
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      require_an
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   audio
+   bench
+   characters
+   compile
+   conftest
+   expression
+   genre
+   impacts
+   library
+   nw
+   runtime
+   verify

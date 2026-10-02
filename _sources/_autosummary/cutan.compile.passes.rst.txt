@@ -1,0 +1,24 @@
+cutan.compile.passes
+====================
+
+.. automodule:: cutan.compile.passes
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DFLT_LEG_COLOUR
+      DFLT_PUPIL_COLOUR
+      COARTICULATION_ENABLED
+      PROCEDURAL_MOUTH_KEYS
+      EYE_NODE_NAMES
+      PUPIL_NODE_NAMES
+      GAZE_ELLIPSE_MARGIN
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      blink_phase
+   

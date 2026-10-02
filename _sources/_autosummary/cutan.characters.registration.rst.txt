@@ -1,0 +1,22 @@
+cutan.characters.registration
+=============================
+
+.. automodule:: cutan.characters.registration
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      default_play_extent
+      play
+      play_duration
+      read_play_md
+      write_play_md
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      PlayAction
+   

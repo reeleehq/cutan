@@ -9,10 +9,12 @@ leave `an`: rigged characters, faces and expressions, lip-sync visemes, swap
 sets and views, cut-out styles and impacts (ADR 0001 in `an`’s
 `misc/docs/adr/`, tracked by an#225 under the epic an#231).
 
-**Status: scaffold.** The cut-out code still lives inside `an` and is
-moved here in batches, expand -> migrate -> contract: each module arrives here,
-`an` keeps a deprecation re-export for one release, then drops it. Until the
-genre object itself moves, `an` ships it and this package registers nothing.
+Rigged characters (`cutan.characters`), faces (`cutan.expression`), impacts
+(`cutan.impacts`), the cut-out compile passes (`cutan.compile`), lip-sync
+providers (`cutan.audio`), the style lint (`cutan.verify`) and the genre object
+(`cutan.genre`) lived inside `an` until the P8 move (an#225); `an` keeps
+warning aliases at the old import paths. Install it with `pip install "an[cutout]"`;
+`an` finds it through the `an.genres` entry point.
 
 The identifiers below are the genre’s **persisted** names (ADR 0001 decision 9):
 they are written into documents, stores and entry-point metadata, and none of
@@ -29,13 +31,19 @@ them changes when code moves between distributions.
 
 ### Module Attributes
 
-| [`GENRE_NAME`](#cutan.GENRE_NAME)        | the `an.genres` entry-point name and the `nw` genre id.                                                                                  |
-|--------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
-| [`ENTRY_POINT_GROUP`](#cutan.ENTRY_POINT_GROUP) | The entry-point group `an.genres.load()` reads.                                                                                          |
-| [`ENTRY_POINT_NAME`](#cutan.ENTRY_POINT_NAME)  | the SAME name `an` declares today, so the handover is by name.                                                                           |
-| [`ENTRY_POINT_VALUE`](#cutan.ENTRY_POINT_VALUE) | Where the entry point will point once the genre object lives here.                                                                       |
-| [`RENDERER_NAME`](#cutan.RENDERER_NAME)     | The persisted renderer name of cut-out shots (`an.stage` claims it).                                                                     |
-| [`LIBRARY_NAME`](#cutan.LIBRARY_NAME)      | The package whose data root holds the genre's asset library and projects (`~/.local/share/cutan` by default; `CUTAN_HOME` overrides it). |
+| [`GENRE_NAME`](#cutan.GENRE_NAME)            | the `an.genres` entry-point name and the `nw` genre id.                                                                                                                                 |
+|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`ENTRY_POINT_GROUP`](#cutan.ENTRY_POINT_GROUP)     | The entry-point group `an.genres.load()` reads.                                                                                                                                         |
+| [`ENTRY_POINT_NAME`](#cutan.ENTRY_POINT_NAME)      | the name `an` used to declare for the in-distribution genre, so the handover was by name.                                                                                               |
+| [`ENTRY_POINT_VALUE`](#cutan.ENTRY_POINT_VALUE)     | Where the entry point points.                                                                                                                                                           |
+| [`RENDERER_NAME`](#cutan.RENDERER_NAME)         | The persisted renderer name of cut-out shots (`an.stage` claims it).                                                                                                                    |
+| [`LIBRARY_NAME`](#cutan.LIBRARY_NAME)          | The package whose data root holds the genre's asset library and projects (`~/.local/share/cutan` by default; `CUTAN_HOME` overrides it).                                                |
+| [`REQUIRED_AN_API_LEVEL`](#cutan.REQUIRED_AN_API_LEVEL) | The lowest `an.genres.API_LEVEL` this `cutan` runs against ("the lowest `an` it supports", ADR 0001 decision 8, said without a version pin: `an`'s version is assigned by CI at merge). |
+
+### Functions
+
+| [`require_an`](#cutan.require_an)()   | Refuse, with an upgrade hint, to load against an `an` older than this `cutan` needs.   |
+|-----------------------------------------------------------------|----------------------------------------------------------------------------------------|
 
 ### cutan.ENTRY_POINT_GROUP *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'an.genres'*
 
@@ -43,17 +51,15 @@ The entry-point group `an.genres.load()` reads.
 
 ### cutan.ENTRY_POINT_NAME *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'cutout_animation'*
 
-the SAME name `an`
-declares today, so the handover is by name. `an.genres` de-duplicates by
-entry-point name with `an`’s in-distribution declaration first, so while
-`an` still ships the genre, a declaration here is shadowed, never doubled.
+the name
+`an` used to declare for the in-distribution genre, so the handover was by name.
 
 * **Type:**
-  The entry-point name this distribution will declare
+  The entry-point name this distribution declares (`pyproject.toml`)
 
 ### cutan.ENTRY_POINT_VALUE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'cutan.genre:CUTOUT'*
 
-Where the entry point will point once the genre object lives here.
+Where the entry point points.
 
 ### cutan.GENRE_NAME *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'cutout_animation'*
 
@@ -70,3 +76,36 @@ The package whose data root holds the genre’s asset library and projects
 ### cutan.RENDERER_NAME *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'cutout'*
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
+
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 2*
+
+The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
+it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
+assigned by CI at merge). Level 2 is the move itself: `Genre.services`,
+`ActionKind.lowering`, `EntityKind.swap_declaration` and `an.stage.rig`.
+
+### cutan.require_an()
+
+Refuse, with an upgrade hint, to load against an `an` older than this `cutan` needs.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+```pycon
+>>> require_an()
+```
+
+### Modules
+
+| [`audio`](cutan.audio.md#module-cutan.audio)           | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.   |
+|-------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| [`bench`](cutan.bench.md#module-cutan.bench)           | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.       |
+| [`characters`](cutan.characters.md#module-cutan.characters) | Character art system: Spine-shaped descriptor + SVG sidecars.                                |
+| [`compile`](cutan.compile.md#module-cutan.compile)       | The cut-out genre's compile passes, their lowering hooks and the visuals of its runtime.     |
+| [`conftest`](cutan.conftest.md#module-cutan.conftest)     | Doctest collection for `cutan`: `nw` is an optional dependency of `cutan.nw` only.           |
+| [`expression`](cutan.expression.md#module-cutan.expression) | Facial expression for the cutout face (an#98, epic #9 Wave 6).                               |
+| [`genre`](cutan.genre.md#module-cutan.genre)           | The cut-out animation genre, declared as one object.                                         |
+| [`impacts`](cutan.impacts.md#module-cutan.impacts)       | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                |
+| [`library`](cutan.library.md#module-cutan.library)       | The character analyser: legs, arms, views and mouth chart, derived from the rig.             |
+| [`runtime`](cutan.runtime.md#module-cutan.runtime)       | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).    |
+| [`verify`](cutan.verify.md#module-cutan.verify)         | The cut-out style lint: measures a render against a named style spec.                        |

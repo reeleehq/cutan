@@ -1,0 +1,13 @@
+cutan.impacts.cli
+=================
+
+.. automodule:: cutan.impacts.cli
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      clip
+      clip_set
+   

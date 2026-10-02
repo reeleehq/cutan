@@ -1,0 +1,20 @@
+cutan.expression.presets
+========================
+
+.. automodule:: cutan.expression.presets
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      known_presets
+      mouth_form_of
+      preset_axes
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Preset
+   

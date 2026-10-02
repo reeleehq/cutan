@@ -1,0 +1,28 @@
+cutan.impacts.objects
+=====================
+
+.. automodule:: cutan.impacts.objects
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      IMPACT_OBJECTS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      ball
+      impact_object
+      stick
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ImpactObject
+      PropArt
+      StrokeChannel
+   

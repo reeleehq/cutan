@@ -1,0 +1,21 @@
+cutan.characters.colour\_roles
+==============================
+
+.. automodule:: cutan.characters.colour_roles
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      ColourRoles
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      normalise_hex
+      recolour_svg
+      role_recolouring
+      distinct_literal
+   

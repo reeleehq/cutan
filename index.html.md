@@ -2,33 +2,38 @@
 
 # cutan
 
-Cut-out animation for [`an`](https://github.com/thorwhalen/an): rigged characters, faces and expressions, lip-sync, swap sets and views, and cut-out styles, as a genre package that depends on the `an` core.
-
-**Status: scaffold.** The cut-out code still ships inside `an` and is moving here in batches ([thorwhalen/an#225](https://github.com/thorwhalen/an/issues/225), epic [thorwhalen/an#231](https://github.com/thorwhalen/an/issues/231)). Until then, install and use `an` as before:
+Cut-out animation for [`an`](https://github.com/thorwhalen/an): rigged characters, faces and expressions, lip-sync, swap sets and views, impacts, and cut-out styles, as a genre package on the `an` core.
 
 ```bash
-pip install "an[cutout]"
+pip install "an[cutout]"      # an + the stage + cutan
+an character new maya --offline
 ```
 
-That one command keeps working through the move: once the genre lives here, the `cutout` extra of `an` depends on `cutan`.
+`an` finds `cutan` through the `an.genres` entry point and loads it with `an.genres.load()` (the CLI and `an.load(project)` do). The scene format, rendering and the asset library are `an`’s; see its README.
 
-## What moves here
+## What is here
 
-`an` is the core of structured animation: scene documents, the timing kernel, renderers, audio, storage and verification. A *genre* adds what one kind of animation needs and registers it with the core through the `an.genres` entry point. `cutan` will register:
+`cutan` registers with the core:
 
-- the `character` entity kind, and the `play` and `expression` actions;
-- the rig, face, viseme, blink, gaze and swap-pose compile passes over the `an.stage` compiler;
-- the mouth and eye visuals of the stage runtime;
-- locomotion, speech, blink and turn methods with their requirements and defaults;
-- the cut-out vocabulary, the style specs and the style lint;
-- the `an character …` command namespace.
+- the `character` entity kind and the `play` and `expression` actions, the `[emotion]` dialogue sugar and the semantic checks that go with them (`cutan.genre`, `cutan.characters`, `cutan.expression`);
+- the rig, face, viseme, blink, gaze and swap-pose compile passes over the `an.stage` compiler (`cutan.compile`), and the mouth and eye visuals of the stage runtime (`cutan/runtime/visuals.js`);
+- the lip-sync providers `offline`, `rhubarb` and `whisper` (`cutan.audio`);
+- locomotion, speech, blink and turn methods with their requirements and defaults, and the cut-out vocabulary;
+- the `an character …` and `an impacts …` command namespaces;
+- the style lint (`python -m cutan.verify.style`) and the style specs of the `cutan-style` skill.
+
+The cut-out bench corpus (`misc/bench/`), `examples/` and the demo gallery (`misc/demos/`) live here too; `cutan.bench.run_bench()` runs the corpus through `an`’s bench runner.
 
 ## Names that never change
 
-The move renames nothing that is stored. Scenes keep `renderer: cutout`, the genre keeps its slug `cutout_animation`, character descriptors keep their document kind and version, and asset ids keep their `character.` prefix. These names are in `cutan/__init__.py`.
+Moving the code renamed nothing that is stored. Scenes keep `renderer: cutout`, the genre keeps its slug `cutout_animation`, character descriptors keep their document kind and version, and asset ids keep their `character.` prefix. These names are in `cutan/__init__.py`. The old `an.characters`, `an.expression`, `an.impacts`, `an.audio.offline_lipsync`-style import paths still work in `an`, with a `MovedModuleWarning`.
 
 ## Where data lives
 
 The genre’s asset library and agent-made projects live under `~/.local/share/cutan` by default. Set `CUTAN_HOME` to move them. The core’s own library (voices, sounds, fonts) stays under `an`’s root, and a project reads both as one search path.
+
+## Working on cutan
+
+Read `CLAUDE.md`. In short: `pip install -e . --no-deps` next to an editable `an`, then `pytest`. The tests that render need a headless browser (`playwright install chromium`) and `ffmpeg`.
 
 <p class="epythet-aggregates">This documentation as a single file: <a href="cutan.md">cutan.md</a> (Markdown, for agents).</p>

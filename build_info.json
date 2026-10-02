@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-01T20:26:50Z",
+  "built_at": "2026-10-02T04:20:19Z",
   "package": {
     "name": "cutan",
     "version": "0.0.1",
@@ -9,24 +9,24 @@
   },
   "git": {
     "available": true,
-    "commit": "a17fb7c03c316853ce30708c216a8a56c8cee7be",
-    "short_commit": "a17fb7c",
+    "commit": "e3091f6b22f7155755a7207071ecaf658e075279",
+    "short_commit": "e3091f6",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/cutan",
-    "commit_url": "https://github.com/thorwhalen/cutan/commit/a17fb7c03c316853ce30708c216a8a56c8cee7be",
+    "commit_url": "https://github.com/thorwhalen/cutan/commit/e3091f6b22f7155755a7207071ecaf658e075279",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/cutan",
-    "sha": "a17fb7c03c316853ce30708c216a8a56c8cee7be",
+    "sha": "e3091f6b22f7155755a7207071ecaf658e075279",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "36921393045",
-    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/36921393045",
+    "run_id": "36963923277",
+    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/36963923277",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -55,8 +55,8 @@
     "docs_dir": "docsrc"
   },
   "site": {
-    "modules_documented": 1,
-    "objects_documented": 6
+    "modules_documented": 52,
+    "objects_documented": 544
   },
   "pypi": {
     "checked": true,
@@ -64,7 +64,7 @@
     "relation": "unknown",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout a17fb7c03c316853ce30708c216a8a56c8cee7be\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout e3091f6b22f7155755a7207071ecaf658e075279\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

@@ -34,7 +34,7 @@
 <link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="../ai-agents.html" rel="next" title="For AI agents"/>
+<link href="cutan.audio.html" rel="next" title="cutan.audio"/>
 <link href="../api.html" rel="prev" title="API reference"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
@@ -82,7 +82,20 @@
 </nav><nav class="table w-full min-w-full my-6 lg:my-8">
 <ul class="current">
 <li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">cutan</a></li>
+<li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="current reference internal expandable" href="#">cutan<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-cloak="" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="cutan.audio.html">cutan.audio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.bench.html">cutan.bench</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.characters.html">cutan.characters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.compile.html">cutan.compile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.conftest.html">cutan.conftest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.expression.html">cutan.expression</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.genre.html">cutan.genre</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.impacts.html">cutan.impacts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.library.html">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.runtime.html">cutan.runtime</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.verify.html">cutan.verify</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
@@ -118,10 +131,12 @@ animation needs and registers it with the core; <code class="docutils literal no
 leave <code class="docutils literal notranslate"><span class="pre">an</span></code>: rigged characters, faces and expressions, lip-sync visemes, swap
 sets and views, cut-out styles and impacts (ADR 0001 in <code class="docutils literal notranslate"><span class="pre">an</span></code>’s
 <code class="docutils literal notranslate"><span class="pre">misc/docs/adr/</span></code>, tracked by an#225 under the epic an#231).</p>
-<p><strong>Status: scaffold.</strong> The cut-out code still lives inside <code class="docutils literal notranslate"><span class="pre">an</span></code> and is
-moved here in batches, expand -&gt; migrate -&gt; contract: each module arrives here,
-<code class="docutils literal notranslate"><span class="pre">an</span></code> keeps a deprecation re-export for one release, then drops it. Until the
-genre object itself moves, <code class="docutils literal notranslate"><span class="pre">an</span></code> ships it and this package registers nothing.</p>
+<p>Rigged characters (<code class="docutils literal notranslate"><span class="pre">cutan.characters</span></code>), faces (<code class="docutils literal notranslate"><span class="pre">cutan.expression</span></code>), impacts
+(<code class="docutils literal notranslate"><span class="pre">cutan.impacts</span></code>), the cut-out compile passes (<code class="docutils literal notranslate"><span class="pre">cutan.compile</span></code>), lip-sync
+providers (<code class="docutils literal notranslate"><span class="pre">cutan.audio</span></code>), the style lint (<code class="docutils literal notranslate"><span class="pre">cutan.verify</span></code>) and the genre object
+(<code class="docutils literal notranslate"><span class="pre">cutan.genre</span></code>) lived inside <code class="docutils literal notranslate"><span class="pre">an</span></code> until the P8 move (an#225); <code class="docutils literal notranslate"><span class="pre">an</span></code> keeps
+warning aliases at the old import paths. Install it with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">"an[cutout]"</span></code>;
+<code class="docutils literal notranslate"><span class="pre">an</span></code> finds it through the <code class="docutils literal notranslate"><span class="pre">an.genres</span></code> entry point.</p>
 <p>The identifiers below are the genre’s <strong>persisted</strong> names (ADR 0001 decision 9):
 they are written into documents, stores and entry-point metadata, and none of
 them changes when code moves between distributions.</p>
@@ -143,16 +158,27 @@ them changes when code moves between distributions.</p>
 <td><p>The entry-point group <code class="docutils literal notranslate"><span class="pre">an.genres.load()</span></code> reads.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.ENTRY_POINT_NAME" title="cutan.ENTRY_POINT_NAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ENTRY_POINT_NAME</span></code></a></p></td>
-<td><p>the SAME name <code class="docutils literal notranslate"><span class="pre">an</span></code> declares today, so the handover is by name.</p></td>
+<td><p>the name <code class="docutils literal notranslate"><span class="pre">an</span></code> used to declare for the in-distribution genre, so the handover was by name.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.ENTRY_POINT_VALUE" title="cutan.ENTRY_POINT_VALUE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ENTRY_POINT_VALUE</span></code></a></p></td>
-<td><p>Where the entry point will point once the genre object lives here.</p></td>
+<td><p>Where the entry point points.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.RENDERER_NAME" title="cutan.RENDERER_NAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RENDERER_NAME</span></code></a></p></td>
 <td><p>The persisted renderer name of cut-out shots (<code class="docutils literal notranslate"><span class="pre">an.stage</span></code> claims it).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.LIBRARY_NAME" title="cutan.LIBRARY_NAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LIBRARY_NAME</span></code></a></p></td>
 <td><p>The package whose data root holds the genre's asset library and projects (<code class="docutils literal notranslate"><span class="pre">~/.local/share/cutan</span></code> by default; <code class="docutils literal notranslate"><span class="pre">CUTAN_HOME</span></code> overrides it).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.REQUIRED_AN_API_LEVEL" title="cutan.REQUIRED_AN_API_LEVEL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REQUIRED_AN_API_LEVEL</span></code></a></p></td>
+<td><p>The lowest <code class="docutils literal notranslate"><span class="pre">an.genres.API_LEVEL</span></code> this <code class="docutils literal notranslate"><span class="pre">cutan</span></code> runs against ("the lowest <code class="docutils literal notranslate"><span class="pre">an</span></code> it supports", ADR 0001 decision 8, said without a version pin: <code class="docutils literal notranslate"><span class="pre">an</span></code>'s version is assigned by CI at merge).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.require_an" title="cutan.require_an"><code class="xref py py-obj docutils literal notranslate"><span class="pre">require_an</span></code></a>()</p></td>
+<td><p>Refuse, with an upgrade hint, to load against an <code class="docutils literal notranslate"><span class="pre">an</span></code> older than this <code class="docutils literal notranslate"><span class="pre">cutan</span></code> needs.</p></td>
 </tr>
 </tbody>
 </table>
@@ -164,20 +190,18 @@ them changes when code moves between distributions.</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="cutan.ENTRY_POINT_NAME">
 <span class="sig-prename descclassname"><span class="pre">cutan.</span></span><span class="sig-name descname"><span class="pre">ENTRY_POINT_NAME</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cutout_animation'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.ENTRY_POINT_NAME" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.ENTRY_POINT_NAME'">¶</a></dt>
-<dd><p>the SAME name <code class="docutils literal notranslate"><span class="pre">an</span></code>
-declares today, so the handover is by name. <code class="docutils literal notranslate"><span class="pre">an.genres</span></code> de-duplicates by
-entry-point name with <code class="docutils literal notranslate"><span class="pre">an</span></code>’s in-distribution declaration first, so while
-<code class="docutils literal notranslate"><span class="pre">an</span></code> still ships the genre, a declaration here is shadowed, never doubled.</p>
+<dd><p>the name
+<code class="docutils literal notranslate"><span class="pre">an</span></code> used to declare for the in-distribution genre, so the handover was by name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The entry-point name this distribution will declare</p>
+<dd class="field-odd"><p>The entry-point name this distribution declares (<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>)</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="cutan.ENTRY_POINT_VALUE">
 <span class="sig-prename descclassname"><span class="pre">cutan.</span></span><span class="sig-name descname"><span class="pre">ENTRY_POINT_VALUE</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cutan.genre:CUTOUT'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.ENTRY_POINT_VALUE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.ENTRY_POINT_VALUE'">¶</a></dt>
-<dd><p>Where the entry point will point once the genre object lives here.</p>
+<dd><p>Where the entry point points.</p>
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="cutan.GENRE_NAME">
@@ -200,6 +224,65 @@ entry-point name with <code class="docutils literal notranslate"><span class="pr
 <span class="sig-prename descclassname"><span class="pre">cutan.</span></span><span class="sig-name descname"><span class="pre">RENDERER_NAME</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cutout'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.RENDERER_NAME" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.RENDERER_NAME'">¶</a></dt>
 <dd><p>The persisted renderer name of cut-out shots (<code class="docutils literal notranslate"><span class="pre">an.stage</span></code> claims it).</p>
 </dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.REQUIRED_AN_API_LEVEL">
+<span class="sig-prename descclassname"><span class="pre">cutan.</span></span><span class="sig-name descname"><span class="pre">REQUIRED_AN_API_LEVEL</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">int</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.REQUIRED_AN_API_LEVEL" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.REQUIRED_AN_API_LEVEL'">¶</a></dt>
+<dd><p>The lowest <code class="docutils literal notranslate"><span class="pre">an.genres.API_LEVEL</span></code> this <code class="docutils literal notranslate"><span class="pre">cutan</span></code> runs against (“the lowest <code class="docutils literal notranslate"><span class="pre">an</span></code>
+it supports”, ADR 0001 decision 8, said without a version pin: <code class="docutils literal notranslate"><span class="pre">an</span></code>’s version is
+assigned by CI at merge). Level 2 is the move itself: <code class="docutils literal notranslate"><span class="pre">Genre.services</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ActionKind.lowering</span></code>, <code class="docutils literal notranslate"><span class="pre">EntityKind.swap_declaration</span></code> and <code class="docutils literal notranslate"><span class="pre">an.stage.rig</span></code>.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.require_an">
+<span class="sig-prename descclassname"><span class="pre">cutan.</span></span><span class="sig-name descname"><span class="pre">require_an</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan.html#require_an"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.require_an" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.require_an'">¶</a></dt>
+<dd><p>Refuse, with an upgrade hint, to load against an <code class="docutils literal notranslate"><span class="pre">an</span></code> older than this <code class="docutils literal notranslate"><span class="pre">cutan</span></code> needs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">require_an</span><span class="p">()</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<p class="rubric">Modules</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.audio.html#module-cutan.audio" title="cutan.audio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">audio</span></code></a></p></td>
+<td><p>The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.bench.html#module-cutan.bench" title="cutan.bench"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bench</span></code></a></p></td>
+<td><p>The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.characters.html#module-cutan.characters" title="cutan.characters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">characters</span></code></a></p></td>
+<td><p>Character art system: Spine-shaped descriptor + SVG sidecars.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.compile.html#module-cutan.compile" title="cutan.compile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compile</span></code></a></p></td>
+<td><p>The cut-out genre's compile passes, their lowering hooks and the visuals of its runtime.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.conftest.html#module-cutan.conftest" title="cutan.conftest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conftest</span></code></a></p></td>
+<td><p>Doctest collection for <code class="docutils literal notranslate"><span class="pre">cutan</span></code>: <code class="docutils literal notranslate"><span class="pre">nw</span></code> is an optional dependency of <code class="docutils literal notranslate"><span class="pre">cutan.nw</span></code> only.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.expression.html#module-cutan.expression" title="cutan.expression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expression</span></code></a></p></td>
+<td><p>Facial expression for the cutout face (an#98, epic #9 Wave 6).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.genre.html#module-cutan.genre" title="cutan.genre"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genre</span></code></a></p></td>
+<td><p>The cut-out animation genre, declared as one object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.impacts.html#module-cutan.impacts" title="cutan.impacts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">impacts</span></code></a></p></td>
+<td><p>Synthetic impact clips with exact ground truth, for scoring sub-frame timing.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.library.html#module-cutan.library" title="cutan.library"><code class="xref py py-obj docutils literal notranslate"><span class="pre">library</span></code></a></p></td>
+<td><p>The character analyser: legs, arms, views and mouth chart, derived from the rig.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.runtime.html#module-cutan.runtime" title="cutan.runtime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime</span></code></a></p></td>
+<td><p>JavaScript the cut-out genre adds to the stage runtime (<code class="docutils literal notranslate"><span class="pre">visuals.js</span></code>: the mouth and eye).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.verify.html#module-cutan.verify" title="cutan.verify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify</span></code></a></p></td>
+<td><p>The cut-out style lint: measures a render against a named style spec.</p></td>
+</tr>
+</tbody>
+</table>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
@@ -210,6 +293,8 @@ entry-point name with <code class="docutils literal notranslate"><span class="pr
 <li><a :data-current="activeSection === '#cutan.GENRE_NAME'" class="reference internal" href="#cutan.GENRE_NAME"><code class="docutils literal notranslate"><span class="pre">GENRE_NAME</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.LIBRARY_NAME'" class="reference internal" href="#cutan.LIBRARY_NAME"><code class="docutils literal notranslate"><span class="pre">LIBRARY_NAME</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.RENDERER_NAME'" class="reference internal" href="#cutan.RENDERER_NAME"><code class="docutils literal notranslate"><span class="pre">RENDERER_NAME</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.REQUIRED_AN_API_LEVEL'" class="reference internal" href="#cutan.REQUIRED_AN_API_LEVEL"><code class="docutils literal notranslate"><span class="pre">REQUIRED_AN_API_LEVEL</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.require_an'" class="reference internal" href="#cutan.require_an"><code class="docutils literal notranslate"><span class="pre">require_an()</span></code></a></li>
 </ul>
 </div>
 </aside>

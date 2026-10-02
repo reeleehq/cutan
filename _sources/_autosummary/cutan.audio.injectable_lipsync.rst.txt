@@ -1,0 +1,13 @@
+cutan.audio.injectable\_lipsync
+===============================
+
+.. automodule:: cutan.audio.injectable_lipsync
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      StaticWordTimings
+      WordTimingsLipSync
+   

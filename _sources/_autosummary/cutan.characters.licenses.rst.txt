@@ -1,0 +1,29 @@
+cutan.characters.licenses
+=========================
+
+.. automodule:: cutan.characters.licenses
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      FREE_PERSONAL_AND_COMMERCIAL
+      DICEBEAR_STYLE_LICENSES
+      NO_ATTRIBUTION_REQUIRED
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      attribution_for
+      dicebear_source
+      reconstruct_legacy_source
+      requires_acknowledgement
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      StyleLicense
+   

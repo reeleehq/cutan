@@ -1,4 +1,4 @@
-> built 2026-10-01 20:26 UTC from a17fb7c (main) · cutan 0.0.1. Details: build_info.json
+> built 2026-10-02 04:20 UTC from e3091f6 (main) · cutan 0.0.1. Details: build_info.json
 
 # index.html.md
 
@@ -6,36 +6,6579 @@
 
 # cutan
 
-Cut-out animation for [`an`](https://github.com/thorwhalen/an): rigged characters, faces and expressions, lip-sync, swap sets and views, and cut-out styles, as a genre package that depends on the `an` core.
-
-**Status: scaffold.** The cut-out code still ships inside `an` and is moving here in batches ([thorwhalen/an#225](https://github.com/thorwhalen/an/issues/225), epic [thorwhalen/an#231](https://github.com/thorwhalen/an/issues/231)). Until then, install and use `an` as before:
+Cut-out animation for [`an`](https://github.com/thorwhalen/an): rigged characters, faces and expressions, lip-sync, swap sets and views, impacts, and cut-out styles, as a genre package on the `an` core.
 
 ```bash
-pip install "an[cutout]"
+pip install "an[cutout]"      # an + the stage + cutan
+an character new maya --offline
 ```
 
-That one command keeps working through the move: once the genre lives here, the `cutout` extra of `an` depends on `cutan`.
+`an` finds `cutan` through the `an.genres` entry point and loads it with `an.genres.load()` (the CLI and `an.load(project)` do). The scene format, rendering and the asset library are `an`’s; see its README.
 
-## What moves here
+## What is here
 
-`an` is the core of structured animation: scene documents, the timing kernel, renderers, audio, storage and verification. A *genre* adds what one kind of animation needs and registers it with the core through the `an.genres` entry point. `cutan` will register:
+`cutan` registers with the core:
 
-- the `character` entity kind, and the `play` and `expression` actions;
-- the rig, face, viseme, blink, gaze and swap-pose compile passes over the `an.stage` compiler;
-- the mouth and eye visuals of the stage runtime;
-- locomotion, speech, blink and turn methods with their requirements and defaults;
-- the cut-out vocabulary, the style specs and the style lint;
-- the `an character …` command namespace.
+- the `character` entity kind and the `play` and `expression` actions, the `[emotion]` dialogue sugar and the semantic checks that go with them (`cutan.genre`, `cutan.characters`, `cutan.expression`);
+- the rig, face, viseme, blink, gaze and swap-pose compile passes over the `an.stage` compiler (`cutan.compile`), and the mouth and eye visuals of the stage runtime (`cutan/runtime/visuals.js`);
+- the lip-sync providers `offline`, `rhubarb` and `whisper` (`cutan.audio`);
+- locomotion, speech, blink and turn methods with their requirements and defaults, and the cut-out vocabulary;
+- the `an character …` and `an impacts …` command namespaces;
+- the style lint (`python -m cutan.verify.style`) and the style specs of the `cutan-style` skill.
+
+The cut-out bench corpus (`misc/bench/`), `examples/` and the demo gallery (`misc/demos/`) live here too; `cutan.bench.run_bench()` runs the corpus through `an`’s bench runner.
 
 ## Names that never change
 
-The move renames nothing that is stored. Scenes keep `renderer: cutout`, the genre keeps its slug `cutout_animation`, character descriptors keep their document kind and version, and asset ids keep their `character.` prefix. These names are in `cutan/__init__.py`.
+Moving the code renamed nothing that is stored. Scenes keep `renderer: cutout`, the genre keeps its slug `cutout_animation`, character descriptors keep their document kind and version, and asset ids keep their `character.` prefix. These names are in `cutan/__init__.py`. The old `an.characters`, `an.expression`, `an.impacts`, `an.audio.offline_lipsync`-style import paths still work in `an`, with a `MovedModuleWarning`.
 
 ## Where data lives
 
 The genre’s asset library and agent-made projects live under `~/.local/share/cutan` by default. Set `CUTAN_HOME` to move them. The core’s own library (voices, sounds, fonts) stays under `an`’s root, and a project reads both as one search path.
 
+## Working on cutan
+
+Read `CLAUDE.md`. In short: `pip install -e . --no-deps` next to an editable `an`, then `pytest`. The tests that render need a headless browser (`playwright install chromium`) and `ffmpeg`.
+
 <p class="epythet-aggregates">This documentation as a single file: <a href="cutan.md">cutan.md</a> (Markdown, for agents).</p>
+
+
+# _autosummary/cutan.audio.html.md
+
+# cutan.audio
+
+The cut-out genre’s lip-sync providers: letters, Rhubarb and word timings to mouth shapes.
+
+Moved from `an.audio` (an#225). `an.audio` keeps the protocols
+(`LipSyncProvider`, `VisemeTrack`),
+text-to-speech and the pipeline; a viseme only means something to a genre that
+draws mouths. The genre registers these by name as `lipsync.<name>` services
+([`cutan.genre`](_autosummary/cutan.genre.html.md#module-cutan.genre)), which is how `render(lipsync="offline")` and
+`an render --lipsync rhubarb` keep working.
+
+```pycon
+>>> offline_factory().name
+'offline'
+```
+
+### Functions
+
+| [`offline_factory`](_autosummary/cutan.audio.html.md#cutan.audio.offline_factory)(\*\*_)          | The deterministic char-to-viseme provider (the default).                        |
+|----------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| [`rhubarb_factory`](_autosummary/cutan.audio.html.md#cutan.audio.rhubarb_factory)(\*[, language]) | Rhubarb Lip Sync (needs the `rhubarb` binary); `language` picks its recognizer. |
+| [`whisper_factory`](_autosummary/cutan.audio.html.md#cutan.audio.whisper_factory)(\*\*_)          | Word timings from Whisper, distributed over the mouth shapes.                   |
+
+### Classes
+
+| [`OfflineLipSync`](_autosummary/cutan.audio.html.md#cutan.audio.OfflineLipSync)(\*[, char_to_viseme])             | Default lip-sync provider: deterministic char-to-viseme mapping.   |
+|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| [`RhubarbLipSync`](_autosummary/cutan.audio.html.md#cutan.audio.RhubarbLipSync)(\*[, binary_path, language, ...]) | Wrap the rhubarb CLI.                                              |
+| [`StaticWordTimings`](_autosummary/cutan.audio.html.md#cutan.audio.StaticWordTimings)(words, \*[, label])            | A `WordTimingProvider` over a fixed list of timings.               |
+| [`WhisperLipSync`](_autosummary/cutan.audio.html.md#cutan.audio.WhisperLipSync)(\*[, model_size, device, ...])    | faster-whisper word timestamps → visemes.                          |
+| [`WordTimingsLipSync`](_autosummary/cutan.audio.html.md#cutan.audio.WordTimingsLipSync)(provider, \*[, ...])          | `LipSyncProvider` driven by a `WordTimingProvider`.                |
+
+### *class* cutan.audio.OfflineLipSync(, char_to_viseme=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Default lip-sync provider: deterministic char-to-viseme mapping.
+
+Implements the `LipSyncProvider` protocol.
+
+### *class* cutan.audio.RhubarbLipSync(, binary_path=None, language='en', recognizer=None, timeout_s=60.0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Wrap the rhubarb CLI. Implements the `LipSyncProvider` protocol.
+
+```pycon
+>>> RhubarbLipSync(binary_path="/bin/rhubarb").recognizer
+'pocketSphinx'
+>>> RhubarbLipSync(binary_path="/bin/rhubarb", language="de").recognizer
+'phonetic'
+>>> RhubarbLipSync(binary_path="/bin/rhubarb", language="de").name
+'rhubarb:phonetic'
+```
+
+#### *property* uses_dialog_file *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Whether the chosen recognizer reads a transcript at all.
+
+### *class* cutan.audio.StaticWordTimings(words, , label='static')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A `WordTimingProvider` over a fixed list of timings.
+
+### *class* cutan.audio.WhisperLipSync(, model_size='tiny', device='cpu', compute_type='int8', char_to_viseme=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+faster-whisper word timestamps → visemes.
+
+Implements the `LipSyncProvider` protocol. The model is lazy-loaded on
+the first call (subsequent calls in the same process reuse the instance
+via the class-level `_model` cache).
+
+#### emits_word_timings *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+Whisper aligns from words, so the track carries them (an#96).
+
+### *class* cutan.audio.WordTimingsLipSync(provider, , char_to_viseme=None, convention='rhubarb', rest_viseme='X', min_gap_for_rest=0.2)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+`LipSyncProvider` driven by a `WordTimingProvider`.
+
+Skips transcription entirely. Use this when the caller already has
+authoritative word timings (e.g. from a separate lyric-alignment
+pipeline).
+
+* **Parameters:**
+  * **provider** (`WordTimingProvider`) – any `WordTimingProvider`.
+  * **char_to_viseme** ([`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – optional override of the character→viseme code
+    mapping; defaults to the one shared with
+    [`OfflineLipSync`](_autosummary/cutan.audio.html.md#cutan.audio.OfflineLipSync) / [`WhisperLipSync`](_autosummary/cutan.audio.html.md#cutan.audio.WhisperLipSync).
+  * **convention** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – declared viseme convention string for the produced
+    track. Defaults to `"rhubarb"` for compatibility with the
+    existing cutout adapter.
+  * **rest_viseme** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – code emitted in silent gaps. Defaults to
+    `_REST_VISEME`.
+  * **min_gap_for_rest** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – minimum inter-word silence (seconds) before
+    we insert a rest keyframe. Defaults to `0.20`.
+
+#### emits_word_timings *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+Built from words, so the track carries them (an#96).
+
+### cutan.audio.offline_factory(\*\*\_)
+
+The deterministic char-to-viseme provider (the default).
+
+* **Return type:**
+  [`OfflineLipSync`](_autosummary/cutan.audio.offline_lipsync.html.md#cutan.audio.offline_lipsync.OfflineLipSync)
+
+### cutan.audio.rhubarb_factory(, language='en', \*\*\_)
+
+Rhubarb Lip Sync (needs the `rhubarb` binary); `language` picks its recognizer.
+
+* **Return type:**
+  [`RhubarbLipSync`](_autosummary/cutan.audio.rhubarb_lipsync.html.md#cutan.audio.rhubarb_lipsync.RhubarbLipSync)
+
+### cutan.audio.whisper_factory(\*\*\_)
+
+Word timings from Whisper, distributed over the mouth shapes.
+
+* **Return type:**
+  [`WhisperLipSync`](_autosummary/cutan.audio.whisper_lipsync.html.md#cutan.audio.whisper_lipsync.WhisperLipSync)
+
+### Modules
+
+| [`injectable_lipsync`](_autosummary/cutan.audio.injectable_lipsync.html.md#module-cutan.audio.injectable_lipsync)   | Lip-sync provider that consumes pre-computed word timings.                      |
+|-------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| [`offline_lipsync`](_autosummary/cutan.audio.offline_lipsync.html.md#module-cutan.audio.offline_lipsync)         | OfflineLipSync — deterministic transcript → viseme track.                       |
+| [`rhubarb_lipsync`](_autosummary/cutan.audio.rhubarb_lipsync.html.md#module-cutan.audio.rhubarb_lipsync)         | RhubarbLipSync — calls the rhubarb-lip-sync binary for phoneme-aligned visemes. |
+| [`whisper_lipsync`](_autosummary/cutan.audio.whisper_lipsync.html.md#module-cutan.audio.whisper_lipsync)         | WhisperLipSync — faster-whisper word timestamps → viseme keyframes.             |
+
+
+# _autosummary/cutan.audio.injectable_lipsync.html.md
+
+# cutan.audio.injectable_lipsync
+
+Lip-sync provider that consumes pre-computed word timings.
+
+Useful when an upstream system already has authoritative word-level
+timings and would otherwise force `an` to re-transcribe the same
+audio. The canonical case is `muvid`, where the lyric → audio
+alignment store (`lacing`) is the SSOT and re-running
+`WhisperLipSync` on the audio produces a redundant (and possibly
+divergent) word-timestamp set.
+
+Two pieces:
+
+- [`StaticWordTimings`](_autosummary/cutan.audio.injectable_lipsync.html.md#cutan.audio.injectable_lipsync.StaticWordTimings) — a `WordTimingProvider` over a
+  fixed list of `(word, start, end)` tuples.
+- [`WordTimingsLipSync`](_autosummary/cutan.audio.injectable_lipsync.html.md#cutan.audio.injectable_lipsync.WordTimingsLipSync) — a `LipSyncProvider` that reads
+  from any `WordTimingProvider` and runs the same
+  word→viseme conversion as `WhisperLipSync` (via
+  `word_timings_to_visemes()`), so output is shape-compatible with
+  > the rest of the cutout pipeline.
+
+Drop-in usage:
+
+```default
+from cutan.audio.injectable_lipsync import (
+    StaticWordTimings, WordTimingsLipSync,
+)
+
+timings = [("hello", 0.5, 1.0), ("world", 1.2, 1.8)]
+lipsync = WordTimingsLipSync(StaticWordTimings(timings))
+track = lipsync.align(audio_clip, "hello world")
+```
+
+### Classes
+
+| [`StaticWordTimings`](_autosummary/cutan.audio.injectable_lipsync.html.md#cutan.audio.injectable_lipsync.StaticWordTimings)(words, \*[, label])   | A `WordTimingProvider` over a fixed list of timings.   |
+|------------------------------------------------------------------------------------------|--------------------------------------------------------|
+| [`WordTimingsLipSync`](_autosummary/cutan.audio.injectable_lipsync.html.md#cutan.audio.injectable_lipsync.WordTimingsLipSync)(provider, \*[, ...]) | `LipSyncProvider` driven by a `WordTimingProvider`.    |
+
+### *class* cutan.audio.injectable_lipsync.StaticWordTimings(words, , label='static')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A `WordTimingProvider` over a fixed list of timings.
+
+### *class* cutan.audio.injectable_lipsync.WordTimingsLipSync(provider, , char_to_viseme=None, convention='rhubarb', rest_viseme='X', min_gap_for_rest=0.2)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+`LipSyncProvider` driven by a `WordTimingProvider`.
+
+Skips transcription entirely. Use this when the caller already has
+authoritative word timings (e.g. from a separate lyric-alignment
+pipeline).
+
+* **Parameters:**
+  * **provider** (`WordTimingProvider`) – any `WordTimingProvider`.
+  * **char_to_viseme** ([`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – optional override of the character→viseme code
+    mapping; defaults to the one shared with
+    `OfflineLipSync` / `WhisperLipSync`.
+  * **convention** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – declared viseme convention string for the produced
+    track. Defaults to `"rhubarb"` for compatibility with the
+    existing cutout adapter.
+  * **rest_viseme** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – code emitted in silent gaps. Defaults to
+    `_REST_VISEME`.
+  * **min_gap_for_rest** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – minimum inter-word silence (seconds) before
+    we insert a rest keyframe. Defaults to `0.20`.
+
+#### emits_word_timings *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+Built from words, so the track carries them (an#96).
+
+
+# _autosummary/cutan.audio.offline_lipsync.html.md
+
+# cutan.audio.offline_lipsync
+
+OfflineLipSync — deterministic transcript → viseme track. No network, no binary.
+
+The default lip-sync provider for `an`. Maps each meaningful character of the
+transcript to a Rhubarb-convention viseme letter (A–H + X), then distributes
+keyframes evenly across the audio’s duration. Repeated visemes get collapsed
+into a single keyframe so the mouth doesn’t “stutter” on long vowel runs.
+
+Crude but visible. Use `RhubarbLipSync` for real phoneme alignment once
+you’ve installed the Rhubarb binary.
+
+```pycon
+>>> from an.audio.tts import AudioClip
+>>> ls = OfflineLipSync()
+>>> track = ls.align(AudioClip(duration=1.0, transcript="hello"), "hello")
+>>> track.convention
+'rhubarb'
+>>> track.duration
+1.0
+>>> len(track.visemes) >= 2
+True
+```
+
+### Classes
+
+| [`OfflineLipSync`](_autosummary/cutan.audio.offline_lipsync.html.md#cutan.audio.offline_lipsync.OfflineLipSync)(\*[, char_to_viseme])   | Default lip-sync provider: deterministic char-to-viseme mapping.   |
+|-----------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+
+### *class* cutan.audio.offline_lipsync.OfflineLipSync(, char_to_viseme=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Default lip-sync provider: deterministic char-to-viseme mapping.
+
+Implements the `LipSyncProvider` protocol.
+
+
+# _autosummary/cutan.audio.rhubarb_lipsync.html.md
+
+# cutan.audio.rhubarb_lipsync
+
+RhubarbLipSync — calls the rhubarb-lip-sync binary for phoneme-aligned visemes.
+
+Requires the `rhubarb` binary on PATH. macOS: `brew install rhubarb-lipsync`.
+Linux/Windows: download from the project’s GitHub releases.
+
+Falls back gracefully (raises a clear error) if the binary is missing — the
+default `OfflineLipSync` keeps the pipeline functional in the meantime.
+
+**The recognizer follows the language** (an#96, epic #9 defect 5a). Rhubarb has
+two: `pocketSphinx` — its default, “use for English recordings”, the only one
+that reads `--dialogFile` (it builds a dialog language model and mixes it 90/10
+with the default) — and `phonetic`, “use for non-English recordings”, which
+`UNUSED(dialog)``s the transcript at source. This module used to pass
+``-r phonetic` **and** `--dialogFile` unconditionally: English speech from an
+English transcript ran the language-independent recognizer and the transcript
+it wrote to disk was never read. Now `recognizer=None` (the default) resolves
+per `language` — `"en"` → `pocketSphinx` with the dialog file, anything
+else → `phonetic` and **no transcript is written** (a file nothing reads is a
+lie waiting for the next reader). An explicit `recognizer` still overrides.
+`name` carries the recognizer so the viseme cache key changes with it and no
+stale `phonetic` track replays.
+
+### Module Attributes
+
+| [`ENGLISH_LANGUAGES`](_autosummary/cutan.audio.rhubarb_lipsync.html.md#cutan.audio.rhubarb_lipsync.ENGLISH_LANGUAGES)   | The languages `pocketSphinx` (CMU Sphinx US English acoustic model) covers.   |
+|----------------------------------------------------------------------|-------------------------------------------------------------------------------|
+
+### Functions
+
+| [`recognizer_for`](_autosummary/cutan.audio.rhubarb_lipsync.html.md#cutan.audio.rhubarb_lipsync.recognizer_for)(language)   | The Rhubarb recognizer for a BCP-47 language tag (primary subtag only).   |
+|-----------------------------------------------------------------------------|---------------------------------------------------------------------------|
+
+### Classes
+
+| [`RhubarbLipSync`](_autosummary/cutan.audio.rhubarb_lipsync.html.md#cutan.audio.rhubarb_lipsync.RhubarbLipSync)(\*[, binary_path, language, ...])   | Wrap the rhubarb CLI.   |
+|-----------------------------------------------------------------------------------------------------|-------------------------|
+
+### cutan.audio.rhubarb_lipsync.ENGLISH_LANGUAGES *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'en'})*
+
+The languages `pocketSphinx` (CMU Sphinx US English acoustic model) covers.
+
+### *class* cutan.audio.rhubarb_lipsync.RhubarbLipSync(, binary_path=None, language='en', recognizer=None, timeout_s=60.0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Wrap the rhubarb CLI. Implements the `LipSyncProvider` protocol.
+
+```pycon
+>>> RhubarbLipSync(binary_path="/bin/rhubarb").recognizer
+'pocketSphinx'
+>>> RhubarbLipSync(binary_path="/bin/rhubarb", language="de").recognizer
+'phonetic'
+>>> RhubarbLipSync(binary_path="/bin/rhubarb", language="de").name
+'rhubarb:phonetic'
+```
+
+#### *property* uses_dialog_file *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Whether the chosen recognizer reads a transcript at all.
+
+### cutan.audio.rhubarb_lipsync.recognizer_for(language)
+
+The Rhubarb recognizer for a BCP-47 language tag (primary subtag only).
+
+Accepts the POSIX locale spelling too (`en_US`); an empty tag is refused
+rather than read as “non-English” (an#96 review).
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+```pycon
+>>> recognizer_for("en"), recognizer_for("en-GB"), recognizer_for("en_US"), recognizer_for("fr")
+('pocketSphinx', 'pocketSphinx', 'pocketSphinx', 'phonetic')
+```
+
+
+# _autosummary/cutan.audio.whisper_lipsync.html.md
+
+# cutan.audio.whisper_lipsync
+
+WhisperLipSync — faster-whisper word timestamps → viseme keyframes.
+
+Phase 9. Bridges the gap between deterministic `OfflineLipSync` (twitchy,
+char-distributed) and the system-binary-dependent `RhubarbLipSync`. Uses
+`faster-whisper` to transcribe the rendered audio into word-level
+timestamps, then distributes visemes within each word’s [start, end] span
+based on the word’s letter→viseme mapping (collapsed-duplicates).
+
+This gives ~75% of Rhubarb-quality lip-sync without any system binaries,
+just a ~75 MB model download (cached after first use).
+
+Trade-offs vs. OfflineLipSync:
+
+- **Better**: timing is locked to actual word boundaries. Mouth holds shape
+  through silent gaps between words instead of cycling through visemes.
+- **Same**: viseme codes per phoneme are still our simple letter mapping;
+  no IPA/ARPAbet awareness yet (that’s a future upgrade with cmudict).
+- **Cost**: ~3–5 seconds CPU inference for a 10s clip on first call;
+  subsequent calls in the same process re-use the cached model.
+
+### Classes
+
+| [`WhisperLipSync`](_autosummary/cutan.audio.whisper_lipsync.html.md#cutan.audio.whisper_lipsync.WhisperLipSync)(\*[, model_size, device, ...])   | faster-whisper word timestamps → visemes.   |
+|--------------------------------------------------------------------------------------------------|---------------------------------------------|
+
+### *class* cutan.audio.whisper_lipsync.WhisperLipSync(, model_size='tiny', device='cpu', compute_type='int8', char_to_viseme=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+faster-whisper word timestamps → visemes.
+
+Implements the `LipSyncProvider` protocol. The model is lazy-loaded on
+the first call (subsequent calls in the same process reuse the instance
+via the class-level `_model` cache).
+
+#### emits_word_timings *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+Whisper aligns from words, so the track carries them (an#96).
+
+
+# _autosummary/cutan.bench.html.md
+
+# cutan.bench
+
+The cut-out genre’s bench corpus: eight scenes that use characters, and their goldens.
+
+Moved from `an.bench.corpus` (an#225). The bench RUNNER stays in `an`
+(`an.bench.run.run_bench`); the scenes, their blessed golden frames and their
+ledger rows live in this repository’s `misc/bench/`. Run it from a source
+checkout of `cutan`:
+
+```pycon
+>>> sorted(CUTOUT_FIXTURES)[:3]
+['aa_probe', 'dialogue', 'expressions']
+```
+
+### Module Attributes
+
+| [`REPO_ROOT`](_autosummary/cutan.bench.html.md#cutan.bench.REPO_ROOT)       | The checkout whose `examples/` and `misc/bench/` hold the corpus.                                                                                                                                                      |
+|------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES) | the descriptor (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the procedural one (2.94% vs 0.24% of pixels under GPU-vs-software), so a procedural-only corpus under-reports the case that matters. |
+
+### Functions
+
+| [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
+|--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
+
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'eye', 'rect', 'mouth'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+
+the descriptor
+(SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
+procedural one (2.94% vs 0.24% of pixels under GPU-vs-software), so a
+procedural-only corpus under-reports the case that matters.
+
+The four scenes an#38 adds, each for a **measured** reason:
+
+- `graded_field` — a real gradient (98 distinct luma levels down the centre
+  column) over a large flat block. Banding has no edge in it, so every
+  edge-masked metric is blind to it; and the gradient itself sits OUTSIDE the
+  flat mask by construction (`flat_mask` demands a zero 4-neighbour delta),
+  which is why the scene carries a flat block too — measured 0.2795 of the
+  frame, against 0.0341 for a gradient alone.
+- `saturated_outline` — maximally saturated fills under a pure-black 12px
+  outline. The shipped examples are 31 colours on white and their measured
+  4:2:0 edge error is ~3x smaller, so the chroma metric under-reports exactly
+  the artefact class the epic cares about. Highest edge-mask fraction in the
+  corpus (0.0566).
+- `aa_probe` — three bars pinned at 7, 23 and 45 degrees. Axis-aligned
+  `drawRect` edges are bit-identical with MSAA on or off, so a corpus of
+  axis-aligned art cannot validate an AA metric at all. Measured under the
+  real AA lever (PixiJS `antialias: false`): `edge_transition_width`
+  2.9866 -> 2.0000 and `video_stream_bytes` **+6.1%**. That last number is
+  why this scene is load-bearing rather than decorative — on
+  `single_character` the same lever moves the bytes **-6.1%**, the opposite
+  of the declared direction, because AA-off on axis-aligned art removes
+  intermediate colours instead of creating a staircase. Family F is only an
+  honest witness for `disabled_aa` on a scene with non-axis-aligned edges.
+- `multi_shot` — two shots, so `an/render.py`’s `_ffmpeg_concat` is
+  exercised at all (a single-shot render short-circuits it to
+  `shutil.copy`) and `file_bytes` stops meaning two different things
+  depending on shot count. Its shot ids are `intro` then `beat`
+  **deliberately**: they sort the other way, so any code that recovers shot
+  order from the directory name instead of the timeline pairs source frames
+  against the wrong half of the concatenated video, and this fixture is what
+  notices.
+
+One measured fact that shapes the set: the \*\*descriptor path is nearly blind
+to the AA lever\*\* (96 differing pixels out of 12.4M on `promote_demo`),
+because MSAA applies to WebGL geometry and an SVG sprite is a pre-rasterised
+texture. So the descriptor scenes are in the corpus for the rasteriser
+sensitivity the cross-arch work measured, not as AA witnesses.
+The cut-out corpus (see the reasons per scene, which moved with them).
+
+* **Type:**
+  The corpus. One fixture per render path, deliberately both
+
+### cutan.bench.REPO_ROOT *: [Path](https://docs.python.org/3/library/pathlib.html#pathlib.Path)* *= PosixPath('/home/runner/work/cutan/cutan')*
+
+The checkout whose `examples/` and `misc/bench/` hold the corpus.
+
+### cutan.bench.run_bench(\*\*kwargs)
+
+`an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.
+
+
+# _autosummary/cutan.characters.brows.html.md
+
+# cutan.characters.brows
+
+Brow acting: where the brows can go, what may not draw there, and the `face.brows` capability.
+
+An expression acts largely with the brows (raised in surprise, knitted in
+anger, tilted in sorrow). A drawing that sits where the brows go — a hat brim
+pulled down over the forehead — leaves them nothing to read against, and the
+expression falls to the lids, the gaze and the mouth (an#252). So:
+
+- **The brows’ acting range** ([`brow_range()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_range)) is measured, not assumed:
+  the factory’s brow drawing, posed by every shipped expression preset through
+  the default expression binding (its travel and its signs), on every view
+  that shows a brow, at the character’s head scale — in the offline head’s
+  drawing units, so it can be compared with what the head draws.
+- **A hat is seated above that range** ([`seat_above_brows()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.seat_above_brows)): lifted, and
+  if its crown would leave the drawing, flattened toward its crown, by one
+  transform shared by every view so the hat does not change shape as the
+  character turns. When even the flattest seat still overlaps — a small head
+  under a tall hat — the overlap is not hidden: the factory records it in the
+  descriptor’s `occluded` (a declared fact, written by whoever KNOWS the
+  geometry, like `colour_roles`).
+- **\`\`face.brows\`\`** is the capability the character analyser
+  ([`cutan.library`](_autosummary/cutan.library.html.md#module-cutan.library)) derives with [`brow_affordance()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_affordance): two brow
+  slots with art on an overlay face, and nothing recorded over them. The cut-out genre’s `expression` aspect
+  requires it for its full-face method ([`cutan.characters.methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)).
+
+Hair is not measured here: the brows’ outer ends meet the hairline by design
+(the default hair has always run under them), so a hair style is held to the
+default hairline instead (tests), never to the brows’ range.
+
+Units: the offline head is drawn in an [`HEAD_ART_SIZE`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.HEAD_ART_SIZE) square; the rig
+draws it [`REFERENCE_HEAD_HEIGHT`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.REFERENCE_HEAD_HEIGHT) × `head_scale`
+view-box units tall, hung from the neck at
+[`HEAD_ANCHOR`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.HEAD_ANCHOR). The face offsets scale with the head
+(`_scale_face`), so a brow’s rest place in head units does not depend on the
+head scale; its expression travel does (`BROW_HEIGHT_TRAVEL` is a view-box
+length), which is why a small head’s brows reach higher up its forehead.
+
+A surprised brow reaches about three head units above its rest, less on a
+bigger head; a band drawn across the forehead is lifted clear of it:
+
+```pycon
+>>> round(BROW_REST_TOP, 1)
+22.8
+>>> [round(min(brow_range(head_scale=s)["front"].values()), 1) for s in (1.0, 1.7)]
+[19.5, 20.3]
+>>> seat_above_brows({"front": '<rect x="20" y="20" width="40" height="4"/>'}, head_scale=1.0)
+Seat(transform='translate(0 -5.47)', covers=False)
+```
+
+### Module Attributes
+
+| [`HEAD_ART_SIZE`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.HEAD_ART_SIZE)      | The offline head's drawing is this many units square (its `viewBox`).                                                                                  |
+|---------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`BROW_CANVAS`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.BROW_CANVAS)        | its canvas (view-box units at head scale 1), the stroke, and how far each end tilts from the level.                                                    |
+| [`BROWS_FEATURE`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.BROWS_FEATURE)      | The face features a drawing can be recorded as covering (`occluded` keys).                                                                             |
+| [`HAT_BROW_CLEARANCE`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.HAT_BROW_CLEARANCE) | Head units left between a hat's lowest ink and the brows' highest reach — about the outline's width, so a raised brow never touches the brim's line.   |
+| [`HAT_CROWN_MIN_Y`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.HAT_CROWN_MIN_Y)    | How high a lifted hat's crown may go (head units from the drawing's top edge): above it the crown would be clipped by the head's canvas.               |
+| [`HAT_MIN_FLATTEN`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.HAT_MIN_FLATTEN)    | The flattest a hat is drawn (its height kept, as a fraction) to seat it above the brows; past it the hat keeps this shape and the overlap is recorded. |
+
+### Functions
+
+| [`brow_affordance`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_affordance)(desc, drawn)                       | `face.brows`'s params for a descriptor whose drawn slots are `drawn`, or `None`.   |
+|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| [`brow_slots`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_slots)(desc)                                   | The slots the character's own expression binding moves on a brow axis.             |
+| [`brow_path_d`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_path_d)(side)                                  | The path of the factory's brow on `side` (`l` or `r`) in its canvas.               |
+| [`brow_range`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_range)(\*[, head_scale, views, presets])       | `{view: {column: top}}`: the highest the brows' ink reaches, per head-unit column. |
+| [`ink_columns`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.ink_columns)(discs)                                 | `{column: (top, bottom)}` of ink, per head-unit column (`round(x)`).               |
+| [`seat_above_brows`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.seat_above_brows)(fragments, \*[, head_scale, ...]) | Seat a hat, drawn as `{view: svg fragment}` in head units, above the brows' range. |
+
+### Classes
+
+| [`Seat`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.Seat)([transform, covers])   | Where a hat is drawn: `transform` (`None`: where it was drawn) and whether it still covers the brows' range there (`covers`).   |
+|------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+
+### cutan.characters.brows.BROWS_FEATURE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'brows'*
+
+The face features a drawing can be recorded as covering (`occluded` keys).
+
+### cutan.characters.brows.BROW_CANVAS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]* *= (80, 24)*
+
+its canvas (view-box units at head scale 1),
+the stroke, and how far each end tilts from the level.
+
+* **Type:**
+  The factory’s brow drawing
+
+### cutan.characters.brows.HAT_BROW_CLEARANCE *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 1.0*
+
+Head units left between a hat’s lowest ink and the brows’ highest reach —
+about the outline’s width, so a raised brow never touches the brim’s line.
+
+### cutan.characters.brows.HAT_CROWN_MIN_Y *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+
+How high a lifted hat’s crown may go (head units from the drawing’s top
+edge): above it the crown would be clipped by the head’s canvas.
+
+### cutan.characters.brows.HAT_MIN_FLATTEN *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.6*
+
+The flattest a hat is drawn (its height kept, as a fraction) to seat it
+above the brows; past it the hat keeps this shape and the overlap is recorded.
+
+### cutan.characters.brows.HEAD_ART_SIZE *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 80.0*
+
+The offline head’s drawing is this many units square (its `viewBox`).
+
+### *class* cutan.characters.brows.Seat(transform=None, covers=False)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Where a hat is drawn: `transform` (`None`: where it was drawn) and
+whether it still covers the brows’ range there (`covers`).
+
+### cutan.characters.brows.brow_affordance(desc, drawn)
+
+`face.brows`’s params for a descriptor whose drawn slots are `drawn`, or `None`.
+
+Afforded when the face is an overlay (`face_overlay`), the binding moves
+a brow ([`brow_slots()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_slots)) and every slot it moves on a brow axis has
+art, and the descriptor records nothing over the brows (`occluded`).
+The slots are the solver’s own binding’s, so the capability and the solver
+cannot disagree about which slots act.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+```pycon
+>>> from cutan.characters.schema import CharacterDescriptor
+>>> d = CharacterDescriptor(name="c")
+>>> brow_affordance(d, {"left_brow": {"brow_l"}, "right_brow": {"brow_r"}})
+{'slots': ['left_brow', 'right_brow']}
+>>> d.occluded = {"brows": "a helmet"}
+>>> brow_affordance(d, {"left_brow": {"brow_l"}, "right_brow": {"brow_r"}}) is None
+True
+```
+
+### cutan.characters.brows.brow_path_d(side)
+
+The path of the factory’s brow on `side` (`l` or `r`) in its canvas.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+```pycon
+>>> brow_path_d("l")
+'M 8 16 Q 40 4 72 8'
+```
+
+### cutan.characters.brows.brow_range(, head_scale=1.0, views=('front', 'three_quarter', 'side'), presets=None)
+
+`{view: {column: top}}`: the highest the brows’ ink reaches, per head-unit column.
+
+Every shipped expression preset (or `presets`), at full intensity, posed
+through the default binding on each brow the view shows (its turnaround
+pose: shifted, narrowed, or hidden) — the region a cover must stay above
+for the presets to read.
+The range is bounded by the PRESETS, not by the axes’ full box: an
+`axes:` override at the corner (height 1, a full tilt) or two summed
+spans can reach past it (review-278 L1).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
+### cutan.characters.brows.brow_slots(desc)
+
+The slots the character’s own expression binding moves on a brow axis.
+
+The binding the solver uses ([`binding_for()`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.binding_for):
+the declared `expression_binding`, else the default one), so a rig whose
+brows live on slots of its own naming is read as having brows, and one
+whose declared binding moves no brow is read as having none. A binding
+that does not resolve moves nothing (`an validate` reports it).
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> from cutan.characters.schema import CharacterDescriptor
+>>> brow_slots(CharacterDescriptor(name="c"))
+['left_brow', 'right_brow']
+```
+
+### cutan.characters.brows.ink_columns(discs)
+
+`{column: (top, bottom)}` of ink, per head-unit column (`round(x)`).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
+```pycon
+>>> ink_columns([(10.2, 5.0, 0.0), (10.4, 7.0, 0.0)])
+{10: (5.0, 7.0)}
+```
+
+### cutan.characters.brows.seat_above_brows(fragments, , head_scale=1.0, clearance=1.0, crown_min_y=0.5, min_flatten=0.6)
+
+Seat a hat, drawn as `{view: svg fragment}` in head units, above the brows’ range.
+
+No transform when it already clears them by `clearance`. Else it is
+lifted — as far as its crown may go (`crown_min_y`) — and, if that is
+not enough, flattened toward its crown, never below `min_flatten` of its
+height; one transform for every view. `covers` says the seat found still
+overlaps the range (it never claims a clearance it did not measure).
+
+* **Return type:**
+  [`Seat`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.Seat)
+
+
+# _autosummary/cutan.characters.checks.html.md
+
+# cutan.characters.checks
+
+The cut-out genre’s semantic checks: `play`, `expression`, turns, views and character refs.
+
+Moved from `an.ir.validate` (an#225, an#246): the core’s validator runs whatever checks a genre registers
+(`cutan.genre.CUTOUT`), and these are the cut-out ones.
+
+### Functions
+
+| [`check_character_refs`](_autosummary/cutan.characters.checks.html.md#cutan.characters.checks.check_character_refs)(ctx)              | The cut-out genre's missing-character warning.                              |
+|-----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| [`check_expression_actions`](_autosummary/cutan.characters.checks.html.md#cutan.characters.checks.check_expression_actions)(ctx)          | The cut-out genre's `expression` / `[emotion]` check.                       |
+| [`check_hidden_mouth_while_speaking`](_autosummary/cutan.characters.checks.html.md#cutan.characters.checks.check_hidden_mouth_while_speaking)(ctx) | The cut-out genre's mouth-hidden-by-a-view warning.                         |
+| [`check_play_actions`](_autosummary/cutan.characters.checks.html.md#cutan.characters.checks.check_play_actions)(ctx)                | The cut-out genre's `play` check (`_check_play_actions()`).                 |
+| [`check_turns`](_autosummary/cutan.characters.checks.html.md#cutan.characters.checks.check_turns)(ctx)                       | The cut-out genre's contradicted-turn warning (`_check_turns()`).           |
+| [`check_view_continuity`](_autosummary/cutan.characters.checks.html.md#cutan.characters.checks.check_view_continuity)(ctx)             | The cut-out genre's view-across-a-cut warning (`_check_view_continuity()`). |
+
+### Classes
+
+| [`CharacterSwapChecks`](_autosummary/cutan.characters.checks.html.md#cutan.characters.checks.CharacterSwapChecks)()   | The `character` entity kind's swap-reference checks (`EntityKind.swap_checks`).   |
+|--------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+
+### *class* cutan.characters.checks.CharacterSwapChecks
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+The `character` entity kind’s swap-reference checks (`EntityKind.swap_checks`).
+
+#### *static* missing_set_hint(prop)
+
+What to add to “names no declared asset set” for a missing `view` set.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+#### *static* whole_entity(action, desc, prop, keys, entity_id, , where, report, art_exists)
+
+A swap on the character ITSELF is judged slot by slot (an#197, an#201).
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+### cutan.characters.checks.check_character_refs(ctx)
+
+The cut-out genre’s missing-character warning. A WARNING: the compiler
+falls back to the built-in placeholder rig and the scene still renders.
+Deliberately not escalated — an asset-less project rendering placeholders
+is a supported way to work.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.checks.check_expression_actions(ctx)
+
+The cut-out genre’s `expression` / `[emotion]` check.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.checks.check_hidden_mouth_while_speaking(ctx)
+
+The cut-out genre’s mouth-hidden-by-a-view warning.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.checks.check_play_actions(ctx)
+
+The cut-out genre’s `play` check (`_check_play_actions()`).
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.checks.check_turns(ctx)
+
+The cut-out genre’s contradicted-turn warning (`_check_turns()`).
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.checks.check_view_continuity(ctx)
+
+The cut-out genre’s view-across-a-cut warning (`_check_view_continuity()`).
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+
+# _autosummary/cutan.characters.cli.html.md
+
+# cutan.characters.cli
+
+User-facing character CLI subcommands.
+
+Wired into the top-level `an` dispatcher via `character_*` dispatch-friendly
+functions in `an.tools`. Each function here takes plain strings/bools
+and returns a string for terminal display.
+
+Subcommands (used as `an character <verb> ...`):
+
+- `new`       — generate a fresh character from DiceBear or fallback art.
+- `add-views` — give an offline character its turnaround (an#197).
+- `mouths`    — regenerate the 9-shape default mouth set.
+- `validate`  — completeness check.
+- `capabilities` — what it affords, and per aspect which methods apply (an#248).
+- `silhouette`— rasterize silhouettes; for two characters, also IoU.
+- `preview`   — open an HTML viewer cycling visemes + idle animation.
+
+### Functions
+
+| [`add_gaze`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.add_gaze)(name[, out_dir, overwrite_eyes])         | Give `name` the eye stack (an#99): sclera and pupil slots under each lid, a filled closed lid, and the `gaze_travel` clamp — so `gaze_x` / `gaze_y` and the ambient saccades move its pupils.   |
+|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`add_views`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.add_views)(name[, out_dir])                        | Give `name` its turnaround (an#197): back, side and three-quarter head and torso art, a `view` swap set, and a pose per view — so `play: turn` and `set <name> view <key>` turn it.             |
+| [`capabilities`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.capabilities)(name[, out_dir, as_json])            | What a character affords, and per aspect which methods apply and what the rest lack.                                                                                                            |
+| [`contract`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.contract)()                                        | Print the art-package contract an illustrator must satisfy.                                                                                                                                     |
+| [`mouths`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.mouths)(name[, out_dir, palette, variants])        | Regenerate the default 9-shape mouth set for `name`, plus its `viseme@<form>` variants, and declare them in the descriptor.                                                                     |
+| [`new`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.new)(name[, out_dir, seed, style, voice_ref, ...]) | Create a new character at `out_dir`/`name`.                                                                                                                                                     |
+| [`preview`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.preview)(name[, out_dir, open_browser])            | Render a small HTML viewer that previews all visemes + idle animation.                                                                                                                          |
+| [`record`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.record)(name[, out_dir, output, duration, ...])    | Record a character's preview HTML to mp4.                                                                                                                                                       |
+| [`silhouette`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.silhouette)(name[, other, out_dir, output, size])  | Render a black silhouette for `name` (and optionally compare to `other`).                                                                                                                       |
+| [`validate`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.validate)(name[, out_dir])                         | Validate a character's directory structure and descriptor.                                                                                                                                      |
+
+### cutan.characters.cli.add_gaze(name, out_dir='', overwrite_eyes=False)
+
+Give `name` the eye stack (an#99): sclera and pupil slots under each
+lid, a filled closed lid, and the `gaze_travel` clamp — so `gaze_x` /
+`gaze_y` and the ambient saccades move its pupils. The expand step for a
+character made before Wave 6; idempotent on one that has it.
+
+name: character id
+out_dir: parent directory; defaults to ./assets/characters
+overwrite_eyes: replace hand-drawn eye parts with the synthesized outline
+
+> and filled lid (refused otherwise — a promoted rig’s eyes are not the
+> factory’s to redraw)
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.add_views(name, out_dir='')
+
+Give `name` its turnaround (an#197): back, side and three-quarter head
+and torso art, a `view` swap set, and a pose per view — so `play: turn`
+and `set <name> view <key>` turn it. The expand step for an offline
+character made before views; idempotent. Refused for a DiceBear head or a
+hand-drawn rig, whose views are an illustrator’s to draw.
+
+name: character id
+out_dir: parent directory; defaults to ./assets/characters
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.capabilities(name, out_dir='', as_json=False)
+
+What a character affords, and per aspect which methods apply and what the rest lack.
+
+The affordances are derived from `character.json` and the art files
+present (ADR 0002 decision 2), with the declared overrides it used; per
+aspect (`locomotion`, `speech`, …) the method the default chain picks,
+the methods that apply, and for each other method the missing capabilities
+with the remedy that would add them.
+
+name: character id
+out_dir: parent directory; defaults to ./assets/characters
+as_json: print the answer as JSON (what the MCP surface returns)
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.contract()
+
+Print the art-package contract an illustrator must satisfy.
+
+**Derived from the schema and the validator, never hand-written**, so it
+cannot drift from what `an character validate` actually enforces — a
+contract that disagrees with its checker is worse than none, because it
+gets a human paid for work that cannot land.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.mouths(name, out_dir='', palette='', variants='happy,sad')
+
+Regenerate the default 9-shape mouth set for `name`, plus its
+`viseme@<form>` variants, and declare them in the descriptor.
+
+Useful when you want to reset a character’s mouth art to the offline
+fallback (e.g. after experimenting with hand-drawn mouths), or to give a
+pre-an#98 character the variant sets its expressions prefer.
+
+name: character id
+out_dir: parent directory; defaults to ./assets/characters
+palette: optional JSON string to override colors, e.g. ‘{“lip”:”#a44”}’
+variants: comma-separated mouth forms (see `an character new`); “” = none
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.new(name, out_dir='', seed='', style='lorelei', voice_ref='', offline=False, acknowledge_attribution=False, overwrite=False, mouth_variants='happy,sad', palette='', build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short')
+
+Create a new character at `out_dir`/`name`.
+
+name: character id (used as the directory name and descriptor ‘name’)
+out_dir: parent directory; defaults to ./assets/characters
+seed: deterministic seed for DiceBear; defaults to `name`
+style: DiceBear style. The default is CC0 — no attribution duty. Some styles
+
+> are CC BY 4.0 and oblige whoever ships the video to credit the artist;
+> those need –acknowledge-attribution. Run `an credits <project>` to see
+> what a project owes.
+
+voice_ref: voice id stored in the descriptor’s `voice_ref` field
+offline: skip DiceBear and use the deterministic geometric fallback
+acknowledge_attribution: accept the attribution duty of a CC BY style
+overwrite: replace an existing directory at the target
+mouth_variants: comma-separated mouth forms to draw as `viseme@<form>`
+
+> sets (an#98) — a form an expression preset prefers (happy, sad, angry,
+> surprised, afraid, disgusted); “” for the neutral set only
+
+palette: colours by StylePack role, “skin=#f1c9a5,clothing=#2e7d4f” (or a
+: JSON object); roles: skin, hair, clothing, leg, accessory
+
+build: body proportions — regular, squat (round body, short legs), tall,
+: stick (small blocky body, stick limbs)
+
+head_scale: the head and its whole face scaled together (1.0 = regular)
+hat: none, cap, beanie, bowler or bicorne (offline head only), in the
+
+> accessory colour, worn above the brows so expressions read (a hat that
+> cannot clear them on a very small head is recorded, and
+> `an character capabilities` says the brows cannot act)
+
+hair_style: peak (the default), bald, bun or curly (offline head only),
+: in the hair colour
+
+hair_length: short (the default), medium (to the jaw) or long (past the
+: chin) (offline head only); bald takes short
+
+sash: a diagonal band across the torso, in the accessory colour
+views: draw the turnaround — back, side (a profile facing right) and
+
+> three_quarter beside the front, as a `view` swap set (offline head
+> only), so `play: turn` can turn the character (an#197)
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.preview(name, out_dir='', open_browser=False)
+
+Render a small HTML viewer that previews all visemes + idle animation.
+
+The page includes the head SVG, cycles through `mouth_a … mouth_x`
+once a second, and shows a ±2 px sine-wave breath on the head. Useful
+for eyeballing a character’s mouth set before integrating into the
+main runtime.
+
+name: character id
+out_dir: parent directory; defaults to ./assets/characters
+open_browser: also open the file in the default browser
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.record(name, out_dir='', output='', duration=8.0, width=640, height=480)
+
+Record a character’s preview HTML to mp4.
+
+Real video file showing the new SVG character art animating: cycles
+through all 9 visemes and applies the breath/head-tilt animation.
+
+name: character id
+out_dir: parent directory; defaults to ./assets/characters
+output: output mp4 path; defaults to <character_dir>/preview.mp4
+duration: recording length in seconds (default 8)
+width / height: video resolution (default 640x480)
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.silhouette(name, other='', out_dir='', output='', size=512)
+
+Render a black silhouette for `name` (and optionally compare to `other`).
+
+When two names are given, prints both silhouettes’ paths and an IoU
+score (0..1; lower means more visually distinct).
+
+name: character id
+other: optional second character to compare against
+out_dir: parent directory; defaults to ./assets/characters
+output: output PNG path; defaults to <character_dir>/silhouette.png
+size: square output size in pixels (default 512)
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.validate(name, out_dir='')
+
+Validate a character’s directory structure and descriptor.
+
+name: character id
+out_dir: parent directory; defaults to ./assets/characters
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+
+# _autosummary/cutan.characters.colour_roles.html.md
+
+# cutan.characters.colour_roles
+
+Colour roles: which colour literal in which part is skin, clothing, hair…
+
+A `StylePack` maps a role to a colour. For the procedural rig the compiler
+decides every colour, so the mapping is a lookup. For SVG art the colours live
+inside the drawings, and a pack could only reach them by guessing which literal
+means what — inferring a role from a pixel, which is what produced an#99’s
+wrong-tone lid. So the roles are recorded at the SOURCE instead: the character
+factory knows which fill it drew as skin and which as clothing, and it writes
+that down in the descriptor’s `colour_roles`:
+
+```default
+{"parts/torso.svg": {"#a83249": "clothing", "#3b2a1a": "hair"}}
+```
+
+This is **palette swapping**, the indexed-colour technique 2D games have used
+since sprites: a part is keyed by the literal it was drawn in, and a swap
+rewrites that literal. Keyed per PART, not per character, because one literal
+can mean two things in two drawings (the default pupil and a near-black hair
+are both `#1a1a1a`). The one limit it inherits is the classic one: within a
+single part, two roles must be drawn in two distinct literals — the factory
+guarantees it ([`distinct_literal()`](_autosummary/cutan.characters.colour_roles.html.md#cutan.characters.colour_roles.distinct_literal)), and an illustrator tagging their own
+art is told so by the descriptor validator.
+
+The compiler applies it ([`recolour_svg()`](_autosummary/cutan.characters.colour_roles.html.md#cutan.characters.colour_roles.recolour_svg)) at compile time: the tagged
+part’s SVG text is rewritten, and the result becomes a new, content-addressed
+inline texture. Art with no roles — hand-drawn, DiceBear — is untouched, and
+the compiler says so.
+
+```pycon
+>>> recolour_svg('<rect fill="#A83249" stroke="#222"/>', {"#a83249": "#123456"})
+'<rect fill="#123456" stroke="#222"/>'
+```
+
+### Module Attributes
+
+| [`ColourRoles`](_autosummary/cutan.characters.colour_roles.html.md#cutan.characters.colour_roles.ColourRoles)   | `{part path: {"#rrggbb": role}}` — the descriptor field's shape.   |
+|----------------------------------------------------------------|--------------------------------------------------------------------|
+
+### Functions
+
+| [`normalise_hex`](_autosummary/cutan.characters.colour_roles.html.md#cutan.characters.colour_roles.normalise_hex)(colour)               | `'#ABC'` -> `'#aabbcc'`: the one spelling a literal is keyed by.                                                              |
+|--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| [`recolour_svg`](_autosummary/cutan.characters.colour_roles.html.md#cutan.characters.colour_roles.recolour_svg)(svg, swaps)            | `svg` with every paint use of an old literal replaced by its new one.                                                         |
+| [`role_recolouring`](_autosummary/cutan.characters.colour_roles.html.md#cutan.characters.colour_roles.role_recolouring)(roles, colour_for) | `{old literal: new colour}` for the roles `colour_for` sets.                                                                  |
+| [`distinct_literal`](_autosummary/cutan.characters.colour_roles.html.md#cutan.characters.colour_roles.distinct_literal)(colour, taken)     | `colour`, nudged by the smallest step until no literal in `taken` has it — the one rule palette swapping needs within a part. |
+
+### cutan.characters.colour_roles.ColourRoles
+
+`{part path: {"#rrggbb": role}}` — the descriptor field’s shape.
+
+alias of [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
+
+### cutan.characters.colour_roles.distinct_literal(colour, taken)
+
+`colour`, nudged by the smallest step until no literal in `taken`
+has it — the one rule palette swapping needs within a part.
+
+Two roles drawn in one literal cannot be told apart by a swap, and neither
+can a role and an untagged detail (a shoe, an outline) that happens to share
+it. One step in one channel is invisible and makes the key exact.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+```pycon
+>>> distinct_literal("#222222", {"#222222"})
+'#222223'
+>>> distinct_literal("#ffffff", {"#ffffff", "#fffffe"})
+'#fffffd'
+>>> distinct_literal("#123456", {"#abcdef"})
+'#123456'
+```
+
+### cutan.characters.colour_roles.normalise_hex(colour)
+
+`'#ABC'` -> `'#aabbcc'`: the one spelling a literal is keyed by.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+```pycon
+>>> normalise_hex("#A83249"), normalise_hex("#fa0")
+('#a83249', '#ffaa00')
+>>> normalise_hex("red")
+Traceback (most recent call last):
+...
+ValueError: 'red' is not a #rgb or #rrggbb colour
+```
+
+### cutan.characters.colour_roles.recolour_svg(svg, swaps)
+
+`svg` with every paint use of an old literal replaced by its new one.
+
+Only paint colours are touched (`fill`, `stroke`, gradient stops…, as an
+attribute or a style declaration); everything else — geometry, ids,
+fragment references — stays byte-for-byte. Literals match case- and
+length-insensitively (`#FA0` is `#ffaa00`). Deterministic, and cached by
+content: the same text and swaps are rewritten once per process.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+```pycon
+>>> recolour_svg('<g style="fill:#fa0;stroke:#000"><use href="#fa0"/></g>',
+...              {"#ffaa00": "#010203"})
+'<g style="fill:#010203;stroke:#000"><use href="#fa0"/></g>'
+>>> recolour_svg('<rect data-fill="#aaa" fill="#aaa"/>', {"#aaaaaa": "#bbbbbb"})
+'<rect data-fill="#aaa" fill="#bbbbbb"/>'
+```
+
+### cutan.characters.colour_roles.role_recolouring(roles, colour_for)
+
+`{old literal: new colour}` for the roles `colour_for` sets.
+
+`colour_for(role)` is the pack’s lookup (per entity); a role it leaves
+unset keeps its literal, and a role set to the colour it already has is not
+a swap — so a pack that changes nothing produces nothing to rewrite.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> role_recolouring({"#a83249": "clothing", "#3b2a1a": "hair"},
+...                  {"clothing": "#202028"}.get)
+{'#a83249': '#202028'}
+```
+
+
+# _autosummary/cutan.characters.dicebear.html.md
+
+# cutan.characters.dicebear
+
+DiceBear HTTP API client + best-effort post-processing.
+
+DiceBear ([https://www.dicebear.com](https://www.dicebear.com)) hosts deterministic SVG avatar
+generators. We pin to API `9.x` for stability — DiceBear pins styles to
+API versions and 9.x is supported through 2028 (research §4.1, caveats).
+
+The styles we care about — `adventurer`, `lorelei`, `avataaars` —
+emit SVGs with internal groups but the group naming is style-specific and
+not stable across versions. Rather than parse it heuristically (which
+would silently break on a future style version), we wrap the DiceBear SVG
+in a [`wrap_dicebear_for_an()`](_autosummary/cutan.characters.dicebear.html.md#cutan.characters.dicebear.wrap_dicebear_for_an) envelope: the original SVG becomes a
+single `head` part, and the rest of the rig is filled in from defaults.
+That gives a usable cutout puppet immediately, at the cost of less
+articulation (you can’t, e.g., blink an avataaars-style avatar — the eyes
+are baked into the head).
+
+```pycon
+>>> # The wrapping is offline and deterministic.
+>>> wrapped = wrap_dicebear_for_an('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><circle cx="40" cy="40" r="35"/></svg>', name='maya')
+>>> 'id="head"' in wrapped
+True
+```
+
+### Module Attributes
+
+| [`DICEBEAR_API_VERSION`](_autosummary/cutan.characters.dicebear.html.md#cutan.characters.dicebear.DICEBEAR_API_VERSION)   | 9.x and 10.x are both Active with End of Life "None" — the April 2028 date sometimes cited is the EOL of the DEPRECATED 5.x-8.x line, not of this one.   |
+|-------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`DICEBEAR_DEFAULT_STYLE`](_autosummary/cutan.characters.dicebear.html.md#cutan.characters.dicebear.DICEBEAR_DEFAULT_STYLE) | The default avatar style.                                                                                                                                |
+
+### Functions
+
+| [`fetch_dicebear`](_autosummary/cutan.characters.dicebear.html.md#cutan.characters.dicebear.fetch_dicebear)(seed, \*[, style, ...])            | Fetch an avatar SVG from DiceBear's HTTP API.                     |
+|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
+| [`wrap_dicebear_for_an`](_autosummary/cutan.characters.dicebear.html.md#cutan.characters.dicebear.wrap_dicebear_for_an)(avatar_svg, \*, name[, ...]) | Wrap a DiceBear avatar SVG into the canonical `an` cutout layout. |
+
+### cutan.characters.dicebear.DICEBEAR_API_VERSION *= '9.x'*
+
+9.x and 10.x are both Active with End of Life “None” —
+the April 2028 date sometimes cited is the EOL of the DEPRECATED 5.x-8.x line,
+not of this one. The pin is right; the reason previously given for it was not.
+
+* **Type:**
+  Pinned major. NOTE
+
+### cutan.characters.dicebear.DICEBEAR_DEFAULT_STYLE *= 'lorelei'*
+
+The default avatar style. CC0 1.0 — no attribution duty falls on anyone who
+renders with stock settings.
+
+The previous default (`adventurer`) is CC BY 4.0, so every character created
+with default flags carried an undischarged attribution obligation, recorded
+nowhere. `lorelei` is not merely “a CC0 one”: it is the only CC0 *human* style
+shaped like a head-and-shoulders bust, which is what the rig needs —
+`wrap_dicebear_for_an` pastes the whole avatar in as the single `head` part,
+so the other CC0 human styles (`notionists`, `open-peeps`) render half-body
+characters and would put a torso on a torso. It is also by the same artist as
+`adventurer`, so the demo art barely shifts. `pixel-art` is the CC0 fallback.
+
+All 27 styles stay requestable; only the default moves. See
+`cutan/characters/licenses.py` for the per-style table.
+
+### cutan.characters.dicebear.fetch_dicebear(seed, , style='lorelei', api_version='9.x', timeout_s=10.0, extra_params=None)
+
+Fetch an avatar SVG from DiceBear’s HTTP API.
+
+Returns the SVG string. Raises [`RuntimeError`](https://docs.python.org/3/builtins/exceptions.html#RuntimeError) if the API call
+fails (network error, HTTP error, non-SVG response).
+
+The URL pattern is:
+
+```default
+https://api.dicebear.com/<api_version>/<style>/svg?seed=<seed>
+```
+
+Pass `extra_params` to forward style-specific options (e.g.
+`backgroundColor=transparent`).
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.dicebear.wrap_dicebear_for_an(avatar_svg, , name, canvas_size=1024, head_size=600)
+
+Wrap a DiceBear avatar SVG into the canonical `an` cutout layout.
+
+The avatar becomes the `head` part; `torso`, `arm_l`, `arm_r`,
+`leg_l`, `leg_r` are filled with simple colored rounded-rects so the
+character is immediately renderable as a stick-figure-with-real-face.
+The user can later replace any part by dropping a hand-drawn SVG into
+`parts/<part>.svg`.
+
+`head_size` is the head’s width in canvas pixels; the rest of the rig
+scales accordingly.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+
+# _autosummary/cutan.characters.drawn.html.md
+
+# cutan.characters.drawn
+
+What the character factory wrote, as it wrote it: the in-memory log behind its record of drawn bytes.
+
+The machine’s record of bytes the factory drew (an#269,
+`an.library.registry.record_generated`) verifies the factory’s stamps in the
+asset library. It must hold the digests of bytes the factory itself produced,
+never of whatever sits on disk when it finishes: a file swapped in while
+`new_character` runs is not the factory’s drawing. So every file the factory
+writes goes through [`write_text()`](_autosummary/cutan.characters.drawn.html.md#cutan.characters.drawn.write_text) / [`write_bytes()`](_autosummary/cutan.characters.drawn.html.md#cutan.characters.drawn.write_bytes), which write it AND,
+while a [`drawing()`](_autosummary/cutan.characters.drawn.html.md#cutan.characters.drawn.drawing) is open in this context, log the SHA-256 of the exact
+bytes written — computed in memory at write time.
+
+```pycon
+>>> import tempfile, pathlib
+>>> with tempfile.TemporaryDirectory() as d, drawing() as log:
+...     p = pathlib.Path(d) / "a.svg"
+...     write_text(p, "<svg/>")
+...     log[str(p.resolve())] == hashlib.sha256(b"<svg/>").hexdigest()
+True
+```
+
+### Functions
+
+| [`drawing`](_autosummary/cutan.characters.drawn.html.md#cutan.characters.drawn.drawing)()                                         | Log `{resolved path: sha256}` of every file written through this module, in this context.                           |
+|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| [`write_bytes`](_autosummary/cutan.characters.drawn.html.md#cutan.characters.drawn.write_bytes)(path, data)                           | Write `data` to `path`, logging its digest if a [`drawing()`](_autosummary/cutan.characters.drawn.html.md#cutan.characters.drawn.drawing) is open. |
+| [`write_derived_text`](_autosummary/cutan.characters.drawn.html.md#cutan.characters.drawn.write_derived_text)(path, source, text, \*[, ...]) | Write `text`, derived from `source` — the bytes just read back from `path`.                                         |
+| [`write_text`](_autosummary/cutan.characters.drawn.html.md#cutan.characters.drawn.write_text)(path, text, \*[, encoding])            | Write `text` as `Path.write_text` does (newlines as the platform writes them), logged.                              |
+
+### cutan.characters.drawn.drawing()
+
+Log `{resolved path: sha256}` of every file written through this module, in this context.
+
+Re-entrant: inside an open drawing (`add_gaze` called by
+`new_character`) the same log is shared, so the outer call sees every
+byte the inner one wrote.
+
+* **Return type:**
+  [`Iterator`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
+
+### cutan.characters.drawn.write_bytes(path, data)
+
+Write `data` to `path`, logging its digest if a [`drawing()`](_autosummary/cutan.characters.drawn.html.md#cutan.characters.drawn.drawing) is open.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.drawn.write_derived_text(path, source, text, , encoding='utf-8')
+
+Write `text`, derived from `source` — the bytes just read back from `path`.
+
+Logged only if `source` is exactly what this drawing itself wrote there:
+a file swapped in between the factory’s write and its re-read (a rescale)
+is rewritten, but not as the factory’s drawing (review-288 round 2).
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+```pycon
+>>> import tempfile, pathlib
+>>> with tempfile.TemporaryDirectory() as d, drawing() as log:
+...     p = pathlib.Path(d) / "a.svg"
+...     write_text(p, "<svg/>")
+...     p.write_bytes(b"<svg>swapped</svg>")  # not the factory's write
+...     write_derived_text(p, p.read_bytes(), "<svg>scaled</svg>")
+...     str(p.resolve()) in log
+18
+False
+```
+
+### cutan.characters.drawn.write_text(path, text, , encoding='utf-8')
+
+Write `text` as `Path.write_text` does (newlines as the platform writes them), logged.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+
+# _autosummary/cutan.characters.factory.html.md
+
+# cutan.characters.factory
+
+High-level entry points: build and inspect a character.
+
+The [`new_character()`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.new_character) function wires together fetching/wrapping art,
+slicing it into per-part SVGs, generating the default mouth set, and
+writing a complete character directory + `character.json` descriptor.
+
+Checking one is [`cutan.characters.validate`](_autosummary/cutan.characters.validate.html.md#module-cutan.characters.validate)’s job, not this module’s — it
+opens every part and reports `an.verify._base.Finding` s, so a character
+problem routes the way every other verifier’s does (an#78).
+
+```pycon
+>>> import tempfile
+>>> with tempfile.TemporaryDirectory() as d:
+...     descriptor_path = new_character(d, name='nobody', use_dicebear=False)
+...     descriptor_path.parent.name, descriptor_path.name
+('nobody', 'character.json')
+```
+
+### Module Attributes
+
+| [`PALETTE_ROLES`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.PALETTE_ROLES)            | The roles `new_character(palette=...)` takes.                                                                                                                                                                                                                                                                                                               |
+|---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`HEAD_ART_ROLES`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.HEAD_ART_ROLES)           | The roles a head's own art carries.                                                                                                                                                                                                                                                                                                                         |
+| [`OUTLINE_COLOUR`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.OUTLINE_COLOUR)           | it is the drawing's ink, not a costume colour.                                                                                                                                                                                                                                                                                                              |
+| [`SHOE_COLOUR`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.SHOE_COLOUR)              | The shoe, drawn in the leg part.                                                                                                                                                                                                                                                                                                                            |
+| [`PUPIL_COLOUR`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.PUPIL_COLOUR)             | The pupil, in its own part (or the pre-gaze open eye).                                                                                                                                                                                                                                                                                                      |
+| [`DFLT_HAND_COLOUR`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.DFLT_HAND_COLOUR)         | Default hand, trouser and brow colours — the literals the factory always drew.                                                                                                                                                                                                                                                                              |
+| [`HATS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.HATS)                     | The hats [`new_character()`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.new_character) can draw.                                                                                                                                                                                                                                                                         |
+| [`HAIR_STYLES`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.HAIR_STYLES)              | `peak` (the factory's original hair, a widow's peak — the default), `bald`, `bun` (the hair gathered in a bun on the crown) and `curly` (a halo of curls around the crown).                                                                                                                                                                                 |
+| [`HAIR_LENGTHS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.HAIR_LENGTHS)             | `short` (nothing below the crown — the default), `medium` (falling beside the face to the jaw) and `long` (past the chin, in locks that keep clear of the neck and the collar).                                                                                                                                                                             |
+| [`MAX_HEAD_SCALE`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.MAX_HEAD_SCALE)           | The largest head scale accepted — past it the head no longer fits the 1024-unit view box above a regular body.                                                                                                                                                                                                                                              |
+| [`BUILDS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.BUILDS)                   | Named builds.                                                                                                                                                                                                                                                                                                                                               |
+| [`FACTORY_AUTHOR`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.FACTORY_AUTHOR)           | The provider of every per-part source the factory stamps on what it draws.                                                                                                                                                                                                                                                                                  |
+| [`EYE_CANVAS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.EYE_CANVAS)               | The eye's geometry in its 64x32 canvas, shared by the four synthesizers so the sclera, the pupil and the lid outline agree (an#99).                                                                                                                                                                                                                         |
+| [`GAZE_PARTS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.GAZE_PARTS)               | The parts a rig gains with `an character add-gaze`.                                                                                                                                                                                                                                                                                                         |
+| [`FACE_SLOTS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.FACE_SLOTS)               | The face slots of the default rig with the eye stack (an#99).                                                                                                                                                                                                                                                                                               |
+| [`SIDE_EYE_SHIFT`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.SIDE_EYE_SHIFT)           | how far the near eye, its stack and brow slide toward the face's edge, and the mouth with them (view_box units at head_scale 1); the mouth is narrowed, seen edge-on.                                                                                                                                                                                       |
+| [`SIDE_LEG_OFFSET`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.SIDE_LEG_OFFSET)          | both hang from under the body, the near leg (`leg_r`, drawn over the far one) a little forward and the far leg a little back, overlapping at the hip — each hip sits `SIDE_LEG_OFFSET` leg widths off the centre line — and splayed so the FEET part: the shoe centres land `SIDE_FOOT_SPREAD` leg widths apart, on every build (a stubby leg splays more). |
+| [`THREE_QUARTER_FACE_SHIFT`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.THREE_QUARTER_FACE_SHIFT) | the whole face slides toward the facing side, the far eye narrows, the far arm tucks in toward the body and the legs in.                                                                                                                                                                                                                                    |
+
+### Functions
+
+| [`add_gaze`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.add_gaze)(char_dir, \*[, skin, overwrite_eyes])   | Give a character the eye stack (an#99): three sibling slots per eye under the head — `<side>_sclera` (white fill) below `<side>_pupil` below `<side>_eye` (the existing slot, now the lid, drawn above the pupil) — with synthesized parts, an outline-only open eye, a FILLED closed lid, the `gaze_travel` clamp, and draw orders that put the lid over the pupil.   |
+|---------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`add_views`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.add_views)(char_dir)                              | Give a factory character its turnaround (an#197): `back`, `side` and `three_quarter` head and torso art beside the front, a `view` swap set projected onto those two slots, and a pose per view (`swap_poses`) — so `{kind: set, target: <entity>, property: view, value: side}` or `an.motion.turn()` turns the whole character.                                      |
+| [`declare_mouth_variants`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.declare_mouth_variants)(descriptor, variants)     | Declare a `viseme@<form>` set per variant on `descriptor` — the set's keys map to `mouth_<shape>_<form>` attachments, which are added to the default skin's `mouth` slot with the neutral mouth's geometry.                                                                                                                                                            |
+| [`factory_descriptor_source`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.factory_descriptor_source)(source_svg)            | The descriptor-level source of a character this factory drew, pinned to its drawing.                                                                                                                                                                                                                                                                                   |
+| [`factory_source`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.factory_source)(data)                             | The per-part source of a part this factory drew, pinned to its bytes.                                                                                                                                                                                                                                                                                                  |
+| [`gaze_travel_for`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.gaze_travel_for)([rx, ry, pupil_r])               | The pupil's travel per axis, in view-box units: the sclera's clearance minus the pupil's radius — the semi-axes of the inner ellipse the gaze axes' unit circle maps onto.                                                                                                                                                                                             |
+| [`new_character`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.new_character)(out_dir, \*, name[, seed, ...])    | Build a complete character on disk.                                                                                                                                                                                                                                                                                                                                    |
+| [`recording_drawn`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.recording_drawn)(char_dir)                        | Log what the body writes, then record the factory-stamped bytes it wrote at `char_dir`.                                                                                                                                                                                                                                                                                |
+| [`scale_part_files`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.scale_part_files)(paths, scale)                   | Rewrite each part SVG's root size by `scale` (its drawing untouched): the compiler draws a part at its own raster size, so that IS its size on screen.                                                                                                                                                                                                                 |
+| [`stage_extent`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.stage_extent)(desc)                               | How far a character's art reaches above and below its stage point, in scene pixels at `stage.scale: 1`: `{"top", "feet", "height"}`.                                                                                                                                                                                                                                   |
+| [`stamp_factory_descriptor`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.stamp_factory_descriptor)(char_dir)               | Record the factory as the source of the character it just drew at `char_dir`.                                                                                                                                                                                                                                                                                          |
+| [`stamp_factory_parts`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.stamp_factory_parts)(char_dir, paths, \*[, skip]) | Give each part the factory drew a `cc0` per-part source pinned to its digest.                                                                                                                                                                                                                                                                                          |
+| [`stamp_generated_head`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.stamp_generated_head)(char_dir, source)           | Pin a generator's `source` (DiceBear's) to the bytes it produced at `char_dir`.                                                                                                                                                                                                                                                                                        |
+| [`view_poses`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.view_poses)([body, head_scale, slots])            | `{view: {slot: SlotPose}}` for the factory's rig built as `body` — what a view does besides swapping art: the back hides the face, the side hides the far eye and arm and slides the near eye and mouth to the profile edge.                                                                                                                                           |
+
+### Classes
+
+| [`BodyBuild`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.BodyBuild)([torso_size, torso_radius, ...])   | The proportions of a synthesized body, in view_box units.   |
+|-----------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+
+### cutan.characters.factory.BUILDS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [BodyBuild](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.BodyBuild)]* *= {'regular': BodyBuild(torso_size=(256, 256), torso_radius=40, torso_inset_bottom=20, arm_width=36, arm_length=256, hand_radius=20, limb_stroke=4, leg_width=40, leg_length=300.0, shoe_size=(32, 18), shoulder=(90, 240), hip_x=50, neck_height=260), 'squat': BodyBuild(torso_size=(300, 220), torso_radius=80, torso_inset_bottom=4, arm_width=36, arm_length=140, hand_radius=18, limb_stroke=4, leg_width=50, leg_length=96, shoe_size=(34, 16), shoulder=(118, 168), hip_x=46, neck_height=214), 'stick': BodyBuild(torso_size=(170, 210), torso_radius=14, torso_inset_bottom=4, arm_width=10, arm_length=200, hand_radius=9, limb_stroke=3, leg_width=10, leg_length=230, shoe_size=(15, 7), shoulder=(82, 188), hip_x=28, neck_height=214), 'tall': BodyBuild(torso_size=(224, 320), torso_radius=36, torso_inset_bottom=4, arm_width=32, arm_length=320, hand_radius=18, limb_stroke=4, leg_width=36, leg_length=380, shoe_size=(30, 16), shoulder=(80, 304), hip_x=44, neck_height=324)}*
+
+Named builds. `regular` is today’s body, number for number.
+
+### *class* cutan.characters.factory.BodyBuild(torso_size=(256, 256), torso_radius=40, torso_inset_bottom=20, arm_width=36, arm_length=256, hand_radius=20, limb_stroke=4, leg_width=40, leg_length=300.0, shoe_size=(32, 18), shoulder=(90, 240), hip_x=50, neck_height=260)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+The proportions of a synthesized body, in view_box units.
+
+Every length that decides where a part hangs is here, so the bones the
+factory writes and the art it draws are derived from ONE record and cannot
+disagree — a leg’s art is exactly `leg_length` tall and its bone sits
+`leg_length` above the ground, so it hangs from the hip to the ground at
+every build (tests/test_rig_layout.py).
+
+#### arm_width *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 36*
+
+Sleeve thickness and the arm canvas’s length (sleeve + hand).
+
+#### hip_x *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 50*
+
+The hip joints’ distance from the centre line.
+
+#### neck_height *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 260*
+
+The neck’s height above the hip; the head hangs above it.
+
+#### shoulder *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]* *= (90, 240)*
+
+The shoulder joint (x from the centre line, height above the hip).
+
+#### torso_inset_bottom *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 20*
+
+The gap between the drawn body and the canvas bottom (the hip). The
+regular body’s 20 leaves a sliver between body and legs; the other
+builds close it.
+
+#### torso_size *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]* *= (256, 256)*
+
+Torso canvas; the drawn body is inset 20 on every side, and the canvas
+bottom sits on the hip.
+
+### cutan.characters.factory.DFLT_HAND_COLOUR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '#f1c9a5'*
+
+Default hand, trouser and brow colours — the literals the factory always drew.
+
+### cutan.characters.factory.EYE_CANVAS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]* *= (64, 32)*
+
+The eye’s geometry in its 64x32 canvas, shared by the four synthesizers so
+the sclera, the pupil and the lid outline agree (an#99).
+
+### cutan.characters.factory.FACE_SLOTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('left_eye', 'right_eye', 'left_sclera', 'right_sclera', 'left_pupil', 'right_pupil', 'mouth', 'left_brow', 'right_brow')*
+
+The face slots of the default rig with the eye stack (an#99).
+
+### cutan.characters.factory.FACTORY_AUTHOR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'an (generated locally)'*
+
+The provider of every per-part source the factory stamps on what it draws.
+The licence of the factory’s own drawings: no rights to clear.
+Who the factory’s descriptor-level source names as the author.
+
+### cutan.characters.factory.GAZE_PARTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('sclera_l', 'sclera_r', 'pupil_l', 'pupil_r')*
+
+The parts a rig gains with `an character add-gaze`. Optional — never in
+`REQUIRED_PARTS`: a pre-Wave-6 rig without them still renders, and gaze is
+a no-op on it.
+
+### cutan.characters.factory.HAIR_LENGTHS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('short', 'medium', 'long')*
+
+`short` (nothing below the crown — the default), `medium`
+(falling beside the face to the jaw) and `long` (past the chin, in locks
+that keep clear of the neck and the collar).
+
+* **Type:**
+  Hair lengths
+
+### cutan.characters.factory.HAIR_STYLES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('peak', 'bald', 'bun', 'curly')*
+
+`peak` (the factory’s original hair, a widow’s peak — the
+default), `bald`, `bun` (the hair gathered in a bun on the crown) and
+`curly` (a halo of curls around the crown). Every style keeps the default
+hairline over the forehead — none draws lower over the brows (tests) — so a
+hair style never costs brow acting.
+
+* **Type:**
+  Hair styles
+
+### cutan.characters.factory.HATS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('none', 'cap', 'beanie', 'bowler', 'bicorne')*
+
+The hats [`new_character()`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.new_character) can draw.
+
+### cutan.characters.factory.HEAD_ART_ROLES *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'hair', 'skin'})*
+
+The roles a head’s own art carries. On a head the factory did not draw
+(DiceBear) they are left untagged everywhere, never half-tagged.
+
+### cutan.characters.factory.MAX_HEAD_SCALE *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 2.5*
+
+The largest head scale accepted — past it the head no longer fits the
+1024-unit view box above a regular body.
+
+### cutan.characters.factory.OUTLINE_COLOUR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '#222222'*
+
+it is the
+drawing’s ink, not a costume colour.
+
+* **Type:**
+  The outline every synthesized body part is stroked in. Untagged
+
+### cutan.characters.factory.PALETTE_ROLES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('skin', 'hair', 'clothing', 'leg', 'accessory')*
+
+The roles `new_character(palette=...)` takes. They are `StylePack` role
+names on purpose: a palette chosen at authoring time and a pack applied at
+compile time speak one vocabulary, and the factory records each as a colour
+role so the pack can reach what the palette drew.
+
+### cutan.characters.factory.PUPIL_COLOUR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '#1a1a1a'*
+
+The pupil, in its own part (or the pre-gaze open eye). Role `pupil`.
+
+### cutan.characters.factory.SHOE_COLOUR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '#1a1a1a'*
+
+The shoe, drawn in the leg part. Untagged.
+
+### cutan.characters.factory.SIDE_EYE_SHIFT *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 14.0*
+
+how far the near eye, its stack and brow slide toward
+the face’s edge, and the mouth with them (view_box units at head_scale 1);
+the mouth is narrowed, seen edge-on.
+
+* **Type:**
+  Profile (facing right)
+
+### cutan.characters.factory.SIDE_LEG_OFFSET *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.25*
+
+both hang from under the body, the near leg
+(`leg_r`, drawn over the far one) a little forward and the far leg a
+little back, overlapping at the hip — each hip sits `SIDE_LEG_OFFSET` leg
+widths off the centre line — and splayed so the FEET part: the shoe centres
+land `SIDE_FOOT_SPREAD` leg widths apart, on every build (a stubby leg
+splays more). Both legs show, even as one silhouette, and a walk in profile
+has two legs to alternate (an#203). A stick leg is thinner than its shoe,
+so leg widths alone would leave the two shoes on top of each other — a
+one-legged stand; the shoes part by at least `SIDE_FOOT_MIN_SHOES` shoe
+lengths (a floor every other build already clears, so they are unchanged).
+
+* **Type:**
+  Profile legs (facing right)
+
+### cutan.characters.factory.THREE_QUARTER_FACE_SHIFT *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 20.0*
+
+the whole face slides toward the facing side,
+the far eye narrows, the far arm tucks in toward the body and the legs in.
+
+* **Type:**
+  Three-quarter (facing right)
+
+### cutan.characters.factory.add_gaze(char_dir, , skin=None, overwrite_eyes=False)
+
+Give a character the eye stack (an#99): three sibling slots per eye under
+the head — `<side>_sclera` (white fill) below `<side>_pupil` below
+`<side>_eye` (the existing slot, now the lid, drawn above the pupil) —
+with synthesized parts, an outline-only open eye, a FILLED closed lid, the
+`gaze_travel` clamp, and draw orders that put the lid over the pupil.
+Idempotent: a rig that already has the stack is rewritten to the same
+state. Returns the descriptor path.
+
+The open and closed eye parts are REWRITTEN (outline-only, filled lid), so
+on a rig whose eyes are not this factory’s drawings — a promoted hand rig —
+it refuses unless `overwrite_eyes=True`: the stack’s geometry is the
+synthesized eye’s, and an illustrator’s eyes would be silently replaced
+(an#99 review). Such a rig wants its own outline-only open eye, filled
+lid, sclera and pupil parts drawn to its own geometry.
+
+This is the **expand** step for a pre-Wave-6 descriptor: no migration
+inserts pupil slots, because their art would be absent and absent art is
+fatal under `strict_assets` — every existing character would stop
+rendering on the bench.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.factory.add_views(char_dir)
+
+Give a factory character its turnaround (an#197): `back`, `side` and
+`three_quarter` head and torso art beside the front, a `view` swap set
+projected onto those two slots, and a pose per view (`swap_poses`) — so
+`{kind: set, target: <entity>, property: view, value: side}` or
+`an.motion.turn()` turns the whole character. Idempotent. Returns the
+descriptor path.
+
+The views are REDRAWN from the recorded knobs (seed, palette, build, hat,
+hair style and length, sash, head scale), so it refuses a rig whose head is not this factory’s
+drawing for them — a DiceBear head (its face is baked, and there is no
+back of it to draw), a promoted hand rig, or an edited head: its views are
+an illustrator’s to draw, declared the same way (a `view` set whose keys
+name attachments on the head and torso slots, and `swap_poses`).
+
+Every colour is role-tagged like the front’s, so a StylePack recolours the
+views exactly as it recolours the front (an#191). The existing art is not
+touched: a shot that never sets a view renders byte-identically.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.factory.declare_mouth_variants(descriptor, variants)
+
+Declare a `viseme@<form>` set per variant on `descriptor` — the set’s
+keys map to `mouth_<shape>_<form>` attachments, which are added to the
+default skin’s `mouth` slot with the neutral mouth’s geometry. The
+neutral set is the SSOT for which shapes exist; a variant mirrors it.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.factory.factory_descriptor_source(source_svg)
+
+The descriptor-level source of a character this factory drew, pinned to its drawing.
+
+The digest is that of the descriptor’s `source_svg` — the drawing every
+part was cut from. Like a part stamp it speaks only for bytes it pins: the
+asset library and `an credits` read every file of the character that no
+stamp pins (a part re-carved later, a file added by hand) as UNVERIFIED,
+never as the factory’s (`an.credits._part_credits()`).
+
+* **Return type:**
+  `AssetSource`
+
+```pycon
+>>> s = factory_descriptor_source(b"<svg/>")
+>>> (s.provider, s.license, len(s.sha256))
+('an character factory', 'cc0-1.0', 64)
+```
+
+### cutan.characters.factory.factory_source(data)
+
+The per-part source of a part this factory drew, pinned to its bytes.
+
+* **Return type:**
+  `AssetSource`
+
+```pycon
+>>> factory_source(b"<svg/>").license, len(factory_source(b"<svg/>").sha256)
+('cc0-1.0', 64)
+```
+
+### cutan.characters.factory.gaze_travel_for(rx=14, ry=10, pupil_r=5)
+
+The pupil’s travel per axis, in view-box units: the sclera’s clearance
+minus the pupil’s radius — the semi-axes of the inner ellipse the gaze
+axes’ unit circle maps onto. The compiler clamps the summed gaze to 0.95
+of that circle (`GAZE_ELLIPSE_MARGIN`), which is what keeps the pupil disc
+inside the white at every angle without a runtime mask.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+```pycon
+>>> gaze_travel_for()
+{'x': 9.0, 'y': 5.0}
+```
+
+### cutan.characters.factory.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short')
+
+Build a complete character on disk.
+
+**Variety knobs** (every default reproduces the pre-knob character byte for
+byte, which a golden test holds):
+
+- `palette` — `{role: "#rrggbb"}` over [`PALETTE_ROLES`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.PALETTE_ROLES) (`skin`,
+  `hair`, `clothing`, `leg`, `accessory`) — the SAME role names a
+  `StylePack` uses. Unset roles keep the seed’s colours.
+  > `skin` also paints the hands and the gaze lid; `hair` the brows and
+  > the collar. On a DiceBear head only the body follows (its face is baked).
+- `build` — a key of [`BUILDS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.BUILDS): `regular`, `squat` (round body,
+  short legs), `tall`, `stick` (small blocky body, stick limbs).
+- `head_scale` — the head and its whole face (eyes, brows, mouths, their
+  offsets, the pupil travel) scaled together, so a big head keeps its face.
+- `hat` — a key of [`HATS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.HATS) (offline head only), in `accessory`,
+  worn above the brows’ acting range at this head scale (an#252): lifted,
+  and flattened toward its crown when lifting is not enough. A hat that
+  still covers the brows (a very small head) is recorded in the
+  descriptor’s `occluded`, so the character does not afford
+  `face.brows` and expressions fall to the lids, gaze and mouth.
+- `hair_style` — [`HAIR_STYLES`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.HAIR_STYLES): `peak` (the default), `bald`,
+  `bun`, `curly`; `hair_length` — [`HAIR_LENGTHS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.HAIR_LENGTHS): `short`
+  (the default), `medium`, `long` (offline head only). Drawn in the
+  `hair` role (the palette’s `hair` colours them), in every view.
+- `sash` — a diagonal band across the torso, in `accessory`.
+- `views` (an#197) — draw the turnaround: `back`, `side` (a profile
+  facing the viewer’s right) and `three_quarter` beside the front, as a
+  `view` swap set with a pose per view ([`add_views()`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.add_views)), so
+  `an.motion.turn()` can turn the character around. Offline head only
+  > (a DiceBear face is baked into its art); ignored for a DiceBear head.
+
+  Additive: a shot that never sets a view renders exactly as without it.
+
+Every colour the factory draws in a role is recorded in the descriptor’s
+`colour_roles` so a style pack can recolour it later (palette swapping,
+[`cutan.characters.colour_roles`](_autosummary/cutan.characters.colour_roles.html.md#module-cutan.characters.colour_roles)).
+
+`gaze` (an#99) adds the eye stack — sclera and pupil slots under each
+lid, a filled closed lid, the `gaze_travel` clamp — through
+[`add_gaze()`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.add_gaze), so `gaze_x`/`gaze_y` and the ambient saccades reach the
+pupils. Off, the eye is the single pre-stack drawing.
+
+`mouth_variants` (an#98) — `{form: smile offset}` — writes one more
+9-shape mouth set per form (`mouth_<shape>_<form>.svg`) and declares it
+as the `viseme@<form>` swap set, with its attachments in the default
+skin’s `mouth` slot, so an expression preset preferring that form
+selects it. `None` means [`DEFAULT_MOUTH_VARIANTS`](_autosummary/cutan.characters.mouth_set.html.md#cutan.characters.mouth_set.DEFAULT_MOUTH_VARIANTS)
+(happy, sad); `{}` means the neutral set only.
+
+Steps:
+
+1. Fetch a DiceBear avatar (skip if `use_dicebear=False` — useful for
+   offline tests).
+2. Wrap it into the canonical `an` cutout SVG (skeleton + illustration
+   groups), saved as `<name>.svg`.
+3. Slice each part into `parts/<part>.svg`.
+4. Write the 9-shape default mouth set into `parts/mouth/`.
+5. Synthesize a few derived parts (open/closed eyes, brows) so the
+   character is complete out of the box.
+6. Emit a `character.json` descriptor.
+
+Returns the path to the created `character.json`.
+
+Raises [`FileExistsError`](https://docs.python.org/3/builtins/exceptions.html#FileExistsError) if `out_dir/name` already exists and
+`overwrite=False`.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.factory.recording_drawn(char_dir)
+
+Log what the body writes, then record the factory-stamped bytes it wrote at `char_dir`.
+
+For a drawing path outside this module (`an character mouths`): only
+bytes written through [`cutan.characters.drawn`](_autosummary/cutan.characters.drawn.html.md#module-cutan.characters.drawn) inside the block, and
+stamped by the factory, are recorded.
+
+### cutan.characters.factory.scale_part_files(paths, scale)
+
+Rewrite each part SVG’s root size by `scale` (its drawing untouched):
+the compiler draws a part at its own raster size, so that IS its size on
+screen. Missing files are skipped.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.factory.stage_extent(desc)
+
+How far a character’s art reaches above and below its stage point, in
+scene pixels at `stage.scale: 1`: `{"top", "feet", "height"}`.
+
+The stage point (`stage.at`) is not the feet: the compiler places a rig
+by the middle of its bones’ extent, between the neck and the feet, so
+where the feet land depends on the build and the head scale (a squat
+figure’s feet sit about half as far below the point as a tall one’s).
+Read from the compiler’s own placement rule and the head’s art, so this is
+what the compiled scene does, not a second guess at it. Multiply by
+`stage.scale`. The head reaches its drawing’s top edge (a hat stays
+inside it).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+```pycon
+>>> e = stage_extent(CharacterDescriptor(name="c"))
+>>> round(e["top"]), round(e["feet"])
+(169, 94)
+```
+
+### cutan.characters.factory.stamp_factory_descriptor(char_dir)
+
+Record the factory as the source of the character it just drew at `char_dir`.
+
+Only a descriptor that declares no source is stamped (a DiceBear head
+carries DiceBear’s); the stamp pins the bytes of its `source_svg`. Called
+by [`new_character()`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.new_character) on what it has just drawn, never on a character
+someone may have edited since.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.factory.stamp_factory_parts(char_dir, paths, , skip=())
+
+Give each part the factory drew a `cc0` per-part source pinned to its digest.
+
+Rights in the asset library attach to the BYTES (an#236): a file is as
+restricted as the strictest thing any library says about its SHA-256, and an
+asset-level licence speaks for every file the asset does not itemise. The
+factory’s parts are byte-identical across characters (the default mouths,
+the eyes), so without this stamp a carved character built on a factory body
+would make every other character’s shared parts private. The stamp pins the
+digest, so a part later re-drawn or re-carved no longer matches it and stops
+being itemised as the factory’s — the stamp cannot launder new bytes.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+paths: the relative paths this call has just DRAWN — required (an#249
+: R4-N1): a stamp says “the factory made these bytes”, so only the code
+  that made them may write it. Stamping every part by default would label
+  a part re-carved since as the factory’s `cc0`. A part carrying some
+  other provider’s source is never re-stamped.
+
+### cutan.characters.factory.stamp_generated_head(char_dir, source)
+
+Pin a generator’s `source` (DiceBear’s) to the bytes it produced at `char_dir`.
+
+The head part(s) the generator drew (`parts/head.svg`) carry the source
+with their own digest, and the descriptor carries it with the digest of its
+`source_svg`. Like the factory’s stamps, it then speaks only for those
+bytes: a part re-carved since, or a file added, is UNVERIFIED in `an
+credits` and `unknown` in the asset library. Called by
+[`new_character()`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.new_character) on what it has just written.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.factory.view_poses(body=BodyBuild(torso_size=(256, 256), torso_radius=40, torso_inset_bottom=20, arm_width=36, arm_length=256, hand_radius=20, limb_stroke=4, leg_width=40, leg_length=300.0, shoe_size=(32, 18), shoulder=(90, 240), hip_x=50, neck_height=260), , head_scale=1.0, slots=None)
+
+`{view: {slot: SlotPose}}` for the factory’s rig built as `body` — what
+a view does besides swapping art: the back hides the face, the side hides
+the far eye and arm and slides the near eye and mouth to the profile edge.
+
+Face offsets scale with `head_scale` (the face was drawn at it), limb
+offsets come from the build’s own joints. `slots` limits the poses to the
+slots a rig has (a rig without the eye stack has no pupils to pose).
+
+* **Return type:**
+  dict[str, dict[str, ‘SlotPose’]]
+
+```pycon
+>>> poses = view_poses()
+>>> sorted(poses)
+['back', 'front', 'side', 'three_quarter']
+>>> poses["front"], poses["back"]["mouth"].alpha, poses["side"]["arm_r"].x
+({}, 0.0, -90.0)
+```
+
+
+# _autosummary/cutan.characters.html.md
+
+# cutan.characters
+
+Character art system: Spine-shaped descriptor + SVG sidecars.
+
+Public API:
+
+- [`CharacterDescriptor`](_autosummary/cutan.characters.html.md#cutan.characters.CharacterDescriptor) — the on-disk schema for a character (bones,
+  slots, skins, viseme map, idle animations).
+- [`new_character()`](_autosummary/cutan.characters.html.md#cutan.characters.new_character) — generate a fresh character (DiceBear or built-in).
+- [`generate_default_mouths()`](_autosummary/cutan.characters.html.md#cutan.characters.generate_default_mouths) — produce the 9-shape default mouth set.
+- [`render_silhouette()`](_autosummary/cutan.characters.html.md#cutan.characters.render_silhouette), [`compare_silhouettes()`](_autosummary/cutan.characters.html.md#cutan.characters.compare_silhouettes) — silhouette test.
+- [`breath_animation()`](_autosummary/cutan.characters.html.md#cutan.characters.breath_animation), [`blink_animation()`](_autosummary/cutan.characters.html.md#cutan.characters.blink_animation) — idle animation factories.
+- [`validate_character()`](_autosummary/cutan.characters.html.md#cutan.characters.validate_character) — completeness check against the schema.
+- [`promote()`](_autosummary/cutan.characters.html.md#cutan.characters.promote) — lift an inline character into the reusable mall.
+
+Conventions (locked in):
+
+- Slot/skin/animation separation modeled on Spine’s JSON format.
+- SVG layout: a `<g id="skeleton">` of named `<circle>` pivots and a
+  sibling `<g id="illustration">` containing named part groups (Pose
+  Animator convention).
+- 9 mouth shapes, named `mouth_a` through `mouth_h` plus `mouth_x`
+  (the rest position), matching Rhubarb’s A–H + X visemes.
+- Time in seconds (float); `bone:<name>.<prop>` and
+  `slot:<name>.attachment` are the two animation target syntaxes.
+
+```pycon
+>>> from cutan.characters import MOUTH_SHAPES
+>>> MOUTH_SHAPES
+('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x')
+```
+
+### Functions
+
+| [`normalize_svg`](_autosummary/cutan.characters.html.md#cutan.characters.normalize_svg)(source, \*[, fallback_viewbox])     | Promote Inkscape labels to ids and ensure a viewBox is set.                                                                                                                         |
+|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`extract_part`](_autosummary/cutan.characters.html.md#cutan.characters.extract_part)(source, part_id, \*[, ...])          | Emit a standalone SVG tree containing only the group with the given id.                                                                                                             |
+| [`extract_pivots`](_autosummary/cutan.characters.html.md#cutan.characters.extract_pivots)(source, \*[, skeleton_id])         | Return `{name: (cx, cy)}` for every named `<circle>` under skeleton.                                                                                                                |
+| [`write_svg`](_autosummary/cutan.characters.html.md#cutan.characters.write_svg)(tree_or_element[, path])                | Serialize an `ElementTree` or `Element` to bytes (and optionally disk).                                                                                                             |
+| [`promote_inkscape_labels_to_ids`](_autosummary/cutan.characters.html.md#cutan.characters.promote_inkscape_labels_to_ids)(tree)              | Copy `inkscape:label` to `id` on each group missing an id.                                                                                                                          |
+| [`generate_default_mouths`](_autosummary/cutan.characters.html.md#cutan.characters.generate_default_mouths)(\*[, canvas, ...])        | Return `{"mouth_<letter>[_<form>]": <svg-string>, ...}` for every shape.                                                                                                            |
+| [`write_default_mouths`](_autosummary/cutan.characters.html.md#cutan.characters.write_default_mouths)(out_dir, \*[, canvas, ...])  | Write the default mouth SVGs into `out_dir` (created if missing), plus one `mouth_<shape>_<form>.svg` per shape for every `variants` entry (`{form: smile offset}`; `None` = none). |
+| [`breath_animation`](_autosummary/cutan.characters.html.md#cutan.characters.breath_animation)(\*[, period_s, ...])             | Sine-wave breath on torso Y + head rotation; optional weight shift.                                                                                                                 |
+| [`blink_animation`](_autosummary/cutan.characters.html.md#cutan.characters.blink_animation)(\*[, closure_s, duration_s, ...]) | Step-animation that snaps both eye slots closed → open.                                                                                                                             |
+| [`render_silhouette`](_autosummary/cutan.characters.html.md#cutan.characters.render_silhouette)(svg_source, out_png, \*[, ...]) | Render an SVG to a binary silhouette PNG (black on white).                                                                                                                          |
+| [`compare_silhouettes`](_autosummary/cutan.characters.html.md#cutan.characters.compare_silhouettes)(a, b, \*[, size])             | Return IoU between two silhouette PNGs (0..1; lower = more distinct).                                                                                                               |
+| [`fetch_dicebear`](_autosummary/cutan.characters.html.md#cutan.characters.fetch_dicebear)(seed, \*[, style, ...])            | Fetch an avatar SVG from DiceBear's HTTP API.                                                                                                                                       |
+| [`new_character`](_autosummary/cutan.characters.html.md#cutan.characters.new_character)(out_dir, \*, name[, seed, ...])     | Build a complete character on disk.                                                                                                                                                 |
+| [`validate_character`](_autosummary/cutan.characters.html.md#cutan.characters.validate_character)(char_dir, \*[, name])          | Check an art package against the contract, offline.                                                                                                                                 |
+| [`promote`](_autosummary/cutan.characters.html.md#cutan.characters.promote)(project_dir, entity, as_, \*[, ...])      | Promote `entity` from `project_dir`'s inline assets into the mall.                                                                                                                  |
+| [`record_character`](_autosummary/cutan.characters.html.md#cutan.characters.record_character)(char_dir, \*[, name, ...])       | Render preview.html for the character at `char_dir` and record it.                                                                                                                  |
+| [`record_preview_to_mp4`](_autosummary/cutan.characters.html.md#cutan.characters.record_preview_to_mp4)(preview_html, out_mp4, \*)  | Record `preview_html` to `out_mp4` for `duration_s` seconds.                                                                                                                        |
+
+### Classes
+
+| [`CharacterDescriptor`](_autosummary/cutan.characters.html.md#cutan.characters.CharacterDescriptor)(\*\*data)   | The on-disk character schema.                                           |
+|----------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`Bone`](_autosummary/cutan.characters.html.md#cutan.characters.Bone)(\*\*data)                  | A skeleton joint with a local transform relative to its parent.         |
+| [`Slot`](_autosummary/cutan.characters.html.md#cutan.characters.Slot)(\*\*data)                  | A draw-order slot bound to a bone, displaying one attachment at a time. |
+| [`Attachment`](_autosummary/cutan.characters.html.md#cutan.characters.Attachment)(\*\*data)            | A drawable: an SVG path + anchor point (in 0..1 per-axis units).        |
+| [`Skin`](_autosummary/cutan.characters.html.md#cutan.characters.Skin)(\*\*data)                  | A named outfit/variant: maps slot → {attachment_name → Attachment}.     |
+| [`IdleAnimation`](_autosummary/cutan.characters.html.md#cutan.characters.IdleAnimation)(\*\*data)         | A named idle loop (e.g., breath, blink).                                |
+| [`AnimationTrack`](_autosummary/cutan.characters.html.md#cutan.characters.AnimationTrack)(\*\*data)        | A single channel inside an idle animation.                              |
+
+### *class* cutan.characters.AnimationTrack(\*\*data)
+
+Bases: `RigModel`
+
+A single channel inside an idle animation.
+
+The `target` is a path-string per the architecture pillar:
+
+- `bone:<name>.<prop>` for bone transforms (`x`, `y`, `rotation_deg`,
+  `scale_x`, `scale_y`).
+- `slot:<name>.attachment` for swap animations (eyes blinking, mouth visemes).
+
+For `type="sine"`: `amplitude` is the peak deviation; `phase` is in
+cycles (0..1). For `type="step"` / `type="linear"`: `frames` is a
+list of `[time_s, value]` pairs evaluated in order.
+
+```pycon
+>>> t = AnimationTrack(target="bone:torso.y", type="sine", amplitude=2.0)
+>>> t.amplitude
+2.0
+```
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+### *class* cutan.characters.Attachment(\*\*data)
+
+Bases: `RigModel`
+
+A drawable: an SVG path + anchor point (in 0..1 per-axis units).
+
+```pycon
+>>> a = Attachment(path="parts/head.svg", anchor=(0.5, 0.78))
+>>> a.anchor
+(0.5, 0.78)
+```
+
+#### anchor *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]*
+
+Anchor in 0..1 per-axis units (Pixi’s Sprite.anchor convention).
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+#### source *: AssetSource | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Where THIS part’s art came from, when it is not the descriptor’s
+`source` — a character composed from several clips, or a carved head
+on a CC0 body, credits each (an#220). `None` = the descriptor’s
+`source` covers it. `an credits` lists every one; an all-rights-
+reserved part makes the render NOT PUBLISHABLE like any other.
+Omitted from the stored document when unset.
+
+#### width *: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+The size the part draws at, in **view_box units** — the rig’s units,
+the ones `x`/`y` and the bones use (an#220). \*\*A declared size
+wins\*\* over the art’s own extent, as `Plane.size` does for plates.
+Unset, the art’s own extent is the size: an SVG’s `width`/`height`
+(else its viewBox), a raster’s PIXEL count — so a PNG carved at one
+pixel per unit needs nothing, and one carved at any other scale
+declares its size here instead of being resampled. The aspect is the
+art’s, always (an#74): with ONE of the two declared the other follows
+the art’s aspect; with both, the art is contained in the box
+(uniformly scaled to fit, never stretched) and `an character
+validate` says when the two aspects disagree. See
+`attachment_box()`.
+
+#### x *: [float](https://docs.python.org/3/builtins/functions.html#float)*
+
+Offset from the slot’s bone, in view_box units.
+
+**This is where a part’s position lives**, and it is the reference data
+model’s answer, not an invention: DragonBones puts it in
+`display.transform`, Spine in the region attachment’s `{x, y}`, and
+in both the *slot* carries no transform at all. It is what lets five face
+parts share one `head` bone and still land in different places — before
+this field they all stacked on the bone, because the descriptor had no
+way to say otherwise and the compiler used hardcoded literals instead.
+
+### *class* cutan.characters.Bone(\*\*data)
+
+Bases: `RigModel`
+
+A skeleton joint with a local transform relative to its parent.
+
+```pycon
+>>> b = Bone(name="head", parent="torso", x=0, y=-260, pivot="neck")
+>>> b.parent
+'torso'
+```
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+#### pivot *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Optional pivot name — must match a circle in the SVG `skeleton` group.
+
+### *class* cutan.characters.CharacterDescriptor(\*\*data)
+
+Bases: `RigModel`
+
+The on-disk character schema. Saved as `character.json`.
+
+The descriptor is the SSOT for a character’s identity, body part inventory,
+pivot geometry, viseme map, and built-in idle behaviors. Binary art lives
+as SVG sidecars referenced by `Attachment.path` (relative to the
+descriptor file).
+
+```pycon
+>>> c = CharacterDescriptor(name="maya")
+>>> c.schema_version == CHARACTER_SCHEMA_VERSION
+True
+>>> # all 9 mouths are wired into the default skin
+>>> sorted(c.skins["default"].slots["mouth"].keys()) == [
+...     'mouth_a', 'mouth_b', 'mouth_c', 'mouth_d',
+...     'mouth_e', 'mouth_f', 'mouth_g', 'mouth_h', 'mouth_x',
+... ]
+True
+>>> # round-trip
+>>> raw = c.model_dump_json()
+>>> back = CharacterDescriptor.model_validate_json(raw)
+>>> back.name == c.name
+True
+```
+
+#### asset_sets *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]]*
+
+`{channel: {key: attachment_name}}` — what a swap key SELECTS, layered
+over `skins`, which is the SSOT for what art EXISTS. The indirection is
+deliberate: a channel key is not an attachment name. Today’s viseme map
+happens to be one-to-one (9 keys, 9 attachments), but real mouth charts
+are many-to-one — ~10 drawings carrying ~40 phonemes — and collapsing the
+two namespaces makes the first shared drawing a schema change instead of
+a data change. Replaces `viseme_map` (schema 0.2.0).
+
+#### colour_roles *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]]*
+
+Which colour literal in which part plays which `StylePack` role —
+`{part path: {"#rrggbb": role}}`, e.g.
+`{"parts/torso.svg": {"#a83249": "clothing"}}`. Written by the factory,
+which KNOWS what it drew as skin or clothing; read by the compiler, which
+rewrites the tagged literals under a pack (palette swapping — see
+[`cutan.characters.colour_roles`](_autosummary/cutan.characters.colour_roles.html.md#module-cutan.characters.colour_roles)). Empty = untagged art (hand-drawn,
+DiceBear): a pack cannot reach it and the compiler says so, because the
+alternative is inferring a role from a pixel (an#99’s wrong-tone lid).
+Additive: no schema bump, and a descriptor without it reads back as
+untagged. Keys are normalised to lowercase `#rrggbb`; a role must be
+one a pack can set (`an.styles.REACHABLE_ROLES`).
+
+#### expression_binding *: [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+How expression axes reach this rig (an#98), as a list of binding dicts —
+`{"axis", "slot", "property", "gain"[, "rig_scaled"]}` for a transform
+channel, `{"axis", "slot", "set_family"}` for a swap set. `None` means
+the default binding derived from the slots the rig has
+([`cutan.expression.binding.default_binding()`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.default_binding)). Additive: no schema bump,
+and a pre-Wave-6 descriptor reads back unchanged.
+
+#### face_overlay *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Whether this character’s face is drawn as separate overlay parts
+(eyes, brows, mouth as their own slots — the default) or baked into the
+head art (DiceBear / external avatars). `False` suppresses the face
+overlay slots at rig build AND the viseme/emotion channels at dialogue
+compile — a baked face has no overlay mouth to drive.
+
+This is a **declared fact**, replacing the old vendor-name check on
+`metadata.art_provenance` (an#87): provenance says where art came
+from; this says what the art IS. The 0.2.0 → 0.3.0 migration derives it
+from the provenance string once, and `art_provenance` reverts to pure
+provenance/licensing metadata.
+
+#### gait *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+This character’s default walk `gait` (one of `GAITS`, an#220);
+an author’s `gait` arg overrides it. `None` = `legs` when the rig
+builds a leg pair, else `rock`. A robe figure whose leg slots are hem
+halves declares `"hem"` once, here, rather than on every walk.
+Omitted from the stored document when unset.
+
+#### gaze_travel *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+How far a pupil may travel from its rest, in view-box units per axis
+(an#99): the sclera’s clearance minus the pupil’s radius, written by
+`an character add-gaze` from the parts it synthesized. `None` = the
+rig has no pupil layer (gaze is a no-op on it) or uses the default
+travel. The travel maps the gaze axes’ unit circle onto the sclera’s
+inner ellipse; the compiler clamps the summed (x, y) to 0.95 of that
+circle, which keeps the whole pupil disc inside the white at every
+angle (a per-axis box pokes out at the diagonal) — no runtime mask.
+
+#### metadata *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]*
+
+Free-form metadata (dicebear style/seed, etc.). Schema-evolution
+friendly: anything an external tool wants to record can land here.
+
+This comment used to say “art license, etc.” — an invitation nothing ever
+took up. Rights live in `source` now, typed, so they can be found.
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+#### model_post_init(\_CharacterDescriptor_\_context)
+
+Override this method to perform additional initialization after `__init__` and `model_construct`.
+This is useful if you want to do some validation that requires the entire model to be initialized.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+#### occluded *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
+
+The face features another drawing of this character covers, and what
+covers them — `{feature: what}`, e.g. `{"brows": "the cap hat at
+head_scale 0.3"}` (an#252). A **declared fact**, written by whoever
+knows the geometry: the factory measures its hat against the brows’
+acting range and records an overlap it could not seat away; an
+illustrator declares a helmet over the brows. Read by the character
+analyser: a covered feature is not afforded (`brows` →
+`face.brows`), so the methods needing it fall to their default, said
+by `an character capabilities`. Keys are
+`OCCLUDABLE_FEATURES`. Omitted from the
+stored document when empty.
+
+#### rest_view *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+The view the DEFAULT art is drawn in (an#220) — a declared fact about
+the art, like `face_overlay`. `None` means `DFLT_VIEW`
+(front). A character carved from a profile (a silhouette film, a side-
+on figure) says `"side"`, and everything that asks which view is in
+force before any turn — `walk` swinging its legs rather than lifting
+them — reads it instead of the author passing `view: side` by hand.
+Omitted from the stored document when unset.
+
+#### source *: AssetSource | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Where this character’s art came from, and what its licence obliges.
+
+`None` means “we made this” — not “unknown”. Anything acquired should
+carry one, because a licence defect is the only failure that reaches
+BACKWARDS through completed work: a video shipped with an unattributed
+CC BY asset cannot be un-shipped.
+
+Field names match `illustration.ImageResult` exactly, so an adapter is a
+dict copy rather than a rename table — and a rename table is where a field
+quietly stops being carried. Pinned by test.
+
+#### source_svg *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Optional source SVG (relative path) that the parts/ folder was
+extracted from. Useful for re-slicing.
+
+#### speech *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+a
+method’s spelling (`mouth_chart`, `pulse`), its id
+(`speech.pose_only`) or a choice with args and an optional version pin
+(`{method: pulse, args: {strength: 0}}` — a mime). `None` = the
+default chain: lip-sync when the character has a mouth chart, else a
+head pulse, recorded. Declaring it is also how a baked-face character
+renders under `--strict-assets`: a declared pulse is the request, not a
+fallback. Resolved (and refused when unknown) by the capability
+registry. Omitted from the stored document when unset.
+
+* **Type:**
+  How this character shows it is speaking (the speech aspect, an#248)
+
+#### swap_poses *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [SlotPose](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.SlotPose)]]]*
+
+{slot:
+SlotPose}}}\`\` (an#197). A `set` of a swap set on the ENTITY itself
+(`{kind: set, target: maya, property: view, value: side}`) fans the
+key out to every slot the set projects onto AND poses the slots listed
+under that key; a slot listed under another key of the set returns to
+rest. That is how one key turns a whole character: the head and torso
+swap art, the far eye and arm hide, the mouth slides to the profile
+edge — while blinks, gaze and lip-sync keep running on what is visible
+(the face solver folds a pose into its own channels). Additive: no
+schema bump, and a descriptor without it reads back unposed.
+
+* **Type:**
+  How slots are POSED while a swap key shows — 
+
+  ```
+  ``
+  ```
+
+  {set
+* **Type:**
+  {key
+
+#### voice_ref *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Voice-store id or path used by the audio pipeline. Optional; the scene
+can override per shot.
+
+### *class* cutan.characters.IdleAnimation(\*\*data)
+
+Bases: `RigModel`
+
+A named idle loop (e.g., breath, blink).
+
+```pycon
+>>> a = IdleAnimation(name="idle_breath", duration=4.0)
+>>> a.loop
+True
+```
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+### *class* cutan.characters.Skin(\*\*data)
+
+Bases: `RigModel`
+
+A named outfit/variant: maps slot → {attachment_name → Attachment}.
+
+```pycon
+>>> skin = Skin(name="default", slots={"mouth": {"mouth_a": Attachment(path="parts/mouth/mouth_a.svg")}})
+>>> skin.slots["mouth"]["mouth_a"].path
+'parts/mouth/mouth_a.svg'
+```
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+### *class* cutan.characters.Slot(\*\*data)
+
+Bases: `RigModel`
+
+A draw-order slot bound to a bone, displaying one attachment at a time.
+
+```pycon
+>>> s = Slot(name="mouth", bone="head", draw_order=7, attachment="mouth_x")
+>>> s.attachment
+'mouth_x'
+```
+
+#### attachment *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Default attachment name; the active attachment can change at runtime
+via animation tracks targeting `slot:<name>.attachment`.
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+### cutan.characters.blink_animation(, closure_s=0.13, duration_s=0.18, eye_l_slot='left_eye', eye_r_slot='right_eye', open_attachment_l='open', closed_attachment_l='closed', open_attachment_r='open', closed_attachment_r='closed', name='blink')
+
+Step-animation that snaps both eye slots closed → open.
+
+The closure is centred: open → closed at `(duration - closure) / 2` →
+open again `closure` later. With the defaults (0.13s closure in an
+0.18s envelope) that is closed at 0.025s, open at 0.155s. (An earlier
+docstring claimed 0.05/0.13 — numbers from an older closure value; and
+the slot/attachment defaults were the stale pre-0.2.0 spellings
+`eye_l`/`eye_l_open`, unnoticed for as long as nothing consumed
+`descriptor.animations` — both fixed in an#87.)
+
+* **Return type:**
+  [`IdleAnimation`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.IdleAnimation)
+
+### cutan.characters.breath_animation(, period_s=4.0, amplitude_px=2.0, head_tilt_deg=0.5, include_weight_shift=True, weight_shift_amplitude_px=1.5, weight_shift_period_s=6.0, name='idle_breath')
+
+Sine-wave breath on torso Y + head rotation; optional weight shift.
+
+The head tilt is phase-offset by 0.25 cycles to follow the chest with a
+natural lag. The optional weight shift is on a slower 6-second period to
+avoid a metronomic feel when both run at the same time.
+
+The animation’s `duration` is the LCM-ish combined period: the longest
+sub-track period, so the overall loop closes cleanly.
+
+* **Return type:**
+  [`IdleAnimation`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.IdleAnimation)
+
+### cutan.characters.compare_silhouettes(a, b, , size=(256, 256))
+
+Return IoU between two silhouette PNGs (0..1; lower = more distinct).
+
+Both images are resized to `size`, converted to grayscale, thresholded
+at the midpoint, and the intersection-over-union of the foreground (dark)
+pixels is computed.
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+```pycon
+>>> # Two identical silhouettes → IoU = 1.0; two empty → 0.0 (no overlap).
+>>> # Tested via test suite, not doctest, since it requires Playwright.
+```
+
+### cutan.characters.extract_part(source, part_id, , crop_viewbox=True, padding=8.0)
+
+Emit a standalone SVG tree containing only the group with the given id.
+
+Any top-level `<defs>` from the source is copied so the part can
+resolve gradient / pattern / filter references like
+`fill="url(#some_gradient)"`. The matched group is appended unchanged.
+
+When `crop_viewbox` is True (the default), the new SVG’s viewBox is
+cropped to the bounding box of the part’s primitive content (rect /
+circle / ellipse / path) plus `padding` units on each side. This
+keeps a part’s texture proportional to its content instead of to the whole
+character canvas. Falls back to the source viewBox when no bbox can be
+derived.
+
+The emitted `width`/`height` always match the emitted viewBox, so the
+part rasterises at its own extent and is never letterboxed inside a canvas
+it does not fill. The crop rect’s \*\*parent-space origin survives as the
+viewBox’s first two numbers\*\*, so where the part sat relative to its
+siblings is not lost and needs no separate record.
+
+If no match is found, raises [`KeyError`](https://docs.python.org/3/builtins/exceptions.html#KeyError).
+
+* **Return type:**
+  [`ElementTree`](https://docs.python.org/3/library/xml.etree.elementtree.html#xml.etree.ElementTree.ElementTree)
+
+### cutan.characters.extract_pivots(source, , skeleton_id='skeleton')
+
+Return `{name: (cx, cy)}` for every named `<circle>` under skeleton.
+
+Pivots use the Pose Animator convention: a `<g id="skeleton">` group
+sibling of the illustration, containing one `<circle>` per named joint.
+The circle’s `cx`/`cy` is the pivot in the same coordinate system as
+the art (the SVG’s viewBox).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
+### cutan.characters.fetch_dicebear(seed, , style='lorelei', api_version='9.x', timeout_s=10.0, extra_params=None)
+
+Fetch an avatar SVG from DiceBear’s HTTP API.
+
+Returns the SVG string. Raises [`RuntimeError`](https://docs.python.org/3/builtins/exceptions.html#RuntimeError) if the API call
+fails (network error, HTTP error, non-SVG response).
+
+The URL pattern is:
+
+```default
+https://api.dicebear.com/<api_version>/<style>/svg?seed=<seed>
+```
+
+Pass `extra_params` to forward style-specific options (e.g.
+`backgroundColor=transparent`).
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.generate_default_mouths(, canvas=(256, 128), palette=None, shapes=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x'), smile=0.0, form=None)
+
+Return `{"mouth_<letter>[_<form>]": <svg-string>, ...}` for every shape.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> svgs = generate_default_mouths()
+>>> 'mouth_x' in svgs and 'viewBox' in svgs['mouth_x']
+True
+>>> sorted(generate_default_mouths(shapes=["a"], smile=0.35, form="happy"))
+['mouth_a_happy']
+```
+
+### cutan.characters.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short')
+
+Build a complete character on disk.
+
+**Variety knobs** (every default reproduces the pre-knob character byte for
+byte, which a golden test holds):
+
+- `palette` — `{role: "#rrggbb"}` over `PALETTE_ROLES` (`skin`,
+  `hair`, `clothing`, `leg`, `accessory`) — the SAME role names a
+  `StylePack` uses. Unset roles keep the seed’s colours.
+  > `skin` also paints the hands and the gaze lid; `hair` the brows and
+  > the collar. On a DiceBear head only the body follows (its face is baked).
+- `build` — a key of `BUILDS`: `regular`, `squat` (round body,
+  short legs), `tall`, `stick` (small blocky body, stick limbs).
+- `head_scale` — the head and its whole face (eyes, brows, mouths, their
+  offsets, the pupil travel) scaled together, so a big head keeps its face.
+- `hat` — a key of `HATS` (offline head only), in `accessory`,
+  worn above the brows’ acting range at this head scale (an#252): lifted,
+  and flattened toward its crown when lifting is not enough. A hat that
+  still covers the brows (a very small head) is recorded in the
+  descriptor’s `occluded`, so the character does not afford
+  `face.brows` and expressions fall to the lids, gaze and mouth.
+- `hair_style` — `HAIR_STYLES`: `peak` (the default), `bald`,
+  `bun`, `curly`; `hair_length` — `HAIR_LENGTHS`: `short`
+  (the default), `medium`, `long` (offline head only). Drawn in the
+  `hair` role (the palette’s `hair` colours them), in every view.
+- `sash` — a diagonal band across the torso, in `accessory`.
+- `views` (an#197) — draw the turnaround: `back`, `side` (a profile
+  facing the viewer’s right) and `three_quarter` beside the front, as a
+  `view` swap set with a pose per view (`add_views()`), so
+  `an.motion.turn()` can turn the character around. Offline head only
+  > (a DiceBear face is baked into its art); ignored for a DiceBear head.
+
+  Additive: a shot that never sets a view renders exactly as without it.
+
+Every colour the factory draws in a role is recorded in the descriptor’s
+`colour_roles` so a style pack can recolour it later (palette swapping,
+[`cutan.characters.colour_roles`](_autosummary/cutan.characters.colour_roles.html.md#module-cutan.characters.colour_roles)).
+
+`gaze` (an#99) adds the eye stack — sclera and pupil slots under each
+lid, a filled closed lid, the `gaze_travel` clamp — through
+`add_gaze()`, so `gaze_x`/`gaze_y` and the ambient saccades reach the
+pupils. Off, the eye is the single pre-stack drawing.
+
+`mouth_variants` (an#98) — `{form: smile offset}` — writes one more
+9-shape mouth set per form (`mouth_<shape>_<form>.svg`) and declares it
+as the `viseme@<form>` swap set, with its attachments in the default
+skin’s `mouth` slot, so an expression preset preferring that form
+selects it. `None` means [`DEFAULT_MOUTH_VARIANTS`](_autosummary/cutan.characters.mouth_set.html.md#cutan.characters.mouth_set.DEFAULT_MOUTH_VARIANTS)
+(happy, sad); `{}` means the neutral set only.
+
+Steps:
+
+1. Fetch a DiceBear avatar (skip if `use_dicebear=False` — useful for
+   offline tests).
+2. Wrap it into the canonical `an` cutout SVG (skeleton + illustration
+   groups), saved as `<name>.svg`.
+3. Slice each part into `parts/<part>.svg`.
+4. Write the 9-shape default mouth set into `parts/mouth/`.
+5. Synthesize a few derived parts (open/closed eyes, brows) so the
+   character is complete out of the box.
+6. Emit a `character.json` descriptor.
+
+Returns the path to the created `character.json`.
+
+Raises [`FileExistsError`](https://docs.python.org/3/builtins/exceptions.html#FileExistsError) if `out_dir/name` already exists and
+`overwrite=False`.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.normalize_svg(source, , fallback_viewbox='0 0 1024 1024')
+
+Promote Inkscape labels to ids and ensure a viewBox is set.
+
+Returns the parsed `ElementTree`. Idempotent: running it twice is a
+no-op on the second pass.
+
+* **Return type:**
+  [`ElementTree`](https://docs.python.org/3/library/xml.etree.elementtree.html#xml.etree.ElementTree.ElementTree)
+
+### cutan.characters.promote(project_dir, entity, as_, , source_svg=None, voice_ref=None, use_dicebear=True, overwrite=False)
+
+Promote `entity` from `project_dir`’s inline assets into the mall.
+
+* **Parameters:**
+  * **project_dir** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)) – Path to an `an` project (must contain `assets/characters/`).
+  * **entity** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Inline entity id used inside the scene (the directory under
+    `assets/characters/<entity>`, or the SVG file at
+    `assets/characters/<entity>.svg`).
+  * **as_** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – The mall character id to register the result as. Becomes the
+    directory name under `assets/characters/` and the descriptor’s
+    `name` field.
+  * **source_svg** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Optional explicit path to a source SVG. If omitted, the function
+    looks for `assets/characters/<entity>.svg` or
+    `assets/characters/<entity>/<entity>.svg`.
+  * **voice_ref** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]) – Voice reference to embed in the descriptor.
+  * **use_dicebear** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Forwarded to [`new_character()`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.new_character) on the
+    no-source fallback path. Pass `False` to keep the call offline —
+    without it that fallback always reaches the DiceBear API, and
+    `new_character` swallows the failure and generates geometry instead,
+    so an offline test looks like it passed rather than like it was skipped.
+  * **overwrite** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – If False and the target already exists, raises `FileExistsError`.
+  * **character.json.** (*Returns the path to the new*)
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.promote_inkscape_labels_to_ids(tree)
+
+Copy `inkscape:label` to `id` on each group missing an id.
+
+Returns the number of groups updated.
+
+Inkscape stores the user-visible name in the `inkscape:label` attribute
+and does NOT promote it to `id` on save. This is a long-standing UX
+issue (Inkscape bug #243383); the workaround is to promote at parse time.
+
+* **Return type:**
+  [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
+### cutan.characters.record_character(char_dir, , name=None, out_mp4=None, duration_s=8.0, size=(640, 480))
+
+Render preview.html for the character at `char_dir` and record it.
+
+The preview HTML is generated/refreshed via the same writer used by
+`an character preview`, so this command is self-contained.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.record_preview_to_mp4(preview_html, out_mp4, , duration_s=8.0, size=(640, 480), fps=30, crf=23)
+
+Record `preview_html` to `out_mp4` for `duration_s` seconds.
+
+Returns the output mp4 path.
+
+Pipeline:
+
+> 1. Playwright launches headless Chromium with video recording on.
+> 2. Navigates to `preview_html` ([file://](file://) URL).
+> 3. Waits `duration_s` real-time so the browser captures frames.
+> 4. Closes the context to flush the webm.
+> 5. ffmpeg re-encodes the webm to H.264 mp4 (better compatibility,
+>    smaller files, plays in `quicktime` / GitHub previews).
+
+Both Playwright (project dep) and ffmpeg (system dep, already
+required by the renderer) must be installed.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.render_silhouette(svg_source, out_png, , size=(256, 256), background='#ffffff')
+
+Render an SVG to a binary silhouette PNG (black on white).
+
+Uses Playwright/Chromium to rasterize, then PIL to threshold by alpha
+or luminance. Returns the output path.
+
+The output is RGB; the silhouette is filled with black (#000) and the
+background with the given color.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.validate_character(char_dir, , name=None)
+
+Check an art package against the contract, offline.
+
+Reports a `Finding` per problem: a missing or
+unparseable descriptor, absent required parts or mouth shapes, a part that
+draws nothing, a prohibited construct, a letterboxed part, a joint name
+colliding with a part id, and an unpopulated `AssetSource`.
+
+* **Return type:**
+  `VerificationReport`
+
+```pycon
+>>> import tempfile, pathlib
+>>> with tempfile.TemporaryDirectory() as d:
+...     report = validate_character(d, name="nobody")
+>>> report.passed
+False
+>>> any("character.json" in f.description for f in report.findings)
+True
+```
+
+### cutan.characters.write_default_mouths(out_dir, , canvas=(256, 128), palette=None, shapes=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x'), variants=None)
+
+Write the default mouth SVGs into `out_dir` (created if missing),
+plus one `mouth_<shape>_<form>.svg` per shape for every `variants`
+entry (`{form: smile offset}`; `None` = none).
+
+Returns the list of paths written: the neutral set in shape order, then
+each variant’s.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]
+
+### cutan.characters.write_svg(tree_or_element, path=None)
+
+Serialize an `ElementTree` or `Element` to bytes (and optionally disk).
+
+Always emits `<?xml version="1.0" encoding="UTF-8"?>` and the SVG
+namespace as the default, so the output is a valid standalone SVG.
+
+* **Return type:**
+  [`bytes`](https://docs.python.org/3/builtins/stdtypes.html#bytes)
+
+### Modules
+
+| [`brows`](_autosummary/cutan.characters.brows.html.md#module-cutan.characters.brows)               | Brow acting: where the brows can go, what may not draw there, and the `face.brows` capability.        |
+|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| [`checks`](_autosummary/cutan.characters.checks.html.md#module-cutan.characters.checks)             | The cut-out genre's semantic checks: `play`, `expression`, turns, views and character refs.           |
+| [`cli`](_autosummary/cutan.characters.cli.html.md#module-cutan.characters.cli)                   | User-facing character CLI subcommands.                                                                |
+| [`colour_roles`](_autosummary/cutan.characters.colour_roles.html.md#module-cutan.characters.colour_roles) | Colour roles: which colour literal in which part is skin, clothing, hair…                             |
+| [`dicebear`](_autosummary/cutan.characters.dicebear.html.md#module-cutan.characters.dicebear)         | DiceBear HTTP API client + best-effort post-processing.                                               |
+| [`drawn`](_autosummary/cutan.characters.drawn.html.md#module-cutan.characters.drawn)               | What the character factory wrote, as it wrote it: the in-memory log behind its record of drawn bytes. |
+| [`factory`](_autosummary/cutan.characters.factory.html.md#module-cutan.characters.factory)           | High-level entry points: build and inspect a character.                                               |
+| [`idle`](_autosummary/cutan.characters.idle.html.md#module-cutan.characters.idle)                 | Idle animation factories: breath, blink, weight-shift.                                                |
+| [`licenses`](_autosummary/cutan.characters.licenses.html.md#module-cutan.characters.licenses)         | DiceBear per-style licences, as data.                                                                 |
+| [`methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)           | The cut-out genre's methods and aspects, and their compile-time resolution (ADR 0002).                |
+| [`mouth_set`](_autosummary/cutan.characters.mouth_set.html.md#module-cutan.characters.mouth_set)       | Generate the 9-shape default mouth set as parametric SVGs.                                            |
+| [`play`](_autosummary/cutan.characters.play.html.md#module-cutan.characters.play)                 | Resolve a `play` against a character descriptor — the renderer-free half (an#7).                      |
+| [`record`](_autosummary/cutan.characters.record.html.md#module-cutan.characters.record)             | Record a character's preview HTML to an mp4.                                                          |
+| [`registration`](_autosummary/cutan.characters.registration.html.md#module-cutan.characters.registration) | The character side of the cut-out genre, as declarations: `play` and `character`.                     |
+| [`schema`](_autosummary/cutan.characters.schema.html.md#module-cutan.characters.schema)             | Character descriptor schema (Spine-shaped, Pydantic v2).                                              |
+| [`silhouette`](_autosummary/cutan.characters.silhouette.html.md#module-cutan.characters.silhouette)     | Silhouette rendering and comparison for the silhouette test.                                          |
+| [`svg_utils`](_autosummary/cutan.characters.svg_utils.html.md#module-cutan.characters.svg_utils)       | SVG manipulation: namespace-aware DOM helpers using stdlib `xml.etree`.                               |
+| [`validate`](_autosummary/cutan.characters.validate.html.md#module-cutan.characters.validate)         | Whether an art package is one the compiler can actually render.                                       |
+| [`vocabulary`](_autosummary/cutan.characters.vocabulary.html.md#module-cutan.characters.vocabulary)     | The cut-out genre's vocabulary entries: motion presets, expression presets, IR-field notes.           |
+
+
+# _autosummary/cutan.characters.idle.html.md
+
+# cutan.characters.idle
+
+Idle animation factories: breath, blink, weight-shift.
+
+Defaults are taken from production references (see research §6.3):
+
+- 15 breaths/min ⇒ 4-second period.
+- ±2 px torso vertical travel at a 1024-px-tall canonical character height.
+- ±0.5° head rotation, phase-offset by 0.25 cycles from the chest.
+- Blink closure ≈ 0.13 s; spontaneous blink gap 3-8 s (sampled per scene).
+
+The functions return [`cutan.characters.IdleAnimation`](_autosummary/cutan.characters.html.md#cutan.characters.IdleAnimation) instances ready
+to drop into `CharacterDescriptor.animations`.
+
+**Nothing here renders on its own.** Descriptor `animations` are seeded
+by `model_post_init` and reach the screen ONLY through an authored `play`
+action (an#7: `play("maya", "idle_breath")` renders exactly what
+[`breath_animation()`](_autosummary/cutan.characters.idle.html.md#cutan.characters.idle.breath_animation) returns — resolved by [`cutan.characters.play`](_autosummary/cutan.characters.play.html.md#module-cutan.characters.play)),
+never automatically. The blink you see without one is compiled by
+`an.stage.compile._add_face_clips` (an#88, via `_blink_placements`) from a fixed
+entity-name-phase schedule (period 4.0 s). `random_blink_schedule` has no
+caller — it is the seeded alternative the compiled blink could adopt.
+
+One documented number is not what a `play` shows: the “4-second period”
+above is `DEFAULT_BREATH_PERIOD_S`, but the seeded `idle_breath` also
+carries the 6 s weight shift, and [`evaluate_track()`](_autosummary/cutan.characters.idle.html.md#cutan.characters.idle.evaluate_track) divides by the
+ANIMATION’s duration — `max(4, 6)` — so every sine track in it runs a 6 s
+cycle. A per-track period is the fix; until then, `include_weight_shift=False`
+gives the 4 s breath the numbers describe.
+
+```pycon
+>>> a = breath_animation()
+>>> a.name
+'idle_breath'
+>>> [t.target for t in a.tracks][:2]
+['bone:torso.y', 'bone:head.rotation_deg']
+>>> b = blink_animation()
+>>> b.duration
+0.18
+```
+
+### Functions
+
+| [`blink_animation`](_autosummary/cutan.characters.idle.html.md#cutan.characters.idle.blink_animation)(\*[, closure_s, duration_s, ...])   | Step-animation that snaps both eye slots closed → open.             |
+|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| [`breath_animation`](_autosummary/cutan.characters.idle.html.md#cutan.characters.idle.breath_animation)(\*[, period_s, ...])               | Sine-wave breath on torso Y + head rotation; optional weight shift. |
+| [`evaluate_track`](_autosummary/cutan.characters.idle.html.md#cutan.characters.idle.evaluate_track)(track, t, duration)                  | Evaluate a single animation track at time `t`.                      |
+| [`random_blink_schedule`](_autosummary/cutan.characters.idle.html.md#cutan.characters.idle.random_blink_schedule)(duration_s, \*[, ...])        | Return a sorted list of blink start times across `duration_s`.      |
+
+### cutan.characters.idle.blink_animation(, closure_s=0.13, duration_s=0.18, eye_l_slot='left_eye', eye_r_slot='right_eye', open_attachment_l='open', closed_attachment_l='closed', open_attachment_r='open', closed_attachment_r='closed', name='blink')
+
+Step-animation that snaps both eye slots closed → open.
+
+The closure is centred: open → closed at `(duration - closure) / 2` →
+open again `closure` later. With the defaults (0.13s closure in an
+0.18s envelope) that is closed at 0.025s, open at 0.155s. (An earlier
+docstring claimed 0.05/0.13 — numbers from an older closure value; and
+the slot/attachment defaults were the stale pre-0.2.0 spellings
+`eye_l`/`eye_l_open`, unnoticed for as long as nothing consumed
+`descriptor.animations` — both fixed in an#87.)
+
+* **Return type:**
+  [`IdleAnimation`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.IdleAnimation)
+
+### cutan.characters.idle.breath_animation(, period_s=4.0, amplitude_px=2.0, head_tilt_deg=0.5, include_weight_shift=True, weight_shift_amplitude_px=1.5, weight_shift_period_s=6.0, name='idle_breath')
+
+Sine-wave breath on torso Y + head rotation; optional weight shift.
+
+The head tilt is phase-offset by 0.25 cycles to follow the chest with a
+natural lag. The optional weight shift is on a slower 6-second period to
+avoid a metronomic feel when both run at the same time.
+
+The animation’s `duration` is the LCM-ish combined period: the longest
+sub-track period, so the overall loop closes cleanly.
+
+* **Return type:**
+  [`IdleAnimation`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.IdleAnimation)
+
+### cutan.characters.idle.evaluate_track(track, t, duration)
+
+Evaluate a single animation track at time `t`.
+
+For sine: `amplitude * sin(2π * (t/duration + phase))`.
+For step: returns the value of the latest frame whose time ≤ `t`.
+For linear: linear interpolation between bracketing frames.
+
+* **Return type:**
+  [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+```pycon
+>>> tr = AnimationTrack(target='bone:torso.y', type='sine', amplitude=2.0)
+>>> round(evaluate_track(tr, 0.0, 4.0), 6)
+0.0
+>>> round(evaluate_track(tr, 1.0, 4.0), 6)
+2.0
+```
+
+### cutan.characters.idle.random_blink_schedule(duration_s, , min_gap_s=3.0, max_gap_s=8.0, seed=None)
+
+Return a sorted list of blink start times across `duration_s`.
+
+A seeded schedule with uniform gaps in `[min_gap_s, max_gap_s]`. NOT
+what the renderer uses today (see the module docstring); kept as the
+candidate for descriptor-driven scheduling.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+```pycon
+>>> times = random_blink_schedule(20.0, seed=0)
+>>> all(0 <= t < 20 for t in times)
+True
+>>> times == sorted(times)
+True
+```
+
+
+# _autosummary/cutan.characters.licenses.html.md
+
+# cutan.characters.licenses
+
+DiceBear per-style licences, as data.
+
+The DiceBear *software* licence (MIT) is a separate fact from each *style*
+licence — DiceBear itself splits them under literal `# Design` and `# Code`
+headings inside every per-style licence file. Reading the repo’s top-level MIT
+and concluding the avatars are MIT is the trap this table exists to close.
+
+Verified against the per-style licence files and style pages at the pinned API
+major; the sources are recorded in `misc/docs/wave1_verification.md` §2.
+
+Of the styles `an` can request: 11 are CC0 (no attribution duty), 12 are
+CC BY 4.0 (a real duty), and the Pablo Stanley set carries bespoke
+“free for personal and commercial use” terms that are **not** Creative Commons —
+which is why they are their own code here rather than being rounded to one.
+
+### Module Attributes
+
+| [`FREE_PERSONAL_AND_COMMERCIAL`](_autosummary/cutan.characters.licenses.html.md#cutan.characters.licenses.FREE_PERSONAL_AND_COMMERCIAL)   | Pablo Stanley's own terms.                                  |
+|---------------------------------------------------------------------------------|-------------------------------------------------------------|
+| [`DICEBEAR_STYLE_LICENSES`](_autosummary/cutan.characters.licenses.html.md#cutan.characters.licenses.DICEBEAR_STYLE_LICENSES)        | style name -> its DESIGN licence.                           |
+| [`NO_ATTRIBUTION_REQUIRED`](_autosummary/cutan.characters.licenses.html.md#cutan.characters.licenses.NO_ATTRIBUTION_REQUIRED)        | Licences that need no credit from whoever ships the output. |
+
+### Functions
+
+| [`attribution_for`](_autosummary/cutan.characters.licenses.html.md#cutan.characters.licenses.attribution_for)(style)                | DiceBear's own attribution template, filled in.                       |
+|----------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
+| [`dicebear_source`](_autosummary/cutan.characters.licenses.html.md#cutan.characters.licenses.dicebear_source)(style, \*, seed)      | Build the provenance record for a DiceBear avatar.                    |
+| [`reconstruct_legacy_source`](_autosummary/cutan.characters.licenses.html.md#cutan.characters.licenses.reconstruct_legacy_source)(descriptor) | Recover provenance from a descriptor written before `source` existed. |
+| [`requires_acknowledgement`](_autosummary/cutan.characters.licenses.html.md#cutan.characters.licenses.requires_acknowledgement)(style)       | Whether using `style` puts a duty on whoever ships the output.        |
+
+### Classes
+
+| [`StyleLicense`](_autosummary/cutan.characters.licenses.html.md#cutan.characters.licenses.StyleLicense)(license, license_url, author, ...)   | One style's design licence and the credit it obliges.   |
+|----------------------------------------------------------------------------------------------------|---------------------------------------------------------|
+
+### cutan.characters.licenses.DICEBEAR_STYLE_LICENSES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [StyleLicense](_autosummary/cutan.characters.licenses.html.md#cutan.characters.licenses.StyleLicense)]* *= {'adventurer': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'Lisa Wischofsky', 'https://www.instagram.com/lischi_art/', 'Adventurer', 'https://www.figma.com/community/file/1184595184137881796'), 'adventurer-neutral': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'Lisa Wischofsky', 'https://www.instagram.com/lischi_art/', 'Adventurer Neutral', 'https://www.figma.com/community/file/1184595184137881796'), 'avataaars': ('free-personal-and-commercial', 'https://avataaars.com/', 'Pablo Stanley', 'https://twitter.com/pablostanley', None, 'https://avataaars.com/'), 'avataaars-neutral': ('free-personal-and-commercial', 'https://avataaars.com/', 'Pablo Stanley', 'https://twitter.com/pablostanley', None, 'https://avataaars.com/'), 'big-ears': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'The Visual Team', 'https://thevisual.team/', 'Face Generator', 'https://www.figma.com/community/file/986078800058673824'), 'big-ears-neutral': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'The Visual Team', 'https://thevisual.team/', 'Face Generator', 'https://www.figma.com/community/file/986078800058673824'), 'big-smile': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'Ashley Seo', 'http://www.ashleyseo.com/', 'Custom Avatar', 'https://www.figma.com/community/file/881358461963645496'), 'bottts': ('free-personal-and-commercial', 'https://bottts.com/', 'Pablo Stanley', 'https://twitter.com/pablostanley', None, 'https://bottts.com/'), 'bottts-neutral': ('free-personal-and-commercial', 'https://bottts.com/', 'Pablo Stanley', 'https://twitter.com/pablostanley', None, 'https://bottts.com/'), 'croodles': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'vijay verma', 'https://vjy.me/', 'Croodles - Doodle your face', 'https://www.figma.com/community/file/966199982810283152'), 'croodles-neutral': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'vijay verma', 'https://vjy.me/', 'Croodles - Doodle your face', 'https://www.figma.com/community/file/966199982810283152'), 'dylan': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'Natalia Spivak', 'https://nataspvk.tilda.ws/', 'Dylan! The Avatar Generator', 'https://www.figma.com/community/file/1356575240759683500'), 'fun-emoji': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'Davis Uche', 'https://www.instagram.com/davedirect3/', 'Fun Emoji Set', 'https://www.figma.com/community/file/968125295144990435'), 'glass': ('cc0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/', 'DiceBear', 'https://www.dicebear.com', 'Glass', 'https://www.dicebear.com'), 'icons': ('mit', 'https://opensource.org/licenses/MIT', 'The Bootstrap Authors', None, None, None), 'identicon': ('cc0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/', 'DiceBear', None, None, 'https://www.dicebear.com'), 'initials': ('mit', 'https://opensource.org/licenses/MIT', 'Florian Körner', None, None, None), 'lorelei': ('cc0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/', 'Lisa Wischofsky', 'https://www.instagram.com/lischi_art/', 'Lorelei', 'https://www.figma.com/community/file/1198749693280469639'), 'lorelei-neutral': ('cc0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/', 'Lisa Wischofsky', 'https://www.instagram.com/lischi_art/', 'Lorelei Neutral', 'https://www.figma.com/community/file/1198749693280469639'), 'micah': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'Micah Lanier', 'https://dribbble.com/micahlanier', 'Avatar Illustration System', 'https://www.figma.com/community/file/829741575478342595'), 'miniavs': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'Webpixels', 'https://webpixels.io/', 'Miniavs - Free Avatar Creator', 'https://www.figma.com/community/file/923211396597067458'), 'notionists': ('cc0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/', 'Zoish', 'https://bio.link/heyzoish', 'Notionists', 'https://heyzoish.gumroad.com/l/notionists'), 'notionists-neutral': ('cc0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/', 'Zoish', 'https://bio.link/heyzoish', 'Notionists', 'https://heyzoish.gumroad.com/l/notionists'), 'open-peeps': ('cc0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/', 'Pablo Stanley', 'https://twitter.com/pablostanley', 'Open Peeps', 'https://www.openpeeps.com/'), 'personas': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'Draftbit', 'https://draftbit.com/', 'Personas by Draftbit', 'https://personas.draftbit.com/'), 'pixel-art': ('cc0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/', 'DiceBear', None, 'Pixel Art', 'https://www.figma.com/community/file/1198754108850888330'), 'pixel-art-neutral': ('cc0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/', 'DiceBear', None, 'Pixel Art Neutral', 'https://www.figma.com/community/file/1198754108850888330'), 'rings': ('cc0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/', 'DiceBear', 'https://www.dicebear.com', 'Rings', 'https://www.dicebear.com'), 'shapes': ('cc0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/', 'DiceBear', None, None, 'https://www.dicebear.com'), 'thumbs': ('cc0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/', 'DiceBear', None, None, 'https://www.dicebear.com'), 'toon-head': ('cc-by-4.0', 'https://creativecommons.org/licenses/by/4.0/', 'Johan Melin', 'https://www.johanmelin.com', 'ToonHead', 'https://www.figma.com/community/file/1589627891082866389')}*
+
+style name -> its DESIGN licence. Absent from this table means “unverified”,
+which is refused rather than assumed permissive.
+
+### cutan.characters.licenses.FREE_PERSONAL_AND_COMMERCIAL *= 'free-personal-and-commercial'*
+
+Pablo Stanley’s own terms. Permissive in effect, not a CC licence, and not
+something to silently relabel as one.
+
+### cutan.characters.licenses.NO_ATTRIBUTION_REQUIRED *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'cc0-1.0', 'free-personal-and-commercial', 'mit'})*
+
+Licences that need no credit from whoever ships the output.
+
+### *class* cutan.characters.licenses.StyleLicense(license, license_url, author, author_url, source_title, source_page_url)
+
+Bases: [`NamedTuple`](https://docs.python.org/3/library/typing.html#typing.NamedTuple)
+
+One style’s design licence and the credit it obliges.
+
+#### author *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Alias for field number 2
+
+#### author_url *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Alias for field number 3
+
+#### license *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+Alias for field number 0
+
+#### license_url *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Alias for field number 1
+
+#### source_page_url *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Alias for field number 5
+
+#### source_title *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Alias for field number 4
+
+### cutan.characters.licenses.attribution_for(style)
+
+DiceBear’s own attribution template, filled in. `None` when none is owed.
+
+The wording is theirs, verbatim from the per-style package README, including
+the “Remix of the original” half — which is what discharges CC BY’s
+“indicate if changes were made” clause. `an` wraps the avatar into a rig, so
+it genuinely produces a modified work.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.licenses.dicebear_source(style, , seed)
+
+Build the provenance record for a DiceBear avatar.
+
+Raises on an unlisted style rather than returning an empty record: “we did
+not check” and “there is nothing to discharge” must not look the same, and
+a `None` licence silently reads as the latter everywhere downstream.
+
+* **Return type:**
+  `AssetSource`
+
+### cutan.characters.licenses.reconstruct_legacy_source(descriptor)
+
+Recover provenance from a descriptor written before `source` existed.
+
+\*\*The users most at risk are the ones with no `source` field\*\*, because
+every character created before it existed used a CC BY default. Reporting
+those as “no third-party assets recorded” is not an absence of information —
+it is an affirmative, false compliance statement, made to exactly the people
+who need the opposite.
+
+The evidence is right there in the same file: `new_character` has always
+written `metadata.dicebear_style` and `metadata.dicebear_seed`. So this
+reconstructs the record rather than shrugging.
+
+Returns `None` only when the art genuinely was not third-party (the
+offline geometric fallback), which is the one case where “nothing owed” is
+the true answer.
+
+* **Return type:**
+  `AssetSource` | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.licenses.requires_acknowledgement(style)
+
+Whether using `style` puts a duty on whoever ships the output.
+
+An unlisted style counts as requiring acknowledgement — an unverified
+licence is a refusal, not a warning.
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+
+# _autosummary/cutan.characters.methods.html.md
+
+# cutan.characters.methods
+
+The cut-out genre’s methods and aspects, and their compile-time resolution (ADR 0002).
+
+The first two aspects of ADR 0002’s first slice, as registry data:
+
+| aspect     | method (spelled)                       | requires     | chain      |
+|------------|----------------------------------------|--------------|------------|
+| locomotion | `loco.legged_cycle` (`legs`)           | `limbs.legs` | 1st        |
+| locomotion | `loco.hem_sway` (`hem`)                | `limbs.legs` | by request |
+| locomotion | `loco.rock` (`rock`)                   | nothing      | last link  |
+| speech     | `speech.mouth_chart` (`mouth_chart`)   | `face.mouth` | 1st        |
+| speech     | `speech.pose_only` (`pulse`)           | nothing      | last link  |
+| expression | `expr.full_face` (`full_face`)         | `face.brows` | 1st        |
+| expression | `expr.without_brows` (`without_brows`) | nothing      | last link  |
+
+**Locomotion is today’s walk/gait chain, moved, not changed** (ADR 0002
+decision 8: the gate is byte-identical output). A walk’s `gait` arg is the
+author’s request, the descriptor’s `gait` a declared override (reported as
+such); with neither, the chain picks `legs` when the character affords a leg
+pair and `rock` when it does not — exactly what `an.motion.walk()` did on
+its own. What is new is that the choice is the registry’s, made once, and a
+requested gait the rig cannot honour (`hem` on a legless blob) is a
+**recorded substitution**: a warning, fatal under `--strict-assets`.
+
+**Speech gains a requirement-free last link.** A character whose face is baked
+into its art (`face_overlay: false`) used to speak with a frozen mouth; it now
+pulses its head on each syllable (`an.motion.speech_pulse()`, parametrised:
+`strength`, `part`, `attack`, `release`; `strength: 0` is a mime).
+
+**Expression names what reads when the brows cannot** (an#252). A hat the
+factory could not seat above the brows (recorded in `occluded`), or brow
+slots without art, leave `face.brows` unafforded: the face then acts with
+the lids, the gaze and the mouth form (`expr.without_brows`), recorded. Both
+methods compile to the same face channels — the solver drives whatever the
+rig binds — so the aspect is not consulted by the compiler; `an validate`
+reports the fall ([`check_brow_acting()`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.check_brow_acting)) and `an character
+capabilities` shows it with the remedy.
+
+The asset profile the compiler resolves against is the character analyser’s
+(`an.capabilities.affordances`), fed what the compiler actually has: the
+descriptor and the art its store holds, or — for a rig drawn from `parts` or
+the placeholder — the parts the builder built. Characters only: other entity
+kinds have no analyser yet, and keep the preset’s own rig lookup.
+
+Importing this module registers nothing: `cutan.genre.CUTOUT` lists
+[`CUTOUT_METHODS`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.CUTOUT_METHODS) and [`CUTOUT_ASPECTS`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.CUTOUT_ASPECTS).
+
+### Module Attributes
+
+| [`LOCOMOTION`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.LOCOMOTION)     | The aspect names (persisted in substitution records).       |
+|-----------------------------------------------------------------|-------------------------------------------------------------|
+| [`CUTOUT_METHODS`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.CUTOUT_METHODS) | The genre's methods, as vocabulary entries (kind `method`). |
+| [`CUTOUT_ASPECTS`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.CUTOUT_ASPECTS) | each chain ends in a method that requires nothing.          |
+
+### Functions
+
+| [`check_brow_acting`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.check_brow_acting)(ctx)                             | The cut-out genre's semantic check: an expression that moves the brows of a character whose brows cannot act is reported (a warning) — the expression aspect's recorded fall to `expr.without_brows` (an#252).   |
+|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`check_declared_speech`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.check_declared_speech)(ctx)                         | The cut-out genre's semantic check: each character's declared `speech` resolves.                                                                                                                                 |
+| [`compile_profile`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.compile_profile)(descriptor, \*[, ...])             | The character's profile, from what the compiler has: the analyser, fed honestly.                                                                                                                                 |
+| [`speech_problems`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.speech_problems)(declared)                          | Why a character's declared `speech` cannot be honoured (empty: it can).                                                                                                                                          |
+| [`normalise_gait_args`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.normalise_gait_args)(args)                          | A walk's args with `gait` as the walk spells it (`legs`/`hem`/`rock`).                                                                                                                                           |
+| [`resolve_walk_gait`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.resolve_walk_gait)(entity, \*, args, ...[, policy]) | `(gait, resolution)` of a walk on `entity`: the locomotion method's spelling.                                                                                                                                    |
+| [`speech_plan`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.speech_plan)(shot, \*, is_character, profile_of)    | Resolve the speech aspect ONCE per speaking character, and say what it adds.                                                                                                                                     |
+| [`substitution_record`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.substitution_record)(sub, \*[, entity_ref])         | A `Substitution` as an `asset_resolution` entry.                                                                                                                                                                 |
+| [`syllable_beats`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.syllable_beats)(line, \*[, min_gap_s])              | Syllable onsets of a dialogue line, in seconds from its start.                                                                                                                                                   |
+
+### Classes
+
+| [`SpeechPlan`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.SpeechPlan)([actions, no_lip_sync])   | What the speech aspect decided for a shot: the actions it adds, and the speakers whose lip-sync it switched off (the viseme pass skips them).   |
+|---------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+
+### cutan.characters.methods.CUTOUT_ASPECTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Aspect, ...]* *= (Aspect(name='locomotion', chain=('loco.legged_cycle', 'loco.rock'), applies_to=frozenset(), description='how a character travels when it walks.', declared_by='gait', records_fallback=False), Aspect(name='speech', chain=('speech.mouth_chart', 'speech.pose_only'), applies_to=frozenset(), description='how a character shows that it is speaking.', declared_by='speech', records_fallback=True), Aspect(name='expression', chain=('expr.full_face', 'expr.without_brows'), applies_to=frozenset({'character'}), description="how a character's face shows an emotion.", declared_by='', records_fallback=True))*
+
+each chain ends in a method that requires nothing.
+
+* **Type:**
+  The genre’s aspects
+
+### cutan.characters.methods.CUTOUT_METHODS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Method, ...]* *= (Method(id='loco.legged_cycle', kind='method', version='1', name='legs', title='legged walk cycle', description='a legged walk cycle: in profile the legs swing about the hip in opposition, facing the camera the stepping leg lifts; the arms swing against the legs', usage='', params={'type': 'object', 'properties': {'stride': {'type': 'number', 'default': 0.35}, 'lift': {'type': 'number', 'default': 10.0}, 'arm_swing': {'type': 'number', 'default': 0.3}, 'bob': {'type': 'number', 'default': 6.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'legs'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.hem_sway', kind='method', version='1', name='hem', title='hem sway', description="a robe figure's walk: the leg slots are the two halves of the hem, which tilt in turn about the hip while the body sways and bobs", usage='', params={'type': 'object', 'properties': {'hem_tilt': {'type': 'number', 'default': 0.24}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0}, 'stride': {'type': 'number', 'default': 0.35}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hem'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': "carve the robe's hem into two halves on slots leg_l/leg_r, pivoted at the hip, and declare \`gait: hem\` in character.json"}), Method(id='loco.rock', kind='method', version='1', name='rock', title='rock and bob', description='no leg moves: the body rocks side to side and bobs once per step while it travels (a blob, a sack, anything drawable)', usage='', params={'type': 'object', 'properties': {'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'rock'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='speech.mouth_chart', kind='method', version='1', name='mouth_chart', title='mouth chart lip-sync', description="lip-sync on the character's mouth chart: the line's visemes swap the mouth drawings (the nine Rhubarb shapes, or the character's own set)", usage='', params={}, examples=(), requires=(Requirement(capability='face.mouth', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='speech', remedies={'face.mouth': "give the character an overlay mouth: a \`mouth\` slot with the viseme set's drawings (\`an character mouths <dir>\`) and face_overlay: true"}), Method(id='speech.pose_only', kind='method', version='1', name='pulse', title='speech pulse', description='no lip-sync: the head (or the body) pulses on each syllable, so a baked face or a mime still reads as speaking', usage='', params={'type': 'object', 'properties': {'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=('a character with face_overlay: false speaks',), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='speech', remedies={}), Method(id='expr.full_face', kind='method', version='1', name='full_face', title='full-face expression', description="the expression acts with the whole face: the brows rise, knit and tilt, the lids open and close, the pupils move and the mouth takes the preset's form", usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'},), requires=(Requirement(capability='face.brows', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='expression', remedies={'face.brows': "keep the brows clear: \`an character new\` seats a hat above them at most head scales — at this one it could not, so use a larger --head-scale, another --hat or --hat none; for drawn art, redraw what covers the brows and remove the descriptor's \`occluded\` entry, or give the face brow slots (left_brow/right_brow) with art"}), Method(id='expr.without_brows', kind='method', version='1', name='without_brows', title='expression without brows', description='the brows cannot be seen acting (covered, or not drawn): the lids, the gaze and the mouth form carry the expression', usage='', params={}, examples=('a character whose hat covers its brows takes [surprised]',), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='expression', remedies={}))*
+
+The genre’s methods, as vocabulary entries (kind `method`).
+
+### cutan.characters.methods.LOCOMOTION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'locomotion'*
+
+The aspect names (persisted in substitution records).
+
+### *class* cutan.characters.methods.SpeechPlan(actions=(), no_lip_sync=frozenset({}))
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+What the speech aspect decided for a shot: the actions it adds, and the
+speakers whose lip-sync it switched off (the viseme pass skips them).
+
+### cutan.characters.methods.check_brow_acting(ctx)
+
+The cut-out genre’s semantic check: an expression that moves the brows of
+a character whose brows cannot act is reported (a warning) — the expression
+aspect’s recorded fall to `expr.without_brows` (an#252).
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.methods.check_declared_speech(ctx)
+
+The cut-out genre’s semantic check: each character’s declared `speech` resolves.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.methods.compile_profile(descriptor, , built_parts=(), art_exists=None)
+
+The character’s profile, from what the compiler has: the analyser, fed honestly.
+
+`descriptor` is the migrated `CharacterDescriptor` (or `None` for a
+rig drawn from `parts` / the placeholder); `art_exists(rel_path)` the
+store’s probe (`None`: the store cannot say, so every declared drawing
+counts — the rig builder’s own rule); `built_parts` the part names the
+builder built under the entity (for a non-descriptor rig, they ARE its
+parts document).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
+
+### cutan.characters.methods.normalise_gait_args(args)
+
+A walk’s args with `gait` as the walk spells it (`legs`/`hem`/`rock`).
+
+`gait` may name a locomotion method by id (`loco.rock`) or be a choice
+`{method, args, version}` — the level-(a) form, and how a scene pins a
+method’s version (ADR 0003 decision 2). The choice’s `args` join the
+walk’s (an explicit arg wins); a pin that no longer holds, or a method of
+another aspect, raises `VocabularyError`.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+```pycon
+>>> normalise_gait_args({"gait": {"method": "loco.legged_cycle", "args": {"stride": 0.5}, "version": "1"}})
+{'stride': 0.5, 'gait': 'legs'}
+>>> normalise_gait_args({"gait": "hem", "distance": 80})
+{'gait': 'hem', 'distance': 80}
+```
+
+### cutan.characters.methods.resolve_walk_gait(entity, , args, descriptor, profile, policy=None)
+
+`(gait, resolution)` of a walk on `entity`: the locomotion method’s spelling.
+
+The request is the walk’s `gait` arg, else the descriptor’s declared
+`gait` (an override of the derivation, and reported as one). An explicit
+`legs` arg names the limbs itself: a non-empty pair affords legs whatever
+the derivation says, `()` affords none.
+
+```pycon
+>>> gait, r = resolve_walk_gait("blob", args={"gait": "hem"}, descriptor=None, profile={})
+>>> gait, r.substitution.reason, r.substitution.missing
+('rock', 'missing', ('limbs.legs',))
+```
+
+### cutan.characters.methods.speech_plan(shot, \*, is_character, profile_of, descriptor_of=<function <lambda>>, has_part, record=None, policy=None)
+
+Resolve the speech aspect ONCE per speaking character, and say what it adds.
+
+The request is the character’s declared `speech` (a method spelling or a
+`{method, args, version}` choice); `policy` is the shot/style policy.
+The one resolution decides both halves: a speaker resolved to anything but
+`speech.mouth_chart` gets no viseme channel (`SpeechPlan.no_lip_sync`),
+and one resolved to `speech.pose_only` gets a `speech_pulse` play at each
+syllable onset of each timed line — one play per syllable, each built at the
+head’s pose at that instant, so it rides an authored head-scale tween rather
+than overwriting it; a syllable that starts while the speaker’s previous pulse
+is still running is skipped, so the head always settles back. `strength: 0`
+is a mime: no pulse at all. An authored `play: speech_pulse` on the speaker
+replaces the automatic pulses (nothing is added beside it), but it is not a
+declaration: the fall from the mouth chart is still recorded, and only a
+declared `speech` makes it the request. Substitutions (a declared method
+the rig cannot honour; the fall from the mouth chart to the pulse) go to
+`record`, once per speaker. A declared `speech` naming no method of the
+aspect, or pinned to a stale version, raises
+`VocabularyError` naming the aspect’s methods
+([`speech_problems()`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.speech_problems) is `an validate`’s side of it).
+
+* **Return type:**
+  [`SpeechPlan`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.SpeechPlan)
+
+### cutan.characters.methods.speech_problems(declared)
+
+Why a character’s declared `speech` cannot be honoured (empty: it can).
+
+An unknown method, a method of another aspect, or a pin to a version the
+registry no longer has; the message names the speech methods.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> speech_problems("pulse"), speech_problems(None)
+([], [])
+>>> speech_problems("flap")[0].startswith("speech 'flap'")
+True
+```
+
+### cutan.characters.methods.substitution_record(sub, , entity_ref=None)
+
+A `Substitution` as an `asset_resolution` entry.
+
+The compiled document’s record generalised (ADR 0002 decision 6):
+`kind: method`, `store` the aspect, `ref` what was asked for,
+`resolved` what was used, `fallback` whether `--strict-assets` makes
+it fatal.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### cutan.characters.methods.syllable_beats(line, , min_gap_s=0.18)
+
+Syllable onsets of a dialogue line, in seconds from its start.
+
+From the line’s viseme track (a syllable starts where the mouth opens out
+of a closed shape), else its word timings (one beat per word), else one
+beat at its start. Beats closer than `min_gap_s` merge.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+
+# _autosummary/cutan.characters.mouth_set.html.md
+
+# cutan.characters.mouth_set
+
+Generate the 9-shape default mouth set as parametric SVGs.
+
+Produces drop-in art for `mouth_a` … `mouth_h` plus `mouth_x`, with
+shape parameters cribbed from Daniel Wolf’s Rhubarb README (see research
+§2.2). Every shape is rendered into the same per-mouth canvas
+(`DEFAULT_MOUTH_VIEWBOX`, default 256×128) with a centered anchor, so
+swapping attachments at runtime needs no per-shape offset.
+
+The set is deliberately stylized — flat colors, bold strokes — so it reads
+at the small sizes a typical cutout puppet uses (~30-40 px tall on a
+1080p frame). It’s not meant to compete with hand-drawn art; it’s the
+“always works” fallback.
+
+```pycon
+>>> svgs = generate_default_mouths()
+>>> sorted(svgs.keys())
+['mouth_a', 'mouth_b', 'mouth_c', 'mouth_d', 'mouth_e', 'mouth_f', 'mouth_g', 'mouth_h', 'mouth_x']
+>>> len(svgs['mouth_a']) > 100
+True
+```
+
+### Module Attributes
+
+| [`DEFAULT_MOUTH_VIEWBOX`](_autosummary/cutan.characters.mouth_set.html.md#cutan.characters.mouth_set.DEFAULT_MOUTH_VIEWBOX)   | Mouth canvas viewBox (width, height) — small per-shape and centered so the anchor is always (0.5, 0.5).   |
+|--------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| [`DEFAULT_MOUTH_VARIANTS`](_autosummary/cutan.characters.mouth_set.html.md#cutan.characters.mouth_set.DEFAULT_MOUTH_VARIANTS)  | a `viseme@<form>` set per entry, its shapes drawn with this corner upturn added (an#98).                  |
+
+### Functions
+
+| [`generate_default_mouths`](_autosummary/cutan.characters.mouth_set.html.md#cutan.characters.mouth_set.generate_default_mouths)(\*[, canvas, ...])       | Return `{"mouth_<letter>[_<form>]": <svg-string>, ...}` for every shape.                                                                                                            |
+|---------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`mouth_attachment_name`](_autosummary/cutan.characters.mouth_set.html.md#cutan.characters.mouth_set.mouth_attachment_name)(shape[, form])             | The attachment (and file stem) of one mouth drawing.                                                                                                                                |
+| [`write_default_mouths`](_autosummary/cutan.characters.mouth_set.html.md#cutan.characters.mouth_set.write_default_mouths)(out_dir, \*[, canvas, ...]) | Write the default mouth SVGs into `out_dir` (created if missing), plus one `mouth_<shape>_<form>.svg` per shape for every `variants` entry (`{form: smile offset}`; `None` = none). |
+
+### cutan.characters.mouth_set.DEFAULT_MOUTH_VARIANTS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]* *= {'happy': 0.35, 'sad': -0.35}*
+
+a
+`viseme@<form>` set per entry, its shapes drawn with this corner upturn
+added (an#98). Every preset that prefers a form the character lacks falls
+back to `viseme` with a warning, so the default covers the two forms the
+most-authored presets (`happy`/`amused`, `sad`) ask for.
+
+* **Type:**
+  The mouth-form variants a synthesized character gets by default
+
+### cutan.characters.mouth_set.DEFAULT_MOUTH_VIEWBOX *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]* *= (256, 128)*
+
+Mouth canvas viewBox (width, height) — small per-shape and centered so the
+anchor is always (0.5, 0.5).
+
+### cutan.characters.mouth_set.generate_default_mouths(, canvas=(256, 128), palette=None, shapes=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x'), smile=0.0, form=None)
+
+Return `{"mouth_<letter>[_<form>]": <svg-string>, ...}` for every shape.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> svgs = generate_default_mouths()
+>>> 'mouth_x' in svgs and 'viewBox' in svgs['mouth_x']
+True
+>>> sorted(generate_default_mouths(shapes=["a"], smile=0.35, form="happy"))
+['mouth_a_happy']
+```
+
+### cutan.characters.mouth_set.mouth_attachment_name(shape, form=None)
+
+The attachment (and file stem) of one mouth drawing.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+```pycon
+>>> mouth_attachment_name("a"), mouth_attachment_name("a", "happy")
+('mouth_a', 'mouth_a_happy')
+```
+
+### cutan.characters.mouth_set.write_default_mouths(out_dir, , canvas=(256, 128), palette=None, shapes=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x'), variants=None)
+
+Write the default mouth SVGs into `out_dir` (created if missing),
+plus one `mouth_<shape>_<form>.svg` per shape for every `variants`
+entry (`{form: smile offset}`; `None` = none).
+
+Returns the list of paths written: the neutral set in shape order, then
+each variant’s.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]
+
+
+# _autosummary/cutan.characters.play.html.md
+
+# cutan.characters.play
+
+Resolve a `play` against a character descriptor — the renderer-free half (an#7).
+
+A `PlayAction` names a descriptor animation. Its tracks
+speak the DESCRIPTOR’s vocabulary — bones, slots, attachment names, view-box
+units, degrees — while the renderer’s channels speak the SCENE’s: node paths,
+swap-set keys, scene pixels, radians. This module does everything on the
+descriptor side of that line and knows no renderer, so that `an validate`
+and the cutout compiler share ONE verdict on whether a play can resolve. The
+compiler used to decide alone, and validate passed plays that compile then
+refused — four measured cases: an unknown bone property, a bone with no slot
+of its own, a frame naming art that is not on disk, and a slot suppressed by
+`face_overlay=false` (an#7 review).
+
+Every rule mirrors a rig-builder fact, and the builder imports the shared
+helpers rather than restating them, so the two cannot drift:
+
+- A bone track animates the node of the bone’s **primary slot** — the slot
+  named like the bone ([`primary_slot_per_bone()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.primary_slot_per_bone)); `bone:root.*`
+  animates the entity container. A bone with no primary slot is a resolution
+  error that *says so*: the old message (“no node of that name was built”)
+  named the symptom and left the rule for the author to guess.
+- A slot track resolves to exactly **one** swap set: the set whose keys name
+  every frame’s attachment. Resolving frame-by-frame used to split a track
+  across two channels; the runtime applies a pose’s properties in name order,
+  so `blink` never closed once a second set that sorted before `eyelid`
+  also named `open`. Two candidates is an error naming both.
+- Art is consulted when the caller can consult it (`art_exists`): a frame
+  whose attachment is declared but not on disk is reported as exactly that,
+  not as “no set resolves it”.
+
+```pycon
+>>> from cutan.characters.schema import CharacterDescriptor
+>>> desc = CharacterDescriptor(name="maya")
+>>> resolved = resolve_play(desc, "blink")
+>>> [(t.slot, t.set_name) for t in resolved.tracks]
+[('left_eye', 'eyelid'), ('right_eye', 'eyelid')]
+```
+
+**Motion presets (an#166).** A name the descriptor does not declare — or any
+name on an entity with no descriptor (a procedural rig, a prop) — falls back
+to `an.motion.PRESETS`. The DESCRIPTOR WINS a name both know: a rig that
+ships its own `hop` means that one. [`play_source()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.play_source) makes that call and
+[`play_problems()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.play_problems) gives the whole verdict, for `an validate` and the
+compiler alike. A preset resolves to tweens, not a clip:
+[`expand_preset_play()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.expand_preset_play) builds them at the moved node’s pose, which the
+caller reads off the built scene and the timeline before the play (an#212),
+so an author never passes `rest`.
+
+```pycon
+>>> play_problems(desc, "moonwalk")
+["no animation 'moonwalk': the descriptor declares ['blink', 'idle_breath'] and no
+  motion preset has that name (presets: ['hop', 'nod', 'point', 'pop_in',
+  'shake', 'slide_in', 'slide_out', 'speech_pulse', 'squash_stretch', 'turn',
+  'waddle', 'walk'])"]
+>>> play_source(desc, "hop"), play_source(None, "hop"), play_source(desc, "blink")
+('preset', 'preset', 'descriptor')
+```
+
+### Module Attributes
+
+| [`BONE_TRACK_PROPERTIES`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.BONE_TRACK_PROPERTIES)   | Descriptor bone-track properties → `(runtime property, unit factor)`.                                                          |
+|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| [`RIG_SCALED_PROPERTIES`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.RIG_SCALED_PROPERTIES)   | Bone-track properties whose values are view-box LENGTHS, so a renderer scales them by the rig's view-box → scene-pixel factor. |
+| [`ROOT_BONE`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.ROOT_BONE)               | a track on it animates the entity's container node rather than any slot.                                                       |
+| [`HEAD_BONE`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.HEAD_BONE)               | The bone whose primary slot's nested slots are the FACE — what `face_overlay=false` suppresses.                                |
+| [`DESCRIPTOR_SOURCE`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.DESCRIPTOR_SOURCE)       | the entity descriptor's own `animations`…                                                                                      |
+| [`PRESET_SOURCE`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.PRESET_SOURCE)           | …or, for a name it does not declare, `an.motion.PRESETS` (an#166).                                                             |
+| [`RESERVED_PRESET_ARGS`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.RESERVED_PRESET_ARGS)    | the target is the play's own, and the rest pose is read off the built scene.                                                   |
+| [`TURN_PRESET`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.TURN_PRESET)             | a turn opens from the side the character faces NOW, which only the timeline knows.                                             |
+
+### Functions
+
+| [`active_skin`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.active_skin)(desc)                                | The skin the rig draws: `default`, else the first declared, else empty.                                                                                                                                                                                                                                                                                                |
+|---------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`art_exists_for`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.art_exists_for)(characters_store, ref)            | `rel_path -> is the art on disk`, for a character in a filesystem store; `None` when the store has no root to look under (a dict, a fake) — a store that can answer nothing must assume presence, not absence, exactly as the rig builder's part probe does.                                                                                                           |
+| [`drawn_attachment`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.drawn_attachment)(desc, skin, slot)               | The `(name, attachment)` a slot draws by default, or `None`.                                                                                                                                                                                                                                                                                                           |
+| [`expand_preset_play`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.expand_preset_play)(action, \*, start, rest_of)   | A preset `play` as the flat tweens and settling `set``s it stands for, at absolute times from ``start` (an#166).                                                                                                                                                                                                                                                       |
+| [`facing_at`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.facing_at)(events, entity, t, \*[, view_set])     | What `entity` shows at time `t`: the latest `view_set` swap set on the entity and the sign of the latest `scale_x` it was given, at or before `t` (a tween counts from its END, when its value has landed; at one instant the one LATER in `events` wins — so pass them in authoring order, as [`resolve_turns()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.resolve_turns) does). |
+| [`play_problems`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.play_problems)(desc, animation, \*[, ...])        | Every reason `play(<entity>, animation, ...)` cannot resolve — empty when it can.                                                                                                                                                                                                                                                                                      |
+| [`play_source`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.play_source)(desc, animation)                     | Which library a `play` of `animation` resolves in — [`DESCRIPTOR_SOURCE`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.DESCRIPTOR_SOURCE) when `desc` declares it (the descriptor WINS a name a preset also has), else [`PRESET_SOURCE`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.PRESET_SOURCE) when a motion preset has it.                                                                        |
+| [`preset_moved_node`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.preset_moved_node)(action_target, animation)      | The ONE node path a preset play moves — `<target>/head` for a `nod`, the target itself for the rest.                                                                                                                                                                                                                                                                   |
+| [`preset_moved_nodes`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.preset_moved_nodes)(action_target, animation)     | Every node path a preset play moves.                                                                                                                                                                                                                                                                                                                                   |
+| [`preset_takes`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.preset_takes)(animation, name)                    | Whether the motion preset `animation` has the keyword `name`.                                                                                                                                                                                                                                                                                                          |
+| [`preset_play_span`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.preset_play_span)(action)                         | How long a preset `play` runs, in seconds: its `duration` when set, else the preset's natural length divided by `speed`.                                                                                                                                                                                                                                               |
+| [`preset_problems`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.preset_problems)(animation, \*[, args, ...])      | Why a `play` of the motion preset `animation` cannot expand.                                                                                                                                                                                                                                                                                                           |
+| [`primary_slot_per_bone`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.primary_slot_per_bone)(desc)                      | `{bone name: the slot that IS that bone}`, when one exists.                                                                                                                                                                                                                                                                                                            |
+| [`resolve_play`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.resolve_play)(desc, animation, \*[, art_exists])  | Resolve `animation` of `desc` into renderer-ready tracks, or raise [`PlayResolutionError`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.PlayResolutionError) listing every problem found.                                                                                                                                                                                                   |
+| [`resolve_turns`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.resolve_turns)(flat_list, \*, descriptor_of, ...) | Fill in each turn's `from_direction` from the timeline before it (an#203): a `play` of `turn` on an entity that does not pass one opens from the side the latest earlier `scale_x` left the entity facing — so `side` (`direction: left`) then `back` is two plays, with no `from_direction` by hand.                                                                  |
+| [`sampled_deviations`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.sampled_deviations)(track, duration, fps)         | `(time, deviation)` pairs for a sine bone track at the frame rate — [`cutan.characters.idle.evaluate_track()`](_autosummary/cutan.characters.idle.html.md#cutan.characters.idle.evaluate_track)'s formula, sampled, so the descriptor's own evaluator stays the one definition of a sine track.                                                                       |
+| [`sine_sample_times`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.sine_sample_times)(duration, fps)                 | Frame-rate sample times for a sine track, ALWAYS ending at `duration`.                                                                                                                                                                                                                                                                                                 |
+| [`slot_node_path`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.slot_node_path)(desc, slot_name)                  | The node path of a slot RELATIVE to its entity (`head/left_eye`, `torso`) — the rig builder's nesting rule, stated once.                                                                                                                                                                                                                                               |
+| [`slot_parent`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.slot_parent)(desc, slot)                          | The slot `slot` nests under, or `None` when it is a direct child.                                                                                                                                                                                                                                                                                                      |
+| [`suppressed_slots`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.suppressed_slots)(desc)                           | Slots the rig builder never builds: with the face baked into the head art (`face_overlay=false`), every slot nested under the HEAD BONE's primary slot — keyed on the bone, not on a slot named "head".                                                                                                                                                                |
+
+### Classes
+
+| [`BoneTrack`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.BoneTrack)(track, slot, property, unit, ...)   | A resolved `bone:<name>.<prop>` track.                                                                                                                                                                                                                                                                                             |
+|------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`Facing`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.Facing)([view, direction])                     | What an entity shows at one instant, read off a flat timeline.                                                                                                                                                                                                                                                                     |
+| [`ResolvedPlay`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.ResolvedPlay)(animation, tracks)               |                                                                                                                                                                                                                                                                                                                                    |
+| [`SlotTrack`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.SlotTrack)(track, slot, set_name, frames)      | A resolved `slot:<name>.attachment` track: one set, frames as KEYS.                                                                                                                                                                                                                                                                |
+| [`TurnInference`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.TurnInference)(index, start, entity, before)   | One `play` of [`TURN_PRESET`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.TURN_PRESET) and the state it starts from.                                                                                                                                                                                                                           |
+| [`TurnResolution`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.TurnResolution)(flats, turns, events)          | [`resolve_turns()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.resolve_turns)' result: `flats` is the input with each turn's inferred `from_direction` filled in; `turns` says what each turn started from; `events` is the timeline with every preset play expanded, which [`facing_at()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.facing_at) reads. |
+
+### Exceptions
+
+| [`PlayResolutionError`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.PlayResolutionError)(animation, problems)   | A `play` that cannot resolve; `problems` lists every reason found.   |
+|---------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+
+### cutan.characters.play.BONE_TRACK_PROPERTIES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]]* *= {'rotation_deg': ('rotation', 0.017453292519943295), 'scale_x': ('scale_x', 1.0), 'scale_y': ('scale_y', 1.0), 'x': ('x', 1.0), 'y': ('y', 1.0)}*
+
+Descriptor bone-track properties → `(runtime property, unit factor)`.
+The descriptor speaks degrees for rotation; the runtime is radians.
+
+### *class* cutan.characters.play.BoneTrack(track, slot, property, unit, rig_scaled)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A resolved `bone:<name>.<prop>` track.
+
+`slot` is the primary slot whose node carries the bone, or `None` for
+the entity container (`bone:root`). `property` is the RUNTIME name;
+values are `rest + deviation * unit` (times the rig’s pixel factor when
+`rig_scaled`).
+
+### cutan.characters.play.DESCRIPTOR_SOURCE *= 'descriptor'*
+
+the entity descriptor’s own `animations`…
+
+* **Type:**
+  Where a `play` resolves
+
+### *class* cutan.characters.play.Facing(view=None, direction=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+What an entity shows at one instant, read off a flat timeline.
+
+`view` is the key of its view set last set on the ENTITY (`None`: not
+set in this shot, so the rig’s default — `front` on a factory
+character); `direction` is `"right"`/`"left"` from the sign of the
+last `scale_x` it was given (`None`: nothing set it, so its rest).
+
+### cutan.characters.play.HEAD_BONE *= 'head'*
+
+The bone whose primary slot’s nested slots are the FACE — what
+`face_overlay=false` suppresses.
+
+### cutan.characters.play.PRESET_SOURCE *= 'preset'*
+
+…or, for a name it does not declare, `an.motion.PRESETS` (an#166).
+
+### *exception* cutan.characters.play.PlayResolutionError(animation, problems)
+
+Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+A `play` that cannot resolve; `problems` lists every reason found.
+
+### cutan.characters.play.RESERVED_PRESET_ARGS *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'parts', 'rest', 'target'})*
+
+the target is
+the play’s own, and the rest pose is read off the built scene.
+
+* **Type:**
+  Preset parameters an author may NOT pass through `args`
+
+### cutan.characters.play.RIG_SCALED_PROPERTIES *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'x', 'y'})*
+
+Bone-track properties whose values are view-box LENGTHS, so a renderer
+scales them by the rig’s view-box → scene-pixel factor. Scales and angles
+are dimensionless.
+
+### cutan.characters.play.ROOT_BONE *= 'root'*
+
+a track on it animates the entity’s
+container node rather than any slot.
+
+* **Type:**
+  The bone that stands for the whole rig
+
+### *class* cutan.characters.play.ResolvedPlay(animation, tracks)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+### *class* cutan.characters.play.SlotTrack(track, slot, set_name, frames)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A resolved `slot:<name>.attachment` track: one set, frames as KEYS.
+
+### cutan.characters.play.TURN_PRESET *= 'turn'*
+
+a
+turn opens from the side the character faces NOW, which only the timeline
+knows.
+
+* **Type:**
+  The preset whose START depends on what came before it on the timeline
+
+### *class* cutan.characters.play.TurnInference(index, start, entity, before, declared=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One `play` of [`TURN_PRESET`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.TURN_PRESET) and the state it starts from.
+
+`index` is the play’s position in the flat list it was read from;
+`declared` is the `from_direction` the author passed (`None`: left
+to the timeline).
+
+#### *property* contradicted *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+The author’s `from_direction` disagrees with the timeline — the
+turn would jump to the other side before it squashes.
+
+### *class* cutan.characters.play.TurnResolution(flats, turns, events)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+[`resolve_turns()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.resolve_turns)’ result: `flats` is the input with each turn’s
+inferred `from_direction` filled in; `turns` says what each turn
+started from; `events` is the timeline with every preset play expanded,
+which [`facing_at()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.facing_at) reads.
+
+### cutan.characters.play.active_skin(desc)
+
+The skin the rig draws: `default`, else the first declared, else empty.
+
+* **Return type:**
+  [`Skin`](_autosummary/cutan.characters.html.md#cutan.characters.Skin)
+
+### cutan.characters.play.art_exists_for(characters_store, ref)
+
+`rel_path -> is the art on disk`, for a character in a filesystem
+store; `None` when the store has no root to look under (a dict, a
+fake) — a store that can answer nothing must assume presence, not absence,
+exactly as the rig builder’s part probe does.
+
+* **Return type:**
+  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)], [`bool`](https://docs.python.org/3/builtins/functions.html#bool)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.play.drawn_attachment(desc, skin, slot)
+
+The `(name, attachment)` a slot draws by default, or `None`.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Attachment`](_autosummary/cutan.characters.html.md#cutan.characters.Attachment)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.play.expand_preset_play(action, , start, rest_of, parts_of=None)
+
+A preset `play` as the flat tweens and settling `set``s it stands
+for, at absolute times from ``start` (an#166).
+
+`rest_of(node_path)` returns the pose to build that node’s move from
+(`x`, `y`, `rotation`, `scale_x`, `scale_y`, `alpha` — the
+compiler passes the pose the node HAS at `start`, an#212), or `None` when the
+built scene carries no such node — then this raises naming it, which is
+what the runtime would otherwise do mid-render. `duration` stretches the
+move to that length; `speed` divides it. Assumes
+[`preset_problems()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.preset_problems) came back empty.
+
+A preset that moves several nodes of the entity (it takes `parts`,
+`PARTS_ARG` — `walk`) gets `parts_of(entity)`’s paths with their
+`rest_of` poses, and every node its expansion moves is checked.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
+
+```pycon
+>>> from cutan.characters.registration import PlayAction
+>>> flats = expand_preset_play(
+...     PlayAction(target="a", animation="hop", args={"height": 10}),
+...     start=1.0, rest_of=lambda p: {"y": 5.0})
+>>> [(round(f.start, 3), type(f.action).__name__, f.action.property) for f in flats]
+[(1.0, 'TweenAction', 'y'), (1.25, 'TweenAction', 'y'), (1.5, 'SetAction', 'y')]
+>>> flats[0].action.to_value
+-5.0
+```
+
+### cutan.characters.play.facing_at(events, entity, t, , view_set='view')
+
+What `entity` shows at time `t`: the latest `view_set` swap set
+on the entity and the sign of the latest `scale_x` it was given, at or
+before `t` (a tween counts from its END, when its value has landed; at
+one instant the one LATER in `events` wins — so pass them in authoring
+order, as [`resolve_turns()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.resolve_turns) does).
+
+* **Return type:**
+  [`Facing`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.Facing)
+
+```pycon
+>>> from an.ir.compose import flatten, sequence
+>>> from an.motion import turn
+>>> flats = flatten(sequence(turn("ned", to="side", direction="left")))
+>>> facing_at(flats, "ned", 0.0), facing_at(flats, "ned", 1.0)
+(Facing(view=None, direction=None), Facing(view='side', direction='left'))
+```
+
+### cutan.characters.play.play_problems(desc, animation, , art_exists=None, args=None, duration=None, speed=1.0, loop=None)
+
+Every reason `play(<entity>, animation, ...)` cannot resolve — empty
+when it can. THE verdict `an validate` reports and the compiler raises
+on, for both sources (an#7, an#166).
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> play_problems(None, "hop", args={"heigth": 3})
+["motion preset 'hop' has no parameter 'heigth' (it takes: [...])"]
+>>> play_problems(None, "hop", loop=True)
+["motion preset 'hop' is a one-shot: `loop: true` ...
+```
+
+### cutan.characters.play.play_source(desc, animation)
+
+Which library a `play` of `animation` resolves in —
+[`DESCRIPTOR_SOURCE`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.DESCRIPTOR_SOURCE) when `desc` declares it (the descriptor WINS a
+name a preset also has), else [`PRESET_SOURCE`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.PRESET_SOURCE) when a motion preset
+has it. `desc=None` is an entity with no descriptor: presets only.
+
+Raises [`PlayResolutionError`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.PlayResolutionError) naming BOTH vocabularies when neither
+has the name.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.play.preset_moved_node(action_target, animation, args=None)
+
+The ONE node path a preset play moves — `<target>/head` for a `nod`,
+the target itself for the rest. Read off the expansion rather than
+restated per preset, so a preset added later needs no entry here.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+```pycon
+>>> preset_moved_node("charlie", "nod"), preset_moved_node("charlie", "hop")
+('charlie/head', 'charlie')
+```
+
+### cutan.characters.play.preset_moved_nodes(action_target, animation, args=None, , parts=None)
+
+Every node path a preset play moves. `parts` (the entity’s built part
+paths, relative to it) is what a multi-node preset chooses its limbs from;
+`None` lets it assume the rig contract’s names.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> preset_moved_nodes("bob", "walk", {"distance": 80}, parts=["torso", "left_leg", "right_leg"])
+['bob', 'bob/left_leg', 'bob/right_leg']
+>>> preset_moved_nodes("charlie", "nod")
+['charlie/head']
+```
+
+### cutan.characters.play.preset_play_span(action)
+
+How long a preset `play` runs, in seconds: its `duration` when set,
+else the preset’s natural length divided by `speed`. What a
+`sequence` advances by is `play_extent()`, which is this for a preset
+source.
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+```pycon
+>>> from cutan.characters.registration import PlayAction
+>>> preset_play_span(PlayAction(target="a", animation="hop"))
+0.5
+>>> preset_play_span(PlayAction(target="a", animation="hop", speed=2.0))
+0.25
+```
+
+### cutan.characters.play.preset_problems(animation, , args=None, duration=None, speed=1.0, loop=None)
+
+Why a `play` of the motion preset `animation` cannot expand.
+
+The parameters are checked by NAME against the preset’s signature, then by
+building it (at the identity pose), so a value the preset itself refuses —
+`cycles: 0`, a string height — is reported in the preset’s own words.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### cutan.characters.play.preset_takes(animation, name)
+
+Whether the motion preset `animation` has the keyword `name`.
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+```pycon
+>>> preset_takes("walk", "parts"), preset_takes("hop", "parts")
+(True, False)
+```
+
+### cutan.characters.play.primary_slot_per_bone(desc)
+
+`{bone name: the slot that IS that bone}`, when one exists.
+
+Used for node nesting, which is deliberately **not** the bone hierarchy.
+The rigs here are flat by design — arms are siblings of the torso, not
+children (CLAUDE.md pillar 4) — so bone parentage decides *position* only.
+A slot nests under the primary slot of its bone when it is not that slot
+itself, which is what puts eyes and mouth under `head` and leaves every
+limb a direct child of the entity.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> from types import SimpleNamespace as NS
+>>> primary_slot_per_bone(NS(slots=[NS(name="head", bone="head"), NS(name="mouth", bone="head")]))["head"]
+'head'
+```
+
+### cutan.characters.play.resolve_play(desc, animation, , art_exists=None)
+
+Resolve `animation` of `desc` into renderer-ready tracks, or raise
+[`PlayResolutionError`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.PlayResolutionError) listing every problem found.
+
+`art_exists(rel_path)` answers whether a skin attachment’s art is on
+disk; pass `None` when the caller cannot know, and every declared
+attachment is assumed present (the rig builder’s own rule for a store
+without a filesystem root).
+
+* **Return type:**
+  [`ResolvedPlay`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.ResolvedPlay)
+
+### cutan.characters.play.resolve_turns(flat_list, , descriptor_of, rest_of)
+
+Fill in each turn’s `from_direction` from the timeline before it
+(an#203): a `play` of `turn` on an entity that does not pass one
+opens from the side the latest earlier `scale_x` left the entity facing
+— so `side` (`direction: left`) then `back` is two plays, with no
+`from_direction` by hand. Turns are resolved in time order, each seeing
+the ones before it expanded. THE resolver the compiler expands with and
+`an validate` checks with.
+
+An explicit `from_direction` is kept — `turns` records it with the
+inferred state so `an validate` can say when the two disagree. A play
+that cannot resolve is left for [`play_problems()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.play_problems) to report.
+
+* **Return type:**
+  [`TurnResolution`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.TurnResolution)
+
+```pycon
+>>> from an.ir.compose import flatten, sequence
+>>> from cutan.characters.registration import PlayAction
+>>> flats = flatten(sequence(
+...     PlayAction(target="ned", animation="turn", args={"to": "side", "direction": "left"}),
+...     PlayAction(target="ned", animation="turn", args={"to": "back"})))
+>>> res = resolve_turns(flats, descriptor_of=lambda e: None,
+...                     rest_of=lambda p: {"scale_x": 1.0})
+>>> res.flats[1].action.args["from_direction"], res.turns[1].before
+('left', Facing(view='side', direction='left'))
+```
+
+### cutan.characters.play.sampled_deviations(track, duration, fps)
+
+`(time, deviation)` pairs for a sine bone track at the frame rate —
+[`cutan.characters.idle.evaluate_track()`](_autosummary/cutan.characters.idle.html.md#cutan.characters.idle.evaluate_track)’s formula, sampled, so the
+descriptor’s own evaluator stays the one definition of a sine track.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
+### cutan.characters.play.sine_sample_times(duration, fps)
+
+Frame-rate sample times for a sine track, ALWAYS ending at `duration`.
+
+`ceil` rather than `round`: with `round`, a 0.18 s track at 24 fps
+got samples up to 0.1667 s and then held that value to the clip end, so
+the cycle-closing sample (equal to the first) was never emitted and the
+clip wrapped with a jump (an#7 review).
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+```pycon
+>>> sine_sample_times(0.19, 24)[-2:]
+[0.16666666666666666, 0.19]
+>>> len(sine_sample_times(6.0, 24))
+145
+```
+
+### cutan.characters.play.slot_node_path(desc, slot_name)
+
+The node path of a slot RELATIVE to its entity (`head/left_eye`,
+`torso`) — the rig builder’s nesting rule, stated once.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+```pycon
+>>> slot_node_path(CharacterDescriptor(name="m"), "left_eye")
+'head/left_eye'
+>>> slot_node_path(CharacterDescriptor(name="m"), "torso")
+'torso'
+```
+
+### cutan.characters.play.slot_parent(desc, slot)
+
+The slot `slot` nests under, or `None` when it is a direct child.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.play.suppressed_slots(desc)
+
+Slots the rig builder never builds: with the face baked into the head
+art (`face_overlay=false`), every slot nested under the HEAD BONE’s
+primary slot — keyed on the bone, not on a slot named “head”.
+
+* **Return type:**
+  [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> sorted(suppressed_slots(CharacterDescriptor(name="m", face_overlay=False)))
+['left_brow', 'left_eye', 'mouth', 'right_brow', 'right_eye']
+>>> suppressed_slots(CharacterDescriptor(name="m"))
+frozenset()
+```
+
+
+# _autosummary/cutan.characters.record.html.md
+
+# cutan.characters.record
+
+Record a character’s preview HTML to an mp4.
+
+Uses Playwright’s video recording (saved as webm) and converts to mp4
+via ffmpeg. The result is a real video file showing the new SVG
+character art animating: cycling visemes + breath/head-tilt.
+
+This is a stop-gap until Phase 11b wires the SVG-texture path into
+`runtime.js` and proper scene rendering uses the new character art
+directly.
+
+```pycon
+>>> # Smoke-tested in tests/test_characters_record.py
+```
+
+### Functions
+
+| [`record_character`](_autosummary/cutan.characters.record.html.md#cutan.characters.record.record_character)(char_dir, \*[, name, ...])      | Render preview.html for the character at `char_dir` and record it.   |
+|---------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| [`record_preview_to_mp4`](_autosummary/cutan.characters.record.html.md#cutan.characters.record.record_preview_to_mp4)(preview_html, out_mp4, \*) | Record `preview_html` to `out_mp4` for `duration_s` seconds.         |
+
+### Exceptions
+
+| [`PreviewRecordError`](_autosummary/cutan.characters.record.html.md#cutan.characters.record.PreviewRecordError)   | Raised when preview recording fails.   |
+|-----------------------------------------------------------------------|----------------------------------------|
+
+### *exception* cutan.characters.record.PreviewRecordError
+
+Bases: [`RuntimeError`](https://docs.python.org/3/builtins/exceptions.html#RuntimeError)
+
+Raised when preview recording fails.
+
+### cutan.characters.record.record_character(char_dir, , name=None, out_mp4=None, duration_s=8.0, size=(640, 480))
+
+Render preview.html for the character at `char_dir` and record it.
+
+The preview HTML is generated/refreshed via the same writer used by
+`an character preview`, so this command is self-contained.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.record.record_preview_to_mp4(preview_html, out_mp4, , duration_s=8.0, size=(640, 480), fps=30, crf=23)
+
+Record `preview_html` to `out_mp4` for `duration_s` seconds.
+
+Returns the output mp4 path.
+
+Pipeline:
+
+> 1. Playwright launches headless Chromium with video recording on.
+> 2. Navigates to `preview_html` ([file://](file://) URL).
+> 3. Waits `duration_s` real-time so the browser captures frames.
+> 4. Closes the context to flush the webm.
+> 5. ffmpeg re-encodes the webm to H.264 mp4 (better compatibility,
+>    smaller files, plays in `quicktime` / GitHub previews).
+
+Both Playwright (project dep) and ffmpeg (system dep, already
+required by the renderer) must be installed.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+
+# _autosummary/cutan.characters.registration.html.md
+
+# cutan.characters.registration
+
+The character side of the cut-out genre, as declarations: `play` and `character`.
+
+What the cut-out genre ([`cutan.genre`](_autosummary/cutan.genre.html.md#module-cutan.genre)) registers from here (ADR 0001
+§First slice):
+
+- the **\`\`play\`\` action kind** — [`PlayAction`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.PlayAction), how long a
+  duration-less play occupies a `sequence` (its natural length, through the
+  caller’s extent resolver), and its `scene.md` spelling;
+- the **\`\`character\`\` entity kind** — a rigged character, whose nodes are
+  nodes of the 2D stage engine (the `stage.node` property space).
+
+Plain declarations: importing this module registers nothing.
+
+```pycon
+>>> PLAY.name, CHARACTER.space
+('play', 'stage.node')
+```
+
+### Functions
+
+| [`default_play_extent`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.default_play_extent)(action)                  | A duration-less play's extent when no descriptor is known: a motion preset's natural length over `speed`, else `0.0`.   |
+|-----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| [`play`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.play)(target, animation, \*[, duration, ...]) | Play a named animation of the target entity's descriptor (an#7).                                                        |
+| [`play_duration`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.play_duration)(action, extent)                | The span a `play` occupies: its `duration`, else its natural extent.                                                    |
+| [`read_play_md`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.read_play_md)(item, \*, index)                | `{kind: play, target, animation, [duration], [speed], [loop], [args]}`.                                                 |
+| [`write_play_md`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.write_play_md)(leaf)                          | The `scene.md` entry for `leaf` (`read_play_md`'s inverse).                                                             |
+
+### Classes
+
+| [`PlayAction`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.PlayAction)(\*\*data)   | Play a named animation of the target entity's descriptor (an#7).   |
+|-------------------------------------------------------------------------|--------------------------------------------------------------------|
+
+### *class* cutan.characters.registration.PlayAction(\*\*data)
+
+Bases: `ExtensionAction`
+
+Play a named animation of the target entity’s descriptor (an#7).
+
+`animation` names an entry of `CharacterDescriptor.animations` (the
+seeded `idle_breath` and `blink`, or anything an author adds); the
+compiler resolves its tracks into channels on the entity’s nodes. A name
+the descriptor does NOT declare — or any name on an entity with no
+descriptor (a procedural rig, a prop) — falls back to the motion presets
+of `an.motion.PRESETS` (`hop`, `nod`, …), which expand to
+ordinary tweens at the target’s built rest pose; a descriptor animation of
+the same name wins (an#166). Both halves are decided by
+[`cutan.characters.play.play_problems()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.play_problems), the one resolver `an validate`
+and the compiler share. For a preset, `args` are its parameters,
+`duration` stretches the whole move to that length, `speed` divides
+it, and `loop: true` is refused (a preset is a one-shot).
+`duration` widens/narrows the placement window; `None` means the
+animation’s own duration — or, when the resolved `loop` is true, the
+rest of the shot, because a loop bounded by its own natural duration
+never loops. `loop` overrides the animation’s declared `loop`
+(`None` = use the descriptor’s). Inside a `sequence` a play with
+`duration=None` occupies its NATURAL length — a motion preset’s own
+length, a non-looping descriptor animation’s `duration`, both over
+`speed` — so the next sibling starts when it ends; a looping one runs to
+the shot end and occupies ZERO (`an.characters.play.play_extent()`).
+
+#### args *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Parameters of a MOTION PRESET (an#166) — `{"height": 30}` for a
+`hop` — passed to its `an.motion.PRESETS` function as keyword
+arguments. `None` (the default, omitted from JSON) means the preset’s
+own defaults. A descriptor animation takes none, and one given to it is
+refused; `rest` is never one — it is read off the built scene.
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+### cutan.characters.registration.default_play_extent(action)
+
+A duration-less play’s extent when no descriptor is known: a motion
+preset’s natural length over `speed`, else `0.0`.
+
+The one resolver is `cutan.characters.play.play_extent()`; this is it with
+`desc=None`.
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+```pycon
+>>> default_play_extent(PlayAction(target="a", animation="hop"))
+0.5
+>>> default_play_extent(PlayAction(target="a", animation="not_a_preset"))
+0.0
+```
+
+### cutan.characters.registration.play(target, animation, , duration=None, speed=1.0, loop=None, args=None)
+
+Play a named animation of the target entity’s descriptor (an#7).
+
+`duration=None` fills the animation’s natural length — or the shot’s
+remainder for a looping one. In a `sequence` a play with no `duration`
+occupies its **natural** length (a motion preset’s own length divided by
+`speed`; a non-looping descriptor animation’s likewise), so the sibling
+after it starts when it ends; a looping one runs to the shot end and
+occupies **zero**:
+
+* **Return type:**
+  [`PlayAction`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.PlayAction)
+
+```pycon
+>>> [f.start for f in flatten(sequence(play("a", "idle_breath"), delay(1.0), play("a", "blink")))]
+[0.0, 1.0]
+>>> [f.start for f in flatten(sequence(play("a", "idle_breath", duration=2.0), play("a", "blink")))]
+[0.0, 2.0]
+>>> [f.start for f in flatten(sequence(play("a", "hop"), play("a", "nod")))]
+[0.0, 0.5]
+>>> [f.start for f in flatten(sequence(play("a", "hop", speed=2.0), play("a", "nod")))]
+[0.0, 0.25]
+```
+
+(Bare `flatten` knows only the presets, by name; `an validate` and the
+compiler pass the entity’s descriptor too — `cutan.characters.play.play_extent()`
+— so a descriptor animation that shares a preset’s name is measured as the
+descriptor’s.)
+
+A name the descriptor does not declare falls back to a motion preset of
+`an.motion.PRESETS`, with `args` as its parameters (an#166):
+
+```pycon
+>>> play("charlie", "hop", args={"height": 30}).args
+{'height': 30}
+```
+
+### cutan.characters.registration.play_duration(action, extent)
+
+The span a `play` occupies: its `duration`, else its natural extent.
+
+`extent` is the caller’s resolver (the compiler and `an validate` pass
+one bound to the entity’s descriptor); without one, a motion preset’s own
+length ([`default_play_extent()`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.default_play_extent)).
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+```pycon
+>>> play_duration(PlayAction(target="a", animation="hop", duration=2.0), None)
+2.0
+>>> play_duration(PlayAction(target="a", animation="hop"), None)
+0.5
+```
+
+### cutan.characters.registration.read_play_md(item, , index)
+
+`{kind: play, target, animation, [duration], [speed], [loop], [args]}`.
+
+Resolved at compile against the target entity’s descriptor `animations`
+(an#7), falling back to the motion presets of `an.motion.PRESETS` for a
+name the descriptor does not declare, with `args` as the preset’s
+parameters (an#166). `loop` omitted means the animation’s own. This
+reader accepted the shape from the start, then #24 made it refuse (nothing
+resolved a play) while the writer kept emitting it — three days of a
+project’s own scene.md failing to parse.
+
+* **Return type:**
+  [`PlayAction`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.PlayAction)
+
+### cutan.characters.registration.write_play_md(leaf)
+
+The `scene.md` entry for `leaf` (`read_play_md`’s inverse).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+
+# _autosummary/cutan.characters.schema.html.md
+
+# cutan.characters.schema
+
+Character descriptor schema (Spine-shaped, Pydantic v2).
+
+A character on disk lives at:
+
+```default
+characters/<name>/
+    <name>.svg              # optional canonical layered SVG
+    character.json          # CharacterDescriptor as JSON
+    parts/
+        head.svg
+        torso.svg
+        arm_l.svg, arm_r.svg
+        leg_l.svg, leg_r.svg
+        eye_l_open.svg, eye_l_closed.svg, eye_r_open.svg, eye_r_closed.svg
+        brow_l.svg, brow_r.svg
+        mouth/mouth_a.svg … mouth_h.svg, mouth_x.svg
+```
+
+The descriptor borrows Spine’s separation of concerns:
+
+- **bones** — where things attach. Local transforms relative to a parent.
+- **slots** — what is drawn at each bone (one attachment active at a time).
+- **skins** — for each slot, the named attachments and their SVG paths.
+- **asset_sets** — `{channel: {key: attachment_name}}`. What a swap key
+  *selects*, layered over `skins`, which says what art *exists*. The
+  `viseme` channel is Rhubarb’s shape letter → an attachment on the `mouth`
+  slot. (Replaced `viseme_map` in schema 0.2.0.)
+- **animations** — built-in idle loops (breath, blink) keyed by name.
+
+A slot’s name **is** its scene-graph node name, which is why the face slots read
+`left_eye` rather than `eye_l`; attachment names are a separate, per-slot
+namespace — file-derived for single-attachment slots, and shared key-like names
+(`open`/`closed` on both eye slots, 0.3.0) where one swap set must drive
+several slots.
+
+```pycon
+>>> char = CharacterDescriptor(name="maya")
+>>> char.asset_sets["viseme"]["A"]
+'mouth_a'
+>>> char.asset_sets["viseme"]["X"]
+'mouth_x'
+>>> char.view_box
+(0, 0, 1024, 1024)
+>>> sorted(char.skins["default"].slots.keys())[:3]
+['arm_l', 'arm_r', 'head']
+```
+
+### Module Attributes
+
+| [`CHARACTER_DOCUMENT_KIND`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.CHARACTER_DOCUMENT_KIND)   | The descriptor is a schema-versioned document in its own right, with its own version field.                                                                                                                                                           |
+|----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`MOUTH_SHAPES`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.MOUTH_SHAPES)              | Rhubarb mouth shapes.                                                                                                                                                                                                                                 |
+| [`DEFAULT_VISEME_MAP`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.DEFAULT_VISEME_MAP)        | Default Rhubarb-letter → mouth-attachment-name mapping.                                                                                                                                                                                               |
+| [`VISEME_CHANNEL`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.VISEME_CHANNEL)            | The swap channel lip-sync drives.                                                                                                                                                                                                                     |
+| [`EYELID_CHANNEL`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.EYELID_CHANNEL)            | The swap channel blinks drive.                                                                                                                                                                                                                        |
+| [`DEFAULT_EYELID_MAP`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.DEFAULT_EYELID_MAP)        | Default eyelid-state → attachment-name mapping, shared by both eye slots.                                                                                                                                                                             |
+| [`VIEW_CHANNEL`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.VIEW_CHANNEL)              | one KEY per drawn view, projected onto the slots whose art changes with the view (the factory draws the head and the torso), each slot carrying attachments NAMED after the keys.                                                                     |
+| [`VIEWS`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.VIEWS)                     | The views the factory draws, in turnaround order.                                                                                                                                                                                                     |
+| [`DFLT_VIEW`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.DFLT_VIEW)                 | its default attachments ARE this view.                                                                                                                                                                                                                |
+| [`VIEW_VARIANT_SEP`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.VIEW_VARIANT_SEP)          | What joins a swap set's name to the view a variant of it serves: `eyelid@side` is the `eyelid` set drawn for the `side` view (an#220), the same separator the expression variants (`viseme@happy`, an#98) use.                                        |
+| [`REQUIRED_PARTS`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.REQUIRED_PARTS)            | Required body parts.                                                                                                                                                                                                                                  |
+| [`SLOT_POSE_OFFSETS`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.SLOT_POSE_OFFSETS)         | The transform properties a [`SlotPose`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.SlotPose) sets, and whether each is an OFFSET added to the rest (in view_box units, so scaled by the rig), an ANGLE added to it (radians, never scaled) or a FACTOR on it. |
+| [`LEG_LENGTH`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.LEG_LENGTH)                | Hip to ground in the default rig, in view_box units.                                                                                                                                                                                                  |
+| [`HEAD_ANCHOR`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.HEAD_ANCHOR)               | the head hangs above the neck, its lower ~fifth overlapping the collar.                                                                                                                                                                               |
+| [`REFERENCE_HEAD_HEIGHT`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.REFERENCE_HEAD_HEIGHT)     | The head height the default face layout is drawn for, in view_box units — the pre-Wave-4 compiler's 96 px head at k = 345/1024.                                                                                                                       |
+| [`FACE_OFFSETS`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.FACE_OFFSETS)              | Where each face part sits relative to the `head` bone, in view_box units.                                                                                                                                                                             |
+
+### Functions
+
+| [`bones_from_pivots`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.bones_from_pivots)(pivots, \*[, bones])   | Re-place a bone rig onto an illustrator's own joint coordinates.                                                                                                                                                           |
+|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`default_asset_sets`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.default_asset_sets)()                     | `{channel: {key: attachment_name}}` for a freshly-built character.                                                                                                                                                         |
+| [`view_variant_set`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.view_variant_set)(set_name, view)         | The name of `set_name`'s variant for `view` (an#220).                                                                                                                                                                      |
+| [`view_variant_sets`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.view_variant_sets)(desc, \*[, view_set])  | `{base set: {view: variant set name}}` — every per-view face set the descriptor declares (an#220): a set named `<base>@<view>` where `<base>` is a declared set and `<view>` a key of its `view` set (or its `rest_view`). |
+
+### Classes
+
+| [`AnimationTrack`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.AnimationTrack)(\*\*data)      | A single channel inside an idle animation.                              |
+|--------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`CharacterDescriptor`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.CharacterDescriptor)(\*\*data) | The on-disk character schema.                                           |
+| [`IdleAnimation`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.IdleAnimation)(\*\*data)       | A named idle loop (e.g., breath, blink).                                |
+| [`SlotPose`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.SlotPose)(\*\*data)            | How one slot is posed while a swap key is shown (`swap_poses`, an#197). |
+
+### *class* cutan.characters.schema.AnimationTrack(\*\*data)
+
+Bases: `RigModel`
+
+A single channel inside an idle animation.
+
+The `target` is a path-string per the architecture pillar:
+
+- `bone:<name>.<prop>` for bone transforms (`x`, `y`, `rotation_deg`,
+  `scale_x`, `scale_y`).
+- `slot:<name>.attachment` for swap animations (eyes blinking, mouth visemes).
+
+For `type="sine"`: `amplitude` is the peak deviation; `phase` is in
+cycles (0..1). For `type="step"` / `type="linear"`: `frames` is a
+list of `[time_s, value]` pairs evaluated in order.
+
+```pycon
+>>> t = AnimationTrack(target="bone:torso.y", type="sine", amplitude=2.0)
+>>> t.amplitude
+2.0
+```
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+### cutan.characters.schema.CHARACTER_DOCUMENT_KIND *: DocumentKind* *= DocumentKind(name='CharacterDescriptor', version_field='schema_version', current_version='0.3.0')*
+
+The descriptor is a schema-versioned document in its own right, with its own
+version field. Registered here rather than in `an.ir.migrate` because
+this module already imports from `an.ir.assets` — registering from the
+other direction would close an import cycle, and because the package that
+owns a schema is the one that knows its version field.
+
+### *class* cutan.characters.schema.CharacterDescriptor(\*\*data)
+
+Bases: `RigModel`
+
+The on-disk character schema. Saved as `character.json`.
+
+The descriptor is the SSOT for a character’s identity, body part inventory,
+pivot geometry, viseme map, and built-in idle behaviors. Binary art lives
+as SVG sidecars referenced by `Attachment.path` (relative to the
+descriptor file).
+
+```pycon
+>>> c = CharacterDescriptor(name="maya")
+>>> c.schema_version == CHARACTER_SCHEMA_VERSION
+True
+>>> # all 9 mouths are wired into the default skin
+>>> sorted(c.skins["default"].slots["mouth"].keys()) == [
+...     'mouth_a', 'mouth_b', 'mouth_c', 'mouth_d',
+...     'mouth_e', 'mouth_f', 'mouth_g', 'mouth_h', 'mouth_x',
+... ]
+True
+>>> # round-trip
+>>> raw = c.model_dump_json()
+>>> back = CharacterDescriptor.model_validate_json(raw)
+>>> back.name == c.name
+True
+```
+
+#### asset_sets *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]]*
+
+`{channel: {key: attachment_name}}` — what a swap key SELECTS, layered
+over `skins`, which is the SSOT for what art EXISTS. The indirection is
+deliberate: a channel key is not an attachment name. Today’s viseme map
+happens to be one-to-one (9 keys, 9 attachments), but real mouth charts
+are many-to-one — ~10 drawings carrying ~40 phonemes — and collapsing the
+two namespaces makes the first shared drawing a schema change instead of
+a data change. Replaces `viseme_map` (schema 0.2.0).
+
+#### colour_roles *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]]*
+
+Which colour literal in which part plays which `StylePack` role —
+`{part path: {"#rrggbb": role}}`, e.g.
+`{"parts/torso.svg": {"#a83249": "clothing"}}`. Written by the factory,
+which KNOWS what it drew as skin or clothing; read by the compiler, which
+rewrites the tagged literals under a pack (palette swapping — see
+[`cutan.characters.colour_roles`](_autosummary/cutan.characters.colour_roles.html.md#module-cutan.characters.colour_roles)). Empty = untagged art (hand-drawn,
+DiceBear): a pack cannot reach it and the compiler says so, because the
+alternative is inferring a role from a pixel (an#99’s wrong-tone lid).
+Additive: no schema bump, and a descriptor without it reads back as
+untagged. Keys are normalised to lowercase `#rrggbb`; a role must be
+one a pack can set (`an.styles.REACHABLE_ROLES`).
+
+#### expression_binding *: [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+How expression axes reach this rig (an#98), as a list of binding dicts —
+`{"axis", "slot", "property", "gain"[, "rig_scaled"]}` for a transform
+channel, `{"axis", "slot", "set_family"}` for a swap set. `None` means
+the default binding derived from the slots the rig has
+([`cutan.expression.binding.default_binding()`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.default_binding)). Additive: no schema bump,
+and a pre-Wave-6 descriptor reads back unchanged.
+
+#### face_overlay *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Whether this character’s face is drawn as separate overlay parts
+(eyes, brows, mouth as their own slots — the default) or baked into the
+head art (DiceBear / external avatars). `False` suppresses the face
+overlay slots at rig build AND the viseme/emotion channels at dialogue
+compile — a baked face has no overlay mouth to drive.
+
+This is a **declared fact**, replacing the old vendor-name check on
+`metadata.art_provenance` (an#87): provenance says where art came
+from; this says what the art IS. The 0.2.0 → 0.3.0 migration derives it
+from the provenance string once, and `art_provenance` reverts to pure
+provenance/licensing metadata.
+
+#### gait *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+This character’s default walk `gait` (one of `GAITS`, an#220);
+an author’s `gait` arg overrides it. `None` = `legs` when the rig
+builds a leg pair, else `rock`. A robe figure whose leg slots are hem
+halves declares `"hem"` once, here, rather than on every walk.
+Omitted from the stored document when unset.
+
+#### gaze_travel *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+How far a pupil may travel from its rest, in view-box units per axis
+(an#99): the sclera’s clearance minus the pupil’s radius, written by
+`an character add-gaze` from the parts it synthesized. `None` = the
+rig has no pupil layer (gaze is a no-op on it) or uses the default
+travel. The travel maps the gaze axes’ unit circle onto the sclera’s
+inner ellipse; the compiler clamps the summed (x, y) to 0.95 of that
+circle, which keeps the whole pupil disc inside the white at every
+angle (a per-axis box pokes out at the diagonal) — no runtime mask.
+
+#### metadata *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]*
+
+Free-form metadata (dicebear style/seed, etc.). Schema-evolution
+friendly: anything an external tool wants to record can land here.
+
+This comment used to say “art license, etc.” — an invitation nothing ever
+took up. Rights live in `source` now, typed, so they can be found.
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+#### model_post_init(\_CharacterDescriptor_\_context)
+
+Override this method to perform additional initialization after `__init__` and `model_construct`.
+This is useful if you want to do some validation that requires the entire model to be initialized.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+#### occluded *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
+
+The face features another drawing of this character covers, and what
+covers them — `{feature: what}`, e.g. `{"brows": "the cap hat at
+head_scale 0.3"}` (an#252). A **declared fact**, written by whoever
+knows the geometry: the factory measures its hat against the brows’
+acting range and records an overlap it could not seat away; an
+illustrator declares a helmet over the brows. Read by the character
+analyser: a covered feature is not afforded (`brows` →
+`face.brows`), so the methods needing it fall to their default, said
+by `an character capabilities`. Keys are
+`OCCLUDABLE_FEATURES`. Omitted from the
+stored document when empty.
+
+#### rest_view *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+The view the DEFAULT art is drawn in (an#220) — a declared fact about
+the art, like `face_overlay`. `None` means [`DFLT_VIEW`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.DFLT_VIEW)
+(front). A character carved from a profile (a silhouette film, a side-
+on figure) says `"side"`, and everything that asks which view is in
+force before any turn — `walk` swinging its legs rather than lifting
+them — reads it instead of the author passing `view: side` by hand.
+Omitted from the stored document when unset.
+
+#### source *: AssetSource | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Where this character’s art came from, and what its licence obliges.
+
+`None` means “we made this” — not “unknown”. Anything acquired should
+carry one, because a licence defect is the only failure that reaches
+BACKWARDS through completed work: a video shipped with an unattributed
+CC BY asset cannot be un-shipped.
+
+Field names match `illustration.ImageResult` exactly, so an adapter is a
+dict copy rather than a rename table — and a rename table is where a field
+quietly stops being carried. Pinned by test.
+
+#### source_svg *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Optional source SVG (relative path) that the parts/ folder was
+extracted from. Useful for re-slicing.
+
+#### speech *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+a
+method’s spelling (`mouth_chart`, `pulse`), its id
+(`speech.pose_only`) or a choice with args and an optional version pin
+(`{method: pulse, args: {strength: 0}}` — a mime). `None` = the
+default chain: lip-sync when the character has a mouth chart, else a
+head pulse, recorded. Declaring it is also how a baked-face character
+renders under `--strict-assets`: a declared pulse is the request, not a
+fallback. Resolved (and refused when unknown) by the capability
+registry. Omitted from the stored document when unset.
+
+* **Type:**
+  How this character shows it is speaking (the speech aspect, an#248)
+
+#### swap_poses *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [SlotPose](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.SlotPose)]]]*
+
+{slot:
+SlotPose}}}\`\` (an#197). A `set` of a swap set on the ENTITY itself
+(`{kind: set, target: maya, property: view, value: side}`) fans the
+key out to every slot the set projects onto AND poses the slots listed
+under that key; a slot listed under another key of the set returns to
+rest. That is how one key turns a whole character: the head and torso
+swap art, the far eye and arm hide, the mouth slides to the profile
+edge — while blinks, gaze and lip-sync keep running on what is visible
+(the face solver folds a pose into its own channels). Additive: no
+schema bump, and a descriptor without it reads back unposed.
+
+* **Type:**
+  How slots are POSED while a swap key shows — 
+
+  ```
+  ``
+  ```
+
+  {set
+* **Type:**
+  {key
+
+#### voice_ref *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Voice-store id or path used by the audio pipeline. Optional; the scene
+can override per shot.
+
+### cutan.characters.schema.DEFAULT_EYELID_MAP *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'CLOSED': 'closed', 'OPEN': 'open'}*
+
+Default eyelid-state → attachment-name mapping, shared by both eye slots.
+
+### cutan.characters.schema.DEFAULT_VISEME_MAP *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'A': 'mouth_a', 'B': 'mouth_b', 'C': 'mouth_c', 'D': 'mouth_d', 'E': 'mouth_e', 'F': 'mouth_f', 'G': 'mouth_g', 'H': 'mouth_h', 'X': 'mouth_x'}*
+
+Default Rhubarb-letter → mouth-attachment-name mapping. Uppercase keys
+because Rhubarb emits A-X; lowercase attachment names by convention.
+
+### cutan.characters.schema.DFLT_VIEW *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'front'*
+
+its default attachments ARE this view.
+A descriptor whose art is drawn in another view says so in `rest_view`.
+
+* **Type:**
+  The view a character shows at rest
+
+### cutan.characters.schema.EYELID_CHANNEL *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'eyelid'*
+
+The swap channel blinks drive. One set serves BOTH eye slots because the
+eye slots share per-slot attachment names (`open` / `closed`) — the 0.3.0
+migration renamed them from the file-derived `eye_l_open` spelling for
+exactly this: a set’s keys are looked up per slot, so slots that a single
+channel must drive together need attachment names in common.
+
+### cutan.characters.schema.FACE_OFFSETS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]]* *= {'left_brow': (-41.6, -133.2), 'left_eye': (-41.6, -97.6), 'mouth': (0.0, -38.2), 'right_brow': (41.6, -133.2), 'right_eye': (41.6, -97.6)}*
+
+Where each face part sits relative to the `head` bone, in view_box units.
+
+All five share one bone, so without a per-attachment offset they stack on it.
+These are the compiler’s four deleted hardcoded pairs converted at
+k = 345/1024 — i.e. the same picture, now expressed where an illustrator can
+change it. Those pairs were relative to the head’s CENTRE (the old compiler
+anchored the head at 0.5); the bone is the NECK, and the head hangs above it
+at [`HEAD_ANCHOR`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.HEAD_ANCHOR), so each pair is lifted by the centre’s height above
+the neck. Unlifted, the mouth sat below the neck — on the torso (an#168).
+
+### cutan.characters.schema.HEAD_ANCHOR *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]* *= (0.5, 0.78)*
+
+the head hangs above the neck, its lower
+~fifth overlapping the collar.
+
+* **Type:**
+  The head’s anchor on the neck bone
+
+### *class* cutan.characters.schema.IdleAnimation(\*\*data)
+
+Bases: `RigModel`
+
+A named idle loop (e.g., breath, blink).
+
+```pycon
+>>> a = IdleAnimation(name="idle_breath", duration=4.0)
+>>> a.loop
+True
+```
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+### cutan.characters.schema.LEG_LENGTH *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 300.0*
+
+Hip to ground in the default rig, in view_box units. The torso bone (the
+hip) and both leg bones sit this far above the root (the ground contact), so
+a leg drawn this long reaches the ground. The factory draws its legs to it.
+
+### cutan.characters.schema.MOUTH_SHAPES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x')*
+
+Rhubarb mouth shapes. A-F are mandatory in Rhubarb’s basic set; G/H/X
+are emitted when `--extendedShapes GHX` is on (Rhubarb’s default).
+We always ship all 9 so the renderer never has to fall back.
+
+### cutan.characters.schema.REFERENCE_HEAD_HEIGHT *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 285.0*
+
+The head height the default face layout is drawn for, in view_box units —
+the pre-Wave-4 compiler’s 96 px head at k = 345/1024. The factory writes its
+head art at this height, so [`FACE_OFFSETS`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.FACE_OFFSETS) lands on the face.
+
+### cutan.characters.schema.REQUIRED_PARTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('head', 'torso', 'arm_l', 'arm_r', 'leg_l', 'leg_r', 'eye_l_open', 'eye_l_closed', 'eye_r_open', 'eye_r_closed', 'brow_l', 'brow_r')*
+
+Required body parts. A character missing any of these can’t be rendered
+as a full puppet; `validate_character` flags the gap.
+
+### cutan.characters.schema.SLOT_POSE_OFFSETS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('x', 'y')*
+
+The transform properties a [`SlotPose`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.SlotPose) sets, and whether each is an
+OFFSET added to the rest (in view_box units, so scaled by the rig), an
+ANGLE added to it (radians, never scaled) or a FACTOR on it.
+
+### *class* cutan.characters.schema.SlotPose(\*\*data)
+
+Bases: `RigModel`
+
+How one slot is posed while a swap key is shown (`swap_poses`, an#197).
+
+Relative to the slot’s REST, so one pose serves every placement: `x`/`y`
+are added (view_box units, like an attachment offset), `rotation` is
+added too (radians, about the slot’s own pivot — how a profile splays its
+legs so both show), `scale_x`, `scale_y` and `alpha` multiply.
+`alpha: 0` is how a view HIDES a slot — the back view hides the face —
+which is a property of the view, never an author’s alpha hack on node
+paths guessed by trial.
+
+```pycon
+>>> SlotPose(alpha=0).alpha, SlotPose().x, SlotPose().rotation
+(0.0, 0.0, 0.0)
+```
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+### cutan.characters.schema.VIEWS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('front', 'three_quarter', 'side', 'back')*
+
+The views the factory draws, in turnaround order. `side` is a profile
+facing the viewer’s RIGHT at a positive `scale_x`; a negative `scale_x`
+(`an.motion.turn(direction="left")`) mirrors it to face left.
+
+### cutan.characters.schema.VIEW_CHANNEL *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'view'*
+
+one KEY per drawn view, projected
+onto the slots whose art changes with the view (the factory draws the head
+and the torso), each slot carrying attachments NAMED after the keys. A
+conventional name, like `viseme` — nothing in the compiler or the runtime
+reads it; `an.motion.turn` is the one writer that defaults to it.
+
+* **Type:**
+  The swap set a turnaround rides (an#197)
+
+### cutan.characters.schema.VIEW_VARIANT_SEP *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '@'*
+
+What joins a swap set’s name to the view a variant of it serves:
+`eyelid@side` is the `eyelid` set drawn for the `side` view (an#220),
+the same separator the expression variants (`viseme@happy`, an#98) use.
+
+### cutan.characters.schema.VISEME_CHANNEL *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'viseme'*
+
+The swap channel lip-sync drives. `viseme` is a conventional set name, not
+a special case in control flow (an#87): the compiler projects EVERY
+`asset_sets` channel onto the slots whose attachments its keys name, and
+the runtime applies any projected channel the same way.
+
+### cutan.characters.schema.bones_from_pivots(pivots, , bones=None)
+
+Re-place a bone rig onto an illustrator’s own joint coordinates.
+
+Each `Bone` already declares the joint it stands for
+(`head` -> `neck`, `arm_l` -> `shoulder_l`, …), and
+[`extract_pivots()`](_autosummary/cutan.characters.svg_utils.html.md#cutan.characters.svg_utils.extract_pivots) already returns those joints
+as `{name: (cx, cy)}`. Nothing connected the two: `promote` computed the
+pivots and stored **only their names**, so the coordinates an artist drew
+were discarded and every character got the generic rig (an#75).
+
+Bones a drawing has no joint for keep their default placement, so a partial
+skeleton improves a rig rather than breaking it.
+
+Positions are stored parent-relative, so an absolute joint is converted
+against its parent’s resolved absolute position — and parents are resolved
+first, which is why this walks in declaration order rather than by index.
+
+* **Return type:**
+  list[Bone]
+
+```pycon
+>>> bones = bones_from_pivots({"neck": (500.0, 300.0), "root": (500.0, 900.0)})
+>>> head = next(b for b in bones if b.name == "head")
+>>> root = next(b for b in bones if b.name == "root")
+>>> root.x, root.y
+(500.0, 900.0)
+>>> torso = next(b for b in bones if b.name == "torso")
+>>> round(head.y + torso.y + root.y)          # absolute, back to the neck
+300
+```
+
+### cutan.characters.schema.default_asset_sets()
+
+`{channel: {key: attachment_name}}` for a freshly-built character.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
+
+### cutan.characters.schema.view_variant_set(set_name, view)
+
+The name of `set_name`’s variant for `view` (an#220).
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+```pycon
+>>> view_variant_set("eyelid", "side")
+'eyelid@side'
+```
+
+### cutan.characters.schema.view_variant_sets(desc, , view_set='view')
+
+`{base set: {view: variant set name}}` — every per-view face set the
+descriptor declares (an#220): a set named `<base>@<view>` where `<base>`
+is a declared set and `<view>` a key of its `view` set (or its
+`rest_view`). `viseme@happy` is NOT one — `happy` is not a view —
+so the expression variants (an#98) and the view variants never collide.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
+
+```pycon
+>>> d = CharacterDescriptor(name="v")
+>>> d.asset_sets["view"] = {"front": "front", "side": "side"}
+>>> d.asset_sets["eyelid@side"] = {"OPEN": "open_side", "CLOSED": "closed_side"}
+>>> d.asset_sets["viseme@happy"] = {"X": "mouth_x_happy"}
+>>> view_variant_sets(d)
+{'eyelid': {'side': 'eyelid@side'}}
+```
+
+
+# _autosummary/cutan.characters.silhouette.html.md
+
+# cutan.characters.silhouette
+
+Silhouette rendering and comparison for the silhouette test.
+
+The silhouette test (Disney/AnimSchool, see research §6.4) is a quick
+read-test for character distinctiveness: fill the character with solid
+black, and if you can still tell who’s who, the design is strong.
+
+This module renders an SVG to a binary silhouette PNG (Playwright is the
+underlying rasterizer — already a project dep) and computes an IoU score
+between two silhouettes after centering and scaling them to a common
+canvas. A score near 1.0 means the silhouettes are nearly identical
+(BAD — the characters are indistinguishable). A score below ~0.5 is
+typically the sweet spot for visually-distinct characters.
+
+```pycon
+>>> from cutan.characters import generate_default_mouths
+>>> import tempfile, pathlib
+>>> # Skip the doctest body — it requires Playwright with Chromium installed.
+```
+
+### Functions
+
+| [`compare_silhouettes`](_autosummary/cutan.characters.silhouette.html.md#cutan.characters.silhouette.compare_silhouettes)(a, b, \*[, size])             | Return IoU between two silhouette PNGs (0..1; lower = more distinct).   |
+|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`render_silhouette`](_autosummary/cutan.characters.silhouette.html.md#cutan.characters.silhouette.render_silhouette)(svg_source, out_png, \*[, ...]) | Render an SVG to a binary silhouette PNG (black on white).              |
+
+### cutan.characters.silhouette.compare_silhouettes(a, b, , size=(256, 256))
+
+Return IoU between two silhouette PNGs (0..1; lower = more distinct).
+
+Both images are resized to `size`, converted to grayscale, thresholded
+at the midpoint, and the intersection-over-union of the foreground (dark)
+pixels is computed.
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+```pycon
+>>> # Two identical silhouettes → IoU = 1.0; two empty → 0.0 (no overlap).
+>>> # Tested via test suite, not doctest, since it requires Playwright.
+```
+
+### cutan.characters.silhouette.render_silhouette(svg_source, out_png, , size=(256, 256), background='#ffffff')
+
+Render an SVG to a binary silhouette PNG (black on white).
+
+Uses Playwright/Chromium to rasterize, then PIL to threshold by alpha
+or luminance. Returns the output path.
+
+The output is RGB; the silhouette is filled with black (#000) and the
+background with the given color.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+
+# _autosummary/cutan.characters.svg_utils.html.md
+
+# cutan.characters.svg_utils
+
+SVG manipulation: namespace-aware DOM helpers using stdlib `xml.etree`.
+
+Pure stdlib so the package stays dependency-light. Operations supported:
+
+- [`promote_inkscape_labels_to_ids()`](_autosummary/cutan.characters.svg_utils.html.md#cutan.characters.svg_utils.promote_inkscape_labels_to_ids) — copy `inkscape:label` to `id`
+  on each group, since Inkscape doesn’t auto-promote labels (a 2008-vintage
+  bug; see research §1.2).
+- [`normalize_svg()`](_autosummary/cutan.characters.svg_utils.html.md#cutan.characters.svg_utils.normalize_svg) — promote labels, ensure a viewBox is set, return
+  the parsed `ElementTree`.
+- [`extract_pivots()`](_autosummary/cutan.characters.svg_utils.html.md#cutan.characters.svg_utils.extract_pivots) — read the `<g id="skeleton">` group of named
+  `<circle>` elements and return `{name: (cx, cy)}`.
+- [`extract_part()`](_autosummary/cutan.characters.svg_utils.html.md#cutan.characters.svg_utils.extract_part) — emit a standalone SVG containing only the named
+  group. By default it writes a viewBox **cropped** to the part’s own bbox
+  while copying the parent’s `width`/`height`, which letterboxes the part
+  under `preserveAspectRatio="xMidYMid meet"` (see #75). The crop rect’s
+  parent-space origin survives as the viewBox’s first two numbers.
+- [`write_svg()`](_autosummary/cutan.characters.svg_utils.html.md#cutan.characters.svg_utils.write_svg) — pretty-print an `ElementTree` (or `Element`) to
+  disk with the SVG namespace set as the default.
+
+```pycon
+>>> raw = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+...   <g id="skeleton"><circle id="neck" cx="50" cy="40" r="2"/></g>
+...   <g id="illustration"><g id="head"><circle cx="50" cy="40" r="20"/></g></g>
+... </svg>'''
+>>> import io
+>>> tree = normalize_svg(io.StringIO(raw))
+>>> extract_pivots(tree)
+{'neck': (50.0, 40.0)}
+>>> part = extract_part(tree, 'head')
+>>> b'<g id="head"' in write_svg(part)
+True
+```
+
+### Functions
+
+| [`extract_part`](_autosummary/cutan.characters.svg_utils.html.md#cutan.characters.svg_utils.extract_part)(source, part_id, \*[, ...])      | Emit a standalone SVG tree containing only the group with the given id.   |
+|------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| [`extract_pivots`](_autosummary/cutan.characters.svg_utils.html.md#cutan.characters.svg_utils.extract_pivots)(source, \*[, skeleton_id])     | Return `{name: (cx, cy)}` for every named `<circle>` under skeleton.      |
+| [`normalize_svg`](_autosummary/cutan.characters.svg_utils.html.md#cutan.characters.svg_utils.normalize_svg)(source, \*[, fallback_viewbox]) | Promote Inkscape labels to ids and ensure a viewBox is set.               |
+| [`promote_inkscape_labels_to_ids`](_autosummary/cutan.characters.svg_utils.html.md#cutan.characters.svg_utils.promote_inkscape_labels_to_ids)(tree)          | Copy `inkscape:label` to `id` on each group missing an id.                |
+| [`write_svg`](_autosummary/cutan.characters.svg_utils.html.md#cutan.characters.svg_utils.write_svg)(tree_or_element[, path])            | Serialize an `ElementTree` or `Element` to bytes (and optionally disk).   |
+
+### cutan.characters.svg_utils.extract_part(source, part_id, , crop_viewbox=True, padding=8.0)
+
+Emit a standalone SVG tree containing only the group with the given id.
+
+Any top-level `<defs>` from the source is copied so the part can
+resolve gradient / pattern / filter references like
+`fill="url(#some_gradient)"`. The matched group is appended unchanged.
+
+When `crop_viewbox` is True (the default), the new SVG’s viewBox is
+cropped to the bounding box of the part’s primitive content (rect /
+circle / ellipse / path) plus `padding` units on each side. This
+keeps a part’s texture proportional to its content instead of to the whole
+character canvas. Falls back to the source viewBox when no bbox can be
+derived.
+
+The emitted `width`/`height` always match the emitted viewBox, so the
+part rasterises at its own extent and is never letterboxed inside a canvas
+it does not fill. The crop rect’s \*\*parent-space origin survives as the
+viewBox’s first two numbers\*\*, so where the part sat relative to its
+siblings is not lost and needs no separate record.
+
+If no match is found, raises [`KeyError`](https://docs.python.org/3/builtins/exceptions.html#KeyError).
+
+* **Return type:**
+  [`ElementTree`](https://docs.python.org/3/library/xml.etree.elementtree.html#xml.etree.ElementTree.ElementTree)
+
+### cutan.characters.svg_utils.extract_pivots(source, , skeleton_id='skeleton')
+
+Return `{name: (cx, cy)}` for every named `<circle>` under skeleton.
+
+Pivots use the Pose Animator convention: a `<g id="skeleton">` group
+sibling of the illustration, containing one `<circle>` per named joint.
+The circle’s `cx`/`cy` is the pivot in the same coordinate system as
+the art (the SVG’s viewBox).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
+### cutan.characters.svg_utils.normalize_svg(source, , fallback_viewbox='0 0 1024 1024')
+
+Promote Inkscape labels to ids and ensure a viewBox is set.
+
+Returns the parsed `ElementTree`. Idempotent: running it twice is a
+no-op on the second pass.
+
+* **Return type:**
+  [`ElementTree`](https://docs.python.org/3/library/xml.etree.elementtree.html#xml.etree.ElementTree.ElementTree)
+
+### cutan.characters.svg_utils.promote_inkscape_labels_to_ids(tree)
+
+Copy `inkscape:label` to `id` on each group missing an id.
+
+Returns the number of groups updated.
+
+Inkscape stores the user-visible name in the `inkscape:label` attribute
+and does NOT promote it to `id` on save. This is a long-standing UX
+issue (Inkscape bug #243383); the workaround is to promote at parse time.
+
+* **Return type:**
+  [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
+### cutan.characters.svg_utils.write_svg(tree_or_element, path=None)
+
+Serialize an `ElementTree` or `Element` to bytes (and optionally disk).
+
+Always emits `<?xml version="1.0" encoding="UTF-8"?>` and the SVG
+namespace as the default, so the output is a valid standalone SVG.
+
+* **Return type:**
+  [`bytes`](https://docs.python.org/3/builtins/stdtypes.html#bytes)
+
+
+# _autosummary/cutan.characters.validate.html.md
+
+# cutan.characters.validate
+
+Whether an art package is one the compiler can actually render.
+
+The artist-facing contract, checked offline. Wave 4 (#78) exists because the
+previous check had no teeth in two separate ways:
+
+- **It checked file existence only.** A part that was present but drew nothing
+  passed, and then rendered invisibly — the one failure mode with no diagnostic
+  anywhere in the pipeline (`misc/docs/wave4_research.md` §4).
+- **It returned a bespoke report type**, so the orchestrator’s typed-error
+  routing did not apply to any character problem. Findings here are
+  `an.verify._base.Finding`, the same type every verifier emits, with
+  > `ir_path` pointing at the file or slot that needs the fix.
+
+Everything here is offline and free: no render, no browser, no network. That is
+the point — an illustrator should be able to run it before delivering, and a
+contract they cannot check themselves is a contract that gets them paid for work
+that cannot land.
+
+### Module Attributes
+
+| [`PROHIBITED_ELEMENTS`](_autosummary/cutan.characters.validate.html.md#cutan.characters.validate.PROHIBITED_ELEMENTS)       | Elements an art package may not contain.                                                                                                |
+|----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| [`PART_SUFFIXES`](_autosummary/cutan.characters.validate.html.md#cutan.characters.validate.PART_SUFFIXES)             | SVG, or raster with the suffixes `an.stage.raster` reads (an#211).                                                                      |
+| [`DRAWABLE_ELEMENTS`](_autosummary/cutan.characters.validate.html.md#cutan.characters.validate.DRAWABLE_ELEMENTS)         | Elements that put ink on the canvas.                                                                                                    |
+| [`BLOCKING`](_autosummary/cutan.characters.validate.html.md#cutan.characters.validate.BLOCKING)                  | Severity for a problem that stops the part rendering correctly.                                                                         |
+| [`ADVISORY`](_autosummary/cutan.characters.validate.html.md#cutan.characters.validate.ADVISORY)                  | Severity for a problem worth fixing that still renders.                                                                                 |
+| [`DECLARED_ASPECT_TOLERANCE`](_autosummary/cutan.characters.validate.html.md#cutan.characters.validate.DECLARED_ASPECT_TOLERANCE) | How far a declared box's aspect may differ from its art's before the containment is worth saying (a rounding of a pixel or two is not). |
+
+### Functions
+
+| [`format_report`](_autosummary/cutan.characters.validate.html.md#cutan.characters.validate.format_report)(report, \*, name)          | A short human-readable rendering, for the CLI.                          |
+|-------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`render_contract`](_autosummary/cutan.characters.validate.html.md#cutan.characters.validate.render_contract)()                        | The artist-facing spec, generated from the schema and the checks above. |
+| [`validate_character`](_autosummary/cutan.characters.validate.html.md#cutan.characters.validate.validate_character)(char_dir, \*[, name]) | Check an art package against the contract, offline.                     |
+
+### cutan.characters.validate.ADVISORY *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'warning'*
+
+Severity for a problem worth fixing that still renders.
+
+### cutan.characters.validate.BLOCKING *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'error'*
+
+Severity for a problem that stops the part rendering correctly.
+
+### cutan.characters.validate.DECLARED_ASPECT_TOLERANCE *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.01*
+
+How far a declared box’s aspect may differ from its art’s before the
+containment is worth saying (a rounding of a pixel or two is not).
+
+### cutan.characters.validate.DRAWABLE_ELEMENTS *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'circle', 'ellipse', 'line', 'path', 'polygon', 'polyline', 'rect', 'text', 'use'})*
+
+Elements that put ink on the canvas. A part containing none of these is
+blank, whatever else it contains.
+
+### cutan.characters.validate.PART_SUFFIXES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('.svg', '.png', '.jpg', '.jpeg', '.webp')*
+
+SVG, or raster with the
+suffixes `an.stage.raster` reads (an#211). Order is the lookup order for a
+required part, so an SVG wins when both exist.
+
+* **Type:**
+  The part file formats an art package may ship
+
+### cutan.characters.validate.PROHIBITED_ELEMENTS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'foreignObject': 'embeds non-SVG content that most rasterisers drop', 'image': 'raster embed; ship the raster as its own part instead (parts/<name>.png, with alpha — an#211)', 'script': 'executable content; a part is a drawing, not a program'}*
+
+Elements an art package may not contain.
+
+Not a security perimeter — the renderer loads these files into a headless
+browser we control — but a portability one: each of these makes a part render
+differently, or not at all, depending on the rasteriser, and a part that
+depends on script execution is not a drawing.
+
+### cutan.characters.validate.format_report(report, , name)
+
+A short human-readable rendering, for the CLI.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.validate.render_contract()
+
+The artist-facing spec, generated from the schema and the checks above.
+
+Every line here is read out of a live object: the required parts and mouth
+shapes from [`cutan.characters.schema`](_autosummary/cutan.characters.schema.html.md#module-cutan.characters.schema), the slot and attachment layout from
+a freshly-built descriptor, the prohibitions from
+[`PROHIBITED_ELEMENTS`](_autosummary/cutan.characters.validate.html.md#cutan.characters.validate.PROHIBITED_ELEMENTS), and the drawable set from
+[`DRAWABLE_ELEMENTS`](_autosummary/cutan.characters.validate.html.md#cutan.characters.validate.DRAWABLE_ELEMENTS). Nothing is retyped, so the document and the
+validator cannot disagree.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.validate.validate_character(char_dir, , name=None)
+
+Check an art package against the contract, offline.
+
+Reports a `Finding` per problem: a missing or
+unparseable descriptor, absent required parts or mouth shapes, a part that
+draws nothing, a prohibited construct, a letterboxed part, a joint name
+colliding with a part id, and an unpopulated `AssetSource`.
+
+* **Return type:**
+  `VerificationReport`
+
+```pycon
+>>> import tempfile, pathlib
+>>> with tempfile.TemporaryDirectory() as d:
+...     report = validate_character(d, name="nobody")
+>>> report.passed
+False
+>>> any("character.json" in f.description for f in report.findings)
+True
+```
+
+
+# _autosummary/cutan.characters.vocabulary.html.md
+
+# cutan.characters.vocabulary
+
+The cut-out genre’s vocabulary entries: motion presets, expression presets, IR-field notes.
+
+ADR 0003’s first slice, the genre’s share (the core’s is
+`an.semantic.seeds`). Each entry is built FROM the table that already
+defines the thing — `an.motion.PRESETS` (with
+`an.motion.PRESET_VERSIONS`), `cutan.expression.presets.PRESETS`, the
+expression axes — never restated, so a preset added there is an entry here
+with nothing else to edit. The genre declares them through
+`cutan.genre.CUTOUT`’s `vocabulary` field; importing this module
+registers nothing.
+
+```pycon
+>>> walk = next(e for e in MOTION_PRESET_ENTRIES if e.term == "walk")
+>>> walk.id, walk.aspects, "gait" in walk.params["properties"]
+('motion.walk', ('locomotion',), True)
+```
+
+### Module Attributes
+
+| [`PRESET_ASPECTS`](_autosummary/cutan.characters.vocabulary.html.md#cutan.characters.vocabulary.PRESET_ASPECTS)             | a `walk` picks a locomotion method; `speech_pulse` IS the speech aspect's last link.                                                                                                |
+|-----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`EXPRESSION_PRESET_VERSIONS`](_autosummary/cutan.characters.vocabulary.html.md#cutan.characters.vocabulary.EXPRESSION_PRESET_VERSIONS) | Each expression preset's vocabulary version (ADR 0003).                                                                                                                             |
+| [`CUTOUT_VOCABULARY`](_autosummary/cutan.characters.vocabulary.html.md#cutan.characters.vocabulary.CUTOUT_VOCABULARY)          | Everything this genre contributes to the vocabulary except its methods ([`cutan.characters.methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)). |
+
+### cutan.characters.vocabulary.CUTOUT_VOCABULARY *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Entry, ...]* *= (Entry(id='field.shot.actions.swap_set', kind='field', version='1', name='shot.actions.swap_set', title='', description='a set action that swaps a drawing (replacement animation)', usage="A set/tween property may also be the name of a swap set the target character's descriptor declares in asset_sets (e.g. 'viseme', 'eyelid', 'hands'), used with a 'set' action whose 'value' is one of that set's declared KEYS (replacement animation). The compiler refuses any other name with the declared sets listed. Never invent a set or a key.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='field.shot.actions.play', kind='field', version='1', name='shot.actions.play', title='', description='play a named animation of the target character, or a motion preset', usage="A 'play' action ({kind: play, target: <entity>, animation: <name>, [duration], [speed], [loop], [args]}) plays one of the target character's descriptor animations ('idle_breath', 'blink', or any it declares) or, for a name the descriptor does not declare, a motion preset (listed below) with 'args' as its parameters (e.g. {'height': 30}); a name in neither fails validation — never invent one. 'point' targets the arm node. A 'walk' picks its gait from the character's structure (its locomotion method, below) unless 'gait' is given.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('locomotion',)), Entry(id='field.shot.actions.expression', kind='field', version='1', name='shot.actions.expression', title='', description='hold a facial expression on a character', usage="An 'expression' action ({kind: expression, target: <entity>, preset: <name>, [axes: {axis: value}], [intensity], [duration], [blend]}) holds a facial expression on a character: brows, eyelids, and the mouth's set for any dialogue under it. 'preset' is an expression preset (listed below) — an unknown preset fails validation. Axes are offsets within their ranges: brow_height_l [-1, 1], brow_height_r [-1, 1], brow_angle_l [-1, 1], brow_angle_r [-1, 1], lid_open_l [-1, 0.5], lid_open_r [-1, 0.5], gaze_x [-1, 1], gaze_y [-1, 1]. 'duration' omitted = to the shot end. A character whose descriptor says face_overlay: false cannot take one.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='field.shot.dialogue.emotion', kind='field', version='1', name='shot.dialogue.emotion', title='', description='the mood a line is said in', usage="A dialogue line's 'emotion' is an expression preset name ([happy] on a scene.md line): it sets the face for the line and the voice's mood. When a line's wording changes, update its emotion if the mood changed too.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('speech',)), Entry(id='motion.pop_in', kind='motion_preset', version='1', name='pop_in', title='pop in', description='Grow from nothing to full size, overshooting and settling (an entrance).', usage='', params={'type': 'object', 'properties': {'duration': {'type': 'number', 'default': 0.45}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'pop_in'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.hop', kind='motion_preset', version='1', name='hop', title='hop', description='Jump up by \`height\` scene pixels and land back where it started.', usage='', params={'type': 'object', 'properties': {'height': {'type': 'number', 'default': 40.0}, 'duration': {'type': 'number', 'default': 0.5}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'hop'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.shake', kind='motion_preset', version='1', name='shake', title='shake', description='Tremble side to side \`cycles\` times and come back to rest (on \`x\`).', usage='', params={'type': 'object', 'properties': {'amplitude': {'type': 'number', 'default': 8.0}, 'duration': {'type': 'number', 'default': 0.4}, 'cycles': {'type': 'integer', 'default': 3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'shake'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.nod', kind='motion_preset', version='1', name='nod', title='nod', description='Dip the head \`count\` times (a rotation of \`<target>/<part>\`).', usage='', params={'type': 'object', 'properties': {'part': {'type': 'string', 'default': 'head'}, 'angle': {'type': 'number', 'default': 0.18}, 'duration': {'type': 'number', 'default': 0.5}, 'count': {'type': 'integer', 'default': 2}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'nod'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.point', kind='motion_preset', version='1', name='point', title='point', description='Swing an arm out to point, hold it, and lower it again.', usage='', params={'type': 'object', 'properties': {'angle': {'type': 'number', 'default': -1.3}, 'raise_duration': {'type': 'number', 'default': 0.25}, 'hold': {'type': 'number', 'default': 0.6}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'point'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.slide_in', kind='motion_preset', version='1', name='slide_in', title='slide in', description='Whip in from \`distance\` pixels off to one side, overshoot, and settle.', usage='', params={'type': 'object', 'properties': {'from_side': {'type': 'string', 'default': 'left'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_in'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.slide_out', kind='motion_preset', version='1', name='slide_out', title='slide out', description='Exit \`distance\` pixels off to one side, accelerating (an exit).', usage='', params={'type': 'object', 'properties': {'to_side': {'type': 'string', 'default': 'right'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'type': 'string', 'default': 'ease_in'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_out'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.squash_stretch', kind='motion_preset', version='1', name='squash_stretch', title='squash stretch', description='Squash (wide and short), stretch (narrow and tall), then settle.', usage='', params={'type': 'object', 'properties': {'amount': {'type': 'number', 'default': 0.2}, 'duration': {'type': 'number', 'default': 0.36}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'squash_stretch'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.waddle', kind='motion_preset', version='1', name='waddle', title='waddle', description='A walk cycle for a rig with no legs to animate: rock and bob per step.', usage='', params={'type': 'object', 'properties': {'steps': {'type': 'integer', 'default': 4}, 'step_duration': {'type': 'number', 'default': 0.3}, 'angle': {'type': 'number', 'default': 0.1}, 'lift': {'type': 'number', 'default': 6.0}, 'travel': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'waddle'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.turn', kind='motion_preset', version='1', name='turn', title='turn', description='Turn a character to the view \`to\` — the classic cut-out turn.', usage='', params={'type': 'object', 'properties': {'to': {'type': 'string', 'default': 'back'}, 'direction': {'type': 'string', 'default': 'right'}, 'from_direction': {'type': 'string', 'default': None}, 'duration': {'type': 'number', 'default': 0.3}, 'view_set': {'type': 'string', 'default': 'view'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'turn'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.walk', kind='motion_preset', version='1', name='walk', title='walk', description='Walk: the body travels on \`x\` and bobs once per step while the legs alternate and the arms swing against them.', usage='', params={'type': 'object', 'properties': {'to_x': {'type': 'number', 'default': None}, 'distance': {'type': 'number', 'default': None}, 'direction': {'type': 'string', 'default': None}, 'steps': {'type': 'integer', 'default': None}, 'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0}, 'stride': {'type': 'number', 'default': 0.35}, 'lift': {'type': 'number', 'default': 10.0}, 'bob': {'type': 'number', 'default': 6.0}, 'arm_swing': {'type': 'number', 'default': 0.3}, 'rock': {'type': 'number', 'default': 0.06}, 'hem_tilt': {'type': 'number', 'default': 0.24}, 'view': {'type': 'string', 'default': None}, 'gait': {'type': 'string', 'default': None}, 'legs': {'type': 'array', 'default': None}, 'arms': {'type': 'array', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('locomotion',)), Entry(id='motion.speech_pulse', kind='motion_preset', version='1', name='speech_pulse', title='speech pulse', description='Pulse a part on each syllable: speech carried without a mouth.', usage='', params={'type': 'object', 'properties': {'beats': {'type': 'array', 'default': [0.0]}, 'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'speech_pulse'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('speech',)), Entry(id='expression.neutral', kind='expression_preset', version='1', name='neutral', title='', description='the rest face: every axis at its neutral value', usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'neutral'}, '[neutral] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.happy', kind='expression_preset', version='1', name='happy', title='', description="expression-sheet preset: brow_angle_l +0.1, brow_angle_r +0.1, brow_height_l +0.2, brow_height_r +0.2, lid_open_l -0.2, lid_open_r -0.2; mouth form 'happy'", usage='FACS cross-reference 6+12', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'happy'}, '[happy] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.sad', kind='expression_preset', version='1', name='sad', title='', description="expression-sheet preset: brow_angle_l +0.6, brow_angle_r +0.6, brow_height_l +0.3, brow_height_r +0.3, lid_open_l -0.3, lid_open_r -0.3; mouth form 'sad'", usage='FACS cross-reference 1+4+15', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'sad'}, '[sad] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.angry', kind='expression_preset', version='1', name='angry', title='', description="expression-sheet preset: brow_angle_l -0.8, brow_angle_r -0.8, brow_height_l -0.6, brow_height_r -0.6, lid_open_l +0.1, lid_open_r +0.1; mouth form 'angry'", usage='FACS cross-reference 4+5+7+23', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'angry'}, '[angry] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.surprised', kind='expression_preset', version='1', name='surprised', title='', description="expression-sheet preset: brow_angle_l +0, brow_angle_r +0, brow_height_l +1, brow_height_r +1, lid_open_l +0.4, lid_open_r +0.4; mouth form 'surprised'", usage='FACS cross-reference 1+2+5+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'}, '[surprised] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.afraid', kind='expression_preset', version='1', name='afraid', title='', description="expression-sheet preset: brow_angle_l +0.5, brow_angle_r +0.5, brow_height_l +0.7, brow_height_r +0.7, lid_open_l +0.5, lid_open_r +0.5; mouth form 'afraid'", usage='FACS cross-reference 1+2+4+5+7+20+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'afraid'}, '[afraid] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.disgusted', kind='expression_preset', version='1', name='disgusted', title='', description="expression-sheet preset: brow_angle_l -0.3, brow_angle_r -0.3, brow_height_l -0.3, brow_height_r -0.3, lid_open_l -0.4, lid_open_r -0.4; mouth form 'disgusted'", usage='FACS cross-reference 9+15+17', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'disgusted'}, '[disgusted] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.thinking', kind='expression_preset', version='1', name='thinking', title='', description='expression-sheet preset: brow_angle_l +0.3, brow_angle_r -0.1, brow_height_l +0.5, brow_height_r -0.2, lid_open_l -0.1, lid_open_r -0.1', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'thinking'}, '[thinking] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.skeptical', kind='expression_preset', version='1', name='skeptical', title='', description='expression-sheet preset: brow_angle_l +0, brow_angle_r -0.2, brow_height_l +0.6, brow_height_r -0.3, lid_open_l +0, lid_open_r -0.2', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'skeptical'}, '[skeptical] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.amused', kind='expression_preset', version='1', name='amused', title='', description="expression-sheet preset: brow_angle_l +0.05, brow_angle_r +0.05, brow_height_l +0.1, brow_height_r +0.1, lid_open_l -0.1, lid_open_r -0.1; mouth form 'happy'", usage='FACS cross-reference happy at ~0.6', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'amused'}, '[amused] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()))*
+
+Everything this genre contributes to the vocabulary except its methods
+([`cutan.characters.methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)).
+
+### cutan.characters.vocabulary.EXPRESSION_PRESET_VERSIONS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {}*
+
+Each expression preset’s vocabulary version (ADR 0003). Bump one in the same
+change that moves its axes or its mouth form.
+
+### cutan.characters.vocabulary.PRESET_ASPECTS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]]* *= {'speech_pulse': ('speech',), 'walk': ('locomotion',)}*
+
+a `walk` picks a
+locomotion method; `speech_pulse` IS the speech aspect’s last link.
+
+* **Type:**
+  Which aspect a preset resolves when played (ADR 0002)
+
+
+# _autosummary/cutan.compile.coarticulate.html.md
+
+# cutan.compile.coarticulate
+
+Co-articulation for a swap mouth: the passes between a provider’s raw viseme
+track and the compiler’s channel emission (an#97, epic #9 Wave 6).
+
+A lip-sync provider hands the compiler a list of `(time, code)` cues — one
+mouth shape per phoneme or per character, at whatever density it produced.
+Shown as-is, that track *flickers*: consonant clusters swap the mouth faster
+than a frame or two can show, tongue-only shapes swap the lips for one frame, and
+every shape lands exactly on its sound instead of a beat ahead of it. These
+passes turn the raw track into what an animator would key, in this order:
+
+1. **Symbolic** — [`merge_duplicates()`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.merge_duplicates) drops a cue whose shape is already
+   showing; [`suppress_weak()`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.suppress_weak) drops a low-dominance cue that would show for
+   less than one frame (JALI, Edwards et al. 2016 §4.2: “Tongue-only visemes
+   (l n t d g k N) have no influence on the lips” — for a swap mouth, “take the
+   neighbour’s shape” is “do not swap”).
+2. **Anticipation** — [`lead()`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.lead) moves every cue earlier by a fixed lead
+   (JALI: “speech onset begins 120 ms before the apex”; the animator’s “two
+   frames ahead”; Rhubarb’s own `maxExtensionDuration` of 60 ms), clamped
+   at 0.
+   2b. **Close after speech** — [`close_after_speech()`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.close_after_speech) puts the mouth at rest
+   where the last WORD ends, when the line knows its words (an#213). A
+   provider that aligns from words keyed a rest between words but, until
+   an#213, not after the last one, so the last shape held through the
+   trailing silence of the clip; cached tracks keep that defect, so the
+   compiler closes the mouth rather than asking for a re-alignment. After
+   the lead (on the led times, so a word shorter than the lead still opens
+   the mouth before it closes) and before the decay (which gives the last
+   shape its time).
+3. **Decay** — [`decay()`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.decay) gives a shape its time to close: a rest cue that
+   arrives sooner than `decay_s` after the shape before it is pushed out to
+   `decay_s` (JALI: “another 120 ms to decay to zero”), never past the next
+   speaking cue.
+4. **Minimum hold** — [`condense()`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.condense), LAST. It **holds and votes**; it never
+   drops a cue unvoted (a carried loser can lose its next window too and never
+   show — outvoted twice, not skipped). Windows of at least `min_hold_s` open at each cue that clears the
+   previous window; within a window the shape with the largest
+   `span × dominance` (Rhubarb’s “select shape with highest total duration
+   within the candidate range”, weighted by Cohen–Massaro’s per-segment
+   dominance) shows, **placed at the window start**. The old compiler loop
+
+   ```
+   ``
+   ```
+
+   continue\`\`d past every cue inside the window, so a consonant cluster
+   collapsed to whichever shape arrived first — the defect epic #9 names.
+
+Order matters: (1) before (4) so a one-frame /t/ never wins a window; (2) and
+(3) before (4) so the hold is measured on shifted times. Every pass is a pure
+function over `list[Cue]`, runs in the **compiler** (never in the audio
+pipeline, so a knob change is a recompile and never a paid re-alignment), and
+none of these constants may ever enter a cache key.
+
+Dominance: the ORDER of [`DOMINANCE`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.DOMINANCE) is sourced — A (bilabial closure;
+JALI rule 1 “must close the lips”) > F, G (lip-heavy) > E, D > C > X > B, H
+(tongue) — and its values are art direction. A provider that knows the
+character behind a cue may scale it through `Cue.intensity` (Rhubarb’s `B`
+codes both “most consonants” and the vowel EE, so the letter alone cannot say).
+
+### Module Attributes
+
+| [`DOMINANCE`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.DOMINANCE)          | Per-shape dominance for Rhubarb's letters.                                                                 |
+|---------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| [`DEFAULT_DOMINANCE`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.DEFAULT_DOMINANCE)  | A shape not in the table (another convention's code) is neither strong nor weak.                           |
+| [`WEAK_BELOW`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.WEAK_BELOW)         | Below this dominance a cue is "weak" for [`suppress_weak()`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.suppress_weak). |
+| [`DEFAULT_LEAD_S`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.DEFAULT_LEAD_S)     | Anticipation lead — two frames at 24 fps (art direction; JALI's 120 ms is the ceiling).                    |
+| [`DEFAULT_DECAY_S`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.DEFAULT_DECAY_S)    | Time a shape is given to close before rest (JALI's "120 ms to decay").                                     |
+| [`DEFAULT_MIN_HOLD_S`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.DEFAULT_MIN_HOLD_S) | The minimum hold, unchanged from the pre-an#97 compiler until measured.                                    |
+
+### Functions
+
+| [`close_after_speech`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.close_after_speech)(keys, \*, speech_end[, rest])   | Rest once speech is over: at `speech_end`, or just after the last shape when a shape is keyed at or after it — never before a shape.                                                                                    |
+|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`coarticulate`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.coarticulate)(keys, \*, fps[, end, ...])            | All the passes, in the order the module docstring gives.                                                                                                                                                                |
+| [`condense`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.condense)(keys, \*, min_hold_s[, end])              | Enforce a minimum hold by voting, never by dropping.                                                                                                                                                                    |
+| [`decay`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.decay)(keys, \*, decay_s[, rest, end])              | Give a shape `decay_s` to close: a rest arriving sooner than that after the shape before it is pushed out to `decay_s`, never past the next cue and never past `end` (a rest pushed to `end` is where the line closes). |
+| [`lead`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.lead)(keys, \*, lead_s)                             | Anticipation: every cue moves `lead_s` earlier, clamped at 0.                                                                                                                                                           |
+| [`merge_duplicates`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.merge_duplicates)(keys)                             | Drop a cue whose shape is the one already showing.                                                                                                                                                                      |
+| [`suppress_weak`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.suppress_weak)(keys, \*, max_weak_s[, end])         | Drop a weak (low-dominance) cue that would show for less than `max_weak_s`.                                                                                                                                             |
+
+### Classes
+
+| [`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)(time, code[, intensity])   | One mouth-shape cue: when it starts, which shape, how loudly it wants the lips.   |
+|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+
+### *class* cutan.compile.coarticulate.Cue(time, code, intensity=1.0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One mouth-shape cue: when it starts, which shape, how loudly it wants the lips.
+
+### cutan.compile.coarticulate.DEFAULT_DECAY_S *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.12*
+
+Time a shape is given to close before rest (JALI’s “120 ms to decay”).
+
+### cutan.compile.coarticulate.DEFAULT_DOMINANCE *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+
+A shape not in the table (another convention’s code) is neither strong nor weak.
+
+### cutan.compile.coarticulate.DEFAULT_LEAD_S *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.08333333333333333*
+
+Anticipation lead — two frames at 24 fps (art direction; JALI’s 120 ms is the ceiling).
+
+### cutan.compile.coarticulate.DEFAULT_MIN_HOLD_S *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.14*
+
+The minimum hold, unchanged from the pre-an#97 compiler until measured.
+
+### cutan.compile.coarticulate.DOMINANCE *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]* *= {'A': 1.0, 'B': 0.3, 'C': 0.6, 'D': 0.8, 'E': 0.8, 'F': 0.9, 'G': 0.9, 'H': 0.3, 'X': 0.5}*
+
+Per-shape dominance for Rhubarb’s letters. Order sourced, values ours.
+
+### cutan.compile.coarticulate.WEAK_BELOW *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+
+Below this dominance a cue is “weak” for [`suppress_weak()`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.suppress_weak).
+
+### cutan.compile.coarticulate.close_after_speech(keys, , speech_end, rest='X')
+
+Rest once speech is over: at `speech_end`, or just after the last
+shape when a shape is keyed at or after it — never before a shape.
+
+`speech_end` is where the line’s last word ends (`None`: the line does
+not know its words, and nothing changes). A provider spreads a very short
+word’s shapes over a minimum span, so a shape can start after its word’s
+end; the rest then follows that shape, and [`decay()`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.decay) pushes it out to
+`decay_s` after it (an#213 review). Nothing is inserted when the mouth
+is already at rest there. `rest` is the TRACK’s rest code (a track keyed
+in another convention closes with its own).
+
+The evidence, “Bye.” timed 0.0–0.5 s in a 1.84 s clip:
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
+
+```pycon
+>>> raw = [(0, "X"), (0, "A"), (0.167, "B"), (0.333, "C"), (1.838, "X")]
+>>> [(c.time, c.code) for c in close_after_speech(raw, speech_end=0.5)]
+[(0.0, 'X'), (0.0, 'A'), (0.167, 'B'), (0.333, 'C'), (0.5, 'X'), (1.838, 'X')]
+>>> close_after_speech(raw, speech_end=None) == _cues(raw)
+True
+```
+
+A 25 ms last word whose second shape starts after it ends:
+
+```pycon
+>>> [(c.time, c.code) for c in close_after_speech(
+...     [(0, "X"), (1.0, "E"), (1.025, "B"), (2.0, "X")], speech_end=1.02)][-3:]
+[(1.025, 'B'), (1.025000001, 'X'), (2.0, 'X')]
+```
+
+### cutan.compile.coarticulate.coarticulate(keys, , fps, end=None, min_hold_s=0.14, lead_s=0.08333333333333333, decay_s=0.12, rest='X', speech_end=None)
+
+All the passes, in the order the module docstring gives.
+
+`speech_end` (where the last word ends, when the line knows its words)
+closes the mouth there instead of at `end` (an#213):
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
+
+```pycon
+>>> bye = [(0, "X"), (0, "A"), (0.167, "B"), (0.333, "C"), (1.838, "X")]
+>>> [(round(c.time, 3), c.code) for c in coarticulate(bye, fps=24, end=1.838)][-2:]
+[(0.28, 'C'), (1.755, 'X')]
+>>> [(round(c.time, 3), c.code) for c in coarticulate(bye, fps=24, end=1.838, speech_end=0.5)][-2:]
+[(0.28, 'C'), (0.5, 'X')]
+```
+
+(The shapes lead by two frames; the closing rest is placed after the lead,
+at the word’s end, and the decay keeps it at least `decay_s` after the
+last shape.)
+
+```pycon
+>>> raw = [(0.0, "X"), (0.30, "B"), (0.34, "A"), (0.38, "D"), (0.80, "X")]
+>>> [(round(c.time, 3), c.code) for c in coarticulate(raw, fps=24, end=1.0)]
+[(0.0, 'X'), (0.257, 'D'), (0.717, 'X')]
+```
+
+A track that ends on `rest` still does after the passes, at `end` when
+the decay left no room before it (the compiler appends its own terminal
+rest at the line’s end regardless — this is for every other caller):
+
+```pycon
+>>> [(round(c.time, 3), c.code) for c in coarticulate([(0, "X"), (0.3, "D"), (0.69, "C"), (0.71, "X")], fps=24, end=0.71)]
+[(0.0, 'X'), (0.217, 'D'), (0.607, 'C'), (0.71, 'X')]
+```
+
+The knobs are validated up front — a negative lead or a zero hold is a
+typo, not a style:
+
+```pycon
+>>> coarticulate(raw, fps=24, end=1.0, min_hold_s=0)
+Traceback (most recent call last):
+...
+ValueError: min_hold_s must be > 0, got 0
+```
+
+### cutan.compile.coarticulate.condense(keys, , min_hold_s, end=None)
+
+Enforce a minimum hold by voting, never by dropping.
+
+Windows of `min_hold_s` open at each cue that clears the previous window.
+Every cue inside a window — the opener included — votes with the length of
+its raw span **that falls inside the window** times its dominance
+(Rhubarb’s “select shape with highest total duration within the candidate
+range”, weighted); the winner shows for the window, placed at the window
+start. A member whose span runs past the window’s end and did not win is
+not lost: it opens the next window at the window’s end, delayed — that is
+the hold doing its job. Ties go to the later arrival.
+
+The defect the epic names, verbatim semantics of the old compiler loop —
+‘A’ (the closure) and ‘D’ (the open vowel) are gone and a 40 ms ‘B’ holds
+for 500 ms:
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
+
+```pycon
+>>> raw = [(0.0, "X"), (0.30, "B"), (0.34, "A"), (0.38, "D"), (0.80, "X")]
+>>> old = []
+>>> for t, v in raw:
+...     if old and (t - old[-1][0]) < 0.14:
+...         continue
+...     old.append((t, v))
+>>> old
+[(0.0, 'X'), (0.3, 'B'), (0.8, 'X')]
+```
+
+The vote in the window at 0.30: B (0.04 × 0.3) and A (0.04 × 1.0) lose to
+D (0.06 in-window × 0.8), which shows at the window’s start:
+
+```pycon
+>>> [(c.time, c.code) for c in condense(raw, min_hold_s=0.14)]
+[(0.0, 'X'), (0.3, 'D'), (0.8, 'X')]
+```
+
+A cue exactly at the window edge opens the next window, untouched — also
+at the third edge, where `0.28 + 0.14` is a hair over `0.42` in binary:
+
+```pycon
+>>> [(c.time, c.code) for c in condense([(0.0, "X"), (0.14, "C"), (0.28, "D"), (0.42, "A")], min_hold_s=0.14)]
+[(0.0, 'X'), (0.14, 'C'), (0.28, 'D'), (0.42, 'A')]
+```
+
+Without `end` the last cue shows forever, so it always survives (it opens
+its own window when it loses one):
+
+```pycon
+>>> [(c.time, c.code) for c in condense([(0.0, "X"), (0.1, "A")], min_hold_s=0.14)]
+[(0.0, 'X'), (0.14, 'A')]
+```
+
+Windows chain, so nothing is lost: the opening rest keeps its window
+(0.10 of rest beats a 20 ms closure and 20 ms of F); F, running past the
+window, opens the next one at 0.14 and wins it over the 40 ms of C inside
+it; C in turn opens the window at 0.28:
+
+```pycon
+>>> [(c.time, c.code) for c in condense([(0.0, "X"), (0.10, "A"), (0.12, "F"), (0.20, "C"), (0.9, "X")], min_hold_s=0.14)]
+[(0.0, 'X'), (0.14, 'F'), (0.28, 'C'), (0.9, 'X')]
+```
+
+A winner equal to the shape already showing is merged:
+
+```pycon
+>>> [(c.time, c.code) for c in condense([(0.0, "X"), (0.05, "B"), (0.10, "X")], min_hold_s=0.14)]
+[(0.0, 'X')]
+```
+
+### cutan.compile.coarticulate.decay(keys, , decay_s, rest='X', end=None)
+
+Give a shape `decay_s` to close: a rest arriving sooner than that after
+the shape before it is pushed out to `decay_s`, never past the next cue
+and never past `end` (a rest pushed to `end` is where the line closes).
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
+
+```pycon
+>>> [(round(c.time, 3), c.code) for c in decay([(0.0, "X"), (0.2, "D"), (0.25, "X"), (0.6, "B")], decay_s=0.12)]
+[(0.0, 'X'), (0.2, 'D'), (0.32, 'X'), (0.6, 'B')]
+>>> [(round(c.time, 3), c.code) for c in decay([(0.0, "X"), (0.2, "D"), (0.25, "X"), (0.30, "B")], decay_s=0.12)]
+[(0.0, 'X'), (0.2, 'D'), (0.3, 'B')]
+```
+
+### cutan.compile.coarticulate.lead(keys, , lead_s)
+
+Anticipation: every cue moves `lead_s` earlier, clamped at 0.
+
+Cues that collide at 0 collapse to the last one — the shape that is still
+the state once the collision is over. An opening burst shorter than the
+lead (`[(0, X), (0.02, A), (0.05, D), (0.07, X)]`) therefore never opens
+the mouth; the hold would have refused a 70 ms word anyway, and the old
+condenser did.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
+
+```pycon
+>>> [(round(c.time, 3), c.code) for c in lead([(0.0, "X"), (0.05, "D"), (0.5, "B")], lead_s=0.08)]
+[(0.0, 'D'), (0.42, 'B')]
+```
+
+### cutan.compile.coarticulate.merge_duplicates(keys)
+
+Drop a cue whose shape is the one already showing.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
+
+```pycon
+>>> [(c.time, c.code) for c in merge_duplicates([(0, "X"), (0.1, "B"), (0.2, "B"), (0.3, "C")])]
+[(0.0, 'X'), (0.1, 'B'), (0.3, 'C')]
+```
+
+### cutan.compile.coarticulate.suppress_weak(keys, , max_weak_s, end=None)
+
+Drop a weak (low-dominance) cue that would show for less than `max_weak_s`.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
+
+```pycon
+>>> raw = [(0.0, "X"), (0.20, "D"), (0.40, "B"), (0.43, "D"), (0.80, "X")]
+>>> [(c.time, c.code) for c in suppress_weak(raw, max_weak_s=0.04)]
+[(0.0, 'X'), (0.2, 'D'), (0.8, 'X')]
+```
+
+A weak cue that lasts is kept — this is not the minimum-hold pass:
+
+```pycon
+>>> [(c.time, c.code) for c in suppress_weak([(0.0, "X"), (0.2, "B"), (0.5, "D")], max_weak_s=0.04)]
+[(0.0, 'X'), (0.2, 'B'), (0.5, 'D')]
+```
+
+
+# _autosummary/cutan.compile.gaze.html.md
+
+# cutan.compile.gaze
+
+Ambient saccades for a cutout rig’s pupils: a seeded generator (an#99, epic #9 Wave 6).
+
+Pure Python, no renderer. Given an entity’s name, a shot’s duration and its
+frame rate, produce a **step** track of pupil offsets — where the eyes rest,
+and when they jump — that the face solver adds onto the pupil nodes’ `x` /
+`y` beside any authored gaze. Steps, not tweens: at 24 fps a frame is
+41.7 ms and a small saccade is 20–200 ms, so a jump between two frames is the
+honest rendering (the way the compiled blink squash samples at frame times).
+
+The statistics are **design values**, labelled so: the canonical source
+(“Eyes Alive”, Lee, Badler & Badler, SIGGRAPH 2002) was unreachable when this
+was designed, and nothing was transcribed from memory. Fixation lengths are
+right-skewed with a ~200 ms peak and a long tail, so they are drawn from a
+gamma clipped to `[FIXATION_MIN_S, FIXATION_MAX_S]`; amplitudes are mostly
+small with a rare large jump and a horizontal bias; and a jump above
+`BLINK_COUPLED_AMPLITUDE` is moved to the centre of the nearest blink window
+within `BLINK_COUPLING_WINDOW_S` when one exists, because gaze-evoked blinks
+hide the pop.
+
+Seeding follows the blink pattern — a pure function of the entity name — so
+renaming a character re-seeds its saccades (the recorded blink hazard); the
+seed is stamped into the compiled scene’s `meta` beside `blink_phases`.
+Integer seeding of [`random.Random`](https://docs.python.org/3/library/random.html#random.Random) is version-stable.
+
+```pycon
+>>> track = saccade_track("gale", duration=2.0, fps=24)
+>>> track[0].time, all(t.time <= 2.0 for t in track)
+(0.0, True)
+>>> track == saccade_track("gale", duration=2.0, fps=24)  # deterministic
+True
+>>> track != saccade_track("nora", duration=2.0, fps=24)  # per entity
+True
+```
+
+### Module Attributes
+
+| [`GAZE_SALT`](_autosummary/cutan.compile.gaze.html.md#cutan.compile.gaze.GAZE_SALT)   | XOR'd into the entity-name hash so saccades and blinks never share a seed.   |
+|--------------------------------------------------------------|------------------------------------------------------------------------------|
+
+### Functions
+
+| [`gaze_seed`](_autosummary/cutan.compile.gaze.html.md#cutan.compile.gaze.gaze_seed)(entity_id)                               | The generator's seed for an entity — a pure function of its name.   |
+|-----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| [`saccade_track`](_autosummary/cutan.compile.gaze.html.md#cutan.compile.gaze.saccade_track)(entity_id, \*, duration, fps[, ...]) | Step keyframes on frame times, seeded by `entity_id`.               |
+
+### Classes
+
+| [`GazeStep`](_autosummary/cutan.compile.gaze.html.md#cutan.compile.gaze.GazeStep)(time, x, y)   | The pupils rest at `(x, y)` (axis units) from `time` on.   |
+|-------------------------------------------------------------------------|------------------------------------------------------------|
+
+### cutan.compile.gaze.GAZE_SALT *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 27182*
+
+XOR’d into the entity-name hash so saccades and blinks never share a seed.
+
+### *class* cutan.compile.gaze.GazeStep(time, x, y)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+The pupils rest at `(x, y)` (axis units) from `time` on.
+
+### cutan.compile.gaze.gaze_seed(entity_id)
+
+The generator’s seed for an entity — a pure function of its name.
+
+* **Return type:**
+  [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
+```pycon
+>>> gaze_seed("gale") == gaze_seed("gale") and gaze_seed("gale") != gaze_seed("nora")
+True
+```
+
+### cutan.compile.gaze.saccade_track(entity_id, , duration, fps, blink_windows=None, amplitude=1.0)
+
+Step keyframes on frame times, seeded by `entity_id`.
+
+`amplitude` scales every jump (0 = the eyes hold centre; the design
+values assume 1). `blink_windows` are the entity’s compiled blink
+windows, for the coupling rule.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`GazeStep`](_autosummary/cutan.compile.gaze.html.md#cutan.compile.gaze.GazeStep)]
+
+
+# _autosummary/cutan.compile.html.md
+
+# cutan.compile
+
+The cut-out genre’s compile passes, their lowering hooks and the visuals of its runtime.
+
+### Modules
+
+| [`coarticulate`](_autosummary/cutan.compile.coarticulate.html.md#module-cutan.compile.coarticulate)   | Co-articulation for a swap mouth: the passes between a provider's raw viseme track and the compiler's channel emission (an#97, epic #9 Wave 6).   |
+|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`gaze`](_autosummary/cutan.compile.gaze.html.md#module-cutan.compile.gaze)                   | Ambient saccades for a cutout rig's pupils: a seeded generator (an#99, epic #9 Wave 6).                                                           |
+| [`lowering`](_autosummary/cutan.compile.lowering.html.md#module-cutan.compile.lowering)           | How the stage compiler lowers the cut-out genre's actions, and reads a character's swap sets.                                                     |
+| [`passes`](_autosummary/cutan.compile.passes.html.md#module-cutan.compile.passes)               | The cut-out passes over the stage compiler, and the helpers only they use.                                                                        |
+
+
+# _autosummary/cutan.compile.lowering.html.md
+
+# cutan.compile.lowering
+
+How the stage compiler lowers the cut-out genre’s actions, and reads a character’s swap sets.
+
+The stage compiler (`an.stage.compile`) knows no cut-out kind by name. A genre
+hands it an *action lowering* (`an.genres.ActionKind.lowering`) for each
+kind that is more than a tween or set, and an *entity swap declaration*
+(`an.genres.EntityKind.swap_declaration`) saying what a descriptor declares.
+Both live here; the code they call is [`cutan.compile.passes`](_autosummary/cutan.compile.passes.html.md#module-cutan.compile.passes).
+
+```pycon
+>>> from cutan.characters.registration import PlayAction
+>>> PLAY_LOWERING.extent_resolver(None)(PlayAction(target="a", animation="hop"))
+0.5
+```
+
+### Module Attributes
+
+| [`CHARACTERS_STORE`](_autosummary/cutan.compile.lowering.html.md#cutan.compile.lowering.CHARACTERS_STORE)   | The mall store holding character descriptors (a persisted name).   |
+|---------------------------------------------------------------------|--------------------------------------------------------------------|
+
+### Functions
+
+| [`character_swap_declaration`](_autosummary/cutan.compile.lowering.html.md#cutan.compile.lowering.character_swap_declaration)(entity, mall)   | What a character's (migrated) descriptor declares, for the swap vocabulary.   |
+|---------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+
+### Classes
+
+| [`ExpressionLowering`](_autosummary/cutan.compile.lowering.html.md#cutan.compile.lowering.ExpressionLowering)()   | The `expression` action kind: the face solver's input, so it makes no clip of its own.   |
+|-------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| [`PlayLowering`](_autosummary/cutan.compile.lowering.html.md#cutan.compile.lowering.PlayLowering)()         | The `play` action kind, as the stage compiler lowers it (an#7, an#166, an#220).          |
+
+### cutan.compile.lowering.CHARACTERS_STORE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'characters'*
+
+The mall store holding character descriptors (a persisted name).
+
+### *class* cutan.compile.lowering.ExpressionLowering
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+The `expression` action kind: the face solver’s input, so it makes no clip of its own.
+
+#### expand(flat_list, \*\*kw)
+
+Drop the `expression` leaves: `_add_face_clips` sums them per (node, property).
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
+
+### *class* cutan.compile.lowering.PlayLowering
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+The `play` action kind, as the stage compiler lowers it (an#7, an#166, an#220).
+
+#### clip(action, \*\*kw)
+
+The clip of one descriptor `play` (the presets were expanded already).
+
+#### expand(flat_list, \*\*kw)
+
+Replace each `play` of a motion preset by the tweens and sets it stands for.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
+
+#### extent_resolver(vocab)
+
+`play -> seconds` for a play that names no duration, read off its descriptor.
+
+* **Return type:**
+  [`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[[`Any`](https://docs.python.org/3/library/typing.html#typing.Any)], [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+#### view_of(entity_swaps, vocab, , duration)
+
+`flat -> the view its entity is in then`, for characters with per-view face sets.
+
+### cutan.compile.lowering.character_swap_declaration(entity, mall)
+
+What a character’s (migrated) descriptor declares, for the swap vocabulary.
+
+`None` when the store has no descriptor for the entity (a procedural or
+placeholder rig: its built nodes’ sets ARE its declaration).
+
+* **Return type:**
+  `SwapDeclaration` | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+
+# _autosummary/cutan.compile.passes.html.md
+
+# cutan.compile.passes
+
+The cut-out passes over the stage compiler, and the helpers only they use.
+
+Moved from `an.stage.compile` (an#225). The stage compiler keeps the passes every
+genre shares (scene, actions, camera, parallax, checks) and the helpers both sides use;
+this module holds what only the cut-out genre reaches: the `speech`, `swap_pose`,
+`view_spans`, `visemes` and `face` passes (registered by `cutan.genre.CUTOUT`
+as `"cutan.compile.passes:<name>"`) and the character rig builder.
+
+### Module Attributes
+
+| [`DFLT_LEG_COLOUR`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.DFLT_LEG_COLOUR)        | The procedural rig's leg colour — a literal the palette table never carried, which is why it is a named constant rather than two copies of a string.                                                                                                                                                         |
+|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`DFLT_PUPIL_COLOUR`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.DFLT_PUPIL_COLOUR)      | The procedural rig's pupil colour.                                                                                                                                                                                                                                                                           |
+| [`COARTICULATION_ENABLED`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.COARTICULATION_ENABLED) | Co-articulation on/off (an#97).                                                                                                                                                                                                                                                                              |
+| [`PROCEDURAL_MOUTH_KEYS`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.PROCEDURAL_MOUTH_KEYS)  | The procedural (drawn) mouth's swap vocabulary, DECLARED as data on its visual exactly as the runtime declares it (`g._anDrawSets = {viseme: ...}`) and as an SVG mouth carries its projection.                                                                                                              |
+| [`EYE_NODE_NAMES`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.EYE_NODE_NAMES)         | the default rig's eye slots ARE its node names, on both the procedural and the descriptor path.                                                                                                                                                                                                              |
+| [`PUPIL_NODE_NAMES`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.PUPIL_NODE_NAMES)       | The pupil nodes of the gaze stack (an#99); a rig without them takes gaze as a no-op.                                                                                                                                                                                                                         |
+| [`GAZE_ELLIPSE_MARGIN`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.GAZE_ELLIPSE_MARGIN)    | The summed gaze (x, y), in axis units, is clamped to a circle of this radius — the declared travel maps the unit circle onto the sclera's inner ellipse, and 0.95 keeps the whole pupil disc inside it at every angle (measured on the synthesized eye: 1.0 pokes out by 2% of the ellipse at the diagonal). |
+
+### Functions
+
+| [`blink_phase`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.blink_phase)(entity_id)   | The entity's blink phase in [0, 1): the runtime's rule, ported exactly.   |
+|---------------------------------------------------------------------------|---------------------------------------------------------------------------|
+
+### cutan.compile.passes.COARTICULATION_ENABLED *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+Co-articulation on/off (an#97). ON is the product; OFF reproduces the
+pre-#97 mouth CHOICE — the raw provider track thinned by the old drop-not-hold
+condenser — over the new frame-ceiled clip window (so not byte-for-byte the
+old emission: OFF still closes the mouth after a line) and exists so the `lipsync-coarticulation` demo and a test can
+render the two side by side. Not a RenderContext knob: nobody should ship
+the old behaviour, and a module flag rebound for one render is the shape
+the bench’s levers already use.
+
+### cutan.compile.passes.DFLT_LEG_COLOUR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '#2c3e50'*
+
+The procedural rig’s leg colour — a literal the palette table never
+carried, which is why it is a named constant rather than two copies of a
+string. A `StylePack`’s `leg` role replaces it.
+
+### cutan.compile.passes.DFLT_PUPIL_COLOUR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '#1a1a1a'*
+
+The procedural rig’s pupil colour. `makeEye` reads it from the document —
+the eye WHITE beside it is a literal and cannot be reached, which is the
+split `REACHABLE_ROLES` / `UNREACHABLE_ROLES` records.
+
+### cutan.compile.passes.EYE_NODE_NAMES *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'left_eye', 'right_eye'})*
+
+the default rig’s eye slots ARE its node
+names, on both the procedural and the descriptor path.
+
+* **Type:**
+  The nodes that blink, by name
+
+### cutan.compile.passes.GAZE_ELLIPSE_MARGIN *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.95*
+
+The summed gaze (x, y), in axis units, is clamped to a circle of this radius
+— the declared travel maps the unit circle onto the sclera’s inner ellipse,
+and 0.95 keeps the whole pupil disc inside it at every angle (measured on
+the synthesized eye: 1.0 pokes out by 2% of the ellipse at the diagonal).
+
+### cutan.compile.passes.PROCEDURAL_MOUTH_KEYS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E', 'F': 'F', 'G': 'G', 'H': 'H', 'X': 'X'}*
+
+The procedural (drawn) mouth’s swap vocabulary, DECLARED as data on its
+visual exactly as the runtime declares it (`g._anDrawSets = {viseme: ...}`)
+and as an SVG mouth carries its projection. A drawn mouth has no textures,
+so each key maps to itself — the code the runtime’s shape table draws. The
+compiler never branches on the set’s NAME: the drawn mouth is just a node
+whose visual carries a `viseme` set (an#87).
+
+### cutan.compile.passes.PUPIL_NODE_NAMES *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'left_pupil', 'right_pupil'})*
+
+The pupil nodes of the gaze stack (an#99); a rig without them takes gaze as a no-op.
+
+### cutan.compile.passes.blink_phase(entity_id)
+
+The entity’s blink phase in [0, 1): the runtime’s rule, ported exactly.
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+```pycon
+>>> blink_phase("charlie")
+0.762
+```
+
+
+# _autosummary/cutan.conftest.html.md
+
+# cutan.conftest
+
+Doctest collection for `cutan`: `nw` is an optional dependency of `cutan.nw` only.
+
+
+# _autosummary/cutan.expression.axes.html.md
+
+# cutan.expression.axes
+
+The facial expression axes: what a cutout face can be asked to do (an#98).
+
+Ten axes ship in Wave 6 of epic #9 — eight numeric, one selection
+(`mouth_form`, which picks a `viseme@<preset>` set and is not a number),
+one scalar (`intensity`). Every numeric value is an \*\*offset over the built
+rest\*\* of the node it drives; rest is neutral. The ranges and the eyelid
+ladder below are the only numbers in the vocabulary (research
+`misc/docs/wave6_research.md` §4, §6).
+
+Deferred, named so nobody re-invents them: `brow_squeeze`, `squint`,
+`head_yaw` / `head_pitch` (Wave 7), `mouth_open` (the viseme set already
+opens monotonically `X → A → B → C → D`).
+
+```pycon
+>>> AXES["brow_height_l"].clamp(3.0)
+1.0
+>>> lid_key(-0.9, available={"OPEN", "CLOSED"})
+'CLOSED'
+>>> lid_key(-0.5, available={"OPEN", "CLOSED"})          # no `half` art: stays open
+'OPEN'
+>>> lid_key(-0.5, available={"OPEN", "CLOSED", "HALF"})
+'HALF'
+```
+
+### Module Attributes
+
+| [`AXES`](_autosummary/cutan.expression.axes.html.md#cutan.expression.axes.AXES)            |                                                                                    |
+|------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| [`MOUTH_FORM_AXIS`](_autosummary/cutan.expression.axes.html.md#cutan.expression.axes.MOUTH_FORM_AXIS) | which `viseme@<form>` set the mouth's key indexes.                                 |
+| [`INTENSITY_AXIS`](_autosummary/cutan.expression.axes.html.md#cutan.expression.axes.INTENSITY_AXIS)  | The scalar on every offset (MPEG-4 "excitation"); the blend ramp is a curve on it. |
+| [`LID_WIDE_ABOVE`](_autosummary/cutan.expression.axes.html.md#cutan.expression.axes.LID_WIDE_ABOVE)  | The eyelid ladder — one rule, stated once (research §6).                           |
+| [`LID_KEY_WIDE`](_autosummary/cutan.expression.axes.html.md#cutan.expression.axes.LID_KEY_WIDE)    | Eyelid set keys the ladder can name, by openness.                                  |
+
+### Functions
+
+| [`clamp_axes`](_autosummary/cutan.expression.axes.html.md#cutan.expression.axes.clamp_axes)(values)            | Clamp every numeric axis to its range; an unknown axis is an error.       |
+|--------------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| [`lid_key`](_autosummary/cutan.expression.axes.html.md#cutan.expression.axes.lid_key)(value, \*, available) | The eyelid key a lid state selects, degraded to the art the rig declares. |
+
+### Classes
+
+| [`Axis`](_autosummary/cutan.expression.axes.html.md#cutan.expression.axes.Axis)(name, lo, hi[, rest])   | One numeric axis: its range and its rest (neutral) value.   |
+|-------------------------------------------------------------------------------|-------------------------------------------------------------|
+
+### cutan.expression.axes.AXES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Axis](_autosummary/cutan.expression.axes.html.md#cutan.expression.axes.Axis)]* *= {'brow_angle_l': Axis(name='brow_angle_l', lo=-1.0, hi=1.0, rest=0.0), 'brow_angle_r': Axis(name='brow_angle_r', lo=-1.0, hi=1.0, rest=0.0), 'brow_height_l': Axis(name='brow_height_l', lo=-1.0, hi=1.0, rest=0.0), 'brow_height_r': Axis(name='brow_height_r', lo=-1.0, hi=1.0, rest=0.0), 'gaze_x': Axis(name='gaze_x', lo=-1.0, hi=1.0, rest=0.0), 'gaze_y': Axis(name='gaze_y', lo=-1.0, hi=1.0, rest=0.0), 'lid_open_l': Axis(name='lid_open_l', lo=-1.0, hi=0.5, rest=0.0), 'lid_open_r': Axis(name='lid_open_r', lo=-1.0, hi=0.5, rest=0.0)}*
+
++ raises the brow, scaled by the rig’s eye height.
+
+Brow angle, per side: + inner end up (worry), − inner end down (furrow);
+the binding’s per-side gain carries the screen sign.
+Lid openness, per side: − closes (`half`, then `closed`), + widens (`wide`).
+Gaze: pupil travel inside the eye, clamped by the rig’s declared travel.
+
+* **Type:**
+  Brow height, per side
+
+### *class* cutan.expression.axes.Axis(name, lo, hi, rest=0.0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One numeric axis: its range and its rest (neutral) value.
+
+### cutan.expression.axes.INTENSITY_AXIS *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'intensity'*
+
+The scalar on every offset (MPEG-4 “excitation”); the blend ramp is a curve on it.
+
+### cutan.expression.axes.LID_KEY_WIDE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'WIDE'*
+
+Eyelid set keys the ladder can name, by openness.
+
+### cutan.expression.axes.LID_WIDE_ABOVE *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.25*
+
+The eyelid ladder — one rule, stated once (research §6). A lid state
+`min(lid_expr, lid_blink)` reads off these thresholds; a rig without the
+intermediate art degrades to the key it has.
+
+### cutan.expression.axes.MOUTH_FORM_AXIS *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'mouth_form'*
+
+which `viseme@<form>` set the mouth’s key indexes.
+
+* **Type:**
+  The selection axis
+
+### cutan.expression.axes.clamp_axes(values)
+
+Clamp every numeric axis to its range; an unknown axis is an error.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+```pycon
+>>> clamp_axes({"brow_height_l": 2.0, "lid_open_r": -3.0})
+{'brow_height_l': 1.0, 'lid_open_r': -1.0}
+>>> clamp_axes({"eyebrow": 1.0})
+Traceback (most recent call last):
+...
+ValueError: unknown expression axis 'eyebrow' (known: brow_angle_l, ...)
+```
+
+### cutan.expression.axes.lid_key(value, , available)
+
+The eyelid key a lid state selects, degraded to the art the rig declares.
+
+`wide` above +0.25, `open`, `half` below −0.35, `closed` below −0.85;
+a rig without `half` stays open until the lower threshold and one without
+`wide` stays open above the upper one — never a blend of two drawings.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+
+# _autosummary/cutan.expression.binding.html.md
+
+# cutan.expression.binding
+
+How the axes reach a character: the binding and the mouth-set resolver (an#98).
+
+Renderer-free, like [`cutan.characters.play`](_autosummary/cutan.characters.play.html.md#module-cutan.characters.play) — `an validate`,
+`an character validate` and the cutout face solver all call the same
+functions here, so the three cannot disagree about whether an expression can
+resolve on a character.
+
+- A **channel binding** maps a numeric axis onto `(slot, property, gain)`:
+  the solver emits `rest + Σ axis·gain` on that slot’s node. The brow angle’s
+  per-side sign lives in the gain — the two sides rotate in opposite screen
+  directions for one axis sign.
+- A **set binding** maps a lid axis onto a slot’s swap set (`eyelid`); the
+  solver reads a key off the ladder in [`cutan.expression.axes`](_autosummary/cutan.expression.axes.html.md#module-cutan.expression.axes).
+- `resolve_mouth_set` is the ONE chain for “which mouth set does this line
+  use”: `viseme@<form>` if declared **and** it covers the keys the line
+  uses, else `viseme` with a warning naming the missing keys, else an
+  [`ExpressionResolutionError`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ExpressionResolutionError) (a speaking overlay face with no neutral
+  > mouth set).
+
+```pycon
+>>> from cutan.characters.schema import CharacterDescriptor
+>>> desc = CharacterDescriptor(name="m")
+>>> sorted({b.axis for b in default_binding(desc)})
+['brow_angle_l', 'brow_angle_r', 'brow_height_l', 'brow_height_r', 'lid_open_l', 'lid_open_r']
+>>> resolve_mouth_set(desc, None, keys_used=["A", "X"])
+'viseme'
+>>> import warnings
+>>> with warnings.catch_warnings(record=True) as w:
+...     warnings.simplefilter("always")
+...     resolve_mouth_set(desc, "happy", keys_used=["A", "X"])
+'viseme'
+>>> "viseme@happy" in str(w[0].message)
+True
+```
+
+### Module Attributes
+
+| [`BROW_HEIGHT_TRAVEL`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.BROW_HEIGHT_TRAVEL)   | Brow travel per unit of `brow_height_*`, in the rig's view-box units (scaled to scene pixels by the entity's rig factor).                             |
+|-----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`BROW_ANGLE_TRAVEL`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.BROW_ANGLE_TRAVEL)    | Brow rotation per unit of `brow_angle_*`, radians.                                                                                                    |
+| [`GAZE_TRAVEL`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.GAZE_TRAVEL)          | Pupil travel per unit of `gaze_*`, in view-box units — the default when a descriptor declares no travel of its own (`add_gaze` writes `gaze_travel`). |
+| [`LID_SQUASH_GAIN`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.LID_SQUASH_GAIN)      | On a rig whose eye squashes instead of swapping art, a lid offset scales the eye by this much per unit.                                               |
+
+### Functions
+
+| [`binding_for`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.binding_for)(desc)                              | The descriptor's declared `expression_binding` (additive field), else the default.                                               |
+|-------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| [`declared_mouth_variants`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.declared_mouth_variants)(desc)                  | `{form: set name}` for every `viseme@<form>` set the descriptor declares.                                                        |
+| [`default_binding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.default_binding)(desc)                          | The binding the default rig implies, from the slots it actually has.                                                             |
+| [`expression_problems`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.expression_problems)(desc, \*, preset[, axes])  | Every reason an expression cannot resolve on `desc` — empty means it can.                                                        |
+| [`preset_axes`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.preset_axes)(preset, \*[, axes, intensity])     | The numeric axis offsets an expression asks for: the preset's, with `axes` layered over them, scaled by `intensity` and clamped. |
+| [`resolve_mouth_set`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.resolve_mouth_set)(desc, preset, \*, keys_used) | Which mouth set a line under `preset` uses — the one chain, shared.                                                              |
+| [`touches_gaze`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.touches_gaze)(axes)                             | Whether any of `axes` is a gaze axis (a no-op on a rig without pupils).                                                          |
+| [`variant_set_name`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.variant_set_name)(form)                         | The swap-set name for a mouth form (`@` is a legal set-name character).                                                          |
+
+### Classes
+
+| [`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding)(axis, slot, property, gain[, ...])   | A numeric axis driving one transform property of one slot's node.   |
+|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)(axis, slot[, set_family])                | A lid axis driving one slot's swap set through the ladder.          |
+
+### Exceptions
+
+| [`ExpressionResolutionError`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ExpressionResolutionError)(who, problems)   | An expression that cannot resolve on a character; `problems` says why.   |
+|---------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+
+### cutan.expression.binding.BROW_ANGLE_TRAVEL *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.35*
+
+Brow rotation per unit of `brow_angle_*`, radians. Art direction.
+
+### cutan.expression.binding.BROW_HEIGHT_TRAVEL *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 10.0*
+
+Brow travel per unit of `brow_height_*`, in the rig’s view-box units
+(scaled to scene pixels by the entity’s rig factor). Art direction; about
+the synthesized eye’s half-height.
+
+### *class* cutan.expression.binding.ChannelBinding(axis, slot, property, gain, rig_scaled=False)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A numeric axis driving one transform property of one slot’s node.
+
+#### rig_scaled *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= False*
+
+Whether the gain is a view-box length (scaled by the rig factor).
+
+### *exception* cutan.expression.binding.ExpressionResolutionError(who, problems)
+
+Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+An expression that cannot resolve on a character; `problems` says why.
+
+### cutan.expression.binding.GAZE_TRAVEL *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 6.0*
+
+Pupil travel per unit of `gaze_*`, in view-box units — the default when a
+descriptor declares no travel of its own (`add_gaze` writes `gaze_travel`).
+
+### cutan.expression.binding.LID_SQUASH_GAIN *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+
+On a rig whose eye squashes instead of swapping art, a lid offset scales
+the eye by this much per unit.
+
+### *class* cutan.expression.binding.SetBinding(axis, slot, set_family='eyelid')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A lid axis driving one slot’s swap set through the ladder.
+
+### cutan.expression.binding.binding_for(desc)
+
+The descriptor’s declared `expression_binding` (additive field), else the default.
+
+A declared binding is a list of dicts in the two dataclasses’ shapes
+(`{"axis", "slot", "property", "gain"[, "rig_scaled"]}` or
+`{"axis", "slot", "set_family"}`). An unknown axis in it is an error.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Union`[[`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
+
+### cutan.expression.binding.declared_mouth_variants(desc)
+
+`{form: set name}` for every `viseme@<form>` set the descriptor declares.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> declared_mouth_variants(CharacterDescriptor(name="m"))
+{}
+```
+
+### cutan.expression.binding.default_binding(desc)
+
+The binding the default rig implies, from the slots it actually has.
+
+The brow angle’s screen sign: PixiJS rotation is clockwise-positive with y
+down, so on the LEFT brow (screen-left) a clockwise turn drops the inner
+end while on the RIGHT brow it lifts it — the axis says “+ = inner end
+up”, hence `-travel` on the left and `+travel` on the right.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Union`[[`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
+
+### cutan.expression.binding.expression_problems(desc, , preset, axes=(), who)
+
+Every reason an expression cannot resolve on `desc` — empty means it can.
+
+Shared by `an validate` (each becomes an error Finding) and the compiler
+(which raises [`ExpressionResolutionError`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ExpressionResolutionError) with the same list).
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> expression_problems(CharacterDescriptor(name="m"), preset="joyful", who="m")
+["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]
+>>> expression_problems(CharacterDescriptor(name="m", face_overlay=False), preset="happy", who="m")[0].startswith("'m' has its face baked")
+True
+```
+
+### cutan.expression.binding.preset_axes(preset, , axes=None, intensity=1.0)
+
+The numeric axis offsets an expression asks for: the preset’s, with
+`axes` layered over them, scaled by `intensity` and clamped. Only
+non-zero offsets are returned, so a neutral expression is `{}`.
+
+An unknown preset or axis is a `ValueError` — validate reports it as an
+error, the compiler refuses it.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### cutan.expression.binding.resolve_mouth_set(desc, preset, , keys_used, who=None)
+
+Which mouth set a line under `preset` uses — the one chain, shared.
+
+`viseme@<form>` if the preset prefers a form the descriptor declares and
+that set covers `keys_used`; else `viseme` with a warning naming what
+was missing; else [`ExpressionResolutionError`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ExpressionResolutionError). A descriptor with no
+`viseme` set and no covering variant cannot speak at all — that is the
+error, not a fallback.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.expression.binding.touches_gaze(axes)
+
+Whether any of `axes` is a gaze axis (a no-op on a rig without pupils).
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+```pycon
+>>> touches_gaze(["gaze_x"]), touches_gaze(["brow_angle_l"])
+(True, False)
+```
+
+### cutan.expression.binding.variant_set_name(form)
+
+The swap-set name for a mouth form (`@` is a legal set-name character).
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+```pycon
+>>> variant_set_name("happy")
+'viseme@happy'
+```
+
+
+# _autosummary/cutan.expression.blendshapes.html.md
+
+# cutan.expression.blendshapes
+
+The 52-coefficient blendshape vocabulary, as an import/export mapping (an#98).
+
+Reproduced only from the MediaPipe “Blendshape V2” model card (Apache-2.0,
+[https://storage.googleapis.com/mediapipe-assets/Model%20Card%20Blendshape%20V2.pdf](https://storage.googleapis.com/mediapipe-assets/Model%20Card%20Blendshape%20V2.pdf),
+sha256 `c8e9cf60a39998f4b341740623917590e050d1c97004e2de4568d84e026445ae`,
+appendix “List of predicted blendshapes”, transcribed from the rendered page —
+the text layer drops the “ft” ligature). Compatible with the ARKit-style
+52-coefficient convention; no identifier here carries that name, by rule
+(research `misc/docs/wave6_research.md` §3).
+
+These are **not rig channels**: most have no cutout meaning. They exist so a
+tracked or imported face can be mapped onto the axes in
+[`cutan.expression.axes`](_autosummary/cutan.expression.axes.html.md#module-cutan.expression.axes) and back, unipolar in `[0, 1]` with rest 0 and
+left/right split — the card’s contract.
+
+```pycon
+>>> len(BLENDSHAPE_V2_NAMES)
+52
+>>> from_blendshapes({"browInnerUp": 1.0, "eyeBlinkLeft": 1.0})
+{'brow_height_l': 1.0, 'brow_height_r': 1.0, 'brow_angle_l': 1.0, 'brow_angle_r': 1.0, 'lid_open_l': -1.0}
+```
+
+### Functions
+
+| [`from_blendshapes`](_autosummary/cutan.expression.blendshapes.html.md#cutan.expression.blendshapes.from_blendshapes)(coefficients)   | Fold unipolar coefficients onto the axes (summed, then clamped).   |
+|-----------------------------------------------------------------------------------|--------------------------------------------------------------------|
+
+### cutan.expression.blendshapes.from_blendshapes(coefficients)
+
+Fold unipolar coefficients onto the axes (summed, then clamped).
+
+Unknown names raise — a misspelt coefficient must not vanish quietly.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+
+# _autosummary/cutan.expression.html.md
+
+# cutan.expression
+
+Facial expression for the cutout face (an#98, epic #9 Wave 6).
+
+The vocabulary ([`axes`](_autosummary/cutan.expression.axes.html.md#module-cutan.expression.axes)), our presets
+([`presets`](_autosummary/cutan.expression.presets.html.md#module-cutan.expression.presets)), how they reach a character’s slots and which
+mouth set a line uses ([`binding`](_autosummary/cutan.expression.binding.html.md#module-cutan.expression.binding)), the provider seam that
+turns authored leaves and dialogue sugar into per-frame curves
+([`provider`](_autosummary/cutan.expression.provider.html.md#module-cutan.expression.provider)), and the 52-coefficient import/export
+mapping ([`blendshapes`](_autosummary/cutan.expression.blendshapes.html.md#module-cutan.expression.blendshapes)). Renderer-free throughout: the
+cutout compiler’s face solver consumes these; `an validate` and
+`an character validate` share the same resolution.
+
+### Functions
+
+| [`binding_for`](_autosummary/cutan.expression.html.md#cutan.expression.binding_for)(desc)                              | The descriptor's declared `expression_binding` (additive field), else the default.                                               |
+|-------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| [`clamp_axes`](_autosummary/cutan.expression.html.md#cutan.expression.clamp_axes)(values)                             | Clamp every numeric axis to its range; an unknown axis is an error.                                                              |
+| [`declared_mouth_variants`](_autosummary/cutan.expression.html.md#cutan.expression.declared_mouth_variants)(desc)                  | `{form: set name}` for every `viseme@<form>` set the descriptor declares.                                                        |
+| [`default_binding`](_autosummary/cutan.expression.html.md#cutan.expression.default_binding)(desc)                          | The binding the default rig implies, from the slots it actually has.                                                             |
+| [`expression_problems`](_autosummary/cutan.expression.html.md#cutan.expression.expression_problems)(desc, \*, preset[, axes])  | Every reason an expression cannot resolve on `desc` — empty means it can.                                                        |
+| [`expression_spans`](_autosummary/cutan.expression.html.md#cutan.expression.expression_spans)(shot, entity_id)              | Every expression contributor on `entity_id`: authored leaves, then dialogue sugar.                                               |
+| [`from_blendshapes`](_autosummary/cutan.expression.html.md#cutan.expression.from_blendshapes)(coefficients)                 | Fold unipolar coefficients onto the axes (summed, then clamped).                                                                 |
+| [`known_presets`](_autosummary/cutan.expression.html.md#cutan.expression.known_presets)()                                | The preset names, in declaration order.                                                                                          |
+| [`lid_key`](_autosummary/cutan.expression.html.md#cutan.expression.lid_key)(value, \*, available)                  | The eyelid key a lid state selects, degraded to the art the rig declares.                                                        |
+| [`mouth_form_of`](_autosummary/cutan.expression.html.md#cutan.expression.mouth_form_of)(preset)                          | The `viseme@<form>` a preset prefers, or `None` for the neutral set.                                                             |
+| [`preset_axes`](_autosummary/cutan.expression.html.md#cutan.expression.preset_axes)(preset, \*[, axes, intensity])     | The numeric axis offsets an expression asks for: the preset's, with `axes` layered over them, scaled by `intensity` and clamped. |
+| [`resolve_mouth_set`](_autosummary/cutan.expression.html.md#cutan.expression.resolve_mouth_set)(desc, preset, \*, keys_used) | Which mouth set a line under `preset` uses — the one chain, shared.                                                              |
+| [`variant_set_name`](_autosummary/cutan.expression.html.md#cutan.expression.variant_set_name)(form)                         | The swap-set name for a mouth form (`@` is a legal set-name character).                                                          |
+
+### Classes
+
+| [`Axis`](_autosummary/cutan.expression.html.md#cutan.expression.Axis)(name, lo, hi[, rest])                        | One numeric axis: its range and its rest (neutral) value.                          |
+|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| [`AxisCurve`](_autosummary/cutan.expression.html.md#cutan.expression.AxisCurve)(axis, samples)                          | One axis sampled at the frame times `0, 1/fps, …, n/fps` (offline, deterministic). |
+| [`ChannelBinding`](_autosummary/cutan.expression.html.md#cutan.expression.ChannelBinding)(axis, slot, property, gain[, ...]) | A numeric axis driving one transform property of one slot's node.                  |
+| [`DefaultExpressionProvider`](_autosummary/cutan.expression.html.md#cutan.expression.DefaultExpressionProvider)()                       | Sum of the shot's expression spans on the entity, ramped, per frame.               |
+| [`ExpressionProvider`](_autosummary/cutan.expression.html.md#cutan.expression.ExpressionProvider)(\*args, \*\*kwargs)            | The seam: whatever produces per-axis curves for one entity of one shot.            |
+| [`ExpressionSpan`](_autosummary/cutan.expression.html.md#cutan.expression.ExpressionSpan)(start, end, preset[, axes, ...])   | One expression contributor on one entity, in absolute shot time.                   |
+| [`Preset`](_autosummary/cutan.expression.html.md#cutan.expression.Preset)(name[, axes, mouth_form, anchor])          | A named expression: axis offsets, the mouth form it prefers, its anchor.           |
+| [`SetBinding`](_autosummary/cutan.expression.html.md#cutan.expression.SetBinding)(axis, slot[, set_family])              | A lid axis driving one slot's swap set through the ladder.                         |
+
+### Exceptions
+
+| [`ExpressionResolutionError`](_autosummary/cutan.expression.html.md#cutan.expression.ExpressionResolutionError)(who, problems)   | An expression that cannot resolve on a character; `problems` says why.   |
+|---------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+
+### *class* cutan.expression.Axis(name, lo, hi, rest=0.0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One numeric axis: its range and its rest (neutral) value.
+
+### *class* cutan.expression.AxisCurve(axis, samples)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One axis sampled at the frame times `0, 1/fps, …, n/fps` (offline, deterministic).
+
+### *class* cutan.expression.ChannelBinding(axis, slot, property, gain, rig_scaled=False)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A numeric axis driving one transform property of one slot’s node.
+
+#### rig_scaled *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= False*
+
+Whether the gain is a view-box length (scaled by the rig factor).
+
+### *class* cutan.expression.DefaultExpressionProvider
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Sum of the shot’s expression spans on the entity, ramped, per frame.
+
+#### mouth_preset_at(shot, entity_id, t)
+
+The preset whose mouth form is in force at `t`: the heaviest span
+at `t` that prefers a form, or `None` (the neutral set).
+
+Whole-line by construction when called at a line’s start — the solver
+asks once per line, never per frame, so at most one mouth swap
+property is live per instant.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### *class* cutan.expression.ExpressionProvider(\*args, \*\*kwargs)
+
+Bases: [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol)
+
+The seam: whatever produces per-axis curves for one entity of one shot.
+
+### *exception* cutan.expression.ExpressionResolutionError(who, problems)
+
+Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+An expression that cannot resolve on a character; `problems` says why.
+
+### *class* cutan.expression.ExpressionSpan(start, end, preset, axes=<factory>, intensity=1.0, blend=0.0, source='action')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One expression contributor on one entity, in absolute shot time.
+
+#### offsets()
+
+The unscaled axis offsets this span asks for.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+#### source *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'action'*
+
+`"action"` for an authored leaf, `"dialogue"` for the `[emotion]` sugar.
+
+#### weight_at(t)
+
+The ramped intensity at `t`: 0 outside, ramping over `blend` at each end.
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+### *class* cutan.expression.Preset(name, axes=<factory>, mouth_form=None, anchor='')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A named expression: axis offsets, the mouth form it prefers, its anchor.
+
+#### anchor *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= ''*
+
+FACS AU cross-reference (a comment, never a source).
+
+#### mouth_form *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)* *= None*
+
+The `viseme@<form>` set this preset’s mouth prefers; `None` = `viseme`.
+
+### *class* cutan.expression.SetBinding(axis, slot, set_family='eyelid')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A lid axis driving one slot’s swap set through the ladder.
+
+### cutan.expression.binding_for(desc)
+
+The descriptor’s declared `expression_binding` (additive field), else the default.
+
+A declared binding is a list of dicts in the two dataclasses’ shapes
+(`{"axis", "slot", "property", "gain"[, "rig_scaled"]}` or
+`{"axis", "slot", "set_family"}`). An unknown axis in it is an error.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Union`[[`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
+
+### cutan.expression.clamp_axes(values)
+
+Clamp every numeric axis to its range; an unknown axis is an error.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+```pycon
+>>> clamp_axes({"brow_height_l": 2.0, "lid_open_r": -3.0})
+{'brow_height_l': 1.0, 'lid_open_r': -1.0}
+>>> clamp_axes({"eyebrow": 1.0})
+Traceback (most recent call last):
+...
+ValueError: unknown expression axis 'eyebrow' (known: brow_angle_l, ...)
+```
+
+### cutan.expression.declared_mouth_variants(desc)
+
+`{form: set name}` for every `viseme@<form>` set the descriptor declares.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> declared_mouth_variants(CharacterDescriptor(name="m"))
+{}
+```
+
+### cutan.expression.default_binding(desc)
+
+The binding the default rig implies, from the slots it actually has.
+
+The brow angle’s screen sign: PixiJS rotation is clockwise-positive with y
+down, so on the LEFT brow (screen-left) a clockwise turn drops the inner
+end while on the RIGHT brow it lifts it — the axis says “+ = inner end
+up”, hence `-travel` on the left and `+travel` on the right.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Union`[[`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
+
+### cutan.expression.expression_problems(desc, , preset, axes=(), who)
+
+Every reason an expression cannot resolve on `desc` — empty means it can.
+
+Shared by `an validate` (each becomes an error Finding) and the compiler
+(which raises [`ExpressionResolutionError`](_autosummary/cutan.expression.html.md#cutan.expression.ExpressionResolutionError) with the same list).
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> expression_problems(CharacterDescriptor(name="m"), preset="joyful", who="m")
+["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]
+>>> expression_problems(CharacterDescriptor(name="m", face_overlay=False), preset="happy", who="m")[0].startswith("'m' has its face baked")
+True
+```
+
+### cutan.expression.expression_spans(shot, entity_id)
+
+Every expression contributor on `entity_id`: authored leaves, then
+dialogue sugar. `duration=None` runs to the shot end (the looping-play
+rule); a span never extends past the shot.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ExpressionSpan`](_autosummary/cutan.expression.provider.html.md#cutan.expression.provider.ExpressionSpan)]
+
+### cutan.expression.from_blendshapes(coefficients)
+
+Fold unipolar coefficients onto the axes (summed, then clamped).
+
+Unknown names raise — a misspelt coefficient must not vanish quietly.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### cutan.expression.known_presets()
+
+The preset names, in declaration order.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
+```pycon
+>>> known_presets()[:3]
+('neutral', 'happy', 'sad')
+```
+
+### cutan.expression.lid_key(value, , available)
+
+The eyelid key a lid state selects, degraded to the art the rig declares.
+
+`wide` above +0.25, `open`, `half` below −0.35, `closed` below −0.85;
+a rig without `half` stays open until the lower threshold and one without
+`wide` stays open above the upper one — never a blend of two drawings.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.expression.mouth_form_of(preset)
+
+The `viseme@<form>` a preset prefers, or `None` for the neutral set.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+```pycon
+>>> mouth_form_of("amused"), mouth_form_of("thinking"), mouth_form_of(None)
+('happy', None, None)
+```
+
+### cutan.expression.preset_axes(preset, , axes=None, intensity=1.0)
+
+The numeric axis offsets an expression asks for: the preset’s, with
+`axes` layered over them, scaled by `intensity` and clamped. Only
+non-zero offsets are returned, so a neutral expression is `{}`.
+
+An unknown preset or axis is a `ValueError` — validate reports it as an
+error, the compiler refuses it.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### cutan.expression.resolve_mouth_set(desc, preset, , keys_used, who=None)
+
+Which mouth set a line under `preset` uses — the one chain, shared.
+
+`viseme@<form>` if the preset prefers a form the descriptor declares and
+that set covers `keys_used`; else `viseme` with a warning naming what
+was missing; else [`ExpressionResolutionError`](_autosummary/cutan.expression.html.md#cutan.expression.ExpressionResolutionError). A descriptor with no
+`viseme` set and no covering variant cannot speak at all — that is the
+error, not a fallback.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.expression.variant_set_name(form)
+
+The swap-set name for a mouth form (`@` is a legal set-name character).
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+```pycon
+>>> variant_set_name("happy")
+'viseme@happy'
+```
+
+### Modules
+
+| [`axes`](_autosummary/cutan.expression.axes.html.md#module-cutan.expression.axes)                 | The facial expression axes: what a cutout face can be asked to do (an#98).           |
+|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| [`binding`](_autosummary/cutan.expression.binding.html.md#module-cutan.expression.binding)           | How the axes reach a character: the binding and the mouth-set resolver (an#98).      |
+| [`blendshapes`](_autosummary/cutan.expression.blendshapes.html.md#module-cutan.expression.blendshapes)   | The 52-coefficient blendshape vocabulary, as an import/export mapping (an#98).       |
+| [`presets`](_autosummary/cutan.expression.presets.html.md#module-cutan.expression.presets)           | Expression presets: our art direction on the axes (an#98).                           |
+| [`provider`](_autosummary/cutan.expression.provider.html.md#module-cutan.expression.provider)         | The expression provider: authored leaves + dialogue sugar → per-axis curves (an#98). |
+| [`registration`](_autosummary/cutan.expression.registration.html.md#module-cutan.expression.registration) | The face side of the cut-out genre, as declarations: `expression` and `[emotion]`.   |
+
+
+# _autosummary/cutan.expression.presets.html.md
+
+# cutan.expression.presets
+
+Expression presets: our art direction on the axes (an#98).
+
+Every name the compiler’s retired brow-tilt table accepted is a preset here
+(`amused` included — live content authors it), plus the two the research
+added (`afraid`, `disgusted`). The FACS action-unit numbers in each `anchor` are cross-reference
+comments, not sources: no emotion table was transcribed (research
+`misc/docs/wave6_research.md` §3, §8). Gaze is absent from every preset so
+the two sources stay independent — “thinking looks up and away” is a gaze
+action, not a preset value.
+
+A preset’s `mouth_form` names the `viseme@<form>` set its mouth prefers;
+a character that declares none falls back to `viseme` with a warning
+([`cutan.expression.binding.resolve_mouth_set()`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.resolve_mouth_set)).
+
+```pycon
+>>> preset_axes("happy")["brow_height_l"]
+0.2
+>>> preset_axes("happy", intensity=0.5)["brow_height_l"]
+0.1
+>>> preset_axes("happy", axes={"brow_height_l": -1.0})["brow_height_l"]
+-1.0
+>>> preset_axes(None) == {}
+True
+>>> PRESETS["skeptical"].mouth_form is None
+True
+```
+
+### Functions
+
+| [`known_presets`](_autosummary/cutan.expression.presets.html.md#cutan.expression.presets.known_presets)()                            | The preset names, in declaration order.                                                                                          |
+|---------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| [`mouth_form_of`](_autosummary/cutan.expression.presets.html.md#cutan.expression.presets.mouth_form_of)(preset)                      | The `viseme@<form>` a preset prefers, or `None` for the neutral set.                                                             |
+| [`preset_axes`](_autosummary/cutan.expression.presets.html.md#cutan.expression.presets.preset_axes)(preset, \*[, axes, intensity]) | The numeric axis offsets an expression asks for: the preset's, with `axes` layered over them, scaled by `intensity` and clamped. |
+
+### Classes
+
+| [`Preset`](_autosummary/cutan.expression.presets.html.md#cutan.expression.presets.Preset)(name[, axes, mouth_form, anchor])   | A named expression: axis offsets, the mouth form it prefers, its anchor.   |
+|---------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+
+### *class* cutan.expression.presets.Preset(name, axes=<factory>, mouth_form=None, anchor='')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A named expression: axis offsets, the mouth form it prefers, its anchor.
+
+#### anchor *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= ''*
+
+FACS AU cross-reference (a comment, never a source).
+
+#### mouth_form *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)* *= None*
+
+The `viseme@<form>` set this preset’s mouth prefers; `None` = `viseme`.
+
+### cutan.expression.presets.known_presets()
+
+The preset names, in declaration order.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
+```pycon
+>>> known_presets()[:3]
+('neutral', 'happy', 'sad')
+```
+
+### cutan.expression.presets.mouth_form_of(preset)
+
+The `viseme@<form>` a preset prefers, or `None` for the neutral set.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+```pycon
+>>> mouth_form_of("amused"), mouth_form_of("thinking"), mouth_form_of(None)
+('happy', None, None)
+```
+
+### cutan.expression.presets.preset_axes(preset, , axes=None, intensity=1.0)
+
+The numeric axis offsets an expression asks for: the preset’s, with
+`axes` layered over them, scaled by `intensity` and clamped. Only
+non-zero offsets are returned, so a neutral expression is `{}`.
+
+An unknown preset or axis is a `ValueError` — validate reports it as an
+error, the compiler refuses it.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+
+# _autosummary/cutan.expression.provider.html.md
+
+# cutan.expression.provider
+
+The expression provider: authored leaves + dialogue sugar → per-axis curves (an#98).
+
+The face solver in the cutout compiler sums contributors per `(node,
+property)` at compile time. It gets those contributors from an
+[`ExpressionProvider`](_autosummary/cutan.expression.provider.html.md#cutan.expression.provider.ExpressionProvider) — the seam an audio- or vision-driven source
+plugs into later. The default provider composes, for one entity of one shot:
+
+- every `expression` leaf action (flattened out of the shot’s composition
+  tree with its absolute times);
+- the **dialogue sugar**: a line’s `[emotion]` becomes an expression over
+  the line, **in memory only** — never written into `shot.actions` or the
+  scenes store, or the md writer would emit the emotion twice.
+
+Each span ramps its intensity in and out over `blend` seconds (0 = cut);
+two overlapping spans cross-fade because the sum is additive. Curves are
+sampled per frame, so the solver and this module agree on time by
+construction.
+
+```pycon
+>>> from an.ir.schema import AssetRef, Dialogue, Shot
+>>> from cutan.expression.registration import expression
+>>> shot = Shot(id="s", renderer="cutout", duration=1.0,
+...             entities=[AssetRef(kind="character", id="c", store="characters", ref="c")],
+...             actions=[expression("c", "angry", blend=0.0)])
+>>> [s.preset for s in expression_spans(shot, "c")]
+['angry']
+>>> curves = {c.axis: c for c in DefaultExpressionProvider().curves(shot, "c", fps=4)}
+>>> curves["brow_angle_l"].samples
+(-0.8, -0.8, -0.8, -0.8, -0.8)
+```
+
+### Module Attributes
+
+| [`DIALOGUE_EMOTION_BLEND_S`](_autosummary/cutan.expression.provider.html.md#cutan.expression.provider.DIALOGUE_EMOTION_BLEND_S)   | The `[emotion]` sugar ramps in and out over this; it is a comment on the line, not a cut.   |
+|-----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+
+### Functions
+
+| [`expression_spans`](_autosummary/cutan.expression.provider.html.md#cutan.expression.provider.expression_spans)(shot, entity_id)   | Every expression contributor on `entity_id`: authored leaves, then dialogue sugar.   |
+|--------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| [`flatten_expressions`](_autosummary/cutan.expression.provider.html.md#cutan.expression.provider.flatten_expressions)(shot)           | The shot's `expression` leaves with absolute times (other leaves dropped).           |
+
+### Classes
+
+| [`AxisCurve`](_autosummary/cutan.expression.provider.html.md#cutan.expression.provider.AxisCurve)(axis, samples)                        | One axis sampled at the frame times `0, 1/fps, …, n/fps` (offline, deterministic).   |
+|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| [`DefaultExpressionProvider`](_autosummary/cutan.expression.provider.html.md#cutan.expression.provider.DefaultExpressionProvider)()                     | Sum of the shot's expression spans on the entity, ramped, per frame.                 |
+| [`ExpressionProvider`](_autosummary/cutan.expression.provider.html.md#cutan.expression.provider.ExpressionProvider)(\*args, \*\*kwargs)          | The seam: whatever produces per-axis curves for one entity of one shot.              |
+| [`ExpressionSpan`](_autosummary/cutan.expression.provider.html.md#cutan.expression.provider.ExpressionSpan)(start, end, preset[, axes, ...]) | One expression contributor on one entity, in absolute shot time.                     |
+
+### *class* cutan.expression.provider.AxisCurve(axis, samples)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One axis sampled at the frame times `0, 1/fps, …, n/fps` (offline, deterministic).
+
+### cutan.expression.provider.DIALOGUE_EMOTION_BLEND_S *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.15*
+
+The `[emotion]` sugar ramps in and out over this; it is a comment on the
+line, not a cut.
+
+### *class* cutan.expression.provider.DefaultExpressionProvider
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Sum of the shot’s expression spans on the entity, ramped, per frame.
+
+#### mouth_preset_at(shot, entity_id, t)
+
+The preset whose mouth form is in force at `t`: the heaviest span
+at `t` that prefers a form, or `None` (the neutral set).
+
+Whole-line by construction when called at a line’s start — the solver
+asks once per line, never per frame, so at most one mouth swap
+property is live per instant.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### *class* cutan.expression.provider.ExpressionProvider(\*args, \*\*kwargs)
+
+Bases: [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol)
+
+The seam: whatever produces per-axis curves for one entity of one shot.
+
+### *class* cutan.expression.provider.ExpressionSpan(start, end, preset, axes=<factory>, intensity=1.0, blend=0.0, source='action')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One expression contributor on one entity, in absolute shot time.
+
+#### offsets()
+
+The unscaled axis offsets this span asks for.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+#### source *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'action'*
+
+`"action"` for an authored leaf, `"dialogue"` for the `[emotion]` sugar.
+
+#### weight_at(t)
+
+The ramped intensity at `t`: 0 outside, ramping over `blend` at each end.
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+### cutan.expression.provider.expression_spans(shot, entity_id)
+
+Every expression contributor on `entity_id`: authored leaves, then
+dialogue sugar. `duration=None` runs to the shot end (the looping-play
+rule); a span never extends past the shot.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ExpressionSpan`](_autosummary/cutan.expression.provider.html.md#cutan.expression.provider.ExpressionSpan)]
+
+### cutan.expression.provider.flatten_expressions(shot)
+
+The shot’s `expression` leaves with absolute times (other leaves dropped).
+
+
+# _autosummary/cutan.expression.registration.html.md
+
+# cutan.expression.registration
+
+The face side of the cut-out genre, as declarations: `expression` and `[emotion]`.
+
+What the cut-out genre ([`cutan.genre`](_autosummary/cutan.genre.html.md#module-cutan.genre)) registers from here:
+
+- the **\`\`expression\`\` action kind** — [`ExpressionAction`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.ExpressionAction)
+  (hold a facial expression, an#98): zero-width in a `sequence` when it runs
+  to the shot end, and its `scene.md` spelling;
+- the **\`\`[emotion]\`\` dialogue sugar** — `maya [happy]: Hi!` fills
+  `an.ir.schema.Dialogue.emotion`, which the expression provider turns
+  > into an expression over the line, in memory only.
+
+Plain declarations: importing this module registers nothing.
+
+```pycon
+>>> EXPRESSION.name, EMOTION.opener, EMOTION.parse(" Happy ")
+('expression', '[', 'happy')
+```
+
+### Module Attributes
+
+| [`DFLT_EXPRESSION_BLEND_S`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.DFLT_EXPRESSION_BLEND_S)   | Default ramp in/out of an expression, seconds (0 = cut).   |
+|----------------------------------------------------------------------------|------------------------------------------------------------|
+| [`EMOTION_NAME_RE`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.EMOTION_NAME_RE)           | a preset name (`happy`, `wry-smile`).                      |
+
+### Functions
+
+| [`expression`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.expression)(target[, preset, axes, ...])   | Hold a facial expression on an entity (an#98).                                    |
+|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| [`expression_duration`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.expression_duration)(action, extent)       | An expression's span: its `duration`, else zero (it runs to the shot end).        |
+| [`format_emotion`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.format_emotion)(line)                      | The `[…]` content for `line`, or `None` when it carries no emotion.               |
+| [`parse_emotion`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.parse_emotion)(content)                    | `[happy]`'s content to the line's emotion, lower-cased; refuse a non-name.        |
+| [`read_expression_md`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.read_expression_md)(item, \*, index)       | `{kind: expression, target, [preset], [axes], [intensity], [duration], [blend]}`. |
+| [`write_expression_md`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.write_expression_md)(leaf)                 | The `scene.md` entry for `leaf` (`read_expression_md`'s inverse).                 |
+
+### Classes
+
+| [`ExpressionAction`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.ExpressionAction)(\*\*data)   | Hold a facial expression on an entity (an#98, epic #9 Wave 6).   |
+|-------------------------------------------------------------------------------|------------------------------------------------------------------|
+
+### cutan.expression.registration.DFLT_EXPRESSION_BLEND_S *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.15*
+
+Default ramp in/out of an expression, seconds (0 = cut). The dialogue
+`[emotion]` sugar uses its own in `an.expression.provider`.
+
+### cutan.expression.registration.EMOTION_NAME_RE *= re.compile('[\\\\w-]+')*
+
+a preset name (`happy`, `wry-smile`).
+
+* **Type:**
+  What an emotion name may be
+
+### *class* cutan.expression.registration.ExpressionAction(\*\*data)
+
+Bases: `ExtensionAction`
+
+Hold a facial expression on an entity (an#98, epic #9 Wave 6).
+
+`preset` names one of `an.expression.presets.PRESETS`; `axes`
+are per-axis overrides layered on it (axis units, see
+`an.expression.axes`); `None` + no axes is a cheap “return to
+rest”. `duration=None` runs to the shot end (the looping-play rule) and
+is **zero-width in a sequence**, like a looping `play`. `blend` ramps the
+intensity in and out; two overlapping expressions cross-fade because the
+face solver sums offsets. The dialogue `speaker [emotion]: …` bracket is
+sugar for one of these over the line, desugared in memory only.
+
+A leaf action, flattened like `play`: the compiler resolves it in the
+face solver (one channel per `(node, property)`), never per action.
+
+The ramp is a min over the two ends, so a span shorter than `2·blend`
+never reaches full intensity (a 0.2 s expression at the default 0.15 s
+blend peaks at 0.67) and a `duration=0` expression shows only where a
+frame lands on it with `blend=0` — cut the blend for a flash.
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+### cutan.expression.registration.expression(target, preset=None, , axes=None, intensity=1.0, duration=None, blend=0.15)
+
+Hold a facial expression on an entity (an#98).
+
+`duration=None` runs to the shot end and counts as **zero** in a
+`sequence`, as a looping `play` does:
+
+* **Return type:**
+  [`ExpressionAction`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.ExpressionAction)
+
+```pycon
+>>> [f.start for f in flatten(sequence(expression("a", "happy"), delay(1.0), expression("a", "sad")))]
+[0.0, 1.0]
+>>> flatten(expression("a", "angry", duration=2.0))[0].end
+2.0
+```
+
+### cutan.expression.registration.expression_duration(action, extent)
+
+An expression’s span: its `duration`, else zero (it runs to the shot end).
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+```pycon
+>>> expression_duration(ExpressionAction(target="a", duration=2.0), None)
+2.0
+>>> expression_duration(ExpressionAction(target="a"), None)
+0.0
+```
+
+### cutan.expression.registration.format_emotion(line)
+
+The `[…]` content for `line`, or `None` when it carries no emotion.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.expression.registration.parse_emotion(content)
+
+`[happy]`’s content to the line’s emotion, lower-cased; refuse a non-name.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.expression.registration.read_expression_md(item, , index)
+
+`{kind: expression, target, [preset], [axes], [intensity], [duration], [blend]}`.
+
+Landed with its writer and round trip in one commit (an#98): the writer
+skips unknown leaves, so a parser-only entry would vanish from scene.md on
+the next sync and then from the JSON on the next md edit.
+
+* **Return type:**
+  [`ExpressionAction`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.ExpressionAction)
+
+### cutan.expression.registration.write_expression_md(leaf)
+
+The `scene.md` entry for `leaf` (`read_expression_md`’s inverse).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+
+# _autosummary/cutan.genre.html.md
+
+# cutan.genre
+
+The cut-out animation genre, declared as one object.
+
+ADR 0001 §First slice: the cut-out genre’s IR extensions register through the
+same door any genre uses — the `an.genres` entry point (this distribution’s
+`pyproject.toml` declares `cutout_animation = "cutan.genre:CUTOUT"`) —
+instead of being wired into the core. `CUTOUT` lists:
+
+- **action kinds** `play` ([`cutan.characters.registration`](_autosummary/cutan.characters.registration.html.md#module-cutan.characters.registration)) and
+  `expression` ([`cutan.expression.registration`](_autosummary/cutan.expression.registration.html.md#module-cutan.expression.registration));
+- **entity kind** `character`, whose nodes are stage nodes (`stage.node`);
+- the **\`\`[emotion]\`\`** dialogue sugar;
+- its **semantic checks**: `play` and `expression` resolution, brow
+  acting on a character whose brows cannot act (an#252), the turn
+  checks (contradicted `from_direction`, a mouth hidden while speaking) and
+  view continuity across a cut, placed in the report where they always were;
+- its **capabilities** and the **character analyser** (ADR 0002:
+  [`cutan.library`](_autosummary/cutan.library.html.md#module-cutan.library)), its **vocabulary** (motion and expression
+  > presets, IR-field notes: [`cutan.characters.vocabulary`](_autosummary/cutan.characters.vocabulary.html.md#module-cutan.characters.vocabulary); the methods:
+
+  [`cutan.characters.methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)) and its **aspects**, `locomotion`,
+  : `speech` and `expression`, each with a default chain that ends in a
+    method requiring nothing.
+
+Its `name` is the persisted genre slug `cutout_animation`, the one
+`cutan.nw` declares to `nw` (ADR 0001 decision 9: persisted identifiers do
+not change). It also offers the core **services** (`an.genres.register_service()`):
+the `an character` / `an impacts` CLI namespaces, the `offline` / `rhubarb` /
+`whisper` lip-sync providers, the licence lookup for pre-`source` descriptors, the
+library’s publish warning and the expression labels `judge_emotion` uses; and the
+**runtime script** that draws the mouth and the eye.
+
+Importing this module registers nothing: `an.genres.load()` (or
+`an.genres.register_genre()`) does.
+
+```pycon
+>>> CUTOUT.provides()["action kinds"]
+('play', 'expression')
+```
+
+### Module Attributes
+
+| [`CUTOUT_GENRE_NAME`](_autosummary/cutan.genre.html.md#cutan.genre.CUTOUT_GENRE_NAME)   | The genre's persisted slug (also `cutan.nw.CUTOUT_ANIMATION_SLUG`).   |
+|----------------------------------------------------------------------|-----------------------------------------------------------------------|
+
+### cutan.genre.CUTOUT_GENRE_NAME *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'cutout_animation'*
+
+The genre’s persisted slug (also `cutan.nw.CUTOUT_ANIMATION_SLUG`).
 
 
 # _autosummary/cutan.html.md
@@ -51,10 +6594,12 @@ leave `an`: rigged characters, faces and expressions, lip-sync visemes, swap
 sets and views, cut-out styles and impacts (ADR 0001 in `an`’s
 `misc/docs/adr/`, tracked by an#225 under the epic an#231).
 
-**Status: scaffold.** The cut-out code still lives inside `an` and is
-moved here in batches, expand -> migrate -> contract: each module arrives here,
-`an` keeps a deprecation re-export for one release, then drops it. Until the
-genre object itself moves, `an` ships it and this package registers nothing.
+Rigged characters (`cutan.characters`), faces (`cutan.expression`), impacts
+(`cutan.impacts`), the cut-out compile passes (`cutan.compile`), lip-sync
+providers (`cutan.audio`), the style lint (`cutan.verify`) and the genre object
+(`cutan.genre`) lived inside `an` until the P8 move (an#225); `an` keeps
+warning aliases at the old import paths. Install it with `pip install "an[cutout]"`;
+`an` finds it through the `an.genres` entry point.
 
 The identifiers below are the genre’s **persisted** names (ADR 0001 decision 9):
 they are written into documents, stores and entry-point metadata, and none of
@@ -71,13 +6616,19 @@ them changes when code moves between distributions.
 
 ### Module Attributes
 
-| [`GENRE_NAME`](_autosummary/cutan.html.md#cutan.GENRE_NAME)        | the `an.genres` entry-point name and the `nw` genre id.                                                                                  |
-|--------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
-| [`ENTRY_POINT_GROUP`](_autosummary/cutan.html.md#cutan.ENTRY_POINT_GROUP) | The entry-point group `an.genres.load()` reads.                                                                                          |
-| [`ENTRY_POINT_NAME`](_autosummary/cutan.html.md#cutan.ENTRY_POINT_NAME)  | the SAME name `an` declares today, so the handover is by name.                                                                           |
-| [`ENTRY_POINT_VALUE`](_autosummary/cutan.html.md#cutan.ENTRY_POINT_VALUE) | Where the entry point will point once the genre object lives here.                                                                       |
-| [`RENDERER_NAME`](_autosummary/cutan.html.md#cutan.RENDERER_NAME)     | The persisted renderer name of cut-out shots (`an.stage` claims it).                                                                     |
-| [`LIBRARY_NAME`](_autosummary/cutan.html.md#cutan.LIBRARY_NAME)      | The package whose data root holds the genre's asset library and projects (`~/.local/share/cutan` by default; `CUTAN_HOME` overrides it). |
+| [`GENRE_NAME`](_autosummary/cutan.html.md#cutan.GENRE_NAME)            | the `an.genres` entry-point name and the `nw` genre id.                                                                                                                                 |
+|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`ENTRY_POINT_GROUP`](_autosummary/cutan.html.md#cutan.ENTRY_POINT_GROUP)     | The entry-point group `an.genres.load()` reads.                                                                                                                                         |
+| [`ENTRY_POINT_NAME`](_autosummary/cutan.html.md#cutan.ENTRY_POINT_NAME)      | the name `an` used to declare for the in-distribution genre, so the handover was by name.                                                                                               |
+| [`ENTRY_POINT_VALUE`](_autosummary/cutan.html.md#cutan.ENTRY_POINT_VALUE)     | Where the entry point points.                                                                                                                                                           |
+| [`RENDERER_NAME`](_autosummary/cutan.html.md#cutan.RENDERER_NAME)         | The persisted renderer name of cut-out shots (`an.stage` claims it).                                                                                                                    |
+| [`LIBRARY_NAME`](_autosummary/cutan.html.md#cutan.LIBRARY_NAME)          | The package whose data root holds the genre's asset library and projects (`~/.local/share/cutan` by default; `CUTAN_HOME` overrides it).                                                |
+| [`REQUIRED_AN_API_LEVEL`](_autosummary/cutan.html.md#cutan.REQUIRED_AN_API_LEVEL) | The lowest `an.genres.API_LEVEL` this `cutan` runs against ("the lowest `an` it supports", ADR 0001 decision 8, said without a version pin: `an`'s version is assigned by CI at merge). |
+
+### Functions
+
+| [`require_an`](_autosummary/cutan.html.md#cutan.require_an)()   | Refuse, with an upgrade hint, to load against an `an` older than this `cutan` needs.   |
+|-----------------------------------------------------------------|----------------------------------------------------------------------------------------|
 
 ### cutan.ENTRY_POINT_GROUP *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'an.genres'*
 
@@ -85,17 +6636,15 @@ The entry-point group `an.genres.load()` reads.
 
 ### cutan.ENTRY_POINT_NAME *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'cutout_animation'*
 
-the SAME name `an`
-declares today, so the handover is by name. `an.genres` de-duplicates by
-entry-point name with `an`’s in-distribution declaration first, so while
-`an` still ships the genre, a declaration here is shadowed, never doubled.
+the name
+`an` used to declare for the in-distribution genre, so the handover was by name.
 
 * **Type:**
-  The entry-point name this distribution will declare
+  The entry-point name this distribution declares (`pyproject.toml`)
 
 ### cutan.ENTRY_POINT_VALUE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'cutan.genre:CUTOUT'*
 
-Where the entry point will point once the genre object lives here.
+Where the entry point points.
 
 ### cutan.GENRE_NAME *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'cutout_animation'*
 
@@ -113,6 +6662,1773 @@ The package whose data root holds the genre’s asset library and projects
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 2*
+
+The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
+it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
+assigned by CI at merge). Level 2 is the move itself: `Genre.services`,
+`ActionKind.lowering`, `EntityKind.swap_declaration` and `an.stage.rig`.
+
+### cutan.require_an()
+
+Refuse, with an upgrade hint, to load against an `an` older than this `cutan` needs.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+```pycon
+>>> require_an()
+```
+
+### Modules
+
+| [`audio`](_autosummary/cutan.audio.html.md#module-cutan.audio)           | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.   |
+|-------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| [`bench`](_autosummary/cutan.bench.html.md#module-cutan.bench)           | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.       |
+| [`characters`](_autosummary/cutan.characters.html.md#module-cutan.characters) | Character art system: Spine-shaped descriptor + SVG sidecars.                                |
+| [`compile`](_autosummary/cutan.compile.html.md#module-cutan.compile)       | The cut-out genre's compile passes, their lowering hooks and the visuals of its runtime.     |
+| [`conftest`](_autosummary/cutan.conftest.html.md#module-cutan.conftest)     | Doctest collection for `cutan`: `nw` is an optional dependency of `cutan.nw` only.           |
+| [`expression`](_autosummary/cutan.expression.html.md#module-cutan.expression) | Facial expression for the cutout face (an#98, epic #9 Wave 6).                               |
+| [`genre`](_autosummary/cutan.genre.html.md#module-cutan.genre)           | The cut-out animation genre, declared as one object.                                         |
+| [`impacts`](_autosummary/cutan.impacts.html.md#module-cutan.impacts)       | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                |
+| [`library`](_autosummary/cutan.library.html.md#module-cutan.library)       | The character analyser: legs, arms, views and mouth chart, derived from the rig.             |
+| [`runtime`](_autosummary/cutan.runtime.html.md#module-cutan.runtime)       | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).    |
+| [`verify`](_autosummary/cutan.verify.html.md#module-cutan.verify)         | The cut-out style lint: measures a render against a named style spec.                        |
+
+
+# _autosummary/cutan.impacts.cli.html.md
+
+# cutan.impacts.cli
+
+`an impacts ...` — the impact harness from the shell.
+
+Thin string-typed wrappers over [`cutan.impacts.clip`](_autosummary/cutan.impacts.clip.html.md#module-cutan.impacts.clip), dispatched by typer the
+same way as `an character ...`: the business logic stays in plain functions
+that take real types, and these only parse the list-valued flags.
+
+> an impacts clip ~/.local/share/thoremin/synthetic –kind air –fps 30 –exposure 0.5
+> an impacts clip-set ~/.local/share/thoremin/synthetic/set-v1 –fps 24,30,60
+
+### Functions
+
+| [`clip`](_autosummary/cutan.impacts.cli.html.md#cutan.impacts.cli.clip)(out_dir[, object, kind, tempo, beats, ...])   | Write one impact clip (video + ground truth) under OUT_DIR.            |
+|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
+| [`clip_set`](_autosummary/cutan.impacts.cli.html.md#cutan.impacts.cli.clip_set)(out_dir[, objects, kinds, fps, ...])      | Write a benchmark set (the product of the given axes) plus index.json. |
+
+### cutan.impacts.cli.clip(out_dir, object='stick', kind='surface', tempo='100', beats=16, subdivision=1, pattern='1', lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, fps=30.0, exposure=0.0, exposure_samples=0, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, seed=0, render=True)
+
+Write one impact clip (video + ground truth) under OUT_DIR.
+
+out_dir: parent directory; the clip gets its own sub-directory
+object: stick or ball
+kind: surface (contact) or air (the stroke turns with nothing to hit)
+tempo: a bpm, or beat:bpm pairs for a tempo change, e.g. 0:90,16:120
+beats: number of beats
+subdivision: grid steps per beat
+pattern: per-step stroke heights, cycled; 0 is a rest, e.g. 1,0.5,0.8,0.5
+lead_in: seconds before the first beat
+tail: seconds after the last beat
+jitter_sd: humanisation, seconds (standard deviation of the timing offset; 0 = metronome)
+jitter_rho: correlation of consecutive offsets (0 = independent)
+jitter_bias: constant lead (negative) or lag (positive), seconds
+fps: frame rate (need not be an integer)
+exposure: fraction of the frame period the shutter is open (0.5 = 180 degrees)
+exposure_samples: instants averaged per open exposure (0 = automatic)
+timestamp_jitter_sd: seconds of jitter in WHEN each frame is captured
+timestamp_noise_sd: seconds of noise on the REPORTED timestamp only
+phase: sub-frame offset of the camera clock, seconds
+timestamps: what keypoints.ndjson reports as t: nominal or actual
+width: frame width in pixels
+height: frame height in pixels
+seed: random seed (performance and camera streams derive from it)
+render: render the mp4; –no-render writes the truth and keypoints only
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.impacts.cli.clip_set(out_dir, objects='stick,ball', kinds='surface,air', fps='24,30,60', exposures='0,0.5', timestamp_jitter_sds='0', seeds='0', render=True)
+
+Write a benchmark set (the product of the given axes) plus index.json.
+
+Every clip shares one performance per seed — an accelerando from 96 to 132
+BPM over 24 beats, accented, with 12 ms of drifting human timing — so clips
+differ only in object, kind and camera.
+
+out_dir: directory for the set
+objects: comma-separated, from stick,ball
+kinds: comma-separated, from surface,air
+fps: comma-separated frame rates
+exposures: comma-separated shutter fractions
+timestamp_jitter_sds: comma-separated capture-jitter standard deviations (s)
+seeds: comma-separated performance seeds
+render: render the videos; –no-render writes the truth and keypoints only
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+
+# _autosummary/cutan.impacts.clip.html.md
+
+# cutan.impacts.clip
+
+One impact clip, end to end: spec -> scene -> ground truth -> (video) -> files.
+
+[`ImpactClipSpec`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec) is the whole description of a clip as flat, JSON-able
+data — it is written verbatim into the sidecar, so any clip can be regenerated
+from its own `truth.json`. [`plan_impact_clip()`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.plan_impact_clip) turns it into the scene an
+animation would have (props + tweens, a normal `an` Shot) without touching
+disk; [`write_impact_clip()`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.write_impact_clip) compiles it, extracts the ground truth, renders
+the video (optional — the truth and keypoints need no browser), and writes:
+
+```pycon
+>>> plan = plan_impact_clip(ImpactClipSpec(beats=4, tempo=120))
+>>> [e.t_grid for e in plan.events]                        # intended
+[0.5, 1.0, 1.5, 2.0]
+>>> [round(e.t_impact - e.t_grid, 3) for e in plan.events]  # executed: humanised
+[0.003, 0.013, -0.005, 0.006]
+>>> len(plan.frames)
+75
+```
+
+### Module Attributes
+
+| [`DEFAULT_TAIL`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.DEFAULT_TAIL)          | Seconds after the last grid beat before the clip ends.           |
+|------------------------------------------------------------------------|------------------------------------------------------------------|
+| [`DEFAULT_JITTER_SD`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.DEFAULT_JITTER_SD)     | Default humanisation (seconds, standard deviation).              |
+| [`DEFAULT_TRAJECTORY_HZ`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.DEFAULT_TRAJECTORY_HZ) | Samples per second of the dense trajectory in `trajectory.csv`.  |
+| [`BENCHMARK_SPEC`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.BENCHMARK_SPEC)        | an accelerando with accents and human, slightly drifting timing. |
+
+### Functions
+
+| [`impact_set_specs`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.impact_set_specs)(\*[, base, objects, kinds, ...])   | The cartesian product of the given axes over `base`.                                                                          |
+|------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| [`plan_impact_clip`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.plan_impact_clip)(spec)                              | Resolve `spec` into events, a stroke, frames and a Scene IR.                                                                  |
+| [`write_impact_clip`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.write_impact_clip)(spec, out_dir, \*[, ...])         | Write one clip into `out_dir / (clip_dir or spec.clip_id)`; return that dir.                                                  |
+| [`write_impact_set`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.write_impact_set)(out_dir[, specs, render, ...])     | Write every clip in `specs` (default: [`impact_set_specs()`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.impact_set_specs)) plus `index.json`. |
+
+### Classes
+
+| [`ImpactClipSpec`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec)([object, kind, tempo, beats, ...])   | Everything that determines a clip.                                       |
+|------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| [`ImpactPlan`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactPlan)(spec, events, obj, stroke, ...)          | A clip before it touches disk: events, motion, camera, and the Scene IR. |
+
+### Exceptions
+
+| [`ImpactSpecError`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactSpecError)   | A clip spec that cannot describe a clip.   |
+|--------------------------------------------------------------------|--------------------------------------------|
+
+### cutan.impacts.clip.BENCHMARK_SPEC *= ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)*
+
+an accelerando with accents and
+human, slightly drifting timing. What [`impact_set_specs()`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.impact_set_specs) varies the
+camera and the object over.
+
+* **Type:**
+  A harder default for scoring estimators
+
+### cutan.impacts.clip.DEFAULT_JITTER_SD *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.008*
+
+Default humanisation (seconds, standard deviation). See `ImpactClipSpec`.
+
+### cutan.impacts.clip.DEFAULT_TAIL *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+
+Seconds after the last grid beat before the clip ends.
+
+### cutan.impacts.clip.DEFAULT_TRAJECTORY_HZ *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 1000.0*
+
+Samples per second of the dense trajectory in `trajectory.csv`.
+
+### *class* cutan.impacts.clip.ImpactClipSpec(object='stick', kind='surface', tempo=100.0, beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Everything that determines a clip. Defaults: a stick hitting a table at 100 BPM.
+
+Performance: `tempo` (a bpm, or `[(beat, bpm), ...]` for a tempo
+change), `beats`, `subdivision`, `pattern` (per-step stroke heights,
+`0` = rest), `lead_in`, `tail`, and the humanisation `jitter_sd` /
+`jitter_rho` / `jitter_bias` (seconds; see
+[`cutan.impacts.performance.gaussian_humanizer()`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.gaussian_humanizer)). Humanised by default
+(`jitter_sd` = [`DEFAULT_JITTER_SD`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.DEFAULT_JITTER_SD)): on a perfect grid every impact
+of a round tempo lands exactly on a frame at common rates, which is the one
+case a sub-frame estimator cannot be scored on. Set it to 0 for a metronome.
+
+Motion: `object` (`"stick"` or `"ball"`), `kind` (`"surface"` or
+`"air"`), the stroke timings `rise` / `fall` / `brake`, and
+`show_surface` (`None`: drawn for surface impacts only).
+
+Camera ([`an.frame_clock.FrameClock`](_autosummary/cutan.impacts.html.md#cutan.impacts.FrameClock)): `fps`, `exposure`,
+`exposure_samples`, `timestamp_jitter_sd` (when frames are really
+taken), `timestamp_noise_sd` (noise on the reported timestamp only),
+`phase`, `timestamps`.
+
+`seed` drives two independent streams — the performance’s and the
+camera’s — so clips that differ only in camera settings share the exact same
+performance.
+
+#### *property* clip_id *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+A readable, deterministic directory name.
+
+```pycon
+>>> ImpactClipSpec().clip_id[:-8]
+'stick-surface-30fps-e0-'
+>>> ImpactClipSpec().clip_id == ImpactClipSpec().clip_id
+True
+```
+
+#### *classmethod* from_dict(d)
+
+The inverse of `to_dict()`. Refuses fields it does not know —
+dropping one would regenerate a different clip under the same spec.
+
+* **Return type:**
+  [`ImpactClipSpec`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec)
+
+### *class* cutan.impacts.clip.ImpactPlan(spec, events, obj, stroke, frames, scene)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A clip before it touches disk: events, motion, camera, and the Scene IR.
+
+### *exception* cutan.impacts.clip.ImpactSpecError
+
+Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+A clip spec that cannot describe a clip.
+
+### cutan.impacts.clip.impact_set_specs(, base=ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0), objects=('stick', 'ball'), kinds=('surface', 'air'), fps=(24, 30, 60), exposures=(0.0, 0.5), timestamp_jitter_sds=(0.0,), seeds=(0,))
+
+The cartesian product of the given axes over `base`.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ImpactClipSpec`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec)]
+
+```pycon
+>>> len(impact_set_specs())
+24
+>>> {s.seed for s in impact_set_specs(seeds=(0, 1), fps=(30,))}
+{0, 1}
+```
+
+### cutan.impacts.clip.plan_impact_clip(spec)
+
+Resolve `spec` into events, a stroke, frames and a Scene IR. No I/O.
+
+* **Return type:**
+  [`ImpactPlan`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactPlan)
+
+### cutan.impacts.clip.write_impact_clip(spec, out_dir, , render=True, clip_dir=None)
+
+Write one clip into `out_dir / (clip_dir or spec.clip_id)`; return that dir.
+
+With `render=False` everything but `clip.mp4` is written, and no
+browser is needed: the keypoints and the truth come from the compiled
+document, not from the pixels.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.impacts.clip.write_impact_set(out_dir, specs=None, , render=True, progress=None)
+
+Write every clip in `specs` (default: [`impact_set_specs()`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.impact_set_specs)) plus `index.json`.
+
+`progress`, if given, is called with `(i, n, clip_dir)` after each clip.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+
+# _autosummary/cutan.impacts.html.md
+
+# cutan.impacts
+
+Synthetic impact clips with exact ground truth, for scoring sub-frame timing.
+
+Structured animations of simple objects — a stick or a ball — striking a
+surface, or striking “the air” (a stroke that reverses with no contact), on a
+known tempo grid. Each clip ships a sidecar that keeps three times apart:
+
+- the **intended** grid time of every event (`t_grid`),
+- the **executed** impact time in continuous seconds (`t_impact` — the grid
+  plus controllable humanisation, never snapped to a frame),
+- and **what the frames show**: every frame’s exposure interval and sample
+  instants ([`an.frame_clock.FrameClock`](_autosummary/cutan.impacts.html.md#cutan.impacts.FrameClock): frame rate, shutter, capture
+  jitter), the 2D keypoints at each frame, and which frames bracket each impact.
+
+The clips are ordinary `an` scenes — props moved by tweens — rendered by the
+cutout backend, and the ground truth is read back from the same compiled
+document the renderer draws.
+
+Quick start:
+
+```default
+from cutan.impacts import ImpactClipSpec, write_impact_clip, write_impact_set
+
+write_impact_clip(ImpactClipSpec(kind="air", fps=30, exposure=0.5,
+                                 jitter_sd=0.01), "~/clips")
+write_impact_set("~/clips/set")      # 24 clips: objects x kinds x fps x shutter
+```
+
+Or from the shell: `an impacts clip OUT_DIR` / `an impacts clip-set OUT_DIR`.
+
+```pycon
+>>> plan = plan_impact_clip(ImpactClipSpec(kind="air", beats=2, tempo=60, jitter_sd=0))
+>>> [(e.t_grid, e.t_impact) for e in plan.events]
+[(0.5, 0.5), (1.5, 1.5)]
+```
+
+### Functions
+
+| [`ball`](_autosummary/cutan.impacts.html.md#cutan.impacts.ball)(\*[, radius, x, floor_y, drop, color, ...])   | A ball moving vertically onto a floor whose top is at `floor_y`.                                                              |
+|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| [`build_stroke`](_autosummary/cutan.impacts.html.md#cutan.impacts.build_stroke)(events, \*[, kind, rise, fall, ...])  | Chain rise / hold / fall segments through every executed impact.                                                              |
+| [`gaussian_humanizer`](_autosummary/cutan.impacts.html.md#cutan.impacts.gaussian_humanizer)([sd, rho, bias])                | Offsets from an AR(1) Gaussian process: `o[k] = bias + rho*(o[k-1]-bias) + e`.                                                |
+| [`impact_object`](_autosummary/cutan.impacts.html.md#cutan.impacts.impact_object)(name, \*\*kwargs)                    | Build a registered object by name.                                                                                            |
+| [`impact_set_specs`](_autosummary/cutan.impacts.html.md#cutan.impacts.impact_set_specs)(\*[, base, objects, kinds, ...])  | The cartesian product of the given axes over `base`.                                                                          |
+| [`perform`](_autosummary/cutan.impacts.html.md#cutan.impacts.perform)([tempo, beats, subdivision, ...])          | The impacts of `beats` beats of `pattern`, on `tempo`'s grid.                                                                 |
+| [`plan_impact_clip`](_autosummary/cutan.impacts.html.md#cutan.impacts.plan_impact_clip)(spec)                             | Resolve `spec` into events, a stroke, frames and a Scene IR.                                                                  |
+| [`stick`](_autosummary/cutan.impacts.html.md#cutan.impacts.stick)(\*[, length, thickness, pivot, ...])         | A drumstick rotating about `pivot` (its butt — the hand).                                                                     |
+| [`tempo_map`](_autosummary/cutan.impacts.html.md#cutan.impacts.tempo_map)(tempo)                                   | Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](_autosummary/cutan.impacts.html.md#cutan.impacts.TempoMap).                    |
+| [`write_impact_clip`](_autosummary/cutan.impacts.html.md#cutan.impacts.write_impact_clip)(spec, out_dir, \*[, ...])        | Write one clip into `out_dir / (clip_dir or spec.clip_id)`; return that dir.                                                  |
+| [`write_impact_set`](_autosummary/cutan.impacts.html.md#cutan.impacts.write_impact_set)(out_dir[, specs, render, ...])    | Write every clip in `specs` (default: [`impact_set_specs()`](_autosummary/cutan.impacts.html.md#cutan.impacts.impact_set_specs)) plus `index.json`. |
+
+### Classes
+
+| [`CapturedFrame`](_autosummary/cutan.impacts.html.md#cutan.impacts.CapturedFrame)(index, t_nominal, t_open, ...)      | One output frame: when its exposure opened and closed, and what it saw.         |
+|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| [`FrameClock`](_autosummary/cutan.impacts.html.md#cutan.impacts.FrameClock)([fps, exposure, samples, ...])         | A camera's timing, as data.                                                     |
+| [`ImpactClipSpec`](_autosummary/cutan.impacts.html.md#cutan.impacts.ImpactClipSpec)([object, kind, tempo, beats, ...]) | Everything that determines a clip.                                              |
+| [`ImpactEvent`](_autosummary/cutan.impacts.html.md#cutan.impacts.ImpactEvent)(index, beat, t_grid, t_impact, ...)   | One impact: where the grid put it and when it was executed.                     |
+| [`ImpactObject`](_autosummary/cutan.impacts.html.md#cutan.impacts.ImpactObject)(name, art, at, channels, ...[, ...]) | One striking object, its surface, and how the stroke moves it.                  |
+| [`ImpactPlan`](_autosummary/cutan.impacts.html.md#cutan.impacts.ImpactPlan)(spec, events, obj, stroke, ...)        | A clip before it touches disk: events, motion, camera, and the Scene IR.        |
+| [`Stroke`](_autosummary/cutan.impacts.html.md#cutan.impacts.Stroke)(kind, duration, segments, kinematics)      | The whole curve, plus the kinematics of every impact on it.                     |
+| [`StrokeSegment`](_autosummary/cutan.impacts.html.md#cutan.impacts.StrokeSegment)(t0, t1, h0, h1, easing)             | `h` goes from `h0` to `h1` over `[t0, t1]` under `easing`.                      |
+| [`TempoMap`](_autosummary/cutan.impacts.html.md#cutan.impacts.TempoMap)(points)                                  | Tempo as a function of beat: piecewise-linear BPM between `(beat, bpm)` points. |
+
+### Exceptions
+
+| [`TruthMismatch`](_autosummary/cutan.impacts.html.md#cutan.impacts.TruthMismatch)   | The ground truth and the thing it describes disagree.   |
+|------------------------------------------------------------------|---------------------------------------------------------|
+
+### *class* cutan.impacts.CapturedFrame(index, t_nominal, t_open, t_close, samples, t_reported)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One output frame: when its exposure opened and closed, and what it saw.
+
+`t_nominal` is `index / fps` — what a constant-rate container (an mp4)
+says the frame’s time is. `samples` are the instants actually rendered
+and averaged into it; `t_mid` is the middle of the exposure, the single
+best instant to attribute a blurred frame to. `t_reported` is the
+timestamp a capture pipeline hands downstream: nominal or actual, per the
+clock’s `timestamps` setting.
+
+### *class* cutan.impacts.FrameClock(fps=30.0, exposure=0.0, samples=None, jitter_sd=0.0, phase=0.0, timestamps='nominal', report_noise_sd=0.0, seed=0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A camera’s timing, as data. Every field defaults to the ideal camera.
+
+`fps`: nominal frame rate (need not be an integer: 29.97 is a camera).
+`exposure`: fraction of the frame period the shutter is open, in
+`[0, 1]`; 0 is an instantaneous sample, 0.5 a 180-degree shutter.
+`samples`: instants integrated per open exposure (midpoint rule);
+`None` means 1 when `exposure == 0` and
+`DEFAULT_EXPOSURE_SAMPLES` otherwise.
+`jitter_sd`: standard deviation, in seconds, of each frame’s CAPTURE
+offset from the nominal grid — the frame really is taken early or late.
+Gaussian, clamped at [`max_jitter`](_autosummary/cutan.impacts.html.md#cutan.impacts.FrameClock.max_jitter) so frames never overlap; a
+`jitter_sd` above half that clamp is refused rather than silently
+shrunk (at `exposure=1` there is no room for any).
+`phase`: seconds added to every capture instant — the camera clock’s
+sub-frame offset from scene time, in `(-1/fps, 1/fps)`.
+`timestamps`: the base of `CapturedFrame.t_reported` —
+`"nominal"` (`index / fps`, what a naive tick loop or an mp4 reports)
+or `"actual"` (`t_open`, what a capture API with real timestamps
+reports).
+`report_noise_sd`: Gaussian noise, in seconds, added to the REPORTED
+timestamp only — regular capture, noisy clock (a browser frame callback).
+Clamped at `MAX_REPORT_NOISE_FRACTION` of a frame period, with the
+same refuse-rather-than-shrink rule as `jitter_sd`, and reported
+timestamps must still increase: a real frame clock never runs backwards.
+`seed`: the random streams (capture jitter and report noise are
+independent draws from it).
+
+Every instant is clipped into `[0, duration]`, because a render cannot
+sample a scene outside its own timeline; the clipped values are what
+[`frames()`](_autosummary/cutan.impacts.html.md#cutan.impacts.FrameClock.frames) returns and what gets rendered.
+
+#### frames(duration)
+
+One [`CapturedFrame`](_autosummary/cutan.impacts.html.md#cutan.impacts.CapturedFrame) per output frame of a `duration` render.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`CapturedFrame`](_autosummary/cutan.impacts.html.md#cutan.impacts.CapturedFrame), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
+#### *property* max_jitter *: [float](https://docs.python.org/3/builtins/functions.html#float)*
+
+The clamp on a frame’s capture offset, in seconds.
+
+```pycon
+>>> round(FrameClock(fps=10, exposure=0.5).max_jitter, 9)
+0.0245
+```
+
+#### sample_times(duration)
+
+Per frame, the scene instants to render and average — the render seam.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)], [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
+#### *property* samples_per_frame *: [int](https://docs.python.org/3/builtins/functions.html#int)*
+
+1 for an instantaneous shutter.
+
+```pycon
+>>> FrameClock().samples_per_frame, FrameClock(exposure=0.5).samples_per_frame
+(1, 8)
+```
+
+* **Type:**
+  The resolved sample count
+
+### *class* cutan.impacts.ImpactClipSpec(object='stick', kind='surface', tempo=100.0, beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Everything that determines a clip. Defaults: a stick hitting a table at 100 BPM.
+
+Performance: `tempo` (a bpm, or `[(beat, bpm), ...]` for a tempo
+change), `beats`, `subdivision`, `pattern` (per-step stroke heights,
+`0` = rest), `lead_in`, `tail`, and the humanisation `jitter_sd` /
+`jitter_rho` / `jitter_bias` (seconds; see
+[`cutan.impacts.performance.gaussian_humanizer()`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.gaussian_humanizer)). Humanised by default
+(`jitter_sd` = `DEFAULT_JITTER_SD`): on a perfect grid every impact
+of a round tempo lands exactly on a frame at common rates, which is the one
+case a sub-frame estimator cannot be scored on. Set it to 0 for a metronome.
+
+Motion: `object` (`"stick"` or `"ball"`), `kind` (`"surface"` or
+`"air"`), the stroke timings `rise` / `fall` / `brake`, and
+`show_surface` (`None`: drawn for surface impacts only).
+
+Camera ([`an.frame_clock.FrameClock`](_autosummary/cutan.impacts.html.md#cutan.impacts.FrameClock)): `fps`, `exposure`,
+`exposure_samples`, `timestamp_jitter_sd` (when frames are really
+taken), `timestamp_noise_sd` (noise on the reported timestamp only),
+`phase`, `timestamps`.
+
+`seed` drives two independent streams — the performance’s and the
+camera’s — so clips that differ only in camera settings share the exact same
+performance.
+
+#### *property* clip_id *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+A readable, deterministic directory name.
+
+```pycon
+>>> ImpactClipSpec().clip_id[:-8]
+'stick-surface-30fps-e0-'
+>>> ImpactClipSpec().clip_id == ImpactClipSpec().clip_id
+True
+```
+
+#### *classmethod* from_dict(d)
+
+The inverse of `to_dict()`. Refuses fields it does not know —
+dropping one would regenerate a different clip under the same spec.
+
+* **Return type:**
+  [`ImpactClipSpec`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec)
+
+### *class* cutan.impacts.ImpactEvent(index, beat, t_grid, t_impact, amplitude)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One impact: where the grid put it and when it was executed.
+
+#### *property* offset *: [float](https://docs.python.org/3/builtins/functions.html#float)*
+
+the humanisation actually applied (post-clamp).
+
+* **Type:**
+  `t_impact - t_grid`
+
+### *class* cutan.impacts.ImpactObject(name, art, at, channels, keypoints, impact_keypoint, keypoint_nodes=<factory>, surface_art=None, surface_at=None, params=<factory>)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One striking object, its surface, and how the stroke moves it.
+
+`channels` are the properties the stroke drives — one for a stick or a
+ball, two for a forearm-plus-stick limb (each affine in the SAME `h`, so
+the motion stays exact). `keypoints` are local points by name; each lives
+on the node `keypoint_nodes[name]` names, the entity itself by default.
+
+#### impact_keypoint *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+The keypoint that does the striking (a stick’s tip, a ball’s bottom).
+
+#### keypoints *: [Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]]*
+
+Local points by name. What a tracker would report.
+
+#### pose(h)
+
+`{(node path, property): value}` at stroke height `h`.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)], [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+#### surface_at *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Where the surface’s top edge is centred, in scene coordinates.
+
+### *class* cutan.impacts.ImpactPlan(spec, events, obj, stroke, frames, scene)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A clip before it touches disk: events, motion, camera, and the Scene IR.
+
+### *class* cutan.impacts.Stroke(kind, duration, segments, kinematics)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+The whole curve, plus the kinematics of every impact on it.
+
+#### h(t)
+
+Stroke height at scene time `t` (clamped to the clip).
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+#### velocity(t)
+
+`dh/dt` at `t`; at a segment boundary, the LATER segment’s value.
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+### *class* cutan.impacts.StrokeSegment(t0, t1, h0, h1, easing)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+`h` goes from `h0` to `h1` over `[t0, t1]` under `easing`.
+
+### *class* cutan.impacts.TempoMap(points)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Tempo as a function of beat: piecewise-linear BPM between `(beat, bpm)` points.
+
+Constant before the first point and after the last. Linear in BEATS, not in
+seconds, which is how a score writes an accelerando (“speed up over these
+four bars”); the time of a beat is the exact integral of `60 / bpm`.
+
+```pycon
+>>> TempoMap(((0, 120),)).time_of(3)
+1.5
+>>> m = TempoMap(((0, 60), (4, 120)))
+>>> round(m.time_of(4), 6)   # 4 * 60/(120-60) * ln(120/60)
+2.772589
+>>> m.bpm_at(2), m.bpm_at(10)
+(90.0, 120.0)
+```
+
+#### time_of(beat)
+
+Seconds from beat 0 to `beat` (`beat >= 0`).
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+### *exception* cutan.impacts.TruthMismatch
+
+Bases: [`RuntimeError`](https://docs.python.org/3/builtins/exceptions.html#RuntimeError)
+
+The ground truth and the thing it describes disagree.
+
+### cutan.impacts.ball(, radius=18.0, x=0.0, floor_y=90.0, drop=170.0, color='#111827', surface_color='#9ca3af', surface_size=(160.0, 24.0))
+
+A ball moving vertically onto a floor whose top is at `floor_y`.
+
+A full stroke lifts it `drop` pixels. Keypoints: `center` and
+`bottom` (its contact point).
+
+* **Return type:**
+  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
+
+### cutan.impacts.build_stroke(events, , kind='surface', duration, rise=0.18, fall=0.18, brake=0.03, rest_height=1.0)
+
+Chain rise / hold / fall segments through every executed impact.
+
+The object starts and ends at `rest_height`; before impact `k` it is
+raised to `events[k].amplitude` (a bigger preparation, a harder hit).
+Segments tile `[0, duration]` exactly, and every impact is a segment
+boundary at precisely `t_impact`.
+
+* **Return type:**
+  [`Stroke`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.Stroke)
+
+### cutan.impacts.gaussian_humanizer(sd=0.0, , rho=0.0, bias=0.0)
+
+Offsets from an AR(1) Gaussian process: `o[k] = bias + rho*(o[k-1]-bias) + e`.
+
+`sd` is the STATIONARY standard deviation of the offsets (seconds) — the
+innovation is scaled by `sqrt(1 - rho**2)` so changing `rho` changes how
+the timing wanders, not how far. `rho = 0` is independent jitter;
+`rho` near 1 is a player who drifts ahead or behind for several beats.
+`bias` is a constant lead (negative) or lag (positive).
+
+* **Return type:**
+  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)], [`object`](https://docs.python.org/3/builtins/functions.html#object)], [`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
+```pycon
+>>> import numpy as np
+>>> h = gaussian_humanizer(0.01, rho=0.5)
+>>> offs = h([0.0] * 20000, np.random.default_rng(0))
+>>> round(float(np.std(offs)), 3)
+0.01
+>>> gaussian_humanizer()([0.0, 1.0], None)
+[0.0, 0.0]
+```
+
+### cutan.impacts.impact_object(name, \*\*kwargs)
+
+Build a registered object by name.
+
+* **Return type:**
+  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
+
+```pycon
+>>> impact_object("ball").name
+'ball'
+>>> impact_object("hammer")
+Traceback (most recent call last):
+  ...
+KeyError: "no impact object 'hammer'; known: ['ball', 'stick']"
+```
+
+### cutan.impacts.impact_set_specs(, base=ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0), objects=('stick', 'ball'), kinds=('surface', 'air'), fps=(24, 30, 60), exposures=(0.0, 0.5), timestamp_jitter_sds=(0.0,), seeds=(0,))
+
+The cartesian product of the given axes over `base`.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ImpactClipSpec`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec)]
+
+```pycon
+>>> len(impact_set_specs())
+24
+>>> {s.seed for s in impact_set_specs(seeds=(0, 1), fps=(30,))}
+{0, 1}
+```
+
+### cutan.impacts.perform(tempo=100.0, , beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, humanizer=None, seed=0)
+
+The impacts of `beats` beats of `pattern`, on `tempo`’s grid.
+
+`subdivision` grid steps per beat; `pattern` is cycled over the steps,
+one value per step: `0` is a rest, anything in `(0, 1]` is a hit of that
+relative stroke height (an accent is a bigger stroke). `lead_in` shifts
+beat 0 to that many seconds into the clip. `humanizer` turns grid times
+into offsets (default: none); each offset is then clamped to
+`MAX_OFFSET_FRACTION` of the gap to either neighbour, and the clamped
+value is what the event records — the ground truth is what was executed.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImpactEvent`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.ImpactEvent), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
+```pycon
+>>> [e.beat for e in perform(120, beats=2, subdivision=2, pattern=(1, 0))]
+[0.0, 1.0]
+>>> [e.amplitude for e in perform(120, beats=1, subdivision=4, pattern=(1, .5))]
+[1.0, 0.5, 1.0, 0.5]
+```
+
+### cutan.impacts.plan_impact_clip(spec)
+
+Resolve `spec` into events, a stroke, frames and a Scene IR. No I/O.
+
+* **Return type:**
+  [`ImpactPlan`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactPlan)
+
+### cutan.impacts.stick(, length=200.0, thickness=12.0, pivot=(-120.0, -30.0), contact_angle=0.35, swing=0.95, color='#111827', surface_color='#9ca3af', surface_size=(140.0, 24.0))
+
+A drumstick rotating about `pivot` (its butt — the hand).
+
+At contact it points `contact_angle` radians below horizontal; a full
+stroke raises it by `swing` radians. Keypoints: `pivot` and `tip`
+(the end of its axis). The surface’s top meets the lowest point of its
+rounded end.
+
+* **Return type:**
+  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
+
+### cutan.impacts.tempo_map(tempo)
+
+Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](_autosummary/cutan.impacts.html.md#cutan.impacts.TempoMap).
+
+* **Return type:**
+  [`TempoMap`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap)
+
+```pycon
+>>> tempo_map(90).points
+((0.0, 90.0),)
+>>> tempo_map([(0, 90), (16, 120)]).points
+((0.0, 90.0), (16.0, 120.0))
+```
+
+### cutan.impacts.write_impact_clip(spec, out_dir, , render=True, clip_dir=None)
+
+Write one clip into `out_dir / (clip_dir or spec.clip_id)`; return that dir.
+
+With `render=False` everything but `clip.mp4` is written, and no
+browser is needed: the keypoints and the truth come from the compiled
+document, not from the pixels.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.impacts.write_impact_set(out_dir, specs=None, , render=True, progress=None)
+
+Write every clip in `specs` (default: [`impact_set_specs()`](_autosummary/cutan.impacts.html.md#cutan.impacts.impact_set_specs)) plus `index.json`.
+
+`progress`, if given, is called with `(i, n, clip_dir)` after each clip.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### Modules
+
+| [`cli`](_autosummary/cutan.impacts.cli.html.md#module-cutan.impacts.cli)                 | `an impacts ...` — the impact harness from the shell.                           |
+|-----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| [`clip`](_autosummary/cutan.impacts.clip.html.md#module-cutan.impacts.clip)               | One impact clip, end to end: spec -> scene -> ground truth -> (video) -> files. |
+| [`objects`](_autosummary/cutan.impacts.objects.html.md#module-cutan.impacts.objects)         | The things that strike: a stick and a ball, as ordinary `an` props.             |
+| [`performance`](_autosummary/cutan.impacts.performance.html.md#module-cutan.impacts.performance) | The performance: a tempo grid, and when each impact was intended and executed.  |
+| [`stroke`](_autosummary/cutan.impacts.stroke.html.md#module-cutan.impacts.stroke)           | The stroke: impact events -> one continuous height curve `h(t)`.                |
+| [`truth`](_autosummary/cutan.impacts.truth.html.md#module-cutan.impacts.truth)             | Ground truth: what was intended, what was executed, and what each frame shows.  |
+
+
+# _autosummary/cutan.impacts.objects.html.md
+
+# cutan.impacts.objects
+
+The things that strike: a stick and a ball, as ordinary `an` props.
+
+An [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject) is data: the prop to draw, where it stands, the ONE
+property the stroke animates and the affine map from stroke height `h` to
+that property’s value, and the named keypoints a tracker would report. Being
+affine is the whole contract — it is what lets [`cutan.impacts.stroke`](_autosummary/cutan.impacts.stroke.html.md#module-cutan.impacts.stroke) reason
+in `h` while the renderer tweens the property, with no approximation between
+them.
+
+The objects are real props (an#108), stored in a real props store and drawn by
+the real cutout rig builder, so the harness exercises the same path an
+animation does. Their art is generated here as plain SVG, sized so the rig’s
+view-box factor is exactly 1 (`view_box` height = the compiler’s
+`SCENE_PX_PER_VIEW_BOX`): one SVG pixel is one scene pixel, and a keypoint’s
+local coordinates are read straight off the drawing.
+
+Coordinates are scene pixels relative to the canvas centre, `y` down — the
+space `StagePlacement.at` and the camera use. Rotation is in radians,
+clockwise-positive on screen, as PixiJS applies it.
+
+```pycon
+>>> s = stick()
+>>> s.pose(0.0) == {("stick", "rotation"): 0.35}
+True
+>>> (ch,) = s.channels
+>>> round(ch.value(1.0) - ch.value(0.0), 6) == -ch.stroke_extent
+True
+>>> list(ball().pose(1.0))
+[('ball', 'y')]
+```
+
+### Module Attributes
+
+| [`IMPACT_OBJECTS`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.IMPACT_OBJECTS)   | Name -> factory.   |
+|-------------------------------------------------------------------|--------------------|
+
+### Functions
+
+| [`ball`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ball)(\*[, radius, x, floor_y, drop, color, ...])   | A ball moving vertically onto a floor whose top is at `floor_y`.   |
+|-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| [`impact_object`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.impact_object)(name, \*\*kwargs)                    | Build a registered object by name.                                 |
+| [`stick`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.stick)(\*[, length, thickness, pivot, ...])         | A drumstick rotating about `pivot` (its butt — the hand).          |
+
+### Classes
+
+| [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)(name, art, at, channels, ...[, ...])   | One striking object, its surface, and how the stroke moves it.        |
+|------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
+| [`PropArt`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.PropArt)(ref, descriptor, parts)                     | A prop's descriptor and its SVG parts — what goes into a props store. |
+| [`StrokeChannel`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.StrokeChannel)(target, property, ...)                | One animated property, AFFINE in stroke height `h`.                   |
+
+### cutan.impacts.objects.IMPACT_OBJECTS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[...], [ImpactObject](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)]]* *= {'ball': <function ball>, 'stick': <function stick>}*
+
+Name -> factory. The registry the clip spec and the CLI resolve names through.
+
+### *class* cutan.impacts.objects.ImpactObject(name, art, at, channels, keypoints, impact_keypoint, keypoint_nodes=<factory>, surface_art=None, surface_at=None, params=<factory>)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One striking object, its surface, and how the stroke moves it.
+
+`channels` are the properties the stroke drives — one for a stick or a
+ball, two for a forearm-plus-stick limb (each affine in the SAME `h`, so
+the motion stays exact). `keypoints` are local points by name; each lives
+on the node `keypoint_nodes[name]` names, the entity itself by default.
+
+#### impact_keypoint *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+The keypoint that does the striking (a stick’s tip, a ball’s bottom).
+
+#### keypoints *: [Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]]*
+
+Local points by name. What a tracker would report.
+
+#### pose(h)
+
+`{(node path, property): value}` at stroke height `h`.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)], [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+#### surface_at *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Where the surface’s top edge is centred, in scene coordinates.
+
+### *class* cutan.impacts.objects.PropArt(ref, descriptor, parts)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A prop’s descriptor and its SVG parts — what goes into a props store.
+
+### *class* cutan.impacts.objects.StrokeChannel(target, property, contact_value, stroke_extent)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One animated property, AFFINE in stroke height `h`.
+
+`value(h) = contact_value - stroke_extent * h`: `h = 0` is contact and
+`stroke_extent` is how far a full stroke moves the property away from it
+(radians, or pixels). Affine is the whole contract — it is what makes an
+eased tween of the property exactly the same easing of `h`.
+
+### cutan.impacts.objects.ball(, radius=18.0, x=0.0, floor_y=90.0, drop=170.0, color='#111827', surface_color='#9ca3af', surface_size=(160.0, 24.0))
+
+A ball moving vertically onto a floor whose top is at `floor_y`.
+
+A full stroke lifts it `drop` pixels. Keypoints: `center` and
+`bottom` (its contact point).
+
+* **Return type:**
+  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
+
+### cutan.impacts.objects.impact_object(name, \*\*kwargs)
+
+Build a registered object by name.
+
+* **Return type:**
+  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
+
+```pycon
+>>> impact_object("ball").name
+'ball'
+>>> impact_object("hammer")
+Traceback (most recent call last):
+  ...
+KeyError: "no impact object 'hammer'; known: ['ball', 'stick']"
+```
+
+### cutan.impacts.objects.stick(, length=200.0, thickness=12.0, pivot=(-120.0, -30.0), contact_angle=0.35, swing=0.95, color='#111827', surface_color='#9ca3af', surface_size=(140.0, 24.0))
+
+A drumstick rotating about `pivot` (its butt — the hand).
+
+At contact it points `contact_angle` radians below horizontal; a full
+stroke raises it by `swing` radians. Keypoints: `pivot` and `tip`
+(the end of its axis). The surface’s top meets the lowest point of its
+rounded end.
+
+* **Return type:**
+  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
+
+
+# _autosummary/cutan.impacts.performance.html.md
+
+# cutan.impacts.performance
+
+The performance: a tempo grid, and when each impact was intended and executed.
+
+Three times are kept apart on purpose, because scoring a sub-frame estimator is
+meaningless if they blur together:
+
+- `t_grid` — the INTENDED time: where the beat grid (a [`TempoMap`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap)) put
+  the event. What a quantiser would snap to.
+- `t_impact` — the EXECUTED time, in continuous seconds: the grid time plus a
+  humanisation offset. This is when the object actually hits (or, in the air,
+  turns); the motion is built so it happens at exactly this float, never on a
+  frame.
+- what the frames show — not here at all; that is [`cutan.impacts.truth`](_autosummary/cutan.impacts.truth.html.md#module-cutan.impacts.truth),
+  after a [`an.frame_clock.FrameClock`](_autosummary/cutan.impacts.html.md#cutan.impacts.FrameClock) has sampled the motion.
+
+```pycon
+>>> events = perform(120, beats=4)
+>>> [e.t_grid for e in events]
+[0.5, 1.0, 1.5, 2.0]
+>>> all(e.t_impact == e.t_grid for e in events)   # no humanisation by default
+True
+```
+
+A tempo change is a [`TempoMap`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap) with more than one point — here an
+accelerando from 60 to 120 BPM over four beats, so the gaps shrink:
+
+```pycon
+>>> ts = [e.t_grid for e in perform([(0, 60), (4, 120)], beats=5, lead_in=0.0)]
+>>> [round(b - a, 3) for a, b in zip(ts, ts[1:])]
+[0.893, 0.729, 0.617, 0.534]
+```
+
+### Module Attributes
+
+| [`DEFAULT_LEAD_IN`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.DEFAULT_LEAD_IN)     | Seconds before the first grid beat.                                                                                                                                                           |
+|----------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`MAX_OFFSET_FRACTION`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.MAX_OFFSET_FRACTION) | A humanisation offset is clamped to this fraction of the gap to each neighbouring grid event, so executed impacts can never swap order or collide — whatever the jitter's standard deviation. |
+| [`Humanizer`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.Humanizer)           | `(grid_times, rng) -> offsets`, in seconds, one per grid time.                                                                                                                                |
+
+### Functions
+
+| [`gaussian_humanizer`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.gaussian_humanizer)([sd, rho, bias])       | Offsets from an AR(1) Gaussian process: `o[k] = bias + rho*(o[k-1]-bias) + e`.                             |
+|--------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| [`perform`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.perform)([tempo, beats, subdivision, ...]) | The impacts of `beats` beats of `pattern`, on `tempo`'s grid.                                              |
+| [`tempo_map`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.tempo_map)(tempo)                          | Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap). |
+
+### Classes
+
+| [`ImpactEvent`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.ImpactEvent)(index, beat, t_grid, t_impact, ...)   | One impact: where the grid put it and when it was executed.                     |
+|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| [`TempoMap`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap)(points)                                  | Tempo as a function of beat: piecewise-linear BPM between `(beat, bpm)` points. |
+
+### Exceptions
+
+| [`PerformanceError`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.PerformanceError)   | A performance description that cannot be played.   |
+|---------------------------------------------------------------------|----------------------------------------------------|
+
+### cutan.impacts.performance.DEFAULT_LEAD_IN *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+
+Seconds before the first grid beat. Long enough for the first stroke’s
+preparation and for any humanisation to pull the first impact early.
+
+### cutan.impacts.performance.Humanizer
+
+`(grid_times, rng) -> offsets`, in seconds, one per grid time. The seam for
+timing models richer than [`gaussian_humanizer()`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.gaussian_humanizer) (a learned groove, a
+drummer’s measured microtiming).
+
+alias of [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)], [`object`](https://docs.python.org/3/builtins/functions.html#object)], [`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
+### *class* cutan.impacts.performance.ImpactEvent(index, beat, t_grid, t_impact, amplitude)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One impact: where the grid put it and when it was executed.
+
+#### *property* offset *: [float](https://docs.python.org/3/builtins/functions.html#float)*
+
+the humanisation actually applied (post-clamp).
+
+* **Type:**
+  `t_impact - t_grid`
+
+### cutan.impacts.performance.MAX_OFFSET_FRACTION *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.4*
+
+A humanisation offset is clamped to this fraction of the gap to each
+neighbouring grid event, so executed impacts can never swap order or
+collide — whatever the jitter’s standard deviation.
+
+### *exception* cutan.impacts.performance.PerformanceError
+
+Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+A performance description that cannot be played.
+
+### *class* cutan.impacts.performance.TempoMap(points)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Tempo as a function of beat: piecewise-linear BPM between `(beat, bpm)` points.
+
+Constant before the first point and after the last. Linear in BEATS, not in
+seconds, which is how a score writes an accelerando (“speed up over these
+four bars”); the time of a beat is the exact integral of `60 / bpm`.
+
+```pycon
+>>> TempoMap(((0, 120),)).time_of(3)
+1.5
+>>> m = TempoMap(((0, 60), (4, 120)))
+>>> round(m.time_of(4), 6)   # 4 * 60/(120-60) * ln(120/60)
+2.772589
+>>> m.bpm_at(2), m.bpm_at(10)
+(90.0, 120.0)
+```
+
+#### time_of(beat)
+
+Seconds from beat 0 to `beat` (`beat >= 0`).
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+### cutan.impacts.performance.gaussian_humanizer(sd=0.0, , rho=0.0, bias=0.0)
+
+Offsets from an AR(1) Gaussian process: `o[k] = bias + rho*(o[k-1]-bias) + e`.
+
+`sd` is the STATIONARY standard deviation of the offsets (seconds) — the
+innovation is scaled by `sqrt(1 - rho**2)` so changing `rho` changes how
+the timing wanders, not how far. `rho = 0` is independent jitter;
+`rho` near 1 is a player who drifts ahead or behind for several beats.
+`bias` is a constant lead (negative) or lag (positive).
+
+* **Return type:**
+  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)], [`object`](https://docs.python.org/3/builtins/functions.html#object)], [`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
+```pycon
+>>> import numpy as np
+>>> h = gaussian_humanizer(0.01, rho=0.5)
+>>> offs = h([0.0] * 20000, np.random.default_rng(0))
+>>> round(float(np.std(offs)), 3)
+0.01
+>>> gaussian_humanizer()([0.0, 1.0], None)
+[0.0, 0.0]
+```
+
+### cutan.impacts.performance.perform(tempo=100.0, , beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, humanizer=None, seed=0)
+
+The impacts of `beats` beats of `pattern`, on `tempo`’s grid.
+
+`subdivision` grid steps per beat; `pattern` is cycled over the steps,
+one value per step: `0` is a rest, anything in `(0, 1]` is a hit of that
+relative stroke height (an accent is a bigger stroke). `lead_in` shifts
+beat 0 to that many seconds into the clip. `humanizer` turns grid times
+into offsets (default: none); each offset is then clamped to
+[`MAX_OFFSET_FRACTION`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.MAX_OFFSET_FRACTION) of the gap to either neighbour, and the clamped
+value is what the event records — the ground truth is what was executed.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImpactEvent`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.ImpactEvent), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
+```pycon
+>>> [e.beat for e in perform(120, beats=2, subdivision=2, pattern=(1, 0))]
+[0.0, 1.0]
+>>> [e.amplitude for e in perform(120, beats=1, subdivision=4, pattern=(1, .5))]
+[1.0, 0.5, 1.0, 0.5]
+```
+
+### cutan.impacts.performance.tempo_map(tempo)
+
+Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap).
+
+* **Return type:**
+  [`TempoMap`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap)
+
+```pycon
+>>> tempo_map(90).points
+((0.0, 90.0),)
+>>> tempo_map([(0, 90), (16, 120)]).points
+((0.0, 90.0), (16.0, 120.0))
+```
+
+
+# _autosummary/cutan.impacts.stroke.html.md
+
+# cutan.impacts.stroke
+
+The stroke: impact events -> one continuous height curve `h(t)`.
+
+`h` is the object’s height above its impact position, in units of a full
+stroke: `0` is contact (or, in the air, the turning point) and `1` a full
+preparation. Every object in [`cutan.impacts.objects`](_autosummary/cutan.impacts.objects.html.md#module-cutan.impacts.objects) maps `h` AFFINELY onto
+one animated property (a stick’s rotation, a ball’s `y`), which is what makes
+the curve below exactly the curve the renderer draws: an eased tween of the
+property IS the same easing of `h`.
+
+The curve is a chain of [`StrokeSegment`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.StrokeSegment)s built only from the
+quadratic easings the cutout runtime already has, and each is chosen for its
+physics:
+
+- **surface** — the object falls with `ease_in` (constant acceleration, like
+  gravity) and reaches `h = 0` at full speed, then leaves with `ease_out`: a
+  velocity reversal AT the impact. Contact is visible in position (the object
+  stops at the surface) and as a kink in velocity.
+- **air** — no surface. The fall is `ease_in` and then a short `ease_out`
+  **brake** of `brake` seconds that brings the object to rest at `h = 0`;
+  it then leaves with `ease_in_out`. The executed “impact” is that turning
+  point — the moment the stroke’s lowest point is reached — and the peak speed
+  comes `brake` seconds BEFORE it. The brake’s distance is chosen so velocity
+  is continuous into it (`d = apex * brake / fall`), so the only
+  discontinuity is in acceleration — a muscle stopping a limb, not a collision.
+
+In both kinds the speed at the peak is `2 * apex / fall`.
+
+```pycon
+>>> from cutan.impacts.performance import perform
+>>> events = perform(120, beats=3)
+>>> s = build_stroke(events, kind="surface", duration=2.0)
+>>> [s.h(e.t_impact) for e in events]
+[0.0, 0.0, 0.0]
+>>> round(s.h(0.0), 6), round(s.h(0.75), 6)   # at rest, then the apex between hits
+(1.0, 1.0)
+>>> a = build_stroke(events, kind="air", duration=2.0)
+>>> [round(a.velocity(e.t_impact), 9) for e in events]   # the air stroke TURNS
+[0.0, 0.0, 0.0]
+```
+
+### Module Attributes
+
+| [`DEFAULT_RISE`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.DEFAULT_RISE)   | Longest rise after an impact, and longest fall into one (seconds).   |
+|-----------------------------------------------------------------|----------------------------------------------------------------------|
+| [`DEFAULT_BRAKE`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.DEFAULT_BRAKE)  | The air stroke's braking time before its turning point (seconds).    |
+
+### Functions
+
+| [`build_stroke`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.build_stroke)(events, \*[, kind, rise, fall, ...])   | Chain rise / hold / fall segments through every executed impact.   |
+|------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+
+### Classes
+
+| [`Stroke`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.Stroke)(kind, duration, segments, kinematics)   | The whole curve, plus the kinematics of every impact on it.   |
+|-------------------------------------------------------------------------------------------------|---------------------------------------------------------------|
+| [`StrokeKinematics`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.StrokeKinematics)(index, kind, t_impact, ...)   | How the object moved into one impact.                         |
+| [`StrokeSegment`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.StrokeSegment)(t0, t1, h0, h1, easing)          | `h` goes from `h0` to `h1` over `[t0, t1]` under `easing`.    |
+
+### Exceptions
+
+| [`StrokeError`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.StrokeError)   | A stroke that cannot be built from these events.   |
+|----------------------------------------------------------------|----------------------------------------------------|
+
+### cutan.impacts.stroke.DEFAULT_BRAKE *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.03*
+
+The air stroke’s braking time before its turning point (seconds).
+
+### cutan.impacts.stroke.DEFAULT_RISE *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.18*
+
+Longest rise after an impact, and longest fall into one (seconds). A slower
+tempo holds at the apex between them instead of floating: a drummer’s stroke
+takes about as long at 60 BPM as at 120, it is the wait that changes.
+
+### *class* cutan.impacts.stroke.Stroke(kind, duration, segments, kinematics)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+The whole curve, plus the kinematics of every impact on it.
+
+#### h(t)
+
+Stroke height at scene time `t` (clamped to the clip).
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+#### velocity(t)
+
+`dh/dt` at `t`; at a segment boundary, the LATER segment’s value.
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+### *exception* cutan.impacts.stroke.StrokeError
+
+Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+A stroke that cannot be built from these events.
+
+### *class* cutan.impacts.stroke.StrokeKinematics(index, kind, t_impact, t_peak_speed, peak_speed, apex, fall, brake)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+How the object moved into one impact.
+
+`t_peak_speed` equals `t_impact` for a surface impact and precedes it by
+`brake` for an air impact; `peak_speed` is in stroke heights per second
+(multiply by the object’s stroke extent for pixels or radians).
+
+### *class* cutan.impacts.stroke.StrokeSegment(t0, t1, h0, h1, easing)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+`h` goes from `h0` to `h1` over `[t0, t1]` under `easing`.
+
+### cutan.impacts.stroke.build_stroke(events, , kind='surface', duration, rise=0.18, fall=0.18, brake=0.03, rest_height=1.0)
+
+Chain rise / hold / fall segments through every executed impact.
+
+The object starts and ends at `rest_height`; before impact `k` it is
+raised to `events[k].amplitude` (a bigger preparation, a harder hit).
+Segments tile `[0, duration]` exactly, and every impact is a segment
+boundary at precisely `t_impact`.
+
+* **Return type:**
+  [`Stroke`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.Stroke)
+
+
+# _autosummary/cutan.impacts.truth.html.md
+
+# cutan.impacts.truth
+
+Ground truth: what was intended, what was executed, and what each frame shows.
+
+Every position here comes from one of two sources, and they are checked against
+each other at every instant the renderer captures:
+
+- **the compiled document**, evaluated by `an.stage.timeline` — the
+  executable spec of the JS runtime (parity-tested under node) — and projected
+  to canvas pixels by `screen_position`. The per-frame keypoints come from
+  here, at exactly the instants the renderer captured;
+- **the analytic stroke** ([`cutan.impacts.stroke.Stroke`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.Stroke)), mapped through
+  the object’s affine channels. The dense trajectory comes from here, because
+  it is exact at any instant and cheap.
+
+A frame with an open shutter is the AVERAGE of its sample instants, so what it
+shows is the average of the keypoint’s positions over them — not the position
+at mid-exposure. The two differ most exactly where estimators are scored: a
+surface contact is a V in position, and its average sits above contact (by
+~6 px at 30 fps and a 180-degree shutter). So each frame records both, and the
+observation stream carries the average.
+
+[`ground_truth()`](_autosummary/cutan.impacts.truth.html.md#cutan.impacts.truth.ground_truth) refuses ([`TruthMismatch`](_autosummary/cutan.impacts.truth.html.md#cutan.impacts.truth.TruthMismatch)) if the two sources
+disagree at any sample instant, or if the compiled document does not put the
+object at contact at every executed impact; `write_impact_clip` additionally
+refuses if the document the renderer staged is not the one the truth was read
+from. A sidecar that could silently drift from its video would be worse than
+none.
+
+\*\*The `truth.json` schema\*\* (`schema: "cutan.impacts/truth"`, version
+[`TRUTH_SCHEMA_VERSION`](_autosummary/cutan.impacts.truth.html.md#cutan.impacts.truth.TRUTH_SCHEMA_VERSION); every time is scene seconds, every position canvas
+pixels with the origin at the top-left and `y` down; objects are a LIST so a
+clip with two can be described without changing any reader):
+
+- `generator` — `{package, version, module}`.
+- `spec` — the [`cutan.impacts.clip.ImpactClipSpec`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec), verbatim;
+  `ImpactClipSpec.from_dict(truth["spec"])` regenerates the clip (byte for
+  byte under the same `an` version).
+- `clock` — the resolved [`an.frame_clock.FrameClock`](_autosummary/cutan.impacts.html.md#cutan.impacts.FrameClock).
+- `tempo` — `{points: [[beat, bpm], ...]}`, piecewise-linear in beats.
+- `clip` — `{duration, fps, width, height, frame_count, rendered, files}`.
+- `objects` — one entry per striking object: `{name, keypoints: [names],
+  impact_keypoint, params, surface_xy (top-centre of the surface, or null),
+  stroke: {kind, segments: [{t0, t1, h0, h1, easing}], channels: [{target,
+  property, contact_value, stroke_extent}]}}`. `h` is exact and
+  continuous; each channel’s value is `contact_value - stroke_extent * h`.
+- `events` — one per impact:
+  - `object` (a name from `objects`), `index`, `beat`, `amplitude`;
+  - `t_grid` — INTENDED time (the tempo grid);
+  - `t_impact` — EXECUTED time, continuous; `offset = t_impact - t_grid`;
+  - `kind` — `surface` (contact; velocity reverses at `t_impact`) or
+    `air` (turning point; velocity is zero at `t_impact`);
+  - `t_peak_speed` (`= t_impact` for surface, `t_impact - brake` for
+    air), `peak_speed` (stroke heights/s), `peak_speed_px` (the impact
+    keypoint’s px/s), `fall`, `brake` (seconds);
+  - `impact_xy` — the impact keypoint at `t_impact`;
+  - `frames` — what the frames show: `before` (last frame whose exposure
+    closed at or before the impact), `after` (first to open at or after it),
+    `during` (the frame whose exposure contains it, else `null`),
+    `nearest` (+ `nearest_error`, by exposure midpoint), and `lowest` —
+    the frame a naive “lowest point” detector picks, by the stroke height the
+    frame SHOWS (averaged over its samples) — with `lowest_h`,
+    `lowest_t_reported` and `lowest_error` (its reported time minus
+    `t_impact`: the frame-snapped baseline’s error).
+- `frames` — one per video frame: `index`, `t_nominal` (`index / fps`,
+  what the mp4 says), `t_open`, `t_close`, `t_mid`, `samples` (the
+  instants rendered and averaged), `t_reported` (what `keypoints.ndjson`
+  carries as `t`), `keypoints` (`{object: {name: [x, y]}}`, averaged
+  over the samples — what the frame shows) and `keypoints_mid` (at
+  `t_mid`; equal to `keypoints` when the shutter is instantaneous).
+
+`keypoints.ndjson` is one line per frame,
+`{"tick", "t", "value": {"width", "height", "keypoints": [{"object", "name",
+"x", "y"}]}}` — observations only (the frame’s `keypoints`, at its reported
+time). `trajectory.csv` is `t, h, <object>.<kp>_x, <object>.<kp>_y, ...` at
+`spec.trajectory_hz`.
+
+### Module Attributes
+
+| [`TRUTH_SCHEMA_VERSION`](_autosummary/cutan.impacts.truth.html.md#cutan.impacts.truth.TRUTH_SCHEMA_VERSION)   | Bumped on any change a reader must know about; additive fields bump MINOR.   |
+|-------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| [`KEYPOINT_TOLERANCE_PX`](_autosummary/cutan.impacts.truth.html.md#cutan.impacts.truth.KEYPOINT_TOLERANCE_PX)  | The analytic and compiled keypoints must agree to this many pixels.          |
+
+### Functions
+
+| [`ground_truth`](_autosummary/cutan.impacts.truth.html.md#cutan.impacts.truth.ground_truth)(\*, scene, obj, stroke, events, ...)   | The truth document for one clip (see the module docstring for its schema).   |
+|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| [`keypoint_lines`](_autosummary/cutan.impacts.truth.html.md#cutan.impacts.truth.keypoint_lines)(truth, \*[, digits])                 | One observation per frame, in thoremin's recorder shape.                     |
+| [`trajectory_rows`](_autosummary/cutan.impacts.truth.html.md#cutan.impacts.truth.trajectory_rows)(\*, scene, obj, stroke, hz[, ...])  | The dense continuous trajectory: a header row, then one row per `1/hz` s.    |
+
+### Exceptions
+
+| [`TruthMismatch`](_autosummary/cutan.impacts.truth.html.md#cutan.impacts.truth.TruthMismatch)   | The ground truth and the thing it describes disagree.   |
+|------------------------------------------------------------------|---------------------------------------------------------|
+
+### cutan.impacts.truth.KEYPOINT_TOLERANCE_PX *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 1e-06*
+
+The analytic and compiled keypoints must agree to this many pixels. Both are
+double-precision evaluations of the same easing, so any real disagreement is
+orders of magnitude larger.
+
+### cutan.impacts.truth.TRUTH_SCHEMA_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '1.0.0'*
+
+Bumped on any change a reader must know about; additive fields bump MINOR.
+
+### *exception* cutan.impacts.truth.TruthMismatch
+
+Bases: [`RuntimeError`](https://docs.python.org/3/builtins/exceptions.html#RuntimeError)
+
+The ground truth and the thing it describes disagree.
+
+### cutan.impacts.truth.ground_truth(, scene, obj, stroke, events, frames, header)
+
+The truth document for one clip (see the module docstring for its schema).
+
+`header` is merged in first (spec, clock, tempo, clip, generator); this
+function owns `objects`, `events` and `frames`.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### cutan.impacts.truth.keypoint_lines(truth, , digits=4)
+
+One observation per frame, in thoremin’s recorder shape.
+
+`{"tick", "t", "value": {"width", "height", "keypoints": [{"object",
+"name", "x", "y"}]}}` — `t` is the frame’s REPORTED timestamp and the
+points are what the frame shows; nothing else from the truth leaks in.
+
+* **Return type:**
+  [`Iterator`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
+
+### cutan.impacts.truth.trajectory_rows(, scene, obj, stroke, hz, digits=6)
+
+The dense continuous trajectory: a header row, then one row per `1/hz` s.
+
+* **Return type:**
+  [`Iterator`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator)[[`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
+
+
+# _autosummary/cutan.library.html.md
+
+# cutan.library
+
+The character analyser: legs, arms, views and mouth chart, derived from the rig.
+
+The first analyser (ADR 0005 first slice, item 2), shared with ADR 0002’s first
+slice: P7’s capability registry adopts [`character_affordances()`](_autosummary/cutan.library.html.md#cutan.library.character_affordances) as
+`affordances(asset)` for characters instead of deriving a second time.
+
+**What it reads is what the compiler reads**, or the facets would lie (ADR 0005,
+Risks): the limb pairs `walk` resolves (`an.motion.WALK_LEG_NAMES`,
+`an.motion.WALK_ARM_NAMES`), the `view` and `viseme` swap sets
+(`asset_sets`), the declared facts `rest_view`,
+`face_overlay` and `occluded`. And **art must be present**: a slot or swap key counts only
+when an attachment it names has its file among the asset’s files — a descriptor
+promising a side view whose drawing is missing does not afford one.
+
+It is genre code (cut-out characters). It lives here until the genre package
+exists (plan P8) and imports the cut-out modules lazily so `import an.library`
+stays free of them. **Importing it registers nothing** (P7): the cut-out genre
+declares [`CHARACTER_CAPABILITIES`](_autosummary/cutan.library.html.md#cutan.library.CHARACTER_CAPABILITIES) and [`CHARACTER_ANALYSER`](_autosummary/cutan.library.html.md#cutan.library.CHARACTER_ANALYSER) in its
+`capabilities` and `analysers` fields (`cutan.genre.CUTOUT`), so
+they register with the genre, owned by it, and come out with it.
+
+| capability   | afforded when                                                                                           | `keys`                                 |
+|--------------|---------------------------------------------------------------------------------------------------------|----------------------------------------|
+| `limbs.legs` | a leg pair `walk` resolves, both with art                                                               | —                                      |
+| `limbs.arms` | an arm pair `walk` resolves, both with art                                                              | —                                      |
+| `swap.view`  | always: the rest view, plus every `view` key with<br/>art (`swappable`: whether it can turn at all)     | the views it can show                  |
+| `face.mouth` | an overlay face (`face_overlay`) whose `viseme`<br/>set has drawings                                    | the chart (`rhubarb9`<br/>or `custom`) |
+| `face.brows` | an overlay face whose two brow slots have art, with<br/>nothing recorded over them (`occluded`, an#252) | —                                      |
+
+### Module Attributes
+
+| [`CHARACTER_ANALYSER_VERSION`](_autosummary/cutan.library.html.md#cutan.library.CHARACTER_ANALYSER_VERSION)   | Bump when the derivation can answer differently for the same input.              |
+|-------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| [`MOUTH_CHART_RHUBARB`](_autosummary/cutan.library.html.md#cutan.library.MOUTH_CHART_RHUBARB)          | The chart name of the nine Rhubarb mouth shapes (A–H, X) — `an`'s default.       |
+| [`CHARACTER_CAPABILITIES`](_autosummary/cutan.library.html.md#cutan.library.CHARACTER_CAPABILITIES)       | The capabilities the character analyser derives (declared by the cut-out genre). |
+| [`CHARACTER_ANALYSER`](_autosummary/cutan.library.html.md#cutan.library.CHARACTER_ANALYSER)           | The character analyser (declared by the cut-out genre, registered with it).      |
+
+### Functions
+
+| [`character_affordances`](_autosummary/cutan.library.html.md#cutan.library.character_affordances)(doc, art)   | The capabilities a character descriptor and its art afford.                      |
+|------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| [`renders_as_placeholder`](_autosummary/cutan.library.html.md#cutan.library.renders_as_placeholder)(doc)       | Whether the compiler would draw this character only as its placeholder stand-in. |
+
+### cutan.library.CHARACTER_ANALYSER *: Analyser* *= Analyser(kind='character', version='0.2.0', subject='asset', declares=('rest_view', 'face_overlay', 'gait', 'speech', 'occluded'))*
+
+The character analyser (declared by the cut-out genre, registered with it).
+
+### cutan.library.CHARACTER_ANALYSER_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '0.2.0'*
+
+Bump when the derivation can answer differently for the same input.
+0.2.0: `face.brows` (an#252).
+
+### cutan.library.CHARACTER_CAPABILITIES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Capability, ...]* *= (Capability(name='limbs.legs', description='a pair of leg slots with art that a legged walk swings', remedy='add two leg slots named leg_l/leg_r (or left_leg/right_leg) with their art, pivoted at the hip; \`an character new\` builds them (an-art-package skill)', subject='asset', command=None, version='1'), Capability(name='limbs.arms', description='a pair of arm slots with art that a walk swings and gestures move', remedy='add two arm slots named arm_l/arm_r (or left_arm/right_arm) with their art, pivoted at the shoulder (an-art-package skill)', subject='asset', command=None, version='1'), Capability(name='swap.view', description='the turnaround views the character can show (keys); swappable=true when a \`view\` swap set lets it turn', remedy='add turnaround art and list it in the \`view\` swap set: \`an character add-views <dir>\` for an offline character, else draw the views', subject='asset', command='an character add-views', version='1'), Capability(name='face.mouth', description='an overlay mouth with a viseme chart that lip-sync drives (keys: the chart)', remedy="give the character an overlay mouth: a \`mouth\` slot with the viseme set's drawings (\`an character mouths <dir>\` writes the default nine) and face_overlay: true — a face baked into the head art cannot lip-sync", subject='asset', command='an character mouths', version='1'), Capability(name='face.brows', description='two brows on an overlay face that an expression raises, lowers and angles, with nothing recorded over their acting range (slots: the brow slots)', remedy="give the overlay face two brow slots (left_brow/right_brow) with their art, and keep hats off the brows' acting range: a factory hat that cannot sit above them is recorded in character.json's \`occluded\` — \`an character new\` with a larger --head-scale, another --hat or --hat none; for drawn art, redraw the cover above the brows and remove its \`occluded\` entry", subject='asset', command=None, version='1'))*
+
+The capabilities the character analyser derives (declared by the cut-out genre).
+
+### cutan.library.MOUTH_CHART_RHUBARB *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'rhubarb9'*
+
+The chart name of the nine Rhubarb mouth shapes (A–H, X) — `an`’s default.
+
+### cutan.library.character_affordances(doc, art)
+
+The capabilities a character descriptor and its art afford.
+
+doc: the character descriptor document (any schema version; migrated first)
+art: the files present, `{relative path: ContentRef JSON}` (`parts/head.svg`, …)
+
+Gait is deliberately not here: which walk methods apply is the capability
+matcher’s answer (`applicable("locomotion", asset)`, ADR 0002), derived from
+`limbs.legs`, not a second fact about the asset.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
+
+```pycon
+>>> from cutan.characters.schema import CharacterDescriptor
+>>> doc = CharacterDescriptor(name="blob").model_dump(mode="json")
+>>> sorted(character_affordances(doc, art={}))   # a descriptor with no art
+['swap.view']
+```
+
+### cutan.library.renders_as_placeholder(doc)
+
+Whether the compiler would draw this character only as its placeholder stand-in.
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+```pycon
+>>> renders_as_placeholder({"name": "alice"}), renders_as_placeholder({"parts": ["head"]})
+(True, False)
+```
+
+
+# _autosummary/cutan.runtime.html.md
+
+# cutan.runtime
+
+JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).
+
+
+# _autosummary/cutan.verify.html.md
+
+# cutan.verify
+
+The cut-out style lint: measures a render against a named style spec.
+
+### Modules
+
+| [`style`](_autosummary/cutan.verify.style.html.md#module-cutan.verify.style)   | Style lint: measure a render's cadence, cut rate and palette, and compare them to a style's targets.   |
+|------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+
+
+# _autosummary/cutan.verify.style.html.md
+
+# cutan.verify.style
+
+Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
+
+“Make it in the style of X” is only checkable if X is a set of numbers. The
+cut-out styles research (`misc/docs/cutout_styles_research.md`) measured six
+styles with one fixed set of statistics; this module is that measurement,
+ported, so an agent can render, measure the same statistics on its own output,
+and adjust. The style specs that carry the `targets` live with the downstream
+skill (`.claude/skills/cutan-style/styles/*.yaml`).
+
+\*\*The estimators are the research’s estimators, on purpose — with one
+measured exception.\*\* Every threshold below is the one the six styles were
+measured with, including the ones that are crude (a noise floor at the 10th
+percentile of frame differences, a cut as a colour-histogram jump). A better
+estimator measures a different quantity from the one the targets were
+calibrated on, and a render would then pass or miss for a reason nobody
+measured. Change an estimator only together with re-measuring the targets: the
+local-change rule (an#255) did, and the cadence targets of every style spec
+were re-measured on the six study clips with it (the table in
+`misc/docs/cutout_styles_research.md` §3). `min_changed_pixels=0` is the
+research’s original estimator, unchanged.
+
+What is measured (see [`METRICS`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.METRICS) for the vocabulary a spec’s `targets`
+may use):
+
+- **Holds and cadence.** A frame “changes” when its mean absolute grey
+  difference from the previous frame exceeds `max(0.25, 2.5 × p10)`, where
+  p10 is the clip’s own 10th-percentile difference (compression noise, capped
+  at 1.0 — see `NOISE_FLOOR_CAP`), **or** when at least
+  `MIN_CHANGED_PIXELS` of its pixels moved by more than
+  `PIXEL_CHANGE_DELTA` grey levels — a change measured on the area of
+  > the moving part, not the whole frame (an#255): a frame-wide mean cannot see
+  > a stick figure’s shrug or a blink in a close-up, whose few changed pixels
+  > average to nothing. From
+  > that: the share of frames identical to the previous one, pose changes per
+  > second, and the histogram of gaps between successive changes (one frame = on
+  > ones, two = on twos, three or more = threes and holds, gaps above 12 frames
+  > ignored as holds rather than cadence).
+- **Cuts and shot length.** For an `an` render the cuts are KNOWN — every shot
+  boundary in the IR is a hard cut, because shots are concatenated — so the
+  verifier takes them from the IR. Without an IR (any mp4), a cut is a frame
+  whose 8×8×8 colour-histogram L1 distance exceeds 0.6 and whose mean
+  difference exceeds 8; dissolves and morphs are missed, so on such footage the
+  count is a floor.
+- **Palette.** Mean HSV saturation, the share of dark pixels (every channel
+  below 60, an outline proxy), and the coverage of the 16 most common colours
+  after 4-bit quantisation (flatness), all on every 15th frame.
+
+Not ported, deliberately: the research also measured global camera motion
+(`cv2.phaseCorrelate`) and a k-means palette. Both need OpenCV or
+scikit-learn, and this module adds no dependency — numpy and the ffmpeg binary
+are already what `an.verify.media` uses.
+
+A pure function over frames — [`measure_style()`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.measure_style) — is the core, so it is
+testable without ffmpeg:
+
+```pycon
+>>> import numpy as np
+>>> still = np.zeros((4, 8, 8, 3), np.uint8)
+>>> frames = np.concatenate([still, still + 200, still + 200, still])  # 16 frames, changes at 4 and 12
+>>> m = measure_style(frames, fps=4.0, shot_durations=[4.0])
+>>> m.identical_frame_share, m.pose_changes_per_s
+(0.867, 0.5)
+```
+
+A target is a `[low, high]` range; a miss is a warning naming the knob that
+moves it:
+
+```pycon
+>>> findings = check_targets(m, {"identical_frame_share": [0.2, 0.5]})
+>>> findings[0].severity, findings[0].ir_path
+('warning', '<style>/identical_frame_share')
+>>> check_targets(m, {"identical_frame_share": [0.5, 0.9]})
+[]
+```
+
+A target nothing measures is refused, not ignored — a spec that silently checks
+less than it says is worse than one that fails to load:
+
+```pycon
+>>> check_targets(m, {"camera_shake": [0, 1]})
+Traceback (most recent call last):
+...
+ValueError: unknown style target 'camera_shake'; measurable targets are [...]
+```
+
+### Module Attributes
+
+| [`METRICS`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.METRICS)      | every key a spec's `targets` may use, and what it is.                                                |
+|---------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| [`SHOT_METRICS`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.SHOT_METRICS) | the cadence ones, which a single static shot (a date card, a held map) can swing for the whole clip. |
+
+### Functions
+
+| [`measure_style`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.measure_style)(frames, \*, fps[, ...])         | Measure the [`METRICS`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.METRICS) on `frames`, an `(n, h, w, 3)` uint8 RGB array.                      |
+|------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| [`measure_shots`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.measure_shots)(frames, \*, fps[, ...])         | Per-shot cadence ([`SHOT_METRICS`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.SHOT_METRICS)) of `frames`, one row per shot.                           |
+| [`measure_video`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.measure_video)(mp4, \*[, shot_durations, ...]) | Decode `mp4` at the research's scale and [`measure_style()`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.measure_style) it.                             |
+| [`film_shots`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.film_shots)(scene)                             | `(shot id, seconds on screen)` per shot of an `an` render, in order.                                                                      |
+| [`project_of_render`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.project_of_render)(mp4)                        | The project directory an `an` render sits in — `<project>/output/x.mp4` beside `<project>/ir/scene.json` — or `None` for any other video. |
+| [`check_targets`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.check_targets)(metrics, targets, \*[, ...])    | One `Finding` per target the metrics miss; `[]` when all hit.                                                                             |
+| [`load_style_spec`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.load_style_spec)(spec)                         | A style spec as a dict: a mapping is passed through, a path is read as YAML.                                                              |
+| [`style_lint`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.style_lint)(mp4, spec_or_targets, \*[, ...])   | Measure `mp4` and compare it to a style spec's `targets`.                                                                                 |
+
+### Classes
+
+| [`StyleMetrics`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.StyleMetrics)(fps, frames, duration_s, ...)    | The statistics [`METRICS`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.METRICS) names, measured on one clip.               |
+|------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| [`StyleLintResult`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.StyleLintResult)(metrics, report[, per_shot])  | What one lint run measured, and what it found.                                                                     |
+| [`StyleLintVerifier`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.StyleLintVerifier)(spec_or_targets, \*[, ...]) | Compare a render to a style spec's `targets`.                                                                      |
+| [`ShotMetrics`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.ShotMetrics)(shot, start_s, duration_s, ...)   | The cadence of one shot, measured with the WHOLE clip's change threshold so a shot's numbers add up to the clip's. |
+
+### cutan.verify.style.METRICS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'cuts_per_min': 'hard cuts per minute', 'dark_pixel_share': 'share of pixels with every channel below 60', 'identical_frame_share': 'share of frames identical to the previous one (holds)', 'max_hold_frames': 'longest run of identical frames', 'mean_saturation': 'mean HSV saturation, 0..1', 'mean_shot_s': 'mean shot length in seconds', 'one_frame_interval_share': 'share of change gaps of one frame (on ones)', 'pose_changes_per_s': 'changed frames per second', 'three_plus_interval_share': 'share of change gaps of three to twelve frames', 'top16_colour_coverage': 'coverage of the 16 commonest 4-bit colours (flatness)', 'two_frame_interval_share': 'share of change gaps of two frames (on twos)'}*
+
+every key a spec’s `targets` may use, and what it is.
+
+* **Type:**
+  The target vocabulary
+
+### cutan.verify.style.SHOT_METRICS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('identical_frame_share', 'pose_changes_per_s', 'one_frame_interval_share', 'two_frame_interval_share', 'three_plus_interval_share', 'max_hold_frames')*
+
+the cadence ones, which a single static shot (a date
+card, a held map) can swing for the whole clip.
+
+* **Type:**
+  The per-shot statistics
+
+### *class* cutan.verify.style.ShotMetrics(shot, start_s, duration_s, frames, identical_frame_share, pose_changes_per_s, one_frame_interval_share, two_frame_interval_share, three_plus_interval_share, max_hold_frames)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+The cadence of one shot, measured with the WHOLE clip’s change
+threshold so a shot’s numbers add up to the clip’s.
+
+### *class* cutan.verify.style.StyleLintResult(metrics, report, per_shot=<factory>)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+What one lint run measured, and what it found.
+
+`per_shot` is the cadence of each shot ([`ShotMetrics`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.ShotMetrics)) — the
+breakdown that finds which shot is holding a whole clip’s share up (a
+static date card is 90% identical frames on its own).
+
+### *class* cutan.verify.style.StyleLintVerifier(spec_or_targets, , miss_severity='warning')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Compare a render to a style spec’s `targets`. Implements `Verifier`.
+
+Shot boundaries come from the IR (every shot boundary is a cut in an `an`
+render, and a dissolve’s overlap is accounted for), so `cuts_per_min` and
+`mean_shot_s` are exact rather than detected. Pre-render
+(`render is None`) it reports `info` and passes: it has nothing to
+measure yet.
+
+### *class* cutan.verify.style.StyleMetrics(fps, frames, duration_s, identical_frame_share, pose_changes_per_s, one_frame_interval_share, two_frame_interval_share, three_plus_interval_share, max_hold_frames, cuts, cuts_per_min, mean_shot_s, mean_saturation, dark_pixel_share, top16_colour_coverage, cut_source, change_threshold)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+The statistics [`METRICS`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.METRICS) names, measured on one clip.
+
+#### cut_source *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+`"shots"` (a shot list, exact) or `"pixels"`.
+
+* **Type:**
+  Where the cuts came from
+
+### cutan.verify.style.check_targets(metrics, targets, , miss_severity='warning', live=None)
+
+One `Finding` per target the metrics miss; `[]` when all hit.
+
+`live` is the style spec’s `live` section. Given, each suggested fix
+respects it — a style that sets `step_hz` is never told to drop it, one
+that leaves it unset is never told to set it:
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Finding`]
+
+```pycon
+>>> m = measure_style(np.zeros((8, 4, 4, 3), np.uint8), fps=8.0, shot_durations=[1.0])
+>>> (f,) = check_targets(m, {"identical_frame_share": [0.5, 0.7]},
+...                      live={"meta": {"fps": 24, "step_hz": 12}})
+>>> "drop `step_hz`" in f.suggested_fix, "keep `step_hz` at the style's 12" in f.suggested_fix
+(False, True)
+```
+
+Raises `ValueError` for a target [`METRICS`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.METRICS) does not name, or a range
+that is not `[low, high]` with `low <= high`.
+
+### cutan.verify.style.film_shots(scene)
+
+`(shot id, seconds on screen)` per shot of an `an` render, in order.
+
+What the lint needs to place the cuts exactly. It is the shot durations,
+except where a dissolve overlaps two shots: the film is that much shorter
+than their sum (`an.assemble.film_timeline()`), and each shot is
+counted from where its frames start in the film.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
+```pycon
+>>> from an.ir.schema import Shot, Transition
+>>> film_shots(SceneIR(timeline=[
+...     Shot(id="a", duration=2.0),
+...     Shot(id="b", duration=2.0, transition=Transition(kind="dissolve", duration=0.5))]))
+[('a', 1.5), ('b', 2.0)]
+```
+
+### cutan.verify.style.load_style_spec(spec)
+
+A style spec as a dict: a mapping is passed through, a path is read as YAML.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### cutan.verify.style.measure_shots(frames, , fps, shot_durations=None, shot_ids=None, min_changed_pixels=8)
+
+Per-shot cadence ([`SHOT_METRICS`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.SHOT_METRICS)) of `frames`, one row per shot.
+
+The shots are `shot_durations` (seconds, in order) when given, else the
+pixel cut detector’s. The step INTO each shot is the cut, not a pose
+change, so it belongs to no shot. A one-frame shot has no step of its own
+and measures as all-identical.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ShotMetrics`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.ShotMetrics)]
+
+```pycon
+>>> import numpy as np
+>>> still = np.zeros((4, 8, 8, 3), np.uint8)
+>>> moving = np.stack([still[0] + 10 * i for i in range(4)])
+>>> rows = measure_shots(np.concatenate([still, moving]), fps=4.0,
+...                      shot_durations=[1.0, 1.0], shot_ids=["card", "map"])
+>>> [(r.shot, r.identical_frame_share) for r in rows]
+[('card', 1.0), ('map', 0.0)]
+```
+
+### cutan.verify.style.measure_style(frames, , fps, shot_durations=None, min_changed_pixels=8)
+
+Measure the [`METRICS`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.METRICS) on `frames`, an `(n, h, w, 3)` uint8 RGB array.
+
+`shot_durations` (seconds, in order) gives the cuts exactly; without it the
+pixel cut detector is used. Ratios are rounded to three decimals.
+`min_changed_pixels` is the local-change rule’s size (`0`: the research’s
+frame-wide estimator alone, which the targets were first measured with).
+
+* **Return type:**
+  [`StyleMetrics`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.StyleMetrics)
+
+```pycon
+>>> import numpy as np
+>>> f = np.zeros((6, 4, 4, 3), np.uint8)
+>>> f[1::2] = 255                       # a change on every frame
+>>> m = measure_style(f, fps=6.0, shot_durations=[1.0])
+>>> m.identical_frame_share, m.one_frame_interval_share, m.cuts
+(0.0, 1.0, 0)
+```
+
+### cutan.verify.style.measure_video(mp4, , shot_durations=None, width=320, height=180)
+
+Decode `mp4` at the research’s scale and [`measure_style()`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.measure_style) it.
+
+* **Return type:**
+  [`StyleMetrics`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.StyleMetrics)
+
+### cutan.verify.style.project_of_render(mp4)
+
+The project directory an `an` render sits in — `<project>/output/x.mp4`
+beside `<project>/ir/scene.json` — or `None` for any other video.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.verify.style.style_lint(mp4, spec_or_targets, , shot_durations=None, scene=None, miss_severity='warning')
+
+Measure `mp4` and compare it to a style spec’s `targets`.
+
+The cuts are exact when the shots are known: pass `scene` (a project
+directory, a `scene.json`, or a `SceneIR`; dissolve overlaps are
+accounted for) or `shot_durations`. Without either, cuts are detected
+from pixels, which misses a cut between two shots on the same backdrop and
+every dissolve — the lint says so in its report.
+
+Suggested fixes respect the spec’s `live` settings ([`check_targets()`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.check_targets)).
+
+A decode or probe failure is reported at
+`an.verify.vision.FAILURE_SEVERITY`, never as `info` — a lint that
+could not run must not read as a clean one. A malformed spec raises: that is
+the caller’s error, not the video’s.
+
+* **Return type:**
+  [`StyleLintResult`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.StyleLintResult)
+
 
 # about-this-build.html.md
 
@@ -120,7 +8436,7 @@ The persisted renderer name of cut-out shots (`an.stage` claims it).
 
 # About this build
 
-This documentation was built on **2026-10-01 20:26 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/a17fb7c03c316853ce30708c216a8a56c8cee7be"><code>a17fb7c</code></a> on branch <code>main</code>, for **cutan 0.0.1** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-02 04:20 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/e3091f6b22f7155755a7207071ecaf658e075279"><code>e3091f6</code></a> on branch <code>main</code>, for **cutan 0.0.1** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -129,7 +8445,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/a17fb7c03c316853ce30708c216a8a56c8cee7be"><code>a17fb7c03c316853ce30708c216a8a56c8cee7be</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/e3091f6b22f7155755a7207071ecaf658e075279"><code>e3091f6b22f7155755a7207071ecaf658e075279</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -140,9 +8456,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/36921393045">36921393045</a>     |
+| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/36963923277">36963923277</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>a17fb7c03c316853ce30708c216a8a56c8cee7be</code> (in the history of the built commit) |
+| Event commit | <code>e3091f6b22f7155755a7207071ecaf658e075279</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -173,7 +8489,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout a17fb7c03c316853ce30708c216a8a56c8cee7be
+git checkout e3091f6b22f7155755a7207071ecaf658e075279
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
@@ -190,6 +8506,52 @@ The same data, for machines: <a href="build_info.json"><code>build_info.json</co
 `cutan` ships artifacts for coding agents alongside its code. This page lists
 them, says where each lives in the repository, and points at the
 machine-readable copies of this documentation.
+
+## Skills
+
+Skills are folders holding a `SKILL.md` (the [Agent Skills](https://agentskills.io) format): a description that tells an agent when to use it and a body with the procedure. Install one into your agent with `gh skill` (any host: `--agent claude-code`, `copilot`, `cursor`, `codex`, `gemini`), or use the copy bundled in the wheel.
+
+### `cutan`
+
+Use when making a cut-out animated character video with `an`: rigged characters, faces and expressions, lip-sync, turning and facing, motion, impacts, and named cut-out styles (South Park, OverSimplified, Kurzgesagt, Gilliam, Reiniger, Norstein). Triggers on “make a character”, “an character new”, “lip-sync”, “expression”, “turn around”, “walk”, “cutout”, “in the style of”, or any scene with a `character` entity.
+
+Source: [`.claude/skills/cutan`](https://github.com/thorwhalen/cutan/tree/HEAD/.claude/skills/cutan).
+
+### `cutan-art-package`
+
+The artist-facing contract for an `an` character — folder layout, the skeleton, required parts, slot and attachment conventions, licence fields — and how to check a delivery offline before anyone is paid for it. Use when commissioning, reviewing, receiving, or authoring character art; when writing a brief for an illustrator; or when `an character validate` reports something. Triggers on “art package”, “commission a character”, “the artist delivered”, “character contract”, “brief for an illustrator”, “an character validate”, “an character contract”, “rig an SVG”, “skeleton”, “pivots”.
+
+Source: [`.claude/skills/cutan-art-package`](https://github.com/thorwhalen/cutan/tree/HEAD/.claude/skills/cutan-art-package).
+
+### `cutan-dev-expression`
+
+The facial expression vocabulary of the `an` repo — the axes and their ranges, additive-over-rest composition in the compile-time face solver, emotion × viseme by set selection, the `expression` leaf action and its dialogue sugar, gaze, baked-face refusal, and the licence boundary. Load before touching `cutan/expression/`, `_add_face_clips`, the `viseme@<preset>` sets, presets, `Dialogue.emotion`, brows, eyelids, pupils, or any demo/corpus scene that authors a face. Triggers on “expression”, “emotion”, “preset”, “gaze”, “saccade”, “brow”, “eyelid”, “pupil”, “face solver”, “blendshape”.
+
+Source: [`.claude/skills/cutan-dev-expression`](https://github.com/thorwhalen/cutan/tree/HEAD/.claude/skills/cutan-dev-expression).
+
+### `cutan-dev-lipsync`
+
+Lip sync in the `an` repo — where co-articulation sits (in the compiler, over the provider’s raw track), the pass order (symbolic → lead → decay → a minimum hold that votes by dominance), the condenser that HOLDS and votes instead of dropping, the Rhubarb recognizer rule, word-timing retention and its cache rule, the alignment-model licence trap, and the two standing measurements. Load before touching `an/audio/*lipsync*`, `an/audio/pipeline.py`, `_add_viseme_clips`, `_LEGACY_MIN_VISEME_GAP_S`, `an/adapters/cutout/coarticulate.py`, any viseme test, or a dialogue corpus scene. Triggers on “lip sync”, “viseme”, “Rhubarb”, “whisper”, “word timings”, “co-articulation”, “condenser”, “aligner”.
+
+Source: [`.claude/skills/cutan-dev-lipsync`](https://github.com/thorwhalen/cutan/tree/HEAD/.claude/skills/cutan-dev-lipsync).
+
+### `cutan-dev-rig-contract`
+
+How a character descriptor becomes a scene tree in the `an` repo — which fields are load-bearing, which are declared and dead, and the invariants that broke when they were ignored. Use when touching `_build_svg_character_subtree`, `cutan/characters/schema.py`, `extract_part`/`promote`, the descriptor→scene mapping, part sizing or placement, `viseme_map`/`asset_sets`, the character migration, or anything that decides what an illustrator’s art does on screen. Triggers on “the art doesn’t change anything”, “part is stretched”, “aspect ratio”, “bones”, “slots”, “skins”, “attachment”, “view_box”, “descriptor”, “rig”, “missing part”, “white rectangle”, “an character validate”.
+
+Source: [`.claude/skills/cutan-dev-rig-contract`](https://github.com/thorwhalen/cutan/tree/HEAD/.claude/skills/cutan-dev-rig-contract).
+
+### `cutan-dev-swap-channels`
+
+How swap channels work in the `an` repo — the one generic replacement-animation mechanism (an#87) that viseme, eyelid, hands, body_facing, view and every future set ride, plus whole-character swaps and `swap_poses` (an#197). Use when touching `asset_sets`, the per-slot projection in `compile.py`, `applySwap`/`applyProperty` in `runtime.js`, `VisualJSON.asset_sets`, swap validation, texture aliases, or when adding a new swap set or authoring swaps from scene.md. Triggers on “swap channel”, “asset set”, “attachment swap”, “texture swap”, “viseme special case”, “the mouth doesn’t change”, “unknown swap key”, “add a hands set”, “turnaround”, “body_facing”, “eyelid”.
+
+Source: [`.claude/skills/cutan-dev-swap-channels`](https://github.com/thorwhalen/cutan/tree/HEAD/.claude/skills/cutan-dev-swap-channels).
+
+### `cutan-style`
+
+Use when the user wants a script or scene made “in the style of” a named cut-out animation look — South Park, OverSimplified, Kurzgesagt, Terry Gilliam / Monty Python, Lotte Reiniger silhouettes, Yuri Norstein / Hedgehog in the Fog — or asks what a style needs, how expensive it is, or whether a render looks like the style. Triggers on “in the style of”, “make it look like South Park”, “OverSimplified-style”, “Kurzgesagt look”, “silhouette film”, “Monty Python cut-outs”, “does this match the style”, “style lint”. Applies a style spec to an `an` scene, renders, measures the render against the spec’s targets, and adjusts.
+
+Source: [`.claude/skills/cutan-style`](https://github.com/thorwhalen/cutan/tree/HEAD/.claude/skills/cutan-style).
 
 ## Instruction files
 

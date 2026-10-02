@@ -1,0 +1,23 @@
+cutan.characters.checks
+=======================
+
+.. automodule:: cutan.characters.checks
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      check_character_refs
+      check_expression_actions
+      check_hidden_mouth_while_speaking
+      check_play_actions
+      check_turns
+      check_view_continuity
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CharacterSwapChecks
+   

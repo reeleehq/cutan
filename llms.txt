@@ -8,8 +8,59 @@
 - [cutan](index.html.md): Cut-out animation for &#96;an&#96;: rigged characters, faces and expressions, lip-sync, swap sets and views,...
 - [API reference](api.html.md): | &#96;cutan&#96;   | cutan: cut-out animation, as a genre package on the &#96;an&#96; core.   |
 - [cutan](_autosummary/cutan.html.md): cutan: cut-out animation, as a genre package on the &#96;an&#96; core.
+- [cutan.audio](_autosummary/cutan.audio.html.md): The cut-out genre’s lip-sync providers: letters, Rhubarb and word timings to mouth shapes.
+- [cutan.audio.injectable_lipsync](_autosummary/cutan.audio.injectable_lipsync.html.md): Lip-sync provider that consumes pre-computed word timings.
+- [cutan.audio.offline_lipsync](_autosummary/cutan.audio.offline_lipsync.html.md): OfflineLipSync — deterministic transcript → viseme track. No network, no binary.
+- [cutan.audio.rhubarb_lipsync](_autosummary/cutan.audio.rhubarb_lipsync.html.md): RhubarbLipSync — calls the rhubarb-lip-sync binary for phoneme-aligned visemes.
+- [cutan.audio.whisper_lipsync](_autosummary/cutan.audio.whisper_lipsync.html.md): WhisperLipSync — faster-whisper word timestamps → viseme keyframes.
+- [cutan.bench](_autosummary/cutan.bench.html.md): The cut-out genre’s bench corpus: eight scenes that use characters, and their goldens.
+- [cutan.characters](_autosummary/cutan.characters.html.md): Character art system: Spine-shaped descriptor + SVG sidecars.
+- [cutan.characters.brows](_autosummary/cutan.characters.brows.html.md): Brow acting: where the brows can go, what may not draw there, and the &#96;face.brows&#96; capability.
+- [cutan.characters.checks](_autosummary/cutan.characters.checks.html.md): The cut-out genre’s semantic checks: &#96;play&#96;, &#96;expression&#96;, turns, views and character refs.
+- [cutan.characters.cli](_autosummary/cutan.characters.cli.html.md): User-facing character CLI subcommands.
+- [cutan.characters.colour_roles](_autosummary/cutan.characters.colour_roles.html.md): Colour roles: which colour literal in which part is skin, clothing, hair…
+- [cutan.characters.dicebear](_autosummary/cutan.characters.dicebear.html.md): DiceBear HTTP API client + best-effort post-processing.
+- [cutan.characters.drawn](_autosummary/cutan.characters.drawn.html.md): What the character factory wrote, as it wrote it: the in-memory log behind its record of drawn bytes...
+- [cutan.characters.factory](_autosummary/cutan.characters.factory.html.md): High-level entry points: build and inspect a character.
+- [cutan.characters.idle](_autosummary/cutan.characters.idle.html.md): Idle animation factories: breath, blink, weight-shift.
+- [cutan.characters.licenses](_autosummary/cutan.characters.licenses.html.md): DiceBear per-style licences, as data.
+- [cutan.characters.methods](_autosummary/cutan.characters.methods.html.md): The cut-out genre’s methods and aspects, and their compile-time resolution (ADR 0002).
+- [cutan.characters.mouth_set](_autosummary/cutan.characters.mouth_set.html.md): Generate the 9-shape default mouth set as parametric SVGs.
+- [cutan.characters.play](_autosummary/cutan.characters.play.html.md): Resolve a &#96;play&#96; against a character descriptor — the renderer-free half (an#7).
+- [cutan.characters.record](_autosummary/cutan.characters.record.html.md): Record a character’s preview HTML to an mp4.
+- [cutan.characters.registration](_autosummary/cutan.characters.registration.html.md): The character side of the cut-out genre, as declarations: &#96;play&#96; and &#96;character&#96;.
+- [cutan.characters.schema](_autosummary/cutan.characters.schema.html.md): Character descriptor schema (Spine-shaped, Pydantic v2).
+- [cutan.characters.silhouette](_autosummary/cutan.characters.silhouette.html.md): Silhouette rendering and comparison for the silhouette test.
+- [cutan.characters.svg_utils](_autosummary/cutan.characters.svg_utils.html.md): SVG manipulation: namespace-aware DOM helpers using stdlib &#96;xml.etree&#96;.
+- [cutan.characters.validate](_autosummary/cutan.characters.validate.html.md): Whether an art package is one the compiler can actually render.
+- [cutan.characters.vocabulary](_autosummary/cutan.characters.vocabulary.html.md): The cut-out genre’s vocabulary entries: motion presets, expression presets, IR-field notes.
+- [cutan.compile](_autosummary/cutan.compile.html.md): The cut-out genre’s compile passes, their lowering hooks and the visuals of its runtime.
+- [cutan.compile.coarticulate](_autosummary/cutan.compile.coarticulate.html.md): Co-articulation for a swap mouth: the passes between a provider’s raw viseme
+- [cutan.compile.gaze](_autosummary/cutan.compile.gaze.html.md): Ambient saccades for a cutout rig’s pupils: a seeded generator (an#99, epic #9 Wave 6).
+- [cutan.compile.lowering](_autosummary/cutan.compile.lowering.html.md): How the stage compiler lowers the cut-out genre’s actions, and reads a character’s swap sets.
+- [cutan.compile.passes](_autosummary/cutan.compile.passes.html.md): The cut-out passes over the stage compiler, and the helpers only they use.
+- [cutan.conftest](_autosummary/cutan.conftest.html.md): Doctest collection for &#96;cutan&#96;: &#96;nw&#96; is an optional dependency of &#96;cutan.nw&#96; only.
+- [cutan.expression](_autosummary/cutan.expression.html.md): Facial expression for the cutout face (an#98, epic #9 Wave 6).
+- [cutan.expression.axes](_autosummary/cutan.expression.axes.html.md): The facial expression axes: what a cutout face can be asked to do (an#98).
+- [cutan.expression.binding](_autosummary/cutan.expression.binding.html.md): How the axes reach a character: the binding and the mouth-set resolver (an#98).
+- [cutan.expression.blendshapes](_autosummary/cutan.expression.blendshapes.html.md): The 52-coefficient blendshape vocabulary, as an import/export mapping (an#98).
+- [cutan.expression.presets](_autosummary/cutan.expression.presets.html.md): Expression presets: our art direction on the axes (an#98).
+- [cutan.expression.provider](_autosummary/cutan.expression.provider.html.md): The expression provider: authored leaves + dialogue sugar → per-axis curves (an#98).
+- [cutan.expression.registration](_autosummary/cutan.expression.registration.html.md): The face side of the cut-out genre, as declarations: &#96;expression&#96; and &#96;&#91;emotion&#93;&#96;.
+- [cutan.genre](_autosummary/cutan.genre.html.md): The cut-out animation genre, declared as one object.
+- [cutan.impacts](_autosummary/cutan.impacts.html.md): Synthetic impact clips with exact ground truth, for scoring sub-frame timing.
+- [cutan.impacts.cli](_autosummary/cutan.impacts.cli.html.md): &#96;an impacts ...&#96; — the impact harness from the shell.
+- [cutan.impacts.clip](_autosummary/cutan.impacts.clip.html.md): One impact clip, end to end: spec -&gt; scene -&gt; ground truth -&gt; (video) -&gt; files.
+- [cutan.impacts.objects](_autosummary/cutan.impacts.objects.html.md): The things that strike: a stick and a ball, as ordinary &#96;an&#96; props.
+- [cutan.impacts.performance](_autosummary/cutan.impacts.performance.html.md): The performance: a tempo grid, and when each impact was intended and executed.
+- [cutan.impacts.stroke](_autosummary/cutan.impacts.stroke.html.md): The stroke: impact events -&gt; one continuous height curve &#96;h(t)&#96;.
+- [cutan.impacts.truth](_autosummary/cutan.impacts.truth.html.md): Ground truth: what was intended, what was executed, and what each frame shows.
+- [cutan.library](_autosummary/cutan.library.html.md): The character analyser: legs, arms, views and mouth chart, derived from the rig.
+- [cutan.runtime](_autosummary/cutan.runtime.html.md): JavaScript the cut-out genre adds to the stage runtime (&#96;visuals.js&#96;: the mouth and eye).
+- [cutan.verify](_autosummary/cutan.verify.html.md): The cut-out style lint: measures a render against a named style spec.
+- [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-01 20:26 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-02 04:20 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
 ## Optional
 

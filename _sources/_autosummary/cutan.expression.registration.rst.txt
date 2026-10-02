@@ -1,0 +1,30 @@
+cutan.expression.registration
+=============================
+
+.. automodule:: cutan.expression.registration
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DFLT_EXPRESSION_BLEND_S
+      EMOTION_NAME_RE
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      expression
+      expression_duration
+      format_emotion
+      parse_emotion
+      read_expression_md
+      write_expression_md
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ExpressionAction
+   
