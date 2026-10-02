@@ -1,0 +1,82 @@
+# The rendering lane of cutan: the tests and goldens that need a headless browser
+# and ffmpeg (the pixel gate of the cut-out corpus: misc/bench/golden/).
+#
+# Like `an`'s own lane (an#22) it runs on demand, not on every push: dispatch it,
+# or put the `run-browser-tests` label on a PR. NOT `gh pr edit --add-label` (it
+# exits 0 and applies nothing); use
+#
+#     gh api -X POST repos/thorwhalen/cutan/issues/<N>/labels -f 'labels[]=run-browser-tests'
+#
+# ADD THE LABEL when a PR can change a pixel: the compile passes, the lowering,
+# the rig, the mouth/eye visuals script, lip-sync or expression solving.
+#
+# `an` comes from its main branch, not PyPI: a seam cutan needs may be on main before it is released.
+
+name: Rendering tests (browser)
+
+on:
+  workflow_dispatch:
+    inputs:
+      python-version:
+        description: "Python version to run the rendering lane on"
+        required: false
+        default: "3.12"
+  pull_request:
+    types: [labeled, synchronize, reopened]
+
+concurrency:
+  group: browser-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    name: Rendering lane (Linux)
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'run-browser-tests')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Install cutan, then the an it needs
+        run: |
+          uv python install ${{ inputs.python-version || '3.12' }}
+          uv venv --python ${{ inputs.python-version || '3.12' }}
+          uv pip install -e '.[dev]'
+          uv pip install --no-deps --reinstall 'an @ git+https://github.com/thorwhalen/an@main'
+
+      - name: Resolve the pinned Chromium build
+        id: pw
+        run: |
+          source .venv/bin/activate
+          echo "version=$(python -c 'import importlib.metadata as m; print(m.version("playwright"))')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache the Playwright browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ms-playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+
+      - name: Install Chromium
+        run: |
+          source .venv/bin/activate
+          playwright install --with-deps chromium
+
+      - name: Install ffmpeg
+        run: |
+          command -v ffmpeg >/dev/null 2>&1 && { ffmpeg -version | head -1; exit 0; }
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+
+      - name: Rendering tests
+        env:
+          AN_BROWSER_TESTS: "1"
+        run: |
+          source .venv/bin/activate
+          python -m pytest -q -p no:cacheprovider -m "browser or ffmpeg" --durations=30

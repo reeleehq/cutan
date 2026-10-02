@@ -7,10 +7,12 @@ leave ``an``: rigged characters, faces and expressions, lip-sync visemes, swap
 sets and views, cut-out styles and impacts (ADR 0001 in ``an``'s
 ``misc/docs/adr/``, tracked by an#225 under the epic an#231).
 
-**Status: scaffold.** The cut-out code still lives inside ``an`` and is
-moved here in batches, expand -> migrate -> contract: each module arrives here,
-``an`` keeps a deprecation re-export for one release, then drops it. Until the
-genre object itself moves, ``an`` ships it and this package registers nothing.
+Rigged characters (``cutan.characters``), faces (``cutan.expression``), impacts
+(``cutan.impacts``), the cut-out compile passes (``cutan.compile``), lip-sync
+providers (``cutan.audio``), the style lint (``cutan.verify``) and the genre object
+(``cutan.genre``) lived inside ``an`` until the P8 move (an#225); ``an`` keeps
+warning aliases at the old import paths. Install it with ``pip install "an[cutout]"``;
+``an`` finds it through the ``an.genres`` entry point.
 
 The identifiers below are the genre's **persisted** names (ADR 0001 decision 9):
 they are written into documents, stores and entry-point metadata, and none of
@@ -30,13 +32,11 @@ GENRE_NAME: str = "cutout_animation"
 #: The entry-point group ``an.genres.load()`` reads.
 ENTRY_POINT_GROUP: str = "an.genres"
 
-#: The entry-point name this distribution will declare: the SAME name ``an``
-#: declares today, so the handover is by name. ``an.genres`` de-duplicates by
-#: entry-point name with ``an``'s in-distribution declaration first, so while
-#: ``an`` still ships the genre, a declaration here is shadowed, never doubled.
+#: The entry-point name this distribution declares (``pyproject.toml``): the name
+#: ``an`` used to declare for the in-distribution genre, so the handover was by name.
 ENTRY_POINT_NAME: str = GENRE_NAME
 
-#: Where the entry point will point once the genre object lives here.
+#: Where the entry point points.
 ENTRY_POINT_VALUE: str = "cutan.genre:CUTOUT"
 
 #: The persisted renderer name of cut-out shots (``an.stage`` claims it).
@@ -46,11 +46,35 @@ RENDERER_NAME: str = "cutout"
 #: (``~/.local/share/cutan`` by default; ``CUTAN_HOME`` overrides it).
 LIBRARY_NAME: str = "cutan"
 
+#: The lowest ``an.genres.API_LEVEL`` this ``cutan`` runs against ("the lowest ``an``
+#: it supports", ADR 0001 decision 8, said without a version pin: ``an``'s version is
+#: assigned by CI at merge). Level 2 is the move itself: ``Genre.services``,
+#: ``ActionKind.lowering``, ``EntityKind.swap_declaration`` and ``an.stage.rig``.
+REQUIRED_AN_API_LEVEL: int = 2
+
+
+def require_an() -> None:
+    """Refuse, with an upgrade hint, to load against an ``an`` older than this ``cutan`` needs.
+
+    >>> require_an()
+    """
+    import an.genres
+
+    level = getattr(an.genres, "API_LEVEL", 0)
+    if level < REQUIRED_AN_API_LEVEL:
+        raise ImportError(
+            f"cutan needs an.genres API level {REQUIRED_AN_API_LEVEL} or higher; this an "
+            f"provides {level}. Upgrade an: pip install -U an"
+        )
+
+
 __all__ = [
     "ENTRY_POINT_GROUP",
     "ENTRY_POINT_NAME",
     "ENTRY_POINT_VALUE",
     "GENRE_NAME",
     "LIBRARY_NAME",
+    "REQUIRED_AN_API_LEVEL",
     "RENDERER_NAME",
+    "require_an",
 ]

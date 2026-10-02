@@ -22,25 +22,24 @@ authors = [
     { name = "Thor Whalen" },
 ]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
     "Topic :: Multimedia :: Graphics",
 ]
 # `an` is the core this genre registers with (ADR 0001). Unversioned, per the
-# local-package convention; the lowest `an` cutan supports is declared here
-# when the first module moves.
+# local-package convention; the lowest `an` cutan supports is its API level
+# (`cutan.REQUIRED_AN_API_LEVEL`, checked at import).
 dependencies = [
     "an",
+    "pyyaml",
+    "numpy",
+    "pillow",
 ]
 
-# RESERVED, not declared yet (an#225). The genre object still ships inside
-# `an`, which declares it under this same name; the batch that moves `CUTOUT`
-# here uncomments this table and drops `an`'s line in the same coordinated
-# release. `an.genres` de-duplicates by entry-point name, `an`'s own first.
-# tests/test_scaffold.py fails if this is declared before then.
-#
-# [project.entry-points."an.genres"]
-# cutout_animation = "cutan.genre:CUTOUT"
+# The genre `an.genres.load()` registers. Same name `an` itself declared before the
+# move, so the handover was by name.
+[project.entry-points."an.genres"]
+cutout_animation = "cutan.genre:CUTOUT"
 
 [project.urls]
 Homepage = "https://github.com/thorwhalen/cutan"
@@ -49,6 +48,7 @@ Documentation = "https://thorwhalen.github.io/cutan"
 
 [project.optional-dependencies]
 dev = [
+    "an[stage]",
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "ruff>=0.1.0",
@@ -126,9 +126,11 @@ project_name = ""
 [tool.wads.ci.install]
 extras = "dev"
 
+# cutan needs an `an` with `an.genres.API_LEVEL >= REQUIRED_AN_API_LEVEL` (cutan.require_an) and its CI
+# installs `an` from PyPI: a change that needs a newer `an` merges `an` first. The rendering lane
+# (browser-tests.yml) installs `an` from main.
 [tool.wads.ci.commands]
 pre_test = []
-test = []
 post_test = []
 lint = []
 format = []
@@ -182,10 +184,9 @@ force_run = false
 sdist = true
 wheel = true
 
-# OFF until the first batch of an#225 gives the package real content: a
-# release now would put an empty package on PyPI. That batch sets `true`.
+# ON since the move (an#225): the first batch gave the package its content.
 [tool.wads.ci.publish]
-enabled = false
+enabled = true
 skip_ci_marker = "[skip ci]"
 publish_marker = "[publish]"
 
