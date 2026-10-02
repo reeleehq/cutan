@@ -7,7 +7,6 @@ Moved from ``an.ir.validate`` (an#225, an#246): the core's validator runs whatev
 from __future__ import annotations
 
 
-
 from typing import Any, Mapping
 
 from pydantic import ValidationError
@@ -580,7 +579,6 @@ def check_view_continuity(ctx: ValidationContext) -> None:
     _check_view_continuity(ctx.scene, ctx.report, resolved)
 
 
-
 class CharacterSwapChecks:
     """The ``character`` entity kind's swap-reference checks (``EntityKind.swap_checks``)."""
 
@@ -595,7 +593,9 @@ class CharacterSwapChecks:
         return ""
 
     @staticmethod
-    def whole_entity(action, desc, prop, keys, entity_id, *, where, report, art_exists) -> bool:
+    def whole_entity(
+        action, desc, prop, keys, entity_id, *, where, report, art_exists
+    ) -> bool:
         """A swap on the character ITSELF is judged slot by slot (an#197, an#201)."""
         _check_whole_character_swap(
             action,

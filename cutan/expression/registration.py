@@ -91,6 +91,8 @@ def expression(
         duration=duration,
         blend=blend,
     )
+
+
 #: What an emotion name may be: a preset name (``happy``, ``wry-smile``).
 EMOTION_NAME_RE = re.compile(r"[\w-]+")
 

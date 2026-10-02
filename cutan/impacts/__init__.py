@@ -41,7 +41,13 @@ from cutan.impacts.clip import (
     write_impact_clip,
     write_impact_set,
 )
-from cutan.impacts.objects import IMPACT_OBJECTS, ImpactObject, ball, impact_object, stick
+from cutan.impacts.objects import (
+    IMPACT_OBJECTS,
+    ImpactObject,
+    ball,
+    impact_object,
+    stick,
+)
 from cutan.impacts.performance import (
     ImpactEvent,
     TempoMap,

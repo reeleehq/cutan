@@ -673,10 +673,7 @@ def _build_gradient_planes(work: Path) -> Path:
     )
     meta = _meta("Gradient planes", 3.0).replace("```\n", "style_pack: dusk\n```\n", 1)
     md = (
-        meta
-        + "\n"
-        + _shot("s1", 3.0, camera="pan_right")
-        + "\n```yaml entities\n"
+        meta + "\n" + _shot("s1", 3.0, camera="pan_right") + "\n```yaml entities\n"
         "- kind: environment\n  id: glass\n  store: environments\n  ref: glass\n"
         + _character_rows(("maya",))
         + "\n```\n"
@@ -2669,10 +2666,10 @@ DEMOS: tuple[Demo, ...] = (
             "interpolated in sRGB, like CSS and SVG, not in a perceptual space."
         ),
         how=(
-            "`PlaneArt(kind=\"gradient\", gradient={\"stops\": [...]})`, with "
+            '`PlaneArt(kind="gradient", gradient={"stops": [...]})`, with '
             "`type: radial`, `angle` (CSS degrees, 0 = up) or `center`/`radius` "
             "(fractions of the box). `role: glass` on a plane plus "
-            "`StylePack(gradients={\"glass\": {...}})` repaints it. The compiler "
+            '`StylePack(gradients={"glass": {...}})` repaints it. The compiler '
             "turns each into an inline SVG texture (`an.stage.gradients`), so "
             "`runtime.js` is unchanged."
         ),

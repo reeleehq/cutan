@@ -192,6 +192,7 @@ REQUIRED_PARTS: tuple[str, ...] = (
     "brow_r",
 )
 
+
 class SlotPose(_CharModel):
     """How one slot is posed while a swap key is shown (``swap_poses``, an#197).
 

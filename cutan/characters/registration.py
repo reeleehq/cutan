@@ -141,6 +141,7 @@ def default_play_extent(action: PlayAction) -> Seconds:
 
     return play_extent(None, action)
 
+
 def play_duration(action: PlayAction, extent: Any) -> float:
     """The span a ``play`` occupies: its ``duration``, else its natural extent.
 

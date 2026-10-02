@@ -1433,7 +1433,12 @@ def add_gaze(
     fatal under `strict_assets` — every existing character would stop
     rendering on the bench.
     """
-    from cutan.characters.schema import CharacterDescriptor, FACE_OFFSETS, Attachment, Slot
+    from cutan.characters.schema import (
+        CharacterDescriptor,
+        FACE_OFFSETS,
+        Attachment,
+        Slot,
+    )
     from an.ir.migrate import migrate
 
     char_dir = Path(char_dir)

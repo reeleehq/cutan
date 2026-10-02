@@ -6,6 +6,7 @@ this module holds what only the cut-out genre reaches: the ``speech``, ``swap_po
 ``view_spans``, ``visemes`` and ``face`` passes (registered by :data:`cutan.genre.CUTOUT`
 as ``"cutan.compile.passes:<name>"``) and the character rig builder.
 """
+
 from __future__ import annotations
 
 from __future__ import annotations
