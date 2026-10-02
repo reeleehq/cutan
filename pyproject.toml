@@ -126,6 +126,10 @@ project_name = ""
 [tool.wads.ci.install]
 extras = "dev"
 
+# cutan needs the `an` that has the seams (API level REQUIRED_AN_API_LEVEL). Until that `an`
+# is on PyPI its CI cannot be green: the reusable workflow installs dependencies from
+# PyPI before it exports any env, and does not run `pre_test`. The move therefore merges
+# `an` first (see the PR). The rendering lane (browser-tests.yml) installs `an` from git.
 [tool.wads.ci.commands]
 pre_test = []
 post_test = []
@@ -137,14 +141,7 @@ required_envvars = []
 test_envvars = []
 extra_envvars = []
 
-# cutan is tested against the `an` that has the seams it needs (API level
-# REQUIRED_AN_API_LEVEL), which may be newer than the release on PyPI: `an` main, or
-# -- while the move's own PR is open -- its branch. uv reads this env var in every
-# install the CI makes, so the override file below replaces the PyPI `an` everywhere
-# (the wads `pre_test` commands are not run by the reusable workflow). ADR 0001
-# decision 7: a scheduled run against an main keeps this permanent.
 [tool.wads.ci.env.defaults]
-UV_OVERRIDE = "ci-overrides.txt"
 
 [tool.wads.ci.quality.ruff]
 enabled = true

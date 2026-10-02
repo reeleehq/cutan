@@ -1,3 +1,0 @@
-# Used through UV_OVERRIDE ([tool.wads.ci.env.defaults] in pyproject.toml): the `an` cutan is
-# tested against. The move's branch while its PR is open; `main` afterwards.
-an[stage] @ git+https://github.com/thorwhalen/an@feat/225-cutan-move
