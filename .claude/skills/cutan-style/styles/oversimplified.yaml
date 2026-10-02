@@ -144,6 +144,15 @@ guidance:
   sound: the bed is `live.sound` (bring a licensed track; the originals are Kevin MacLeod, CC BY, attribution required); dense SFX are shot `sounds` cues you place by hand
   transitions: gag interrupts are an edit, not a transition; cut to them
   voice_acting:
+    cloned_voices:  # NOT a role: overlay it on ANY role when the cast voice is cloned from a REAL person (e.g. a family cast): fidelity to the person comes first.
+      # Maintainer-confirmed 2026-10-02 by ear (coronation A/B, config "A"): eleven_v3 put a child's clone
+      # 2-4 semitones under her real pitch and washed out the timbre; multilingual_v2 at high similarity
+      # keeps it. multilingual_v2 ignores {cue} tags: express emotion through wording, punctuation,
+      # capitals and takes, not settings. No tempo unless the rate is badly off. The overlay replaces the role's
+      # model_id and voice_settings; keep the role's takes/targets (cues become wording).
+      {provider: elevenlabs, model_id: eleven_multilingual_v2,
+       voice_settings: {stability: 0.5, similarity_boost: 0.9, style: 0.0, use_speaker_boost: true},
+       effects: {trim_silence: {threshold_db: -45}}, takes: {n: 2}}
     # A style of METHODS, not an imitation of a person: delivery (timing, pitch movement,
     # emphasis, pauses, register jumps) measured as numbers, applied to the production's own
     # voices. Never clone, imitate or speech-to-speech any reference voice.
