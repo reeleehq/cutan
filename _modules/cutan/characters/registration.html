@@ -326,110 +326,111 @@
 </span><span id="line-142">    <span class="k">return</span> <span class="n">play_extent</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span></div>
 
 </span><span id="line-143">
+</span><span id="line-144">
 <div class="viewcode-block" id="play_duration">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.registration.html#cutan.characters.registration.play_duration">[docs]</a>
-</span><span id="line-144"><span class="k">def</span><span class="w"> </span><span class="nf">play_duration</span><span class="p">(</span><span class="n">action</span><span class="p">:</span> <span class="n">PlayAction</span><span class="p">,</span> <span class="n">extent</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="line-145"><span class="w">    </span><span class="sd">"""The span a ``play`` occupies: its ``duration``, else its natural extent.</span>
-</span><span id="line-146">
-</span><span id="line-147"><span class="sd">    ``extent`` is the caller's resolver (the compiler and ``an validate`` pass</span>
-</span><span id="line-148"><span class="sd">    one bound to the entity's descriptor); without one, a motion preset's own</span>
-</span><span id="line-149"><span class="sd">    length (:func:`default_play_extent`).</span>
-</span><span id="line-150">
-</span><span id="line-151"><span class="sd">    &gt;&gt;&gt; play_duration(PlayAction(target="a", animation="hop", duration=2.0), None)</span>
-</span><span id="line-152"><span class="sd">    2.0</span>
-</span><span id="line-153"><span class="sd">    &gt;&gt;&gt; play_duration(PlayAction(target="a", animation="hop"), None)</span>
-</span><span id="line-154"><span class="sd">    0.5</span>
-</span><span id="line-155"><span class="sd">    """</span>
-</span><span id="line-156">    <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-157">        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">duration</span>
-</span><span id="line-158">    <span class="k">if</span> <span class="n">extent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-159">        <span class="n">extent</span> <span class="o">=</span> <span class="n">default_play_extent</span>
-</span><span id="line-160">    <span class="k">return</span> <span class="n">extent</span><span class="p">(</span><span class="n">action</span><span class="p">)</span></div>
+</span><span id="line-145"><span class="k">def</span><span class="w"> </span><span class="nf">play_duration</span><span class="p">(</span><span class="n">action</span><span class="p">:</span> <span class="n">PlayAction</span><span class="p">,</span> <span class="n">extent</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="line-146"><span class="w">    </span><span class="sd">"""The span a ``play`` occupies: its ``duration``, else its natural extent.</span>
+</span><span id="line-147">
+</span><span id="line-148"><span class="sd">    ``extent`` is the caller's resolver (the compiler and ``an validate`` pass</span>
+</span><span id="line-149"><span class="sd">    one bound to the entity's descriptor); without one, a motion preset's own</span>
+</span><span id="line-150"><span class="sd">    length (:func:`default_play_extent`).</span>
+</span><span id="line-151">
+</span><span id="line-152"><span class="sd">    &gt;&gt;&gt; play_duration(PlayAction(target="a", animation="hop", duration=2.0), None)</span>
+</span><span id="line-153"><span class="sd">    2.0</span>
+</span><span id="line-154"><span class="sd">    &gt;&gt;&gt; play_duration(PlayAction(target="a", animation="hop"), None)</span>
+</span><span id="line-155"><span class="sd">    0.5</span>
+</span><span id="line-156"><span class="sd">    """</span>
+</span><span id="line-157">    <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-158">        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">duration</span>
+</span><span id="line-159">    <span class="k">if</span> <span class="n">extent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-160">        <span class="n">extent</span> <span class="o">=</span> <span class="n">default_play_extent</span>
+</span><span id="line-161">    <span class="k">return</span> <span class="n">extent</span><span class="p">(</span><span class="n">action</span><span class="p">)</span></div>
 
-</span><span id="line-161">
 </span><span id="line-162">
-</span><span id="line-163"><span class="k">def</span><span class="w"> </span><span class="nf">_play_args</span><span class="p">(</span><span class="n">raw</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-164"><span class="w">    </span><span class="sd">"""A ``play``'s ``args:`` — a mapping of motion-preset parameters, or absent."""</span>
-</span><span id="line-165">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.sync</span><span class="w"> </span><span class="kn">import</span> <span class="n">SceneMarkdownError</span>
-</span><span id="line-166">
-</span><span id="line-167">    <span class="k">if</span> <span class="n">raw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-168">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-169">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="line-170">        <span class="k">raise</span> <span class="n">SceneMarkdownError</span><span class="p">(</span>
-</span><span id="line-171">            <span class="sa">f</span><span class="s2">"actions[</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">].args must be a mapping of motion-preset "</span>
-</span><span id="line-172">            <span class="sa">f</span><span class="s2">"parameters (e.g. `args: </span><span class="se">{{</span><span class="s2">height: 30</span><span class="se">}}</span><span class="s2">`); got </span><span class="si">{</span><span class="n">raw</span><span class="si">!r}</span><span class="s2">"</span>
-</span><span id="line-173">        <span class="p">)</span>
-</span><span id="line-174">    <span class="k">return</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">raw</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-</span><span id="line-175">
+</span><span id="line-163">
+</span><span id="line-164"><span class="k">def</span><span class="w"> </span><span class="nf">_play_args</span><span class="p">(</span><span class="n">raw</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-165"><span class="w">    </span><span class="sd">"""A ``play``'s ``args:`` — a mapping of motion-preset parameters, or absent."""</span>
+</span><span id="line-166">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.sync</span><span class="w"> </span><span class="kn">import</span> <span class="n">SceneMarkdownError</span>
+</span><span id="line-167">
+</span><span id="line-168">    <span class="k">if</span> <span class="n">raw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-169">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-170">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="line-171">        <span class="k">raise</span> <span class="n">SceneMarkdownError</span><span class="p">(</span>
+</span><span id="line-172">            <span class="sa">f</span><span class="s2">"actions[</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">].args must be a mapping of motion-preset "</span>
+</span><span id="line-173">            <span class="sa">f</span><span class="s2">"parameters (e.g. `args: </span><span class="se">{{</span><span class="s2">height: 30</span><span class="se">}}</span><span class="s2">`); got </span><span class="si">{</span><span class="n">raw</span><span class="si">!r}</span><span class="s2">"</span>
+</span><span id="line-174">        <span class="p">)</span>
+</span><span id="line-175">    <span class="k">return</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">raw</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </span><span id="line-176">
+</span><span id="line-177">
 <div class="viewcode-block" id="read_play_md">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.registration.html#cutan.characters.registration.read_play_md">[docs]</a>
-</span><span id="line-177"><span class="k">def</span><span class="w"> </span><span class="nf">read_play_md</span><span class="p">(</span><span class="n">item</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayAction</span><span class="p">:</span>
-</span><span id="line-178"><span class="w">    </span><span class="sd">"""``{kind: play, target, animation, [duration], [speed], [loop], [args]}``.</span>
-</span><span id="line-179">
-</span><span id="line-180"><span class="sd">    Resolved at compile against the target entity's descriptor ``animations``</span>
-</span><span id="line-181"><span class="sd">    (an#7), falling back to the motion presets of ``an.motion.PRESETS`` for a</span>
-</span><span id="line-182"><span class="sd">    name the descriptor does not declare, with ``args`` as the preset's</span>
-</span><span id="line-183"><span class="sd">    parameters (an#166). ``loop`` omitted means the animation's own. This</span>
-</span><span id="line-184"><span class="sd">    reader accepted the shape from the start, then #24 made it refuse (nothing</span>
-</span><span id="line-185"><span class="sd">    resolved a play) while the writer kept emitting it — three days of a</span>
-</span><span id="line-186"><span class="sd">    project's own scene.md failing to parse.</span>
-</span><span id="line-187"><span class="sd">    """</span>
-</span><span id="line-188">    <span class="k">return</span> <span class="n">play</span><span class="p">(</span>
-</span><span id="line-189">        <span class="n">item</span><span class="p">[</span><span class="s2">"target"</span><span class="p">],</span>
-</span><span id="line-190">        <span class="n">item</span><span class="p">[</span><span class="s2">"animation"</span><span class="p">],</span>
-</span><span id="line-191">        <span class="n">duration</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-192">            <span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">"duration"</span><span class="p">])</span> <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"duration"</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-</span><span id="line-193">        <span class="p">),</span>
-</span><span id="line-194">        <span class="n">speed</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"speed"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
-</span><span id="line-195">        <span class="n">loop</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">"loop"</span><span class="p">])</span> <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"loop"</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
-</span><span id="line-196">        <span class="n">args</span><span class="o">=</span><span class="n">_play_args</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"args"</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">),</span>
-</span><span id="line-197">    <span class="p">)</span></div>
+</span><span id="line-178"><span class="k">def</span><span class="w"> </span><span class="nf">read_play_md</span><span class="p">(</span><span class="n">item</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayAction</span><span class="p">:</span>
+</span><span id="line-179"><span class="w">    </span><span class="sd">"""``{kind: play, target, animation, [duration], [speed], [loop], [args]}``.</span>
+</span><span id="line-180">
+</span><span id="line-181"><span class="sd">    Resolved at compile against the target entity's descriptor ``animations``</span>
+</span><span id="line-182"><span class="sd">    (an#7), falling back to the motion presets of ``an.motion.PRESETS`` for a</span>
+</span><span id="line-183"><span class="sd">    name the descriptor does not declare, with ``args`` as the preset's</span>
+</span><span id="line-184"><span class="sd">    parameters (an#166). ``loop`` omitted means the animation's own. This</span>
+</span><span id="line-185"><span class="sd">    reader accepted the shape from the start, then #24 made it refuse (nothing</span>
+</span><span id="line-186"><span class="sd">    resolved a play) while the writer kept emitting it — three days of a</span>
+</span><span id="line-187"><span class="sd">    project's own scene.md failing to parse.</span>
+</span><span id="line-188"><span class="sd">    """</span>
+</span><span id="line-189">    <span class="k">return</span> <span class="n">play</span><span class="p">(</span>
+</span><span id="line-190">        <span class="n">item</span><span class="p">[</span><span class="s2">"target"</span><span class="p">],</span>
+</span><span id="line-191">        <span class="n">item</span><span class="p">[</span><span class="s2">"animation"</span><span class="p">],</span>
+</span><span id="line-192">        <span class="n">duration</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-193">            <span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">"duration"</span><span class="p">])</span> <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"duration"</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span id="line-194">        <span class="p">),</span>
+</span><span id="line-195">        <span class="n">speed</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"speed"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
+</span><span id="line-196">        <span class="n">loop</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">"loop"</span><span class="p">])</span> <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"loop"</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
+</span><span id="line-197">        <span class="n">args</span><span class="o">=</span><span class="n">_play_args</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"args"</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">),</span>
+</span><span id="line-198">    <span class="p">)</span></div>
 
-</span><span id="line-198">
 </span><span id="line-199">
+</span><span id="line-200">
 <div class="viewcode-block" id="write_play_md">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.registration.html#cutan.characters.registration.write_play_md">[docs]</a>
-</span><span id="line-200"><span class="k">def</span><span class="w"> </span><span class="nf">write_play_md</span><span class="p">(</span><span class="n">leaf</span><span class="p">:</span> <span class="n">PlayAction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="line-201"><span class="w">    </span><span class="sd">"""The ``scene.md`` entry for ``leaf`` (``read_play_md``'s inverse)."""</span>
-</span><span id="line-202">    <span class="n">entry</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-203">        <span class="s2">"kind"</span><span class="p">:</span> <span class="s2">"play"</span><span class="p">,</span>
-</span><span id="line-204">        <span class="s2">"target"</span><span class="p">:</span> <span class="n">leaf</span><span class="o">.</span><span class="n">target</span><span class="p">,</span>
-</span><span id="line-205">        <span class="s2">"animation"</span><span class="p">:</span> <span class="n">leaf</span><span class="o">.</span><span class="n">animation</span><span class="p">,</span>
-</span><span id="line-206">    <span class="p">}</span>
-</span><span id="line-207">    <span class="k">if</span> <span class="n">leaf</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-208">        <span class="n">entry</span><span class="p">[</span><span class="s2">"duration"</span><span class="p">]</span> <span class="o">=</span> <span class="n">leaf</span><span class="o">.</span><span class="n">duration</span>
-</span><span id="line-209">    <span class="k">if</span> <span class="n">leaf</span><span class="o">.</span><span class="n">speed</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
-</span><span id="line-210">        <span class="n">entry</span><span class="p">[</span><span class="s2">"speed"</span><span class="p">]</span> <span class="o">=</span> <span class="n">leaf</span><span class="o">.</span><span class="n">speed</span>
-</span><span id="line-211">    <span class="k">if</span> <span class="n">leaf</span><span class="o">.</span><span class="n">loop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-212">        <span class="n">entry</span><span class="p">[</span><span class="s2">"loop"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
-</span><span id="line-213">    <span class="k">if</span> <span class="n">leaf</span><span class="o">.</span><span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-214">        <span class="n">entry</span><span class="p">[</span><span class="s2">"args"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
-</span><span id="line-215">    <span class="k">return</span> <span class="n">entry</span></div>
+</span><span id="line-201"><span class="k">def</span><span class="w"> </span><span class="nf">write_play_md</span><span class="p">(</span><span class="n">leaf</span><span class="p">:</span> <span class="n">PlayAction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="line-202"><span class="w">    </span><span class="sd">"""The ``scene.md`` entry for ``leaf`` (``read_play_md``'s inverse)."""</span>
+</span><span id="line-203">    <span class="n">entry</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-204">        <span class="s2">"kind"</span><span class="p">:</span> <span class="s2">"play"</span><span class="p">,</span>
+</span><span id="line-205">        <span class="s2">"target"</span><span class="p">:</span> <span class="n">leaf</span><span class="o">.</span><span class="n">target</span><span class="p">,</span>
+</span><span id="line-206">        <span class="s2">"animation"</span><span class="p">:</span> <span class="n">leaf</span><span class="o">.</span><span class="n">animation</span><span class="p">,</span>
+</span><span id="line-207">    <span class="p">}</span>
+</span><span id="line-208">    <span class="k">if</span> <span class="n">leaf</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-209">        <span class="n">entry</span><span class="p">[</span><span class="s2">"duration"</span><span class="p">]</span> <span class="o">=</span> <span class="n">leaf</span><span class="o">.</span><span class="n">duration</span>
+</span><span id="line-210">    <span class="k">if</span> <span class="n">leaf</span><span class="o">.</span><span class="n">speed</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+</span><span id="line-211">        <span class="n">entry</span><span class="p">[</span><span class="s2">"speed"</span><span class="p">]</span> <span class="o">=</span> <span class="n">leaf</span><span class="o">.</span><span class="n">speed</span>
+</span><span id="line-212">    <span class="k">if</span> <span class="n">leaf</span><span class="o">.</span><span class="n">loop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-213">        <span class="n">entry</span><span class="p">[</span><span class="s2">"loop"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
+</span><span id="line-214">    <span class="k">if</span> <span class="n">leaf</span><span class="o">.</span><span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-215">        <span class="n">entry</span><span class="p">[</span><span class="s2">"args"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+</span><span id="line-216">    <span class="k">return</span> <span class="n">entry</span></div>
 
-</span><span id="line-216">
 </span><span id="line-217">
-</span><span id="line-218"><span class="n">PLAY</span> <span class="o">=</span> <span class="n">ActionKind</span><span class="p">(</span>
-</span><span id="line-219">    <span class="s2">"play"</span><span class="p">,</span>
-</span><span id="line-220">    <span class="n">PlayAction</span><span class="p">,</span>
-</span><span id="line-221">    <span class="n">duration</span><span class="o">=</span><span class="n">play_duration</span><span class="p">,</span>
-</span><span id="line-222">    <span class="n">read_md</span><span class="o">=</span><span class="n">read_play_md</span><span class="p">,</span>
-</span><span id="line-223">    <span class="n">write_md</span><span class="o">=</span><span class="n">write_play_md</span><span class="p">,</span>
-</span><span id="line-224">    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-225">        <span class="s2">"play a named animation (an action / animation clip) of the target "</span>
-</span><span id="line-226">        <span class="s2">"entity's descriptor, falling back to a motion preset"</span>
-</span><span id="line-227">    <span class="p">),</span>
-</span><span id="line-228"><span class="p">)</span>
-</span><span id="line-229">
-</span><span id="line-230"><span class="n">CHARACTER</span> <span class="o">=</span> <span class="n">EntityKind</span><span class="p">(</span>
-</span><span id="line-231">    <span class="s2">"character"</span><span class="p">,</span>
-</span><span id="line-232">    <span class="n">space</span><span class="o">=</span><span class="s2">"stage.node"</span><span class="p">,</span>
-</span><span id="line-233">    <span class="n">store</span><span class="o">=</span><span class="s2">"characters"</span><span class="p">,</span>
-</span><span id="line-234">    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-235">        <span class="s2">"a rigged cut-out character: a skeleton of bones with slots, drawn by "</span>
-</span><span id="line-236">        <span class="s2">"the stage engine; its nodes are stage nodes"</span>
-</span><span id="line-237">    <span class="p">),</span>
-</span><span id="line-238"><span class="p">)</span>
+</span><span id="line-218">
+</span><span id="line-219"><span class="n">PLAY</span> <span class="o">=</span> <span class="n">ActionKind</span><span class="p">(</span>
+</span><span id="line-220">    <span class="s2">"play"</span><span class="p">,</span>
+</span><span id="line-221">    <span class="n">PlayAction</span><span class="p">,</span>
+</span><span id="line-222">    <span class="n">duration</span><span class="o">=</span><span class="n">play_duration</span><span class="p">,</span>
+</span><span id="line-223">    <span class="n">read_md</span><span class="o">=</span><span class="n">read_play_md</span><span class="p">,</span>
+</span><span id="line-224">    <span class="n">write_md</span><span class="o">=</span><span class="n">write_play_md</span><span class="p">,</span>
+</span><span id="line-225">    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-226">        <span class="s2">"play a named animation (an action / animation clip) of the target "</span>
+</span><span id="line-227">        <span class="s2">"entity's descriptor, falling back to a motion preset"</span>
+</span><span id="line-228">    <span class="p">),</span>
+</span><span id="line-229"><span class="p">)</span>
+</span><span id="line-230">
+</span><span id="line-231"><span class="n">CHARACTER</span> <span class="o">=</span> <span class="n">EntityKind</span><span class="p">(</span>
+</span><span id="line-232">    <span class="s2">"character"</span><span class="p">,</span>
+</span><span id="line-233">    <span class="n">space</span><span class="o">=</span><span class="s2">"stage.node"</span><span class="p">,</span>
+</span><span id="line-234">    <span class="n">store</span><span class="o">=</span><span class="s2">"characters"</span><span class="p">,</span>
+</span><span id="line-235">    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-236">        <span class="s2">"a rigged cut-out character: a skeleton of bones with slots, drawn by "</span>
+</span><span id="line-237">        <span class="s2">"the stage engine; its nodes are stage nodes"</span>
+</span><span id="line-238">    <span class="p">),</span>
+</span><span id="line-239"><span class="p">)</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -443,7 +444,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../_static/documentation_options.js?v=e3a6060d"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

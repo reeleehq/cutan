@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-02T04:20:19Z",
+  "built_at": "2026-10-02T10:07:17Z",
   "package": {
     "name": "cutan",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "display_name": "cutan",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "e3091f6b22f7155755a7207071ecaf658e075279",
-    "short_commit": "e3091f6",
+    "commit": "477742258708829d398a21b97b016ad88def0ff3",
+    "short_commit": "4777422",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/cutan",
-    "commit_url": "https://github.com/thorwhalen/cutan/commit/e3091f6b22f7155755a7207071ecaf658e075279",
+    "commit_url": "https://github.com/thorwhalen/cutan/commit/477742258708829d398a21b97b016ad88def0ff3",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/cutan",
-    "sha": "e3091f6b22f7155755a7207071ecaf658e075279",
+    "sha": "477742258708829d398a21b97b016ad88def0ff3",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "36963923277",
-    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/36963923277",
+    "run_id": "36993418025",
+    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/36993418025",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -60,11 +60,11 @@
   },
   "pypi": {
     "checked": true,
-    "latest": null,
-    "relation": "unknown",
+    "latest": "0.0.2",
+    "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout e3091f6b22f7155755a7207071ecaf658e075279\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout 477742258708829d398a21b97b016ad88def0ff3\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,
