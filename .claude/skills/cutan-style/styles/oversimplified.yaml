@@ -74,6 +74,14 @@ live:
       serene:    # Robust: the only setting that flattened an expressive cloned voice; slowed, since no v3 tag slows it
         {provider: elevenlabs, model_id: eleven_v3, voice_settings: {stability: 1.0}, effects: {tempo: 0.7, trim_silence: {threshold_db: -45}},
          takes: {n: 2, targets: serene}}
+      cloned:    # Voices cloned from REAL people (e.g. a family cast): fidelity to the person comes first.
+        # Maintainer-confirmed 2026-10-02 by ear (coronation A/B, config "A"): eleven_v3 put a child's clone
+        # 2-4 semitones under her real pitch and washed out the timbre; multilingual_v2 at high similarity
+        # keeps it. multilingual_v2 ignores {cue} tags: express emotion through wording, punctuation,
+        # capitals and takes, not settings. No tempo unless the rate is badly off.
+        {provider: elevenlabs, model_id: eleven_multilingual_v2,
+         voice_settings: {stability: 0.5, similarity_boost: 0.9, style: 0.0, use_speaker_boost: true},
+         effects: {trim_silence: {threshold_db: -45}}, takes: {n: 2}}
 
 targets:
   identical_frame_share: [0.45, 0.55]    # measured 0.49 (0.59 before the local-change rule, an#255)
