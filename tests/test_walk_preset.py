@@ -136,12 +136,23 @@ def test_the_view_is_read_off_the_timeline_and_can_be_overridden(project):
     assert moved(turned) == {"rotation"} and moved(forced) == {"y"}
 
 
-def test_a_legless_figure_rocks_and_bobs():
-    """The procedural placeholder builds no legs: the walk degrades to the
-    body's rock and bob, and the arms still swing."""
+def test_a_legless_figure_glides():
+    """The procedural placeholder builds no legs: the walk is the locomotion
+    chain's last link (an#224), a glide — the body leans into the move and
+    bobs gently, and no limb moves."""
     doc = _compile(None, _shot([play("c", "walk", args={"distance": -160, "steps": 2})], entity="c", ref="nope"))
     targets = {ch.target for a in doc.animations.values() for ch in a.channels}
-    assert not any("leg" in t for t in targets)
+    assert not any("leg" in t or "arm" in t for t in targets)
+    (pose,) = _poses(doc, 0.2)
+    assert pose[("c", "rotation")] < 0.0  # walking left, it leans left
+
+
+def test_a_legless_figure_rocks_when_asked():
+    """The pre-an#224 legless walk is still a gait: `rock` rocks and bobs, and the arms swing."""
+    doc = _compile(
+        None,
+        _shot([play("c", "walk", args={"distance": -160, "steps": 2, "gait": "rock"})], entity="c", ref="nope"),
+    )
     (pose,) = _poses(doc, 0.2)
     assert pose[("c", "rotation")] != 0.0 and pose[("c/left_arm", "rotation")] != 0.0
 

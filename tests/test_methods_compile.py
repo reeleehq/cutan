@@ -118,7 +118,7 @@ def test_a_requested_gait_the_rig_cannot_honour_is_recorded_and_fatal_under_stri
     assert (record.store, record.ref, record.resolved, record.fallback) == (
         "locomotion",
         "loco.hem_sway",
-        "loco.rock",
+        "loco.glide",
         True,
     )
     assert "limbs.legs" in record.detail
@@ -226,11 +226,11 @@ def test_an_character_capabilities_says_what_applies_and_what_is_missing(tmp_pat
             skin["slots"].pop(slot, None)
     (tmp_path / "blob" / "character.json").write_text(json.dumps(doc), encoding="utf-8")
     out = capabilities("blob", out_dir=str(tmp_path))
-    assert "locomotion: default loco.rock" in out
+    assert "locomotion: default loco.glide" in out
     assert "speech: default speech.pose_only" in out
     assert "not loco.legged_cycle: missing limbs.legs" in out
     assert "to add face.mouth:" in out
-    assert '"default": "loco.rock"' in capabilities("blob", out_dir=str(tmp_path), as_json=True)
+    assert '"default": "loco.glide"' in capabilities("blob", out_dir=str(tmp_path), as_json=True)
 
 
 # --------------------------------------------------------------------------- review-256
@@ -343,11 +343,11 @@ def test_a_headless_rig_pulses_its_body(store):
 
 
 def test_an_explicit_empty_legs_arg_is_honoured_and_recorded(store):
-    """M12: `legs: []` affords no legs, so a requested hem falls to a rock, recorded."""
+    """M12: `legs: []` affords no legs, so a requested hem falls to the glide, recorded."""
     with pytest.warns(Warning, match="loco.hem_sway"):
         scene = compile_shot(_walk_shot("gale", gait="hem", legs=[]), {"characters": store})
     (record,) = _methods(scene)
-    assert (record.ref, record.resolved) == ("loco.hem_sway", "loco.rock")
+    assert (record.ref, record.resolved) == ("loco.hem_sway", "loco.glide")
 
 
 @pytest.mark.parametrize(

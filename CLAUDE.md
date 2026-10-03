@@ -19,7 +19,7 @@ cutan/impacts/        impact choreography and ground truth;  cutan/verify/style.
 cutan/motion.py       the rig presets (nod, point, turn, walk, waddle, speech_pulse; an#322) and PRESETS, the table a `play` resolves in
 cutan/runtime/        visuals.js: the procedural mouth and eye, registered through the stage runtime's anRegisterVisual
 cutan/bench.py        CUTOUT_FIXTURES and run_bench() over this repo's misc/bench/ corpus
-tests/  examples/  misc/bench/{corpus,golden}/  misc/demos/  .claude/skills/
+tests/  examples/  misc/bench/{corpus,golden}/  misc/demos/  misc/docs/ (design notes: locomotion_gaits.md)  .claude/skills/
 ```
 
 ## Rules

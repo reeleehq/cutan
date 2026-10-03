@@ -48,6 +48,7 @@ from cutan.characters.methods import (
     CUTOUT_METHODS,
     check_brow_acting,
     check_declared_speech,
+    check_walk_gaits,
 )
 from cutan.characters.registration import CHARACTER, PLAY
 from cutan.characters.vocabulary import CUTOUT_VOCABULARY
@@ -173,6 +174,15 @@ CUTOUT = Genre(
             description=(
                 "an expression that moves the brows targets a character whose "
                 "brows can act (else it reads through the lids and mouth only)"
+            ),
+        ),
+        SemanticCheck(
+            "cutout.walk_gait",
+            check_walk_gaits,
+            order=41.6,
+            description=(
+                "a `walk`'s requested gait applies to its character (else it says "
+                "which gait is used and what structure would enable the asked one)"
             ),
         ),
         SemanticCheck(
