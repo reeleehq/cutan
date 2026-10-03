@@ -41,7 +41,10 @@ from an.stores.characters import CharactersStore
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "characters"
 RUNTIME_JS = (
-    Path(__import__("an").__file__).resolve().parent / "stage" / "runtime" / "runtime.js"
+    Path(__import__("an").__file__).resolve().parent
+    / "stage"
+    / "runtime"
+    / "runtime.js"
 )
 
 
@@ -137,9 +140,7 @@ def test_the_renderer_knows_nothing_about_the_fixture_sets():
     runtime = _code_only(RUNTIME_JS.read_text(encoding="utf-8"), lang="js")
     compiler = _code_only(
         (
-            Path(__import__("an").__file__).resolve().parent
-            / "stage"
-            / "compile.py"
+            Path(__import__("an").__file__).resolve().parent / "stage" / "compile.py"
         ).read_text(encoding="utf-8"),
         lang="py",
     )
@@ -178,8 +179,12 @@ def test_an_authored_swap_compiles_to_a_hold_channel(gale_store):
     scene = compile_shot(
         _shot(
             [
-                SetAction(target="gale/left_hand", property="hands", value="fist", at=0.0),
-                SetAction(target="gale/left_hand", property="hands", value="point", at=1.2),
+                SetAction(
+                    target="gale/left_hand", property="hands", value="fist", at=0.0
+                ),
+                SetAction(
+                    target="gale/left_hand", property="hands", value="point", at=1.2
+                ),
             ]
         ),
         mall={"characters": gale_store},
@@ -196,8 +201,11 @@ def test_an_authored_swap_compiles_to_a_hold_channel(gale_store):
         p
         for t in scene.timeline.tracks
         for p in t.clips
-        if p.animation_id in {
-            aid for aid, a in scene.animations.items() if a.channels and a.channels[0].property == "hands"
+        if p.animation_id
+        in {
+            aid
+            for aid, a in scene.animations.items()
+            if a.channels and a.channels[0].property == "hands"
         }
     ]
     assert placed[0].start_time == 0.0
@@ -228,7 +236,9 @@ def test_a_non_frame_aligned_numeric_set_still_fires(gale_store):
     # — measured, the old 0.001s window hit 0 of 49 frames at 24 fps.
     tl = timeline_from_scene(scene)
     frames_with_value = [
-        i for i in range(49) if evaluate_timeline(tl, i / 24.0).get(("gale/torso", "scale_x")) == 2.0
+        i
+        for i in range(49)
+        if evaluate_timeline(tl, i / 24.0).get(("gale/torso", "scale_x")) == 2.0
     ]
     assert frames_with_value and frames_with_value[0] == 25
 
@@ -373,6 +383,9 @@ def test_apply_property_routes_an_unknown_set_to_a_loud_error():
     listing the built-ins AND the node's actual set names."""
     script = "\n".join(
         [
+            _extract(
+                "contentOf"
+            ),  # applyProperty reaches a plane's content through it (an#314)
             _extract("applyProperty"),
             "const child = { _anAssetSets: { hands: { fist: 'a1' } } };",
             "const node = { name: 'gale/left_hand', children: [child], scale: {}, skew: {}, pivot: {} };",
@@ -397,6 +410,9 @@ def test_the_procedural_mouth_declares_viseme_as_a_draw_set():
             "function drawMouthShape(g, code) { calls.push(code); }",
             _extract("unknownSwapKey"),
             _extract("applySwap"),
+            _extract(
+                "contentOf"
+            ),  # applyProperty reaches a plane's content through it (an#314)
             _extract("applyProperty"),
             "const g = { _anDrawSets: { viseme: { keys: ['A', 'X'], apply: drawMouthShape } } };",
             "const node = { name: 'c/head/mouth', children: [g], scale: {}, skew: {}, pivot: {} };",
@@ -447,8 +463,12 @@ def test_an_authored_hand_and_facing_swap_change_the_pixels(gale_store, tmp_path
         [
             SetAction(target="gale/left_hand", property="hands", value="fist", at=0.0),
             SetAction(target="gale/left_hand", property="hands", value="point", at=1.0),
-            SetAction(target="gale/torso", property="body_facing", value="front", at=0.0),
-            SetAction(target="gale/torso", property="body_facing", value="left", at=1.0),
+            SetAction(
+                target="gale/torso", property="body_facing", value="front", at=0.0
+            ),
+            SetAction(
+                target="gale/torso", property="body_facing", value="left", at=1.0
+            ),
         ]
     )
     ctx = RenderContext(
@@ -465,8 +485,17 @@ def test_an_authored_hand_and_facing_swap_change_the_pixels(gale_store, tmp_path
         out = tmp_path / f"f{t}.png"
         subprocess.run(
             [
-                "ffmpeg", "-v", "error", "-ss", str(t), "-i", str(result.mp4_path),
-                "-frames:v", "1", "-y", str(out),
+                "ffmpeg",
+                "-v",
+                "error",
+                "-ss",
+                str(t),
+                "-i",
+                str(result.mp4_path),
+                "-frames:v",
+                "1",
+                "-y",
+                str(out),
             ],
             check=True,
         )
@@ -499,8 +528,11 @@ def test_a_set_holds_only_until_the_next_action_on_its_property(gale_store):
                 sequence(
                     delay(1.0),
                     TweenAction(
-                        target="gale/torso", property="x", from_value=0.0,
-                        to_value=100.0, duration=0.5,
+                        target="gale/torso",
+                        property="x",
+                        from_value=0.0,
+                        to_value=100.0,
+                        duration=0.5,
                     ),
                 ),
                 SetAction(target="gale/torso", property="x", value=-7.0, at=1.8),
@@ -550,10 +582,16 @@ def test_the_ir_validator_reads_the_migrated_descriptor(tmp_path):
                 id="s",
                 renderer="cutout",
                 duration=1.0,
-                entities=[AssetRef(kind="character", id="robo", store="characters", ref="robo")],
+                entities=[
+                    AssetRef(
+                        kind="character", id="robo", store="characters", ref="robo"
+                    )
+                ],
                 actions=[
                     SetAction(target="robo/head/mouth", property="viseme", value="A"),
-                    SetAction(target="robo/head/left_eye", property="eyelid", value="CLOSED"),
+                    SetAction(
+                        target="robo/head/left_eye", property="eyelid", value="CLOSED"
+                    ),
                 ],
             )
         ],
@@ -576,7 +614,9 @@ def test_the_ir_validator_sees_swaps_nested_in_compositions(gale_store):
                 [
                     sequence(
                         delay(0.5),
-                        SetAction(target="gale/left_hand", property="hands", value="NOPE"),
+                        SetAction(
+                            target="gale/left_hand", property="hands", value="NOPE"
+                        ),
                     )
                 ]
             )
@@ -657,7 +697,9 @@ def test_a_lowercase_authored_viseme_on_a_procedural_rig_is_refused():
     with pytest.raises(CutoutCompileError, match="'A'"):
         compile_shot(shot, mall={"characters": {}})
     ok = shot.model_copy(
-        update={"actions": [SetAction(target="c/head/mouth", property="viseme", value="A")]}
+        update={
+            "actions": [SetAction(target="c/head/mouth", property="viseme", value="A")]
+        }
     )
     scene = compile_shot(ok, mall={"characters": {}})
     assert _channels(scene, "viseme")[0].keyframes[0].value == "A"
@@ -855,11 +897,15 @@ def test_a_key_whose_geometry_differs_carries_its_own_and_validate_is_quiet(
     hand = next(c for c in gale.children if c.name == "left_hand")
     geometry = hand.visual.asset_geometry
     assert set(geometry) == {"gale.left_hand.point"}, geometry
-    assert (geometry["gale.left_hand.point"]["anchor_x"],
-            geometry["gale.left_hand.point"]["anchor_y"]) == (0.0, 0.0)
+    assert (
+        geometry["gale.left_hand.point"]["anchor_x"],
+        geometry["gale.left_hand.point"]["anchor_y"],
+    ) == (0.0, 0.0)
 
 
-def test_the_factory_declares_face_overlay_from_the_dicebear_path(tmp_path, monkeypatch):
+def test_the_factory_declares_face_overlay_from_the_dicebear_path(
+    tmp_path, monkeypatch
+):
     """`face_overlay` is DECLARED by the factory (an#87): False when the head
     is a DiceBear avatar with the face baked in, True for the offline
     geometric fallback. The DiceBear fetch is stubbed — no network."""
@@ -938,8 +984,12 @@ def test_an_active_tween_governs_over_a_hold_at_the_shared_instant(gale_store):
                 sequence(
                     delay(1.0),
                     TweenAction(
-                        target="gale/torso", property="x", from_value=0.0,
-                        to_value=100.0, duration=1.0, easing="linear",
+                        target="gale/torso",
+                        property="x",
+                        from_value=0.0,
+                        to_value=100.0,
+                        duration=1.0,
+                        easing="linear",
                     ),
                 ),
                 SetAction(target="gale/torso", property="x", value=-7.0, at=1.5),
