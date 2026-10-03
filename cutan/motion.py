@@ -206,6 +206,7 @@ def point(
         ),
     )
 
+
 def waddle(
     target: PathStr,
     *,
@@ -503,6 +504,7 @@ def walk(
             )
     return parallel(*moves)
 
+
 _FACINGS: tuple[str, ...] = ("right", "left")
 
 
@@ -691,6 +693,7 @@ def speech_pulse(
         )
     )
     return sequence(*moves)
+
 
 #: The genre's presets, by name.
 RIG_PRESETS: dict[str, Callable[..., Action]] = {
