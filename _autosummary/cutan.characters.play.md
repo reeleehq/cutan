@@ -51,7 +51,7 @@ so an author never passes `rest`.
 ```pycon
 >>> play_problems(desc, "moonwalk")
 ["no animation 'moonwalk': the descriptor declares ['blink', 'idle_breath'] and no
-  motion preset has that name (presets: ['hop', 'nod', 'point', 'pop_in',
+  motion preset has that name (presets: ['crawl', 'hop', 'nod', 'point', 'pop_in',
   'shake', 'slide_in', 'slide_out', 'speech_pulse', 'squash_stretch', 'turn',
   'waddle', 'walk'])"]
 >>> play_source(desc, "hop"), play_source(None, "hop"), play_source(desc, "blink")
