@@ -47,8 +47,13 @@ Repository = "https://github.com/thorwhalen/cutan"
 Documentation = "https://thorwhalen.github.io/cutan"
 
 [project.optional-dependencies]
+# The nw genre declaration (cutan.nw): a host that catalogs genres installs this.
+nw = [
+    "nw",
+]
 dev = [
     "an[stage]",
+    "nw",
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "ruff>=0.1.0",
