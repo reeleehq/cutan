@@ -345,7 +345,9 @@ def _limb_pair(
     return next((pair for pair in candidates if all(n in parts for n in pair)), None)
 
 
-def gait_params(gait: str, *, scale: float = 1.0, **given: float | None) -> dict[str, float]:
+def gait_params(
+    gait: str, *, scale: float = 1.0, **given: float | None
+) -> dict[str, float]:
     """The parameters a ``gait`` walks with: ``given`` where not ``None``, else its default.
 
     A default length (:data:`SCALED_GAIT_PARAMS`: the step, the body's bob, a
@@ -642,7 +644,9 @@ def walk(
         values.append(r0)
         durations.append(ramp)
         easings.append(DFLT_IN_EASING)
-        return _through(target, "rotation", values, durations=durations, easings=easings)
+        return _through(
+            target, "rotation", values, durations=durations, easings=easings
+        )
 
     # The body's rise and fall.
     if gait == "hop":
@@ -679,7 +683,12 @@ def walk(
     if arm_pair is not None and p["arm_swing"]:
         for phase, name in zip((-1.0, 1.0), arm_pair):
             moves.append(
-                swing(limb(name), _rest(part_rest(name), "rotation"), p["arm_swing"], phase)
+                swing(
+                    limb(name),
+                    _rest(part_rest(name), "rotation"),
+                    p["arm_swing"],
+                    phase,
+                )
             )
     return parallel(*moves)
 

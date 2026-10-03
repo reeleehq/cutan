@@ -244,7 +244,12 @@ def _gait_method(
         description=description,
         params=_walk_params(gait, params),
         examples=(
-            {"kind": "play", "target": "ned", "animation": "walk", "args": {"gait": gait}},
+            {
+                "kind": "play",
+                "target": "ned",
+                "animation": "walk",
+                "args": {"gait": gait},
+            },
         ),
         expand=_walk_expand(gait),
         **kw,
@@ -717,7 +722,9 @@ def check_walk_gaits(ctx) -> None:
                     args=dict(leaf.args or {}),
                     art_exists=art_exists_for(store, refs[leaf.target]),
                 )
-            except Exception:  # a malformed gait or descriptor is `cutout.play`'s to report
+            except (
+                Exception
+            ):  # a malformed gait or descriptor is `cutout.play`'s to report
                 continue
             if problem is not None:
                 ctx.report.add("warning", f"{ctx.path}/actions/{k}", problem)
