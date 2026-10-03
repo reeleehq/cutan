@@ -37,6 +37,26 @@ An `an character new --offline` character carries a **turnaround** (an#197): a `
 - **A face drawn differently in a view gets its own set, not a hide** (an#220): declare `eyelid@side` (`{OPEN, CLOSED}` → the profile's eye attachments, carried by the eye slots) and `viseme@side` (the profile's mouth shapes, on the mouth slot) and whenever `side` is in force the lids (blinks, expressions, a played `blink`) and the mouth (lines that start in it, and its rest between them) draw from them — the same for any view key (`eyelid@back` …). A view set lacking a key a line uses falls back to the plain set with a warning. A profile head carved with its eye and mouth baked in: carve them out as these per-view parts instead of hiding the face slots in `swap_poses` — **`an validate` warns when a line is spoken while the speaker's view hides its mouth** (alpha 0).
 - **Characters made before an#202 (the turnaround) need `an character add-views <name>`** before any `view` set or `turn`; validate and compile both say so. A DiceBear or hand-drawn head cannot be turned by the factory; `an character contract` says how an illustrator declares views (`asset_sets.view` + `swap_poses`).
 
+## Walking: gaits (an#224)
+
+`{kind: play, target: ned, animation: walk, args: {distance: 320, gait: bounce}}`. A walk's **gait** is a locomotion method chosen by what the character affords; with none asked, it is `legs` when the rig has a leg pair (`leg_l`/`leg_r` with art) and `glide` otherwise. Ask for one with `args: {gait: …}`, or declare `"gait": "…"` in `character.json` for every walk of that character.
+
+| gait | needs | reads as |
+|---|---|---|
+| `legs` | legs | legs swing in profile, lift facing the camera; body bobs, arms counter-swing |
+| `profile` | legs + a side view | the four-pose profile walk (contact, down, passing, up); Reiniger |
+| `shuffle` | legs | short quick steps, feet barely lifting |
+| `hem` | legs (the two hem halves of a robe) | hem halves tilt in turn, body sways |
+| `waddle` | nothing | body rocks foot to foot and bobs (legs lift if any) |
+| `hop` | nothing | the figure jumps every step |
+| `bounce` | nothing | slides with a pronounced bob, feet flick: South Park |
+| `glide` | nothing | slides, leaning into the move, gentle bob: robe figures, the legless default |
+| `rock` | nothing | the old legless walk: body rocks about its feet |
+
+- **Lengths scale with the figure**: `step_length`, `bob` and `hop_height` default to values for a figure at scale 1 and grow with its stage scale (a `scale: 2` character steps twice as far); pass them to set scene px outright. Every parameter and its per-gait default: `misc/docs/locomotion_gaits.md`.
+- **A gait the character cannot do is never silent**: `an validate` warns (`cutout.walk_gait`) with the gait it will use instead and what to add (`profile` on a front-only character: `an character add-views <name>`); the compile records it, fatal under `--strict-assets`. `an character capabilities <name>` lists every gait that applies and why the others do not.
+- A walk never turns the character: `turn` first, then `walk`.
+
 ### Addressing a character's parts
 
 A target is `<entity id>/<node>` and the rigs are FLAT except the face, whose parts are children of the head: `ned/head/mouth`, never `ned/mouth`. The node paths each rig builds, for an entity with id `c` (generated from the code; `tests/test_skill_rig_paths.py` fails if this list drifts):

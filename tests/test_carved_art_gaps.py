@@ -262,9 +262,9 @@ def test_an_unknown_gait_is_refused_where_it_is_written():
     from cutan.motion import walk
 
     with pytest.raises(ValidationError, match="gait must be one of"):
-        CharacterDescriptor(name="x", gait="shuffle")
+        CharacterDescriptor(name="x", gait="moonwalk")
     with pytest.raises(ValueError, match="gait must be one of"):
-        walk("x", gait="shuffle")
+        walk("x", gait="moonwalk")
 
 
 def test_unset_view_facts_are_not_written_into_the_descriptor():

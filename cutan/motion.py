@@ -113,10 +113,72 @@ DFLT_PULSE_PART: str = "head"
 DFLT_PULSE_STRENGTH: float = 0.06
 DFLT_PULSE_ATTACK_S: Seconds = 0.06
 DFLT_PULSE_RELEASE_S: Seconds = 0.1
-#: The gaits ``walk`` knows (``gait=``): a legged figure's alternating legs, a
-#: legless figure's hem tilt, or a rock. Persisted in character descriptors and
-#: ``play`` args (:data:`cutan.characters.schema.GAITS`).
-GAITS: tuple[str, ...] = ("legs", "hem", "rock")
+#: How high a ``hop`` gait jumps on each step (scene px at drawn scale 1).
+DFLT_WALK_HOP_HEIGHT: float = 18.0
+#: How far a ``glide`` leans into its travel (radians).
+DFLT_WALK_LEAN: float = 0.04
+
+#: The gaits ``walk`` knows (``gait=``, an#220, an#224): persisted in character
+#: descriptors and ``play`` args (:data:`cutan.characters.schema.GAITS`), so a
+#: spelling is never renamed. Each is a locomotion method
+#: (:mod:`cutan.characters.methods`); ``misc/docs/locomotion_gaits.md`` is the
+#: classification behind them.
+GAITS: tuple[str, ...] = (
+    "legs",
+    "hem",
+    "rock",
+    "profile",
+    "shuffle",
+    "waddle",
+    "hop",
+    "bounce",
+    "glide",
+)
+#: The gaits that move a leg pair — and need one (the ``limbs.legs`` capability).
+LEGGED_GAITS: frozenset[str] = frozenset({"legs", "hem", "profile", "shuffle"})
+#: The gait of a figure with no leg pair: the locomotion chain's last link.
+DFLT_LEGLESS_GAIT: str = "glide"
+#: Every walk parameter a gait reads, with the shared default.
+WALK_PARAM_DEFAULTS: dict[str, float] = {
+    "step_s": DFLT_WALK_STEP_S,
+    "step_length": DFLT_WALK_STEP_LENGTH,
+    "stride": DFLT_WALK_STRIDE,
+    "lift": DFLT_WALK_LIFT,
+    "bob": DFLT_WALK_BOB,
+    "arm_swing": DFLT_WALK_ARM_SWING,
+    "rock": DFLT_WALK_ROCK,
+    "hem_tilt": DFLT_WALK_HEM_TILT,
+    "hop_height": DFLT_WALK_HOP_HEIGHT,
+    "lean": DFLT_WALK_LEAN,
+}
+#: The lengths that scale with the figure's drawn scale (the rest are angles,
+#: times, or a leg's lift in the figure's own frame).
+SCALED_GAIT_PARAMS: frozenset[str] = frozenset({"step_length", "bob", "hop_height"})
+#: Each gait's departures from :data:`WALK_PARAM_DEFAULTS`. The first three are
+#: the pre-an#224 gaits and keep the shared defaults exactly (no pixel moves).
+GAIT_DEFAULTS: dict[str, dict[str, float]] = {
+    "legs": {},
+    "hem": {},
+    "rock": {},
+    # Williams' four poses: a longer stride, the body sinking after contact.
+    "profile": {"stride": 0.45, "arm_swing": 0.35},
+    # Feet barely leave the ground: short, quick steps, no bob to speak of.
+    "shuffle": {
+        "step_s": 0.3,
+        "step_length": 40.0,
+        "stride": 0.12,
+        "lift": 3.0,
+        "bob": 1.0,
+        "arm_swing": 0.1,
+    },
+    # From foot to foot: a big rock, a small lift.
+    "waddle": {"rock": 0.12, "lift": 5.0, "bob": 4.0, "arm_swing": 0.15},
+    "hop": {"arm_swing": 0.0},
+    # South Park: a pronounced bob while sliding, the feet flicking.
+    "bounce": {"bob": 8.0, "lift": 4.0, "stride": 0.1, "arm_swing": 0.15},
+    # A slide with a gentle bob and a lean into the move; no limb moves.
+    "glide": {"bob": 1.5, "arm_swing": 0.0},
+}
 
 #: The swap set a turn swaps: the factory's turnaround (an#197).
 DFLT_TURN_SET: str = "view"
@@ -282,6 +344,33 @@ def _limb_pair(
     return next((pair for pair in candidates if all(n in parts for n in pair)), None)
 
 
+def gait_params(gait: str, *, scale: float = 1.0, **given: float | None) -> dict[str, float]:
+    """The parameters a ``gait`` walks with: ``given`` where not ``None``, else its default.
+
+    A default length (:data:`SCALED_GAIT_PARAMS`: the step, the body's bob, a
+    hop) is stated for a figure at drawn scale 1 and multiplied by ``scale``
+    (the figure's drawn scale: its stage scale, an#224); an explicit value is
+    scene px as given. Angles and a leg's ``lift`` (in the figure's own frame,
+    already scaled with it) never scale.
+
+    >>> gait_params("legs")["step_length"], gait_params("legs", scale=2.0)["step_length"]
+    (80.0, 160.0)
+    >>> gait_params("shuffle", scale=2.0, step_length=50.0)["step_length"]
+    50.0
+    """
+    if gait not in GAITS:
+        raise ValueError(f"gait must be one of {list(GAITS)}, got {gait!r}")
+    out: dict[str, float] = {}
+    for name, base in WALK_PARAM_DEFAULTS.items():
+        value = given.get(name)
+        if value is None:
+            value = GAIT_DEFAULTS[gait].get(name, base)
+            if name in SCALED_GAIT_PARAMS:
+                value = value * scale
+        out[name] = float(value)
+    return out
+
+
 def walk(
     target: PathStr,
     *,
@@ -289,14 +378,16 @@ def walk(
     distance: float | None = None,
     direction: str | None = None,
     steps: int | None = None,
-    step_s: Seconds = DFLT_WALK_STEP_S,
-    step_length: float = DFLT_WALK_STEP_LENGTH,
-    stride: float = DFLT_WALK_STRIDE,
-    lift: float = DFLT_WALK_LIFT,
-    bob: float = DFLT_WALK_BOB,
-    arm_swing: float = DFLT_WALK_ARM_SWING,
-    rock: float = DFLT_WALK_ROCK,
-    hem_tilt: float = DFLT_WALK_HEM_TILT,
+    step_s: Seconds | None = None,
+    step_length: float | None = None,
+    stride: float | None = None,
+    lift: float | None = None,
+    bob: float | None = None,
+    arm_swing: float | None = None,
+    rock: float | None = None,
+    hem_tilt: float | None = None,
+    hop_height: float | None = None,
+    lean: float | None = None,
     view: str | None = None,
     gait: str | None = None,
     legs: tuple[str, str] | None = None,
@@ -304,8 +395,8 @@ def walk(
     parts: Mapping[str, Rest] | None = None,
     rest: Rest | None = None,
 ) -> Action:
-    """Walk: the body travels on ``x`` and bobs once per step while the legs
-    alternate and the arms swing against them (an#214).
+    """Walk: the body travels on ``x`` while the gait moves it — legs that
+    alternate, a hop, a bounce, a glide (an#214, an#224).
 
     **Where to.** ``to_x`` (absolute scene x) or ``distance`` (signed px; with
     ``direction`` ``"left"``/``"right"`` its sign is the direction's), or
@@ -318,30 +409,54 @@ def walk(
     walk's length (``steps × step_s``) is known before it is placed and a
     ``sequence`` waits for exactly that long.
 
-    **Legs, by view.** In a view in :data:`WALK_SWING_VIEWS` (``side``,
-    ``three_quarter``) each leg swings ``stride`` radians either side of its
-    rest about the hip, the two in opposition; in any other view (``front``,
-    ``back``, or none) the stepping leg rises ``lift`` px and sets down again,
-    the two alternating. Played by name, ``view`` is the one in force on the
-    timeline at the play's start (the view the last ``turn`` or ``set`` left);
-    pass it to override. ``legs``/``arms`` name the two limb nodes; by
-    default the first pair in :data:`WALK_LEG_NAMES` / :data:`WALK_ARM_NAMES`
-    that the rig builds (``parts``: the entity's built parts with their pose
-    at the start, filled in by the compiler). Played by name with no view on
-    the timeline, the view is the descriptor's ``rest_view`` (an#220) — a
-    character carved in profile swings its legs with nothing passed.
+    **Gait** (``gait``, one of :data:`GAITS`; the locomotion methods of
+    :mod:`cutan.characters.methods`, classified in
+    ``misc/docs/locomotion_gaits.md``). Each has its own defaults
+    (:data:`GAIT_DEFAULTS`); a parameter passed overrides them.
 
-    **Gait** (``gait``, one of :data:`GAITS`, an#220).
-    ``legs`` is the above. ``hem`` is a robe whose leg slots are the two
-    halves of its hem: facing the camera the halves TILT in turn by
-    ``hem_tilt`` radians about the hip while the body sways by ``rock`` and
-    bobs (in a profile they swing like legs). ``rock`` moves no leg: the body
-    rocks and bobs (a blob, a sack). Unset: the descriptor's ``gait`` when
-    played by name, else ``legs`` when the rig builds a leg pair and ``rock``
-    when it does not. Limbs land on
-    their rest with a :data:`WALK_LANDING_S` constant tween, not a settling
-    ``set``: a ``set``'s hold would outrank the view's pose channel and keep a
-    profile's splay after a later turn to the front.
+    - ``legs``: in a view in :data:`WALK_SWING_VIEWS` (``side``,
+      ``three_quarter``) each leg swings ``stride`` radians either side of its
+      rest about the hip, the two in opposition; in any other view the
+      stepping leg rises ``lift`` px and sets down; the body bobs ``bob`` once
+      per step and the arms swing ``arm_swing`` against the legs.
+    - ``profile``: the four-pose cycle of a profile walk (contact, down,
+      passing, up): the legs swing whatever the view, the body sinks after
+      each contact and rises before the next.
+    - ``shuffle``: ``legs`` with the feet barely leaving the ground — short,
+      quick steps, no bob to speak of.
+    - ``hem``: a robe whose leg slots are the two halves of its hem: facing
+      the camera the halves TILT in turn by ``hem_tilt`` radians while the body
+      sways by ``rock`` and bobs (in a profile they swing like legs).
+    - ``waddle``: the body rocks ``rock`` from foot to foot and bobs; legs, if
+      any, lift in turn.
+    - ``hop``: the body jumps ``hop_height`` px on every step.
+    - ``bounce``: the body bobs ``bob`` on every step while it slides; legs,
+      if any, flick (a South Park walk).
+    - ``glide``: the body slides, leaning ``lean`` radians into the move and
+      bobbing ``bob`` gently; no limb moves.
+    - ``rock``: no leg moves; the body rocks ``rock`` and bobs.
+
+    Unset: ``legs`` when the rig builds a leg pair, else :data:`DFLT_LEGLESS_GAIT`
+    — the locomotion chain's default (played by name, the compiler resolves the
+    gait on the capability registry first: the author's, else the
+    descriptor's, else the chain). A legged gait on a rig with no leg pair
+    walks the legless default too.
+
+    **Size.** ``step_length``, ``bob`` and ``hop_height`` default to lengths
+    for a figure at drawn scale 1, multiplied by the figure's scale — the
+    ``scale_y`` of ``rest``, which carries its stage scale — so a character
+    staged at ``scale: 2`` strides twice as far (an#224). Pass them to set
+    scene px outright.
+
+    **Legs and arms.** ``legs``/``arms`` name the two limb nodes; by default
+    the first pair in :data:`WALK_LEG_NAMES` / :data:`WALK_ARM_NAMES` that the
+    rig builds (``parts``: the entity's built parts with their pose at the
+    start, filled in by the compiler). Played by name, ``view`` is the one in
+    force on the timeline at the play's start (else the descriptor's
+    ``rest_view``, an#220). Limbs land on their rest with a
+    :data:`WALK_LANDING_S` constant tween, not a settling ``set``: a ``set``'s
+    hold would outrank the view's pose channel and keep a profile's splay
+    after a later turn to the front.
 
     The walk does not turn the character: in a side view, face the way it
     walks first (``turn``, ``direction``) — the classic walk-off is ``turn``
@@ -355,11 +470,16 @@ def walk(
     >>> sorted({f.action.property for f in _tweens(walk("bob", distance=80, view="side"))
     ...         if f.action.target == "bob/leg_l"})
     ['rotation']
-    >>> sorted({f.action.target for f in _tweens(walk("blob", steps=2, legs=(), arms=()))})
-    ['blob']
+    >>> sorted({(f.action.target, f.action.property) for f in _tweens(walk("blob", steps=2, legs=(), arms=()))})
+    [('blob', 'y')]
     >>> sorted({(f.action.target, f.action.property) for f in _tweens(walk("al", steps=2, gait="hem"))
     ...         if f.action.target in ("al", "al/leg_l")})
     [('al', 'rotation'), ('al', 'y'), ('al/leg_l', 'rotation')]
+    >>> [round(f.action.to_value, 1) for f in _tweens(walk("k", steps=2, gait="hop", legs=(), arms=()))]
+    [-18.0, 0.0, -18.0, 0.0]
+    >>> [f.action.to_value for f in _tweens(walk("k", distance=160, rest={"scale_y": 2.0}, legs=()))
+    ...  if f.action.property == "x"]
+    [160.0]
     """
     if gait is not None and gait not in GAITS:
         raise ValueError(f"gait must be one of {list(GAITS)}, got {gait!r}")
@@ -370,14 +490,37 @@ def walk(
         if distance is None:
             raise ValueError("direction goes with distance (to_x is already a place)")
         distance = sign * abs(distance)
-    _positive(step_s=step_s, step_length=step_length)
+    leg_pair = _limb_pair(legs, WALK_LEG_NAMES, parts)
+    arm_pair = _limb_pair(arms, WALK_ARM_NAMES, parts)
+    if gait is None:
+        gait = "legs" if leg_pair is not None else DFLT_LEGLESS_GAIT
+    elif gait in LEGGED_GAITS and leg_pair is None:
+        gait = DFLT_LEGLESS_GAIT
+    if gait not in LEGGED_GAITS | {"waddle", "bounce"}:
+        leg_pair = None  # this gait moves no leg
+    p = gait_params(
+        gait,
+        scale=abs(_rest(rest, "scale_y")),
+        step_s=step_s,
+        step_length=step_length,
+        stride=stride,
+        lift=lift,
+        bob=bob,
+        arm_swing=arm_swing,
+        rock=rock,
+        hem_tilt=hem_tilt,
+        hop_height=hop_height,
+        lean=lean,
+    )
+    step_s = p["step_s"]
+    _positive(step_s=step_s, step_length=p["step_length"])
     if step_s <= 4 * WALK_LANDING_S:
         raise ValueError(
             f"step_s must be longer than {4 * WALK_LANDING_S}s, got {step_s!r}"
         )
     if steps is None:
         steps = (
-            max(1, round(abs(distance) / step_length))
+            max(1, round(abs(distance) / p["step_length"]))
             if distance is not None
             else DFLT_WALK_STEPS
         )
@@ -405,12 +548,6 @@ def walk(
                 ),
             )
         )
-    bob_values = [y0]
-    for _ in range(steps):
-        bob_values += [y0 - bob, y0]
-    moves.append(
-        _through(target, "y", bob_values, durations=[half] * n, easings=up_down)
-    )
 
     def limb(name: str) -> str:
         return f"{target}/{name}"
@@ -452,56 +589,99 @@ def walk(
             [DFLT_OSCILLATION_EASING] * steps,
         )
 
-    def body_rock() -> Action:
+    def step_lift(path: str, ly: float, amount: float, phase: float) -> Action:
+        # This leg steps on every other step; the other one stands.
+        values, durations, easings = [ly], [], []
+        for i in range(steps):
+            if (i % 2 == 0) == (phase > 0):
+                values += [ly - amount, ly]
+                durations += [half, half]
+                easings += [DFLT_OUT_EASING, DFLT_IN_EASING]
+            else:
+                values += [ly]
+                durations += [step_s]
+                easings += ["linear"]
+        return unsettled(path, "y", values, durations, easings)
+
+    def body_bob(height: float) -> Action:
+        values = [y0]
+        for _ in range(steps):
+            values += [y0 - height, y0]
+        return _through(target, "y", values, durations=[half] * n, easings=up_down)
+
+    def body_cycle(height: float) -> Action:
+        # contact → down (sinks) → passing → up (rises) → next contact
+        q = step_s / 4
+        values, durations, easings = [y0], [], []
+        for _ in range(steps):
+            values += [y0 + height / 2, y0 - height, y0]
+            durations += [q, 2 * q, q]
+            easings += [DFLT_OUT_EASING, DFLT_OSCILLATION_EASING, DFLT_IN_EASING]
+        return _through(target, "y", values, durations=durations, easings=easings)
+
+    def body_rock(amount: float) -> Action:
         r0 = _rest(rest, "rotation")
         rock_values = [r0] + [
-            v for i in range(steps) for v in (r0 + rock * (-1) ** i, r0)
+            v for i in range(steps) for v in (r0 + amount * (-1) ** i, r0)
         ]
         return _through(
             target, "rotation", rock_values, durations=[half] * n, easings=up_down
         )
 
-    leg_pair = _limb_pair(legs, WALK_LEG_NAMES, parts) if gait != "rock" else None
-    arm_pair = _limb_pair(arms, WALK_ARM_NAMES, parts)
-    swinging = view in WALK_SWING_VIEWS
+    def body_lean(amount: float) -> Action:
+        r0 = _rest(rest, "rotation")
+        tilt = r0 + (amount if x1 > x0 else -amount)
+        ramp = min(step_s, steps * step_s / 4)
+        hold = steps * step_s - 2 * ramp
+        values, durations, easings = [r0, tilt], [ramp], [DFLT_OUT_EASING]
+        if hold > 0:
+            values.append(tilt)
+            durations.append(hold)
+            easings.append("linear")
+        values.append(r0)
+        durations.append(ramp)
+        easings.append(DFLT_IN_EASING)
+        return _through(target, "rotation", values, durations=durations, easings=easings)
+
+    # The body's rise and fall.
+    if gait == "hop":
+        moves.append(body_bob(p["hop_height"]))
+    elif gait == "profile":
+        moves.append(body_cycle(p["bob"]))
+    else:
+        moves.append(body_bob(p["bob"]))
+    # The legs.
+    swinging = view in WALK_SWING_VIEWS or gait == "profile"
     hem = gait == "hem" and not swinging
     if leg_pair is not None:
         for phase, name in zip((1.0, -1.0), leg_pair):
             pose = part_rest(name)
-            if swinging or hem:
+            if gait == "waddle":
+                moves.append(step_lift(limb(name), _rest(pose, "y"), p["lift"], phase))
+            elif swinging or hem:
                 moves.append(
                     swing(
                         limb(name),
                         _rest(pose, "rotation"),
-                        hem_tilt if hem else stride,
+                        p["hem_tilt"] if hem else p["stride"],
                         phase,
                     )
                 )
             else:
-                ly = _rest(pose, "y")
-                # This leg steps on every other step; the other one stands.
-                values, durations, easings = [ly], [], []
-                for i in range(steps):
-                    if (i % 2 == 0) == (phase > 0):
-                        values += [ly - lift, ly]
-                        durations += [half, half]
-                        easings += [DFLT_OUT_EASING, DFLT_IN_EASING]
-                    else:
-                        values += [ly]
-                        durations += [step_s]
-                        easings += ["linear"]
-                moves.append(unsettled(limb(name), "y", values, durations, easings))
-        if hem:
-            moves.append(body_rock())  # the sway that makes a robe read as walking
-    else:
-        moves.append(body_rock())
-    if arm_pair is not None:
-        # Against the leg on the same side: the leg_l phase is +1, so arm_l's is -1.
+                moves.append(step_lift(limb(name), _rest(pose, "y"), p["lift"], phase))
+    # The body's sway.
+    if hem or gait in ("rock", "waddle"):
+        moves.append(body_rock(p["rock"]))
+    elif gait == "glide" and p["lean"] and x1 != x0:
+        moves.append(body_lean(p["lean"]))
+    # The arms, against the legs: the leg_l phase is +1, so arm_l's is -1.
+    if arm_pair is not None and p["arm_swing"]:
         for phase, name in zip((-1.0, 1.0), arm_pair):
             moves.append(
-                swing(limb(name), _rest(part_rest(name), "rotation"), arm_swing, phase)
+                swing(limb(name), _rest(part_rest(name), "rotation"), p["arm_swing"], phase)
             )
     return parallel(*moves)
+
 
 _FACINGS: tuple[str, ...] = ("right", "left")
 
@@ -699,7 +879,12 @@ RIG_PRESETS: dict[str, Callable[..., Action]] = {
 #: Each genre preset's vocabulary version (ADR 0003 decision 2): bump one in the
 #: SAME change that makes it expand differently for the same args, so every shot
 #: that plays it re-renders visibly instead of silently.
-RIG_PRESET_VERSIONS: dict[str, str] = {name: "1" for name in RIG_PRESETS}
+RIG_PRESET_VERSIONS: dict[str, str] = {
+    **{name: "1" for name in RIG_PRESETS},
+    # 2 (an#224): the gaits, a legless figure glides instead of rocking, and
+    # the default lengths scale with the figure's drawn scale.
+    "walk": "2",
+}
 
 #: Every preset a ``play`` can name — the core's and the genre's — the one table
 #: the skill, the demos, the vocabulary and the ``play`` fallback
@@ -713,8 +898,11 @@ PRESET_VERSIONS: dict[str, str] = {**CORE_PRESET_VERSIONS, **RIG_PRESET_VERSIONS
 __all__ = [
     "CORE_PRESETS",
     "DFLT_TURN_SET",
+    "DFLT_LEGLESS_GAIT",
     "GAITS",
+    "GAIT_DEFAULTS",
     "HOME_PRESETS",
+    "LEGGED_GAITS",
     "PRESETS",
     "PRESET_VERSIONS",
     "RIG_PRESETS",
@@ -722,6 +910,7 @@ __all__ = [
     "WALK_LANDING_S",
     "WALK_LEG_NAMES",
     "face_toward",
+    "gait_params",
     "nod",
     "point",
     "speech_pulse",

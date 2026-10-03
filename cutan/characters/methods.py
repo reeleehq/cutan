@@ -6,22 +6,30 @@ The first two aspects of ADR 0002's first slice, as registry data:
 aspect         method (spelled)                                requires               chain
 =============  ==============================================  =====================  ==========
 locomotion     ``loco.legged_cycle`` (``legs``)                ``limbs.legs``         1st
+locomotion     ``loco.profile_cycle`` (``profile``)            ``limbs.legs``,        by request
+                                                               ``swap.view:side``
+locomotion     ``loco.shuffle`` (``shuffle``)                  ``limbs.legs``         by request
 locomotion     ``loco.hem_sway`` (``hem``)                     ``limbs.legs``         by request
-locomotion     ``loco.rock`` (``rock``)                        nothing                last link
+locomotion     ``loco.waddle`` (``waddle``)                    nothing                by request
+locomotion     ``loco.hop`` (``hop``)                          nothing                by request
+locomotion     ``loco.bounce`` (``bounce``)                    nothing                by request
+locomotion     ``loco.rock`` (``rock``)                        nothing                by request
+locomotion     ``loco.glide`` (``glide``)                      nothing                last link
 speech         ``speech.mouth_chart`` (``mouth_chart``)        ``face.mouth``         1st
 speech         ``speech.pose_only`` (``pulse``)                nothing                last link
 expression     ``expr.full_face`` (``full_face``)              ``face.brows``         1st
 expression     ``expr.without_brows`` (``without_brows``)      nothing                last link
 =============  ==============================================  =====================  ==========
 
-**Locomotion is today's walk/gait chain, moved, not changed** (ADR 0002
-decision 8: the gate is byte-identical output). A walk's ``gait`` arg is the
-author's request, the descriptor's ``gait`` a declared override (reported as
-such); with neither, the chain picks ``legs`` when the character affords a leg
-pair and ``rock`` when it does not — exactly what :func:`cutan.motion.walk` did on
-its own. What is new is that the choice is the registry's, made once, and a
-requested gait the rig cannot honour (``hem`` on a legless blob) is a
-**recorded substitution**: a warning, fatal under ``--strict-assets``.
+**Locomotion: the gaits of an#224** (classified in
+``misc/docs/locomotion_gaits.md``). A walk's ``gait`` arg is the author's
+request, the descriptor's ``gait`` a declared override (reported as such);
+with neither, the chain picks ``legs`` when the character affords a leg pair
+and ``glide`` when it does not (the rock, the last link before an#224, read as a
+metronome on robe figures and is now a gait an author asks for). A requested
+gait the rig cannot honour (``hem`` on a legless blob, ``profile`` on a
+character with no side view) is a **recorded substitution**: a warning, fatal
+under ``--strict-assets``, and ``why_not`` names what would enable it.
 
 **Speech gains a requirement-free last link.** A character whose face is baked
 into its art (``face_overlay: false``) used to speak with a frozen mouth; it now
@@ -64,6 +72,8 @@ __all__ = [
     "SPEECH",
     "check_brow_acting",
     "check_declared_speech",
+    "check_walk_gaits",
+    "gait_problem",
     "compile_profile",
     "speech_problems",
     "normalise_gait_args",
@@ -79,6 +89,8 @@ LOCOMOTION: str = "locomotion"
 SPEECH: str = "speech"
 EXPRESSION: str = "expression"
 
+#: The motion preset whose gait is the locomotion aspect's.
+WALK_PRESET: str = "walk"
 #: The entity kind whose assets have an analyser, and so resolve on the registry.
 CHARACTER_KIND: str = "character"
 
@@ -87,17 +99,38 @@ CHARACTER_KIND: str = "character"
 _LEGGED_PARAMS: tuple[str, ...] = ("stride", "lift", "arm_swing", "bob")
 _HEM_PARAMS: tuple[str, ...] = ("hem_tilt", "rock", "bob", "stride", "arm_swing")
 _ROCK_PARAMS: tuple[str, ...] = ("rock", "bob", "arm_swing")
+_PROFILE_PARAMS: tuple[str, ...] = ("stride", "bob", "arm_swing")
+_WADDLE_PARAMS: tuple[str, ...] = ("rock", "lift", "bob", "arm_swing")
+_HOP_PARAMS: tuple[str, ...] = ("hop_height", "arm_swing")
+_BOUNCE_PARAMS: tuple[str, ...] = ("bob", "lift", "stride", "arm_swing")
+_GLIDE_PARAMS: tuple[str, ...] = ("bob", "lean", "arm_swing")
 #: Rhubarb's closed shapes: a syllable starts where the mouth opens out of one.
 CLOSED_VISEMES: frozenset[str] = frozenset({"A", "X"})
 #: Pulses closer than this are one syllable.
 DFLT_MIN_BEAT_GAP_S: float = 0.18
 
 
-def _walk_params(names: Iterable[str]) -> dict[str, Any]:
-    from cutan.motion import walk
+def _walk_params(gait: str, names: Iterable[str]) -> dict[str, Any]:
+    """A gait's params as JSON Schema: its own defaults (a length's at drawn scale 1)."""
+    from cutan.motion import SCALED_GAIT_PARAMS, gait_params
 
-    full = schema_of_callable(walk, skip=("target", "rest", "parts"))["properties"]
-    return {"type": "object", "properties": {n: full[n] for n in names if n in full}}
+    defaults = gait_params(gait)
+    names = ("step_s", "step_length", *names)
+    return {
+        "type": "object",
+        "properties": {
+            n: {
+                "type": "number",
+                "default": defaults[n],
+                **(
+                    {"description": "scene px at drawn scale 1; scales with the figure"}
+                    if n in SCALED_GAIT_PARAMS
+                    else {}
+                ),
+            }
+            for n in dict.fromkeys(names)
+        },
+    }
 
 
 def _walk_expand(gait: str) -> Callable[[Mapping[str, Any], Any], Any]:
@@ -138,7 +171,7 @@ LOCO_LEGGED = Method(
         "opposition, facing the camera the stepping leg lifts; the arms swing "
         "against the legs"
     ),
-    params=_walk_params(_LEGGED_PARAMS),
+    params=_walk_params("legs", _LEGGED_PARAMS),
     requires=("limbs.legs",),
     remedies={"limbs.legs": _LEGS_REMEDY},
     examples=(
@@ -160,7 +193,7 @@ LOCO_HEM = Method(
         "a robe figure's walk: the leg slots are the two halves of the hem, which "
         "tilt in turn about the hip while the body sways and bobs"
     ),
-    params=_walk_params(_HEM_PARAMS),
+    params=_walk_params("hem", _HEM_PARAMS),
     requires=("limbs.legs",),
     remedies={
         "limbs.legs": (
@@ -182,7 +215,7 @@ LOCO_ROCK = Method(
         "no leg moves: the body rocks side to side and bobs once per step while "
         "it travels (a blob, a sack, anything drawable)"
     ),
-    params=_walk_params(_ROCK_PARAMS),
+    params=_walk_params("rock", _ROCK_PARAMS),
     examples=(
         {
             "kind": "play",
@@ -192,6 +225,86 @@ LOCO_ROCK = Method(
         },
     ),
     expand=_walk_expand("rock"),
+)
+_SIDE_VIEW_REMEDY = (
+    "give the character a side view: `an character add-views <name>` (a "
+    "factory character), or carve its art in profile and declare `rest_view: "
+    "side` in character.json"
+)
+
+
+def _gait_method(
+    id_: str, gait: str, title: str, description: str, params: tuple[str, ...], **kw
+) -> Method:
+    return Method(
+        id_,
+        aspect=LOCOMOTION,
+        name=gait,
+        title=title,
+        description=description,
+        params=_walk_params(gait, params),
+        examples=(
+            {"kind": "play", "target": "ned", "animation": "walk", "args": {"gait": gait}},
+        ),
+        expand=_walk_expand(gait),
+        **kw,
+    )
+
+
+LOCO_PROFILE = _gait_method(
+    "loco.profile_cycle",
+    "profile",
+    "profile walk cycle",
+    "the four poses of a walk seen in profile (contact, down, passing, up): the "
+    "legs swing about the hip in opposition whatever the view in force, the "
+    "body sinks after each contact and rises before the next (Reiniger's "
+    "silhouettes, any figure drawn side-on)",
+    _PROFILE_PARAMS,
+    requires=("limbs.legs", "swap.view:side"),
+    remedies={"limbs.legs": _LEGS_REMEDY, "swap.view:side": _SIDE_VIEW_REMEDY},
+)
+LOCO_SHUFFLE = _gait_method(
+    "loco.shuffle",
+    "shuffle",
+    "shuffle",
+    "the feet barely leave the ground: short, quick steps with little bob and "
+    "arms close to the body (the old, the tired, the cautious)",
+    _LEGGED_PARAMS,
+    requires=("limbs.legs",),
+    remedies={"limbs.legs": _LEGS_REMEDY},
+)
+LOCO_WADDLE = _gait_method(
+    "loco.waddle",
+    "waddle",
+    "waddle",
+    "the body rocks from foot to foot and bobs on each step; legs, if any, lift "
+    "in turn (a penguin, a toddler, a squat figure)",
+    _WADDLE_PARAMS,
+)
+LOCO_HOP = _gait_method(
+    "loco.hop",
+    "hop",
+    "hop",
+    "the whole figure jumps on every step while it travels (a bird, a "
+    "kangaroo, a gleeful character, anything drawable)",
+    _HOP_PARAMS,
+)
+LOCO_BOUNCE = _gait_method(
+    "loco.bounce",
+    "bounce",
+    "bounce",
+    "the body bobs on every step while it slides; legs, if any, only flick "
+    "(the South Park walk)",
+    _BOUNCE_PARAMS,
+)
+LOCO_GLIDE = _gait_method(
+    "loco.glide",
+    "glide",
+    "glide",
+    "the figure slides, leaning into the move with a gentle bob; no limb "
+    "moves (a robe figure, a ghost, a sack — the default for any figure "
+    "without legs)",
+    _GLIDE_PARAMS,
 )
 SPEECH_CHART = Method(
     "speech.mouth_chart",
@@ -261,8 +374,14 @@ EXPR_WITHOUT_BROWS = Method(
 #: The genre's methods, as vocabulary entries (kind ``method``).
 CUTOUT_METHODS: tuple[Method, ...] = (
     LOCO_LEGGED,
+    LOCO_PROFILE,
+    LOCO_SHUFFLE,
     LOCO_HEM,
+    LOCO_WADDLE,
+    LOCO_HOP,
+    LOCO_BOUNCE,
     LOCO_ROCK,
+    LOCO_GLIDE,
     SPEECH_CHART,
     SPEECH_PULSE,
     EXPR_FULL_FACE,
@@ -272,7 +391,7 @@ CUTOUT_METHODS: tuple[Method, ...] = (
 CUTOUT_ASPECTS: tuple[Aspect, ...] = (
     Aspect(
         LOCOMOTION,
-        chain=(LOCO_LEGGED.id, LOCO_ROCK.id),
+        chain=(LOCO_LEGGED.id, LOCO_GLIDE.id),
         description="how a character travels when it walks.",
         declared_by="gait",
     ),
@@ -351,7 +470,7 @@ def resolve_walk_gait(
 
     >>> gait, r = resolve_walk_gait("blob", args={"gait": "hem"}, descriptor=None, profile={})
     >>> gait, r.substitution.reason, r.substitution.missing
-    ('rock', 'missing', ('limbs.legs',))
+    ('glide', 'missing', ('limbs.legs',))
     """
     from an.semantic import resolve
 
@@ -368,7 +487,7 @@ def resolve_walk_gait(
 
 
 def normalise_gait_args(args: Mapping[str, Any]) -> dict[str, Any]:
-    """A walk's args with ``gait`` as the walk spells it (``legs``/``hem``/``rock``).
+    """A walk's args with ``gait`` as the walk spells it (one of :data:`cutan.motion.GAITS`).
 
     ``gait`` may name a locomotion method by id (``loco.rock``) or be a choice
     ``{method, args, version}`` — the level-(a) form, and how a scene pins a
@@ -530,6 +649,78 @@ def check_brow_acting(ctx) -> None:
             ctx.report.add(
                 "warning", f"{ctx.path}/dialogue/{j}/emotion", f"{line.speaker}: {p}"
             )
+
+
+def gait_problem(
+    doc: Any, *, entity: str, args: Mapping[str, Any], art_exists: Any = None
+) -> str | None:
+    """Why a walk on ``entity`` will not use the gait it asks for (its ``gait``
+    arg, else the descriptor's), with what would enable it — or ``None``.
+
+    ``doc`` is the character's stored document; ``art_exists`` the store's
+    probe. The sentence is the one the compiler records (``asset_resolution``)
+    when it substitutes the method, plus each missing capability's remedy.
+    """
+    from cutan.characters.schema import CharacterDescriptor
+    from an.capabilities import remedy_for
+    from an.ir.migrate import migrate
+
+    if not isinstance(doc, Mapping) or doc.get("kind") != "CharacterDescriptor":
+        return None
+    desc = CharacterDescriptor.model_validate(
+        migrate(dict(doc), kind="CharacterDescriptor")
+    )
+    args = normalise_gait_args(args)
+    _, r = resolve_walk_gait(
+        entity,
+        args=args,
+        descriptor=desc,
+        profile=compile_profile(desc, art_exists=art_exists),
+    )
+    sub = r.substitution
+    if sub is None or sub.reason != "missing":
+        return None
+    fixes = "; ".join(f"{m}: {remedy_for(m)}" for m in sub.missing)
+    return f"{sub.sentence()}. To enable it — {fixes}"
+
+
+def check_walk_gaits(ctx) -> None:
+    """The cut-out genre's semantic check: a ``walk`` whose requested gait the
+    character cannot honour is reported (a warning, before any render), with
+    the gait it will walk instead and what would make the asked one apply
+    (an#224, ADR 0002 decision 6)."""
+    from an.ir.compose import flatten
+    from an.stores._common import art_exists_for
+
+    store = ctx.stores.get("characters")
+    if store is None:
+        return
+    refs = {
+        e.id: e.ref
+        for e in ctx.shot.entities
+        if e.kind == CHARACTER_KIND and e.ref in store
+    }
+    for k, action in enumerate(ctx.shot.actions or ()):
+        for flat in flatten(action):
+            leaf = flat.action
+            if (
+                getattr(leaf, "kind", None) != "play"
+                or getattr(leaf, "animation", None) != WALK_PRESET
+                or leaf.target not in refs
+            ):
+                continue
+            try:
+                doc = store[refs[leaf.target]]
+                problem = gait_problem(
+                    doc,
+                    entity=leaf.target,
+                    args=dict(leaf.args or {}),
+                    art_exists=art_exists_for(store, refs[leaf.target]),
+                )
+            except Exception:  # a malformed gait or descriptor is `cutout.play`'s to report
+                continue
+            if problem is not None:
+                ctx.report.add("warning", f"{ctx.path}/actions/{k}", problem)
 
 
 def substitution_record(sub, *, entity_ref: str | None = None) -> dict[str, Any]:
