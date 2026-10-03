@@ -25,7 +25,7 @@ live:
     allowed: [hold, pan_left, pan_right]   # slow pans
   easing: [ease_in_out]      # naturalistic, studied movement
   tween_duration_s: [0.5, 2.0]
-  motion_presets: [turn]     # an.motion; a turn keeps to profiles, to `side` facing left or right
+  motion_presets: [turn]     # cutan.motion.PRESETS; a turn keeps to profiles, to `side` facing left or right
   shots:
     mean_s: 12               # measured, n=5
     range_s: [6, 20]

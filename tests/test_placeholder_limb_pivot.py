@@ -32,7 +32,7 @@ from an.adapters.cutout.timeline import (
     timeline_from_scene,
 )
 from an.ir.schema import AssetRef, Shot
-from an.motion import DFLT_POINT_ANGLE, point
+from cutan.motion import DFLT_POINT_ANGLE, point
 
 LIMBS = ("left_arm", "right_arm", "left_leg", "right_leg")
 ANGLES = (0.4, -1.3, 1.9)

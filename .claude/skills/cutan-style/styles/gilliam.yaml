@@ -15,7 +15,7 @@ live:
     allowed: [hold]
   easing: [step, linear]     # "swift, sudden movements are much simpler"
   tween_duration_s: [0.12, 0.32]   # 3-8 frames at 25 fps
-  motion_presets: [pop_in, slide_in, shake]   # an.motion; pop-ups, slides in from the edge
+  motion_presets: [pop_in, slide_in, shake]   # cutan.motion.PRESETS; pop-ups, slides in from the edge
   shots:
     mean_s: 20               # the shot is the gag
     range_s: [8, 30]

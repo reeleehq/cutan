@@ -2407,7 +2407,7 @@ def _with_view_and_posed_parts(
     preset's default). A part the author has animated keeps its timeline pose.
     """
     from an.stage.timeline import SWAP_WRITE_GROUP, write_group
-    from an.motion import DFLT_TURN_SET
+    from cutan.motion import DFLT_TURN_SET
 
     entity = action.target
     args = dict(action.args or {})

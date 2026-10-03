@@ -18,7 +18,7 @@ from an.audio.effects import normalize_effects
 from an.environments import EnvironmentDescriptor
 from an.ir.camera import CAMERA_MOVES
 from an.ir.schema import Meta, SoundCue, Transition
-from an.motion import PRESETS
+from cutan.motion import PRESETS
 from an.styles import StylePack, SurfaceTreatment
 from cutan.verify.style import StyleLintVerifier
 

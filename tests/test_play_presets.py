@@ -33,7 +33,8 @@ from cutan.characters.registration import play
 from an.ir.schema import AssetRef, Meta, SceneIR, Shot, TweenAction
 from an.ir.sync import ir_to_markdown, markdown_to_ir, scene_from_json_doc
 from an.ir.validate import validate_semantic
-from an.motion import PRESETS, as_leaves, hop, nod, rest_pose, shake
+from an.motion import as_leaves, hop, rest_pose, shake
+from cutan.motion import PRESETS, nod
 from an.stores.characters import CharactersStore
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "characters"

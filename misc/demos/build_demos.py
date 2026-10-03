@@ -1689,16 +1689,8 @@ def _build_motion_presets(work: Path) -> Path:
     `scene.md` carries the expanded tweens (with `start:`) and round-trips.
     """
     from an.ir.compose import delay, sequence
-    from an.motion import (
-        as_leaves,
-        hop,
-        nod,
-        point,
-        pop_in,
-        shake,
-        squash_stretch,
-        waddle,
-    )
+    from an.motion import as_leaves, hop, pop_in, shake, squash_stretch
+    from cutan.motion import nod, point, waddle
     from an.project import load, save
 
     md = (

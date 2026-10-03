@@ -30,7 +30,7 @@ from an.ir.compose import delay, sequence, set_
 from cutan.characters.registration import play
 from an.ir.schema import AssetRef, SceneIR, Shot
 from an.ir.validate import validate_semantic
-from an.motion import DFLT_WALK_STRIDE, walk
+from cutan.motion import DFLT_WALK_STRIDE, walk
 from an.project import init, load
 
 
@@ -161,7 +161,7 @@ def test_its_natural_length_is_known_before_it_is_placed(project):
     ]
     assert min(hop_starts) == pytest.approx(1.5)
     from an.ir.compose import duration_of
-    from an.motion import DFLT_WALK_STEP_LENGTH, DFLT_WALK_STEP_S
+    from cutan.motion import DFLT_WALK_STEP_LENGTH, DFLT_WALK_STEP_S
 
     # `distance` counts the steps; an absolute `to_x` cannot, so its length is fixed.
     assert duration_of(walk("x", distance=3 * DFLT_WALK_STEP_LENGTH)) == pytest.approx(3 * DFLT_WALK_STEP_S)

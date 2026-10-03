@@ -5,8 +5,8 @@ slice: P7's capability registry adopts :func:`character_affordances` as
 ``affordances(asset)`` for characters instead of deriving a second time.
 
 **What it reads is what the compiler reads**, or the facets would lie (ADR 0005,
-Risks): the limb pairs ``walk`` resolves (:data:`an.motion.WALK_LEG_NAMES`,
-:data:`an.motion.WALK_ARM_NAMES`), the ``view`` and ``viseme`` swap sets
+Risks): the limb pairs ``walk`` resolves (:data:`cutan.motion.WALK_LEG_NAMES`,
+:data:`cutan.motion.WALK_ARM_NAMES`), the ``view`` and ``viseme`` swap sets
 (``asset_sets``), the declared facts ``rest_view``,
 ``face_overlay`` and ``occluded``. And **art must be present**: a slot or swap key counts only
 when an attachment it names has its file among the asset's files — a descriptor
@@ -216,7 +216,7 @@ def character_affordances(
         CharacterDescriptor,
     )
     from an.ir.migrate import migrate
-    from an.motion import WALK_ARM_NAMES, WALK_LEG_NAMES
+    from cutan.motion import WALK_ARM_NAMES, WALK_LEG_NAMES
 
     if doc.get("kind") != CharacterDescriptor.model_fields["kind"].default:
         # Not a descriptor: the compiler draws the procedural rig from the
