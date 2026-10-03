@@ -7,8 +7,8 @@ slice: P7’s capability registry adopts [`character_affordances()`](#cutan.libr
 `affordances(asset)` for characters instead of deriving a second time.
 
 **What it reads is what the compiler reads**, or the facets would lie (ADR 0005,
-Risks): the limb pairs `walk` resolves (`an.motion.WALK_LEG_NAMES`,
-`an.motion.WALK_ARM_NAMES`), the `view` and `viseme` swap sets
+Risks): the limb pairs `walk` resolves ([`cutan.motion.WALK_LEG_NAMES`](cutan.motion.html.md#cutan.motion.WALK_LEG_NAMES),
+`cutan.motion.WALK_ARM_NAMES`), the `view` and `viseme` swap sets
 (`asset_sets`), the declared facts `rest_view`,
 `face_overlay` and `occluded`. And **art must be present**: a slot or swap key counts only
 when an attachment it names has its file among the asset’s files — a descriptor

@@ -92,6 +92,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cutan.genre.html">cutan.genre</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.impacts.html">cutan.impacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.library.html">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.runtime.html">cutan.runtime</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.verify.html">cutan.verify</a></li>
 </ul>
@@ -163,7 +164,7 @@ not as “no set resolves it”.</p></li>
 </div>
 <p><strong>Motion presets (an#166).</strong> A name the descriptor does not declare — or any
 name on an entity with no descriptor (a procedural rig, a prop) — falls back
-to <code class="xref py py-data docutils literal notranslate"><span class="pre">an.motion.PRESETS</span></code>. The DESCRIPTOR WINS a name both know: a rig that
+to <a class="reference internal" href="cutan.motion.html#cutan.motion.PRESETS" title="cutan.motion.PRESETS"><code class="xref py py-data docutils literal notranslate"><span class="pre">cutan.motion.PRESETS</span></code></a>. The DESCRIPTOR WINS a name both know: a rig that
 ships its own <code class="docutils literal notranslate"><span class="pre">hop</span></code> means that one. <a class="reference internal" href="#cutan.characters.play.play_source" title="cutan.characters.play.play_source"><code class="xref py py-func docutils literal notranslate"><span class="pre">play_source()</span></code></a> makes that call and
 <a class="reference internal" href="#cutan.characters.play.play_problems" title="cutan.characters.play.play_problems"><code class="xref py py-func docutils literal notranslate"><span class="pre">play_problems()</span></code></a> gives the whole verdict, for <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code> and the
 compiler alike. A preset resolves to tweens, not a clip:
@@ -198,7 +199,7 @@ so an author never passes <code class="docutils literal notranslate"><span class
 <td><p>the entity descriptor's own <code class="docutils literal notranslate"><span class="pre">animations</span></code>…</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.play.PRESET_SOURCE" title="cutan.characters.play.PRESET_SOURCE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRESET_SOURCE</span></code></a></p></td>
-<td><p>…or, for a name it does not declare, <code class="xref py py-data docutils literal notranslate"><span class="pre">an.motion.PRESETS</span></code> (an#166).</p></td>
+<td><p>…or, for a name it does not declare, <a class="reference internal" href="cutan.motion.html#cutan.motion.PRESETS" title="cutan.motion.PRESETS"><code class="xref py py-data docutils literal notranslate"><span class="pre">cutan.motion.PRESETS</span></code></a> (an#166).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.play.RESERVED_PRESET_ARGS" title="cutan.characters.play.RESERVED_PRESET_ARGS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RESERVED_PRESET_ARGS</span></code></a></p></td>
 <td><p>the target is the play's own, and the rest pose is read off the built scene.</p></td>
@@ -353,7 +354,7 @@ last <code class="docutils literal notranslate"><span class="pre">scale_x</span>
 <dl class="py data">
 <dt class="sig sig-object py" id="cutan.characters.play.PRESET_SOURCE">
 <span class="sig-prename descclassname"><span class="pre">cutan.characters.play.</span></span><span class="sig-name descname"><span class="pre">PRESET_SOURCE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'preset'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.play.PRESET_SOURCE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.play.PRESET_SOURCE'">¶</a></dt>
-<dd><p>…or, for a name it does not declare, <code class="xref py py-data docutils literal notranslate"><span class="pre">an.motion.PRESETS</span></code> (an#166).</p>
+<dd><p>…or, for a name it does not declare, <a class="reference internal" href="cutan.motion.html#cutan.motion.PRESETS" title="cutan.motion.PRESETS"><code class="xref py py-data docutils literal notranslate"><span class="pre">cutan.motion.PRESETS</span></code></a> (an#166).</p>
 </dd></dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="cutan.characters.play.PlayResolutionError">
@@ -525,7 +526,7 @@ order, as <a class="reference internal" href="#cutan.characters.play.resolve_tur
 </dd>
 </dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten</span><span class="p">,</span> <span class="n">sequence</span>
-</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">an.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">turn</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">turn</span>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">flats</span> <span class="o">=</span> <span class="n">flatten</span><span class="p">(</span><span class="n">sequence</span><span class="p">(</span><span class="n">turn</span><span class="p">(</span><span class="s2">"ned"</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s2">"side"</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)))</span>
 </span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">facing_at</span><span class="p">(</span><span class="n">flats</span><span class="p">,</span> <span class="s2">"ned"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">facing_at</span><span class="p">(</span><span class="n">flats</span><span class="p">,</span> <span class="s2">"ned"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 </span><span id="line-5"><span class="go">(Facing(view=None, direction=None), Facing(view='side', direction='left'))</span>
@@ -844,7 +845,7 @@ primary slot — keyed on the bone, not on a slot named “head”.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=47de8214"></script>
+<script src="../_static/documentation_options.js?v=8c5712d9"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

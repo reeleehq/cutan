@@ -54,6 +54,7 @@
 - [cutan.impacts.stroke](cutan.impacts.stroke.html.md): The stroke: impact events -&gt; one continuous height curve &#96;h(t)&#96;.
 - [cutan.impacts.truth](cutan.impacts.truth.html.md): Ground truth: what was intended, what was executed, and what each frame shows.
 - [cutan.library](cutan.library.html.md): The character analyser: legs, arms, views and mouth chart, derived from the rig.
+- [cutan.motion](cutan.motion.html.md): The cut-out genre’s motion presets: moves that name a rig’s parts or swap its views.
 - [cutan.runtime](cutan.runtime.html.md): JavaScript the cut-out genre adds to the stage runtime (&#96;visuals.js&#96;: the mouth and eye).
 - [cutan.verify](cutan.verify.html.md): The cut-out style lint: measures a render against a named style spec.
 - [cutan.verify.style](cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.

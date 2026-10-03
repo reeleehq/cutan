@@ -122,6 +122,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.genre.html">cutan.genre</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.impacts.html">cutan.impacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.library.html">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.runtime.html">cutan.runtime</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.verify.html">cutan.verify</a></li>
 </ul>
@@ -212,7 +213,7 @@
 </span><span id="line-36">
 </span><span id="line-37"><span class="sd">**Motion presets (an#166).** A name the descriptor does not declare — or any</span>
 </span><span id="line-38"><span class="sd">name on an entity with no descriptor (a procedural rig, a prop) — falls back</span>
-</span><span id="line-39"><span class="sd">to :data:`an.motion.PRESETS`. The DESCRIPTOR WINS a name both know: a rig that</span>
+</span><span id="line-39"><span class="sd">to :data:`cutan.motion.PRESETS`. The DESCRIPTOR WINS a name both know: a rig that</span>
 </span><span id="line-40"><span class="sd">ships its own ``hop`` means that one. :func:`play_source` makes that call and</span>
 </span><span id="line-41"><span class="sd">:func:`play_problems` gives the whole verdict, for ``an validate`` and the</span>
 </span><span id="line-42"><span class="sd">compiler alike. A preset resolves to tweens, not a clip:</span>
@@ -395,7 +396,7 @@
 </span><span id="line-195">
 </span><span id="line-196"><span class="c1">#: Where a ``play`` resolves: the entity descriptor's own ``animations``…</span>
 </span><span id="line-197"><span class="n">DESCRIPTOR_SOURCE</span> <span class="o">=</span> <span class="s2">"descriptor"</span>
-</span><span id="line-198"><span class="c1">#: …or, for a name it does not declare, :data:`an.motion.PRESETS` (an#166).</span>
+</span><span id="line-198"><span class="c1">#: …or, for a name it does not declare, :data:`cutan.motion.PRESETS` (an#166).</span>
 </span><span id="line-199"><span class="n">PRESET_SOURCE</span> <span class="o">=</span> <span class="s2">"preset"</span>
 </span><span id="line-200">
 </span><span id="line-201"><span class="c1">#: Preset parameters an author may NOT pass through ``args``: the target is</span>
@@ -439,8 +440,8 @@
 </span><span id="line-236">
 </span><span id="line-237">
 </span><span id="line-238"><span class="k">def</span><span class="w"> </span><span class="nf">_presets</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]:</span>
-</span><span id="line-239">    <span class="c1"># Lazy: `an.motion` imports the IR, and the IR's validator imports this.</span>
-</span><span id="line-240">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">PRESETS</span>
+</span><span id="line-239">    <span class="c1"># Lazy: `cutan.motion` imports the IR, and the IR's validator imports this.</span>
+</span><span id="line-240">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">PRESETS</span>
 </span><span id="line-241">
 </span><span id="line-242">    <span class="k">return</span> <span class="n">PRESETS</span>
 </span><span id="line-243">
@@ -1047,7 +1048,7 @@
 </span><span id="line-812"><span class="sd">    order, as :func:`resolve_turns` does).</span>
 </span><span id="line-813">
 </span><span id="line-814"><span class="sd">    &gt;&gt;&gt; from an.ir.compose import flatten, sequence</span>
-</span><span id="line-815"><span class="sd">    &gt;&gt;&gt; from an.motion import turn</span>
+</span><span id="line-815"><span class="sd">    &gt;&gt;&gt; from cutan.motion import turn</span>
 </span><span id="line-816"><span class="sd">    &gt;&gt;&gt; flats = flatten(sequence(turn("ned", to="side", direction="left")))</span>
 </span><span id="line-817"><span class="sd">    &gt;&gt;&gt; facing_at(flats, "ned", 0.0), facing_at(flats, "ned", 1.0)</span>
 </span><span id="line-818"><span class="sd">    (Facing(view=None, direction=None), Facing(view='side', direction='left'))</span>
@@ -1141,7 +1142,7 @@
 </span><span id="line-903">            <span class="k">continue</span>
 </span><span id="line-904">        <span class="n">args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">args</span> <span class="ow">or</span> <span class="p">{})</span>
 </span><span id="line-905">        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">animation</span> <span class="o">==</span> <span class="n">TURN_PRESET</span> <span class="ow">and</span> <span class="n">action</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="n">entity</span><span class="p">:</span>
-</span><span id="line-906">            <span class="kn">from</span><span class="w"> </span><span class="nn">an.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_TURN_SET</span>
+</span><span id="line-906">            <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_TURN_SET</span>
 </span><span id="line-907">
 </span><span id="line-908">            <span class="n">before</span> <span class="o">=</span> <span class="n">facing_at</span><span class="p">(</span>
 </span><span id="line-909">                <span class="n">events</span><span class="p">(),</span>
@@ -1503,7 +1504,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=47de8214"></script>
+    <script src="../../../_static/documentation_options.js?v=8c5712d9"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

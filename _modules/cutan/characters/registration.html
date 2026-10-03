@@ -122,6 +122,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.genre.html">cutan.genre</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.impacts.html">cutan.impacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.library.html">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.runtime.html">cutan.runtime</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.verify.html">cutan.verify</a></li>
 </ul>
@@ -214,7 +215,7 @@
 </span><span id="line-36"><span class="sd">    compiler resolves its tracks into channels on the entity's nodes. A name</span>
 </span><span id="line-37"><span class="sd">    the descriptor does NOT declare — or any name on an entity with no</span>
 </span><span id="line-38"><span class="sd">    descriptor (a procedural rig, a prop) — falls back to the motion presets</span>
-</span><span id="line-39"><span class="sd">    of :data:`an.motion.PRESETS` (``hop``, ``nod``, …), which expand to</span>
+</span><span id="line-39"><span class="sd">    of :data:`cutan.motion.PRESETS` (``hop``, ``nod``, …), which expand to</span>
 </span><span id="line-40"><span class="sd">    ordinary tweens at the target's built rest pose; a descriptor animation of</span>
 </span><span id="line-41"><span class="sd">    the same name wins (an#166). Both halves are decided by</span>
 </span><span id="line-42"><span class="sd">    :func:`cutan.characters.play.play_problems`, the one resolver ``an validate``</span>
@@ -239,7 +240,7 @@
 </span><span id="line-61">    <span class="n">speed</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
 </span><span id="line-62">    <span class="n">loop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># None = the descriptor animation's own `loop`</span>
 </span><span id="line-63">    <span class="c1">#: Parameters of a MOTION PRESET (an#166) — ``{"height": 30}`` for a</span>
-</span><span id="line-64">    <span class="c1">#: ``hop`` — passed to its :data:`an.motion.PRESETS` function as keyword</span>
+</span><span id="line-64">    <span class="c1">#: ``hop`` — passed to its :data:`cutan.motion.PRESETS` function as keyword</span>
 </span><span id="line-65">    <span class="c1">#: arguments. ``None`` (the default, omitted from JSON) means the preset's</span>
 </span><span id="line-66">    <span class="c1">#: own defaults. A descriptor animation takes none, and one given to it is</span>
 </span><span id="line-67">    <span class="c1">#: refused; ``rest`` is never one — it is read off the built scene.</span>
@@ -291,7 +292,7 @@
 </span><span id="line-110"><span class="sd">    descriptor's.)</span>
 </span><span id="line-111">
 </span><span id="line-112"><span class="sd">    A name the descriptor does not declare falls back to a motion preset of</span>
-</span><span id="line-113"><span class="sd">    :data:`an.motion.PRESETS`, with ``args`` as its parameters (an#166):</span>
+</span><span id="line-113"><span class="sd">    :data:`cutan.motion.PRESETS`, with ``args`` as its parameters (an#166):</span>
 </span><span id="line-114">
 </span><span id="line-115"><span class="sd">    &gt;&gt;&gt; play("charlie", "hop", args={"height": 30}).args</span>
 </span><span id="line-116"><span class="sd">    {'height': 30}</span>
@@ -369,7 +370,7 @@
 </span><span id="line-179"><span class="w">    </span><span class="sd">"""``{kind: play, target, animation, [duration], [speed], [loop], [args]}``.</span>
 </span><span id="line-180">
 </span><span id="line-181"><span class="sd">    Resolved at compile against the target entity's descriptor ``animations``</span>
-</span><span id="line-182"><span class="sd">    (an#7), falling back to the motion presets of ``an.motion.PRESETS`` for a</span>
+</span><span id="line-182"><span class="sd">    (an#7), falling back to the motion presets of ``cutan.motion.PRESETS`` for a</span>
 </span><span id="line-183"><span class="sd">    name the descriptor does not declare, with ``args`` as the preset's</span>
 </span><span id="line-184"><span class="sd">    parameters (an#166). ``loop`` omitted means the animation's own. This</span>
 </span><span id="line-185"><span class="sd">    reader accepted the shape from the start, then #24 made it refuse (nothing</span>
@@ -444,7 +445,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=47de8214"></script>
+    <script src="../../../_static/documentation_options.js?v=8c5712d9"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

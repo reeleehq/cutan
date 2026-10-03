@@ -40,7 +40,7 @@ helpers rather than restating them, so the two cannot drift:
 
 **Motion presets (an#166).** A name the descriptor does not declare — or any
 name on an entity with no descriptor (a procedural rig, a prop) — falls back
-to `an.motion.PRESETS`. The DESCRIPTOR WINS a name both know: a rig that
+to [`cutan.motion.PRESETS`](cutan.motion.md#cutan.motion.PRESETS). The DESCRIPTOR WINS a name both know: a rig that
 ships its own `hop` means that one. [`play_source()`](#cutan.characters.play.play_source) makes that call and
 [`play_problems()`](#cutan.characters.play.play_problems) gives the whole verdict, for `an validate` and the
 compiler alike. A preset resolves to tweens, not a clip:
@@ -60,15 +60,15 @@ so an author never passes `rest`.
 
 ### Module Attributes
 
-| [`BONE_TRACK_PROPERTIES`](#cutan.characters.play.BONE_TRACK_PROPERTIES)   | Descriptor bone-track properties → `(runtime property, unit factor)`.                                                          |
-|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
-| [`RIG_SCALED_PROPERTIES`](#cutan.characters.play.RIG_SCALED_PROPERTIES)   | Bone-track properties whose values are view-box LENGTHS, so a renderer scales them by the rig's view-box → scene-pixel factor. |
-| [`ROOT_BONE`](#cutan.characters.play.ROOT_BONE)               | a track on it animates the entity's container node rather than any slot.                                                       |
-| [`HEAD_BONE`](#cutan.characters.play.HEAD_BONE)               | The bone whose primary slot's nested slots are the FACE — what `face_overlay=false` suppresses.                                |
-| [`DESCRIPTOR_SOURCE`](#cutan.characters.play.DESCRIPTOR_SOURCE)       | the entity descriptor's own `animations`…                                                                                      |
-| [`PRESET_SOURCE`](#cutan.characters.play.PRESET_SOURCE)           | …or, for a name it does not declare, `an.motion.PRESETS` (an#166).                                                             |
-| [`RESERVED_PRESET_ARGS`](#cutan.characters.play.RESERVED_PRESET_ARGS)    | the target is the play's own, and the rest pose is read off the built scene.                                                   |
-| [`TURN_PRESET`](#cutan.characters.play.TURN_PRESET)             | a turn opens from the side the character faces NOW, which only the timeline knows.                                             |
+| [`BONE_TRACK_PROPERTIES`](#cutan.characters.play.BONE_TRACK_PROPERTIES)   | Descriptor bone-track properties → `(runtime property, unit factor)`.                                                                     |
+|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| [`RIG_SCALED_PROPERTIES`](#cutan.characters.play.RIG_SCALED_PROPERTIES)   | Bone-track properties whose values are view-box LENGTHS, so a renderer scales them by the rig's view-box → scene-pixel factor.            |
+| [`ROOT_BONE`](#cutan.characters.play.ROOT_BONE)               | a track on it animates the entity's container node rather than any slot.                                                                  |
+| [`HEAD_BONE`](#cutan.characters.play.HEAD_BONE)               | The bone whose primary slot's nested slots are the FACE — what `face_overlay=false` suppresses.                                           |
+| [`DESCRIPTOR_SOURCE`](#cutan.characters.play.DESCRIPTOR_SOURCE)       | the entity descriptor's own `animations`…                                                                                                 |
+| [`PRESET_SOURCE`](#cutan.characters.play.PRESET_SOURCE)           | …or, for a name it does not declare, [`cutan.motion.PRESETS`](cutan.motion.md#cutan.motion.PRESETS) (an#166). |
+| [`RESERVED_PRESET_ARGS`](#cutan.characters.play.RESERVED_PRESET_ARGS)    | the target is the play's own, and the rest pose is read off the built scene.                                                              |
+| [`TURN_PRESET`](#cutan.characters.play.TURN_PRESET)             | a turn opens from the side the character faces NOW, which only the timeline knows.                                                        |
 
 ### Functions
 
@@ -150,7 +150,7 @@ The bone whose primary slot’s nested slots are the FACE — what
 
 ### cutan.characters.play.PRESET_SOURCE *= 'preset'*
 
-…or, for a name it does not declare, `an.motion.PRESETS` (an#166).
+…or, for a name it does not declare, [`cutan.motion.PRESETS`](cutan.motion.md#cutan.motion.PRESETS) (an#166).
 
 ### *exception* cutan.characters.play.PlayResolutionError(animation, problems)
 
@@ -291,7 +291,7 @@ order, as [`resolve_turns()`](#cutan.characters.play.resolve_turns) does).
 
 ```pycon
 >>> from an.ir.compose import flatten, sequence
->>> from an.motion import turn
+>>> from cutan.motion import turn
 >>> flats = flatten(sequence(turn("ned", to="side", direction="left")))
 >>> facing_at(flats, "ned", 0.0), facing_at(flats, "ned", 1.0)
 (Facing(view=None, direction=None), Facing(view='side', direction='left'))

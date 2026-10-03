@@ -564,7 +564,7 @@ byte, which a golden test holds):
 - `views` (an#197) — draw the turnaround: `back`, `side` (a profile
   facing the viewer’s right) and `three_quarter` beside the front, as a
   `view` swap set with a pose per view (`add_views()`), so
-  `an.motion.turn()` can turn the character around. Offline head only
+  [`cutan.motion.turn()`](cutan.motion.html.md#cutan.motion.turn) can turn the character around. Offline head only
   > (a DiceBear face is baked into its art); ignored for a DiceBear head.
 
   Additive: a shot that never sets a view renders exactly as without it.

@@ -43,7 +43,7 @@ seeded `idle_breath` and `blink`, or anything an author adds); the
 compiler resolves its tracks into channels on the entity’s nodes. A name
 the descriptor does NOT declare — or any name on an entity with no
 descriptor (a procedural rig, a prop) — falls back to the motion presets
-of `an.motion.PRESETS` (`hop`, `nod`, …), which expand to
+of [`cutan.motion.PRESETS`](cutan.motion.html.md#cutan.motion.PRESETS) (`hop`, `nod`, …), which expand to
 ordinary tweens at the target’s built rest pose; a descriptor animation of
 the same name wins (an#166). Both halves are decided by
 [`cutan.characters.play.play_problems()`](cutan.characters.play.html.md#cutan.characters.play.play_problems), the one resolver `an validate`
@@ -63,7 +63,7 @@ the shot end and occupies ZERO (`an.characters.play.play_extent()`).
 #### args *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
 
 Parameters of a MOTION PRESET (an#166) — `{"height": 30}` for a
-`hop` — passed to its `an.motion.PRESETS` function as keyword
+`hop` — passed to its [`cutan.motion.PRESETS`](cutan.motion.html.md#cutan.motion.PRESETS) function as keyword
 arguments. `None` (the default, omitted from JSON) means the preset’s
 own defaults. A descriptor animation takes none, and one given to it is
 refused; `rest` is never one — it is read off the built scene.
@@ -121,7 +121,7 @@ compiler pass the entity’s descriptor too — `cutan.characters.play.play_exte
 descriptor’s.)
 
 A name the descriptor does not declare falls back to a motion preset of
-`an.motion.PRESETS`, with `args` as its parameters (an#166):
+[`cutan.motion.PRESETS`](cutan.motion.html.md#cutan.motion.PRESETS), with `args` as its parameters (an#166):
 
 ```pycon
 >>> play("charlie", "hop", args={"height": 30}).args
@@ -151,7 +151,7 @@ length ([`default_play_extent()`](#cutan.characters.registration.default_play_ex
 `{kind: play, target, animation, [duration], [speed], [loop], [args]}`.
 
 Resolved at compile against the target entity’s descriptor `animations`
-(an#7), falling back to the motion presets of `an.motion.PRESETS` for a
+(an#7), falling back to the motion presets of `cutan.motion.PRESETS` for a
 name the descriptor does not declare, with `args` as the preset’s
 parameters (an#166). `loop` omitted means the animation’s own. This
 reader accepted the shape from the start, then #24 made it refuse (nothing

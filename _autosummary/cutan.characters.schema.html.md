@@ -434,7 +434,7 @@ Configuration for the model, should be a dictionary conforming to [`ConfigDict`]
 
 The views the factory draws, in turnaround order. `side` is a profile
 facing the viewer’s RIGHT at a positive `scale_x`; a negative `scale_x`
-(`an.motion.turn(direction="left")`) mirrors it to face left.
+(`cutan.motion.turn(direction="left")`) mirrors it to face left.
 
 ### cutan.characters.schema.VIEW_CHANNEL *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'view'*
 
@@ -442,7 +442,7 @@ one KEY per drawn view, projected
 onto the slots whose art changes with the view (the factory draws the head
 and the torso), each slot carrying attachments NAMED after the keys. A
 conventional name, like `viseme` — nothing in the compiler or the runtime
-reads it; `an.motion.turn` is the one writer that defaults to it.
+reads it; `cutan.motion.turn` is the one writer that defaults to it.
 
 * **Type:**
   The swap set a turnaround rides (an#197)

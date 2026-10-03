@@ -34,7 +34,7 @@
 <link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="cutan.runtime.html" rel="next" title="cutan.runtime"/>
+<link href="cutan.motion.html" rel="next" title="cutan.motion"/>
 <link href="cutan.impacts.truth.html" rel="prev" title="cutan.impacts.truth"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
@@ -92,6 +92,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cutan.genre.html">cutan.genre</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.impacts.html">cutan.impacts</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.runtime.html">cutan.runtime</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.verify.html">cutan.verify</a></li>
 </ul>
@@ -130,8 +131,8 @@
 slice: P7’s capability registry adopts <a class="reference internal" href="#cutan.library.character_affordances" title="cutan.library.character_affordances"><code class="xref py py-func docutils literal notranslate"><span class="pre">character_affordances()</span></code></a> as
 <code class="docutils literal notranslate"><span class="pre">affordances(asset)</span></code> for characters instead of deriving a second time.</p>
 <p><strong>What it reads is what the compiler reads</strong>, or the facets would lie (ADR 0005,
-Risks): the limb pairs <code class="docutils literal notranslate"><span class="pre">walk</span></code> resolves (<code class="xref py py-data docutils literal notranslate"><span class="pre">an.motion.WALK_LEG_NAMES</span></code>,
-<code class="xref py py-data docutils literal notranslate"><span class="pre">an.motion.WALK_ARM_NAMES</span></code>), the <code class="docutils literal notranslate"><span class="pre">view</span></code> and <code class="docutils literal notranslate"><span class="pre">viseme</span></code> swap sets
+Risks): the limb pairs <code class="docutils literal notranslate"><span class="pre">walk</span></code> resolves (<a class="reference internal" href="cutan.motion.html#cutan.motion.WALK_LEG_NAMES" title="cutan.motion.WALK_LEG_NAMES"><code class="xref py py-data docutils literal notranslate"><span class="pre">cutan.motion.WALK_LEG_NAMES</span></code></a>,
+<code class="xref py py-data docutils literal notranslate"><span class="pre">cutan.motion.WALK_ARM_NAMES</span></code>), the <code class="docutils literal notranslate"><span class="pre">view</span></code> and <code class="docutils literal notranslate"><span class="pre">viseme</span></code> swap sets
 (<code class="docutils literal notranslate"><span class="pre">asset_sets</span></code>), the declared facts <code class="docutils literal notranslate"><span class="pre">rest_view</span></code>,
 <code class="docutils literal notranslate"><span class="pre">face_overlay</span></code> and <code class="docutils literal notranslate"><span class="pre">occluded</span></code>. And <strong>art must be present</strong>: a slot or swap key counts only
 when an attachment it names has its file among the asset’s files — a descriptor
@@ -283,7 +284,7 @@ matcher’s answer (<code class="docutils literal notranslate"><span class="pre"
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=47de8214"></script>
+<script src="../_static/documentation_options.js?v=8c5712d9"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

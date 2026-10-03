@@ -92,6 +92,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cutan.genre.html">cutan.genre</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.impacts.html">cutan.impacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.library.html">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.runtime.html">cutan.runtime</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.verify.html">cutan.verify</a></li>
 </ul>
@@ -206,7 +207,7 @@ problem routes the way every other verifier’s does (an#78).</p>
 <td><p>Give a character the eye stack (an#99): three sibling slots per eye under the head — <code class="docutils literal notranslate"><span class="pre">&lt;side&gt;_sclera</span></code> (white fill) below <code class="docutils literal notranslate"><span class="pre">&lt;side&gt;_pupil</span></code> below <code class="docutils literal notranslate"><span class="pre">&lt;side&gt;_eye</span></code> (the existing slot, now the lid, drawn above the pupil) — with synthesized parts, an outline-only open eye, a FILLED closed lid, the <code class="docutils literal notranslate"><span class="pre">gaze_travel</span></code> clamp, and draw orders that put the lid over the pupil.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.factory.add_views" title="cutan.characters.factory.add_views"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_views</span></code></a>(char_dir)</p></td>
-<td><p>Give a factory character its turnaround (an#197): <code class="docutils literal notranslate"><span class="pre">back</span></code>, <code class="docutils literal notranslate"><span class="pre">side</span></code> and <code class="docutils literal notranslate"><span class="pre">three_quarter</span></code> head and torso art beside the front, a <code class="docutils literal notranslate"><span class="pre">view</span></code> swap set projected onto those two slots, and a pose per view (<code class="docutils literal notranslate"><span class="pre">swap_poses</span></code>) — so <code class="docutils literal notranslate"><span class="pre">{kind:</span> <span class="pre">set,</span> <span class="pre">target:</span> <span class="pre">&lt;entity&gt;,</span> <span class="pre">property:</span> <span class="pre">view,</span> <span class="pre">value:</span> <span class="pre">side}</span></code> or <code class="xref py py-func docutils literal notranslate"><span class="pre">an.motion.turn()</span></code> turns the whole character.</p></td>
+<td><p>Give a factory character its turnaround (an#197): <code class="docutils literal notranslate"><span class="pre">back</span></code>, <code class="docutils literal notranslate"><span class="pre">side</span></code> and <code class="docutils literal notranslate"><span class="pre">three_quarter</span></code> head and torso art beside the front, a <code class="docutils literal notranslate"><span class="pre">view</span></code> swap set projected onto those two slots, and a pose per view (<code class="docutils literal notranslate"><span class="pre">swap_poses</span></code>) — so <code class="docutils literal notranslate"><span class="pre">{kind:</span> <span class="pre">set,</span> <span class="pre">target:</span> <span class="pre">&lt;entity&gt;,</span> <span class="pre">property:</span> <span class="pre">view,</span> <span class="pre">value:</span> <span class="pre">side}</span></code> or <a class="reference internal" href="cutan.motion.html#cutan.motion.turn" title="cutan.motion.turn"><code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.motion.turn()</span></code></a> turns the whole character.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.factory.declare_mouth_variants" title="cutan.characters.factory.declare_mouth_variants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">declare_mouth_variants</span></code></a>(descriptor, variants)</p></td>
 <td><p>Declare a <code class="docutils literal notranslate"><span class="pre">viseme@&lt;form&gt;</span></code> set per variant on <code class="docutils literal notranslate"><span class="pre">descriptor</span></code> — the set's keys map to <code class="docutils literal notranslate"><span class="pre">mouth_&lt;shape&gt;_&lt;form&gt;</span></code> attachments, which are added to the default skin's <code class="docutils literal notranslate"><span class="pre">mouth</span></code> slot with the neutral mouth's geometry.</p></td>
@@ -482,7 +483,7 @@ rendering on the bench.</p>
 <code class="docutils literal notranslate"><span class="pre">three_quarter</span></code> head and torso art beside the front, a <code class="docutils literal notranslate"><span class="pre">view</span></code> swap set
 projected onto those two slots, and a pose per view (<code class="docutils literal notranslate"><span class="pre">swap_poses</span></code>) — so
 <code class="docutils literal notranslate"><span class="pre">{kind:</span> <span class="pre">set,</span> <span class="pre">target:</span> <span class="pre">&lt;entity&gt;,</span> <span class="pre">property:</span> <span class="pre">view,</span> <span class="pre">value:</span> <span class="pre">side}</span></code> or
-<code class="xref py py-func docutils literal notranslate"><span class="pre">an.motion.turn()</span></code> turns the whole character. Idempotent. Returns the
+<a class="reference internal" href="cutan.motion.html#cutan.motion.turn" title="cutan.motion.turn"><code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.motion.turn()</span></code></a> turns the whole character. Idempotent. Returns the
 descriptor path.</p>
 <p>The views are REDRAWN from the recorded knobs (seed, palette, build, hat,
 hair style and length, sash, head scale), so it refuses a rig whose head is not this factory’s
@@ -597,7 +598,7 @@ descriptor’s <code class="docutils literal notranslate"><span class="pre">occl
 <li><p><code class="docutils literal notranslate"><span class="pre">views</span></code> (an#197) — draw the turnaround: <code class="docutils literal notranslate"><span class="pre">back</span></code>, <code class="docutils literal notranslate"><span class="pre">side</span></code> (a profile
 facing the viewer’s right) and <code class="docutils literal notranslate"><span class="pre">three_quarter</span></code> beside the front, as a
 <code class="docutils literal notranslate"><span class="pre">view</span></code> swap set with a pose per view (<a class="reference internal" href="#cutan.characters.factory.add_views" title="cutan.characters.factory.add_views"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_views()</span></code></a>), so
-<code class="xref py py-func docutils literal notranslate"><span class="pre">an.motion.turn()</span></code> can turn the character around. Offline head only</p>
+<a class="reference internal" href="cutan.motion.html#cutan.motion.turn" title="cutan.motion.turn"><code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.motion.turn()</span></code></a> can turn the character around. Offline head only</p>
 <blockquote>
 <div><p>(a DiceBear face is baked into its art); ignored for a DiceBear head.</p>
 </div></blockquote>
@@ -819,7 +820,7 @@ slots a rig has (a rig without the eye stack has no pupils to pose).</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=47de8214"></script>
+<script src="../_static/documentation_options.js?v=8c5712d9"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

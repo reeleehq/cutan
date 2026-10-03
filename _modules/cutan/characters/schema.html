@@ -122,6 +122,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.genre.html">cutan.genre</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.impacts.html">cutan.impacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.library.html">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.runtime.html">cutan.runtime</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.verify.html">cutan.verify</a></li>
 </ul>
@@ -282,12 +283,12 @@
 </span><span id="line-106"><span class="c1">#: onto the slots whose art changes with the view (the factory draws the head</span>
 </span><span id="line-107"><span class="c1">#: and the torso), each slot carrying attachments NAMED after the keys. A</span>
 </span><span id="line-108"><span class="c1">#: conventional name, like `viseme` — nothing in the compiler or the runtime</span>
-</span><span id="line-109"><span class="c1">#: reads it; `an.motion.turn` is the one writer that defaults to it.</span>
+</span><span id="line-109"><span class="c1">#: reads it; `cutan.motion.turn` is the one writer that defaults to it.</span>
 </span><span id="line-110"><span class="n">VIEW_CHANNEL</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"view"</span>
 </span><span id="line-111">
 </span><span id="line-112"><span class="c1">#: The views the factory draws, in turnaround order. ``side`` is a profile</span>
 </span><span id="line-113"><span class="c1">#: facing the viewer's RIGHT at a positive ``scale_x``; a negative ``scale_x``</span>
-</span><span id="line-114"><span class="c1">#: (``an.motion.turn(direction="left")``) mirrors it to face left.</span>
+</span><span id="line-114"><span class="c1">#: (``cutan.motion.turn(direction="left")``) mirrors it to face left.</span>
 </span><span id="line-115"><span class="n">VIEWS</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"front"</span><span class="p">,</span> <span class="s2">"three_quarter"</span><span class="p">,</span> <span class="s2">"side"</span><span class="p">,</span> <span class="s2">"back"</span><span class="p">)</span>
 </span><span id="line-116">
 </span><span id="line-117"><span class="c1">#: The view a character shows at rest: its default attachments ARE this view.</span>
@@ -299,12 +300,12 @@
 </span><span id="line-123"><span class="c1">#: the same separator the expression variants (``viseme@happy``, an#98) use.</span>
 </span><span id="line-124"><span class="n">VIEW_VARIANT_SEP</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"@"</span>
 </span><span id="line-125">
-</span><span id="line-126"><span class="c1">#: How a character walks (``an.motion.walk``'s ``gait``, an#220): ``legs``</span>
+</span><span id="line-126"><span class="c1">#: How a character walks (``cutan.motion.walk``'s ``gait``, an#220): ``legs``</span>
 </span><span id="line-127"><span class="c1">#: swing about the hip in a profile and step up and down facing the camera;</span>
 </span><span id="line-128"><span class="c1">#: ``hem`` — the leg slots are the two halves of a robe's hem — tilts them in</span>
 </span><span id="line-129"><span class="c1">#: turn under a swaying, bobbing body; ``rock`` moves no leg at all (a blob, a</span>
 </span><span id="line-130"><span class="c1">#: sack) and rocks the body.</span>
-</span><span id="line-131"><span class="kn">from</span><span class="w"> </span><span class="nn">an.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">GAITS</span>  <span class="c1"># noqa: E402,F401  (the gaits `walk` knows)</span>
+</span><span id="line-131"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">GAITS</span>  <span class="c1"># noqa: E402,F401  (the gaits `walk` knows)</span>
 </span><span id="line-132">
 </span><span id="line-133">
 <div class="viewcode-block" id="view_variant_set">
@@ -1135,7 +1136,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=47de8214"></script>
+    <script src="../../../_static/documentation_options.js?v=8c5712d9"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

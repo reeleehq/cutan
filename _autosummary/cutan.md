@@ -107,5 +107,6 @@ Refuse, with an upgrade hint, to load against an `an` older than this `cutan` ne
 | [`genre`](cutan.genre.md#module-cutan.genre)           | The cut-out animation genre, declared as one object.                                         |
 | [`impacts`](cutan.impacts.md#module-cutan.impacts)       | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                |
 | [`library`](cutan.library.md#module-cutan.library)       | The character analyser: legs, arms, views and mouth chart, derived from the rig.             |
+| [`motion`](cutan.motion.md#module-cutan.motion)         | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.         |
 | [`runtime`](cutan.runtime.md#module-cutan.runtime)       | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).    |
 | [`verify`](cutan.verify.md#module-cutan.verify)         | The cut-out style lint: measures a render against a named style spec.                        |
