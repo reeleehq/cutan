@@ -18,6 +18,8 @@ cutan.characters.methods
    
       check_brow_acting
       check_declared_speech
+      check_walk_gaits
+      gait_problem
       compile_profile
       speech_problems
       normalise_gait_args

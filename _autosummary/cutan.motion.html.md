@@ -28,25 +28,36 @@ the genre’s presets into it.
 
 ### Module Attributes
 
-| [`WALK_LANDING_S`](#cutan.motion.WALK_LANDING_S)   | A limb's move ends with a constant tween this long at its end value instead of a settling `set`: it lands the value exactly (a held tween END is evaluated at its own end, which float drift cannot put a grid step early), and unlike a `set` — whose hold outranks a view's pose channel — it lets a later view change pose the limb again.   |
-|-------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`WALK_LEG_NAMES`](#cutan.motion.WALK_LEG_NAMES)   | the rig contract's (descriptor rigs, `an character new`), then the procedural placeholder's.                                                                                                                                                                                                                                                    |
-| [`GAITS`](#cutan.motion.GAITS)            | a legged figure's alternating legs, a legless figure's hem tilt, or a rock.                                                                                                                                                                                                                                                                     |
-| [`DFLT_TURN_SET`](#cutan.motion.DFLT_TURN_SET)    | the factory's turnaround (an#197).                                                                                                                                                                                                                                                                                                              |
-| [`RIG_PRESETS`](#cutan.motion.RIG_PRESETS)      | The genre's presets, by name.                                                                                                                                                                                                                                                                                                                   |
-| [`PRESETS`](#cutan.motion.PRESETS)          | Every preset a `play` can name — the core's and the genre's — the one table the skill, the demos, the vocabulary and the `play` fallback ([`cutan.characters.play.play_source()`](cutan.characters.play.html.md#cutan.characters.play.play_source), an#166) read.                                                                 |
-| [`PRESET_VERSIONS`](#cutan.motion.PRESET_VERSIONS)  | [`PRESETS`](#cutan.motion.PRESETS)' vocabulary versions.                                                                                                                                                                                                                                                                  |
+| [`WALK_LANDING_S`](#cutan.motion.WALK_LANDING_S)    | A limb's move ends with a constant tween this long at its end value instead of a settling `set`: it lands the value exactly (a held tween END is evaluated at its own end, which float drift cannot put a grid step early), and unlike a `set` — whose hold outranks a view's pose channel — it lets a later view change pose the limb again.   |
+|--------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`WALK_LEG_NAMES`](#cutan.motion.WALK_LEG_NAMES)    | the rig contract's (descriptor rigs, `an character new`), then the procedural placeholder's.                                                                                                                                                                                                                                                    |
+| [`GAITS`](#cutan.motion.GAITS)             | persisted in character descriptors and `play` args (`cutan.characters.schema.GAITS`), so a spelling is never renamed.                                                                                                                                                                                                                           |
+| [`LEGGED_GAITS`](#cutan.motion.LEGGED_GAITS)      | The gaits that move a leg pair — and need one (the `limbs.legs` capability).                                                                                                                                                                                                                                                                    |
+| [`DFLT_LEGLESS_GAIT`](#cutan.motion.DFLT_LEGLESS_GAIT) | the locomotion chain's last link.                                                                                                                                                                                                                                                                                                               |
+| [`GAIT_DEFAULTS`](#cutan.motion.GAIT_DEFAULTS)     | Each gait's departures from `WALK_PARAM_DEFAULTS`.                                                                                                                                                                                                                                                                                              |
+| [`DFLT_TURN_SET`](#cutan.motion.DFLT_TURN_SET)     | the factory's turnaround (an#197).                                                                                                                                                                                                                                                                                                              |
+| [`RIG_PRESETS`](#cutan.motion.RIG_PRESETS)       | The genre's presets, by name.                                                                                                                                                                                                                                                                                                                   |
+| [`PRESETS`](#cutan.motion.PRESETS)           | Every preset a `play` can name — the core's and the genre's — the one table the skill, the demos, the vocabulary and the `play` fallback ([`cutan.characters.play.play_source()`](cutan.characters.play.html.md#cutan.characters.play.play_source), an#166) read.                                                                 |
+| [`PRESET_VERSIONS`](#cutan.motion.PRESET_VERSIONS)   | [`PRESETS`](#cutan.motion.PRESETS)' vocabulary versions.                                                                                                                                                                                                                                                                  |
 
 ### Functions
 
 | [`face_toward`](#cutan.motion.face_toward)(shot, who, other, \*[, view, ...])     | [`turn()`](#cutan.motion.turn) `who` to `view`, facing `other` — the direction read off the stage, so a profile looks at the other character wherever the layout put them.   |
 |-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`gait_params`](#cutan.motion.gait_params)(gait, \*[, scale])                     | The parameters a `gait` walks with: `given` where not `None`, else its default.                                                                                                                       |
 | [`nod`](#cutan.motion.nod)(target, \*[, part, angle, duration, ...])      | Dip the head `count` times (a rotation of `<target>/<part>`).                                                                                                                                         |
 | [`point`](#cutan.motion.point)(target, \*[, angle, raise_duration, ...])    | Swing an arm out to point, hold it, and lower it again.                                                                                                                                               |
 | [`speech_pulse`](#cutan.motion.speech_pulse)(target, \*[, beats, strength, ...])   | Pulse a part on each syllable: speech carried without a mouth (an#248).                                                                                                                               |
 | [`turn`](#cutan.motion.turn)(target, \*[, to, direction, ...])             | Turn a character to the view `to` — the classic cut-out turn (an#197).                                                                                                                                |
 | [`waddle`](#cutan.motion.waddle)(target, \*[, steps, step_duration, ...])    | A walk cycle for a rig with no legs to animate: rock and bob per step.                                                                                                                                |
-| [`walk`](#cutan.motion.walk)(target, \*[, to_x, distance, direction, ...]) | Walk: the body travels on `x` and bobs once per step while the legs alternate and the arms swing against them (an#214).                                                                               |
+| [`walk`](#cutan.motion.walk)(target, \*[, to_x, distance, direction, ...]) | Walk: the body travels on `x` while the gait moves it — legs that alternate, a hop, a bounce, a glide (an#214, an#224).                                                                               |
+
+### cutan.motion.DFLT_LEGLESS_GAIT *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'glide'*
+
+the locomotion chain’s last link.
+
+* **Type:**
+  The gait of a figure with no leg pair
 
 ### cutan.motion.DFLT_TURN_SET *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'view'*
 
@@ -55,14 +66,25 @@ the factory’s turnaround (an#197).
 * **Type:**
   The swap set a turn swaps
 
-### cutan.motion.GAITS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('legs', 'hem', 'rock')*
+### cutan.motion.GAITS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('legs', 'hem', 'rock', 'profile', 'shuffle', 'waddle', 'hop', 'bounce', 'glide')*
 
-a legged figure’s alternating legs, a
-legless figure’s hem tilt, or a rock. Persisted in character descriptors and
-`play` args (`cutan.characters.schema.GAITS`).
+persisted in character
+descriptors and `play` args (`cutan.characters.schema.GAITS`), so a
+spelling is never renamed. Each is a locomotion method
+([`cutan.characters.methods`](cutan.characters.methods.html.md#module-cutan.characters.methods)); `misc/docs/locomotion_gaits.md` is the
+classification behind them.
 
 * **Type:**
-  The gaits `walk` knows (`gait=`)
+  The gaits `walk` knows (`gait=`, an#220, an#224)
+
+### cutan.motion.GAIT_DEFAULTS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]]* *= {'bounce': {'arm_swing': 0.15, 'bob': 8.0, 'lift': 4.0, 'stride': 0.1}, 'glide': {'arm_swing': 0.0, 'bob': 1.5}, 'hem': {}, 'hop': {'arm_swing': 0.0}, 'legs': {}, 'profile': {'arm_swing': 0.35, 'stride': 0.45}, 'rock': {}, 'shuffle': {'arm_swing': 0.1, 'bob': 1.0, 'lift': 3.0, 'step_length': 40.0, 'step_s': 0.3, 'stride': 0.12}, 'waddle': {'arm_swing': 0.15, 'bob': 4.0, 'lift': 5.0, 'rock': 0.12}}*
+
+Each gait’s departures from `WALK_PARAM_DEFAULTS`. The first three are
+the pre-an#224 gaits and keep the shared defaults exactly (no pixel moves).
+
+### cutan.motion.LEGGED_GAITS *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'hem', 'legs', 'profile', 'shuffle'})*
+
+The gaits that move a leg pair — and need one (the `limbs.legs` capability).
 
 ### cutan.motion.PRESETS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[...], [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[[Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[SetAction, Tag(tag=[set](https://docs.python.org/3/builtins/stdtypes.html#set))] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[TweenAction, Tag(tag=tween)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[SequenceAction, Tag(tag=sequence)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[ParallelAction, Tag(tag=parallel)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[DelayAction, Tag(tag=delay)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[LoopAction, Tag(tag=loop)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[ExtensionAction, SerializeAsAny(), Tag(tag=extension)], Discriminator(discriminator=\_action_tag, custom_error_type=[None](https://docs.python.org/3/builtins/constants.html#None), custom_error_message=[None](https://docs.python.org/3/builtins/constants.html#None), custom_error_context=[None](https://docs.python.org/3/builtins/constants.html#None))]]]* *= {'crawl': <function crawl>, 'hop': <function hop>, 'nod': <function nod>, 'point': <function point>, 'pop_in': <function pop_in>, 'shake': <function shake>, 'slide_in': <function slide_in>, 'slide_out': <function slide_out>, 'speech_pulse': <function speech_pulse>, 'squash_stretch': <function squash_stretch>, 'turn': <function turn>, 'waddle': <function waddle>, 'walk': <function walk>}*
 
@@ -71,7 +93,7 @@ the skill, the demos, the vocabulary and the `play` fallback
 ([`cutan.characters.play.play_source()`](cutan.characters.play.html.md#cutan.characters.play.play_source), an#166) read. A genre preset wins a
 name the core also has.
 
-### cutan.motion.PRESET_VERSIONS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'crawl': '1', 'hop': '1', 'nod': '1', 'point': '1', 'pop_in': '1', 'shake': '1', 'slide_in': '1', 'slide_out': '1', 'speech_pulse': '1', 'squash_stretch': '1', 'turn': '1', 'waddle': '1', 'walk': '1'}*
+### cutan.motion.PRESET_VERSIONS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'crawl': '1', 'hop': '1', 'nod': '1', 'point': '1', 'pop_in': '1', 'shake': '1', 'slide_in': '1', 'slide_out': '1', 'speech_pulse': '1', 'squash_stretch': '1', 'turn': '1', 'waddle': '1', 'walk': '2'}*
 
 [`PRESETS`](#cutan.motion.PRESETS)’ vocabulary versions.
 
@@ -112,6 +134,26 @@ layout put them.
 ...     AssetRef(kind="character", id=n, store="characters", ref=n) for n in ("a", "b")])
 >>> [f.action.to_value for f in _tweens(face_toward(two, "b", "a"))]
 [0.0, -1.0]
+```
+
+### cutan.motion.gait_params(gait, , scale=1.0, \*\*given)
+
+The parameters a `gait` walks with: `given` where not `None`, else its default.
+
+A default length (`SCALED_GAIT_PARAMS`: the step, the body’s bob, a
+hop) is stated for a figure at drawn scale 1 and multiplied by `scale`
+(the figure’s drawn scale: its stage scale, an#224); an explicit value is
+scene px as given. Angles and a leg’s `lift` (in the figure’s own frame,
+already scaled with it) never scale.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+```pycon
+>>> gait_params("legs")["step_length"], gait_params("legs", scale=2.0)["step_length"]
+(80.0, 160.0)
+>>> gait_params("shuffle", scale=2.0, step_length=50.0)["step_length"]
+50.0
 ```
 
 ### cutan.motion.nod(target, , part='head', angle=0.18, duration=0.5, count=2, rest=None)
@@ -221,10 +263,10 @@ so it is the one that needs `rest` in a multi-character shot.
 0.6
 ```
 
-### cutan.motion.walk(target, , to_x=None, distance=None, direction=None, steps=None, step_s=0.4, step_length=80.0, stride=0.35, lift=10.0, bob=6.0, arm_swing=0.3, rock=0.06, hem_tilt=0.24, view=None, gait=None, legs=None, arms=None, parts=None, rest=None)
+### cutan.motion.walk(target, , to_x=None, distance=None, direction=None, steps=None, step_s=None, step_length=None, stride=None, lift=None, bob=None, arm_swing=None, rock=None, hem_tilt=None, hop_height=None, lean=None, view=None, gait=None, legs=None, arms=None, parts=None, rest=None)
 
-Walk: the body travels on `x` and bobs once per step while the legs
-alternate and the arms swing against them (an#214).
+Walk: the body travels on `x` while the gait moves it — legs that
+alternate, a hop, a bounce, a glide (an#214, an#224).
 
 **Where to.** `to_x` (absolute scene x) or `distance` (signed px; with
 `direction` `"left"`/`"right"` its sign is the direction’s), or
@@ -237,37 +279,58 @@ played by name, `rest` is its pose at the play’s start (an#212), so
 walk’s length (`steps × step_s`) is known before it is placed and a
 `sequence` waits for exactly that long.
 
-**Legs, by view.** In a view in `WALK_SWING_VIEWS` (`side`,
-`three_quarter`) each leg swings `stride` radians either side of its
-rest about the hip, the two in opposition; in any other view (`front`,
-`back`, or none) the stepping leg rises `lift` px and sets down again,
-the two alternating. Played by name, `view` is the one in force on the
-timeline at the play’s start (the view the last `turn` or `set` left);
-pass it to override. `legs`/`arms` name the two limb nodes; by
-default the first pair in [`WALK_LEG_NAMES`](#cutan.motion.WALK_LEG_NAMES) / `WALK_ARM_NAMES`
-that the rig builds (`parts`: the entity’s built parts with their pose
-at the start, filled in by the compiler). Played by name with no view on
-the timeline, the view is the descriptor’s `rest_view` (an#220) — a
-character carved in profile swings its legs with nothing passed.
+**Gait** (`gait`, one of [`GAITS`](#cutan.motion.GAITS); the locomotion methods of
+[`cutan.characters.methods`](cutan.characters.methods.html.md#module-cutan.characters.methods), classified in
+`misc/docs/locomotion_gaits.md`). Each has its own defaults
+([`GAIT_DEFAULTS`](#cutan.motion.GAIT_DEFAULTS)); a parameter passed overrides them.
 
-**Gait** (`gait`, one of [`GAITS`](#cutan.motion.GAITS), an#220).
-`legs` is the above. `hem` is a robe whose leg slots are the two
-halves of its hem: facing the camera the halves TILT in turn by
-`hem_tilt` radians about the hip while the body sways by `rock` and
-bobs (in a profile they swing like legs). `rock` moves no leg: the body
-rocks and bobs (a blob, a sack). Unset: the descriptor’s `gait` when
-played by name, else `legs` when the rig builds a leg pair and `rock`
-when it does not. Limbs land on
-their rest with a [`WALK_LANDING_S`](#cutan.motion.WALK_LANDING_S) constant tween, not a settling
-`set`: a `set`’s hold would outrank the view’s pose channel and keep a
-profile’s splay after a later turn to the front.
+- `legs`: in a view in `WALK_SWING_VIEWS` (`side`,
+  `three_quarter`) each leg swings `stride` radians either side of its
+  rest about the hip, the two in opposition; in any other view the
+  stepping leg rises `lift` px and sets down; the body bobs `bob` once
+  per step and the arms swing `arm_swing` against the legs.
+- `profile`: the four-pose cycle of a profile walk (contact, down,
+  passing, up): the legs swing whatever the view, the body sinks after
+  each contact and rises before the next.
+- `shuffle`: `legs` with the feet barely leaving the ground — short,
+  quick steps, no bob to speak of.
+- `hem`: a robe whose leg slots are the two halves of its hem: facing
+  the camera the halves TILT in turn by `hem_tilt` radians while the body
+  sways by `rock` and bobs (in a profile they swing like legs).
+- `waddle`: the body rocks `rock` from foot to foot and bobs; legs, if
+  any, lift in turn.
+- `hop`: the body jumps `hop_height` px on every step.
+- `bounce`: the body bobs `bob` on every step while it slides; legs,
+  if any, flick (a South Park walk).
+- `glide`: the body slides, leaning `lean` radians into the move and
+  bobbing `bob` gently; no limb moves.
+- `rock`: no leg moves; the body rocks `rock` and bobs.
+
+Unset: `legs` when the rig builds a leg pair, else [`DFLT_LEGLESS_GAIT`](#cutan.motion.DFLT_LEGLESS_GAIT)
+— the locomotion chain’s default (played by name, the compiler resolves the
+gait on the capability registry first: the author’s, else the
+descriptor’s, else the chain). A legged gait on a rig with no leg pair
+walks the legless default too.
+
+**Size.** `step_length`, `bob` and `hop_height` default to lengths
+for a figure at drawn scale 1, multiplied by the figure’s scale — the
+`scale_y` of `rest`, which carries its stage scale — so a character
+staged at `scale: 2` strides twice as far (an#224). Pass them to set
+scene px outright.
+
+**Legs and arms.** `legs`/`arms` name the two limb nodes; by default
+the first pair in [`WALK_LEG_NAMES`](#cutan.motion.WALK_LEG_NAMES) / `WALK_ARM_NAMES` that the
+rig builds (`parts`: the entity’s built parts with their pose at the
+start, filled in by the compiler). Played by name, `view` is the one in
+force on the timeline at the play’s start (else the descriptor’s
+`rest_view`, an#220). Limbs land on their rest with a
+[`WALK_LANDING_S`](#cutan.motion.WALK_LANDING_S) constant tween, not a settling `set`: a `set`’s
+hold would outrank the view’s pose channel and keep a profile’s splay
+after a later turn to the front.
 
 The walk does not turn the character: in a side view, face the way it
 walks first (`turn`, `direction`) — the classic walk-off is `turn`
 then `walk`.
-
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 ```pycon
 >>> w = walk("bob", distance=160, steps=2, step_s=0.5)
@@ -278,9 +341,17 @@ then `walk`.
 >>> sorted({f.action.property for f in _tweens(walk("bob", distance=80, view="side"))
 ...         if f.action.target == "bob/leg_l"})
 ['rotation']
->>> sorted({f.action.target for f in _tweens(walk("blob", steps=2, legs=(), arms=()))})
-['blob']
+>>> sorted({(f.action.target, f.action.property) for f in _tweens(walk("blob", steps=2, legs=(), arms=()))})
+[('blob', 'y')]
 >>> sorted({(f.action.target, f.action.property) for f in _tweens(walk("al", steps=2, gait="hem"))
 ...         if f.action.target in ("al", "al/leg_l")})
 [('al', 'rotation'), ('al', 'y'), ('al/leg_l', 'rotation')]
+>>> [round(f.action.to_value, 1) for f in _tweens(walk("k", steps=2, gait="hop", legs=(), arms=()))]
+[-18.0, 0.0, -18.0, 0.0]
+>>> [f.action.to_value for f in _tweens(walk("k", distance=160, rest={"scale_y": 2.0}, legs=()))
+...  if f.action.property == "x"]
+[160.0]
 ```
+
+* **Return type:**
+  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]

@@ -11,6 +11,9 @@ cutan.motion
       WALK_LANDING_S
       WALK_LEG_NAMES
       GAITS
+      LEGGED_GAITS
+      DFLT_LEGLESS_GAIT
+      GAIT_DEFAULTS
       DFLT_TURN_SET
       RIG_PRESETS
       PRESETS
@@ -21,6 +24,7 @@ cutan.motion
    .. autosummary::
    
       face_toward
+      gait_params
       nod
       point
       speech_pulse
