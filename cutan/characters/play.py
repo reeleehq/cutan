@@ -36,7 +36,7 @@ helpers rather than restating them, so the two cannot drift:
 
 **Motion presets (an#166).** A name the descriptor does not declare — or any
 name on an entity with no descriptor (a procedural rig, a prop) — falls back
-to :data:`an.motion.PRESETS`. The DESCRIPTOR WINS a name both know: a rig that
+to :data:`cutan.motion.PRESETS`. The DESCRIPTOR WINS a name both know: a rig that
 ships its own ``hop`` means that one. :func:`play_source` makes that call and
 :func:`play_problems` gives the whole verdict, for ``an validate`` and the
 compiler alike. A preset resolves to tweens, not a clip:
@@ -195,7 +195,7 @@ def active_skin(desc: CharacterDescriptor) -> Skin:
 
 #: Where a ``play`` resolves: the entity descriptor's own ``animations``…
 DESCRIPTOR_SOURCE = "descriptor"
-#: …or, for a name it does not declare, :data:`an.motion.PRESETS` (an#166).
+#: …or, for a name it does not declare, :data:`cutan.motion.PRESETS` (an#166).
 PRESET_SOURCE = "preset"
 
 #: Preset parameters an author may NOT pass through ``args``: the target is
@@ -236,8 +236,8 @@ def preset_args(animation: str, args: Mapping[str, object] | None) -> dict:
 
 
 def _presets() -> dict[str, Callable]:
-    # Lazy: `an.motion` imports the IR, and the IR's validator imports this.
-    from an.motion import PRESETS
+    # Lazy: `cutan.motion` imports the IR, and the IR's validator imports this.
+    from cutan.motion import PRESETS
 
     return PRESETS
 
@@ -812,7 +812,7 @@ def facing_at(events, entity: str, t: float, *, view_set: str = "view") -> Facin
     order, as :func:`resolve_turns` does).
 
     >>> from an.ir.compose import flatten, sequence
-    >>> from an.motion import turn
+    >>> from cutan.motion import turn
     >>> flats = flatten(sequence(turn("ned", to="side", direction="left")))
     >>> facing_at(flats, "ned", 0.0), facing_at(flats, "ned", 1.0)
     (Facing(view=None, direction=None), Facing(view='side', direction='left'))
@@ -903,7 +903,7 @@ def resolve_turns(
             continue
         args = dict(action.args or {})
         if action.animation == TURN_PRESET and action.target == entity:
-            from an.motion import DFLT_TURN_SET
+            from cutan.motion import DFLT_TURN_SET
 
             before = facing_at(
                 events(),

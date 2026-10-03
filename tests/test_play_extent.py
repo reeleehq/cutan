@@ -34,7 +34,8 @@ from cutan.characters.registration import play
 from an.ir.schema import AssetRef, Meta, SceneIR, Shot
 from cutan.characters.registration import PlayAction
 from an.ir.validate import validate_semantic
-from an.motion import hop, nod
+from an.motion import hop
+from cutan.motion import nod
 from an.stores.characters import CharactersStore
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "characters"

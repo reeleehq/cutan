@@ -16,6 +16,7 @@ cutan/expression/     expression presets, axes, bindings, the face provider
 cutan/compile/        passes.py (the cut-out passes over an.stage.compile), lowering.py (play/expression lowering, swap declaration), coarticulate.py, gaze.py
 cutan/audio/          lip-sync providers (offline, rhubarb, whisper, word timings)
 cutan/impacts/        impact choreography and ground truth;  cutan/verify/style.py: the style lint;  cutan/library.py: the character analyser
+cutan/motion.py       the rig presets (nod, point, turn, walk, waddle, speech_pulse; an#322) and PRESETS, the table a `play` resolves in
 cutan/runtime/        visuals.js: the procedural mouth and eye, registered through the stage runtime's anRegisterVisual
 cutan/bench.py        CUTOUT_FIXTURES and run_bench() over this repo's misc/bench/ corpus
 tests/  examples/  misc/bench/{corpus,golden}/  misc/demos/  .claude/skills/
@@ -30,7 +31,7 @@ tests/  examples/  misc/bench/{corpus,golden}/  misc/demos/  .claude/skills/
 - `cutan.REQUIRED_AN_API_LEVEL` is the lowest `an.genres.API_LEVEL` this package runs against (instead of a version pin: `an`'s version is assigned by CI at merge). Raise it in the same change that uses a new seam.
 - Local packages carry no version pins: `an`, not `an>=…`.
 - One `CLI`: `cutan` adds no console script. Its commands are `an character …` and `an impacts …`.
-- Shims in `an` (`an.characters`, `an.expression`, `an.impacts`, `an.audio.*_lipsync`, `an.verify.style`, `an.library.character`, `an.genres.cutout`, `an.genre`, `an.adapters.cutout.{coarticulate,gaze}`) are removed when no package under `$PP` imports an old path and 14 days have passed (checked by a script, not by memory).
+- Shims in `an` (`an.characters`, `an.expression`, `an.impacts`, `an.audio.*_lipsync`, `an.verify.style`, `an.library.character`, `an.genres.cutout`, `an.genre`, `an.adapters.cutout.{coarticulate,gaze}`, and the rig presets' names in `an.motion`, an#322) are removed when no package under `$PP` imports an old path and 14 days have passed (checked by a script, not by memory).
 - Decisions of the move (the lead's, 2026-10-02): the bench *runner* stays in `an` (generic); skill names `cutan-style` and `cutan-dev-*`, with stubs of the old names left in `an` for one cycle; `an.genres.API_LEVEL` instead of a version floor.
 
 ## Tests

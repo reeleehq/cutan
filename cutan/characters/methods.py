@@ -18,14 +18,14 @@ expression     ``expr.without_brows`` (``without_brows``)      nothing          
 decision 8: the gate is byte-identical output). A walk's ``gait`` arg is the
 author's request, the descriptor's ``gait`` a declared override (reported as
 such); with neither, the chain picks ``legs`` when the character affords a leg
-pair and ``rock`` when it does not — exactly what :func:`an.motion.walk` did on
+pair and ``rock`` when it does not — exactly what :func:`cutan.motion.walk` did on
 its own. What is new is that the choice is the registry's, made once, and a
 requested gait the rig cannot honour (``hem`` on a legless blob) is a
 **recorded substitution**: a warning, fatal under ``--strict-assets``.
 
 **Speech gains a requirement-free last link.** A character whose face is baked
 into its art (``face_overlay: false``) used to speak with a frozen mouth; it now
-pulses its head on each syllable (:func:`an.motion.speech_pulse`, parametrised:
+pulses its head on each syllable (:func:`cutan.motion.speech_pulse`, parametrised:
 ``strength``, ``part``, ``attack``, ``release``; ``strength: 0`` is a mime).
 
 **Expression names what reads when the brows cannot** (an#252). A hat the
@@ -94,7 +94,7 @@ DFLT_MIN_BEAT_GAP_S: float = 0.18
 
 
 def _walk_params(names: Iterable[str]) -> dict[str, Any]:
-    from an.motion import walk
+    from cutan.motion import walk
 
     full = schema_of_callable(walk, skip=("target", "rest", "parts"))["properties"]
     return {"type": "object", "properties": {n: full[n] for n in names if n in full}}
@@ -102,7 +102,7 @@ def _walk_params(names: Iterable[str]) -> dict[str, Any]:
 
 def _walk_expand(gait: str) -> Callable[[Mapping[str, Any], Any], Any]:
     def expand(params: Mapping[str, Any], context: Any):
-        from an.motion import walk
+        from cutan.motion import walk
 
         ctx = dict(context or {})
         return walk(ctx.pop("target"), gait=gait, **ctx, **dict(params))
@@ -111,14 +111,14 @@ def _walk_expand(gait: str) -> Callable[[Mapping[str, Any], Any], Any]:
 
 
 def _pulse_expand(params: Mapping[str, Any], context: Any):
-    from an.motion import speech_pulse
+    from cutan.motion import speech_pulse
 
     ctx = dict(context or {})
     return speech_pulse(ctx.pop("target"), **ctx, **dict(params))
 
 
 def _pulse_params() -> dict[str, Any]:
-    from an.motion import speech_pulse
+    from cutan.motion import speech_pulse
 
     return schema_of_callable(speech_pulse, skip=("target", "rest", "beats"))
 
@@ -649,7 +649,7 @@ def speech_plan(
     from cutan.characters.registration import play
     from an.semantic import resolve
 
-    from an.motion import WALK_LANDING_S
+    from cutan.motion import WALK_LANDING_S
 
     authored = _authored_pulse_speakers(shot)
     resolved: dict[str, Any] = {}

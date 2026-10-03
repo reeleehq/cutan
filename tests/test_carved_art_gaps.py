@@ -230,7 +230,7 @@ def test_a_profile_only_character_walks_as_a_profile_with_nothing_passed(tmp_pat
 def test_a_hem_gait_tilts_the_halves_and_sways_the_body(tmp_path):
     """The OverSimplified robe: facing the camera the hem halves tilt in turn
     while the body sways and bobs — what read in the agent's hand-built walk."""
-    from an.motion import DFLT_WALK_HEM_TILT
+    from cutan.motion import DFLT_WALK_HEM_TILT
 
     doc = _character(tmp_path / "chars", views=False, gait="hem")
     scene = _compile(
@@ -259,7 +259,7 @@ def test_an_author_s_gait_wins_over_the_character_s(tmp_path):
 def test_an_unknown_gait_is_refused_where_it_is_written():
     from pydantic import ValidationError
 
-    from an.motion import walk
+    from cutan.motion import walk
 
     with pytest.raises(ValidationError, match="gait must be one of"):
         CharacterDescriptor(name="x", gait="shuffle")

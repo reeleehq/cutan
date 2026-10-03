@@ -748,7 +748,7 @@ def new_character(
     - ``views`` (an#197) — draw the turnaround: ``back``, ``side`` (a profile
       facing the viewer's right) and ``three_quarter`` beside the front, as a
       ``view`` swap set with a pose per view (:func:`add_views`), so
-      :func:`an.motion.turn` can turn the character around. Offline head only
+      :func:`cutan.motion.turn` can turn the character around. Offline head only
       (a DiceBear face is baked into its art); ignored for a DiceBear head.
       Additive: a shot that never sets a view renders exactly as without it.
 
@@ -2093,7 +2093,7 @@ def add_views(char_dir: str | Path) -> Path:
     ``three_quarter`` head and torso art beside the front, a ``view`` swap set
     projected onto those two slots, and a pose per view (``swap_poses``) — so
     ``{kind: set, target: <entity>, property: view, value: side}`` or
-    :func:`an.motion.turn` turns the whole character. Idempotent. Returns the
+    :func:`cutan.motion.turn` turns the whole character. Idempotent. Returns the
     descriptor path.
 
     The views are REDRAWN from the recorded knobs (seed, palette, build, hat,

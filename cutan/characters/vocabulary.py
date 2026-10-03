@@ -2,8 +2,8 @@
 
 ADR 0003's first slice, the genre's share (the core's is
 :mod:`an.semantic.seeds`). Each entry is built FROM the table that already
-defines the thing — :data:`an.motion.PRESETS` (with
-:data:`an.motion.PRESET_VERSIONS`), :data:`cutan.expression.presets.PRESETS`, the
+defines the thing — :data:`cutan.motion.PRESETS` (with
+:data:`cutan.motion.PRESET_VERSIONS`), :data:`cutan.expression.presets.PRESETS`, the
 expression axes — never restated, so a preset added there is an entry here
 with nothing else to edit. The genre declares them through
 :data:`cutan.genre.CUTOUT`'s ``vocabulary`` field; importing this module
@@ -57,7 +57,7 @@ def _first_sentence(doc: str | None) -> str:
 
 
 def _motion_preset_entries() -> tuple[Entry, ...]:
-    from an.motion import PRESET_VERSIONS, PRESETS
+    from cutan.motion import PRESET_VERSIONS, PRESETS
 
     def expand_with(fn):
         def expand(params: Mapping[str, Any], context: Any):

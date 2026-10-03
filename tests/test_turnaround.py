@@ -54,7 +54,7 @@ from cutan.characters.validate import validate_character
 from an.ir.compose import delay, flatten, sequence, set_
 from an.ir.schema import AssetRef, Dialogue, SetAction, Shot, TweenAction, VisemeKeyframe, VisemeTrack
 from cutan.characters.registration import PlayAction
-from an.motion import PRESETS, face_toward, turn
+from cutan.motion import PRESETS, face_toward, turn
 from an.project import init, load
 
 K = SCENE_PX_PER_VIEW_BOX / 1024.0

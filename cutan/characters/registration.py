@@ -36,7 +36,7 @@ class PlayAction(ExtensionAction):
     compiler resolves its tracks into channels on the entity's nodes. A name
     the descriptor does NOT declare — or any name on an entity with no
     descriptor (a procedural rig, a prop) — falls back to the motion presets
-    of :data:`an.motion.PRESETS` (``hop``, ``nod``, …), which expand to
+    of :data:`cutan.motion.PRESETS` (``hop``, ``nod``, …), which expand to
     ordinary tweens at the target's built rest pose; a descriptor animation of
     the same name wins (an#166). Both halves are decided by
     :func:`cutan.characters.play.play_problems`, the one resolver ``an validate``
@@ -61,7 +61,7 @@ class PlayAction(ExtensionAction):
     speed: float = 1.0
     loop: bool | None = None  # None = the descriptor animation's own `loop`
     #: Parameters of a MOTION PRESET (an#166) — ``{"height": 30}`` for a
-    #: ``hop`` — passed to its :data:`an.motion.PRESETS` function as keyword
+    #: ``hop`` — passed to its :data:`cutan.motion.PRESETS` function as keyword
     #: arguments. ``None`` (the default, omitted from JSON) means the preset's
     #: own defaults. A descriptor animation takes none, and one given to it is
     #: refused; ``rest`` is never one — it is read off the built scene.
@@ -110,7 +110,7 @@ def play(
     descriptor's.)
 
     A name the descriptor does not declare falls back to a motion preset of
-    :data:`an.motion.PRESETS`, with ``args`` as its parameters (an#166):
+    :data:`cutan.motion.PRESETS`, with ``args`` as its parameters (an#166):
 
     >>> play("charlie", "hop", args={"height": 30}).args
     {'height': 30}
@@ -179,7 +179,7 @@ def read_play_md(item: dict[str, Any], *, index: int) -> PlayAction:
     """``{kind: play, target, animation, [duration], [speed], [loop], [args]}``.
 
     Resolved at compile against the target entity's descriptor ``animations``
-    (an#7), falling back to the motion presets of ``an.motion.PRESETS`` for a
+    (an#7), falling back to the motion presets of ``cutan.motion.PRESETS`` for a
     name the descriptor does not declare, with ``args`` as the preset's
     parameters (an#166). ``loop`` omitted means the animation's own. This
     reader accepted the shape from the start, then #24 made it refuse (nothing

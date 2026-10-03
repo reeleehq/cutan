@@ -106,12 +106,12 @@ DEFAULT_EYELID_MAP: dict[str, str] = {"OPEN": "open", "CLOSED": "closed"}
 #: onto the slots whose art changes with the view (the factory draws the head
 #: and the torso), each slot carrying attachments NAMED after the keys. A
 #: conventional name, like `viseme` — nothing in the compiler or the runtime
-#: reads it; `an.motion.turn` is the one writer that defaults to it.
+#: reads it; `cutan.motion.turn` is the one writer that defaults to it.
 VIEW_CHANNEL: str = "view"
 
 #: The views the factory draws, in turnaround order. ``side`` is a profile
 #: facing the viewer's RIGHT at a positive ``scale_x``; a negative ``scale_x``
-#: (``an.motion.turn(direction="left")``) mirrors it to face left.
+#: (``cutan.motion.turn(direction="left")``) mirrors it to face left.
 VIEWS: tuple[str, ...] = ("front", "three_quarter", "side", "back")
 
 #: The view a character shows at rest: its default attachments ARE this view.
@@ -123,12 +123,12 @@ DFLT_VIEW: str = "front"
 #: the same separator the expression variants (``viseme@happy``, an#98) use.
 VIEW_VARIANT_SEP: str = "@"
 
-#: How a character walks (``an.motion.walk``'s ``gait``, an#220): ``legs``
+#: How a character walks (``cutan.motion.walk``'s ``gait``, an#220): ``legs``
 #: swing about the hip in a profile and step up and down facing the camera;
 #: ``hem`` — the leg slots are the two halves of a robe's hem — tilts them in
 #: turn under a swaying, bobbing body; ``rock`` moves no leg at all (a blob, a
 #: sack) and rocks the body.
-from an.motion import GAITS  # noqa: E402,F401  (the gaits `walk` knows)
+from cutan.motion import GAITS  # noqa: E402,F401  (the gaits `walk` knows)
 
 
 def view_variant_set(set_name: str, view: str) -> str:
