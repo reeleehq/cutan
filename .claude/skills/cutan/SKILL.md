@@ -11,6 +11,7 @@ description: Use when making a cut-out animated character video with `an`: rigge
 - **A character:** `an character new <name> --offline` (a built-in factory; `an character --help` for builds, head scale, DiceBear styles), `an character add-views <name>` (a turnaround), `an character validate <dir>` and `an character contract` (what an illustrator must deliver; skill `cutan-art-package`).
 - **Actions on a character:** `play` (a descriptor animation or a motion preset such as `hop`, `nod`, `walk`, `turn`), `expression` (a preset or axes on the face), and the dialogue sugar `maya [happy]: Hi!`. Lines are lip-synced by the `offline` provider by default; `--lipsync rhubarb` or `whisper` choose another.
 - **Styles:** the `cutan-style` skill applies a named style spec to a scene, renders, and lints the render against its targets (`python -m cutan.verify.style`).
+- **Parts carved from a photo or a frame:** `cutan.carve` (`pip install "cutan[carve]"`): matte, neck cut, de-spill, normalise, and a prop folder whose descriptor carries the source; the `cutan-art-package` skill says how a carved part becomes a character's.
 - **Impacts:** `an impacts clip` renders controlled test footage with exact ground truth.
 - **Changing cutan itself:** `cutan/CLAUDE.md` and the `cutan-dev-*` skills.
 

@@ -51,9 +51,25 @@ Documentation = "https://thorwhalen.github.io/cutan"
 nw = [
     "nw",
 ]
+# cutan.carve (cutan#10): OpenCV for every matte strategy; rembg (its own extra,
+# because installing it moves numpy and Pillow) for the neural matte; insightface
+# for carve_head's face locator. All imported lazily: `import cutan` needs none.
+carve = [
+    "opencv-python-headless",
+]
+rembg = [
+    "cutan[carve]",
+    "rembg",
+]
+faces = [
+    "cutan[carve]",
+    "insightface",
+    "onnxruntime",
+]
 dev = [
     "an[stage]",
     "nw",
+    "opencv-python-headless",
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "ruff>=0.1.0",

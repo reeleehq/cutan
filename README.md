@@ -18,7 +18,25 @@ an character new maya --offline
 - the lip-sync providers `offline`, `rhubarb` and `whisper` (`cutan.audio`);
 - locomotion, speech, blink and turn methods with their requirements and defaults, and the cut-out vocabulary;
 - the `an character …` and `an impacts …` command namespaces;
+- carving parts out of photos and frames (`cutan.carve`, below);
 - the style lint (`python -m cutan.verify.style VIDEO <style>`) and the named style specs it measures against, shipped as package data: `cutan.style_spec("south_park")`, `python -m cutan.styles` to list them (the `cutan-style` skill applies one).
+
+## Carving parts from a photo or a frame
+
+`cutan.carve` turns a photo or a video frame into a matted, cleaned, provenance-carrying cut-out part, and writes it as a library-ready prop folder. It needs OpenCV: `pip install "cutan[carve]"`. Add `cutan[rembg]` for the neural matte and `cutan[faces]` for the face locator; `cutan.carve.check_requirements()` lists what is installed.
+
+```python
+from cutan.carve import carve, carve_head, frame_source, write_prop, grab_frame, Polygon, FlatColour
+
+src = frame_source("https://www.youtube.com/watch?v=VIDEO_ID", t=34.5, license="all-rights-reserved")
+frame = grab_frame("clip.mp4", 34.5)
+lamp = carve(frame, point=(1060, 130), source=src)               # flat_colour: the cartoon-frame default
+print(lamp.quality.warnings())                                    # backdrop left on the rim, glyphs attached, ...
+write_prop(lamp, "assets/props/lamp")                             # prop.json + parts/body.png, source included
+head = carve_head(frame, face=(830, 170, 930, 305), matte="rembg")  # neck cut, 512² canvas, face centre as origin
+```
+
+The matte is a strategy: `flat_colour` (the default), `chroma`, `grabcut`, `polygon`, `focus`, `rembg`, or any `(rgb, hint) -> alpha` callable. Two combine with `&` and `|`: `Polygon(outline) & FlatColour()` is a hand outline cleaned by a colour key. `split_parts` lifts moving parts off a carving, each with a pivot (clock hands off the face), and `write_prop` gives each part its own bone. Publishing the folder (`an library publish <folder> prop.<name> --package cutan --origin carved`) records the rights from the descriptor's own `source`.
 
 The cut-out bench corpus (`misc/bench/`), `examples/` and the demo gallery (`misc/demos/`) live here too; `cutan.bench.run_bench()` runs the corpus through `an`'s bench runner.
 
