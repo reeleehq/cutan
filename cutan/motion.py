@@ -25,11 +25,12 @@ the genre's presets into it.
 
 from __future__ import annotations
 
+import math
 from collections.abc import Callable, Mapping
 from typing import Any
 
 from an.base import EasingSpec, PathStr, Seconds
-from an.ir.compose import delay, flatten, parallel, sequence, set_, tween
+from an.ir.compose import delay, duration_of, flatten, parallel, sequence, set_, tween
 from an.ir.schema import Action, Shot
 from an.motion import (
     DFLT_IN_EASING,
@@ -397,6 +398,7 @@ def walk(
     arms: tuple[str, str] | None = None,
     parts: Mapping[str, Rest] | None = None,
     rest: Rest | None = None,
+    scale: float | None = None,
 ) -> Action:
     """Walk: the body travels on ``x`` while the gait moves it — legs that
     alternate, a hop, a bounce, a glide (an#214, an#224).
@@ -446,10 +448,14 @@ def walk(
     walks the legless default too.
 
     **Size.** ``step_length``, ``bob`` and ``hop_height`` default to lengths
-    for a figure at drawn scale 1, multiplied by the figure's scale — the
-    ``scale_y`` of ``rest``, which carries its stage scale — so a character
-    staged at ``scale: 2`` strides twice as far (an#224). Pass them to set
-    scene px outright.
+    for a figure at drawn scale 1, multiplied by ``scale``, the figure's drawn
+    scale — its STAGE scale (``stage.scale``, the rig as built), which the
+    compiler fills in when the walk is played by name — so a character staged
+    at ``scale: 2`` strides twice as far (an#224). Pass them to set scene px
+    outright. Called from Python with no ``scale``, the ``scale_y`` of
+    ``rest`` stands in; that is the pose at the play's start, which a
+    ``pop_in`` running under the walk holds at 0 (cutan#13) — refused, naming
+    the scale — so the compiler never relies on it.
 
     **Legs and arms.** ``legs``/``arms`` name the two limb nodes; by default
     the first pair in :data:`WALK_LEG_NAMES` / :data:`WALK_ARM_NAMES` that the
@@ -483,6 +489,8 @@ def walk(
     >>> [f.action.to_value for f in _tweens(walk("k", distance=160, rest={"scale_y": 2.0}, legs=()))
     ...  if f.action.property == "x"]
     [160.0]
+    >>> duration_of(walk("k", distance=160, scale=2.0, legs=())), duration_of(walk("k", distance=160, legs=()))
+    (0.4, 0.8)
     """
     if gait is not None and gait not in GAITS:
         raise ValueError(f"gait must be one of {list(GAITS)}, got {gait!r}")
@@ -501,9 +509,20 @@ def walk(
         gait = DFLT_LEGLESS_GAIT
     if gait not in LEGGED_GAITS | {"waddle", "bounce"}:
         leg_pair = None  # this gait moves no leg
+    given_scale = scale is not None
+    if scale is None:
+        scale = abs(_rest(rest, "scale_y"))
+    if not (math.isfinite(scale) and scale > 0):
+        raise ValueError(
+            f"the figure's drawn scale is {scale!r}"
+            + ("" if given_scale else " (its scale_y at the play's start)")
+            + ": a walk needs a finite, positive scale (its stage scale)"
+        )
+    if step_length is not None:
+        _positive(step_length=step_length)
     p = gait_params(
         gait,
-        scale=abs(_rest(rest, "scale_y")),
+        scale=abs(scale),
         step_s=step_s,
         step_length=step_length,
         stride=stride,
@@ -516,7 +535,7 @@ def walk(
         lean=lean,
     )
     step_s = p["step_s"]
-    _positive(step_s=step_s, step_length=p["step_length"])
+    _positive(step_s=step_s)
     if step_s <= 4 * WALK_LANDING_S:
         raise ValueError(
             f"step_s must be longer than {4 * WALK_LANDING_S}s, got {step_s!r}"
@@ -894,7 +913,9 @@ RIG_PRESET_VERSIONS: dict[str, str] = {
     **{name: "1" for name in RIG_PRESETS},
     # 2 (an#224): the gaits, a legless figure glides instead of rocking, and
     # the default lengths scale with the figure's drawn scale.
-    "walk": "2",
+    # 3 (cutan#13): the drawn scale is the stage scale, not the pose at the
+    # play's start (a figure resized by an authored move strides as drawn).
+    "walk": "3",
 }
 
 #: Every preset a ``play`` can name — the core's and the genre's — the one table

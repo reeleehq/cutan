@@ -74,6 +74,7 @@ __all__ = [
     "check_declared_speech",
     "check_walk_gaits",
     "gait_problem",
+    "locomotion_args",
     "compile_profile",
     "speech_problems",
     "normalise_gait_args",
@@ -82,6 +83,7 @@ __all__ = [
     "speech_plan",
     "substitution_record",
     "syllable_beats",
+    "walk_preset_context",
 ]
 
 #: The aspect names (persisted in substitution records).
@@ -489,6 +491,77 @@ def resolve_walk_gait(
     requested = args.get("gait") or getattr(descriptor, "gait", None)
     r = resolve(LOCOMOTION, profile, requested=requested, policy=policy, entity=entity)
     return r.method.term, r
+
+
+def locomotion_args(
+    entity: str,
+    args: Mapping[str, Any],
+    *,
+    descriptor: Any | None,
+    profile: Mapping[str, Mapping[str, Any]],
+    policy: Any = None,
+) -> tuple[dict[str, Any], Any]:
+    """``(args with its gait resolved, resolution)`` of a walk on ``entity``:
+    the locomotion method the registry resolves (an#248) — the author's
+    ``gait`` (a spelling, a method id or a pinned choice, spelled out first,
+    its args joining the walk's), else the descriptor's, else the chain.
+
+    ONE function for the compiler's expansion and for the walk's EXTENT (what a
+    ``sequence`` waits for, :func:`walk_preset_context`), so the two cannot
+    disagree about which gait runs (cutan#12).
+
+    >>> args, r = locomotion_args("blob", {"gait": "hem", "distance": 80}, descriptor=None, profile={})
+    >>> args["gait"], r.substitution.reason
+    ('glide', 'missing')
+    """
+    args = normalise_gait_args(args)
+    gait, resolution = resolve_walk_gait(
+        entity, args=args, descriptor=descriptor, profile=profile, policy=policy
+    )
+    return {**args, "gait": gait}, resolution
+
+
+def walk_preset_context(
+    entity: str,
+    args: Mapping[str, Any],
+    *,
+    descriptor: Any | None,
+    profile: Mapping[str, Mapping[str, Any]] | None,
+    scale: float,
+    parts: Iterable[str] | None = None,
+) -> dict[str, Any]:
+    """What the compiler adds to a ``walk`` play's args before expanding it, as
+    far as the walk's LENGTH depends on it: the resolved ``gait`` (when the
+    entity resolves on the registry: ``profile`` given), the figure's drawn
+    ``scale`` (its stage scale, cutan#13), and — off the registry, where the
+    walk picks its own gait from the limbs it finds — the built ``parts``. The
+    extent resolver reads this so a ``sequence`` waits exactly as long as the
+    walk runs (cutan#12); the expansion itself resolves the same way (and
+    records the substitution).
+
+    >>> walk_preset_context("b", {"gait": "shuffle"}, descriptor=None, profile={}, scale=2.0)
+    {'scale': 2.0, 'gait': 'glide'}
+    >>> walk_preset_context("b", {"gait": "shuffle"}, descriptor=None, profile=None, scale=1.0)
+    {'scale': 1.0}
+    >>> walk_preset_context("b", {}, descriptor=None, profile=None, scale=1.0, parts=["head"])
+    {'scale': 1.0, 'parts': {'head': {}}}
+    """
+    out: dict[str, Any] = {"scale": float(scale)}
+    if profile is None:
+        if parts is not None:
+            out["parts"] = {p: {} for p in parts}
+        return out
+    from an.semantic import VocabularyError
+
+    try:
+        resolved, _ = locomotion_args(
+            entity, args, descriptor=descriptor, profile=profile
+        )
+    except (VocabularyError, ValueError, TypeError):
+        return out  # a bad gait is `cutout.play`'s to report; no extent
+    if "gait" in resolved:
+        out["gait"] = resolved["gait"]
+    return out
 
 
 def normalise_gait_args(args: Mapping[str, Any]) -> dict[str, Any]:

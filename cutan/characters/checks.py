@@ -12,6 +12,7 @@ from typing import Any, Mapping
 from pydantic import ValidationError
 
 from cutan.characters.play import (
+    GAIT_ARG,
     PRESET_SOURCE,
     Facing,
     TurnResolution,
@@ -22,6 +23,7 @@ from cutan.characters.play import (
     play_source,
     preset_moved_nodes,
     preset_play_span,
+    preset_takes,
     resolve_turns,
     slot_node_path,
     swap_art_missing,
@@ -41,6 +43,107 @@ from an.ir.validate import (  # noqa: E402
     _rig_scope,
     _text_ids,
 )
+
+
+def _stage_of(shot, stores: Mapping[str, Any], unchecked: set[str] = frozenset()):
+    """``() -> {node path: rest pose}`` of the shot's built stage
+    (:func:`an.motion.stage_poses`), built once, lazily, and ``None`` when it
+    does not build (reported by the play check). What the compiler reads a
+    walk's drawn scale and limbs off (``vocab.node_transforms``), so validate
+    reads the same numbers (cutan#12). Entities whose store was not supplied
+    (``unchecked``) are left out of the build: they are not checked, and they
+    must not take the others' context with them (review C, F1)."""
+    cache: dict[str, Any] = {}
+
+    def poses() -> Mapping[str, Mapping[str, float]] | None:
+        if "poses" not in cache:
+            from an.motion import stage_poses
+
+            staged = shot
+            if unchecked:
+                staged = shot.model_copy(
+                    update={"entities": [e for e in shot.entities if e.id not in unchecked]}
+                )
+            try:
+                cache["poses"] = stage_poses(staged, mall=stores)
+            except Exception:  # the stage did not build: `cutout.play` says why
+                cache["poses"] = None
+        return cache["poses"]
+
+    return poses
+
+
+def _preset_context_of(
+    rigs: Mapping[str, Any],
+    unchecked: set[str],
+    stores: Mapping[str, Any],
+    stage: Any,
+):
+    """``(entity_id, play) -> PresetContext`` for validate's extent resolver:
+    what :func:`cutan.compile.passes.preset_context_of` reads off the compiler's
+    vocabulary, read off the same built stage (``stage``: :func:`_stage_of`)
+    — the target's built scale and limbs — and the same descriptor and art,
+    so validate places a ``sequence``'s later siblings where compile does
+    (cutan#12). No context for an entity whose store was not supplied
+    (``unchecked``: the check did not run) or a target the stage did not
+    build."""
+    from cutan.characters.methods import (
+        CHARACTER_KIND,
+        compile_profile,
+        walk_preset_context,
+    )
+
+    memo: dict[str, tuple[Any, Any]] = {}
+
+    def descriptor_and_profile(entity_id: str, entity) -> tuple[Any, Any]:
+        if entity_id not in memo:
+            descriptor = profile = None
+            if entity.kind == CHARACTER_KIND:
+                doc = _rig_document(entity, stores)
+                try:
+                    descriptor = CharacterDescriptor.model_validate(doc) if doc else None
+                except ValidationError:
+                    descriptor = None  # reported by the play check
+            if descriptor is not None:
+                store = stores.get(entity.store) if entity.store else None
+                art = art_exists_for(store, entity.ref) if store is not None else None
+                profile = compile_profile(descriptor, art_exists=art)
+            memo[entity_id] = (descriptor, profile)
+        return memo[entity_id]
+
+    def context(entity_id: str, action) -> Mapping[str, Any] | None:
+        target = getattr(action, "target", "") or ""
+        entity = rigs.get(entity_id)
+        if entity_id in unchecked or not preset_takes(action.animation, GAIT_ARG):
+            return None
+        poses = stage()
+        if poses is None or target not in poses:
+            return None
+        # A character resolves on the registry; a part of one, a prop, or any
+        # other built entity walks with the limbs the stage built under the
+        # target (as the compiler's does off the registry).
+        is_character = entity is not None and entity.kind == CHARACTER_KIND
+        descriptor, profile = (
+            descriptor_and_profile(entity_id, entity)
+            if "/" not in target and is_character
+            else (None, None)
+        )
+        if profile is None and is_character and "/" not in target:
+            prefix = f"{target}/"
+            profile = compile_profile(
+                None, built_parts=[p[len(prefix) :] for p in poses if p.startswith(prefix)]
+            )
+        prefix = f"{target}/"
+        return walk_preset_context(
+            target,
+            dict(action.args or {}),
+            descriptor=descriptor,
+            profile=profile,
+            scale=abs(float(poses[target]["scale_y"])),
+            parts=None if profile is not None else [p[len(prefix) :] for p in poses if p.startswith(prefix)],
+        )
+
+    return context
 
 
 def _check_play_actions(
@@ -98,7 +201,10 @@ def _check_play_actions(
         except ValidationError:
             return None
 
-    play_extent = play_extent_for(extent_descriptor)
+    preset_context = _preset_context_of(
+        rigs, unchecked, stores, _stage_of(shot, stores, unchecked)
+    )
+    play_extent = play_extent_for(extent_descriptor, context_of=preset_context)
     for k, action in enumerate(shot.actions):
         for flat in flatten(action, play_extent=play_extent):
             leaf = flat.action
@@ -136,7 +242,9 @@ def _check_play_actions(
                             "the node a motion-preset `play` moves was NOT "
                             f"checked: the shot's stage did not build ({why}).",
                         )
-                end = flat.start + preset_play_span(leaf)
+                end = flat.start + preset_play_span(
+                    leaf, preset_context(entity_id, leaf)
+                )
                 if end > shot.duration + 1e-9:
                     report.add(
                         "warning",
@@ -330,7 +438,13 @@ def _turn_resolution(
         except ValidationError:
             return None  # reported by the play check
 
-    extent = play_extent_for(descriptor_of)
+    all_rigs, unchecked = _rig_scope(shot, stores)
+    extent = play_extent_for(
+        descriptor_of,
+        context_of=_preset_context_of(
+            all_rigs, unchecked, stores, _stage_of(shot, stores, unchecked)
+        ),
+    )
     origin: list[int] = []
     flats = []
     for k, action in enumerate(shot.actions):

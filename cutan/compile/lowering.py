@@ -24,6 +24,7 @@ from cutan.characters.play import play_extent_for
 from cutan.characters.schema import CHARACTER_DOCUMENT_KIND, CharacterDescriptor
 from cutan.compile.passes import (
     _expand_preset_plays,
+    preset_context_of,
     _resolve_play,
     _view_at,
     _view_spans,
@@ -37,9 +38,12 @@ class PlayLowering:
     """The ``play`` action kind, as the stage compiler lowers it (an#7, an#166, an#220)."""
 
     def extent_resolver(self, vocab: Any) -> Callable[[Any], float]:
-        """``play -> seconds`` for a play that names no duration, read off its descriptor."""
+        """``play -> seconds`` for a play that names no duration, read off its
+        descriptor — and, for a walk, off the gait and scale the expansion will
+        fill in (:func:`cutan.compile.passes.preset_context_of`, cutan#12)."""
         return play_extent_for(
-            lambda entity_id: vocab.descriptors.get(entity_id) if vocab else None
+            lambda entity_id: vocab.descriptors.get(entity_id) if vocab else None,
+            context_of=preset_context_of(vocab),
         )
 
     def expand(self, flat_list: list, **kw: Any) -> list:

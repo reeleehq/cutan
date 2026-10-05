@@ -199,8 +199,9 @@ DESCRIPTOR_SOURCE = "descriptor"
 PRESET_SOURCE = "preset"
 
 #: Preset parameters an author may NOT pass through ``args``: the target is
-#: the play's own, and the rest pose is read off the built scene.
-RESERVED_PRESET_ARGS: frozenset[str] = frozenset({"target", "rest", "parts"})
+#: the play's own, the rest pose is read off the built scene, and a figure's
+#: drawn ``scale`` is its stage scale (a length in scene px is passed outright).
+RESERVED_PRESET_ARGS: frozenset[str] = frozenset({"target", "rest", "parts", "scale"})
 #: The keyword a preset that moves SEVERAL nodes of an entity (``walk``, an#214)
 #: takes its built parts in: ``{part path relative to the entity: pose}``.
 PARTS_ARG = "parts"
@@ -210,17 +211,25 @@ VIEW_ARG = "view"
 #: The keyword a walk takes its gait in (an#220); played by name, the compiler
 #: fills it from the descriptor's ``gait`` when not given.
 GAIT_ARG = "gait"
+#: The keyword a preset takes the figure's drawn scale in (``walk``, cutan#13);
+#: the compiler fills it from the built stage placement. Reserved: an author
+#: sets a length in scene px instead.
+SCALE_ARG = "scale"
 
 
 def preset_takes(animation: str, name: str) -> bool:
-    """Whether the motion preset ``animation`` has the keyword ``name``.
+    """Whether the motion preset ``animation`` has the keyword ``name``
+    (``False`` for a name that is no preset: a descriptor animation takes nothing).
 
-    >>> preset_takes("walk", "parts"), preset_takes("hop", "parts")
-    (True, False)
+    >>> preset_takes("walk", "parts"), preset_takes("hop", "parts"), preset_takes("blink", "parts")
+    (True, False, False)
     """
     import inspect
 
-    return name in inspect.signature(_presets()[animation]).parameters
+    preset = _presets().get(animation)
+    if preset is None:
+        return False
+    return name in inspect.signature(preset).parameters
 
 
 def preset_args(animation: str, args: Mapping[str, object] | None) -> dict:
@@ -354,6 +363,9 @@ def preset_problems(
                     if name == "rest"
                     else "the parts are read off the built scene"
                     if name == PARTS_ARG
+                    else "the figure's drawn scale is its stage scale (pass a "
+                    "length in scene px instead)"
+                    if name == SCALE_ARG
                     else "the target is the play's own `target`"
                 )
             )
@@ -537,29 +549,46 @@ def _easing_problems(animation: str, tree) -> list[str]:
     return []
 
 
-def preset_play_span(action) -> float:
+#: What the compiler fills into a preset play's args beyond what the author
+#: wrote, as far as the play's LENGTH depends on it (cutan#12): a walk's
+#: resolved ``gait`` and the figure's drawn ``scale``
+#: (:func:`cutan.characters.methods.walk_preset_context`). Keys a preset does
+#: not take are ignored.
+PresetContext = Mapping[str, object]
+
+
+def preset_play_span(action, context: PresetContext | None = None) -> float:
     """How long a preset ``play`` runs, in seconds: its ``duration`` when set,
     else the preset's natural length divided by ``speed``. What a
     ``sequence`` advances by is :func:`play_extent`, which is this for a preset
-    source.
+    source. ``context`` is what the compiler adds to the args before expanding
+    (:data:`PresetContext`): a walk's length depends on its resolved gait and
+    the figure's scale, so the extent must see them too (cutan#12).
 
     >>> from cutan.characters.registration import PlayAction
     >>> preset_play_span(PlayAction(target="a", animation="hop"))
     0.5
     >>> preset_play_span(PlayAction(target="a", animation="hop", speed=2.0))
     0.25
+    >>> walk = PlayAction(target="a", animation="walk", args={"distance": 160})
+    >>> round(preset_play_span(walk), 6), round(preset_play_span(walk, {"scale": 2.0}), 6)
+    (0.8, 0.4)
     """
     from an.ir.compose import duration_of
 
     if action.duration is not None:
         return float(action.duration)
-    tree = _presets()[action.animation](
-        action.target, **preset_args(action.animation, action.args)
-    )
+    kwargs = preset_args(action.animation, action.args)
+    for name, value in (context or {}).items():
+        if preset_takes(action.animation, name):
+            kwargs[name] = value
+    tree = _presets()[action.animation](action.target, **kwargs)
     return duration_of(tree) / float(action.speed)
 
 
-def play_extent(desc: CharacterDescriptor | None, action) -> float:
+def play_extent(
+    desc: CharacterDescriptor | None, action, *, context: PresetContext | None = None
+) -> float:
     """How long a ``play`` occupies inside a ``sequence``, in seconds — THE
     resolver ``flatten`` is given by the compiler and ``an validate`` (with the
     entity's ``desc``) and by default (``desc=None``: presets only).
@@ -589,7 +618,7 @@ def play_extent(desc: CharacterDescriptor | None, action) -> float:
         return 0.0
     if source == PRESET_SOURCE:
         try:
-            return preset_play_span(action)
+            return preset_play_span(action, context)
         except (TypeError, ValueError):
             return 0.0
     anim = desc.animations[action.animation]
@@ -601,14 +630,19 @@ def play_extent(desc: CharacterDescriptor | None, action) -> float:
 
 def play_extent_for(
     descriptor_of: Callable[[str], CharacterDescriptor | None],
+    *,
+    context_of: Callable[[str, object], PresetContext | None] | None = None,
 ) -> Callable[[object], float]:
     """A ``PlayAction -> seconds`` resolver (:func:`play_extent`) that reads
     each play's descriptor from ``descriptor_of(entity_id)``, the entity being
-    the first segment of the play's target."""
+    the first segment of the play's target, and — for a preset whose length
+    depends on what the compiler fills in (a walk's gait and scale, cutan#12)
+    — the :data:`PresetContext` from ``context_of(entity_id, action)``."""
 
     def extent(action) -> float:
         entity_id = (getattr(action, "target", "") or "").split("/", 1)[0]
-        return play_extent(descriptor_of(entity_id), action)
+        context = context_of(entity_id, action) if context_of is not None else None
+        return play_extent(descriptor_of(entity_id), action, context=context)
 
     return extent
 
@@ -1232,6 +1266,7 @@ __all__ = [
     "preset_moved_nodes",
     "preset_takes",
     "preset_play_span",
+    "PresetContext",
     "preset_problems",
     "primary_slot_per_bone",
     "resolve_play",

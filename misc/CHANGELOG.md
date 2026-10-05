@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-05
+
+- **A `sequence` waits exactly as long as the walk runs** (cutan#12): the walk's extent is resolved with the same gait (the author's, the descriptor's, or the chain's substitute) and the same drawn scale the expansion uses (`cutan.characters.methods.walk_preset_context`, read by the compiler's and `an validate`'s extent resolvers), so a descriptor-declared `shuffle`, a substituted gait or a `scale: 2` figure no longer starts the next action early or late.
+- **The walk's drawn scale is the stage scale, not the pose at the play's start** (cutan#13; `walk` is version 3, every shot that plays a walk re-renders): `walk` takes `scale`, which the compiler fills from the built rig, so a walk that starts under a `pop_in` no longer crashes with "step_length must be positive" or hops 0 px, and a figure resized by an authored move strides as drawn. A scale that is not finite and positive is refused naming the scale.
+
 ## 2026-10-03
 
 - **Locomotion gaits** (an#224, P10 of an#231): `walk` takes nine gaits, each a locomotion method with declared requirements — `legs`, `profile` (the four-pose profile cycle; needs `swap.view:side`), `shuffle`, `hem` (need `limbs.legs`), and `waddle`, `hop`, `bounce`, `glide`, `rock` (need nothing). The chain is `legs` → `glide`: a figure without legs now glides instead of rocking about its feet. Default lengths (`step_length`, `bob`, `hop_height`) scale with the figure's drawn scale (an#224's comment: `scale: 2` used to shuffle). `an validate` warns when a requested gait will not be used (`cutout.walk_gait`), naming what would enable it. `walk` is version 2. Classification: `misc/docs/locomotion_gaits.md`.
