@@ -354,7 +354,7 @@ def test_an_explicit_empty_legs_arg_is_honoured_and_recorded(store):
     "spelled,expected",
     [
         ("loco.rock", {"gait": "rock"}),
-        ({"method": "loco.legged_cycle", "version": "1"}, {"gait": "legs"}),
+        ({"method": "loco.legged_cycle", "version": "2"}, {"gait": "legs"}),
         ({"method": "legs", "args": {"stride": 0.5}}, {"gait": "legs", "stride": 0.5}),
     ],
 )

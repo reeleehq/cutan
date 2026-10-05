@@ -79,18 +79,19 @@ DFLT_WALK_STEPS: int = 6
 DFLT_WALK_STEP_LENGTH: float = 80.0  # scene px per step, for ``distance``
 DFLT_WALK_STRIDE: float = 0.35  # radians a leg swings either side (side view)
 DFLT_WALK_LIFT: float = 10.0  # scene px a stepping leg rises (front view)
-DFLT_WALK_BOB: float = 6.0  # scene px the body rises between contacts
+DFLT_WALK_BOB: float = 6.0  # scene px the body travels per step (its whole bob)
 DFLT_WALK_ARM_SWING: float = 0.3  # radians
 DFLT_WALK_ROCK: float = 0.06  # radians, a legless figure's side-to-side rock
 #: Radians each hem half tilts about its hip, in turn, in a ``hem`` gait seen
 #: from the front (an#220) — what read on a carved robe figure, where lifting
 #: one half by ``lift`` px barely showed.
 DFLT_WALK_HEM_TILT: float = 0.24
-#: A limb's move ends with a constant tween this long at its end value instead
-#: of a settling ``set``: it lands the value exactly (a held tween END is
-#: evaluated at its own end, which float drift cannot put a grid step early),
-#: and unlike a ``set`` — whose hold outranks a view's pose channel — it lets
-#: a later view change pose the limb again.
+#: Every channel of a walk — a limb's and the body's (cutan#15) — ends with a
+#: constant tween this long at its end value instead of a settling ``set``: it
+#: lands the value exactly (a held tween END is evaluated at its own end, which
+#: float drift cannot put a grid step early), and unlike a ``set`` — whose hold
+#: outranks a view's pose channel, and holds again when a longer authored tween
+#: on the property ends — it lets later motion carry on.
 WALK_LANDING_S: Seconds = 1e-3
 #: Leg and arm node names a walk looks for, in order: the rig contract's
 #: (descriptor rigs, ``an character new``), then the procedural placeholder's.
@@ -118,6 +119,10 @@ DFLT_PULSE_RELEASE_S: Seconds = 0.1
 DFLT_WALK_HOP_HEIGHT: float = 18.0
 #: How far a ``glide`` leans into its travel (radians).
 DFLT_WALK_LEAN: float = 0.04
+#: The share of a ``profile`` walk's ``bob`` the body SINKS below contact height
+#: after a contact (the "down" pose); it rises the rest above it before the
+#: next (the "up" pose), so ``bob`` is its whole travel between two contacts.
+PROFILE_SINK_SHARE: float = 1 / 3
 
 #: The gaits ``walk`` knows (``gait=``, an#220, an#224): persisted in character
 #: descriptors and ``play`` args (:data:`cutan.characters.schema.GAITS`), so a
@@ -442,12 +447,12 @@ def walk(
       bobbing ``bob`` gently; no limb moves.
     - ``rock``: no leg moves; the body rocks ``rock`` and bobs.
 
-    A sway (``rock``) leans onto the standing foot: it follows the figure's
-    facing (the sign of ``rest``'s ``scale_x``, cutan#20). A parameter set to
-    0 writes no channel at all (cutan#14), and every channel — the body's
-    included — lands with a :data:`WALK_LANDING_S` constant tween rather than
-    a settling ``set`` (cutan#15), so an authored move on the same property
-    that outlasts the walk carries on where it is.
+    A sway (``rock``) follows the figure's facing (the sign of ``rest``'s
+    ``scale_x``, cutan#20): with legs, it leans onto the standing foot. An
+    amplitude set to 0 writes no channel at all (cutan#14), and every channel
+    — the body's included — lands with a :data:`WALK_LANDING_S` constant
+    tween rather than a settling ``set`` (cutan#15), so an authored move on
+    the same property that outlasts the walk carries on where it is.
 
     Unset: ``legs`` when the rig builds a leg pair, else :data:`DFLT_LEGLESS_GAIT`
     — the locomotion chain's default (played by name, the compiler resolves the
@@ -630,6 +635,15 @@ def walk(
         return unsettled(path, "y", values, durations, easings)
 
     def body_bob(height: float) -> Action:
+        # Highest mid-step (the passing pose), at ``y0`` at every contact. A
+        # one-step walk whose legs SWING has its one contact mid-step, so its
+        # bob runs twice in the step, at twice the rate — as its swing does
+        # (review of cutan#16, F5).
+        if steps == 1 and swinging and leg_pair is not None:
+            values = [y0, y0 - height, y0, y0 - height, y0]
+            return unsettled(
+                target, "y", values, [half / 2] * 4, _alternating(4, DFLT_OUT_EASING, DFLT_IN_EASING)
+            )
         values = [y0]
         for _ in range(steps):
             values += [y0 - height, y0]
@@ -647,7 +661,8 @@ def walk(
         # down a quarter step either side of it, at twice the interior rate —
         # as its one-step swing is (cutan#18, cutan#16).
         q = step_s / 4
-        up, down = y0 - 2 * height / 3, y0 + height / 3
+        up = y0 - (1 - PROFILE_SINK_SHARE) * height
+        down = y0 + PROFILE_SINK_SHARE * height
         values: list[float] = [y0]
         durations: list[Seconds] = []
         easings: list[EasingSpec] = []
@@ -703,6 +718,8 @@ def walk(
         easings.append(DFLT_IN_EASING)
         return unsettled(target, "rotation", values, durations, easings)
 
+    swinging = view in WALK_SWING_VIEWS or gait == "profile"
+    hem = gait == "hem" and not swinging
     # A zero amplitude writes NO channel (cutan#14): a constant tween would
     # still outrank an authored move on the property for the walk's length.
     # The travel.
@@ -713,8 +730,6 @@ def walk(
     if rise:
         moves.append(body_cycle(rise) if gait == "profile" else body_bob(rise))
     # The legs.
-    swinging = view in WALK_SWING_VIEWS or gait == "profile"
-    hem = gait == "hem" and not swinging
     if leg_pair is not None:
         for phase, name in zip((1.0, -1.0), leg_pair):
             pose = part_rest(name)

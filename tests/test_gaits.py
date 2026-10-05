@@ -26,7 +26,7 @@ from an.adapters.cutout.compile import compile_shot
 from an.adapters.cutout.timeline import evaluate_timeline, timeline_from_scene
 from an.ir.compose import duration_of, flatten, parallel, sequence, set_, tween
 from an.motion import _tweens, stage_poses
-from an.ir.schema import AssetRef, Meta, SceneIR, Shot, StagePlacement, TweenAction
+from an.ir.schema import AssetRef, Meta, SceneIR, SetAction, Shot, StagePlacement, TweenAction
 from an.ir.validate import validate_semantic
 from an.semantic import applicable, aspect, why_not
 from an.stores.characters import CharactersStore
@@ -443,14 +443,26 @@ def test_the_body_sway_mirrors_with_the_figure():
         assert first_rock(mirrored) == pytest.approx(-first_rock(plain)), gait
 
 
-def test_a_zero_amplitude_writes_no_channel():
-    """cutan#14: as `arm_swing: 0` and `lean: 0` already did."""
-    w = walk("k", gait="glide", bob=0, lean=0, steps=2, distance=100, legs=(), arms=())
-    assert {(f.action.target, f.action.property) for f in _tweens(w)} == {("k", "x")}
-    w = walk("k", gait="rock", rock=0, bob=0, steps=2, distance=100, legs=(), arms=())
-    assert {(f.action.target, f.action.property) for f in _tweens(w)} == {("k", "x")}
-    w = walk("k", gait="legs", lift=0, stride=0, bob=0, arm_swing=0, steps=2, parts=PARTS)
-    assert not _tweens(w) and duration_of(w) == pytest.approx(2 * DFLT_WALK_STEP_S)  # on the spot: still takes its time
+@pytest.mark.parametrize(
+    "kw",
+    [
+        dict(gait="glide", bob=0, lean=0, legs=(), arms=()),
+        dict(gait="rock", rock=0, bob=0, legs=(), arms=()),
+        dict(gait="legs", view="side", stride=0, bob=0, arm_swing=0, parts=PARTS),
+        dict(gait="legs", lift=0, bob=0, arm_swing=0, parts=PARTS),
+        dict(gait="profile", stride=0, bob=0, arm_swing=0, parts=PARTS),
+        dict(gait="hem", hem_tilt=0, rock=0, bob=0, arm_swing=0, parts=PARTS),
+        dict(gait="waddle", lift=0, rock=0, bob=0, arm_swing=0, parts=PARTS),
+        dict(gait="hop", hop_height=0, legs=(), arms=()),
+    ],
+)
+def test_a_zero_amplitude_writes_no_channel_tween_or_set(kw):
+    """cutan#14: as `arm_swing: 0` and `lean: 0` already did — no tween AND no set."""
+    w = walk("k", steps=2, distance=100, **kw)
+    assert {(f.action.target, f.action.property) for f in flatten(w)} == {("k", "x")}
+    assert not [f for f in flatten(w) if isinstance(f.action, SetAction)]
+    still = walk("k", steps=2, **kw)  # on the spot: nothing to write, the time still passes
+    assert not list(flatten(still)) and duration_of(still) == pytest.approx(2 * DFLT_WALK_STEP_S)
 
 
 def test_a_zero_amplitude_walk_leaves_an_authored_tween_alone(store):
@@ -470,7 +482,34 @@ def test_a_walk_does_not_snap_the_body_back_after_a_longer_authored_tween(store)
     )
     doc = _compile(_gale_shot(acts), {"characters": store})
     assert _pose(doc, 2.5)[("w", "y")] == pytest.approx(-100.0)
-    assert _pose(doc, 1.0)[("w", "x")] == pytest.approx(_pose(doc, 0.8)[("w", "x")])  # and x stays landed
+
+
+def test_x_lands_without_a_set_under_a_longer_authored_x_tween(store):
+    acts = parallel(
+        tween("w", "x", to=400.0, duration=2.0, from_=0.0, easing="linear"),
+        PlayAction(target="w", animation="walk", args={"gait": "glide", "steps": 2, "distance": 100}),
+    )
+    doc = _compile(_gale_shot(acts), {"characters": store})
+    assert _pose(doc, 2.5)[("w", "x")] == pytest.approx(400.0)
+
+
+def test_a_one_step_swinging_walk_has_its_contact_at_contact_height():
+    """review F5: the one contact is mid-step; the body is at y0 there, not at its peak."""
+    w = walk("p", gait="legs", view="side", steps=1, parts=PARTS)
+    ys = [(round(f.end, 3), f.action.to_value) for f in _channel(w, "p", "y")]
+    assert ys[1] == (0.2, 0.0) and ys[0][1] == -6.0 and ys[2][1] == -6.0
+    assert [f.action.to_value for f in _channel(w, "p/leg_l", "rotation")][0] == pytest.approx(0.35)
+
+
+def test_a_version_one_locomotion_pin_is_refused():
+    """review F2: the gaits expand differently (walk v3), so every method is version 2."""
+    from an.semantic import VocabularyError
+    from cutan.characters.methods import LOCO_VERSION, normalise_gait_args
+
+    assert LOCO_VERSION == "2"
+    with pytest.raises(VocabularyError):
+        normalise_gait_args({"gait": {"method": "loco.hop", "args": {}, "version": "1"}})
+    assert normalise_gait_args({"gait": {"method": "loco.hop", "args": {}, "version": "2"}})["gait"] == "hop"
 
 
 @pytest.mark.parametrize("fps,step_hz", [(30, None), (24, None), (30, 10.0), (30, 15.0)])
