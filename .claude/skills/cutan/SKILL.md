@@ -45,9 +45,9 @@ An `an character new --offline` character carries a **turnaround** (an#197): a `
 | gait | needs | reads as |
 |---|---|---|
 | `legs` | legs | legs swing in profile, lift facing the camera; body bobs, arms counter-swing |
-| `profile` | legs + a side view | the four-pose profile walk (contact, down, passing, up); Reiniger |
+| `profile` | legs + a side view, in force when the walk starts | the four-pose profile walk (contact, down, passing, up); Reiniger |
 | `shuffle` | legs | short quick steps, feet barely lifting |
-| `hem` | legs (the two hem halves of a robe) | hem halves tilt in turn, body sways |
+| `hem` | legs (the two hem halves of a robe) | hem halves tilt as mirror images (the hem opens and closes), body sways; in profile they swing like legs |
 | `waddle` | nothing | body rocks foot to foot and bobs (legs lift if any) |
 | `hop` | nothing | the figure jumps every step |
 | `bounce` | nothing | slides with a pronounced bob, feet flick: South Park |

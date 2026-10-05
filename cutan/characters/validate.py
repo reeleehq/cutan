@@ -931,7 +931,7 @@ def render_contract() -> str:
         "blinks, expressions and lip-sync keep running in profile. Art drawn",
         "only in profile (no front at all) declares `rest_view: side` instead.",
         "A robe whose leg slots are the two halves of its hem declares",
-        "`gait: hem`, so a walk tilts the halves in turn and sways the body.",
+        "`gait: hem`, so a walk tilts the halves (as mirror images) and sways the body.",
     ]
     lines += [
         "",

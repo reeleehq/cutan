@@ -228,8 +228,9 @@ def test_a_profile_only_character_walks_as_a_profile_with_nothing_passed(tmp_pat
 
 
 def test_a_hem_gait_tilts_the_halves_and_sways_the_body(tmp_path):
-    """The OverSimplified robe: facing the camera the hem halves tilt in turn
-    while the body sways and bobs — what read in the agent's hand-built walk."""
+    """The OverSimplified robe: facing the camera the hem halves tilt as mirror
+    images (both out, then both in) while the body sways and bobs — what read
+    in the agent's hand-built walk."""
     from cutan.motion import DFLT_WALK_HEM_TILT
 
     doc = _character(tmp_path / "chars", views=False, gait="hem")

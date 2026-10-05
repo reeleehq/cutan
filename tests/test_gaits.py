@@ -116,10 +116,14 @@ def test_each_gait_travels_and_lands_at_rest(gait, ref, store):
     shot = _walk_shot(ref, gait=gait, steps=3)
     doc = _compile(shot, mall)
     moved = {ch.target for a in doc.animations.values() for ch in a.channels}
-    if ref == "stick" and gait in LEGGED_GAITS | {"waddle", "bounce"}:
-        assert {"w/left_leg", "w/right_leg"} <= moved, "the parts rig's legs walk"
+    legs_moved = {t for t in moved if "leg" in t.rsplit("/", 1)[-1]}
+    if ref == "stick":
+        if gait in LEGGED_GAITS | {"waddle", "bounce"}:
+            assert legs_moved == {"w/left_leg", "w/right_leg"}, "the parts rig's legs walk"
+        else:
+            assert not legs_moved, f"{gait} moves no leg"
     if ref == "placeholder":
-        assert not {t for t in moved if t.endswith("_leg")}, "the placeholder has no legs"
+        assert not legs_moved, "the placeholder has no legs"
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         home = stage_poses(shot, mall=mall)
