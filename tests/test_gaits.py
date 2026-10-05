@@ -28,6 +28,7 @@ from an.ir.compose import duration_of, flatten, parallel, sequence, set_, tween
 from an.motion import _tweens, stage_poses
 from an.ir.schema import AssetRef, Meta, SceneIR, SetAction, Shot, StagePlacement, TweenAction
 from an.ir.validate import validate_semantic
+from an.stage.compile import CutoutCompileError
 from an.semantic import applicable, aspect, why_not
 from an.stores.characters import CharactersStore
 from cutan.characters.methods import LOCOMOTION, compile_profile
@@ -541,3 +542,82 @@ def test_every_gait_lands_body_and_limbs_at_frame_times(gait, fps, step_hz, stor
     for path, pose in home.items():
         for prop in ("y", "rotation"):
             assert state.get((path, prop), pose[prop]) == pytest.approx(pose[prop], abs=1e-9), (path, prop)
+
+
+# --------------------------------------------------- cutan#17, #21, #22 (validation)
+
+
+@pytest.fixture()
+def ned_store(tmp_path):
+    """A factory character: a turnaround (front, three_quarter, side, back), facing front."""
+    from cutan.characters import new_character
+
+    new_character(tmp_path, name="ned", seed="ned", use_dicebear=False)
+    return CharactersStore(tmp_path)
+
+
+def _validate(shot, **stores):
+    return validate_semantic(SceneIR(meta=Meta(title="t", duration=4.0), timeline=[shot]), **stores)
+
+
+def test_profile_needs_its_side_view_in_force(ned_store):
+    """cutan#17: a `profile` on a character that HAS a side view but is not
+    showing it walks `legs` (no scissoring in front), recorded and warned with
+    the remedy; after a turn to the side it is honoured and nothing is said."""
+    walk_play = PlayAction(target="w", animation="walk", args={"gait": "profile", "steps": 3, "distance": 240})
+    front = Shot(id="s", duration=3.0, entities=[AssetRef(kind="character", id="w", store="characters", ref="ned")], actions=[walk_play])
+    doc = _compile(front, {"characters": ned_store})
+    (record,) = [r for r in doc.asset_resolution if r.kind == "method"]
+    assert record.resolved == "loco.legged_cycle" and "swap.view:side in force" in record.detail and record.fallback
+    pose = _pose(doc, 0.8)  # facing the camera the legs lift; they never swing
+    assert pose.get(("w/leg_l", "rotation"), 0.0) == 0.0 == pose.get(("w/leg_r", "rotation"), 0.0)
+    (said,) = [f.description for f in _validate(front, available_characters=ned_store).findings if "locomotion" in f.description]
+    assert "swap.view:side in force" in said and "turn" in said
+    turned = front.model_copy(update={"actions": [sequence(PlayAction(target="w", animation="turn", args={"to": "side", "direction": "right"}), walk_play)]})
+    doc = _compile(turned, {"characters": ned_store})
+    assert not [r for r in doc.asset_resolution if r.kind == "method"]
+    assert not [f for f in _validate(turned, available_characters=ned_store).findings if "locomotion" in f.description]
+
+
+def test_a_walk_arg_the_gait_does_not_read_is_said(gait_store):
+    """cutan#21: an explicit gait's unread parameter is an error (validate and
+    compile alike, pinned choices included); a descriptor's or the chain's
+    gait makes it a warning."""
+    from cutan.characters.play import play_problems
+
+    assert play_problems(None, "walk", args={"gait": "hop", "bob": 20}) != []
+    pinned = {"gait": {"method": "loco.hop", "args": {"bob": 20}, "version": "1"}}
+    assert play_problems(None, "walk", args=pinned) != []
+    with pytest.raises(CutoutCompileError, match="does not read 'bob'"):
+        _compile(_walk_shot("gale", gait="hop", bob=20), {"characters": gait_store})
+    assert any("does not read 'bob'" in f.description for f in _validate(_walk_shot("gale", gait="hop", bob=20), available_characters=gait_store).findings)
+    implicit = _walk_shot("gale_shuffle", hop_height=30)  # the descriptor says shuffle, which never reads hop_height
+    with pytest.warns(UserWarning, match="does not read 'hop_height'"):
+        compile_shot(implicit, {"characters": gait_store})
+    (said,) = [f.description for f in _validate(implicit, available_characters=gait_store).findings if "hop_height" in f.description]
+    assert "descriptor's" in said
+
+
+def test_a_walk_on_a_part_is_refused_by_validate_and_compile(store):
+    """cutan#22: a walk moves a whole character."""
+    shot = _gale_shot(PlayAction(target="w/torso", animation="walk", args={"distance": 160, "gait": "profile"}))
+    with pytest.raises(CutoutCompileError, match="moves a whole character"):
+        _compile(shot, {"characters": store})
+    assert any("moves a whole character" in f.description for f in _validate(shot, available_characters=store).findings)
+
+
+def test_a_legged_gait_asked_of_a_prop_is_recorded_and_said(tmp_path):
+    """cutan#22: a prop resolves off the registry; a legged gait glides, out loud."""
+    from an.stores.props import PropsStore
+
+    shutil.copytree(PROPS / "lamp", tmp_path / "lamp")
+    props = PropsStore(tmp_path)
+    shot = Shot(id="s", duration=2.0, entities=[AssetRef(kind="prop", id="p", store="props", ref="lamp")],
+                actions=[PlayAction(target="p", animation="walk", args={"distance": 160, "gait": "hem"})])
+    doc = _compile(shot, {"props": props})
+    (record,) = [r for r in doc.asset_resolution if r.kind == "method"]
+    assert (record.ref, record.resolved, record.fallback) == ("loco.hem_sway", "loco.glide", True)
+    (said,) = [f.description for f in _validate(shot, available_props=props).findings if "locomotion" in f.description]
+    assert "only a character can walk on legs" in said
+    quiet = shot.model_copy(update={"actions": [PlayAction(target="p", animation="walk", args={"distance": 160, "gait": "hop"})]})
+    assert not [r for r in _compile(quiet, {"props": props}).asset_resolution if r.kind == "method"]

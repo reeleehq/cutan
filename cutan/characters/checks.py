@@ -24,6 +24,7 @@ from cutan.characters.play import (
     preset_moved_nodes,
     preset_play_span,
     preset_takes,
+    preset_target_problems,
     resolve_turns,
     slot_node_path,
     swap_art_missing,
@@ -223,7 +224,9 @@ def _check_play_actions(
             entity = rigs.get(entity_id)
             is_character = entity is not None and entity.kind == "character"
             desc = play_descriptor(entity_id)
-            problems = play_problems(
+            problems = preset_target_problems(
+                leaf.animation, leaf.target
+            ) + play_problems(
                 desc,
                 leaf.animation,
                 art_exists=(

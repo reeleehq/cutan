@@ -78,6 +78,7 @@ __all__ = [
     "off_registry_substitution",
     "substitution_problem",
     "walk_arg_problems",
+    "walk_problems",
     "SIDE_VIEW_IN_FORCE",
     "UNKNOWN_VIEW",
     "WALK_OWN_ARGS",
@@ -915,45 +916,115 @@ def substitution_problem(sub) -> str | None:
     return f"{sub.sentence()}. To enable it — {fixes}"
 
 
+def walk_problems(
+    doc: Any,
+    *,
+    entity: str,
+    args: Mapping[str, Any],
+    art_exists: Any = None,
+    view: str | None = UNKNOWN_VIEW,
+) -> list[str]:
+    """Everything `an validate` says about one ``walk`` on a character, each a
+    warning: the gait it asks for will not be used (:func:`gait_problem`), and
+    a gait parameter the gait it WILL use never reads (cutan#21) — when the
+    gait is the descriptor's or the chain's; an explicit gait's unread
+    parameter is `play_problems`' error.
+    """
+    from cutan.characters.schema import CharacterDescriptor
+    from an.ir.migrate import migrate
+
+    if not isinstance(doc, Mapping) or doc.get("kind") != "CharacterDescriptor":
+        return []
+    desc = CharacterDescriptor.model_validate(
+        migrate(dict(doc), kind="CharacterDescriptor")
+    )
+    explicit = isinstance(args.get("gait"), str)
+    resolved, r = locomotion_args(
+        entity,
+        args,
+        descriptor=desc,
+        profile=compile_profile(desc, art_exists=art_exists),
+        view=view,
+    )
+    out: list[str] = []
+    if (problem := substitution_problem(r.substitution)) is not None:
+        out.append(problem)
+    if not explicit:
+        out.extend(
+            f"{entity}: {p} — this walk's gait is the "
+            + ("descriptor's" if r.source == "request" else "chain's")
+            for p in walk_arg_problems(resolved["gait"], resolved)
+        )
+    return out
+
+
 def check_walk_gaits(ctx) -> None:
     """The cut-out genre's semantic check: a ``walk`` whose requested gait the
-    character cannot honour is reported (a warning, before any render), with
-    the gait it will walk instead and what would make the asked one apply
-    (an#224, ADR 0002 decision 6)."""
-    from an.ir.compose import flatten
+    entity cannot honour is reported (a warning, before any render), with the
+    gait it will walk instead and what would make the asked one apply (an#224,
+    ADR 0002 decision 6): a missing capability, the side view not in force
+    for a ``profile`` (cutan#17), a legged gait asked of a prop (cutan#22) —
+    and a gait parameter the walk's gait never reads (cutan#21). The view in
+    force is read off the timeline the way the compiler reads it
+    (:func:`cutan.characters.checks._turns_of`)."""
     from an.stores._common import art_exists_for
+    from an.ir.validate import _rig_scope
 
-    store = ctx.stores.get("characters")
-    if store is None:
-        return
-    refs = {
-        e.id: e.ref
-        for e in ctx.shot.entities
-        if e.kind == CHARACTER_KIND and e.ref in store
-    }
-    for k, action in enumerate(ctx.shot.actions or ()):
-        for flat in flatten(action):
-            leaf = flat.action
-            if (
-                getattr(leaf, "kind", None) != "play"
-                or getattr(leaf, "animation", None) != WALK_PRESET
-                or leaf.target not in refs
-            ):
-                continue
-            try:
-                doc = store[refs[leaf.target]]
-                problem = gait_problem(
-                    doc,
-                    entity=leaf.target,
-                    args=dict(leaf.args or {}),
-                    art_exists=art_exists_for(store, refs[leaf.target]),
+    from cutan.characters.checks import _turns_of
+    from cutan.characters.play import facing_at
+    from cutan.motion import DFLT_TURN_SET
+
+    from an.ir.compose import flatten
+
+    rigs, unchecked = _rig_scope(ctx.shot, ctx.stores)
+    resolved = _turns_of(ctx, ctx.index, ctx.shot)
+    if resolved is not None:
+        resolution, origin = resolved
+        flats, events = resolution.flats, resolution.events
+    else:
+        # No characters store: no character is checked (`unchecked`), but a
+        # prop's walk still is, off a plain flatten (no turn to read).
+        flats, origin, events = [], [], []
+        for k, action in enumerate(ctx.shot.actions or ()):
+            for flat in flatten(action):
+                flats.append(flat)
+                origin.append(k)
+    for flat, k in zip(flats, origin):
+        leaf = flat.action
+        if (
+            getattr(leaf, "kind", None) != "play"
+            or getattr(leaf, "animation", None) != WALK_PRESET
+        ):
+            continue
+        entity = leaf.target
+        rig = rigs.get(entity)
+        if rig is None or entity in unchecked or "/" in entity:
+            continue  # a part target is `cutout.play`'s error (cutan#22)
+        args = dict(leaf.args or {})
+        try:
+            if rig.kind != CHARACTER_KIND:
+                sub = off_registry_substitution(entity, normalise_gait_args(args))
+                problems = [p for p in (substitution_problem(sub),) if p]
+            else:
+                store = ctx.stores.get(rig.store) if rig.store else None
+                if store is None or rig.ref not in store:
+                    continue
+                view = args.get("view")
+                if view is None:
+                    view = facing_at(events, entity, flat.start, view_set=DFLT_TURN_SET).view
+                    if view is None:
+                        view = (store[rig.ref] or {}).get("rest_view")
+                problems = walk_problems(
+                    store[rig.ref],
+                    entity=entity,
+                    args=args,
+                    art_exists=art_exists_for(store, rig.ref),
+                    view=view,
                 )
-            except (
-                Exception
-            ):  # a malformed gait or descriptor is `cutout.play`'s to report
-                continue
-            if problem is not None:
-                ctx.report.add("warning", f"{ctx.path}/actions/{k}", problem)
+        except Exception:  # a malformed gait or descriptor is `cutout.play`'s to report
+            continue
+        for problem in problems:
+            ctx.report.add("warning", f"{ctx.path}/actions/{k}", problem)
 
 
 def substitution_record(sub, *, entity_ref: str | None = None) -> dict[str, Any]:
