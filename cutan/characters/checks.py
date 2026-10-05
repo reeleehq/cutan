@@ -62,7 +62,9 @@ def _stage_of(shot, stores: Mapping[str, Any], unchecked: set[str] = frozenset()
             staged = shot
             if unchecked:
                 staged = shot.model_copy(
-                    update={"entities": [e for e in shot.entities if e.id not in unchecked]}
+                    update={
+                        "entities": [e for e in shot.entities if e.id not in unchecked]
+                    }
                 )
             try:
                 cache["poses"] = stage_poses(staged, mall=stores)
@@ -101,7 +103,9 @@ def _preset_context_of(
             if entity.kind == CHARACTER_KIND:
                 doc = _rig_document(entity, stores)
                 try:
-                    descriptor = CharacterDescriptor.model_validate(doc) if doc else None
+                    descriptor = (
+                        CharacterDescriptor.model_validate(doc) if doc else None
+                    )
                 except ValidationError:
                     descriptor = None  # reported by the play check
             if descriptor is not None:
@@ -131,7 +135,8 @@ def _preset_context_of(
         if profile is None and is_character and "/" not in target:
             prefix = f"{target}/"
             profile = compile_profile(
-                None, built_parts=[p[len(prefix) :] for p in poses if p.startswith(prefix)]
+                None,
+                built_parts=[p[len(prefix) :] for p in poses if p.startswith(prefix)],
             )
         prefix = f"{target}/"
         return walk_preset_context(
@@ -140,7 +145,9 @@ def _preset_context_of(
             descriptor=descriptor,
             profile=profile,
             scale=abs(float(poses[target]["scale_y"])),
-            parts=None if profile is not None else [p[len(prefix) :] for p in poses if p.startswith(prefix)],
+            parts=None
+            if profile is not None
+            else [p[len(prefix) :] for p in poses if p.startswith(prefix)],
         )
 
     return context

@@ -34,7 +34,6 @@ __all__ = [
 ]
 
 
-
 def _compiler_params() -> frozenset[str]:
     """Parameters of a motion preset that are the compiler's, never an author's:
     :data:`cutan.characters.play.RESERVED_PRESET_ARGS`, the one list
@@ -42,6 +41,7 @@ def _compiler_params() -> frozenset[str]:
     from cutan.characters.play import RESERVED_PRESET_ARGS
 
     return RESERVED_PRESET_ARGS
+
 
 #: Which aspect a preset resolves when played (ADR 0002): a ``walk`` picks a
 #: locomotion method; ``speech_pulse`` IS the speech aspect's last link.
