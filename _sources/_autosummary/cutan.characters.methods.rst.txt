@@ -9,6 +9,8 @@ cutan.characters.methods
    .. autosummary::
    
       LOCOMOTION
+      SIDE_VIEW_IN_FORCE
+      UNKNOWN_VIEW
       CUTOUT_METHODS
       CUTOUT_ASPECTS
    
@@ -21,6 +23,11 @@ cutan.characters.methods
       check_walk_gaits
       gait_problem
       locomotion_args
+      off_registry_substitution
+      substitution_problem
+      walk_arg_problems
+      walk_problems
+      walk_own_args
       compile_profile
       speech_problems
       normalise_gait_args

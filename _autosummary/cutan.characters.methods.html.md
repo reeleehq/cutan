@@ -55,27 +55,34 @@ Importing this module registers nothing: `cutan.genre.CUTOUT` lists
 
 ### Module Attributes
 
-| [`LOCOMOTION`](#cutan.characters.methods.LOCOMOTION)     | The aspect names (persisted in substitution records).       |
-|-----------------------------------------------------------------|-------------------------------------------------------------|
-| [`CUTOUT_METHODS`](#cutan.characters.methods.CUTOUT_METHODS) | The genre's methods, as vocabulary entries (kind `method`). |
-| [`CUTOUT_ASPECTS`](#cutan.characters.methods.CUTOUT_ASPECTS) | each chain ends in a method that requires nothing.          |
+| [`LOCOMOTION`](#cutan.characters.methods.LOCOMOTION)         | The aspect names (persisted in substitution records).                                                                                                                                                                                         |
+|---------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`SIDE_VIEW_IN_FORCE`](#cutan.characters.methods.SIDE_VIEW_IN_FORCE) | The requirement a `profile` walk has beyond the registry's `swap.view:side`: the side view must be the one SHOWING when the walk starts, or the legs swing in the front view and scissor (cutan#17).                                          |
+| [`UNKNOWN_VIEW`](#cutan.characters.methods.UNKNOWN_VIEW)       | "The view in force is not known" — a caller that cannot read the timeline (the extent resolver, which never needs it: see [`walk_preset_context()`](#cutan.characters.methods.walk_preset_context)); the compiler and `an validate` always can. |
+| [`CUTOUT_METHODS`](#cutan.characters.methods.CUTOUT_METHODS)     | The genre's methods, as vocabulary entries (kind `method`).                                                                                                                                                                                   |
+| [`CUTOUT_ASPECTS`](#cutan.characters.methods.CUTOUT_ASPECTS)     | each chain ends in a method that requires nothing.                                                                                                                                                                                            |
 
 ### Functions
 
-| [`check_brow_acting`](#cutan.characters.methods.check_brow_acting)(ctx)                             | The cut-out genre's semantic check: an expression that moves the brows of a character whose brows cannot act is reported (a warning) — the expression aspect's recorded fall to `expr.without_brows` (an#252).                                                                                                                                                 |
-|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`check_declared_speech`](#cutan.characters.methods.check_declared_speech)(ctx)                         | The cut-out genre's semantic check: each character's declared `speech` resolves.                                                                                                                                                                                                                                                                               |
-| [`check_walk_gaits`](#cutan.characters.methods.check_walk_gaits)(ctx)                              | The cut-out genre's semantic check: a `walk` whose requested gait the character cannot honour is reported (a warning, before any render), with the gait it will walk instead and what would make the asked one apply (an#224, ADR 0002 decision 6).                                                                                                            |
-| [`gait_problem`](#cutan.characters.methods.gait_problem)(doc, \*, entity, args[, art_exists])  | Why a walk on `entity` will not use the gait it asks for (its `gait` arg, else the descriptor's), with what would enable it — or `None`.                                                                                                                                                                                                                       |
-| [`locomotion_args`](#cutan.characters.methods.locomotion_args)(entity, args, \*, descriptor, ...) | `(args with its gait resolved, resolution)` of a walk on `entity`: the locomotion method the registry resolves (an#248) — the author's `gait` (a spelling, a method id or a pinned choice, spelled out first, its args joining the walk's), else the descriptor's, else the chain.                                                                             |
-| [`compile_profile`](#cutan.characters.methods.compile_profile)(descriptor, \*[, ...])             | The character's profile, from what the compiler has: the analyser, fed honestly.                                                                                                                                                                                                                                                                               |
-| [`speech_problems`](#cutan.characters.methods.speech_problems)(declared)                          | Why a character's declared `speech` cannot be honoured (empty: it can).                                                                                                                                                                                                                                                                                        |
-| [`normalise_gait_args`](#cutan.characters.methods.normalise_gait_args)(args)                          | A walk's args with `gait` as the walk spells it (one of [`cutan.motion.GAITS`](cutan.motion.html.md#cutan.motion.GAITS)).                                                                                                                                                                                                               |
-| [`resolve_walk_gait`](#cutan.characters.methods.resolve_walk_gait)(entity, \*, args, ...[, policy]) | `(gait, resolution)` of a walk on `entity`: the locomotion method's spelling.                                                                                                                                                                                                                                                                                  |
-| [`speech_plan`](#cutan.characters.methods.speech_plan)(shot, \*, is_character, profile_of)    | Resolve the speech aspect ONCE per speaking character, and say what it adds.                                                                                                                                                                                                                                                                                   |
-| [`substitution_record`](#cutan.characters.methods.substitution_record)(sub, \*[, entity_ref])         | A `Substitution` as an `asset_resolution` entry.                                                                                                                                                                                                                                                                                                               |
-| [`syllable_beats`](#cutan.characters.methods.syllable_beats)(line, \*[, min_gap_s])              | Syllable onsets of a dialogue line, in seconds from its start.                                                                                                                                                                                                                                                                                                 |
-| [`walk_preset_context`](#cutan.characters.methods.walk_preset_context)(entity, args, \*, ...[, ...])  | What the compiler adds to a `walk` play's args before expanding it, as far as the walk's LENGTH depends on it: the resolved `gait` (when the entity resolves on the registry: `profile` given), the figure's drawn `scale` (its stage scale, cutan#13), and — off the registry, where the walk picks its own gait from the limbs it finds — the built `parts`. |
+| [`check_brow_acting`](#cutan.characters.methods.check_brow_acting)(ctx)                             | The cut-out genre's semantic check: an expression that moves the brows of a character whose brows cannot act is reported (a warning) — the expression aspect's recorded fall to `expr.without_brows` (an#252).                                                                                                                                                                                                                                     |
+|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`check_declared_speech`](#cutan.characters.methods.check_declared_speech)(ctx)                         | The cut-out genre's semantic check: each character's declared `speech` resolves.                                                                                                                                                                                                                                                                                                                                                                   |
+| [`check_walk_gaits`](#cutan.characters.methods.check_walk_gaits)(ctx)                              | The cut-out genre's semantic check: a `walk` whose requested gait the entity cannot honour is reported (a warning, before any render), with the gait it will walk instead and what would make the asked one apply (an#224, ADR 0002 decision 6): a missing capability, the side view not in force for a `profile` (cutan#17), a legged gait asked of a prop with no legs (cutan#22) — and a gait parameter the walk's gait never reads (cutan#21). |
+| [`gait_problem`](#cutan.characters.methods.gait_problem)(doc, \*, entity, args[, ...])         | Why a walk on `entity` will not use the gait it asks for (its `gait` arg, else the descriptor's), with what would enable it — or `None`.                                                                                                                                                                                                                                                                                                           |
+| [`locomotion_args`](#cutan.characters.methods.locomotion_args)(entity, args, \*, descriptor, ...) | `(args with its gait resolved, resolution)` of a walk on `entity`: the locomotion method the registry resolves (an#248) — the author's `gait` (a spelling, a method id or a pinned choice, spelled out first, its args joining the walk's), else the descriptor's, else the chain.                                                                                                                                                                 |
+| [`off_registry_substitution`](#cutan.characters.methods.off_registry_substitution)(entity, args[, parts])   | The record for a legged gait asked of an entity that does not resolve on the capability registry (a prop: no analyser) and whose built `parts` hold no leg pair ([`cutan.motion.WALK_LEG_NAMES`](cutan.motion.html.md#cutan.motion.WALK_LEG_NAMES)): it walks the legless default, and says so (cutan#22).                                                                                                                  |
+| [`substitution_problem`](#cutan.characters.methods.substitution_problem)(sub)                          | The sentence `an validate` reports for a `missing` substitution: what happened, plus each missing capability's remedy (the substitution's own where it carries one, else the registry's).                                                                                                                                                                                                                                                          |
+| [`walk_arg_problems`](#cutan.characters.methods.walk_arg_problems)(gait, args)                      | The gait parameters in `args` that `gait` never reads (cutan#21): each is a silent no-op otherwise.                                                                                                                                                                                                                                                                                                                                                |
+| [`walk_problems`](#cutan.characters.methods.walk_problems)(doc, \*, entity, args[, ...])        | Everything `an validate` says about one `walk` on a character, each a warning: the gait it asks for will not be used ([`gait_problem()`](#cutan.characters.methods.gait_problem)), and a gait parameter the gait it WILL use never reads (cutan#21) — when the gait is the descriptor's or the chain's; an explicit gait's (a spelling, a method id or a pinned choice) unread parameter is `play_problems`' error.                           |
+| [`walk_own_args`](#cutan.characters.methods.walk_own_args)()                                    | The walk's own arguments — where to, how many steps, the limbs, the view — read off its signature: everything it accepts that is not a gait parameter (`cutan.motion.WALK_PARAM_DEFAULTS`), which only the gaits that declare it read (cutan#21).                                                                                                                                                                                                  |
+| [`compile_profile`](#cutan.characters.methods.compile_profile)(descriptor, \*[, ...])             | The character's profile, from what the compiler has: the analyser, fed honestly.                                                                                                                                                                                                                                                                                                                                                                   |
+| [`speech_problems`](#cutan.characters.methods.speech_problems)(declared)                          | Why a character's declared `speech` cannot be honoured (empty: it can).                                                                                                                                                                                                                                                                                                                                                                            |
+| [`normalise_gait_args`](#cutan.characters.methods.normalise_gait_args)(args)                          | A walk's args with `gait` as the walk spells it (one of [`cutan.motion.GAITS`](cutan.motion.html.md#cutan.motion.GAITS)).                                                                                                                                                                                                                                                                                                   |
+| [`resolve_walk_gait`](#cutan.characters.methods.resolve_walk_gait)(entity, \*, args, ...[, ...])    | `(gait, resolution)` of a walk on `entity`: the locomotion method's spelling.                                                                                                                                                                                                                                                                                                                                                                      |
+| [`speech_plan`](#cutan.characters.methods.speech_plan)(shot, \*, is_character, profile_of)    | Resolve the speech aspect ONCE per speaking character, and say what it adds.                                                                                                                                                                                                                                                                                                                                                                       |
+| [`substitution_record`](#cutan.characters.methods.substitution_record)(sub, \*[, entity_ref])         | A `Substitution` as an `asset_resolution` entry.                                                                                                                                                                                                                                                                                                                                                                                                   |
+| [`syllable_beats`](#cutan.characters.methods.syllable_beats)(line, \*[, min_gap_s])              | Syllable onsets of a dialogue line, in seconds from its start.                                                                                                                                                                                                                                                                                                                                                                                     |
+| [`walk_preset_context`](#cutan.characters.methods.walk_preset_context)(entity, args, \*, ...[, ...])  | What the compiler adds to a `walk` play's args before expanding it, as far as the walk's LENGTH depends on it: the resolved `gait` (when the entity resolves on the registry: `profile` given), the figure's drawn `scale` (its stage scale, cutan#13), and — off the registry, where the walk picks its own gait from the limbs it finds — the built `parts`.                                                                                     |
 
 ### Classes
 
@@ -89,7 +96,7 @@ each chain ends in a method that requires nothing.
 * **Type:**
   The genre’s aspects
 
-### cutan.characters.methods.CUTOUT_METHODS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Method, ...]* *= (Method(id='loco.legged_cycle', kind='method', version='2', name='legs', title='legged walk cycle', description='a legged walk cycle: in profile the legs swing about the hip in opposition, facing the camera the stepping leg lifts; the arms swing against the legs', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'lift': {'type': 'number', 'default': 10.0}, 'arm_swing': {'type': 'number', 'default': 0.3}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'legs'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.profile_cycle', kind='method', version='2', name='profile', title='profile walk cycle', description="the four poses of a walk seen in profile (contact, down, passing, up): the legs swing about the hip in opposition whatever the view in force, the body sinks after each contact and rises before the next (Reiniger's silhouettes, any figure drawn side-on)", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.45}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.35}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'profile'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()), Requirement(capability='swap.view', key='side', at_least=None, any_of=())), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)', 'swap.view:side': 'give the character a side view: \`an character add-views <name>\` (a factory character), or carve its art in profile and declare \`rest_view: side\` in character.json'}), Method(id='loco.shuffle', kind='method', version='2', name='shuffle', title='shuffle', description='the feet barely leave the ground: short, quick steps with little bob and arms close to the body (the old, the tired, the cautious)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.3}, 'step_length': {'type': 'number', 'default': 40.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 3.0}, 'arm_swing': {'type': 'number', 'default': 0.1}, 'bob': {'type': 'number', 'default': 1.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'shuffle'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.hem_sway', kind='method', version='2', name='hem', title='hem sway', description="a robe figure's walk: the leg slots are the two halves of the hem, which tilt in turn about the hip while the body sways and bobs", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hem_tilt': {'type': 'number', 'default': 0.24}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hem'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': "carve the robe's hem into two halves on slots leg_l/leg_r, pivoted at the hip, and declare \`gait: hem\` in character.json"}), Method(id='loco.waddle', kind='method', version='2', name='waddle', title='waddle', description='the body rocks from foot to foot and bobs on each step; legs, if any, lift in turn (a penguin, a toddler, a squat figure)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 5.0}, 'bob': {'type': 'number', 'default': 4.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'waddle'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.hop', kind='method', version='2', name='hop', title='hop', description='the whole figure jumps on every step while it travels (a bird, a kangaroo, a gleeful character, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hop_height': {'type': 'number', 'default': 18.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hop'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.bounce', kind='method', version='2', name='bounce', title='bounce', description='the body bobs on every step while it slides; legs, if any, only flick (the South Park walk)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 8.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lift': {'type': 'number', 'default': 4.0}, 'stride': {'type': 'number', 'default': 0.1}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'bounce'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.rock', kind='method', version='2', name='rock', title='rock and bob', description='no leg moves: the body rocks side to side and bobs once per step while it travels (a blob, a sack, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'rock'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.glide', kind='method', version='2', name='glide', title='glide', description='the figure slides, leaning into the move with a gentle bob; no limb moves (a robe figure, a ghost, a sack — the default for any figure without legs)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 1.5, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lean': {'type': 'number', 'default': 0.04}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'glide'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='speech.mouth_chart', kind='method', version='1', name='mouth_chart', title='mouth chart lip-sync', description="lip-sync on the character's mouth chart: the line's visemes swap the mouth drawings (the nine Rhubarb shapes, or the character's own set)", usage='', params={}, examples=(), requires=(Requirement(capability='face.mouth', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='speech', remedies={'face.mouth': "give the character an overlay mouth: a \`mouth\` slot with the viseme set's drawings (\`an character mouths <dir>\`) and face_overlay: true"}), Method(id='speech.pose_only', kind='method', version='1', name='pulse', title='speech pulse', description='no lip-sync: the head (or the body) pulses on each syllable, so a baked face or a mime still reads as speaking', usage='', params={'type': 'object', 'properties': {'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=('a character with face_overlay: false speaks',), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='speech', remedies={}), Method(id='expr.full_face', kind='method', version='1', name='full_face', title='full-face expression', description="the expression acts with the whole face: the brows rise, knit and tilt, the lids open and close, the pupils move and the mouth takes the preset's form", usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'},), requires=(Requirement(capability='face.brows', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='expression', remedies={'face.brows': "keep the brows clear: \`an character new\` seats a hat above them at most head scales — at this one it could not, so use a larger --head-scale, another --hat or --hat none; for drawn art, redraw what covers the brows and remove the descriptor's \`occluded\` entry, or give the face brow slots (left_brow/right_brow) with art"}), Method(id='expr.without_brows', kind='method', version='1', name='without_brows', title='expression without brows', description='the brows cannot be seen acting (covered, or not drawn): the lids, the gaze and the mouth form carry the expression', usage='', params={}, examples=('a character whose hat covers its brows takes [surprised]',), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='expression', remedies={}))*
+### cutan.characters.methods.CUTOUT_METHODS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Method, ...]* *= (Method(id='loco.legged_cycle', kind='method', version='2', name='legs', title='legged walk cycle', description='a legged walk cycle: in profile the legs swing about the hip in opposition, facing the camera the stepping leg lifts; the arms swing against the legs', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'lift': {'type': 'number', 'default': 10.0}, 'arm_swing': {'type': 'number', 'default': 0.3}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'legs'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.profile_cycle', kind='method', version='2', name='profile', title='profile walk cycle', description="the four poses of a walk seen in profile (contact, down, passing, up): with a side or three-quarter view showing the legs swing about the hip in opposition and the body sinks after each contact and rises before the next; asked while another view shows, it walks as legs (Reiniger's silhouettes, any figure drawn side-on)", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.45}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.35}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'profile'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()), Requirement(capability='swap.view', key='side', at_least=None, any_of=())), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)', 'swap.view:side': 'give the character a side view: \`an character add-views <name>\` (a factory character), or carve its art in profile and declare \`rest_view: side\` in character.json'}), Method(id='loco.shuffle', kind='method', version='2', name='shuffle', title='shuffle', description='the feet barely leave the ground: short, quick steps with little bob and arms close to the body (the old, the tired, the cautious)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.3}, 'step_length': {'type': 'number', 'default': 40.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 3.0}, 'arm_swing': {'type': 'number', 'default': 0.1}, 'bob': {'type': 'number', 'default': 1.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'shuffle'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.hem_sway', kind='method', version='2', name='hem', title='hem sway', description="a robe figure's walk: the leg slots are the two halves of the hem, which tilt in turn about the hip while the body sways and bobs", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hem_tilt': {'type': 'number', 'default': 0.24}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hem'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': "carve the robe's hem into two halves on slots leg_l/leg_r, pivoted at the hip, and declare \`gait: hem\` in character.json"}), Method(id='loco.waddle', kind='method', version='2', name='waddle', title='waddle', description='the body rocks from foot to foot and bobs on each step; legs, if any, lift in turn (a penguin, a toddler, a squat figure)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 5.0}, 'bob': {'type': 'number', 'default': 4.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'waddle'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.hop', kind='method', version='2', name='hop', title='hop', description='the whole figure jumps on every step while it travels (a bird, a kangaroo, a gleeful character, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hop_height': {'type': 'number', 'default': 18.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hop'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.bounce', kind='method', version='2', name='bounce', title='bounce', description='the body bobs on every step while it slides; legs, if any, only flick (the South Park walk)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 8.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lift': {'type': 'number', 'default': 4.0}, 'stride': {'type': 'number', 'default': 0.1}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'bounce'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.rock', kind='method', version='2', name='rock', title='rock and bob', description='no leg moves: the body rocks side to side and bobs once per step while it travels (a blob, a sack, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'rock'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.glide', kind='method', version='2', name='glide', title='glide', description='the figure slides, leaning into the move with a gentle bob; no limb moves (a robe figure, a ghost, a sack — the default for any figure without legs)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 1.5, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lean': {'type': 'number', 'default': 0.04}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'glide'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='speech.mouth_chart', kind='method', version='1', name='mouth_chart', title='mouth chart lip-sync', description="lip-sync on the character's mouth chart: the line's visemes swap the mouth drawings (the nine Rhubarb shapes, or the character's own set)", usage='', params={}, examples=(), requires=(Requirement(capability='face.mouth', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='speech', remedies={'face.mouth': "give the character an overlay mouth: a \`mouth\` slot with the viseme set's drawings (\`an character mouths <dir>\`) and face_overlay: true"}), Method(id='speech.pose_only', kind='method', version='1', name='pulse', title='speech pulse', description='no lip-sync: the head (or the body) pulses on each syllable, so a baked face or a mime still reads as speaking', usage='', params={'type': 'object', 'properties': {'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=('a character with face_overlay: false speaks',), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='speech', remedies={}), Method(id='expr.full_face', kind='method', version='1', name='full_face', title='full-face expression', description="the expression acts with the whole face: the brows rise, knit and tilt, the lids open and close, the pupils move and the mouth takes the preset's form", usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'},), requires=(Requirement(capability='face.brows', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='expression', remedies={'face.brows': "keep the brows clear: \`an character new\` seats a hat above them at most head scales — at this one it could not, so use a larger --head-scale, another --hat or --hat none; for drawn art, redraw what covers the brows and remove the descriptor's \`occluded\` entry, or give the face brow slots (left_brow/right_brow) with art"}), Method(id='expr.without_brows', kind='method', version='1', name='without_brows', title='expression without brows', description='the brows cannot be seen acting (covered, or not drawn): the lids, the gaze and the mouth form carry the expression', usage='', params={}, examples=('a character whose hat covers its brows takes [surprised]',), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='expression', remedies={}))*
 
 The genre’s methods, as vocabulary entries (kind `method`).
 
@@ -97,12 +104,25 @@ The genre’s methods, as vocabulary entries (kind `method`).
 
 The aspect names (persisted in substitution records).
 
+### cutan.characters.methods.SIDE_VIEW_IN_FORCE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'swap.view:side in force'*
+
+The requirement a `profile` walk has beyond the registry’s
+`swap.view:side`: the side view must be the one SHOWING when the walk
+starts, or the legs swing in the front view and scissor (cutan#17).
+
 ### *class* cutan.characters.methods.SpeechPlan(actions=(), no_lip_sync=frozenset({}))
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 What the speech aspect decided for a shot: the actions it adds, and the
 speakers whose lip-sync it switched off (the viseme pass skips them).
+
+### cutan.characters.methods.UNKNOWN_VIEW *: [Any](https://docs.python.org/3/library/typing.html#typing.Any)* *= <object object>*
+
+“The view in force is not known” — a caller that cannot read the timeline
+(the extent resolver, which never needs it: see [`walk_preset_context()`](#cutan.characters.methods.walk_preset_context));
+the compiler and `an validate` always can. A private object, so no view an
+author could type (`view: "?"`) stands for it.
 
 ### cutan.characters.methods.check_brow_acting(ctx)
 
@@ -123,9 +143,14 @@ The cut-out genre’s semantic check: each character’s declared `speech` resol
 ### cutan.characters.methods.check_walk_gaits(ctx)
 
 The cut-out genre’s semantic check: a `walk` whose requested gait the
-character cannot honour is reported (a warning, before any render), with
-the gait it will walk instead and what would make the asked one apply
-(an#224, ADR 0002 decision 6).
+entity cannot honour is reported (a warning, before any render), with the
+gait it will walk instead and what would make the asked one apply (an#224,
+ADR 0002 decision 6): a missing capability, the side view not in force
+for a `profile` (cutan#17), a legged gait asked of a prop with no legs
+(cutan#22) — and a gait parameter the walk’s gait never reads (cutan#21).
+The view in force is read off the timeline the way the compiler reads it
+(`cutan.characters.checks._turns_of()`), a prop’s limbs off the built
+stage (`cutan.characters.checks._stage_poses_of()`).
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -144,19 +169,20 @@ parts document).
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
 
-### cutan.characters.methods.gait_problem(doc, , entity, args, art_exists=None)
+### cutan.characters.methods.gait_problem(doc, \*, entity, args, art_exists=None, view=<object object>)
 
 Why a walk on `entity` will not use the gait it asks for (its `gait`
 arg, else the descriptor’s), with what would enable it — or `None`.
 
 `doc` is the character’s stored document; `art_exists` the store’s
-probe. The sentence is the one the compiler records (`asset_resolution`)
-when it substitutes the method, plus each missing capability’s remedy.
+probe; `view` the view in force at the play’s start (cutan#17). The
+sentence is the one the compiler records (`asset_resolution`) when it
+substitutes the method, plus each missing capability’s remedy.
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### cutan.characters.methods.locomotion_args(entity, args, , descriptor, profile, policy=None)
+### cutan.characters.methods.locomotion_args(entity, args, \*, descriptor, profile, policy=None, view=<object object>)
 
 `(args with its gait resolved, resolution)` of a walk on `entity`:
 the locomotion method the registry resolves (an#248) — the author’s
@@ -196,19 +222,51 @@ another aspect, raises `VocabularyError`.
 {'gait': 'hem', 'distance': 80}
 ```
 
-### cutan.characters.methods.resolve_walk_gait(entity, , args, descriptor, profile, policy=None)
+### cutan.characters.methods.off_registry_substitution(entity, args, parts=None)
+
+The record for a legged gait asked of an entity that does not resolve
+on the capability registry (a prop: no analyser) and whose built
+`parts` hold no leg pair ([`cutan.motion.WALK_LEG_NAMES`](cutan.motion.html.md#cutan.motion.WALK_LEG_NAMES)): it walks
+the legless default, and says so (cutan#22). `None` otherwise — a prop
+rigged with legs walks on them.
+
+```pycon
+>>> off_registry_substitution("lamp", {"gait": "hem"}, ["base", "shade"]).sentence()
+"lamp: locomotion 'loco.hem_sway' does not apply (missing limbs.legs); used 'loco.glide'"
+>>> off_registry_substitution("lamp", {"gait": "hop"}, []) is None
+True
+>>> off_registry_substitution("bot", {"gait": "legs"}, ["leg_l", "leg_r"]) is None
+True
+```
+
+### cutan.characters.methods.resolve_walk_gait(entity, \*, args, descriptor, profile, policy=None, view=<object object>)
 
 `(gait, resolution)` of a walk on `entity`: the locomotion method’s spelling.
 
 The request is the walk’s `gait` arg, else the descriptor’s declared
 `gait` (an override of the derivation, and reported as one). An explicit
 `legs` arg names the limbs itself: a non-empty pair affords legs whatever
-the derivation says, `()` affords none.
+the derivation says, `()` affords none. `view` is the view the
+TIMELINE has in force at the play’s start (`None`: the rig’s default
+drawing; never the walk’s own `view` arg, which poses the legs without
+swapping the art): a `profile` while a view its legs do not swing in is
+showing would scissor them in front, so the side view is taken off the
+profile for this resolution — the registry then substitutes as it would
+for a missing capability (the chain, or a policy’s next choice), and the
+record names [`SIDE_VIEW_IN_FORCE`](#cutan.characters.methods.SIDE_VIEW_IN_FORCE) with its remedy (cutan#17).
+[`UNKNOWN_VIEW`](#cutan.characters.methods.UNKNOWN_VIEW) skips that (a caller with no timeline).
 
 ```pycon
 >>> gait, r = resolve_walk_gait("blob", args={"gait": "hem"}, descriptor=None, profile={})
 >>> gait, r.substitution.reason, r.substitution.missing
 ('glide', 'missing', ('limbs.legs',))
+>>> legged = {"limbs.legs": {"slots": ["leg_l", "leg_r"]},
+...           "swap.view": {"keys": ["front", "side"], "rest": "front"}}
+>>> gait, r = resolve_walk_gait("ned", args={"gait": "profile"}, descriptor=None, profile=legged, view=None)
+>>> gait, r.substitution.missing
+('legs', ('swap.view:side in force',))
+>>> resolve_walk_gait("ned", args={"gait": "profile"}, descriptor=None, profile=legged, view="side")[0]
+'profile'
 ```
 
 ### cutan.characters.methods.speech_plan(shot, \*, is_character, profile_of, descriptor_of=<function <lambda>>, has_part, record=None, policy=None)
@@ -254,6 +312,16 @@ registry no longer has; the message names the speech methods.
 True
 ```
 
+### cutan.characters.methods.substitution_problem(sub)
+
+The sentence `an validate` reports for a `missing` substitution: what
+happened, plus each missing capability’s remedy (the substitution’s own
+where it carries one, else the registry’s). `None` for no substitution
+or a non-fatal one.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 ### cutan.characters.methods.substitution_record(sub, , entity_ref=None)
 
 A `Substitution` as an `asset_resolution` entry.
@@ -277,6 +345,39 @@ beat at its start. Beats closer than `min_gap_s` merge.
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
+### cutan.characters.methods.walk_arg_problems(gait, args)
+
+The gait parameters in `args` that `gait` never reads (cutan#21):
+each is a silent no-op otherwise. `gait` is a spelling (one of
+[`cutan.motion.GAITS`](cutan.motion.html.md#cutan.motion.GAITS)); the walk’s own arguments
+([`walk_own_args()`](#cutan.characters.methods.walk_own_args)) are never a problem. An unknown spelling is the
+walk’s own to refuse.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> walk_arg_problems("hop", {"bob": 20, "distance": 80, "arm_swing": 0.2})
+["gait 'hop' does not read 'bob' (it reads: arm_swing, hop_height, step_length, step_s)"]
+>>> walk_arg_problems("glide", {"bob": 2}), walk_arg_problems("noop", {"bob": 2})
+([], [])
+```
+
+### cutan.characters.methods.walk_own_args()
+
+The walk’s own arguments — where to, how many steps, the limbs, the view
+— read off its signature: everything it accepts that is not a gait
+parameter (`cutan.motion.WALK_PARAM_DEFAULTS`), which only the gaits
+that declare it read (cutan#21).
+
+* **Return type:**
+  [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> sorted(walk_own_args())
+['arms', 'direction', 'distance', 'gait', 'legs', 'steps', 'to_x', 'view']
+```
+
 ### cutan.characters.methods.walk_preset_context(entity, args, , descriptor, profile, scale, parts=None)
 
 What the compiler adds to a `walk` play’s args before expanding it, as
@@ -286,7 +387,10 @@ entity resolves on the registry: `profile` given), the figure’s drawn
 walk picks its own gait from the limbs it finds — the built `parts`. The
 extent resolver reads this so a `sequence` waits exactly as long as the
 walk runs (cutan#12); the expansion itself resolves the same way (and
-records the substitution).
+records the substitution). The one thing the extent does not see is the
+view in force (cutan#17): a `profile` it resolves may walk as `legs`,
+which is why those two share `step_s` and `step_length`
+(`tests/test_gaits.py` pins that).
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
@@ -299,3 +403,17 @@ records the substitution).
 >>> walk_preset_context("b", {}, descriptor=None, profile=None, scale=1.0, parts=["head"])
 {'scale': 1.0, 'parts': {'head': {}}}
 ```
+
+### cutan.characters.methods.walk_problems(doc, \*, entity, args, art_exists=None, view=<object object>)
+
+Everything `an validate` says about one `walk` on a character, each a
+warning: the gait it asks for will not be used ([`gait_problem()`](#cutan.characters.methods.gait_problem)), and
+a gait parameter the gait it WILL use never reads (cutan#21) — when the
+gait is the descriptor’s or the chain’s; an explicit gait’s (a spelling,
+a method id or a pinned choice) unread parameter is `play_problems`’ error.
+`doc` is the character’s stored document: a `CharacterDescriptor`, or
+a `parts` rig (resolved on its parts, as the compiler does); anything
+else is `cutout.play`’s to report.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]

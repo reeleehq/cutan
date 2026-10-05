@@ -85,6 +85,7 @@ so an author never passes `rest`.
 | [`preset_moved_nodes`](#cutan.characters.play.preset_moved_nodes)(action_target, animation)     | Every node path a preset play moves.                                                                                                                                                                                                                                                                                                                                   |
 | [`preset_takes`](#cutan.characters.play.preset_takes)(animation, name)                    | Whether the motion preset `animation` has the keyword `name` (`False` for a name that is no preset: a descriptor animation takes nothing).                                                                                                                                                                                                                             |
 | [`preset_play_span`](#cutan.characters.play.preset_play_span)(action[, context])              | How long a preset `play` runs, in seconds: its `duration` when set, else the preset's natural length divided by `speed`.                                                                                                                                                                                                                                               |
+| [`preset_target_problems`](#cutan.characters.play.preset_target_problems)(animation, target)        | Why `animation` cannot be played on `target`: a preset that moves an entity's PARTS (`walk`) is played on the entity, not on one of its parts — a torso asked to walk would glide away from its legs, and the gait resolution keys the whole character (cutan#22).                                                                                                     |
 | [`preset_problems`](#cutan.characters.play.preset_problems)(animation, \*[, args, ...])      | Why a `play` of the motion preset `animation` cannot expand.                                                                                                                                                                                                                                                                                                           |
 | [`primary_slot_per_bone`](#cutan.characters.play.primary_slot_per_bone)(desc)                      | `{bone name: the slot that IS that bone}`, when one exists.                                                                                                                                                                                                                                                                                                            |
 | [`resolve_play`](#cutan.characters.play.resolve_play)(desc, animation, \*[, art_exists])  | Resolve `animation` of `desc` into renderer-ready tracks, or raise [`PlayResolutionError`](#cutan.characters.play.PlayResolutionError) listing every problem found.                                                                                                                                                                                                   |
@@ -413,6 +414,24 @@ Whether the motion preset `animation` has the keyword `name`
 ```pycon
 >>> preset_takes("walk", "parts"), preset_takes("hop", "parts"), preset_takes("blink", "parts")
 (True, False, False)
+```
+
+### cutan.characters.play.preset_target_problems(animation, target)
+
+Why `animation` cannot be played on `target`: a preset that moves an
+entity’s PARTS (`walk`) is played on the entity, not on one of its parts
+— a torso asked to walk would glide away from its legs, and the gait
+resolution keys the whole character (cutan#22). Checked by the compiler
+and by `an validate` alike.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> preset_target_problems("walk", "w/torso")
+["motion preset 'walk' moves a whole character: play it on 'w', not on its part 'w/torso'"]
+>>> preset_target_problems("walk", "w"), preset_target_problems("point", "w/arm_r")
+([], [])
 ```
 
 ### cutan.characters.play.primary_slot_per_bone(desc)

@@ -33,6 +33,7 @@ cutan.characters.play
       preset_moved_nodes
       preset_takes
       preset_play_span
+      preset_target_problems
       preset_problems
       primary_slot_per_bone
       resolve_play
