@@ -237,9 +237,8 @@ def test_a_sequence_waits_exactly_as_long_as_the_walk(gait_store, ref, scale, ar
 
 def test_validate_places_a_sequence_where_compile_does(gait_store):
     """`an validate`'s extent resolver reads the same gait and scale as the compiler's."""
-    from cutan.characters.checks import _preset_context_of
+    from cutan.characters.checks import _preset_context_of, _stage_of
     from cutan.characters.play import play_extent_for
-    from cutan.compile.lowering import PLAY_LOWERING
 
     for ref, scale, args in (("gale", 2.0, {}), ("gale_shuffle", 1.0, {}), ("legless", 1.0, {"gait": "shuffle"})):
         shot = _gale_shot(PlayAction(target="w", animation="walk", args={"distance": 160, **args}), scale=scale, ref=ref)
@@ -247,7 +246,8 @@ def test_validate_places_a_sequence_where_compile_does(gait_store):
         doc = _compile(shot, {"characters": gait_store})
         walked = max(ch.keyframes[-1].time for a in doc.animations.values() for ch in a.channels if ch.target == "w" and ch.property == "x")
         rigs = {e.id: e for e in shot.entities}
-        extent = play_extent_for(lambda e: None, context_of=_preset_context_of(rigs, {"characters": gait_store}))
+        stores = {"characters": gait_store}
+        extent = play_extent_for(lambda e: None, context_of=_preset_context_of(rigs, set(), stores, _stage_of(shot, stores)))
         assert extent(play) == pytest.approx(walked, abs=1e-6), (ref, scale, args)
         # and the shot-end warning validate gives reads the same length
         long = _gale_shot(PlayAction(target="w", animation="walk", args={"distance": 160, **args}), scale=scale, ref=ref).model_copy(update={"duration": walked - 0.1})
@@ -255,13 +255,17 @@ def test_validate_places_a_sequence_where_compile_does(gait_store):
         assert any("past the shot's end" in f.description for f in report.findings), (ref, scale, args)
 
 
-def test_an_explicit_step_count_does_not_need_a_step_length():
-    """cutan#13: `step_length` is read only to count the steps; a zero from the
-    figure's scale is reported as the scale."""
-    walk("k", steps=2, gait="hop", legs=(), arms=(), rest={"scale_y": 0.0})
-    with pytest.raises(ValueError, match="drawn scale is 0.0"):
-        walk("k", distance=160, legs=(), arms=(), rest={"scale_y": 0.0})
-    assert duration_of(walk("k", distance=160, legs=(), scale=0.0, step_length=80.0)) == pytest.approx(0.8)
+def test_a_zero_scale_is_refused_as_the_scale():
+    """cutan#13: a zero (or unusable) drawn scale is said as the scale, never
+    as `step_length`, and never a silent flat walk."""
+    for kwargs in ({"steps": 2}, {"distance": 160}, {"distance": 160, "step_length": 80.0}):
+        with pytest.raises(ValueError, match="drawn scale is 0.0"):
+            walk("k", gait="hop", legs=(), arms=(), rest={"scale_y": 0.0}, **kwargs)
+    for bad in (float("nan"), float("inf"), -1.0):
+        with pytest.raises(ValueError, match="drawn scale"):
+            walk("k", steps=2, legs=(), scale=bad)
+    with pytest.raises(ValueError, match="step_length must be positive"):
+        walk("k", steps=2, legs=(), step_length=0.0)
 
 
 def test_the_drawn_scale_is_the_stage_scale_not_the_pose_at_the_plays_start(store):
@@ -282,4 +286,64 @@ def test_scale_is_the_compilers_to_fill_not_the_authors():
     from cutan.characters.play import play_problems
 
     (problem,) = play_problems(None, "walk", args={"scale": 2.0, "distance": 80})
-    assert "scale" in problem
+    assert "stage scale" in problem and "not an argument" in problem
+
+
+PROPS = FIXTURES.parent / "props"
+
+
+def test_validate_times_a_prop_walk_as_compile_does(tmp_path):
+    """A prop resolves off the registry: the walk picks its gait from the built
+    parts (no legs: a requested `shuffle` glides, 0.8 s), and validate's extent
+    must see those parts too (review of cutan#12, F1)."""
+    from an.stores.props import PropsStore
+    from cutan.characters.checks import _preset_context_of, _stage_of
+    from cutan.characters.play import play_extent_for
+
+    shutil.copytree(PROPS / "lamp", tmp_path / "lamp")
+    props = PropsStore(tmp_path)
+    play = PlayAction(target="p", animation="walk", args={"distance": 160, "gait": "shuffle"})
+    shot = Shot(
+        id="s",
+        duration=1.0,
+        entities=[AssetRef(kind="prop", id="p", store="props", ref="lamp")],
+        actions=[play],
+    )
+    doc = _compile(shot, {"props": props})
+    walked = max(ch.keyframes[-1].time for a in doc.animations.values() for ch in a.channels if ch.target == "p" and ch.property == "x")
+    rigs = {e.id: e for e in shot.entities}
+    stores = {"props": props}
+    extent = play_extent_for(lambda e: None, context_of=_preset_context_of(rigs, set(), stores, _stage_of(shot, stores)))
+    assert extent(play) == pytest.approx(walked, abs=1e-6) == pytest.approx(0.8)
+    report = validate_semantic(SceneIR(meta=Meta(title="t", duration=4.0), timeline=[shot]), available_props=props)
+    assert not any("past the shot's end" in f.description for f in report.findings)
+
+
+def test_the_vocabulary_offers_only_what_play_problems_accepts():
+    """`scale` is the compiler's (cutan#13): the genre's vocabulary must not list it."""
+    from cutan.characters.play import RESERVED_PRESET_ARGS, play_problems
+    from cutan.genre import CUTOUT
+
+    (entry,) = [e for e in CUTOUT.vocabulary if getattr(e, "term", None) == "walk"]
+    listed = set(entry.params["properties"])
+    assert not listed & RESERVED_PRESET_ARGS
+    for name in listed - {"gait", "legs", "arms", "direction", "view"}:  # the typed ones
+        assert play_problems(None, "walk", args={name: 2}) == [], name
+
+
+def test_validate_times_nothing_it_was_not_given_a_store_for(gait_store):
+    """No characters store: validate's extent invents no rig (review F5)."""
+    from cutan.characters.checks import _preset_context_of, _stage_of
+
+    shot = _gale_shot(PlayAction(target="w", animation="walk", args={"distance": 160, "gait": "shuffle"}), ref="gale_shuffle")
+    rigs = {e.id: e for e in shot.entities}
+    assert _preset_context_of(rigs, {"w"}, {}, _stage_of(shot, {}))("w", shot.actions[0]) is None
+
+
+def test_a_figure_resized_by_an_authored_move_strides_as_drawn(store):
+    """cutan#13 / walk v3: the stage scale, not the pose at the play's start."""
+    acts = sequence(set_("w", "scale_y", 2.0), set_("w", "scale_x", 2.0),
+                    PlayAction(target="w", animation="walk", args={"distance": 160}))
+    doc = _compile(_gale_shot(acts), {"characters": store})
+    walked = max(ch.keyframes[-1].time for a in doc.animations.values() for ch in a.channels if ch.target == "w" and ch.property == "x")
+    assert walked == pytest.approx(0.8)  # two 80 px steps: the figure is drawn at scale 1

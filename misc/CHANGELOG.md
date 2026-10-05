@@ -3,7 +3,7 @@
 ## 2026-10-05
 
 - **A `sequence` waits exactly as long as the walk runs** (cutan#12): the walk's extent is resolved with the same gait (the author's, the descriptor's, or the chain's substitute) and the same drawn scale the expansion uses (`cutan.characters.methods.walk_preset_context`, read by the compiler's and `an validate`'s extent resolvers), so a descriptor-declared `shuffle`, a substituted gait or a `scale: 2` figure no longer starts the next action early or late.
-- **The walk's drawn scale is the stage scale, not the pose at the play's start** (cutan#13): `walk` takes `scale`, which the compiler fills from the built rig; a walk that starts under a `pop_in` no longer crashes with "step_length must be positive" or hops 0 px. `step_length` is only checked when it counts the steps, and a zero from the figure's scale says so.
+- **The walk's drawn scale is the stage scale, not the pose at the play's start** (cutan#13; `walk` is version 3, every shot that plays a walk re-renders): `walk` takes `scale`, which the compiler fills from the built rig, so a walk that starts under a `pop_in` no longer crashes with "step_length must be positive" or hops 0 px, and a figure resized by an authored move strides as drawn. A scale that is not finite and positive is refused naming the scale.
 
 ## 2026-10-03
 

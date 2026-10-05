@@ -551,15 +551,16 @@ def walk_preset_context(
         if parts is not None:
             out["parts"] = {p: {} for p in parts}
         return out
-    if profile is not None:
-        try:
-            resolved, _ = locomotion_args(
-                entity, args, descriptor=descriptor, profile=profile
-            )
-        except Exception:  # a bad gait is `cutout.play`'s to report; no extent
-            return out
-        if "gait" in resolved:
-            out["gait"] = resolved["gait"]
+    from an.semantic import VocabularyError
+
+    try:
+        resolved, _ = locomotion_args(
+            entity, args, descriptor=descriptor, profile=profile
+        )
+    except (VocabularyError, ValueError, TypeError):
+        return out  # a bad gait is `cutout.play`'s to report; no extent
+    if "gait" in resolved:
+        out["gait"] = resolved["gait"]
     return out
 
 

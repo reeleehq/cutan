@@ -33,8 +33,15 @@ __all__ = [
     "PRESET_ASPECTS",
 ]
 
-#: Parameters of a motion preset that are the compiler's, never an author's.
-_COMPILER_PARAMS: tuple[str, ...] = ("target", "rest", "parts")
+
+
+def _compiler_params() -> frozenset[str]:
+    """Parameters of a motion preset that are the compiler's, never an author's:
+    :data:`cutan.characters.play.RESERVED_PRESET_ARGS`, the one list
+    `play_problems` refuses (lazy: `play` imports the IR)."""
+    from cutan.characters.play import RESERVED_PRESET_ARGS
+
+    return RESERVED_PRESET_ARGS
 
 #: Which aspect a preset resolves when played (ADR 0002): a ``walk`` picks a
 #: locomotion method; ``speech_pulse`` IS the speech aspect's last link.
@@ -74,7 +81,7 @@ def _motion_preset_entries() -> tuple[Entry, ...]:
             name=name,
             title=name.replace("_", " "),
             description=_first_sentence(fn.__doc__),
-            params=schema_of_callable(fn, skip=_COMPILER_PARAMS),
+            params=schema_of_callable(fn, skip=_compiler_params()),
             examples=({"kind": "play", "target": "ned", "animation": name},),
             aspects=PRESET_ASPECTS.get(name, ()),
             expand=expand_with(fn),

@@ -2405,19 +2405,22 @@ def preset_context_of(vocab: _SwapVocabulary | None):
     from cutan.characters.methods import walk_preset_context
 
     def context(entity: str, action: Any) -> dict[str, Any] | None:
+        # Keyed on the play's TARGET, as the expansion is: a walk played on a
+        # part walks that part (its scale, its limbs).
+        target = action.target
         if vocab is None or not preset_takes(action.animation, GAIT_ARG):
             return None
-        scale = _drawn_scale(entity, vocab)
+        scale = _drawn_scale(target, vocab)
         if scale is None:
             return None
-        on_registry = _on_registry(entity, vocab)
+        on_registry = _on_registry(target, vocab)
         return walk_preset_context(
-            entity,
+            target,
             dict(action.args or {}),
-            descriptor=vocab.descriptors.get(entity),
-            profile=_character_profile(entity, vocab) if on_registry else None,
+            descriptor=vocab.descriptors.get(target),
+            profile=_character_profile(target, vocab) if on_registry else None,
             scale=scale,
-            parts=None if on_registry else _built_parts(vocab, entity),
+            parts=None if on_registry else _built_parts(vocab, target),
         )
 
     return context

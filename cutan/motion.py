@@ -25,6 +25,7 @@ the genre's presets into it.
 
 from __future__ import annotations
 
+import math
 from collections.abc import Callable, Mapping
 from typing import Any
 
@@ -453,8 +454,8 @@ def walk(
     at ``scale: 2`` strides twice as far (an#224). Pass them to set scene px
     outright. Called from Python with no ``scale``, the ``scale_y`` of
     ``rest`` stands in; that is the pose at the play's start, which a
-    ``pop_in`` running under the walk holds at 0 (cutan#13), so the compiler
-    never relies on it.
+    ``pop_in`` running under the walk holds at 0 (cutan#13) — refused, naming
+    the scale — so the compiler never relies on it.
 
     **Legs and arms.** ``legs``/``arms`` name the two limb nodes; by default
     the first pair in :data:`WALK_LEG_NAMES` / :data:`WALK_ARM_NAMES` that the
@@ -508,8 +509,17 @@ def walk(
         gait = DFLT_LEGLESS_GAIT
     if gait not in LEGGED_GAITS | {"waddle", "bounce"}:
         leg_pair = None  # this gait moves no leg
+    given_scale = scale is not None
     if scale is None:
         scale = abs(_rest(rest, "scale_y"))
+    if not (math.isfinite(scale) and scale > 0):
+        raise ValueError(
+            f"the figure's drawn scale is {scale!r}"
+            + ("" if given_scale else " (its scale_y at the play's start)")
+            + ": a walk needs a finite, positive scale (its stage scale)"
+        )
+    if step_length is not None:
+        _positive(step_length=step_length)
     p = gait_params(
         gait,
         scale=abs(scale),
@@ -531,21 +541,11 @@ def walk(
             f"step_s must be longer than {4 * WALK_LANDING_S}s, got {step_s!r}"
         )
     if steps is None:
-        if distance is not None:
-            # The one place `step_length` is read: counting the steps. A zero
-            # here is the figure's scale (a figure not yet drawn), unless the
-            # author passed the length (cutan#13).
-            if not p["step_length"] > 0:
-                if step_length is None:
-                    raise ValueError(
-                        "cannot count the walk's steps: the figure's drawn scale "
-                        f"is {scale!r}, so the default step_length is 0; pass "
-                        "`steps` or `step_length`"
-                    )
-                _positive(step_length=p["step_length"])
-            steps = max(1, round(abs(distance) / p["step_length"]))
-        else:
-            steps = DFLT_WALK_STEPS
+        steps = (
+            max(1, round(abs(distance) / p["step_length"]))
+            if distance is not None
+            else DFLT_WALK_STEPS
+        )
     if steps < 1:
         raise ValueError(f"walk needs at least one step, got {steps}")
     x0, y0 = _rest(rest, "x"), _rest(rest, "y")
@@ -913,7 +913,9 @@ RIG_PRESET_VERSIONS: dict[str, str] = {
     **{name: "1" for name in RIG_PRESETS},
     # 2 (an#224): the gaits, a legless figure glides instead of rocking, and
     # the default lengths scale with the figure's drawn scale.
-    "walk": "2",
+    # 3 (cutan#13): the drawn scale is the stage scale, not the pose at the
+    # play's start (a figure resized by an authored move strides as drawn).
+    "walk": "3",
 }
 
 #: Every preset a ``play`` can name — the core's and the genre's — the one table
