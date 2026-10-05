@@ -94,7 +94,8 @@ DFLT_WALK_HEM_TILT: float = 0.24
 #: on the property ends — it lets later motion carry on.
 WALK_LANDING_S: Seconds = 1e-3
 #: Leg and arm node names a walk looks for, in order: the rig contract's
-#: (descriptor rigs, ``an character new``), then the procedural placeholder's.
+#: (descriptor rigs, ``an character new``), then a ``parts`` rig's (the
+#: built-in placeholder draws arms and no legs: it glides).
 WALK_LEG_NAMES: tuple[tuple[str, str], ...] = (
     ("leg_l", "leg_r"),
     ("left_leg", "right_leg"),

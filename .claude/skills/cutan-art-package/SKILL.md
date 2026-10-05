@@ -98,8 +98,9 @@ Two more declared facts about carved art, both in `character.json`:
   front: a figure carved only in profile says `"side"`, and `walk` swings its
   legs without being told.
 - **`gait`** — `"hem"` when the leg slots are the two halves of a robe's hem
-  (a walk tilts them in turn and sways the body), `"rock"` for a figure with
-  nothing to step with.
+  (a walk tilts them and sways the body). Leave it unset for a figure with
+  nothing to step with: it glides (the chain's default); `"rock"`, `"hop"`,
+  `"bounce"` and `"waddle"` are characterisations to ask for.
 
 ## The four things that actually matter
 

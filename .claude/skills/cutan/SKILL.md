@@ -52,7 +52,7 @@ An `an character new --offline` character carries a **turnaround** (an#197): a `
 | `hop` | nothing | the figure jumps every step |
 | `bounce` | nothing | slides with a pronounced bob, feet flick: South Park |
 | `glide` | nothing | slides, leaning into the move, gentle bob: robe figures, the legless default |
-| `rock` | nothing | the old legless walk: body rocks about its feet |
+| `rock` | nothing | the old legless walk: body rocks about its origin and bobs |
 
 - **Lengths scale with the figure**: `step_length`, `bob` and `hop_height` default to values for a figure at scale 1 and grow with its stage scale (a `scale: 2` character steps twice as far); pass them to set scene px outright. Every parameter and its per-gait default: `misc/docs/locomotion_gaits.md`.
 - **A gait the character cannot do is never silent**: `an validate` warns (`cutout.walk_gait`) with the gait it will use instead and what to add (`profile` on a front-only character: `an character add-views <name>`); the compile records it, fatal under `--strict-assets`. `an character capabilities <name>` lists every gait that applies and why the others do not.

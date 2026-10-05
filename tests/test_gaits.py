@@ -6,8 +6,9 @@ What is pinned here, and why:
   aspect's chain is ``legs`` then the requirement-free ``glide``;
 - the matcher answers which gaits apply to a character and, for the rest,
   what is missing and how to add it (``profile`` needs a side view);
-- every gait compiles on a descriptor rig and on the placeholder, lands where
-  it was asked to and leaves the body and the limbs at rest;
+- every gait compiles on a descriptor rig, on a ``parts`` rig with legs and
+  on the legless placeholder, lands where it was asked to and leaves the
+  body and the limbs at rest;
 - default lengths scale with the figure's drawn scale (an#224's comment: a
   ``scale: 2`` character used to shuffle), an explicit length does not;
 - ``an validate`` says when a requested gait will not be used, and why.
@@ -55,7 +56,11 @@ def store(tmp_path):
     doc = json.loads(path.read_text(encoding="utf-8"))
     doc["rest_view"] = "side"
     path.write_text(json.dumps(doc), encoding="utf-8")
-    return CharactersStore(tmp_path)
+    store = CharactersStore(tmp_path)
+    # A parts rig WITH legs: the built-in placeholder (a ref not in the store)
+    # draws arms and no legs, so it walks every legged gait as `glide` (cutan#25).
+    store["stick"] = {"name": "stick", "parts": ["head", "torso", "left_arm", "right_arm", "left_leg", "right_leg"]}
+    return store
 
 
 def _profile(store, ref):
@@ -105,11 +110,16 @@ def test_the_matcher_says_which_gaits_apply_and_what_the_rest_need(store):
 
 
 @pytest.mark.parametrize("gait", GAITS)
-@pytest.mark.parametrize("ref", ["gale_side", "placeholder"])
+@pytest.mark.parametrize("ref", ["gale_side", "stick", "placeholder"])
 def test_each_gait_travels_and_lands_at_rest(gait, ref, store):
     mall = {"characters": store}
     shot = _walk_shot(ref, gait=gait, steps=3)
     doc = _compile(shot, mall)
+    moved = {ch.target for a in doc.animations.values() for ch in a.channels}
+    if ref == "stick" and gait in LEGGED_GAITS | {"waddle", "bounce"}:
+        assert {"w/left_leg", "w/right_leg"} <= moved, "the parts rig's legs walk"
+    if ref == "placeholder":
+        assert not {t for t in moved if t.endswith("_leg")}, "the placeholder has no legs"
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         home = stage_poses(shot, mall=mall)

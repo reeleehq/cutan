@@ -24,16 +24,16 @@ A cut-out rig realises this with legs as separate parts pivoted at the hip, and,
 | `legs` | `loco.legged_cycle` | Seen from the side, the legs swing about the hip in opposition; facing the camera the stepping leg lifts. Body bobs once per step; arms counter-swing. | `limbs.legs` | any legged figure; the chain's first link |
 | `profile` | `loco.profile_cycle` | The four-pose cycle in profile: legs swing whatever the view in force, the body **sinks after each contact and rises before the next** (down/up, phased to the contacts; the first step has only the up pose, the last only the down), a longer stride. | `limbs.legs`, `swap.view:side` | Reiniger's silhouettes, any figure drawn side-on |
 | `shuffle` | `loco.shuffle` | Feet barely leave the ground: short quick steps, almost no bob, arms close. | `limbs.legs` | the old, the tired, the cautious; Norstein-like small steps |
-| `hem` | `loco.hem_sway` | A robe whose two hem halves are the leg slots: facing the camera they tilt in turn; the body sways and bobs. | `limbs.legs` (the hem halves) | OverSimplified robe figures carved with a split hem |
-| `waddle` | `loco.waddle` | The body rocks from foot to foot (weight shift, no knees) and bobs; legs, if any, lift in turn. | nothing | penguins, toddlers, squat figures |
+| `hem` | `loco.hem_sway` | A robe whose two hem halves are the leg slots: facing the camera they tilt about the hip as mirror images (both out, then both in: the hem opens and closes), the body sways and bobs; in a side or three-quarter view they swing like legs by `stride` and the sway is dropped (`hem_tilt` and `rock` are not read there). | `limbs.legs` (the hem halves) | OverSimplified robe figures carved with a split hem |
+| `waddle` | `loco.waddle` | The body rocks from foot to foot (weight shift, no knees) and bobs; legs, if any, lift in turn (in every view). Not the `waddle` *preset* (`play: waddle`, an older rock-and-bob on the spot or with `travel`), which has its own, unscaled numbers. | nothing | penguins, toddlers, squat figures |
 | `hop` | `loco.hop` | The whole figure jumps on every step. | nothing | birds, gleeful characters, a cartoon "boing" |
-| `bounce` | `loco.bounce` | The body bobs on every step while it slides; legs, if any, only flick. | nothing | South Park's walk [6] |
+| `bounce` | `loco.bounce` | The body bobs on every step while it slides; legs, if any, flick (lift facing the camera, a small swing in profile) and the arms swing a little. | nothing | South Park's walk [6] |
 | `glide` | `loco.glide` | The figure slides, leaning slightly into the move with a gentle bob; no limb moves. | nothing | robe figures, ghosts, sacks; Kurzgesagt-style floating; **the default without legs** |
-| `rock` | `loco.rock` | No leg moves: the body rocks side to side about its root and bobs. | nothing | the pre-an#224 legless walk, kept as a choice |
+| `rock` | `loco.rock` | No leg moves: the body rocks side to side about its origin (mid-body on a descriptor rig, so the planted feet drift a few px) and bobs; the arms swing. | nothing | the pre-an#224 legless walk, kept as a choice |
 
 What each needs, in the capability grammar of `an.capabilities`: `limbs.legs` is two leg slots with art, pivoted at the hip; `swap.view:side` is a side view, either the art's rest view (`rest_view: side`) or a turnaround key (`an character add-views`). A requirement-free gait uses what it finds: `waddle` and `bounce` move a leg pair when there is one, and every gait swings the arms (`limbs.arms`) when its `arm_swing` is not 0.
 
-How gaits compose with **turns and views**: a walk never turns the character. `legs`, `shuffle` and `bounce` read the view in force (a `side`/`three_quarter` view swings the legs, any other lifts them); `profile` always swings; the requirement-free gaits move the body only, so they read the same in every view. The classic walk-off stays `turn` then `walk`.
+How gaits compose with **turns and views**: a walk never turns the character. `legs`, `shuffle`, `hem` and `bounce` read the view in force (a `side`/`three_quarter` view swings the legs, any other lifts or tilts them); `profile` always swings, and needs the side view in force; `waddle` lifts in every view; `hop`, `glide` and `rock` move the body only, so they read the same in every view. The classic walk-off stays `turn` then `walk`.
 
 ## 3. Parameters and defaults
 
@@ -71,7 +71,7 @@ An amplitude set to **0 writes no channel** (an authored move on that property r
 
 | Style | Characters | Gait |
 |---|---|---|
-| South Park | carved legs | `bounce` (the show's slide-and-bob) |
+| South Park | carved legs | `bounce` (the show's slide-and-bob), declared per character (`"gait": "bounce"`) until the style's `policy:` is read by the compiler (cutan#9); the shipped spec lists the `waddle` preset for on-the-spot beats |
 | OverSimplified | robe figures | `glide` (the default without legs; `hem` once the hem is carved in two) |
 | Reiniger | jointed silhouettes in profile | `profile` |
 

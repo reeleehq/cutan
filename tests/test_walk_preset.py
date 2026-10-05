@@ -9,7 +9,7 @@ body bob and a linear ``x``. ``walk`` is that cycle as one ``play``:
 - in a side view the legs SWING about the hip, in opposition, around the
   profile's own splay (an#203) — and the view's pose takes them back after;
 - in a front view the stepping leg rises and sets down, the two alternating;
-- a figure with no legs rocks and bobs instead;
+- a figure with no legs glides instead (an#224; `rock` is a gait to ask for);
 - its length is ``steps × step_s``, known before it is placed (``play_extent``),
   and ``step_hz`` steps it like any tween.
 """
