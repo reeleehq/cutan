@@ -218,6 +218,17 @@ def _walk_then_head_turn(store, ref, *, scale=1.0, **args):
     return lands, round(nxt, 2)
 
 
+def _x_end(doc, target: str = "w") -> float:
+    """When the last clip moving ``target``'s x ends (the walk's landing tween included)."""
+    return max(
+        p.start_time + ch.keyframes[-1].time
+        for t in doc.timeline.tracks
+        for p in t.clips
+        for ch in doc.animations[p.animation_id].channels
+        if ch.target == target and ch.property == "x"
+    )
+
+
 @pytest.fixture()
 def gait_store(tmp_path):
     """``gale``; ``gale_shuffle`` (declares ``gait: shuffle``); ``legless`` (a parts rig)."""
@@ -255,7 +266,7 @@ def test_validate_places_a_sequence_where_compile_does(gait_store):
         shot = _gale_shot(PlayAction(target="w", animation="walk", args={"distance": 160, **args}), scale=scale, ref=ref)
         play = shot.actions[0]
         doc = _compile(shot, {"characters": gait_store})
-        walked = max(ch.keyframes[-1].time for a in doc.animations.values() for ch in a.channels if ch.target == "w" and ch.property == "x")
+        walked = _x_end(doc)
         rigs = {e.id: e for e in shot.entities}
         stores = {"characters": gait_store}
         extent = play_extent_for(lambda e: None, context_of=_preset_context_of(rigs, set(), stores, _stage_of(shot, stores)))
@@ -321,7 +332,7 @@ def test_validate_times_a_prop_walk_as_compile_does(tmp_path):
         actions=[play],
     )
     doc = _compile(shot, {"props": props})
-    walked = max(ch.keyframes[-1].time for a in doc.animations.values() for ch in a.channels if ch.target == "p" and ch.property == "x")
+    walked = _x_end(doc, "p")
     rigs = {e.id: e for e in shot.entities}
     stores = {"props": props}
     extent = play_extent_for(lambda e: None, context_of=_preset_context_of(rigs, set(), stores, _stage_of(shot, stores)))
@@ -356,7 +367,7 @@ def test_a_figure_resized_by_an_authored_move_strides_as_drawn(store):
     acts = sequence(set_("w", "scale_y", 2.0), set_("w", "scale_x", 2.0),
                     PlayAction(target="w", animation="walk", args={"distance": 160}))
     doc = _compile(_gale_shot(acts), {"characters": store})
-    walked = max(ch.keyframes[-1].time for a in doc.animations.values() for ch in a.channels if ch.target == "w" and ch.property == "x")
+    walked = _x_end(doc)
     assert walked == pytest.approx(0.8)  # two 80 px steps: the figure is drawn at scale 1
 
 
