@@ -427,7 +427,7 @@ def walk(
     - ``profile``: the four-pose cycle of a profile walk (contact, down,
       passing, up): the legs swing whatever the view, the body sinks after
       each contact (a third of ``bob``) and rises before the next (two
-      thirds): ``bob`` is its whole travel per step.
+      thirds): ``bob`` is its whole travel between two contacts.
     - ``shuffle``: ``legs`` with the feet barely leaving the ground — short,
       quick steps, no bob to speak of.
     - ``hem``: a robe whose leg slots are the two halves of its hem: facing
@@ -639,11 +639,13 @@ def walk(
         # Williams' four poses between two CONTACTS (a step boundary, the legs
         # at their widest): contact → down (lowest, a quarter step in) →
         # passing (the legs cross, mid-step) → up (highest, three quarters in)
-        # → contact. `height` is the body's whole travel: it sinks a third of
-        # it and rises two thirds. The walk starts and ends STANDING (the legs
-        # together, a passing pose), so the first step gets the half of the
-        # cycle before a contact (up) and the last the half after one (down);
-        # a one-step walk's contact is mid-step (cutan#18, cutan#16).
+        # → contact. `height` is the body's whole travel between two contacts:
+        # it sinks a third of it and rises two thirds. The walk starts and ends
+        # STANDING (the legs together, a passing pose), so the first step gets
+        # the half of the cycle before a contact (up) and the last the half
+        # after one (down); a one-step walk's contact is mid-step, its up and
+        # down a quarter step either side of it, at twice the interior rate —
+        # as its one-step swing is (cutan#18, cutan#16).
         q = step_s / 4
         up, down = y0 - 2 * height / 3, y0 + height / 3
         values: list[float] = [y0]

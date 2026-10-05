@@ -471,3 +471,23 @@ def test_a_walk_does_not_snap_the_body_back_after_a_longer_authored_tween(store)
     doc = _compile(_gale_shot(acts), {"characters": store})
     assert _pose(doc, 2.5)[("w", "y")] == pytest.approx(-100.0)
     assert _pose(doc, 1.0)[("w", "x")] == pytest.approx(_pose(doc, 0.8)[("w", "x")])  # and x stays landed
+
+
+@pytest.mark.parametrize("fps,step_hz", [(30, None), (24, None), (30, 10.0), (30, 15.0)])
+@pytest.mark.parametrize("gait", GAITS)
+def test_every_gait_lands_body_and_limbs_at_frame_times(gait, fps, step_hz, store):
+    """cutan#15: the landing tween lands the body too — at frame times and
+    under `step_hz`, on a legged rig (the preset suite's walk is legless)."""
+    shot = _walk_shot("gale", gait=gait, steps=3)
+    doc = _compile(shot, {"characters": store}) if (fps, step_hz) == (30, None) else compile_shot(
+        shot, {"characters": store}, fps=fps, step_hz=step_hz
+    )
+    tl = timeline_from_scene(doc)
+    state: dict = {}
+    for i in range(int(shot.duration * fps) + 1):
+        state.update(evaluate_timeline(tl, i / fps))
+    home = stage_poses(shot, mall={"characters": store})
+    assert state[("w", "x")] == pytest.approx(home["w"]["x"] + 160.0, abs=1e-9)
+    for path, pose in home.items():
+        for prop in ("y", "rotation"):
+            assert state.get((path, prop), pose[prop]) == pytest.approx(pose[prop], abs=1e-9), (path, prop)

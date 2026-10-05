@@ -45,7 +45,7 @@ Every gait reads the parameters its method declares (`an character capabilities`
 | `step_length` | 80 | scene px per step | **yes** | `shuffle` 40 |
 | `stride` | 0.35 | rad a leg swings | no | `profile` 0.45, `shuffle` 0.12, `bounce` 0.1 |
 | `lift` | 10 | px a stepping leg rises (in the figure's frame) | already does | `shuffle` 3, `waddle` 5, `bounce` 4 |
-| `bob` | 6 | px the body travels per step (`profile`: sinks a third after a contact, rises two thirds before the next) | **yes** | `shuffle` 1, `waddle` 4, `bounce` 8, `glide` 1.5 |
+| `bob` | 6 | px the body travels per step (`profile`: between two contacts it sinks a third after one and rises two thirds before the next; the first step rises only, the last sinks only) | **yes** | `shuffle` 1, `waddle` 4, `bounce` 8, `glide` 1.5 |
 | `arm_swing` | 0.3 | rad | no | `profile` 0.35, `shuffle` 0.1, `waddle`/`bounce` 0.15, `hop`/`glide` 0 |
 | `rock` | 0.06 | rad the body rocks, onto the standing foot (follows the figure's facing) | no | `waddle` 0.12 |
 | `hem_tilt` | 0.24 | rad a hem half tilts | no | |
