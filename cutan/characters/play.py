@@ -363,6 +363,9 @@ def preset_problems(
                     if name == "rest"
                     else "the parts are read off the built scene"
                     if name == PARTS_ARG
+                    else "the figure's drawn scale is its stage scale (pass a "
+                    "length in scene px instead)"
+                    if name == SCALE_ARG
                     else "the target is the play's own `target`"
                 )
             )
