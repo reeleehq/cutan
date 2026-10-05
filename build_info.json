@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-03T08:51:31Z",
+  "built_at": "2026-10-05T15:14:27Z",
   "package": {
     "name": "cutan",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "display_name": "cutan",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "51122686903a83958bccd029b7140f5a7688401f",
-    "short_commit": "5112268",
+    "commit": "fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c",
+    "short_commit": "fa9e7a6",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/cutan",
-    "commit_url": "https://github.com/thorwhalen/cutan/commit/51122686903a83958bccd029b7140f5a7688401f",
+    "commit_url": "https://github.com/thorwhalen/cutan/commit/fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/cutan",
-    "sha": "51122686903a83958bccd029b7140f5a7688401f",
+    "sha": "fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "37110946155",
-    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/37110946155",
+    "run_id": "37330800382",
+    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/37330800382",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -55,16 +55,16 @@
     "docs_dir": "docsrc"
   },
   "site": {
-    "modules_documented": 53,
-    "objects_documented": 564
+    "modules_documented": 54,
+    "objects_documented": 575
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.6",
+    "latest": "0.0.7",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout 51122686903a83958bccd029b7140f5a7688401f\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

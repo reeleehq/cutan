@@ -94,6 +94,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cutan.library.html">cutan.library</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.runtime.html">cutan.runtime</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.styles.html">cutan.styles</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="cutan.verify.html">cutan.verify</a></li>
 </ul>
 </li>
@@ -132,8 +133,9 @@
 cut-out styles research (<code class="docutils literal notranslate"><span class="pre">misc/docs/cutout_styles_research.md</span></code>) measured six
 styles with one fixed set of statistics; this module is that measurement,
 ported, so an agent can render, measure the same statistics on its own output,
-and adjust. The style specs that carry the <code class="docutils literal notranslate"><span class="pre">targets</span></code> live with the downstream
-skill (<code class="docutils literal notranslate"><span class="pre">.claude/skills/cutan-style/styles/*.yaml</span></code>).</p>
+and adjust. The style specs that carry the <code class="docutils literal notranslate"><span class="pre">targets</span></code> ship with the package
+(<a class="reference internal" href="cutan.styles.html#module-cutan.styles" title="cutan.styles"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cutan.styles</span></code></a>): pass a style’s name (<code class="docutils literal notranslate"><span class="pre">"south_park"</span></code>), a path to a spec
+file, or a mapping.</p>
 <p>**The estimators are the research’s estimators, on purpose — with one
 measured exception.** Every threshold below is the one the six styles were
 measured with, including the ones that are crude (a noise floor at the 10th
@@ -238,7 +240,7 @@ less than it says is worse than one that fails to load:</p>
 <td><p>One <code class="xref py py-class docutils literal notranslate"><span class="pre">Finding</span></code> per target the metrics miss; <code class="docutils literal notranslate"><span class="pre">[]</span></code> when all hit.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.verify.style.load_style_spec" title="cutan.verify.style.load_style_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_style_spec</span></code></a>(spec)</p></td>
-<td><p>A style spec as a dict: a mapping is passed through, a path is read as YAML.</p></td>
+<td><p>A style spec as a dict: a style's name, a path to a spec file, or a mapping.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.verify.style.style_lint" title="cutan.verify.style.style_lint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">style_lint</span></code></a>(mp4, spec_or_targets, *[, ...])</p></td>
 <td><p>Measure <code class="docutils literal notranslate"><span class="pre">mp4</span></code> and compare it to a style spec's <code class="docutils literal notranslate"><span class="pre">targets</span></code>.</p></td>
@@ -308,6 +310,8 @@ static date card is 90% identical frames on its own).</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.verify.style.</span></span><span class="sig-name descname"><span class="pre">StyleLintVerifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_or_targets</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">miss_severity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'warning'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/verify/style.html#StyleLintVerifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.verify.style.StyleLintVerifier" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.verify.style.StyleLintVerifier'">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
 <p>Compare a render to a style spec’s <code class="docutils literal notranslate"><span class="pre">targets</span></code>. Implements <code class="docutils literal notranslate"><span class="pre">Verifier</span></code>.</p>
+<p>The spec is a style’s name, a spec file’s path or a mapping, as for
+<a class="reference internal" href="#cutan.verify.style.style_lint" title="cutan.verify.style.style_lint"><code class="xref py py-func docutils literal notranslate"><span class="pre">style_lint()</span></code></a>.</p>
 <p>Shot boundaries come from the IR (every shot boundary is a cut in an <code class="docutils literal notranslate"><span class="pre">an</span></code>
 render, and a dissolve’s overlap is accounted for), so <code class="docutils literal notranslate"><span class="pre">cuts_per_min</span></code> and
 <code class="docutils literal notranslate"><span class="pre">mean_shot_s</span></code> are exact rather than detected. Pre-render
@@ -380,12 +384,18 @@ counted from where its frames start in the film.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.verify.style.load_style_spec">
 <span class="sig-prename descclassname"><span class="pre">cutan.verify.style.</span></span><span class="sig-name descname"><span class="pre">load_style_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/verify/style.html#load_style_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.verify.style.load_style_spec" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.verify.style.load_style_spec'">¶</a></dt>
-<dd><p>A style spec as a dict: a mapping is passed through, a path is read as YAML.</p>
+<dd><p>A style spec as a dict: a style’s name, a path to a spec file, or a mapping.</p>
+<p>The rules are <a class="reference internal" href="cutan.styles.html#cutan.styles.resolve_style_spec" title="cutan.styles.resolve_style_spec"><code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.styles.resolve_style_spec()</span></code></a>’s (a bare name is
+always the shipped spec; <code class="docutils literal notranslate"><span class="pre">./name</span></code> or <code class="docutils literal notranslate"><span class="pre">name.yaml</span></code> is a file).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
 </dd>
 </dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">load_style_spec</span><span class="p">(</span><span class="s2">"reiniger"</span><span class="p">)[</span><span class="s2">"style"</span><span class="p">]</span>
+</span><span id="line-2"><span class="go">'reiniger'</span>
+</span></code></pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.verify.style.measure_shots">
@@ -457,6 +467,8 @@ beside <code class="docutils literal notranslate"><span class="pre">&lt;project&
 <dt class="sig sig-object py" id="cutan.verify.style.style_lint">
 <span class="sig-prename descclassname"><span class="pre">cutan.verify.style.</span></span><span class="sig-name descname"><span class="pre">style_lint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mp4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec_or_targets</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">shot_durations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">miss_severity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'warning'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/verify/style.html#style_lint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.verify.style.style_lint" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.verify.style.style_lint'">¶</a></dt>
 <dd><p>Measure <code class="docutils literal notranslate"><span class="pre">mp4</span></code> and compare it to a style spec’s <code class="docutils literal notranslate"><span class="pre">targets</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">spec_or_targets</span></code> is a style’s name (<code class="docutils literal notranslate"><span class="pre">"south_park"</span></code>), a spec file’s
+path, a spec mapping, or a bare <code class="docutils literal notranslate"><span class="pre">targets</span></code> mapping (<a class="reference internal" href="#cutan.verify.style.load_style_spec" title="cutan.verify.style.load_style_spec"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_style_spec()</span></code></a>).</p>
 <p>The cuts are exact when the shots are known: pass <code class="docutils literal notranslate"><span class="pre">scene</span></code> (a project
 directory, a <code class="docutils literal notranslate"><span class="pre">scene.json</span></code>, or a <code class="code docutils literal notranslate"><span class="pre">SceneIR</span></code>; dissolve overlaps are
 accounted for) or <code class="docutils literal notranslate"><span class="pre">shot_durations</span></code>. Without either, cuts are detected
@@ -507,7 +519,7 @@ the caller’s error, not the video’s.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=1fd71caa"></script>
+<script src="../_static/documentation_options.js?v=bbaf98b3"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

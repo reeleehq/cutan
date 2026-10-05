@@ -42,8 +42,10 @@ them changes when code moves between distributions.
 
 ### Functions
 
-| [`require_an`](#cutan.require_an)()   | Refuse, with an upgrade hint, to load against an `an` older than this `cutan` needs.   |
-|-----------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| [`require_an`](#cutan.require_an)()     | Refuse, with an upgrade hint, to load against an `an` older than this `cutan` needs.   |
+|-------------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| [`style_spec`](#cutan.style_spec)(name) | The style spec `name`, parsed: a new dict on every call.                               |
+| [`style_specs`](#cutan.style_specs)()    | The names of the style specs that ship with `cutan`, sorted.                           |
 
 ### cutan.ENTRY_POINT_GROUP *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'an.genres'*
 
@@ -95,6 +97,20 @@ Refuse, with an upgrade hint, to load against an `an` older than this `cutan` ne
 >>> require_an()
 ```
 
+### cutan.style_spec(name)
+
+The style spec `name`, parsed: a new dict on every call.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### cutan.style_specs()
+
+The names of the style specs that ship with `cutan`, sorted.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
 ### Modules
 
 | [`audio`](cutan.audio.html.md#module-cutan.audio)           | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.   |
@@ -109,4 +125,5 @@ Refuse, with an upgrade hint, to load against an `an` older than this `cutan` ne
 | [`library`](cutan.library.html.md#module-cutan.library)       | The character analyser: legs, arms, views and mouth chart, derived from the rig.             |
 | [`motion`](cutan.motion.html.md#module-cutan.motion)         | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.         |
 | [`runtime`](cutan.runtime.html.md#module-cutan.runtime)       | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).    |
+| [`styles`](cutan.styles.html.md#module-cutan.styles)         | The named cut-out style specs, shipped as package data (cutan#4).                            |
 | [`verify`](cutan.verify.html.md#module-cutan.verify)         | The cut-out style lint: measures a render against a named style spec.                        |

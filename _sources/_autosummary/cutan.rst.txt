@@ -21,6 +21,8 @@
    .. autosummary::
    
       require_an
+      style_spec
+      style_specs
    
 .. rubric:: Modules
 
@@ -40,4 +42,5 @@
    motion
    nw
    runtime
+   styles
    verify

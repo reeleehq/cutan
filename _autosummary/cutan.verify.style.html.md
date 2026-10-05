@@ -6,8 +6,9 @@ Style lint: measure a render’s cadence, cut rate and palette, and compare them
 cut-out styles research (`misc/docs/cutout_styles_research.md`) measured six
 styles with one fixed set of statistics; this module is that measurement,
 ported, so an agent can render, measure the same statistics on its own output,
-and adjust. The style specs that carry the `targets` live with the downstream
-skill (`.claude/skills/cutan-style/styles/*.yaml`).
+and adjust. The style specs that carry the `targets` ship with the package
+([`cutan.styles`](cutan.styles.html.md#module-cutan.styles)): pass a style’s name (`"south_park"`), a path to a spec
+file, or a mapping.
 
 \*\*The estimators are the research’s estimators, on purpose — with one
 measured exception.\*\* Every threshold below is the one the six styles were
@@ -100,7 +101,7 @@ ValueError: unknown style target 'camera_shake'; measurable targets are [...]
 | [`film_shots`](#cutan.verify.style.film_shots)(scene)                             | `(shot id, seconds on screen)` per shot of an `an` render, in order.                                                                      |
 | [`project_of_render`](#cutan.verify.style.project_of_render)(mp4)                        | The project directory an `an` render sits in — `<project>/output/x.mp4` beside `<project>/ir/scene.json` — or `None` for any other video. |
 | [`check_targets`](#cutan.verify.style.check_targets)(metrics, targets, \*[, ...])    | One `Finding` per target the metrics miss; `[]` when all hit.                                                                             |
-| [`load_style_spec`](#cutan.verify.style.load_style_spec)(spec)                         | A style spec as a dict: a mapping is passed through, a path is read as YAML.                                                              |
+| [`load_style_spec`](#cutan.verify.style.load_style_spec)(spec)                         | A style spec as a dict: a style's name, a path to a spec file, or a mapping.                                                              |
 | [`style_lint`](#cutan.verify.style.style_lint)(mp4, spec_or_targets, \*[, ...])   | Measure `mp4` and compare it to a style spec's `targets`.                                                                                 |
 
 ### Classes
@@ -148,6 +149,9 @@ static date card is 90% identical frames on its own).
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 Compare a render to a style spec’s `targets`. Implements `Verifier`.
+
+The spec is a style’s name, a spec file’s path or a mapping, as for
+[`style_lint()`](#cutan.verify.style.style_lint).
 
 Shot boundaries come from the IR (every shot boundary is a cut in an `an`
 render, and a dissolve’s overlap is accounted for), so `cuts_per_min` and
@@ -212,10 +216,18 @@ counted from where its frames start in the film.
 
 ### cutan.verify.style.load_style_spec(spec)
 
-A style spec as a dict: a mapping is passed through, a path is read as YAML.
+A style spec as a dict: a style’s name, a path to a spec file, or a mapping.
+
+The rules are [`cutan.styles.resolve_style_spec()`](cutan.styles.html.md#cutan.styles.resolve_style_spec)’s (a bare name is
+always the shipped spec; `./name` or `name.yaml` is a file).
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+```pycon
+>>> load_style_spec("reiniger")["style"]
+'reiniger'
+```
 
 ### cutan.verify.style.measure_shots(frames, , fps, shot_durations=None, shot_ids=None, min_changed_pixels=8)
 
@@ -278,6 +290,9 @@ beside `<project>/ir/scene.json` — or `None` for any other video.
 ### cutan.verify.style.style_lint(mp4, spec_or_targets, , shot_durations=None, scene=None, miss_severity='warning')
 
 Measure `mp4` and compare it to a style spec’s `targets`.
+
+`spec_or_targets` is a style’s name (`"south_park"`), a spec file’s
+path, a spec mapping, or a bare `targets` mapping ([`load_style_spec()`](#cutan.verify.style.load_style_spec)).
 
 The cuts are exact when the shots are known: pass `scene` (a project
 directory, a `scene.json`, or a `SceneIR`; dissolve overlaps are

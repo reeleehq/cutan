@@ -1,0 +1,30 @@
+cutan.styles
+============
+
+.. automodule:: cutan.styles
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      STYLE_SPEC_SUFFIX
+      STYLE_SPEC_SCHEMA_VERSION
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      resolve_style_spec
+      style_spec
+      style_spec_digest
+      style_spec_path
+      style_spec_text
+      style_specs
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      UnknownStyleError
+   

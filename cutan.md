@@ -1,4 +1,4 @@
-> built 2026-10-03 08:51 UTC from 5112268 (main) · cutan 0.0.6. Details: build_info.json
+> built 2026-10-05 15:14 UTC from fa9e7a6 (main) · cutan 0.0.7. Details: build_info.json
 
 # index.html.md
 
@@ -24,7 +24,7 @@ an character new maya --offline
 - the lip-sync providers `offline`, `rhubarb` and `whisper` (`cutan.audio`);
 - locomotion, speech, blink and turn methods with their requirements and defaults, and the cut-out vocabulary;
 - the `an character …` and `an impacts …` command namespaces;
-- the style lint (`python -m cutan.verify.style`) and the style specs of the `cutan-style` skill.
+- the style lint (`python -m cutan.verify.style VIDEO <style>`) and the named style specs it measures against, shipped as package data: `cutan.style_spec("south_park")`, `python -m cutan.styles` to list them (the `cutan-style` skill applies one).
 
 The cut-out bench corpus (`misc/bench/`), `examples/` and the demo gallery (`misc/demos/`) live here too; `cutan.bench.run_bench()` runs the corpus through `an`’s bench runner.
 
@@ -447,7 +447,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'eye', 'rect', 'mouth', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'eye', 'ellipse', 'rect'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -4859,7 +4859,7 @@ registers nothing.
 | [`EXPRESSION_PRESET_VERSIONS`](_autosummary/cutan.characters.vocabulary.html.md#cutan.characters.vocabulary.EXPRESSION_PRESET_VERSIONS) | Each expression preset's vocabulary version (ADR 0003).                                                                                                                             |
 | [`CUTOUT_VOCABULARY`](_autosummary/cutan.characters.vocabulary.html.md#cutan.characters.vocabulary.CUTOUT_VOCABULARY)          | Everything this genre contributes to the vocabulary except its methods ([`cutan.characters.methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)). |
 
-### cutan.characters.vocabulary.CUTOUT_VOCABULARY *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Entry, ...]* *= (Entry(id='field.shot.actions.swap_set', kind='field', version='1', name='shot.actions.swap_set', title='', description='a set action that swaps a drawing (replacement animation)', usage="A set/tween property may also be the name of a swap set the target character's descriptor declares in asset_sets (e.g. 'viseme', 'eyelid', 'hands'), used with a 'set' action whose 'value' is one of that set's declared KEYS (replacement animation). The compiler refuses any other name with the declared sets listed. Never invent a set or a key.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='field.shot.actions.play', kind='field', version='1', name='shot.actions.play', title='', description='play a named animation of the target character, or a motion preset', usage="A 'play' action ({kind: play, target: <entity>, animation: <name>, [duration], [speed], [loop], [args]}) plays one of the target character's descriptor animations ('idle_breath', 'blink', or any it declares) or, for a name the descriptor does not declare, a motion preset (listed below) with 'args' as its parameters (e.g. {'height': 30}); a name in neither fails validation — never invent one. 'point' targets the arm node. A 'walk' picks its gait from the character's structure (its locomotion method, below) unless 'gait' is given.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('locomotion',)), Entry(id='field.shot.actions.expression', kind='field', version='1', name='shot.actions.expression', title='', description='hold a facial expression on a character', usage="An 'expression' action ({kind: expression, target: <entity>, preset: <name>, [axes: {axis: value}], [intensity], [duration], [blend]}) holds a facial expression on a character: brows, eyelids, and the mouth's set for any dialogue under it. 'preset' is an expression preset (listed below) — an unknown preset fails validation. Axes are offsets within their ranges: brow_height_l [-1, 1], brow_height_r [-1, 1], brow_angle_l [-1, 1], brow_angle_r [-1, 1], lid_open_l [-1, 0.5], lid_open_r [-1, 0.5], gaze_x [-1, 1], gaze_y [-1, 1]. 'duration' omitted = to the shot end. A character whose descriptor says face_overlay: false cannot take one.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='field.shot.dialogue.emotion', kind='field', version='1', name='shot.dialogue.emotion', title='', description='the mood a line is said in', usage="A dialogue line's 'emotion' is an expression preset name ([happy] on a scene.md line): it sets the face for the line and the voice's mood. When a line's wording changes, update its emotion if the mood changed too.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('speech',)), Entry(id='motion.pop_in', kind='motion_preset', version='1', name='pop_in', title='pop in', description='Grow from nothing to full size, overshooting and settling (an entrance).', usage='', params={'type': 'object', 'properties': {'duration': {'type': 'number', 'default': 0.45}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'pop_in'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.hop', kind='motion_preset', version='1', name='hop', title='hop', description='Jump up by \`height\` scene pixels and land back where it started.', usage='', params={'type': 'object', 'properties': {'height': {'type': 'number', 'default': 40.0}, 'duration': {'type': 'number', 'default': 0.5}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'hop'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.shake', kind='motion_preset', version='1', name='shake', title='shake', description='Tremble side to side \`cycles\` times and come back to rest (on \`x\`).', usage='', params={'type': 'object', 'properties': {'amplitude': {'type': 'number', 'default': 8.0}, 'duration': {'type': 'number', 'default': 0.4}, 'cycles': {'type': 'integer', 'default': 3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'shake'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.nod', kind='motion_preset', version='1', name='nod', title='nod', description='Dip the head \`count\` times (a rotation of \`<target>/<part>\`).', usage='', params={'type': 'object', 'properties': {'part': {'type': 'string', 'default': 'head'}, 'angle': {'type': 'number', 'default': 0.18}, 'duration': {'type': 'number', 'default': 0.5}, 'count': {'type': 'integer', 'default': 2}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'nod'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.point', kind='motion_preset', version='1', name='point', title='point', description='Swing an arm out to point, hold it, and lower it again.', usage='', params={'type': 'object', 'properties': {'angle': {'type': 'number', 'default': -1.3}, 'raise_duration': {'type': 'number', 'default': 0.25}, 'hold': {'type': 'number', 'default': 0.6}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'point'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.slide_in', kind='motion_preset', version='1', name='slide_in', title='slide in', description='Whip in from \`distance\` pixels off to one side, overshoot, and settle.', usage='', params={'type': 'object', 'properties': {'from_side': {'type': 'string', 'default': 'left'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_in'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.slide_out', kind='motion_preset', version='1', name='slide_out', title='slide out', description='Exit \`distance\` pixels off to one side, accelerating (an exit).', usage='', params={'type': 'object', 'properties': {'to_side': {'type': 'string', 'default': 'right'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'type': 'string', 'default': 'ease_in'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_out'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.squash_stretch', kind='motion_preset', version='1', name='squash_stretch', title='squash stretch', description='Squash (wide and short), stretch (narrow and tall), then settle.', usage='', params={'type': 'object', 'properties': {'amount': {'type': 'number', 'default': 0.2}, 'duration': {'type': 'number', 'default': 0.36}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'squash_stretch'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.waddle', kind='motion_preset', version='1', name='waddle', title='waddle', description='A walk cycle for a rig with no legs to animate: rock and bob per step.', usage='', params={'type': 'object', 'properties': {'steps': {'type': 'integer', 'default': 4}, 'step_duration': {'type': 'number', 'default': 0.3}, 'angle': {'type': 'number', 'default': 0.1}, 'lift': {'type': 'number', 'default': 6.0}, 'travel': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'waddle'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.turn', kind='motion_preset', version='1', name='turn', title='turn', description='Turn a character to the view \`to\` — the classic cut-out turn.', usage='', params={'type': 'object', 'properties': {'to': {'type': 'string', 'default': 'back'}, 'direction': {'type': 'string', 'default': 'right'}, 'from_direction': {'type': 'string', 'default': None}, 'duration': {'type': 'number', 'default': 0.3}, 'view_set': {'type': 'string', 'default': 'view'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'turn'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.walk', kind='motion_preset', version='2', name='walk', title='walk', description='Walk: the body travels on \`x\` while the gait moves it — legs that alternate, a hop, a bounce, a glide (an#214, an#224).', usage='', params={'type': 'object', 'properties': {'to_x': {'type': 'number', 'default': None}, 'distance': {'type': 'number', 'default': None}, 'direction': {'type': 'string', 'default': None}, 'steps': {'type': 'integer', 'default': None}, 'step_s': {'default': None}, 'step_length': {'type': 'number', 'default': None}, 'stride': {'type': 'number', 'default': None}, 'lift': {'type': 'number', 'default': None}, 'bob': {'type': 'number', 'default': None}, 'arm_swing': {'type': 'number', 'default': None}, 'rock': {'type': 'number', 'default': None}, 'hem_tilt': {'type': 'number', 'default': None}, 'hop_height': {'type': 'number', 'default': None}, 'lean': {'type': 'number', 'default': None}, 'view': {'type': 'string', 'default': None}, 'gait': {'type': 'string', 'default': None}, 'legs': {'type': 'array', 'default': None}, 'arms': {'type': 'array', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('locomotion',)), Entry(id='motion.speech_pulse', kind='motion_preset', version='1', name='speech_pulse', title='speech pulse', description='Pulse a part on each syllable: speech carried without a mouth.', usage='', params={'type': 'object', 'properties': {'beats': {'type': 'array', 'default': [0.0]}, 'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'speech_pulse'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('speech',)), Entry(id='motion.crawl', kind='motion_preset', version='1', name='crawl', title='crawl', description='An opening crawl: lay \`target\` on a plane tilted away, and slide it up and away.', usage='', params={'type': 'object', 'properties': {'distance': {'type': 'number', 'default': 2400.0}, 'duration': {'type': 'number', 'default': 30.0}, 'start': {'type': 'number', 'default': None}, 'tilt': {'type': 'number', 'default': 0.96}, 'perspective': {'type': 'number', 'default': 1.0}, 'fade': {'type': 'array', 'default': [700.0, 1500.0]}, 'y': {'type': 'number', 'default': None}, 'easing': {'type': 'string', 'default': 'linear'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'crawl'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.neutral', kind='expression_preset', version='1', name='neutral', title='', description='the rest face: every axis at its neutral value', usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'neutral'}, '[neutral] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.happy', kind='expression_preset', version='1', name='happy', title='', description="expression-sheet preset: brow_angle_l +0.1, brow_angle_r +0.1, brow_height_l +0.2, brow_height_r +0.2, lid_open_l -0.2, lid_open_r -0.2; mouth form 'happy'", usage='FACS cross-reference 6+12', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'happy'}, '[happy] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.sad', kind='expression_preset', version='1', name='sad', title='', description="expression-sheet preset: brow_angle_l +0.6, brow_angle_r +0.6, brow_height_l +0.3, brow_height_r +0.3, lid_open_l -0.3, lid_open_r -0.3; mouth form 'sad'", usage='FACS cross-reference 1+4+15', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'sad'}, '[sad] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.angry', kind='expression_preset', version='1', name='angry', title='', description="expression-sheet preset: brow_angle_l -0.8, brow_angle_r -0.8, brow_height_l -0.6, brow_height_r -0.6, lid_open_l +0.1, lid_open_r +0.1; mouth form 'angry'", usage='FACS cross-reference 4+5+7+23', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'angry'}, '[angry] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.surprised', kind='expression_preset', version='1', name='surprised', title='', description="expression-sheet preset: brow_angle_l +0, brow_angle_r +0, brow_height_l +1, brow_height_r +1, lid_open_l +0.4, lid_open_r +0.4; mouth form 'surprised'", usage='FACS cross-reference 1+2+5+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'}, '[surprised] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.afraid', kind='expression_preset', version='1', name='afraid', title='', description="expression-sheet preset: brow_angle_l +0.5, brow_angle_r +0.5, brow_height_l +0.7, brow_height_r +0.7, lid_open_l +0.5, lid_open_r +0.5; mouth form 'afraid'", usage='FACS cross-reference 1+2+4+5+7+20+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'afraid'}, '[afraid] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.disgusted', kind='expression_preset', version='1', name='disgusted', title='', description="expression-sheet preset: brow_angle_l -0.3, brow_angle_r -0.3, brow_height_l -0.3, brow_height_r -0.3, lid_open_l -0.4, lid_open_r -0.4; mouth form 'disgusted'", usage='FACS cross-reference 9+15+17', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'disgusted'}, '[disgusted] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.thinking', kind='expression_preset', version='1', name='thinking', title='', description='expression-sheet preset: brow_angle_l +0.3, brow_angle_r -0.1, brow_height_l +0.5, brow_height_r -0.2, lid_open_l -0.1, lid_open_r -0.1', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'thinking'}, '[thinking] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.skeptical', kind='expression_preset', version='1', name='skeptical', title='', description='expression-sheet preset: brow_angle_l +0, brow_angle_r -0.2, brow_height_l +0.6, brow_height_r -0.3, lid_open_l +0, lid_open_r -0.2', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'skeptical'}, '[skeptical] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.amused', kind='expression_preset', version='1', name='amused', title='', description="expression-sheet preset: brow_angle_l +0.05, brow_angle_r +0.05, brow_height_l +0.1, brow_height_r +0.1, lid_open_l -0.1, lid_open_r -0.1; mouth form 'happy'", usage='FACS cross-reference happy at ~0.6', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'amused'}, '[amused] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()))*
+### cutan.characters.vocabulary.CUTOUT_VOCABULARY *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Entry, ...]* *= (Entry(id='field.shot.actions.swap_set', kind='field', version='1', name='shot.actions.swap_set', title='', description='a set action that swaps a drawing (replacement animation)', usage="A set/tween property may also be the name of a swap set the target character's descriptor declares in asset_sets (e.g. 'viseme', 'eyelid', 'hands'), used with a 'set' action whose 'value' is one of that set's declared KEYS (replacement animation). The compiler refuses any other name with the declared sets listed. Never invent a set or a key.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='field.shot.actions.play', kind='field', version='1', name='shot.actions.play', title='', description='play a named animation of the target character, or a motion preset', usage="A 'play' action ({kind: play, target: <entity>, animation: <name>, [duration], [speed], [loop], [args]}) plays one of the target character's descriptor animations ('idle_breath', 'blink', or any it declares) or, for a name the descriptor does not declare, a motion preset (listed below) with 'args' as its parameters (e.g. {'height': 30}); a name in neither fails validation — never invent one. 'point' targets the arm node. A 'walk' picks its gait from the character's structure (its locomotion method, below) unless 'gait' is given.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('locomotion',)), Entry(id='field.shot.actions.expression', kind='field', version='1', name='shot.actions.expression', title='', description='hold a facial expression on a character', usage="An 'expression' action ({kind: expression, target: <entity>, preset: <name>, [axes: {axis: value}], [intensity], [duration], [blend]}) holds a facial expression on a character: brows, eyelids, and the mouth's set for any dialogue under it. 'preset' is an expression preset (listed below) — an unknown preset fails validation. Axes are offsets within their ranges: brow_height_l [-1, 1], brow_height_r [-1, 1], brow_angle_l [-1, 1], brow_angle_r [-1, 1], lid_open_l [-1, 0.5], lid_open_r [-1, 0.5], gaze_x [-1, 1], gaze_y [-1, 1]. 'duration' omitted = to the shot end. A character whose descriptor says face_overlay: false cannot take one.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='field.shot.dialogue.emotion', kind='field', version='1', name='shot.dialogue.emotion', title='', description='the mood a line is said in', usage="A dialogue line's 'emotion' is an expression preset name ([happy] on a scene.md line): it sets the face for the line and the voice's mood. When a line's wording changes, update its emotion if the mood changed too.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('speech',)), Entry(id='motion.pop_in', kind='motion_preset', version='1', name='pop_in', title='pop in', description='Grow from nothing to full size, overshooting and settling (an entrance).', usage='', params={'type': 'object', 'properties': {'duration': {'type': 'number', 'default': 0.45}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'pop_in'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.hop', kind='motion_preset', version='1', name='hop', title='hop', description='Jump up by \`height\` scene pixels and land back where it started.', usage='', params={'type': 'object', 'properties': {'height': {'type': 'number', 'default': 40.0}, 'duration': {'type': 'number', 'default': 0.5}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'hop'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.shake', kind='motion_preset', version='1', name='shake', title='shake', description='Tremble side to side \`cycles\` times and come back to rest (on \`x\`).', usage='', params={'type': 'object', 'properties': {'amplitude': {'type': 'number', 'default': 8.0}, 'duration': {'type': 'number', 'default': 0.4}, 'cycles': {'type': 'integer', 'default': 3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'shake'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.slide_in', kind='motion_preset', version='1', name='slide_in', title='slide in', description='Whip in from \`distance\` pixels off to one side, overshoot, and settle.', usage='', params={'type': 'object', 'properties': {'from_side': {'type': 'string', 'default': 'left'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_in'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.slide_out', kind='motion_preset', version='1', name='slide_out', title='slide out', description='Exit \`distance\` pixels off to one side, accelerating (an exit).', usage='', params={'type': 'object', 'properties': {'to_side': {'type': 'string', 'default': 'right'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'type': 'string', 'default': 'ease_in'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_out'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.squash_stretch', kind='motion_preset', version='1', name='squash_stretch', title='squash stretch', description='Squash (wide and short), stretch (narrow and tall), then settle.', usage='', params={'type': 'object', 'properties': {'amount': {'type': 'number', 'default': 0.2}, 'duration': {'type': 'number', 'default': 0.36}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'squash_stretch'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.crawl', kind='motion_preset', version='1', name='crawl', title='crawl', description='An opening crawl: lay \`target\` on a plane tilted away, and slide it up and away.', usage='', params={'type': 'object', 'properties': {'distance': {'type': 'number', 'default': 2400.0}, 'duration': {'type': 'number', 'default': 30.0}, 'start': {'type': 'number', 'default': None}, 'tilt': {'type': 'number', 'default': 0.96}, 'perspective': {'type': 'number', 'default': 1.0}, 'fade': {'type': 'array', 'default': [700.0, 1500.0]}, 'y': {'type': 'number', 'default': None}, 'easing': {'type': 'string', 'default': 'linear'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'crawl'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.nod', kind='motion_preset', version='1', name='nod', title='nod', description='Dip the head \`count\` times (a rotation of \`<target>/<part>\`).', usage='', params={'type': 'object', 'properties': {'part': {'type': 'string', 'default': 'head'}, 'angle': {'type': 'number', 'default': 0.18}, 'duration': {'type': 'number', 'default': 0.5}, 'count': {'type': 'integer', 'default': 2}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'nod'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.point', kind='motion_preset', version='1', name='point', title='point', description='Swing an arm out to point, hold it, and lower it again.', usage='', params={'type': 'object', 'properties': {'angle': {'type': 'number', 'default': -1.3}, 'raise_duration': {'type': 'number', 'default': 0.25}, 'hold': {'type': 'number', 'default': 0.6}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'point'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.waddle', kind='motion_preset', version='1', name='waddle', title='waddle', description='A walk cycle for a rig with no legs to animate: rock and bob per step.', usage='', params={'type': 'object', 'properties': {'steps': {'type': 'integer', 'default': 4}, 'step_duration': {'type': 'number', 'default': 0.3}, 'angle': {'type': 'number', 'default': 0.1}, 'lift': {'type': 'number', 'default': 6.0}, 'travel': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'waddle'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.turn', kind='motion_preset', version='1', name='turn', title='turn', description='Turn a character to the view \`to\` — the classic cut-out turn.', usage='', params={'type': 'object', 'properties': {'to': {'type': 'string', 'default': 'back'}, 'direction': {'type': 'string', 'default': 'right'}, 'from_direction': {'type': 'string', 'default': None}, 'duration': {'type': 'number', 'default': 0.3}, 'view_set': {'type': 'string', 'default': 'view'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'turn'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.walk', kind='motion_preset', version='2', name='walk', title='walk', description='Walk: the body travels on \`x\` while the gait moves it — legs that alternate, a hop, a bounce, a glide (an#214, an#224).', usage='', params={'type': 'object', 'properties': {'to_x': {'type': 'number', 'default': None}, 'distance': {'type': 'number', 'default': None}, 'direction': {'type': 'string', 'default': None}, 'steps': {'type': 'integer', 'default': None}, 'step_s': {'default': None}, 'step_length': {'type': 'number', 'default': None}, 'stride': {'type': 'number', 'default': None}, 'lift': {'type': 'number', 'default': None}, 'bob': {'type': 'number', 'default': None}, 'arm_swing': {'type': 'number', 'default': None}, 'rock': {'type': 'number', 'default': None}, 'hem_tilt': {'type': 'number', 'default': None}, 'hop_height': {'type': 'number', 'default': None}, 'lean': {'type': 'number', 'default': None}, 'view': {'type': 'string', 'default': None}, 'gait': {'type': 'string', 'default': None}, 'legs': {'type': 'array', 'default': None}, 'arms': {'type': 'array', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('locomotion',)), Entry(id='motion.speech_pulse', kind='motion_preset', version='1', name='speech_pulse', title='speech pulse', description='Pulse a part on each syllable: speech carried without a mouth.', usage='', params={'type': 'object', 'properties': {'beats': {'type': 'array', 'default': [0.0]}, 'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'speech_pulse'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('speech',)), Entry(id='expression.neutral', kind='expression_preset', version='1', name='neutral', title='', description='the rest face: every axis at its neutral value', usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'neutral'}, '[neutral] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.happy', kind='expression_preset', version='1', name='happy', title='', description="expression-sheet preset: brow_angle_l +0.1, brow_angle_r +0.1, brow_height_l +0.2, brow_height_r +0.2, lid_open_l -0.2, lid_open_r -0.2; mouth form 'happy'", usage='FACS cross-reference 6+12', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'happy'}, '[happy] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.sad', kind='expression_preset', version='1', name='sad', title='', description="expression-sheet preset: brow_angle_l +0.6, brow_angle_r +0.6, brow_height_l +0.3, brow_height_r +0.3, lid_open_l -0.3, lid_open_r -0.3; mouth form 'sad'", usage='FACS cross-reference 1+4+15', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'sad'}, '[sad] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.angry', kind='expression_preset', version='1', name='angry', title='', description="expression-sheet preset: brow_angle_l -0.8, brow_angle_r -0.8, brow_height_l -0.6, brow_height_r -0.6, lid_open_l +0.1, lid_open_r +0.1; mouth form 'angry'", usage='FACS cross-reference 4+5+7+23', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'angry'}, '[angry] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.surprised', kind='expression_preset', version='1', name='surprised', title='', description="expression-sheet preset: brow_angle_l +0, brow_angle_r +0, brow_height_l +1, brow_height_r +1, lid_open_l +0.4, lid_open_r +0.4; mouth form 'surprised'", usage='FACS cross-reference 1+2+5+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'}, '[surprised] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.afraid', kind='expression_preset', version='1', name='afraid', title='', description="expression-sheet preset: brow_angle_l +0.5, brow_angle_r +0.5, brow_height_l +0.7, brow_height_r +0.7, lid_open_l +0.5, lid_open_r +0.5; mouth form 'afraid'", usage='FACS cross-reference 1+2+4+5+7+20+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'afraid'}, '[afraid] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.disgusted', kind='expression_preset', version='1', name='disgusted', title='', description="expression-sheet preset: brow_angle_l -0.3, brow_angle_r -0.3, brow_height_l -0.3, brow_height_r -0.3, lid_open_l -0.4, lid_open_r -0.4; mouth form 'disgusted'", usage='FACS cross-reference 9+15+17', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'disgusted'}, '[disgusted] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.thinking', kind='expression_preset', version='1', name='thinking', title='', description='expression-sheet preset: brow_angle_l +0.3, brow_angle_r -0.1, brow_height_l +0.5, brow_height_r -0.2, lid_open_l -0.1, lid_open_r -0.1', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'thinking'}, '[thinking] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.skeptical', kind='expression_preset', version='1', name='skeptical', title='', description='expression-sheet preset: brow_angle_l +0, brow_angle_r -0.2, brow_height_l +0.6, brow_height_r -0.3, lid_open_l +0, lid_open_r -0.2', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'skeptical'}, '[skeptical] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.amused', kind='expression_preset', version='1', name='amused', title='', description="expression-sheet preset: brow_angle_l +0.05, brow_angle_r +0.05, brow_height_l +0.1, brow_height_r +0.1, lid_open_l -0.1, lid_open_r -0.1; mouth form 'happy'", usage='FACS cross-reference happy at ~0.6', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'amused'}, '[amused] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()))*
 
 Everything this genre contributes to the vocabulary except its methods
 ([`cutan.characters.methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)).
@@ -6658,8 +6658,10 @@ them changes when code moves between distributions.
 
 ### Functions
 
-| [`require_an`](_autosummary/cutan.html.md#cutan.require_an)()   | Refuse, with an upgrade hint, to load against an `an` older than this `cutan` needs.   |
-|-----------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| [`require_an`](_autosummary/cutan.html.md#cutan.require_an)()     | Refuse, with an upgrade hint, to load against an `an` older than this `cutan` needs.   |
+|-------------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| [`style_spec`](_autosummary/cutan.html.md#cutan.style_spec)(name) | The style spec `name`, parsed: a new dict on every call.                               |
+| [`style_specs`](_autosummary/cutan.html.md#cutan.style_specs)()    | The names of the style specs that ship with `cutan`, sorted.                           |
 
 ### cutan.ENTRY_POINT_GROUP *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'an.genres'*
 
@@ -6711,6 +6713,20 @@ Refuse, with an upgrade hint, to load against an `an` older than this `cutan` ne
 >>> require_an()
 ```
 
+### cutan.style_spec(name)
+
+The style spec `name`, parsed: a new dict on every call.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### cutan.style_specs()
+
+The names of the style specs that ship with `cutan`, sorted.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
 ### Modules
 
 | [`audio`](_autosummary/cutan.audio.html.md#module-cutan.audio)           | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.   |
@@ -6725,6 +6741,7 @@ Refuse, with an upgrade hint, to load against an `an` older than this `cutan` ne
 | [`library`](_autosummary/cutan.library.html.md#module-cutan.library)       | The character analyser: legs, arms, views and mouth chart, derived from the rig.             |
 | [`motion`](_autosummary/cutan.motion.html.md#module-cutan.motion)         | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.         |
 | [`runtime`](_autosummary/cutan.runtime.html.md#module-cutan.runtime)       | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).    |
+| [`styles`](_autosummary/cutan.styles.html.md#module-cutan.styles)         | The named cut-out style specs, shipped as package data (cutan#4).                            |
 | [`verify`](_autosummary/cutan.verify.html.md#module-cutan.verify)         | The cut-out style lint: measures a render against a named style spec.                        |
 
 
@@ -8511,6 +8528,181 @@ then `walk`.
 JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).
 
 
+# _autosummary/cutan.styles.html.md
+
+# cutan.styles
+
+The named cut-out style specs, shipped as package data (cutan#4).
+
+A style spec is one YAML document per named look (`south_park`,
+`oversimplified`, `kurzgesagt`, `gilliam`, `reiniger`, `norstein`):
+`live` settings that map onto shipped `an` features, `targets` the style
+lint measures a render against, `prosody_targets` for voice acting, and
+`guidance` for what the style needs beyond them. The `cutan-style` skill is
+the procedure that applies one; this module is where the specs live, so code
+and agents load a spec by its name rather than through a path into a skill
+folder.
+
+```pycon
+>>> 'south_park' in style_specs()
+True
+>>> spec = style_spec('south_park')
+>>> spec['style'], spec['cost_class']
+('south_park', 'low')
+>>> style_spec_path('south_park').name
+'south_park.yaml'
+```
+
+Each call returns a fresh dict, so a caller may change it freely:
+
+```pycon
+>>> style_spec('south_park') is style_spec('south_park')
+False
+```
+
+An unknown name is refused with the names there are (a `KeyError`):
+
+```pycon
+>>> try:
+...     style_spec('pixar')
+... except KeyError as e:
+...     print(e)
+no style spec named 'pixar'; the specs are: gilliam, kurzgesagt, norstein, oversimplified, reiniger, south_park
+```
+
+**A spec changes between releases** (targets re-measured, roles re-cast), and
+whatever a production copied out of one (a StylePack, a voice document with
+resolved targets, a kit) is a snapshot of the version it was copied from.
+[`style_spec_digest()`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec_digest) names that version: record it beside the copy, and
+compare it with the installed spec’s to know whether the copy is current.
+
+```pycon
+>>> len(style_spec_digest('south_park'))
+64
+```
+
+[`resolve_style_spec()`](_autosummary/cutan.styles.html.md#cutan.styles.resolve_style_spec) is the one place a *reference* to a spec becomes a
+spec: a mapping (passed through), a path to a YAML file, or a style’s name.
+
+`python -m cutan.styles` lists the specs, `python -m cutan.styles NAME`
+prints one, and `python -m cutan.styles NAME --path` prints its file’s path
+(for a tool that wants a path, such as `an.verify.prosody --targets`).
+
+### Module Attributes
+
+| [`STYLE_SPEC_SUFFIX`](_autosummary/cutan.styles.html.md#cutan.styles.STYLE_SPEC_SUFFIX)         | The file suffix of a style spec in this package.                                                        |
+|----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| [`STYLE_SPEC_SCHEMA_VERSION`](_autosummary/cutan.styles.html.md#cutan.styles.STYLE_SPEC_SCHEMA_VERSION) | bumped when a key's meaning changes, so a reader of a spec copied elsewhere knows which shape it holds. |
+
+### Functions
+
+| [`resolve_style_spec`](_autosummary/cutan.styles.html.md#cutan.styles.resolve_style_spec)(ref)   | A style spec as a dict, from whatever refers to one.                          |
+|----------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| [`style_spec`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec)(name)          | The style spec `name`, parsed: a new dict on every call.                      |
+| [`style_spec_digest`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec_digest)(name)   | The sha256 of the style spec `name`'s file: the version a copy was made from. |
+| [`style_spec_path`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec_path)(name)     | The file of the style spec `name` (for a tool that reads a path).             |
+| [`style_spec_text`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec_text)(name)     | The YAML text of the style spec `name`, comments included.                    |
+| [`style_specs`](_autosummary/cutan.styles.html.md#cutan.styles.style_specs)()             | The names of the style specs that ship with `cutan`, sorted.                  |
+
+### Exceptions
+
+| [`UnknownStyleError`](_autosummary/cutan.styles.html.md#cutan.styles.UnknownStyleError)   | No style spec of that name ships with `cutan`.   |
+|----------------------------------------------------------------------|--------------------------------------------------|
+
+### cutan.styles.STYLE_SPEC_SCHEMA_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '0.1.0'*
+
+bumped when a key’s meaning
+changes, so a reader of a spec copied elsewhere knows which shape it holds.
+
+* **Type:**
+  The `schema_version` the shipped specs carry
+
+### cutan.styles.STYLE_SPEC_SUFFIX *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '.yaml'*
+
+The file suffix of a style spec in this package.
+
+### *exception* cutan.styles.UnknownStyleError
+
+Bases: [`KeyError`](https://docs.python.org/3/builtins/exceptions.html#KeyError)
+
+No style spec of that name ships with `cutan`.
+
+A `KeyError` (so a mapping or a `ChainMap` of spec sources falls through
+it), and so also a `LookupError`.
+
+### cutan.styles.resolve_style_spec(ref)
+
+A style spec as a dict, from whatever refers to one.
+
+- a mapping is passed through (a deep copy);
+- a string spelled as a name (no path separator, no suffix) is looked up
+  by name in the spec sources — today the shipped specs only — and never
+  read from a file in the working directory (spell a local file
+  `./south_park`);
+- anything else is a path to a YAML file.
+
+```pycon
+>>> resolve_style_spec('reiniger')['style']
+'reiniger'
+>>> resolve_style_spec({'targets': {}})
+{'targets': {}}
+```
+
+A missing file whose stem is a shipped style says how to load that one:
+
+```pycon
+>>> resolve_style_spec('oversimplified.yaml')
+Traceback (most recent call last):
+  ...
+FileNotFoundError: no style spec file 'oversimplified.yaml' ...
+```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### cutan.styles.style_spec(name)
+
+The style spec `name`, parsed: a new dict on every call.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### cutan.styles.style_spec_digest(name)
+
+The sha256 of the style spec `name`’s file: the version a copy was made from.
+
+It hashes the file’s bytes with line endings normalised to `\n` (a
+Windows checkout has the same spec as the wheel), so a comment-only edit
+is a new version too.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.styles.style_spec_path(name)
+
+The file of the style spec `name` (for a tool that reads a path).
+
+Raises `FileNotFoundError` when `cutan` is imported from an archive
+(a zipped wheel), where the spec is not a file: use [`style_spec_text()`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec_text).
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.styles.style_spec_text(name)
+
+The YAML text of the style spec `name`, comments included.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.styles.style_specs()
+
+The names of the style specs that ship with `cutan`, sorted.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+
 # _autosummary/cutan.verify.html.md
 
 # cutan.verify
@@ -8533,8 +8725,9 @@ Style lint: measure a render’s cadence, cut rate and palette, and compare them
 cut-out styles research (`misc/docs/cutout_styles_research.md`) measured six
 styles with one fixed set of statistics; this module is that measurement,
 ported, so an agent can render, measure the same statistics on its own output,
-and adjust. The style specs that carry the `targets` live with the downstream
-skill (`.claude/skills/cutan-style/styles/*.yaml`).
+and adjust. The style specs that carry the `targets` ship with the package
+([`cutan.styles`](_autosummary/cutan.styles.html.md#module-cutan.styles)): pass a style’s name (`"south_park"`), a path to a spec
+file, or a mapping.
 
 \*\*The estimators are the research’s estimators, on purpose — with one
 measured exception.\*\* Every threshold below is the one the six styles were
@@ -8627,7 +8820,7 @@ ValueError: unknown style target 'camera_shake'; measurable targets are [...]
 | [`film_shots`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.film_shots)(scene)                             | `(shot id, seconds on screen)` per shot of an `an` render, in order.                                                                      |
 | [`project_of_render`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.project_of_render)(mp4)                        | The project directory an `an` render sits in — `<project>/output/x.mp4` beside `<project>/ir/scene.json` — or `None` for any other video. |
 | [`check_targets`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.check_targets)(metrics, targets, \*[, ...])    | One `Finding` per target the metrics miss; `[]` when all hit.                                                                             |
-| [`load_style_spec`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.load_style_spec)(spec)                         | A style spec as a dict: a mapping is passed through, a path is read as YAML.                                                              |
+| [`load_style_spec`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.load_style_spec)(spec)                         | A style spec as a dict: a style's name, a path to a spec file, or a mapping.                                                              |
 | [`style_lint`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.style_lint)(mp4, spec_or_targets, \*[, ...])   | Measure `mp4` and compare it to a style spec's `targets`.                                                                                 |
 
 ### Classes
@@ -8675,6 +8868,9 @@ static date card is 90% identical frames on its own).
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 Compare a render to a style spec’s `targets`. Implements `Verifier`.
+
+The spec is a style’s name, a spec file’s path or a mapping, as for
+[`style_lint()`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.style_lint).
 
 Shot boundaries come from the IR (every shot boundary is a cut in an `an`
 render, and a dissolve’s overlap is accounted for), so `cuts_per_min` and
@@ -8739,10 +8935,18 @@ counted from where its frames start in the film.
 
 ### cutan.verify.style.load_style_spec(spec)
 
-A style spec as a dict: a mapping is passed through, a path is read as YAML.
+A style spec as a dict: a style’s name, a path to a spec file, or a mapping.
+
+The rules are [`cutan.styles.resolve_style_spec()`](_autosummary/cutan.styles.html.md#cutan.styles.resolve_style_spec)’s (a bare name is
+always the shipped spec; `./name` or `name.yaml` is a file).
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+```pycon
+>>> load_style_spec("reiniger")["style"]
+'reiniger'
+```
 
 ### cutan.verify.style.measure_shots(frames, , fps, shot_durations=None, shot_ids=None, min_changed_pixels=8)
 
@@ -8806,6 +9010,9 @@ beside `<project>/ir/scene.json` — or `None` for any other video.
 
 Measure `mp4` and compare it to a style spec’s `targets`.
 
+`spec_or_targets` is a style’s name (`"south_park"`), a spec file’s
+path, a spec mapping, or a bare `targets` mapping ([`load_style_spec()`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.load_style_spec)).
+
 The cuts are exact when the shots are known: pass `scene` (a project
 directory, a `scene.json`, or a `SceneIR`; dissolve overlaps are
 accounted for) or `shot_durations`. Without either, cuts are detected
@@ -8829,7 +9036,7 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-03 08:51 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/51122686903a83958bccd029b7140f5a7688401f"><code>5112268</code></a> on branch <code>main</code>, for **cutan 0.0.6** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-05 15:14 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c"><code>fa9e7a6</code></a> on branch <code>main</code>, for **cutan 0.0.7** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -8838,7 +9045,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/51122686903a83958bccd029b7140f5a7688401f"><code>51122686903a83958bccd029b7140f5a7688401f</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c"><code>fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -8849,9 +9056,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37110946155">37110946155</a>     |
+| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37330800382">37330800382</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>51122686903a83958bccd029b7140f5a7688401f</code> (in the history of the built commit) |
+| Event commit | <code>fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8876,13 +9083,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.6/">0.0.6</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.7/">0.0.7</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout 51122686903a83958bccd029b7140f5a7688401f
+git checkout fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
