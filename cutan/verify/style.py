@@ -833,44 +833,24 @@ def measure_video(
     )
 
 
-def _is_style_name(spec: str) -> bool:
-    """Whether ``spec`` reads as a style's name rather than a path: one part, no suffix."""
-    path = Path(spec)
-    return not path.suffix and len(path.parts) == 1
-
-
 def load_style_spec(spec: str | Path | Mapping[str, Any]) -> dict[str, Any]:
-    """A style spec as a dict: a mapping is passed through, an existing file is
-    read as YAML, and a bare name (one part, no suffix, not a file) is a shipped
-    style (:func:`cutan.styles.style_spec`).
+    """A style spec as a dict: a style's name, a path to a spec file, or a mapping.
 
-    A file wins over a name, so ``./south_park.yaml`` edited by hand is the one
-    read when its path is given; a bare ``south_park`` is the shipped spec.
+    The rules are :func:`cutan.styles.resolve_style_spec`'s (a bare name is
+    always the shipped spec; ``./name`` or ``name.yaml`` is a file).
 
     >>> load_style_spec("reiniger")["style"]
     'reiniger'
-    >>> load_style_spec({"targets": {}})
-    {'targets': {}}
     """
-    if isinstance(spec, Mapping):
-        return dict(spec)
-    path = Path(spec)
-    if isinstance(spec, str) and not path.is_file() and _is_style_name(spec):
-        from cutan.styles import style_spec
+    from cutan.styles import resolve_style_spec
 
-        return style_spec(spec)
-    import yaml
-
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        raise ValueError(f"style spec {spec} is not a mapping")
-    return data
+    return resolve_style_spec(spec)
 
 
 def _spec_parts(
     spec_or_targets: str | Path | Mapping[str, Any],
 ) -> tuple[str, dict, dict | None]:
-    """``(style name, targets, live)`` from a spec (path or mapping) or a bare
+    """``(style name, targets, live)`` from a spec (name, path or mapping) or a bare
     targets mapping (whose ``live`` is ``None``: nothing to respect)."""
     spec = load_style_spec(spec_or_targets)
     if "targets" in spec:
@@ -884,7 +864,7 @@ def _spec_parts(
 
 
 def _targets_of(spec_or_targets: str | Path | Mapping[str, Any]) -> tuple[str, dict]:
-    """``(style name, targets)`` from a spec (path or mapping) or a bare targets mapping."""
+    """``(style name, targets)`` from a spec (name, path or mapping) or a bare targets mapping."""
     style, targets, _ = _spec_parts(spec_or_targets)
     return style, targets
 
@@ -951,6 +931,9 @@ def style_lint(
     miss_severity: str = "warning",
 ) -> StyleLintResult:
     """Measure ``mp4`` and compare it to a style spec's ``targets``.
+
+    ``spec_or_targets`` is a style's name (``"south_park"``), a spec file's
+    path, a spec mapping, or a bare ``targets`` mapping (:func:`load_style_spec`).
 
     The cuts are exact when the shots are known: pass ``scene`` (a project
     directory, a ``scene.json``, or a `SceneIR`; dissolve overlaps are
@@ -1054,6 +1037,9 @@ def style_lint(
 
 class StyleLintVerifier:
     """Compare a render to a style spec's ``targets``. Implements ``Verifier``.
+
+    The spec is a style's name, a spec file's path or a mapping, as for
+    :func:`style_lint`.
 
     Shot boundaries come from the IR (every shot boundary is a cut in an ``an``
     render, and a dissolve's overlap is accounted for), so ``cuts_per_min`` and

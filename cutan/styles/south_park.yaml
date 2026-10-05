@@ -4,6 +4,7 @@
 # `cutan.verify.style` measures; `guidance` is NOT wired to anything in `an` today.
 # Numbers: misc/docs/cutout_styles_research.md (one 30 s dialogue scene, measured).
 style: south_park
+schema_version: "0.1.0"
 title: South Park (construction-paper cut-out, digital)
 cost_class: low
 cost_note: rigid shape characters, a locked camera and flat sets; `an character new --offline --build squat --head-scale 1.3 --hat beanie` characters are close to the look

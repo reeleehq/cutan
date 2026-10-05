@@ -30,20 +30,30 @@ def _main(argv: Sequence[str]) -> int:
         "--path", action="store_true", help="print the spec file's path, not its text"
     )
     args = parser.parse_args(list(argv))
-    if args.name is None:
-        for name in style_specs():
-            spec = style_spec(name)
-            print(f"{name}\t{spec.get('cost_class', '')}\t{spec.get('title', '')}")
-        return 0
     try:
-        if args.path:
-            print(style_spec_path(args.name))
+        if args.name is None:
+            if args.path:
+                parser.error("--path needs a style name")
+            for name in style_specs():
+                spec = style_spec(name)
+                _write(
+                    f"{name}\t{spec.get('cost_class', '')}\t{spec.get('title', '')}\n"
+                )
+        elif args.path:
+            _write(f"{style_spec_path(args.name)}\n")
         else:
-            sys.stdout.write(style_spec_text(args.name))
-    except UnknownStyleError as e:
+            _write(style_spec_text(args.name))
+    except (UnknownStyleError, OSError, ValueError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
     return 0
+
+
+def _write(text: str) -> None:
+    """UTF-8 to stdout whatever the console's encoding (a spec may hold any character)."""
+    sys.stdout.flush()
+    sys.stdout.buffer.write(text.encode("utf-8"))
+    sys.stdout.buffer.flush()
 
 
 if __name__ == "__main__":

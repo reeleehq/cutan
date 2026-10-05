@@ -1,5 +1,6 @@
 # Yuri Norstein multiplane (Hedgehog in the Fog). See the header of south_park.yaml for how to read this file.
 style: norstein
+schema_version: "0.1.0"
 title: Yuri Norstein (multiplane painted cut-out)
 cost_class: very_high
 cost_note: painted, textured art on every plane; the engine has the planes, the art is the cost

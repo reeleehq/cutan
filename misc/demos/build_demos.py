@@ -50,8 +50,10 @@ OUT_DIR = REPO_ROOT / "misc" / "demos" / "out"
 #: no dithering, 12 fps, 480 px -- lives in `an.media.gif` since an#247, the
 #: one copy in the repository (its module docstring carries the reasons).
 #: Re-exported here under the names this script has always used.
-from cutan.styles import style_spec, style_spec_path  # noqa: E402
 from an.media.gif import GIF_FPS, GIF_MAX_COLOURS, GIF_WIDTH, to_gif  # noqa: E402,F401
+
+#: The style specs ship with cutan (cutan#4): the style demos load them by name.
+from cutan.styles import style_spec, style_spec_path  # noqa: E402
 
 #: Refuse to publish a GIF larger than this. GitHub renders bigger ones, but a
 #: reader on a phone pays for every byte and a demo nobody waits for is not a
