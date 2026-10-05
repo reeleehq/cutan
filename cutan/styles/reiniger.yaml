@@ -1,5 +1,6 @@
 # Lotte Reiniger silhouette film. See the header of south_park.yaml for how to read this file.
 style: reiniger
+schema_version: "0.1.0"
 title: Lotte Reiniger (silhouette film)
 cost_class: high
 cost_note: puppets of 20-50 hinged pieces; the engine mostly exists, the puppets do not

@@ -1,5 +1,6 @@
 # OverSimplified-style history explainer. See the header of south_park.yaml for how to read this file.
 style: oversimplified
+schema_version: "0.1.0"
 title: OverSimplified (stick-figure history explainer)
 cost_class: low_to_medium
 cost_note: stick figures are cheap; sets, props, maps and crowds are many

@@ -68,6 +68,9 @@ def require_an() -> None:
         )
 
 
+# The named style specs (package data, cutan#4): ``cutan.style_spec("south_park")``.
+from cutan.styles import style_spec, style_specs  # noqa: E402
+
 __all__ = [
     "ENTRY_POINT_GROUP",
     "ENTRY_POINT_NAME",
@@ -77,4 +80,6 @@ __all__ = [
     "REQUIRED_AN_API_LEVEL",
     "RENDERER_NAME",
     "require_an",
+    "style_spec",
+    "style_specs",
 ]

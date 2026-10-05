@@ -1,5 +1,6 @@
 # Terry Gilliam (Monty Python) photo-montage cut-out. See the header of south_park.yaml for how to read this file.
 style: gilliam
+schema_version: "0.1.0"
 title: Terry Gilliam (Monty Python photo-montage)
 cost_class: medium
 cost_note: medium if the images are public domain; sourcing and cutting the photographs is the work

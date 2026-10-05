@@ -52,6 +52,9 @@ OUT_DIR = REPO_ROOT / "misc" / "demos" / "out"
 #: Re-exported here under the names this script has always used.
 from an.media.gif import GIF_FPS, GIF_MAX_COLOURS, GIF_WIDTH, to_gif  # noqa: E402,F401
 
+#: The style specs ship with cutan (cutan#4): the style demos load them by name.
+from cutan.styles import style_spec, style_spec_path  # noqa: E402
+
 #: Refuse to publish a GIF larger than this. GitHub renders bigger ones, but a
 #: reader on a phone pays for every byte and a demo nobody waits for is not a
 #: demo.
@@ -1746,11 +1749,9 @@ def _build_preset_plays(work: Path) -> Path:
     return _render(_project(work, scene_md=md, characters=("maya", "bo")))
 
 
-#: The style spec the style demo applies, read from the downstream skill so the
-#: demo and the spec cannot disagree about what "South Park-style" means here.
-STYLE_SPEC_PATH = (
-    REPO_ROOT / ".claude" / "skills" / "an-style" / "styles" / "south_park.yaml"
-)
+#: The style spec the style demo applies, read from the package (``cutan.styles``)
+#: so the demo and the spec cannot disagree about what "South Park-style" means here.
+STYLE_SPEC_PATH = style_spec_path("south_park")
 
 
 def _build_south_park_style(work: Path) -> Path:
@@ -2016,12 +2017,9 @@ def _build_character_casts(work: Path) -> Path:
     import json
     import subprocess
 
-    import yaml
-
     from cutan.characters import new_character
     from an.styles import StylePack
 
-    specs = STYLE_SPEC_PATH.parent
     duration = 4.0
     panes = []
     for style, cast in CHARACTER_CASTS.items():
@@ -2039,9 +2037,7 @@ def _build_character_casts(work: Path) -> Path:
                 **knobs,
             )
         pack = StylePack(
-            **yaml.safe_load((specs / f"{style}.yaml").read_text("utf-8"))["live"][
-                "style_pack"
-            ]
+            **style_spec(style)["live"]["style_pack"]
         )
         (pane / "assets" / "styles").mkdir(parents=True, exist_ok=True)
         (pane / "assets" / "styles" / f"{pack.name}.json").write_text(
@@ -3035,8 +3031,8 @@ DEMOS: tuple[Demo, ...] = (
             "NOT applied: `an` does not have it yet."
         ),
         how=(
-            "The `an-style` skill and `.claude/skills/an-style/styles/south_park.yaml`; "
-            "then `python -m cutan.verify.style out.mp4 south_park.yaml` "
+            "The `cutan-style` skill and the `south_park` spec (`cutan.style_spec`); "
+            "then `python -m cutan.verify.style out.mp4 south_park` "
             "(`cutan.verify.style.StyleLintVerifier`)."
         ),
         build=_build_south_park_style,

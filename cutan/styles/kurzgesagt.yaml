@@ -1,5 +1,6 @@
 # Kurzgesagt-style flat-vector explainer. See the header of south_park.yaml for how to read this file.
 style: kurzgesagt
+schema_version: "0.1.0"
 title: Kurzgesagt (flat-vector science explainer)
 cost_class: very_high
 cost_note: about 200 unique assets per 10-minute video; the cost is art volume, not engine

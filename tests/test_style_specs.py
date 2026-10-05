@@ -1,4 +1,4 @@
-"""The `an-style` skill's style specs claim that every `live` key maps onto a
+"""The style specs (`cutan.styles`, applied by the `cutan-style` skill) claim that every `live` key maps onto a
 shipped feature. This checks each claim against the code, so a spec cannot
 drift into asking for something `an` does not do.
 
@@ -11,7 +11,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-import yaml
 
 from an.adapters.cutout.easing import EASING_FUNCS, apply_easing
 from an.audio.effects import normalize_effects
@@ -20,10 +19,11 @@ from an.ir.camera import CAMERA_MOVES
 from an.ir.schema import Meta, SoundCue, Transition
 from cutan.motion import PRESETS
 from an.styles import StylePack, SurfaceTreatment
+from cutan.styles import style_spec, style_spec_path, style_specs
 from cutan.verify.style import StyleLintVerifier
 
-SPEC_DIR = Path(__file__).resolve().parents[1] / ".claude" / "skills" / "cutan-style" / "styles"
-SPECS = sorted(SPEC_DIR.glob("*.yaml"))
+SPECS = style_specs()
+SKILL_DIR = Path(__file__).resolve().parents[1] / ".claude" / "skills" / "cutan-style"
 
 #: Every key `live` may carry, and nothing else.
 LIVE_KEYS = {
@@ -32,25 +32,25 @@ LIVE_KEYS = {
     "transitions", "sound", "voice", "glow_template",
 }
 TOP_KEYS = {
-    "style", "title", "cost_class", "cost_note", "live", "targets", "prosody_targets", "guidance"
+    "style", "schema_version", "title", "cost_class", "cost_note", "live", "targets", "prosody_targets", "guidance"
 }
 COST_CLASSES = {"low", "low_to_medium", "medium", "high", "very_high"}
 GENERATORS = {"offline", "promote"}
 
 
-def _load(path):
-    return yaml.safe_load(path.read_text(encoding="utf-8"))
+def _load(name):
+    return style_spec(name)
 
 
 def test_the_six_researched_styles_have_specs():
-    assert {p.stem for p in SPECS} >= {
+    assert set(SPECS) >= {
         "south_park", "oversimplified", "kurzgesagt", "gilliam", "reiniger", "norstein"
     }
 
 
-@pytest.fixture(params=SPECS, ids=lambda p: p.stem)
+@pytest.fixture(params=SPECS)
 def spec(request):
-    return _load(request.param) | {"_stem": request.param.stem}
+    return _load(request.param) | {"_stem": style_spec_path(request.param).stem}
 
 
 def test_shape(spec):
@@ -79,11 +79,11 @@ def test_surface_treatments_are_live_where_they_ship():
     """an#163: the outline, the paper-gap shadow and the grain are compiled
     now, so South Park carries them under `live` (and no longer under
     `guidance`), and Kurzgesagt's glow is a per-entity template."""
-    sp = _load(SPEC_DIR / "south_park.yaml")
+    sp = _load("south_park")
     pack = StylePack(**sp["live"]["style_pack"])
     assert pack.surface.outline and pack.surface.shadow and pack.grain
     assert not {"outline", "paper_gap_shadow", "paper_grain"} & set(sp["guidance"])
-    kz = _load(SPEC_DIR / "kurzgesagt.yaml")
+    kz = _load("kurzgesagt")
     assert "glow" not in kz["guidance"]
 
 
@@ -164,14 +164,14 @@ def test_a_spec_s_default_view_is_one_the_factory_draws(spec, tmp_path):
 def test_the_reiniger_silhouette_defaults_to_the_profile():
     """The evidence run faked Reiniger's profile with a squash: the spec says
     `side`, and its turns stay in profile."""
-    live = _load(SPEC_DIR / "reiniger.yaml")["live"]
+    live = _load("reiniger")["live"]
     assert live["characters"]["view"] == "side"
     assert "turn" in live["motion_presets"]
 
 
 @pytest.mark.parametrize("style", ["south_park", "oversimplified"])
 def test_the_dialogue_styles_turn_with_the_preset(style):
-    assert "turn" in _load(SPEC_DIR / f"{style}.yaml")["live"]["motion_presets"]
+    assert "turn" in _load(style)["live"]["motion_presets"]
 
 
 #: `live.characters` keys that are `new_character` keyword arguments, with how a
@@ -311,7 +311,7 @@ def test_voice_acting_devices_name_prosody_targets(spec):
 
 
 def test_south_park_raises_its_voices():
-    fx = _load(SPEC_DIR / "south_park.yaml")["live"]["voice"]["effects"]
+    fx = _load("south_park")["live"]["voice"]["effects"]
     assert 0 < fx["pitch_semitones"] <= 12
 
 
@@ -363,7 +363,9 @@ STALE_ABSENCE_CLAIMS = {
     r"\b(use|needs?) side-view art|\bno (profile|side[- ]view|turnaround)": "views ship (an#197): `live.characters.view`, `play: turn`",
 }
 
-SKILL_MD = SPEC_DIR.parent / "SKILL.md"
+SKILL_MD = SKILL_DIR / "SKILL.md"
+#: The skill folder is in the repository, not in the sdist: skip, don't fail, there.
+_NEEDS_SKILL = pytest.mark.skipif(not SKILL_MD.exists(), reason="no .claude/skills (an sdist)")
 
 
 def _strings(obj):
@@ -389,6 +391,7 @@ def test_guidance_does_not_call_a_shipped_feature_missing(spec):
     assert not found, found
 
 
+@_NEEDS_SKILL
 def test_the_an_style_skill_does_not_call_a_shipped_feature_missing():
     import re
 
@@ -397,8 +400,14 @@ def test_the_an_style_skill_does_not_call_a_shipped_feature_missing():
     assert not found, found
 
 
-def test_the_an_style_skill_points_at_its_specs_relative_to_itself():
-    """A downstream agent has the skill directory, not the `an` repo: a spec
-    path written as `.claude/skills/cutan-style/styles/...` does not exist there."""
+@_NEEDS_SKILL
+def test_the_skill_loads_its_specs_from_the_package_not_from_a_copy():
+    """The specs are package data (cutan#4): the skill holds no copy to drift, names
+    no path into a skill folder, and says how to load a spec by its name."""
     text = SKILL_MD.read_text(encoding="utf-8")
+    assert not (SKILL_DIR / "styles").exists()
     assert ".claude/skills/cutan-style/styles" not in text
+    assert "<skill>/styles" not in text
+    assert "python -m cutan.styles" in text and "cutan.style_spec(" in text
+    for name in SPECS:
+        assert f"`{name}`" in text, f"the skill does not name the shipped style {name!r}"

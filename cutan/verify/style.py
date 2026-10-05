@@ -4,8 +4,9 @@
 cut-out styles research (``misc/docs/cutout_styles_research.md``) measured six
 styles with one fixed set of statistics; this module is that measurement,
 ported, so an agent can render, measure the same statistics on its own output,
-and adjust. The style specs that carry the ``targets`` live with the downstream
-skill (``.claude/skills/cutan-style/styles/*.yaml``).
+and adjust. The style specs that carry the ``targets`` ship with the package
+(:mod:`cutan.styles`): pass a style's name (``"south_park"``), a path to a spec
+file, or a mapping.
 
 **The estimators are the research's estimators, on purpose — with one
 measured exception.** Every threshold below is the one the six styles were
@@ -833,21 +834,23 @@ def measure_video(
 
 
 def load_style_spec(spec: str | Path | Mapping[str, Any]) -> dict[str, Any]:
-    """A style spec as a dict: a mapping is passed through, a path is read as YAML."""
-    if isinstance(spec, Mapping):
-        return dict(spec)
-    import yaml
+    """A style spec as a dict: a style's name, a path to a spec file, or a mapping.
 
-    data = yaml.safe_load(Path(spec).read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        raise ValueError(f"style spec {spec} is not a mapping")
-    return data
+    The rules are :func:`cutan.styles.resolve_style_spec`'s (a bare name is
+    always the shipped spec; ``./name`` or ``name.yaml`` is a file).
+
+    >>> load_style_spec("reiniger")["style"]
+    'reiniger'
+    """
+    from cutan.styles import resolve_style_spec
+
+    return resolve_style_spec(spec)
 
 
 def _spec_parts(
     spec_or_targets: str | Path | Mapping[str, Any],
 ) -> tuple[str, dict, dict | None]:
-    """``(style name, targets, live)`` from a spec (path or mapping) or a bare
+    """``(style name, targets, live)`` from a spec (name, path or mapping) or a bare
     targets mapping (whose ``live`` is ``None``: nothing to respect)."""
     spec = load_style_spec(spec_or_targets)
     if "targets" in spec:
@@ -861,7 +864,7 @@ def _spec_parts(
 
 
 def _targets_of(spec_or_targets: str | Path | Mapping[str, Any]) -> tuple[str, dict]:
-    """``(style name, targets)`` from a spec (path or mapping) or a bare targets mapping."""
+    """``(style name, targets)`` from a spec (name, path or mapping) or a bare targets mapping."""
     style, targets, _ = _spec_parts(spec_or_targets)
     return style, targets
 
@@ -928,6 +931,9 @@ def style_lint(
     miss_severity: str = "warning",
 ) -> StyleLintResult:
     """Measure ``mp4`` and compare it to a style spec's ``targets``.
+
+    ``spec_or_targets`` is a style's name (``"south_park"``), a spec file's
+    path, a spec mapping, or a bare ``targets`` mapping (:func:`load_style_spec`).
 
     The cuts are exact when the shots are known: pass ``scene`` (a project
     directory, a ``scene.json``, or a `SceneIR`; dissolve overlaps are
@@ -1032,6 +1038,9 @@ def style_lint(
 class StyleLintVerifier:
     """Compare a render to a style spec's ``targets``. Implements ``Verifier``.
 
+    The spec is a style's name, a spec file's path or a mapping, as for
+    :func:`style_lint`.
+
     Shot boundaries come from the IR (every shot boundary is a cut in an ``an``
     render, and a dissolve's overlap is accounted for), so ``cuts_per_min`` and
     ``mean_shot_s`` are exact rather than detected. Pre-render
@@ -1124,7 +1133,7 @@ def _format_text(
 
 
 def _main(argv: Sequence[str]) -> int:
-    """``python -m cutan.verify.style VIDEO SPEC.yaml [--project DIR] [--json]``.
+    """``python -m cutan.verify.style VIDEO STYLE|SPEC.yaml [--project DIR] [--json]``.
 
     Prints the metrics beside the targets, one line per finding with its fix,
     and the per-shot cadence. The shots come from ``--project`` (a project
@@ -1142,7 +1151,8 @@ def _main(argv: Sequence[str]) -> int:
     )
     parser.add_argument("video", help="the rendered mp4")
     parser.add_argument(
-        "spec", help="a style spec YAML (cutan-style skill: styles/<name>.yaml)"
+        "spec",
+        help="a style name (python -m cutan.styles lists them) or a style spec YAML file",
     )
     parser.add_argument(
         "--project",
@@ -1157,6 +1167,15 @@ def _main(argv: Sequence[str]) -> int:
     )
     args = parser.parse_args(list(argv))
 
+    import yaml
+
+    from cutan.styles import UnknownStyleError
+
+    try:
+        spec = load_style_spec(args.spec)
+    except (OSError, UnknownStyleError, ValueError, yaml.YAMLError) as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 2
     project = args.project or project_of_render(args.video)
     if project is None:
         print(
@@ -1168,7 +1187,7 @@ def _main(argv: Sequence[str]) -> int:
     elif args.project is None:
         print(f"using the shot list of {project}", file=sys.stderr)
     try:
-        result = style_lint(args.video, args.spec, scene=project)
+        result = style_lint(args.video, spec, scene=project)
     except StyleLintError as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
@@ -1184,7 +1203,7 @@ def _main(argv: Sequence[str]) -> int:
             )
         )
     else:
-        print(_format_text(result, _targets_of(args.spec)[1]))
+        print(_format_text(result, _targets_of(spec)[1]))
     if result.metrics is None:
         return 2
     return 0 if all(f.severity == "info" for f in result.report.findings) else 1
