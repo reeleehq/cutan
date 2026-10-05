@@ -45,20 +45,27 @@ from an.ir.validate import (  # noqa: E402
 )
 
 
-def _stage_of(shot, stores: Mapping[str, Any]):
+def _stage_of(shot, stores: Mapping[str, Any], unchecked: set[str] = frozenset()):
     """``() -> {node path: rest pose}`` of the shot's built stage
     (:func:`an.motion.stage_poses`), built once, lazily, and ``None`` when it
     does not build (reported by the play check). What the compiler reads a
     walk's drawn scale and limbs off (``vocab.node_transforms``), so validate
-    reads the same numbers (cutan#12)."""
+    reads the same numbers (cutan#12). Entities whose store was not supplied
+    (``unchecked``) are left out of the build: they are not checked, and they
+    must not take the others' context with them (review C, F1)."""
     cache: dict[str, Any] = {}
 
     def poses() -> Mapping[str, Mapping[str, float]] | None:
         if "poses" not in cache:
             from an.motion import stage_poses
 
+            staged = shot
+            if unchecked:
+                staged = shot.model_copy(
+                    update={"entities": [e for e in shot.entities if e.id not in unchecked]}
+                )
             try:
-                cache["poses"] = stage_poses(shot, mall=stores)
+                cache["poses"] = stage_poses(staged, mall=stores)
             except Exception:  # the stage did not build: `cutout.play` says why
                 cache["poses"] = None
         return cache["poses"]
@@ -107,23 +114,21 @@ def _preset_context_of(
     def context(entity_id: str, action) -> Mapping[str, Any] | None:
         target = getattr(action, "target", "") or ""
         entity = rigs.get(entity_id)
-        if (
-            entity is None
-            or entity_id in unchecked
-            or not preset_takes(action.animation, GAIT_ARG)
-        ):
+        if entity_id in unchecked or not preset_takes(action.animation, GAIT_ARG):
             return None
         poses = stage()
         if poses is None or target not in poses:
             return None
-        # A character resolves on the registry; a part of one, or a prop,
-        # walks with the limbs the stage built under the target.
+        # A character resolves on the registry; a part of one, a prop, or any
+        # other built entity walks with the limbs the stage built under the
+        # target (as the compiler's does off the registry).
+        is_character = entity is not None and entity.kind == CHARACTER_KIND
         descriptor, profile = (
             descriptor_and_profile(entity_id, entity)
-            if "/" not in target and entity.kind == CHARACTER_KIND
+            if "/" not in target and is_character
             else (None, None)
         )
-        if profile is None and entity.kind == CHARACTER_KIND and "/" not in target:
+        if profile is None and is_character and "/" not in target:
             prefix = f"{target}/"
             profile = compile_profile(
                 None, built_parts=[p[len(prefix) :] for p in poses if p.startswith(prefix)]
@@ -196,7 +201,9 @@ def _check_play_actions(
         except ValidationError:
             return None
 
-    preset_context = _preset_context_of(rigs, unchecked, stores, _stage_of(shot, stores))
+    preset_context = _preset_context_of(
+        rigs, unchecked, stores, _stage_of(shot, stores, unchecked)
+    )
     play_extent = play_extent_for(extent_descriptor, context_of=preset_context)
     for k, action in enumerate(shot.actions):
         for flat in flatten(action, play_extent=play_extent):
@@ -431,9 +438,12 @@ def _turn_resolution(
         except ValidationError:
             return None  # reported by the play check
 
+    all_rigs, unchecked = _rig_scope(shot, stores)
     extent = play_extent_for(
         descriptor_of,
-        context_of=_preset_context_of(rigs, set(), stores, _stage_of(shot, stores)),
+        context_of=_preset_context_of(
+            all_rigs, unchecked, stores, _stage_of(shot, stores, unchecked)
+        ),
     )
     origin: list[int] = []
     flats = []

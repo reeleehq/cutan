@@ -347,3 +347,22 @@ def test_a_figure_resized_by_an_authored_move_strides_as_drawn(store):
     doc = _compile(_gale_shot(acts), {"characters": store})
     walked = max(ch.keyframes[-1].time for a in doc.animations.values() for ch in a.channels if ch.target == "w" and ch.property == "x")
     assert walked == pytest.approx(0.8)  # two 80 px steps: the figure is drawn at scale 1
+
+
+def test_an_unchecked_entity_does_not_cost_the_others_their_context(gait_store, tmp_path):
+    """review C: a prop whose store was not supplied is left out of validate's
+    stage build, so the character's walk is still timed as compile times it."""
+    from cutan.characters.checks import _preset_context_of, _stage_of
+
+    shot = Shot(
+        id="s",
+        duration=4.0,
+        entities=[
+            AssetRef(kind="character", id="w", store="characters", ref="gale_shuffle"),
+            AssetRef(kind="prop", id="p", store="props", ref="lamp"),
+        ],
+        actions=[PlayAction(target="w", animation="walk", args={"distance": 160})],
+    )
+    stores = {"characters": gait_store}  # no props store: `p` is unchecked
+    context = _preset_context_of({e.id: e for e in shot.entities}, {"p"}, stores, _stage_of(shot, stores, {"p"}))
+    assert context("w", shot.actions[0])["gait"] == "shuffle"
