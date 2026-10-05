@@ -24,9 +24,10 @@ import pytest
 
 from an.adapters.cutout.compile import compile_shot
 from an.adapters.cutout.timeline import evaluate_timeline, timeline_from_scene
-from an.ir.compose import duration_of, flatten
+from an.ir.compose import duration_of, flatten, parallel, sequence, set_, tween
 from an.motion import stage_poses
 from an.ir.schema import AssetRef, Meta, SceneIR, Shot, StagePlacement, TweenAction
+from an.ir.validate import validate_semantic
 from an.semantic import applicable, aspect, why_not
 from an.stores.characters import CharactersStore
 from cutan.characters.methods import LOCOMOTION, compile_profile
@@ -173,3 +174,112 @@ def test_validate_says_why_a_requested_gait_will_not_be_used(store):
     assert "swap.view:side" in said and "add-views" in said
     assert _gait_warnings(store, "gale_side", gait="profile") == []
     assert _gait_warnings(store, "gale", gait="hop") == []
+
+
+# --------------------------------------------------------------- cutan#12, cutan#13
+
+
+def _gale_shot(*actions, scale: float = 1.0, ref: str = "gale") -> Shot:
+    stage = StagePlacement(scale=scale) if scale != 1.0 else None
+    return Shot(
+        id="s",
+        duration=4.0,
+        entities=[AssetRef(kind="character", id="w", store="characters", ref=ref, stage=stage)],
+        actions=list(actions),
+    )
+
+
+def _walk_then_head_turn(store, ref, *, scale=1.0, **args):
+    """``(when the walk lands, when the next action in the sequence starts)``."""
+    shot = _gale_shot(
+        sequence(
+            PlayAction(target="w", animation="walk", args={"distance": 160, **args}),
+            tween("w/head", "rotation", to=0.5, duration=0.5, from_=0.0, easing="linear"),
+        ),
+        scale=scale,
+        ref=ref,
+    )
+    tl = timeline_from_scene(_compile(shot, {"characters": store}))
+    ts = [i / 100 for i in range(300)]
+    ev = [evaluate_timeline(tl, t) for t in ts]
+    lands = next(t for t, e in zip(ts, ev) if abs(e.get(("w", "x"), 0.0) - 160) < 1e-6)
+    nxt = next(t for t, e in zip(ts, ev) if e.get(("w/head", "rotation"), 0.0) > 1e-6) - 0.01
+    return lands, round(nxt, 2)
+
+
+@pytest.fixture()
+def gait_store(tmp_path):
+    """``gale``; ``gale_shuffle`` (declares ``gait: shuffle``); ``legless`` (a parts rig)."""
+    shutil.copytree(FIXTURES / "gale", tmp_path / "gale")
+    shutil.copytree(FIXTURES / "gale", tmp_path / "gale_shuffle")
+    path = tmp_path / "gale_shuffle" / "character.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["gait"] = "shuffle"
+    path.write_text(json.dumps(doc), encoding="utf-8")
+    store = CharactersStore(tmp_path)
+    store["legless"] = {"name": "legless", "parts": ["head", "torso", "left_arm", "right_arm"]}
+    return store
+
+
+@pytest.mark.parametrize(
+    "ref,scale,args",
+    [
+        ("gale", 2.0, {}),  # the scaled step: 1 step of 0.4 s, not 2
+        ("gale_shuffle", 1.0, {}),  # the descriptor's gait: 4 steps of 0.3 s
+        ("legless", 1.0, {"gait": "shuffle"}),  # substituted to glide: 2 steps of 0.4 s
+    ],
+)
+def test_a_sequence_waits_exactly_as_long_as_the_walk(gait_store, ref, scale, args):
+    """cutan#12: the extent sees the gait and the scale the expansion uses."""
+    lands, nxt = _walk_then_head_turn(gait_store, ref, scale=scale, **args)
+    assert nxt == pytest.approx(lands, abs=0.011), (ref, scale, lands, nxt)
+
+
+def test_validate_places_a_sequence_where_compile_does(gait_store):
+    """`an validate`'s extent resolver reads the same gait and scale as the compiler's."""
+    from cutan.characters.checks import _preset_context_of
+    from cutan.characters.play import play_extent_for
+    from cutan.compile.lowering import PLAY_LOWERING
+
+    for ref, scale, args in (("gale", 2.0, {}), ("gale_shuffle", 1.0, {}), ("legless", 1.0, {"gait": "shuffle"})):
+        shot = _gale_shot(PlayAction(target="w", animation="walk", args={"distance": 160, **args}), scale=scale, ref=ref)
+        play = shot.actions[0]
+        doc = _compile(shot, {"characters": gait_store})
+        walked = max(ch.keyframes[-1].time for a in doc.animations.values() for ch in a.channels if ch.target == "w" and ch.property == "x")
+        rigs = {e.id: e for e in shot.entities}
+        extent = play_extent_for(lambda e: None, context_of=_preset_context_of(rigs, {"characters": gait_store}))
+        assert extent(play) == pytest.approx(walked, abs=1e-6), (ref, scale, args)
+        # and the shot-end warning validate gives reads the same length
+        long = _gale_shot(PlayAction(target="w", animation="walk", args={"distance": 160, **args}), scale=scale, ref=ref).model_copy(update={"duration": walked - 0.1})
+        report = validate_semantic(SceneIR(meta=Meta(title="t", duration=4.0), timeline=[long]), available_characters=gait_store)
+        assert any("past the shot's end" in f.description for f in report.findings), (ref, scale, args)
+
+
+def test_an_explicit_step_count_does_not_need_a_step_length():
+    """cutan#13: `step_length` is read only to count the steps; a zero from the
+    figure's scale is reported as the scale."""
+    walk("k", steps=2, gait="hop", legs=(), arms=(), rest={"scale_y": 0.0})
+    with pytest.raises(ValueError, match="drawn scale is 0.0"):
+        walk("k", distance=160, legs=(), arms=(), rest={"scale_y": 0.0})
+    assert duration_of(walk("k", distance=160, legs=(), scale=0.0, step_length=80.0)) == pytest.approx(0.8)
+
+
+def test_the_drawn_scale_is_the_stage_scale_not_the_pose_at_the_plays_start(store):
+    """cutan#13: a walk that starts while the figure pops in still hops."""
+    hidden = [set_("w", "scale_x", 0.0), set_("w", "scale_y", 0.0)]
+    play = parallel(
+        PlayAction(target="w", animation="pop_in"),
+        PlayAction(target="w", animation="walk", args={"gait": "hop", "steps": 2, "distance": 160}),
+    )
+    doc = _compile(_gale_shot(sequence(*hidden, play)), {"characters": store})
+    y0, apex = _pose(doc, 0.0)[("w", "y")], _pose(doc, 0.2)[("w", "y")]
+    assert apex == pytest.approx(y0 - 18.0)
+    big = _compile(_gale_shot(sequence(*hidden, play), scale=2.0), {"characters": store})
+    assert _pose(big, 0.2)[("w", "y")] == pytest.approx(_pose(big, 0.0)[("w", "y")] - 36.0)
+
+
+def test_scale_is_the_compilers_to_fill_not_the_authors():
+    from cutan.characters.play import play_problems
+
+    (problem,) = play_problems(None, "walk", args={"scale": 2.0, "distance": 80})
+    assert "scale" in problem

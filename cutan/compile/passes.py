@@ -41,6 +41,7 @@ from cutan.characters.play import (
     play_source,
     GAIT_ARG,
     PARTS_ARG,
+    SCALE_ARG,
     VIEW_ARG,
     facing_at,
     preset_takes,
@@ -123,7 +124,10 @@ def _provider(state) -> ExpressionProvider:
     return state.expression_provider or DefaultExpressionProvider()
 
 
-_PLACEHOLDER_PARTS: tuple[str, ...] = ("head", "torso", "left_arm", "right_arm")
+#: The parts the built-in placeholder rig draws when a character ref has no
+#: descriptor and no ``parts``: arms, no legs (so a walk on it glides).
+PLACEHOLDER_PARTS: tuple[str, ...] = ("head", "torso", "left_arm", "right_arm")
+_PLACEHOLDER_PARTS = PLACEHOLDER_PARTS
 
 
 #: Fraction of a limb rect's height, from its top edge, at which the joint sits:
@@ -2366,20 +2370,57 @@ def _locomotion_args(
     resolutions: list[AssetResolutionJSON] | None,
 ) -> dict[str, Any]:
     """The walk's args with its gait the locomotion method the registry resolves
-    (an#248): a method id or a pinned choice in ``gait`` is spelled out first,
-    its args joining the walk's."""
-    from cutan.characters.methods import normalise_gait_args, resolve_walk_gait
+    (an#248: :func:`cutan.characters.methods.locomotion_args`, the one
+    resolution the extent reads too), the substitution recorded."""
+    from cutan.characters.methods import locomotion_args
 
-    args = normalise_gait_args(args)
-    gait, resolution = resolve_walk_gait(
-        entity,
-        args=args,
-        descriptor=desc,
-        profile=_character_profile(entity, vocab),
+    resolved, resolution = locomotion_args(
+        entity, args, descriptor=desc, profile=_character_profile(entity, vocab)
     )
     if resolution.substitution is not None:
         _record_substitution(resolution.substitution, resolutions)
-    return {**args, GAIT_ARG: gait}
+    return resolved
+
+
+def _drawn_scale(entity: str, vocab: _SwapVocabulary | None) -> float | None:
+    """The figure's drawn scale: the ``scale_y`` of its BUILT root (the stage
+    placement applied to the rig, before any authored move), ``None`` with no
+    built node. What a walk's default lengths are stated against (cutan#13):
+    the pose the timeline holds at a play's start is transient — a ``pop_in``
+    running under the walk holds it at 0."""
+    if vocab is None:
+        return None
+    transform = vocab.node_transforms.get(entity)
+    if transform is None:
+        return None
+    return abs(float(transform.scale_y))
+
+
+def preset_context_of(vocab: _SwapVocabulary | None):
+    """``(entity_id, play) -> PresetContext`` for the extent resolver
+    (:func:`cutan.characters.play.play_extent_for`): exactly the ``gait`` and
+    ``scale`` :func:`_with_view_and_posed_parts` will fill in before the
+    expansion, read off the same vocabulary, so a ``sequence`` waits for what
+    the walk runs (cutan#12)."""
+    from cutan.characters.methods import walk_preset_context
+
+    def context(entity: str, action: Any) -> dict[str, Any] | None:
+        if vocab is None or not preset_takes(action.animation, GAIT_ARG):
+            return None
+        scale = _drawn_scale(entity, vocab)
+        if scale is None:
+            return None
+        on_registry = _on_registry(entity, vocab)
+        return walk_preset_context(
+            entity,
+            dict(action.args or {}),
+            descriptor=vocab.descriptors.get(entity),
+            profile=_character_profile(entity, vocab) if on_registry else None,
+            scale=scale,
+            parts=None if on_registry else _built_parts(vocab, entity),
+        )
+
+    return context
 
 
 def _with_view_and_posed_parts(
@@ -2396,8 +2437,9 @@ def _with_view_and_posed_parts(
     descriptor's ``rest_view``, an#220), its ``gait`` from the locomotion
     method the capability registry resolves (an#248: the author's ``gait``,
     else the descriptor's, else the default chain; a requested gait the rig
-    cannot honour is a recorded substitution in ``resolutions``), and read a
-    part the
+    cannot honour is a recorded substitution in ``resolutions``), its ``scale``
+    from the figure's built root (its stage scale, cutan#13: never the pose at
+    the play's start, which a ``pop_in`` holds at 0), and read a part the
     view POSES at its posed value — a side view splays the legs (an#203), so a
     walk swings them about the splay, not about the front-view rest, and ends
     where the view's pose takes them back.
@@ -2435,6 +2477,11 @@ def _with_view_and_posed_parts(
         resolved = _locomotion_args(entity, args, desc, vocab, resolutions)
         if resolved != args:
             args = resolved
+            action = action.model_copy(update={"args": args})
+    if preset_takes(action.animation, SCALE_ARG) and SCALE_ARG not in args:
+        scale = _drawn_scale(entity, vocab)
+        if scale is not None:
+            args = {**args, SCALE_ARG: scale}
             action = action.model_copy(update={"args": args})
     posed: dict[tuple[str, str], _StepCurve] = {}
     if posed_view is not None and entity in vocab.descriptors:

@@ -29,7 +29,7 @@ from collections.abc import Callable, Mapping
 from typing import Any
 
 from an.base import EasingSpec, PathStr, Seconds
-from an.ir.compose import delay, flatten, parallel, sequence, set_, tween
+from an.ir.compose import delay, duration_of, flatten, parallel, sequence, set_, tween
 from an.ir.schema import Action, Shot
 from an.motion import (
     DFLT_IN_EASING,
@@ -397,6 +397,7 @@ def walk(
     arms: tuple[str, str] | None = None,
     parts: Mapping[str, Rest] | None = None,
     rest: Rest | None = None,
+    scale: float | None = None,
 ) -> Action:
     """Walk: the body travels on ``x`` while the gait moves it — legs that
     alternate, a hop, a bounce, a glide (an#214, an#224).
@@ -446,10 +447,14 @@ def walk(
     walks the legless default too.
 
     **Size.** ``step_length``, ``bob`` and ``hop_height`` default to lengths
-    for a figure at drawn scale 1, multiplied by the figure's scale — the
-    ``scale_y`` of ``rest``, which carries its stage scale — so a character
-    staged at ``scale: 2`` strides twice as far (an#224). Pass them to set
-    scene px outright.
+    for a figure at drawn scale 1, multiplied by ``scale``, the figure's drawn
+    scale — its STAGE scale (``stage.scale``, the rig as built), which the
+    compiler fills in when the walk is played by name — so a character staged
+    at ``scale: 2`` strides twice as far (an#224). Pass them to set scene px
+    outright. Called from Python with no ``scale``, the ``scale_y`` of
+    ``rest`` stands in; that is the pose at the play's start, which a
+    ``pop_in`` running under the walk holds at 0 (cutan#13), so the compiler
+    never relies on it.
 
     **Legs and arms.** ``legs``/``arms`` name the two limb nodes; by default
     the first pair in :data:`WALK_LEG_NAMES` / :data:`WALK_ARM_NAMES` that the
@@ -483,6 +488,8 @@ def walk(
     >>> [f.action.to_value for f in _tweens(walk("k", distance=160, rest={"scale_y": 2.0}, legs=()))
     ...  if f.action.property == "x"]
     [160.0]
+    >>> duration_of(walk("k", distance=160, scale=2.0, legs=())), duration_of(walk("k", distance=160, legs=()))
+    (0.4, 0.8)
     """
     if gait is not None and gait not in GAITS:
         raise ValueError(f"gait must be one of {list(GAITS)}, got {gait!r}")
@@ -501,9 +508,11 @@ def walk(
         gait = DFLT_LEGLESS_GAIT
     if gait not in LEGGED_GAITS | {"waddle", "bounce"}:
         leg_pair = None  # this gait moves no leg
+    if scale is None:
+        scale = abs(_rest(rest, "scale_y"))
     p = gait_params(
         gait,
-        scale=abs(_rest(rest, "scale_y")),
+        scale=abs(scale),
         step_s=step_s,
         step_length=step_length,
         stride=stride,
@@ -516,17 +525,27 @@ def walk(
         lean=lean,
     )
     step_s = p["step_s"]
-    _positive(step_s=step_s, step_length=p["step_length"])
+    _positive(step_s=step_s)
     if step_s <= 4 * WALK_LANDING_S:
         raise ValueError(
             f"step_s must be longer than {4 * WALK_LANDING_S}s, got {step_s!r}"
         )
     if steps is None:
-        steps = (
-            max(1, round(abs(distance) / p["step_length"]))
-            if distance is not None
-            else DFLT_WALK_STEPS
-        )
+        if distance is not None:
+            # The one place `step_length` is read: counting the steps. A zero
+            # here is the figure's scale (a figure not yet drawn), unless the
+            # author passed the length (cutan#13).
+            if not p["step_length"] > 0:
+                if step_length is None:
+                    raise ValueError(
+                        "cannot count the walk's steps: the figure's drawn scale "
+                        f"is {scale!r}, so the default step_length is 0; pass "
+                        "`steps` or `step_length`"
+                    )
+                _positive(step_length=p["step_length"])
+            steps = max(1, round(abs(distance) / p["step_length"]))
+        else:
+            steps = DFLT_WALK_STEPS
     if steps < 1:
         raise ValueError(f"walk needs at least one step, got {steps}")
     x0, y0 = _rest(rest, "x"), _rest(rest, "y")

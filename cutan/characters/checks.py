@@ -12,6 +12,7 @@ from typing import Any, Mapping
 from pydantic import ValidationError
 
 from cutan.characters.play import (
+    GAIT_ARG,
     PRESET_SOURCE,
     Facing,
     TurnResolution,
@@ -22,6 +23,7 @@ from cutan.characters.play import (
     play_source,
     preset_moved_nodes,
     preset_play_span,
+    preset_takes,
     resolve_turns,
     slot_node_path,
     swap_art_missing,
@@ -41,6 +43,59 @@ from an.ir.validate import (  # noqa: E402
     _rig_scope,
     _text_ids,
 )
+
+
+def _preset_context_of(rigs: Mapping[str, Any], stores: Mapping[str, Any]):
+    """``(entity_id, play) -> PresetContext`` for validate's extent resolver:
+    the walk's gait as the registry will resolve it and the figure's drawn
+    scale, from the shot's entities and the stores — the same answers
+    :func:`cutan.compile.passes.preset_context_of` reads off the built scene,
+    so validate places a ``sequence``'s later siblings where compile does
+    (cutan#12)."""
+    from cutan.characters.methods import (
+        CHARACTER_KIND,
+        compile_profile,
+        walk_preset_context,
+    )
+    from cutan.compile.passes import PLACEHOLDER_PARTS
+
+    def context(entity_id: str, action) -> Mapping[str, Any] | None:
+        entity = rigs.get(entity_id)
+        if entity is None or not preset_takes(action.animation, GAIT_ARG):
+            return None
+        scale = abs(float(entity.stage.scale)) if entity.stage is not None else 1.0
+        profile = None
+        descriptor = None
+        if entity.kind == CHARACTER_KIND:
+            store = stores.get(entity.store) if entity.store else None
+            raw = None
+            if store is not None:
+                try:
+                    raw = store[entity.ref]
+                except (KeyError, TypeError):
+                    raw = None
+            doc = _rig_document(entity, stores)
+            try:
+                descriptor = CharacterDescriptor.model_validate(doc) if doc else None
+            except ValidationError:
+                descriptor = None  # reported by the play check; no extent
+            if descriptor is not None:
+                art = art_exists_for(store, entity.ref) if store is not None else None
+                profile = compile_profile(descriptor, art_exists=art)
+            else:
+                declared = raw.get("parts") if isinstance(raw, Mapping) else None
+                profile = compile_profile(
+                    None, built_parts=tuple(declared) if declared else PLACEHOLDER_PARTS
+                )
+        return walk_preset_context(
+            entity_id,
+            dict(action.args or {}),
+            descriptor=descriptor,
+            profile=profile,
+            scale=scale,
+        )
+
+    return context
 
 
 def _check_play_actions(
@@ -98,7 +153,8 @@ def _check_play_actions(
         except ValidationError:
             return None
 
-    play_extent = play_extent_for(extent_descriptor)
+    preset_context = _preset_context_of(rigs, stores)
+    play_extent = play_extent_for(extent_descriptor, context_of=preset_context)
     for k, action in enumerate(shot.actions):
         for flat in flatten(action, play_extent=play_extent):
             leaf = flat.action
@@ -136,7 +192,9 @@ def _check_play_actions(
                             "the node a motion-preset `play` moves was NOT "
                             f"checked: the shot's stage did not build ({why}).",
                         )
-                end = flat.start + preset_play_span(leaf)
+                end = flat.start + preset_play_span(
+                    leaf, preset_context(entity_id, leaf)
+                )
                 if end > shot.duration + 1e-9:
                     report.add(
                         "warning",
@@ -330,7 +388,9 @@ def _turn_resolution(
         except ValidationError:
             return None  # reported by the play check
 
-    extent = play_extent_for(descriptor_of)
+    extent = play_extent_for(
+        descriptor_of, context_of=_preset_context_of(rigs, stores)
+    )
     origin: list[int] = []
     flats = []
     for k, action in enumerate(shot.actions):

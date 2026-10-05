@@ -52,7 +52,7 @@ Every gait reads the same parameters, each with a shared default (`cutan.motion.
 | `hop_height` | 18 | px the body jumps | **yes** | |
 | `lean` | 0.04 | rad a glide leans into the move | no | |
 
-**Relative to the drawn size** (an#224's comment). A descriptor rig is drawn so its view box is 345 scene px tall at scale 1 (`SCENE_PX_PER_VIEW_BOX`), so a character's drawn size is that times its stage scale. The lengths above are stated for scale 1 and multiplied by the figure's scale (the `scale_y` of its pose at the play's start, which carries `stage.scale`): a character staged at `scale: 2` steps 160 px and bobs 12 px, where it used to shuffle 80 px steps. A leg's `lift` is in the figure's own frame and already scales with it; angles never scale. An explicit value is scene px as given.
+**Relative to the drawn size** (an#224's comment). A descriptor rig is drawn so its view box is 345 scene px tall at scale 1 (`SCENE_PX_PER_VIEW_BOX`), so a character's drawn size is that times its stage scale. The lengths above are stated for scale 1 and multiplied by the figure's scale (its `stage.scale`, the rig as built — never the pose at the play's start, which a `pop_in` under the walk holds at 0, cutan#13): a character staged at `scale: 2` steps 160 px and bobs 12 px, where it used to shuffle 80 px steps. A leg's `lift` is in the figure's own frame and already scales with it; angles never scale. An explicit value is scene px as given.
 
 ## 4. The default chain, and choosing
 
