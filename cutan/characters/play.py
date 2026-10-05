@@ -568,7 +568,7 @@ def preset_play_span(action, context: PresetContext | None = None) -> float:
     >>> preset_play_span(PlayAction(target="a", animation="hop", speed=2.0))
     0.25
     >>> walk = PlayAction(target="a", animation="walk", args={"distance": 160})
-    >>> preset_play_span(walk), preset_play_span(walk, {"scale": 2.0})
+    >>> round(preset_play_span(walk), 6), round(preset_play_span(walk, {"scale": 2.0}), 6)
     (0.8, 0.4)
     """
     from an.ir.compose import duration_of
