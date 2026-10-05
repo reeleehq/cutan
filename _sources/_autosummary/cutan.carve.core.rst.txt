@@ -1,0 +1,28 @@
+cutan.carve.core
+================
+
+.. automodule:: cutan.carve.core
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      KEEP
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      carve
+      carve_head
+      grab_frame
+      load_rgb
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CarveQuality
+      Carving
+   

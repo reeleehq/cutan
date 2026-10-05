@@ -1,0 +1,23 @@
+cutan.carve.refine
+==================
+
+.. automodule:: cutan.carve.refine
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      SUBJECT
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      choke
+      despill
+      detach_bridges
+      feather
+      fill_holes
+      keep_components
+   

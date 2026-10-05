@@ -113,17 +113,18 @@ The names of the style specs that ship with `cutan`, sorted.
 
 ### Modules
 
-| [`audio`](cutan.audio.md#module-cutan.audio)           | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.   |
-|-------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
-| [`bench`](cutan.bench.md#module-cutan.bench)           | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.       |
-| [`characters`](cutan.characters.md#module-cutan.characters) | Character art system: Spine-shaped descriptor + SVG sidecars.                                |
-| [`compile`](cutan.compile.md#module-cutan.compile)       | The cut-out genre's compile passes, their lowering hooks and the visuals of its runtime.     |
-| [`conftest`](cutan.conftest.md#module-cutan.conftest)     | Doctest collection for `cutan`: `nw` is an optional dependency of `cutan.nw` only.           |
-| [`expression`](cutan.expression.md#module-cutan.expression) | Facial expression for the cutout face (an#98, epic #9 Wave 6).                               |
-| [`genre`](cutan.genre.md#module-cutan.genre)           | The cut-out animation genre, declared as one object.                                         |
-| [`impacts`](cutan.impacts.md#module-cutan.impacts)       | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                |
-| [`library`](cutan.library.md#module-cutan.library)       | The character analyser: legs, arms, views and mouth chart, derived from the rig.             |
-| [`motion`](cutan.motion.md#module-cutan.motion)         | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.         |
-| [`runtime`](cutan.runtime.md#module-cutan.runtime)       | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).    |
-| [`styles`](cutan.styles.md#module-cutan.styles)         | The named cut-out style specs, shipped as package data (cutan#4).                            |
-| [`verify`](cutan.verify.md#module-cutan.verify)         | The cut-out style lint: measures a render against a named style spec.                        |
+| [`audio`](cutan.audio.md#module-cutan.audio)           | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.                 |
+|-------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| [`bench`](cutan.bench.md#module-cutan.bench)           | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.                     |
+| [`carve`](cutan.carve.md#module-cutan.carve)           | Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cutan#10). |
+| [`characters`](cutan.characters.md#module-cutan.characters) | Character art system: Spine-shaped descriptor + SVG sidecars.                                              |
+| [`compile`](cutan.compile.md#module-cutan.compile)       | The cut-out genre's compile passes, their lowering hooks and the visuals of its runtime.                   |
+| [`conftest`](cutan.conftest.md#module-cutan.conftest)     | Doctest collection for `cutan`: `nw` is an optional dependency of `cutan.nw` only.                         |
+| [`expression`](cutan.expression.md#module-cutan.expression) | Facial expression for the cutout face (an#98, epic #9 Wave 6).                                             |
+| [`genre`](cutan.genre.md#module-cutan.genre)           | The cut-out animation genre, declared as one object.                                                       |
+| [`impacts`](cutan.impacts.md#module-cutan.impacts)       | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                              |
+| [`library`](cutan.library.md#module-cutan.library)       | The character analyser: legs, arms, views and mouth chart, derived from the rig.                           |
+| [`motion`](cutan.motion.md#module-cutan.motion)         | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.                       |
+| [`runtime`](cutan.runtime.md#module-cutan.runtime)       | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).                  |
+| [`styles`](cutan.styles.md#module-cutan.styles)         | The named cut-out style specs, shipped as package data (cutan#4).                                          |
+| [`verify`](cutan.verify.md#module-cutan.verify)         | The cut-out style lint: measures a render against a named style spec.                                      |

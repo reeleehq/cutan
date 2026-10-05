@@ -1,4 +1,4 @@
-> built 2026-10-05 15:14 UTC from fa9e7a6 (main) · cutan 0.0.7. Details: build_info.json
+> built 2026-10-05 17:00 UTC from e9f102f (main) · cutan 0.0.8. Details: build_info.json
 
 # index.html.md
 
@@ -24,7 +24,25 @@ an character new maya --offline
 - the lip-sync providers `offline`, `rhubarb` and `whisper` (`cutan.audio`);
 - locomotion, speech, blink and turn methods with their requirements and defaults, and the cut-out vocabulary;
 - the `an character …` and `an impacts …` command namespaces;
+- carving parts out of photos and frames (`cutan.carve`, below);
 - the style lint (`python -m cutan.verify.style VIDEO <style>`) and the named style specs it measures against, shipped as package data: `cutan.style_spec("south_park")`, `python -m cutan.styles` to list them (the `cutan-style` skill applies one).
+
+## Carving parts from a photo or a frame
+
+`cutan.carve` turns a photo or a video frame into a matted, cleaned, provenance-carrying cut-out part, and writes it as a library-ready prop folder. It needs OpenCV: `pip install "cutan[carve]"` (it installs `opencv-python-headless`; an environment that already has `opencv-python` or `opencv-contrib-python` works as it is, since all three provide the same `cv2`). Add `cutan[rembg]` for the neural matte and `cutan[faces]` for the face locator; `cutan.carve.check_requirements()` lists what is installed.
+
+```python
+from cutan.carve import carve, carve_head, frame_source, write_prop, grab_frame, Polygon, FlatColour
+
+src = frame_source("https://www.youtube.com/watch?v=VIDEO_ID", t=34.5, license="all-rights-reserved")
+frame = grab_frame("clip.mp4", 34.5)
+lamp = carve(frame, point=(1060, 130), source=src)               # flat_colour: the cartoon-frame default
+print(lamp.quality.warnings())                                    # backdrop left on the rim, glyphs attached, ...
+write_prop(lamp, "assets/props/lamp")                             # prop.json + parts/body.png, source included
+head = carve_head(frame, face=(830, 170, 930, 305), matte="rembg")  # neck cut, 512² canvas, face centre as origin
+```
+
+The matte is a strategy: `flat_colour` (the default), `chroma`, `grabcut`, `polygon`, `focus`, `rembg`, or any `(rgb, hint) -> alpha` callable. Two combine with `&` and `|`: `Polygon(outline) & FlatColour()` is a hand outline cleaned by a colour key. `split_parts` lifts moving parts off a carving, each with a pivot (clock hands off the face), and `write_prop` gives each part its own bone. Publishing the folder (`an library publish <folder> prop.<name> --package cutan --origin carved`) records the rights from the descriptor’s own `source`; `write_prop` refuses a carving with no provenance (unless the pixels are yours: `ours=True`) and a `source=` that would loosen its licence without `relicense=`. Every coordinate is in the source’s pixels, and a carving’s `recipe` is its arguments by name, so `carve(frame, **part.recipe)` replays it: a batch of carves is a list of recipes.
 
 The cut-out bench corpus (`misc/bench/`), `examples/` and the demo gallery (`misc/demos/`) live here too; `cutan.bench.run_bench()` runs the corpus through `an`’s bench runner.
 
@@ -447,7 +465,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'eye', 'ellipse', 'rect'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'eye', 'rect', 'mouth'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -503,6 +521,1638 @@ The checkout whose `examples/` and `misc/bench/` hold the corpus.
 ### cutan.bench.run_bench(\*\*kwargs)
 
 `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.
+
+
+# _autosummary/cutan.carve.core.html.md
+
+# cutan.carve.core
+
+The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.
+
+[`carve()`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.carve) runs crop → (upscale) → matte → keep → fill holes → detach
+bridges → choke → feather → de-spill → trim, and returns a [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving):
+the RGBA part, where it came from in the source, its anchor, its quality
+signals, and the recipe that cut it (recorded with its provenance).
+[`carve_head()`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.carve_head) is the same pipeline with a neck cut and the head
+normalised onto a fixed canvas ([`cutan.carve.head`](_autosummary/cutan.carve.head.html.md#module-cutan.carve.head)).
+
+**Every coordinate a caller gives is in the source image’s pixels** (crop,
+box, point, a polygon’s points, a face, a part’s pivot), so a spec can be
+written before anything is carved. A carving’s `recipe` holds the
+arguments it was made with, under their own names, so `carve(image,
+\*\*part.recipe)` (or `carve_head`) replays it: a batch of carves is data.
+
+### Module Attributes
+
+| [`KEEP`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.KEEP)   | The finishing defaults [`carve()`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.carve) and [`carve_head()`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.carve_head) share (one place, so the two cannot drift): keep the component under the point, fill what the subject encloses, detach nothing, no choke, a 0.6 px feather, de-spill 1 px.   |
+|---------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+### Functions
+
+| [`carve`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.carve)(image, \*[, matte, crop, box, point, ...])   | Cut a part out of `image`; every coordinate is in the source image's pixels.   |
+|-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| [`carve_head`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.carve_head)(image, \*[, face, locate, pick, ...])   | A head cut out at the neck and normalised onto a `canvas`-px square.           |
+| [`grab_frame`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.grab_frame)(video, t, \*[, ffmpeg])                 | The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).       |
+| [`load_rgb`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.load_rgb)(image)                                    | An `HxWx3` `uint8` RGB array from a path, a PIL image or an array.             |
+
+### Classes
+
+| [`CarveQuality`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.CarveQuality)(coverage, rim_backdrop_share, ...)   | Signals worth reading before a part is used (cutan#10).   |
+|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)(image, anchor, offset, scale, ...[, ...]) | A carved part.                                            |
+
+### *class* cutan.carve.core.CarveQuality(coverage, rim_backdrop_share, repainted_share, soft_interior_share, detached_pieces, attached_pieces, touches_edge)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Signals worth reading before a part is used (cutan#10).
+
+`coverage`: the subject’s share of the carved region (near 0 or 1 means
+the matte took nothing or everything). `rim_backdrop_share`: the share
+of the part’s partly transparent edge whose colour is still close to the
+backdrop’s (a halo). `repainted_share`: the share of the subject whose
+colour de-spill replaced (high means it repainted real content: lower
+`despill`). `soft_interior_share`: the share of the subject’s interior
+(3 px or more inside its edge) that is see-through. `detached_pieces`:
+pieces `detach` cut off; `attached_pieces`: pieces still hanging on
+the subject by a neck under 4 px (caption glyphs, or a genuinely thin
+part). `touches_edge`: the subject runs into the carved region’s border,
+so the crop probably cut it off.
+
+#### warnings()
+
+The signals that look wrong, in words.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### *class* cutan.carve.core.Carving(image, anchor, offset, scale, quality, recipe, source=None, meta=<factory>, mode='part')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A carved part.
+
+`image`: the RGBA part. `anchor`: its origin as `(u, v)` in 0..1 of
+the image (Pixi’s convention, an `Attachment.anchor`): the point for a
+plain carve, the face centre for a head. `to_part` maps a source pixel
+into the part’s pixels (`part = (source - offset) * scale`; the 2×3
+matrix is `meta["source_to_part"]`). `mode` is `"part"` or
+`"head"`; `recipe` the arguments it was made with (replayable:
+`carve(image, **recipe)` or `carve_head`); `source` the provenance;
+`quality` the signals; `meta` mode-specific facts.
+
+#### *property* alpha *: ndarray*
+
+The alpha channel as floats in 0..1.
+
+#### provenance()
+
+The source with how it was carved in its `extra.carve`: the mode, the
+recipe, the quality and where the part sits in the source.
+
+* **Return type:**
+  `AssetSource` | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+#### to_part(points)
+
+Source pixels to this part’s pixels.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
+### cutan.carve.core.KEEP *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'point'*
+
+The finishing defaults [`carve()`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.carve) and [`carve_head()`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.carve_head) share (one place,
+so the two cannot drift): keep the component under the point, fill what the
+subject encloses, detach nothing, no choke, a 0.6 px feather, de-spill 1 px.
+
+### cutan.carve.core.carve(image, , matte='flat_colour', crop=None, box=None, point=None, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, upscale=1, pad=4, source=None)
+
+Cut a part out of `image`; every coordinate is in the source image’s pixels.
+
+* **Return type:**
+  [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)
+
+image: a path, a PIL image or an RGB(A) array (`grab_frame` for video)
+matte: the strategy ([`cutan.carve.mattes`](_autosummary/cutan.carve.mattes.html.md#module-cutan.carve.mattes)): a name, a recipe mapping,
+
+> a `Matte` (`Polygon(pts) & FlatColour()`) or any `(rgb, hint) -> alpha`
+
+crop: `(x0, y0, x1, y1)`, the region carved (default: the whole image)
+box: a box around the subject (GrabCut’s default rectangle)
+point: a pixel on the subject; `keep="point"` keeps its component, and it
+
+> becomes the part’s anchor (default: the part’s centre)
+
+keep: `"point"` (its component and pieces within a few px), `"largest"`
+: or `"all"` components
+
+fill_holes: fill what the subject encloses (a pale face the matte missed)
+detach: cut off pieces hanging on the subject by a neck narrower than
+
+> `2 * detach` px (caption letters; also any part that thin); 0 keeps
+> them and reports them
+
+choke: pull the edge in by this many px, then `feather` softens it (px)
+despill: re-paint the edge from the subject’s pixels at least this many px
+
+> inside it (1: the anti-aliased band; about 4 for a neural matte’s
+> fuzzy fringe; 0: off)
+
+upscale: matte at this whole factor of the source resolution, then come
+: back: smoother edges on small or low-resolution subjects
+
+pad: transparent px left around the trimmed part
+source: provenance ([`frame_source()`](_autosummary/cutan.carve.provenance.html.md#cutan.carve.provenance.frame_source)), kept
+
+> with the recipe and the quality in `Carving.provenance()`
+```pycon
+>>> img = np.full((60, 80, 3), 250, np.uint8); img[15:45, 20:60] = (30, 90, 200)
+>>> part = carve(img)
+>>> part.size, round(part.quality.coverage, 2), part.quality.warnings()
+((50, 40), 0.25, [])
+>>> carve(img, **part.recipe).recipe == part.recipe     # the recipe replays the carve
+True
+```
+
+### cutan.carve.core.carve_head(image, , face=None, locate=None, pick='largest', matte='flat_colour', cut='auto', neck=None, neck_soft=0.05, pad_x=1.05, pad_top=1.25, pad_bottom=1.0, upscale=3, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, canvas=512, face_h=270.0, centre=(256.0, 300.0), margin=6, view=None, source=None)
+
+A head cut out at the neck and normalised onto a `canvas`-px square.
+
+* **Return type:**
+  [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)
+
+face: the face, a [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face) (box and, when known, a
+: jaw contour and landmarks), a box `(x0, y0, x1, y1)` or a mapping
+  (`Face.as_dict()`); `None` runs `locate`
+
+locate: a face locator `rgb -> [Face]` (default
+: [`InsightFaceLocator`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.InsightFaceLocator), `cutan[faces]`);
+  `pick` chooses among several faces
+
+cut: the neck cut, `"auto"` (along the jaw when the face has a contour,
+: else flat under the chin), `"jaw"`, `"flat"` or `"none"`;
+  `neck` its depth in face-box heights, `neck_soft` its soft edge
+
+pad_x, pad_top, pad_bottom: the crop around the face, in face-box widths
+: (each side) and heights (above, below)
+
+upscale: matte at this whole factor (heads are small in a frame)
+face_h, centre: the face box is scaled to `face_h` px high and its
+
+> centre put on `centre`, unless the head would then leave the canvas
+> (less `margin`), in which case it is scaled down to fit
+
+view: the view the head is drawn in, one of the rig’s views (`front`,
+: `three_quarter`, `side`, `back`), recorded for the step that puts
+  it on a rig; `None` when unknown
+
+The rest are [`carve()`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.carve)’s (`despill` in source px: a neural matte on
+a photo wants about 4). The recipe pins the face, so a replay is
+reproducible whether it was given or located (`meta["located_by"]` says
+which); a batch spec is `{**shared_settings, **per_item}` (the face and
+the crop per image, the matte and the finish shared). The part’s anchor is `centre` (the face centre);
+`meta` holds what a rig needs to hang it: the face box, the chin and the
+neck point, the head’s bounding box, the landmarks, all on the canvas.
+
+### cutan.carve.core.grab_frame(video, t, , ffmpeg='ffmpeg')
+
+The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).
+
+* **Return type:**
+  `ndarray`
+
+### cutan.carve.core.load_rgb(image)
+
+An `HxWx3` `uint8` RGB array from a path, a PIL image or an array.
+
+* **Return type:**
+  `ndarray`
+
+```pycon
+>>> load_rgb(np.zeros((4, 5, 4), np.uint8)).shape
+(4, 5, 3)
+```
+
+
+# _autosummary/cutan.carve.head.html.md
+
+# cutan.carve.head
+
+Head mode: a face located, the neck cut under the jaw, the head normalised on a fixed canvas.
+
+A carved head is useful only if every head from every source lands the same
+way on its canvas, so a rig can take any of them: the face box is scaled to a
+fixed height ([`HEAD_FACE_H`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.HEAD_FACE_H)) and centred on a fixed point
+([`HEAD_CENTRE`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.HEAD_CENTRE)) of a square canvas ([`HEAD_CANVAS`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.HEAD_CANVAS)), and that point
+is the part’s origin (its anchor). The neck is cut just under the jaw,
+following the jaw’s contour when landmarks give one (a neck is narrower than
+the jaw, so the cut dips at the chin), and straight across under the chin for
+a profile, where landmarks fail.
+
+The face comes from a [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face) (a box, optionally a jaw contour) given by
+hand, or from a locator: any `rgb -> list[Face]` callable. The shipped
+locator wraps `insightface` (`pip install "cutan[faces]"`); on cartoon
+frames detectors usually find nothing, and a hand box is the way.
+
+### Module Attributes
+
+| [`HEAD_CANVAS`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.HEAD_CANVAS)   | Side of the square canvas a head is normalised onto, px.   |
+|----------------------------------------------------------------|------------------------------------------------------------|
+| [`HEAD_FACE_H`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.HEAD_FACE_H)   | Height the face box is scaled to, px.                      |
+| [`HEAD_CENTRE`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.HEAD_CENTRE)   | the head part's origin.                                    |
+
+### Functions
+
+| [`neck_cut`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.neck_cut)(shape, face, \*[, cut, neck, soft, ...])   | A `shape` mask, 1 above the neck cut and 0 below, with a soft edge.        |
+|------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| [`pick_face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.pick_face)(faces[, pick])                            | One face of several: `largest`, `leftmost`, `rightmost` or `best` (score). |
+
+### Classes
+
+| [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)(box[, jaw, score, landmarks])              | A face in an image: its box and, when known, its jaw contour.                      |
+|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| [`InsightFaceLocator`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.InsightFaceLocator)(\*[, model, min_score, ...]) | Faces and their jaw contours from `insightface` (106 landmarks; 0–32 are the jaw). |
+
+### *class* cutan.carve.head.Face(box, jaw=None, score=1.0, landmarks=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A face in an image: its box and, when known, its jaw contour.
+
+`box` is `(x0, y0, x1, y1)`; `jaw` a sequence of `(x, y)` points
+along the jaw, ear to ear (any order, at least three); `landmarks` the
+detector’s full set when there is one (kept, mapped onto the canvas, so a
+later step can place eyes and mouth without re-carving); `score` the
+detector’s confidence (1 for a hand box).
+
+```pycon
+>>> f = Face((10, 20, 50, 80))
+>>> f.width, f.height, f.centre, f.chin_y
+(40.0, 60.0, (30.0, 50.0), 80.0)
+```
+
+#### as_dict()
+
+JSON-ready, the inverse of [`of()`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face.of).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+#### *property* chin_y *: [float](https://docs.python.org/3/builtins/functions.html#float)*
+
+The lowest point of the jaw, else the box’s bottom.
+
+#### *classmethod* of(face)
+
+A face from a `Face`, a box `(x0, y0, x1, y1)`, or a mapping (`box`, `jaw`, …).
+
+* **Return type:**
+  [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)
+
+```pycon
+>>> Face.of({"box": [0, 0, 10, 12], "jaw": [[0, 6], [5, 12], [10, 6]]}).chin_y
+12.0
+```
+
+### cutan.carve.head.HEAD_CANVAS *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 512*
+
+Side of the square canvas a head is normalised onto, px.
+
+### cutan.carve.head.HEAD_CENTRE *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]* *= (256.0, 300.0)*
+
+the head part’s origin.
+
+* **Type:**
+  Where the face box’s centre lands on the canvas
+
+### cutan.carve.head.HEAD_FACE_H *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 270.0*
+
+Height the face box is scaled to, px.
+
+### *class* cutan.carve.head.InsightFaceLocator(, model='buffalo_l', min_score=0.4, det_size=960)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Faces and their jaw contours from `insightface` (106 landmarks; 0–32 are the jaw).
+
+`min_score` drops weak detections; the model (`buffalo_l`) is fetched
+by insightface on first use and kept for the process.
+
+### cutan.carve.head.neck_cut(shape, face, , cut='auto', neck=None, soft=0.05, offset=(0.0, 0.0), scale=1.0)
+
+A `shape` mask, 1 above the neck cut and 0 below, with a soft edge.
+
+`cut`: `"jaw"` follows the jaw contour (ends extended past the ears,
+deeper at the chin), `"flat"` cuts straight across under the chin,
+`"auto"` is `jaw` when the face has a contour and `flat` otherwise,
+and `"none"` keeps everything. `neck` is the depth below the jaw (or
+the chin) in face-box heights. `offset`/`scale` map the face (given in
+source pixels) into the mask’s pixels.
+
+* **Return type:**
+  `ndarray`
+
+```pycon
+>>> m = neck_cut((100, 50), Face((10, 10, 40, 60)), cut="flat", neck=0.1)
+>>> float(m[50, 25]), float(m[90, 25])
+(1.0, 0.0)
+```
+
+### cutan.carve.head.pick_face(faces, pick='largest')
+
+One face of several: `largest`, `leftmost`, `rightmost` or `best` (score).
+
+* **Return type:**
+  [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)
+
+```pycon
+>>> pick_face([Face((0, 0, 10, 10)), Face((50, 0, 70, 20))]).box
+(50.0, 0.0, 70.0, 20.0)
+```
+
+
+# _autosummary/cutan.carve.html.md
+
+# cutan.carve
+
+Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cutan#10).
+
+Every production that carves parts re-wrote the same pipeline by hand:
+locate → crop → matte → cut → de-spill → normalise → publish with provenance.
+This is that pipeline once, with the matte as a strategy seam, because no
+single method wins: a colour key beats a neural matte on flat cartoon frames,
+a neural matte wins on photos, GrabCut on a single prop in a rough box.
+
+```pycon
+>>> import numpy as np
+>>> frame = np.full((90, 120, 3), 245, np.uint8)            # a flat backdrop
+>>> frame[20:70, 30:90] = (40, 110, 200)                    # a prop on it
+>>> part = carve(frame, point=(60, 45))                     # flat_colour, the default
+>>> part.size, part.anchor, part.quality.warnings()
+((70, 60), (0.5, 0.5), [])
+```
+
+- **One part:** [`carve()`](_autosummary/cutan.carve.html.md#cutan.carve.carve) (`matte=` a name from `MATTES` or a
+  [`Matte`](_autosummary/cutan.carve.html.md#cutan.carve.Matte); `Polygon(points) & FlatColour()` is a hand outline cleaned
+  > by a key). A video frame comes from [`grab_frame()`](_autosummary/cutan.carve.html.md#cutan.carve.grab_frame).
+- **A head:** [`carve_head()`](_autosummary/cutan.carve.html.md#cutan.carve.carve_head) cuts the neck under the jaw and puts the face
+  on a fixed canvas (512², the face centre as origin); the face is a hand box
+  or found by a locator (`insightface`, `pip install "cutan[faces]"`).
+- **Moving parts:** [`split_parts()`](_autosummary/cutan.carve.html.md#cutan.carve.split_parts) lifts parts off a carving, each with a
+  pivot (clock hands off the face), painting the base in under them.
+- **Provenance:** [`frame_source()`](_autosummary/cutan.carve.html.md#cutan.carve.frame_source) (a licence is required, a YouTube URL
+  gets its `&t=` deep link); [`write_prop()`](_autosummary/cutan.carve.html.md#cutan.carve.write_prop) writes `prop.json` +
+  `parts/` with the source in the descriptor, recipe and quality included,
+  so `an library publish` gets the rights by construction.
+- **Quality:** every [`Carving`](_autosummary/cutan.carve.html.md#cutan.carve.Carving) carries [`CarveQuality`](_autosummary/cutan.carve.html.md#cutan.carve.CarveQuality) (coverage,
+  backdrop left on the rim, how much de-spill repainted, a see-through
+  interior, glyphs left attached or cut off, a subject cut off by the crop);
+  `quality.warnings()` says which look wrong.
+- **Data, not code:** every coordinate is in the source’s pixels, and a
+  carving’s `recipe` is its arguments by name, the matte as its recipe
+  (`as_matte` reads one back): `carve(frame, **part.recipe)` replays it,
+  so a batch of carves is a list of recipes.
+
+Needs OpenCV: `pip install "cutan[carve]"` (`check_requirements()` lists
+what is installed). Nothing here is imported by `import cutan`.
+
+### Functions
+
+| [`as_matte`](_autosummary/cutan.carve.html.md#cutan.carve.as_matte)(matte)                                   | A [`Matte`](_autosummary/cutan.carve.html.md#cutan.carve.Matte) from a strategy's name, its recipe, a `Matte`, or any `(rgb, hint) -> alpha` callable.   |
+|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`border_colours`](_autosummary/cutan.carve.html.md#cutan.carve.border_colours)(rgb, \*[, max_colours, ...])       | The dominant colours of the image's border: the backdrop of a flat frame.                                                                         |
+| [`carve`](_autosummary/cutan.carve.html.md#cutan.carve.carve)(image, \*[, matte, crop, box, point, ...])  | Cut a part out of `image`; every coordinate is in the source image's pixels.                                                                      |
+| [`carve_head`](_autosummary/cutan.carve.html.md#cutan.carve.carve_head)(image, \*[, face, locate, pick, ...])  | A head cut out at the neck and normalised onto a `canvas`-px square.                                                                              |
+| [`check_requirements`](_autosummary/cutan.carve.html.md#cutan.carve.check_requirements)(\*[, verbose])                 | Which optional dependencies of carving are installed (printing how to get the rest).                                                              |
+| [`frame_source`](_autosummary/cutan.carve.html.md#cutan.carve.frame_source)(url, \*, license[, t, author, ...])  | The provenance of a part carved from `url` (a video at time `t`, or an image).                                                                    |
+| [`grab_frame`](_autosummary/cutan.carve.html.md#cutan.carve.grab_frame)(video, t, \*[, ffmpeg])                | The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).                                                                          |
+| [`load_rgb`](_autosummary/cutan.carve.html.md#cutan.carve.load_rgb)(image)                                   | An `HxWx3` `uint8` RGB array from a path, a PIL image or an array.                                                                                |
+| [`neck_cut`](_autosummary/cutan.carve.html.md#cutan.carve.neck_cut)(shape, face, \*[, cut, neck, soft, ...]) | A `shape` mask, 1 above the neck cut and 0 below, with a soft edge.                                                                               |
+| [`pick_face`](_autosummary/cutan.carve.html.md#cutan.carve.pick_face)(faces[, pick])                          | One face of several: `largest`, `leftmost`, `rightmost` or `best` (score).                                                                        |
+| [`register_matte`](_autosummary/cutan.carve.html.md#cutan.carve.register_matte)(cls, \*[, name])                   | Make a third-party strategy nameable (`matte="<name>"`) and its recipes replayable: `register_matte(SamMatte)` (or as a class decorator).         |
+| [`split_parts`](_autosummary/cutan.carve.html.md#cutan.carve.split_parts)(carving, parts, \*[, paint_out, ...]) | Lift `parts` (`{name: PartSpec}`, in draw order) off `carving`.                                                                                   |
+| [`write_prop`](_autosummary/cutan.carve.html.md#cutan.carve.write_prop)(carved, folder, \*[, name, unit, ...]) | Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.                                                                 |
+| [`youtube_id`](_autosummary/cutan.carve.html.md#cutan.carve.youtube_id)(url)                                   | The video id of a YouTube URL, else `None`.                                                                                                       |
+
+### Classes
+
+| [`CarveQuality`](_autosummary/cutan.carve.html.md#cutan.carve.CarveQuality)(coverage, rim_backdrop_share, ...)   | Signals worth reading before a part is used (cutan#10).                                 |
+|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| [`Carving`](_autosummary/cutan.carve.html.md#cutan.carve.Carving)(image, anchor, offset, scale, ...[, ...]) | A carved part.                                                                          |
+| [`Chroma`](_autosummary/cutan.carve.html.md#cutan.carve.Chroma)([hue, width, min_sat, min_val, ramp])      | Key out a saturated backdrop by its hue band (a stage drape, a green screen).           |
+| [`Face`](_autosummary/cutan.carve.html.md#cutan.carve.Face)(box[, jaw, score, landmarks])                | A face in an image: its box and, when known, its jaw contour.                           |
+| [`FlatColour`](_autosummary/cutan.carve.html.md#cutan.carve.FlatColour)([colours, tolerance, softness, ...])   | Key out the backdrop's flat colours, where they are connected to the border.            |
+| [`Focus`](_autosummary/cutan.carve.html.md#cutan.carve.Focus)([window])                                   | The sharp region of an image whose background is out of focus.                          |
+| [`GrabCut`](_autosummary/cutan.carve.html.md#cutan.carve.GrabCut)([box, iterations, margin, seed])          | OpenCV's GrabCut inside a box around one object.                                        |
+| [`Hint`](_autosummary/cutan.carve.html.md#cutan.carve.Hint)([box, point, offset, scale])                 | Where the subject is, in the pixels of the image the matte is given.                    |
+| [`InsightFaceLocator`](_autosummary/cutan.carve.html.md#cutan.carve.InsightFaceLocator)(\*[, model, min_score, ...])   | Faces and their jaw contours from `insightface` (106 landmarks; 0–32 are the jaw).      |
+| [`Levels`](_autosummary/cutan.carve.html.md#cutan.carve.Levels)([of, lo, range])                           | Re-map another matte's alpha: `clip((alpha - lo) / range, 0, 1)`.                       |
+| [`Matte`](_autosummary/cutan.carve.html.md#cutan.carve.Matte)()                                           | Base of the shipped strategies: a name, a recipe, and `&`, `|`, `~`.                    |
+| [`Part`](_autosummary/cutan.carve.html.md#cutan.carve.Part)(name, image, pivot, origin, draw_order)      | One lifted part: its RGBA image, its pivot in that image, where it sits in the carving. |
+| [`PartSet`](_autosummary/cutan.carve.html.md#cutan.carve.PartSet)(carving, base[, parts])                   | A carving split into a base (`None` when every pixel went to a part) and parts.         |
+| [`PartSpec`](_autosummary/cutan.carve.html.md#cutan.carve.PartSpec)(mask, pivot[, grow, reach])              | What to lift off a carving: a `mask` and the `pivot` it turns about.                    |
+| [`Polygon`](_autosummary/cutan.carve.html.md#cutan.carve.Polygon)([points, supersample])                    | A hand-given outline, `[(x, y), ...]` in the SOURCE image, anti-aliased.                |
+| [`Rembg`](_autosummary/cutan.carve.html.md#cutan.carve.Rembg)([model, post_process])                      | `rembg`'s neural background removal (`pip install "cutan[rembg]"`).                     |
+
+### Exceptions
+
+| [`MissingDependencyError`](_autosummary/cutan.carve.html.md#cutan.carve.MissingDependencyError)   | An optional dependency of `cutan.carve` is not installed.   |
+|---------------------------------------------------------------------------|-------------------------------------------------------------|
+
+### *class* cutan.carve.CarveQuality(coverage, rim_backdrop_share, repainted_share, soft_interior_share, detached_pieces, attached_pieces, touches_edge)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Signals worth reading before a part is used (cutan#10).
+
+`coverage`: the subject’s share of the carved region (near 0 or 1 means
+the matte took nothing or everything). `rim_backdrop_share`: the share
+of the part’s partly transparent edge whose colour is still close to the
+backdrop’s (a halo). `repainted_share`: the share of the subject whose
+colour de-spill replaced (high means it repainted real content: lower
+`despill`). `soft_interior_share`: the share of the subject’s interior
+(3 px or more inside its edge) that is see-through. `detached_pieces`:
+pieces `detach` cut off; `attached_pieces`: pieces still hanging on
+the subject by a neck under 4 px (caption glyphs, or a genuinely thin
+part). `touches_edge`: the subject runs into the carved region’s border,
+so the crop probably cut it off.
+
+#### warnings()
+
+The signals that look wrong, in words.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### *class* cutan.carve.Carving(image, anchor, offset, scale, quality, recipe, source=None, meta=<factory>, mode='part')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A carved part.
+
+`image`: the RGBA part. `anchor`: its origin as `(u, v)` in 0..1 of
+the image (Pixi’s convention, an `Attachment.anchor`): the point for a
+plain carve, the face centre for a head. `to_part` maps a source pixel
+into the part’s pixels (`part = (source - offset) * scale`; the 2×3
+matrix is `meta["source_to_part"]`). `mode` is `"part"` or
+`"head"`; `recipe` the arguments it was made with (replayable:
+`carve(image, **recipe)` or `carve_head`); `source` the provenance;
+`quality` the signals; `meta` mode-specific facts.
+
+#### *property* alpha *: ndarray*
+
+The alpha channel as floats in 0..1.
+
+#### provenance()
+
+The source with how it was carved in its `extra.carve`: the mode, the
+recipe, the quality and where the part sits in the source.
+
+* **Return type:**
+  `AssetSource` | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+#### to_part(points)
+
+Source pixels to this part’s pixels.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
+### *class* cutan.carve.Chroma(hue=None, width=60.0, min_sat=0.28, min_val=0.03, ramp=10.0)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+Key out a saturated backdrop by its hue band (a stage drape, a green screen).
+
+`hue`: `(low, high)` in degrees (`high < low` wraps through red);
+`None` centres a band `width` degrees wide on the border’s median hue.
+A pixel is backdrop when its hue is in the band (`ramp` degrees soft at
+each end), its saturation above `min_sat` and its value above `min_val`
+(each with a soft ramp), so dark and grey pixels of the subject stay.
+
+#### band(rgb)
+
+The hue band in degrees: the declared one, or the border’s.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### *class* cutan.carve.Face(box, jaw=None, score=1.0, landmarks=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A face in an image: its box and, when known, its jaw contour.
+
+`box` is `(x0, y0, x1, y1)`; `jaw` a sequence of `(x, y)` points
+along the jaw, ear to ear (any order, at least three); `landmarks` the
+detector’s full set when there is one (kept, mapped onto the canvas, so a
+later step can place eyes and mouth without re-carving); `score` the
+detector’s confidence (1 for a hand box).
+
+```pycon
+>>> f = Face((10, 20, 50, 80))
+>>> f.width, f.height, f.centre, f.chin_y
+(40.0, 60.0, (30.0, 50.0), 80.0)
+```
+
+#### as_dict()
+
+JSON-ready, the inverse of [`of()`](_autosummary/cutan.carve.html.md#cutan.carve.Face.of).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+#### *property* chin_y *: [float](https://docs.python.org/3/builtins/functions.html#float)*
+
+The lowest point of the jaw, else the box’s bottom.
+
+#### *classmethod* of(face)
+
+A face from a `Face`, a box `(x0, y0, x1, y1)`, or a mapping (`box`, `jaw`, …).
+
+* **Return type:**
+  [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)
+
+```pycon
+>>> Face.of({"box": [0, 0, 10, 12], "jaw": [[0, 6], [5, 12], [10, 6]]}).chin_y
+12.0
+```
+
+### *class* cutan.carve.FlatColour(colours=None, tolerance=24.0, softness=16.0, edge=2.0, connected=True, seeds=None)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+Key out the backdrop’s flat colours, where they are connected to the border.
+
+`colours`: the backdrop colours (RGB); `None` reads them off the
+image’s border ([`border_colours()`](_autosummary/cutan.carve.html.md#cutan.carve.border_colours)). A pixel within `tolerance` (the
+largest per-channel difference) of one is backdrop, with a `softness`
+ramp beyond it for anti-aliased edges — but only within `edge` px (source
+pixels) of the backdrop, so a subject colour a little off the backdrop’s
+(a pale grey on white) stays solid inside instead of turning see-through.
+`connected` keeps only backdrop regions that touch the image border (or
+the `seeds`), so a white interior enclosed by an outline (an eye, a
+shirt) stays in the subject.
+
+### *class* cutan.carve.Focus(window=15)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+The sharp region of an image whose background is out of focus.
+
+Local detail (the Laplacian’s magnitude, averaged over `window` px) is
+thresholded by Otsu’s method, closed, and its holes filled.
+
+### *class* cutan.carve.GrabCut(box=None, iterations=8, margin=0.02, seed=0)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+OpenCV’s GrabCut inside a box around one object.
+
+`box`: `(x0, y0, x1, y1)` in the SOURCE image; `None` takes the
+hint’s box, else the whole image less a `margin` share on each side.
+`seed` seeds OpenCV’s random generator before the cut, so a recorded
+recipe replays to the same matte.
+
+### *class* cutan.carve.Hint(box=None, point=None, offset=(0.0, 0.0), scale=1.0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Where the subject is, in the pixels of the image the matte is given.
+
+`box` is `(x0, y0, x1, y1)` around the subject, `point` one pixel on
+it. `to_local` maps a point given in the SOURCE image (before the crop
+and the upscale [`carve()`](_autosummary/cutan.carve.html.md#cutan.carve.carve) applies) into these pixels,
+for strategies that take coordinates (a polygon, a GrabCut box).
+
+```pycon
+>>> Hint(offset=(100, 50), scale=2.0).to_local([(110, 60)])
+[(20.0, 20.0)]
+```
+
+### *class* cutan.carve.InsightFaceLocator(, model='buffalo_l', min_score=0.4, det_size=960)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Faces and their jaw contours from `insightface` (106 landmarks; 0–32 are the jaw).
+
+`min_score` drops weak detections; the model (`buffalo_l`) is fetched
+by insightface on first use and kept for the process.
+
+### *class* cutan.carve.Levels(of=None, lo=0.4, range=0.35)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+Re-map another matte’s alpha: `clip((alpha - lo) / range, 0, 1)`.
+
+Raising `lo` drops a neural matte’s faint halo (the head carver’s
+`edge_lo`); not the same as `choke`, which pulls the edge in by pixels.
+
+### *class* cutan.carve.Matte
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Base of the shipped strategies: a name, a recipe, and `&`, `|`, `~`.
+
+`recipe()` is what provenance records about how a part was cut: the
+strategy’s name under `"matte"` and its constructor’s arguments (never
+the image), plain JSON. It is also data a carve can be replayed from:
+`as_matte(m.recipe())` builds the same matte.
+
+#### otherwise(other, , min_coverage=0.01)
+
+This matte, or `other` when this one keeps less than `min_coverage`
+of the image (the head carver’s retry with another model on an empty matte).
+
+* **Return type:**
+  [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+### *exception* cutan.carve.MissingDependencyError
+
+Bases: [`ImportError`](https://docs.python.org/3/builtins/exceptions.html#ImportError)
+
+An optional dependency of `cutan.carve` is not installed.
+
+### *class* cutan.carve.Part(name, image, pivot, origin, draw_order)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One lifted part: its RGBA image, its pivot in that image, where it sits in the carving.
+
+#### *property* anchor *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]*
+
+The pivot as an attachment anchor (0..1 of the image).
+
+### *class* cutan.carve.PartSet(carving, base, parts=<factory>)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A carving split into a base (`None` when every pixel went to a part) and parts.
+
+### *class* cutan.carve.PartSpec(mask, pivot, grow=1, reach=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+What to lift off a carving: a `mask` and the `pivot` it turns about.
+
+`mask`: a polygon `[(x, y), ...]` in source pixels, a matte called on
+the carving’s RGB with the carving’s frame as its hint (so a matte’s own
+coordinates are source pixels too; `~FlatColour(colours=[grey],
+connected=False)` selects the grey strokes), or an array of the carving’s
+size (bool or 0..1). `pivot`: `(x, y)` in source pixels. `grow`:
+carving px the mask is widened by before lifting (anti-aliased strokes).
+`reach`: keep only the mask’s pieces that come within this many source
+px of the pivot (a colour key also matches specks elsewhere: a tick’s grey
+edge).
+
+### *class* cutan.carve.Polygon(points=(), supersample=4)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+A hand-given outline, `[(x, y), ...]` in the SOURCE image, anti-aliased.
+
+### *class* cutan.carve.Rembg(model='isnet-general-use', post_process=True)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+`rembg`’s neural background removal (`pip install "cutan[rembg]"`).
+
+`model`: a rembg model name (`isnet-general-use` for photos and faces,
+`isnet-anime` for drawn figures, `u2net_human_seg` for people). The
+model is downloaded by rembg on first use and its session kept for the
+process.
+
+### cutan.carve.as_matte(matte)
+
+A [`Matte`](_autosummary/cutan.carve.html.md#cutan.carve.Matte) from a strategy’s name, its recipe, a `Matte`, or any
+`(rgb, hint) -> alpha` callable.
+
+A recipe (`Matte.recipe()`, as a carve records it) builds the same matte
+back, so a strategy with its settings is plain data (a batch spec, a CLI):
+
+* **Return type:**
+  [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+```pycon
+>>> as_matte("chroma").name
+'chroma'
+>>> m = as_matte({"matte": "and", "of": [{"matte": "chroma", "width": 40},
+...                                      {"matte": "polygon", "points": [[0, 0], [9, 0], [9, 9]]}]})
+>>> m.recipe() == as_matte(m.recipe()).recipe(), m.recipe()["of"][0]["width"]
+(True, 40)
+>>> as_matte("rainbow")
+Traceback (most recent call last):
+  ...
+ValueError: no matte strategy 'rainbow'; the strategies are: chroma, flat_colour, ...
+```
+
+### cutan.carve.border_colours(rgb, , max_colours=3, min_share=0.08, bits=4)
+
+The dominant colours of the image’s border: the backdrop of a flat frame.
+
+Border pixels are binned at `bits` per channel; every bin holding at least
+`min_share` of the border (up to `max_colours`, most frequent first)
+gives one colour, the median of its pixels.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int)]]
+
+```pycon
+>>> img = np.zeros((20, 20, 3), np.uint8); img[:] = (250, 240, 230)
+>>> border_colours(img)
+[(250, 240, 230)]
+```
+
+### cutan.carve.carve(image, , matte='flat_colour', crop=None, box=None, point=None, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, upscale=1, pad=4, source=None)
+
+Cut a part out of `image`; every coordinate is in the source image’s pixels.
+
+* **Return type:**
+  [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)
+
+image: a path, a PIL image or an RGB(A) array (`grab_frame` for video)
+matte: the strategy ([`cutan.carve.mattes`](_autosummary/cutan.carve.mattes.html.md#module-cutan.carve.mattes)): a name, a recipe mapping,
+
+> a `Matte` (`Polygon(pts) & FlatColour()`) or any `(rgb, hint) -> alpha`
+
+crop: `(x0, y0, x1, y1)`, the region carved (default: the whole image)
+box: a box around the subject (GrabCut’s default rectangle)
+point: a pixel on the subject; `keep="point"` keeps its component, and it
+
+> becomes the part’s anchor (default: the part’s centre)
+
+keep: `"point"` (its component and pieces within a few px), `"largest"`
+: or `"all"` components
+
+fill_holes: fill what the subject encloses (a pale face the matte missed)
+detach: cut off pieces hanging on the subject by a neck narrower than
+
+> `2 * detach` px (caption letters; also any part that thin); 0 keeps
+> them and reports them
+
+choke: pull the edge in by this many px, then `feather` softens it (px)
+despill: re-paint the edge from the subject’s pixels at least this many px
+
+> inside it (1: the anti-aliased band; about 4 for a neural matte’s
+> fuzzy fringe; 0: off)
+
+upscale: matte at this whole factor of the source resolution, then come
+: back: smoother edges on small or low-resolution subjects
+
+pad: transparent px left around the trimmed part
+source: provenance ([`frame_source()`](_autosummary/cutan.carve.provenance.html.md#cutan.carve.provenance.frame_source)), kept
+
+> with the recipe and the quality in `Carving.provenance()`
+```pycon
+>>> img = np.full((60, 80, 3), 250, np.uint8); img[15:45, 20:60] = (30, 90, 200)
+>>> part = carve(img)
+>>> part.size, round(part.quality.coverage, 2), part.quality.warnings()
+((50, 40), 0.25, [])
+>>> carve(img, **part.recipe).recipe == part.recipe     # the recipe replays the carve
+True
+```
+
+### cutan.carve.carve_head(image, , face=None, locate=None, pick='largest', matte='flat_colour', cut='auto', neck=None, neck_soft=0.05, pad_x=1.05, pad_top=1.25, pad_bottom=1.0, upscale=3, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, canvas=512, face_h=270.0, centre=(256.0, 300.0), margin=6, view=None, source=None)
+
+A head cut out at the neck and normalised onto a `canvas`-px square.
+
+* **Return type:**
+  [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)
+
+face: the face, a [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face) (box and, when known, a
+: jaw contour and landmarks), a box `(x0, y0, x1, y1)` or a mapping
+  (`Face.as_dict()`); `None` runs `locate`
+
+locate: a face locator `rgb -> [Face]` (default
+: [`InsightFaceLocator`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.InsightFaceLocator), `cutan[faces]`);
+  `pick` chooses among several faces
+
+cut: the neck cut, `"auto"` (along the jaw when the face has a contour,
+: else flat under the chin), `"jaw"`, `"flat"` or `"none"`;
+  `neck` its depth in face-box heights, `neck_soft` its soft edge
+
+pad_x, pad_top, pad_bottom: the crop around the face, in face-box widths
+: (each side) and heights (above, below)
+
+upscale: matte at this whole factor (heads are small in a frame)
+face_h, centre: the face box is scaled to `face_h` px high and its
+
+> centre put on `centre`, unless the head would then leave the canvas
+> (less `margin`), in which case it is scaled down to fit
+
+view: the view the head is drawn in, one of the rig’s views (`front`,
+: `three_quarter`, `side`, `back`), recorded for the step that puts
+  it on a rig; `None` when unknown
+
+The rest are [`carve()`](_autosummary/cutan.carve.html.md#cutan.carve.carve)’s (`despill` in source px: a neural matte on
+a photo wants about 4). The recipe pins the face, so a replay is
+reproducible whether it was given or located (`meta["located_by"]` says
+which); a batch spec is `{**shared_settings, **per_item}` (the face and
+the crop per image, the matte and the finish shared). The part’s anchor is `centre` (the face centre);
+`meta` holds what a rig needs to hang it: the face box, the chin and the
+neck point, the head’s bounding box, the landmarks, all on the canvas.
+
+### cutan.carve.check_requirements(, verbose=True)
+
+Which optional dependencies of carving are installed (printing how to get the rest).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
+
+```pycon
+>>> sorted(check_requirements(verbose=False))
+['cv2', 'insightface', 'rembg']
+```
+
+### cutan.carve.frame_source(url, , license, t=None, author=None, author_url=None, title=None, provider=None, attribution=None, note=None, cacheable=True, \*\*extra)
+
+The provenance of a part carved from `url` (a video at time `t`, or an image).
+
+`license` is required (keyword-only, no default): `None` records the
+rights as UNKNOWN, which is a statement too. For footage you do not own,
+`"all-rights-reserved"` (`an credits` then lists the part as NOT
+PUBLISHABLE). A YouTube URL is normalised to its watch page (tracking
+parameters dropped) with a `&t=` deep link; `t` defaults to the URL’s
+own. Any other URL keeps its scheme, host and path only (no password, no
+query: signed-URL tokens are credentials). A local file (a path, a
+`file:` URL) is recorded by its name only: provider `local`, the name
+in `extra.file`, no path anywhere; a `data:` URI is refused. `t`,
+`title` and `note` go into `extra` beside any other keyword.
+
+* **Return type:**
+  `AssetSource`
+
+```pycon
+>>> s = frame_source("https://www.youtube.com/watch?v=AAGIi62-sAU&si=track",
+...                  t=34.6, license="all-rights-reserved", author="OverSimplified")
+>>> s.provider, s.id, s.url
+('youtube', 'AAGIi62-sAU', 'https://www.youtube.com/watch?v=AAGIi62-sAU&t=34')
+>>> s.source_page_url, s.extra["frame_time_s"]
+('https://www.youtube.com/watch?v=AAGIi62-sAU', 34.6)
+>>> frame_source("https://youtu.be/AAGIi62-sAU?t=1m30s", license=None).extra["frame_time_s"]
+90.0
+>>> local = frame_source("/home/me/private/clip.mp4", t=3, license="all-rights-reserved")
+>>> local.provider, local.url, local.extra["file"], "/home" in local.attribution
+('local', None, 'clip.mp4', False)
+```
+
+### cutan.carve.grab_frame(video, t, , ffmpeg='ffmpeg')
+
+The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).
+
+* **Return type:**
+  `ndarray`
+
+### cutan.carve.load_rgb(image)
+
+An `HxWx3` `uint8` RGB array from a path, a PIL image or an array.
+
+* **Return type:**
+  `ndarray`
+
+```pycon
+>>> load_rgb(np.zeros((4, 5, 4), np.uint8)).shape
+(4, 5, 3)
+```
+
+### cutan.carve.neck_cut(shape, face, , cut='auto', neck=None, soft=0.05, offset=(0.0, 0.0), scale=1.0)
+
+A `shape` mask, 1 above the neck cut and 0 below, with a soft edge.
+
+`cut`: `"jaw"` follows the jaw contour (ends extended past the ears,
+deeper at the chin), `"flat"` cuts straight across under the chin,
+`"auto"` is `jaw` when the face has a contour and `flat` otherwise,
+and `"none"` keeps everything. `neck` is the depth below the jaw (or
+the chin) in face-box heights. `offset`/`scale` map the face (given in
+source pixels) into the mask’s pixels.
+
+* **Return type:**
+  `ndarray`
+
+```pycon
+>>> m = neck_cut((100, 50), Face((10, 10, 40, 60)), cut="flat", neck=0.1)
+>>> float(m[50, 25]), float(m[90, 25])
+(1.0, 0.0)
+```
+
+### cutan.carve.pick_face(faces, pick='largest')
+
+One face of several: `largest`, `leftmost`, `rightmost` or `best` (score).
+
+* **Return type:**
+  [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)
+
+```pycon
+>>> pick_face([Face((0, 0, 10, 10)), Face((50, 0, 70, 20))]).box
+(50.0, 0.0, 70.0, 20.0)
+```
+
+### cutan.carve.register_matte(cls, , name=None)
+
+Make a third-party strategy nameable (`matte="<name>"`) and its recipes
+replayable: `register_matte(SamMatte)` (or as a class decorator). The name
+is the class’s `name`; registering a different class under a taken name
+is refused, so a recorded recipe never changes meaning.
+
+* **Return type:**
+  [`type`](https://docs.python.org/3/builtins/functions.html#type)[[`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)]
+
+### cutan.carve.split_parts(carving, parts, , paint_out=True, inpaint_radius=4, pad=2)
+
+Lift `parts` (`{name: PartSpec}`, in draw order) off `carving`.
+
+Each part takes the carving’s pixels under its mask. Parts are drawn in
+the order listed, the last on top, and the one drawn on top owns a pixel
+two masks share (a clock’s hub cap, listed after the hands, keeps the hub).
+The base keeps the rest, and stays opaque under a part’s soft edge (no
+seam at rest); where a part was enclosed by the base, `paint_out`
+re-paints the base under it (`cv2.inpaint`) so it stays whole when the
+part moves. A part’s `origin` and `pivot` are in the carving’s pixels
+(where [`write_prop()`](_autosummary/cutan.carve.html.md#cutan.carve.write_prop) places it).
+
+* **Return type:**
+  [`PartSet`](_autosummary/cutan.carve.parts.html.md#cutan.carve.parts.PartSet)
+
+### cutan.carve.write_prop(carved, folder, , name=None, unit=None, max_side=None, display_name=None, source=None, ours=False, relicense=None, overwrite=False)
+
+Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.
+
+* **Return type:**
+  `PropDescriptor`
+
+name: the prop’s name (default: the folder’s name)
+unit: view_box units per carved pixel (default 1); or `max_side`: the
+
+> unit that makes the longer side that many units (never above 1)
+
+source: overrides the carving’s provenance (its recipe and quality are
+: still recorded in `extra.carve`, its source in `extra.carved_from`)
+
+ours: the pixels are the caller’s own art (a carving with no source)
+relicense: `{"by": who, "reason": why}` (both non-empty), required for a
+
+> `source` that loosens the carving’s licence class. Recorded in the
+> descriptor’s `source.extra.relicensed`; `an library publish` does not
+> read it, so say it again there (`relicense=`) when publishing.
+
+A [`PartSet`](_autosummary/cutan.carve.html.md#cutan.carve.PartSet) is written with its carving’s provenance:
+build one with [`split_parts()`](_autosummary/cutan.carve.html.md#cutan.carve.split_parts) (its parts are cut from
+that carving), never by hand from other carvings’ parts.
+
+The root bone sits at the carving’s anchor. A split prop gets one bone per
+part, at its pivot, parented to the root, and one slot per part above the
+base, in the order the parts were listed. Nothing is written unless the
+whole descriptor is valid.
+
+### cutan.carve.youtube_id(url)
+
+The video id of a YouTube URL, else `None`.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+```pycon
+>>> youtube_id("https://www.youtube.com/watch?v=AAGIi62-sAU&t=34")
+'AAGIi62-sAU'
+>>> youtube_id("https://youtu.be/AAGIi62-sAU?t=3"), youtube_id("https://example.org/a.png")
+('AAGIi62-sAU', None)
+>>> youtube_id("https://notyoutube.com/watch?v=x"), youtube_id("https://WWW.YOUTUBE.COM:443/shorts/abc")
+(None, 'abc')
+```
+
+### Modules
+
+| [`core`](_autosummary/cutan.carve.core.html.md#module-cutan.carve.core)             | The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.   |
+|-------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| [`head`](_autosummary/cutan.carve.head.html.md#module-cutan.carve.head)             | Head mode: a face located, the neck cut under the jaw, the head normalised on a fixed canvas.          |
+| [`mattes`](_autosummary/cutan.carve.mattes.html.md#module-cutan.carve.mattes)         | Matte strategies: which pixels of an image are the subject.                                            |
+| [`parts`](_autosummary/cutan.carve.parts.html.md#module-cutan.carve.parts)           | Split a carved prop into moving parts, each with a declared pivot.                                     |
+| [`prop`](_autosummary/cutan.carve.prop.html.md#module-cutan.carve.prop)             | Write a carving (or a carving split into parts) as a library-ready prop folder.                        |
+| [`provenance`](_autosummary/cutan.carve.provenance.html.md#module-cutan.carve.provenance) | Where carved pixels came from: an `AssetSource` for a frame of a video or an image.                    |
+| [`refine`](_autosummary/cutan.carve.refine.html.md#module-cutan.carve.refine)         | Clean a raw matte into a cut-out's alpha: keep the subject, close it, edge it, de-spill it.            |
+
+
+# _autosummary/cutan.carve.mattes.html.md
+
+# cutan.carve.mattes
+
+Matte strategies: which pixels of an image are the subject.
+
+A **matte** is any callable `(rgb, hint) -> alpha`: `rgb` an `HxWx3`
+`uint8` array, `hint` a [`Hint`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Hint) (where the subject is, in `rgb`’s
+own pixels), and `alpha` an `HxW` `float32` array in `[0, 1]` (1 is the
+subject). It is the strategy seam of [`cutan.carve.carve()`](_autosummary/cutan.carve.html.md#cutan.carve.carve): no single
+method wins (cutan#10), so each is one class here, chosen by name or passed as
+an object, and two combine with `&` (both say subject) and `|` (either
+does). `Polygon(points) & FlatColour()` is the hand outline cleaned by a
+colour key, the recipe that won on flat cartoon frames.
+
+```pycon
+>>> import numpy as np
+>>> rgb = np.full((40, 60, 3), 255, np.uint8)       # a white backdrop
+>>> rgb[10:30, 20:40] = (200, 30, 30)              # a red square on it
+>>> alpha = FlatColour()(rgb, Hint())
+>>> round(float(alpha[20, 30]), 2), round(float(alpha[2, 2]), 2)
+(1.0, 0.0)
+>>> both = FlatColour() & Polygon([(20, 10), (30, 10), (30, 30), (20, 30)])
+>>> float(both(rgb, Hint())[20, 35]) < 0.5         # inside the key, outside the outline
+True
+>>> red = ~FlatColour(colours=[(200, 30, 30)], connected=False)
+>>> float(red(rgb, Hint())[20, 30]), float(red(rgb, Hint())[2, 2])
+(1.0, 0.0)
+```
+
+### Module Attributes
+
+| [`MATTES`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.MATTES)   | The strategies by name, for `matte="<name>"`.   |
+|-----------------------------------------------------------|-------------------------------------------------|
+
+### Functions
+
+| [`as_matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.as_matte)(matte)                             | A [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte) from a strategy's name, its recipe, a `Matte`, or any `(rgb, hint) -> alpha` callable.   |
+|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`border_colours`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.border_colours)(rgb, \*[, max_colours, ...]) | The dominant colours of the image's border: the backdrop of a flat frame.                                                                         |
+| [`register_matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.register_matte)(cls, \*[, name])             | Make a third-party strategy nameable (`matte="<name>"`) and its recipes replayable: `register_matte(SamMatte)` (or as a class decorator).         |
+
+### Classes
+
+| [`Chroma`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Chroma)([hue, width, min_sat, min_val, ramp])    | Key out a saturated backdrop by its hue band (a stage drape, a green screen).   |
+|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| [`FlatColour`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.FlatColour)([colours, tolerance, softness, ...]) | Key out the backdrop's flat colours, where they are connected to the border.    |
+| [`Focus`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Focus)([window])                                 | The sharp region of an image whose background is out of focus.                  |
+| [`GrabCut`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.GrabCut)([box, iterations, margin, seed])        | OpenCV's GrabCut inside a box around one object.                                |
+| [`Hint`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Hint)([box, point, offset, scale])               | Where the subject is, in the pixels of the image the matte is given.            |
+| [`Levels`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Levels)([of, lo, range])                         | Re-map another matte's alpha: `clip((alpha - lo) / range, 0, 1)`.               |
+| [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)()                                         | Base of the shipped strategies: a name, a recipe, and `&`, `|`, `~`.            |
+| [`MatteLike`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.MatteLike)(\*args, \*\*kwargs)                   | Anything that mattes: `(rgb, hint) -> alpha`.                                   |
+| [`Polygon`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Polygon)([points, supersample])                  | A hand-given outline, `[(x, y), ...]` in the SOURCE image, anti-aliased.        |
+| [`Rembg`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Rembg)([model, post_process])                    | `rembg`'s neural background removal (`pip install "cutan[rembg]"`).             |
+
+### *class* cutan.carve.mattes.Chroma(hue=None, width=60.0, min_sat=0.28, min_val=0.03, ramp=10.0)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+Key out a saturated backdrop by its hue band (a stage drape, a green screen).
+
+`hue`: `(low, high)` in degrees (`high < low` wraps through red);
+`None` centres a band `width` degrees wide on the border’s median hue.
+A pixel is backdrop when its hue is in the band (`ramp` degrees soft at
+each end), its saturation above `min_sat` and its value above `min_val`
+(each with a soft ramp), so dark and grey pixels of the subject stay.
+
+#### band(rgb)
+
+The hue band in degrees: the declared one, or the border’s.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### *class* cutan.carve.mattes.FlatColour(colours=None, tolerance=24.0, softness=16.0, edge=2.0, connected=True, seeds=None)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+Key out the backdrop’s flat colours, where they are connected to the border.
+
+`colours`: the backdrop colours (RGB); `None` reads them off the
+image’s border ([`border_colours()`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.border_colours)). A pixel within `tolerance` (the
+largest per-channel difference) of one is backdrop, with a `softness`
+ramp beyond it for anti-aliased edges — but only within `edge` px (source
+pixels) of the backdrop, so a subject colour a little off the backdrop’s
+(a pale grey on white) stays solid inside instead of turning see-through.
+`connected` keeps only backdrop regions that touch the image border (or
+the `seeds`), so a white interior enclosed by an outline (an eye, a
+shirt) stays in the subject.
+
+### *class* cutan.carve.mattes.Focus(window=15)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+The sharp region of an image whose background is out of focus.
+
+Local detail (the Laplacian’s magnitude, averaged over `window` px) is
+thresholded by Otsu’s method, closed, and its holes filled.
+
+### *class* cutan.carve.mattes.GrabCut(box=None, iterations=8, margin=0.02, seed=0)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+OpenCV’s GrabCut inside a box around one object.
+
+`box`: `(x0, y0, x1, y1)` in the SOURCE image; `None` takes the
+hint’s box, else the whole image less a `margin` share on each side.
+`seed` seeds OpenCV’s random generator before the cut, so a recorded
+recipe replays to the same matte.
+
+### *class* cutan.carve.mattes.Hint(box=None, point=None, offset=(0.0, 0.0), scale=1.0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Where the subject is, in the pixels of the image the matte is given.
+
+`box` is `(x0, y0, x1, y1)` around the subject, `point` one pixel on
+it. `to_local` maps a point given in the SOURCE image (before the crop
+and the upscale [`carve()`](_autosummary/cutan.carve.html.md#cutan.carve.carve) applies) into these pixels,
+for strategies that take coordinates (a polygon, a GrabCut box).
+
+```pycon
+>>> Hint(offset=(100, 50), scale=2.0).to_local([(110, 60)])
+[(20.0, 20.0)]
+```
+
+### *class* cutan.carve.mattes.Levels(of=None, lo=0.4, range=0.35)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+Re-map another matte’s alpha: `clip((alpha - lo) / range, 0, 1)`.
+
+Raising `lo` drops a neural matte’s faint halo (the head carver’s
+`edge_lo`); not the same as `choke`, which pulls the edge in by pixels.
+
+### cutan.carve.mattes.MATTES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [type](https://docs.python.org/3/builtins/functions.html#type)[[Matte](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)]]* *= {'chroma': <class 'cutan.carve.mattes.Chroma'>, 'flat_colour': <class 'cutan.carve.mattes.FlatColour'>, 'focus': <class 'cutan.carve.mattes.Focus'>, 'grabcut': <class 'cutan.carve.mattes.GrabCut'>, 'levels': <class 'cutan.carve.mattes.Levels'>, 'polygon': <class 'cutan.carve.mattes.Polygon'>, 'rembg': <class 'cutan.carve.mattes.Rembg'>}*
+
+The strategies by name, for `matte="<name>"`.
+
+### *class* cutan.carve.mattes.Matte
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Base of the shipped strategies: a name, a recipe, and `&`, `|`, `~`.
+
+`recipe()` is what provenance records about how a part was cut: the
+strategy’s name under `"matte"` and its constructor’s arguments (never
+the image), plain JSON. It is also data a carve can be replayed from:
+`as_matte(m.recipe())` builds the same matte.
+
+#### otherwise(other, , min_coverage=0.01)
+
+This matte, or `other` when this one keeps less than `min_coverage`
+of the image (the head carver’s retry with another model on an empty matte).
+
+* **Return type:**
+  [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+### *class* cutan.carve.mattes.MatteLike(\*args, \*\*kwargs)
+
+Bases: [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol)
+
+Anything that mattes: `(rgb, hint) -> alpha`.
+
+### *class* cutan.carve.mattes.Polygon(points=(), supersample=4)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+A hand-given outline, `[(x, y), ...]` in the SOURCE image, anti-aliased.
+
+### *class* cutan.carve.mattes.Rembg(model='isnet-general-use', post_process=True)
+
+Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+`rembg`’s neural background removal (`pip install "cutan[rembg]"`).
+
+`model`: a rembg model name (`isnet-general-use` for photos and faces,
+`isnet-anime` for drawn figures, `u2net_human_seg` for people). The
+model is downloaded by rembg on first use and its session kept for the
+process.
+
+### cutan.carve.mattes.as_matte(matte)
+
+A [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte) from a strategy’s name, its recipe, a `Matte`, or any
+`(rgb, hint) -> alpha` callable.
+
+A recipe (`Matte.recipe()`, as a carve records it) builds the same matte
+back, so a strategy with its settings is plain data (a batch spec, a CLI):
+
+* **Return type:**
+  [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
+```pycon
+>>> as_matte("chroma").name
+'chroma'
+>>> m = as_matte({"matte": "and", "of": [{"matte": "chroma", "width": 40},
+...                                      {"matte": "polygon", "points": [[0, 0], [9, 0], [9, 9]]}]})
+>>> m.recipe() == as_matte(m.recipe()).recipe(), m.recipe()["of"][0]["width"]
+(True, 40)
+>>> as_matte("rainbow")
+Traceback (most recent call last):
+  ...
+ValueError: no matte strategy 'rainbow'; the strategies are: chroma, flat_colour, ...
+```
+
+### cutan.carve.mattes.border_colours(rgb, , max_colours=3, min_share=0.08, bits=4)
+
+The dominant colours of the image’s border: the backdrop of a flat frame.
+
+Border pixels are binned at `bits` per channel; every bin holding at least
+`min_share` of the border (up to `max_colours`, most frequent first)
+gives one colour, the median of its pixels.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int)]]
+
+```pycon
+>>> img = np.zeros((20, 20, 3), np.uint8); img[:] = (250, 240, 230)
+>>> border_colours(img)
+[(250, 240, 230)]
+```
+
+### cutan.carve.mattes.register_matte(cls, , name=None)
+
+Make a third-party strategy nameable (`matte="<name>"`) and its recipes
+replayable: `register_matte(SamMatte)` (or as a class decorator). The name
+is the class’s `name`; registering a different class under a taken name
+is refused, so a recorded recipe never changes meaning.
+
+* **Return type:**
+  [`type`](https://docs.python.org/3/builtins/functions.html#type)[[`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)]
+
+
+# _autosummary/cutan.carve.parts.html.md
+
+# cutan.carve.parts
+
+Split a carved prop into moving parts, each with a declared pivot.
+
+A clock’s hands come off its face, a camera into tripod, body and lens: each
+part is lifted out of a [`Carving`](_autosummary/cutan.carve.html.md#cutan.carve.Carving) by a mask, gets a pivot
+(the point it turns about), and the base keeps what is left. Where a part
+lay *inside* the base (a hand on the face), the base is painted in under it
+from the surrounding pixels, so the part can move without leaving a hole;
+where it stuck *out* (a lens past the body), the base simply loses it.
+
+Masks and pivots are in the SOURCE image’s pixels, like every other
+coordinate [`cutan.carve`](_autosummary/cutan.carve.html.md#module-cutan.carve) takes, so a part spec can be written before the
+carve runs (the carving’s trim decides its own pixels). A mask may also be an
+array of the carving’s size.
+
+```pycon
+>>> import numpy as np
+>>> from cutan.carve import carve
+>>> img = np.full((40, 60, 3), 250, np.uint8); img[10:30, 10:50] = (200, 40, 40)
+>>> img[18:22, 30:46] = (40, 40, 200)                        # a blue hand on a red face
+>>> face = carve(img, point=(20, 20))
+>>> split = split_parts(face, {"hand": PartSpec(mask=[(29, 17), (47, 17), (47, 23), (29, 23)],
+...                                             pivot=(30, 20))})
+>>> hand = split.parts[0]
+>>> (hand.origin[0] + hand.pivot[0], hand.origin[1] + hand.pivot[1]) == face.to_part([(30, 20)])[0]
+True
+>>> tuple(int(v) for v in np.asarray(split.base)[10, 35])   # painted in under the hand, opaque
+(200, 40, 40, 255)
+```
+
+### Functions
+
+| [`split_parts`](_autosummary/cutan.carve.parts.html.md#cutan.carve.parts.split_parts)(carving, parts, \*[, paint_out, ...])   | Lift `parts` (`{name: PartSpec}`, in draw order) off `carving`.   |
+|------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
+
+### Classes
+
+| [`Part`](_autosummary/cutan.carve.parts.html.md#cutan.carve.parts.Part)(name, image, pivot, origin, draw_order)   | One lifted part: its RGBA image, its pivot in that image, where it sits in the carving.   |
+|-------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| [`PartSet`](_autosummary/cutan.carve.parts.html.md#cutan.carve.parts.PartSet)(carving, base[, parts])                | A carving split into a base (`None` when every pixel went to a part) and parts.           |
+| [`PartSpec`](_autosummary/cutan.carve.parts.html.md#cutan.carve.parts.PartSpec)(mask, pivot[, grow, reach])           | What to lift off a carving: a `mask` and the `pivot` it turns about.                      |
+
+### *class* cutan.carve.parts.Part(name, image, pivot, origin, draw_order)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One lifted part: its RGBA image, its pivot in that image, where it sits in the carving.
+
+#### *property* anchor *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]*
+
+The pivot as an attachment anchor (0..1 of the image).
+
+### *class* cutan.carve.parts.PartSet(carving, base, parts=<factory>)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A carving split into a base (`None` when every pixel went to a part) and parts.
+
+### *class* cutan.carve.parts.PartSpec(mask, pivot, grow=1, reach=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+What to lift off a carving: a `mask` and the `pivot` it turns about.
+
+`mask`: a polygon `[(x, y), ...]` in source pixels, a matte called on
+the carving’s RGB with the carving’s frame as its hint (so a matte’s own
+coordinates are source pixels too; `~FlatColour(colours=[grey],
+connected=False)` selects the grey strokes), or an array of the carving’s
+size (bool or 0..1). `pivot`: `(x, y)` in source pixels. `grow`:
+carving px the mask is widened by before lifting (anti-aliased strokes).
+`reach`: keep only the mask’s pieces that come within this many source
+px of the pivot (a colour key also matches specks elsewhere: a tick’s grey
+edge).
+
+### cutan.carve.parts.split_parts(carving, parts, , paint_out=True, inpaint_radius=4, pad=2)
+
+Lift `parts` (`{name: PartSpec}`, in draw order) off `carving`.
+
+Each part takes the carving’s pixels under its mask. Parts are drawn in
+the order listed, the last on top, and the one drawn on top owns a pixel
+two masks share (a clock’s hub cap, listed after the hands, keeps the hub).
+The base keeps the rest, and stays opaque under a part’s soft edge (no
+seam at rest); where a part was enclosed by the base, `paint_out`
+re-paints the base under it (`cv2.inpaint`) so it stays whole when the
+part moves. A part’s `origin` and `pivot` are in the carving’s pixels
+(where [`write_prop()`](_autosummary/cutan.carve.html.md#cutan.carve.write_prop) places it).
+
+* **Return type:**
+  [`PartSet`](_autosummary/cutan.carve.parts.html.md#cutan.carve.parts.PartSet)
+
+
+# _autosummary/cutan.carve.prop.html.md
+
+# cutan.carve.prop
+
+Write a carving (or a carving split into parts) as a library-ready prop folder.
+
+The folder is the layout every `an` project store and the library read:
+`prop.json` (a `PropDescriptor`) and `parts/*.png`.
+The descriptor’s `source` is the carving’s provenance, recipe and quality
+included, so publishing it records the rights without a single flag:
+
+```default
+from an.library import open_library, publish_dir
+publish_dir(open_library("cutan"), folder, "prop.wall-clock", origin="carved")
+```
+
+(`an library publish <folder> prop.wall-clock --package cutan --origin carved`
+from a shell.) One pixel of the carving is one view_box unit times `unit`,
+and each part declares its size, so the prop draws the same whatever the
+resolution the art was carved at.
+
+**Rights are never loosened by accident.** A descriptor with no `source`
+means “we made this” to `an`, so a carving with no provenance is refused
+unless the caller says the art is its own (`ours=True`). A `source=` that
+would loosen the carving’s licence class is refused unless `relicense=`
+says who decided and why (`an`’s own rule for relaxing rights); the
+carving’s source is kept beside it as `extra.carved_from` either way.
+
+### Module Attributes
+
+| [`ROOT_BONE`](_autosummary/cutan.carve.prop.html.md#cutan.carve.prop.ROOT_BONE)   | The bone every carved prop hangs from, at the carving's anchor.   |
+|--------------------------------------------------------------|-------------------------------------------------------------------|
+| [`BASE_SLOT`](_autosummary/cutan.carve.prop.html.md#cutan.carve.prop.BASE_SLOT)   | The slot of the base art (a single-part prop's only slot).        |
+
+### Functions
+
+| [`write_prop`](_autosummary/cutan.carve.prop.html.md#cutan.carve.prop.write_prop)(carved, folder, \*[, name, unit, ...])   | Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.   |
+|------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+
+### cutan.carve.prop.BASE_SLOT *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'body'*
+
+The slot of the base art (a single-part prop’s only slot).
+
+### cutan.carve.prop.ROOT_BONE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'root'*
+
+The bone every carved prop hangs from, at the carving’s anchor.
+
+### cutan.carve.prop.write_prop(carved, folder, , name=None, unit=None, max_side=None, display_name=None, source=None, ours=False, relicense=None, overwrite=False)
+
+Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.
+
+* **Return type:**
+  `PropDescriptor`
+
+name: the prop’s name (default: the folder’s name)
+unit: view_box units per carved pixel (default 1); or `max_side`: the
+
+> unit that makes the longer side that many units (never above 1)
+
+source: overrides the carving’s provenance (its recipe and quality are
+: still recorded in `extra.carve`, its source in `extra.carved_from`)
+
+ours: the pixels are the caller’s own art (a carving with no source)
+relicense: `{"by": who, "reason": why}` (both non-empty), required for a
+
+> `source` that loosens the carving’s licence class. Recorded in the
+> descriptor’s `source.extra.relicensed`; `an library publish` does not
+> read it, so say it again there (`relicense=`) when publishing.
+
+A [`PartSet`](_autosummary/cutan.carve.html.md#cutan.carve.PartSet) is written with its carving’s provenance:
+build one with [`split_parts()`](_autosummary/cutan.carve.html.md#cutan.carve.split_parts) (its parts are cut from
+that carving), never by hand from other carvings’ parts.
+
+The root bone sits at the carving’s anchor. A split prop gets one bone per
+part, at its pivot, parented to the root, and one slot per part above the
+base, in the order the parts were listed. Nothing is written unless the
+whole descriptor is valid.
+
+
+# _autosummary/cutan.carve.provenance.html.md
+
+# cutan.carve.provenance
+
+Where carved pixels came from: an `AssetSource` for a frame of a video or an image.
+
+Provenance by construction: a carve takes its source at the start, and the
+part folder it writes carries it in the descriptor’s `source`, so
+`an library publish` records the rights without flags, and `an credits`
+lists the part as what it is (`all-rights-reserved` footage you do not own
+is NOT PUBLISHABLE, and says so).
+
+The licence is never guessed: [`frame_source()`](_autosummary/cutan.carve.provenance.html.md#cutan.carve.provenance.frame_source) requires one. A local file
+is recorded by its name, never its path: a descriptor travels into libraries
+and credits, and an absolute path is private information.
+
+### Functions
+
+| [`frame_source`](_autosummary/cutan.carve.provenance.html.md#cutan.carve.provenance.frame_source)(url, \*, license[, t, author, ...])   | The provenance of a part carved from `url` (a video at time `t`, or an image).   |
+|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| [`youtube_id`](_autosummary/cutan.carve.provenance.html.md#cutan.carve.provenance.youtube_id)(url)                                    | The video id of a YouTube URL, else `None`.                                      |
+
+### cutan.carve.provenance.frame_source(url, , license, t=None, author=None, author_url=None, title=None, provider=None, attribution=None, note=None, cacheable=True, \*\*extra)
+
+The provenance of a part carved from `url` (a video at time `t`, or an image).
+
+`license` is required (keyword-only, no default): `None` records the
+rights as UNKNOWN, which is a statement too. For footage you do not own,
+`"all-rights-reserved"` (`an credits` then lists the part as NOT
+PUBLISHABLE). A YouTube URL is normalised to its watch page (tracking
+parameters dropped) with a `&t=` deep link; `t` defaults to the URL’s
+own. Any other URL keeps its scheme, host and path only (no password, no
+query: signed-URL tokens are credentials). A local file (a path, a
+`file:` URL) is recorded by its name only: provider `local`, the name
+in `extra.file`, no path anywhere; a `data:` URI is refused. `t`,
+`title` and `note` go into `extra` beside any other keyword.
+
+* **Return type:**
+  `AssetSource`
+
+```pycon
+>>> s = frame_source("https://www.youtube.com/watch?v=AAGIi62-sAU&si=track",
+...                  t=34.6, license="all-rights-reserved", author="OverSimplified")
+>>> s.provider, s.id, s.url
+('youtube', 'AAGIi62-sAU', 'https://www.youtube.com/watch?v=AAGIi62-sAU&t=34')
+>>> s.source_page_url, s.extra["frame_time_s"]
+('https://www.youtube.com/watch?v=AAGIi62-sAU', 34.6)
+>>> frame_source("https://youtu.be/AAGIi62-sAU?t=1m30s", license=None).extra["frame_time_s"]
+90.0
+>>> local = frame_source("/home/me/private/clip.mp4", t=3, license="all-rights-reserved")
+>>> local.provider, local.url, local.extra["file"], "/home" in local.attribution
+('local', None, 'clip.mp4', False)
+```
+
+### cutan.carve.provenance.youtube_id(url)
+
+The video id of a YouTube URL, else `None`.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+```pycon
+>>> youtube_id("https://www.youtube.com/watch?v=AAGIi62-sAU&t=34")
+'AAGIi62-sAU'
+>>> youtube_id("https://youtu.be/AAGIi62-sAU?t=3"), youtube_id("https://example.org/a.png")
+('AAGIi62-sAU', None)
+>>> youtube_id("https://notyoutube.com/watch?v=x"), youtube_id("https://WWW.YOUTUBE.COM:443/shorts/abc")
+(None, 'abc')
+```
+
+
+# _autosummary/cutan.carve.refine.html.md
+
+# cutan.carve.refine
+
+Clean a raw matte into a cut-out’s alpha: keep the subject, close it, edge it, de-spill it.
+
+Each step is a function of arrays, so a caller can run any of them alone;
+[`cutan.carve.carve()`](_autosummary/cutan.carve.html.md#cutan.carve.carve) runs them in this order:
+
+1. [`keep_components()`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.keep_components) — keep the part under the hint point (else the
+   largest), dropping specks and the stray objects a matte also caught;
+2. [`fill_holes()`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.fill_holes) — a pale face or an eye a matte called background;
+3. [`detach_bridges()`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.detach_bridges) — cut what hangs on the subject by a thin neck (a
+   caption’s letters touching a head);
+4. [`choke()`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.choke) and [`feather()`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.feather) — pull the edge in, then soften it;
+5. [`despill()`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.despill) — re-paint the rim’s colour from the subject’s interior, so
+   no backdrop colour is left in the semi-transparent edge.
+
+### Module Attributes
+
+| [`SUBJECT`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.SUBJECT)   | The alpha above which a pixel counts as the subject's.   |
+|------------------------------------------------------------|----------------------------------------------------------|
+
+### Functions
+
+| [`choke`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.choke)(alpha, px)                              | Pull the matte's edge in by `px` pixels (a smooth, distance-based erosion).        |
+|------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| [`despill`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.despill)(rgb, alpha, rim, \*[, solid])         | Re-paint the edge's colours from the subject's interior; `(rgb, repainted share)`. |
+| [`detach_bridges`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.detach_bridges)(mask, radius, \*[, point])     | Cut away what hangs on the main body by a neck narrower than `2 * radius` px.      |
+| [`feather`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.feather)(alpha, sigma)                         | Soften the edge with a Gaussian of `sigma` px (0 leaves it as it is).              |
+| [`fill_holes`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.fill_holes)(mask)                              | `mask` with every enclosed hole filled.                                            |
+| [`keep_components`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.keep_components)(mask, \*[, point, keep, ...]) | The components of the boolean `mask` to keep.                                      |
+
+### cutan.carve.refine.SUBJECT *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+
+The alpha above which a pixel counts as the subject’s.
+
+### cutan.carve.refine.choke(alpha, px)
+
+Pull the matte’s edge in by `px` pixels (a smooth, distance-based erosion).
+
+* **Return type:**
+  `ndarray`
+
+```pycon
+>>> a = np.zeros((9, 9), np.float32); a[1:8, 1:8] = 1
+>>> float(choke(a, 2)[1, 4]), float(choke(a, 2)[4, 4])
+(0.0, 1.0)
+```
+
+### cutan.carve.refine.despill(rgb, alpha, rim, , solid=None)
+
+Re-paint the edge’s colours from the subject’s interior; `(rgb, repainted share)`.
+
+The subject is `solid` (the alpha BEFORE any feathering; default
+`alpha`) above [`SUBJECT`](_autosummary/cutan.carve.refine.html.md#cutan.carve.refine.SUBJECT). Trusted pixels are those at least
+`rim` px inside its edge (a distance, not an alpha: a soft interior is
+still interior). Repainted: every other pixel with some alpha — the
+anti-aliased band, a neural matte’s fuzzy fringe, what feathering spread
+over the backdrop — which is never more than `rim` px plus the fringe
+from the edge. Colours flow outward from the trusted pixels one pixel per
+pass, each the mean of its known neighbours, never from the backdrop. An
+outline stays an outline: it is solid, so its inner part is trusted. The
+share is of the subject’s pixels, the quality signal for a de-spill that
+repainted real content.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[`ndarray`, [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+```pycon
+>>> rgb = np.zeros((7, 7, 3), np.uint8); rgb[:] = (0, 0, 255)  # a blue backdrop
+>>> rgb[1:6, 1:6] = (200, 0, 0); rgb[1, 1:6] = (100, 0, 160)   # a red subject, a spilt top row
+>>> a = np.zeros((7, 7), np.float32); a[1:6, 1:6] = 1
+>>> out, share = despill(rgb, a, 1)
+>>> tuple(int(c) for c in out[1, 3]), round(share, 2)
+((200, 0, 0), 0.64)
+```
+
+### cutan.carve.refine.detach_bridges(mask, radius, , point=None)
+
+Cut away what hangs on the main body by a neck narrower than `2 * radius` px.
+
+Erodes by `radius`, keeps the eroded component under `point` (else the
+largest), grows it back by `radius + 1` inside the original mask. Returns
+`(mask, pieces)`: the cleaned mask and how many pieces it lost (connected
+parts of what was removed, at least `radius²` px: a caption glyph, and also
+a thin part thinner than `2 * radius` px, which erosion cannot tell apart).
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[`ndarray`, [`int`](https://docs.python.org/3/builtins/functions.html#int)]
+
+```pycon
+>>> m = np.zeros((20, 40), bool); m[2:18, 2:18] = True   # a body
+>>> m[9:11, 18:24] = True; m[6:14, 24:32] = True          # a glyph on a 2-px neck
+>>> out, pieces = detach_bridges(m, 2)
+>>> pieces, bool(out[10, 28]), bool(out[10, 10])
+(1, False, True)
+```
+
+### cutan.carve.refine.feather(alpha, sigma)
+
+Soften the edge with a Gaussian of `sigma` px (0 leaves it as it is).
+
+* **Return type:**
+  `ndarray`
+
+### cutan.carve.refine.fill_holes(mask)
+
+`mask` with every enclosed hole filled.
+
+* **Return type:**
+  `ndarray`
+
+```pycon
+>>> m = np.ones((5, 5), bool); m[2, 2] = False
+>>> bool(fill_holes(m)[2, 2])
+True
+```
+
+### cutan.carve.refine.keep_components(mask, , point=None, keep='point', min_share=0.02, gap=6)
+
+The components of the boolean `mask` to keep.
+
+`keep`: `"point"` keeps the component under `point` (the largest when
+the point is off the subject or not given) and the pieces lying within
+`gap` px of it that are at least `min_share` of its area (a hand or a
+hat a matte separated by a sliver); `"largest"` keeps the largest only;
+`"all"` keeps everything.
+
+* **Return type:**
+  `ndarray`
+
+```pycon
+>>> m = np.zeros((10, 30), bool); m[1:9, 1:9] = True; m[4:6, 25:27] = True
+>>> int(keep_components(m, keep="largest").sum()), int(keep_components(m, keep="all").sum())
+(64, 68)
+>>> int(keep_components(m, point=(25, 4)).sum())        # the small piece, alone
+4
+>>> m[4:6, 11:13] = True                                 # a piece 2 px from the body
+>>> int(keep_components(m, point=(4, 4), min_share=0.05).sum())
+68
+```
 
 
 # _autosummary/cutan.characters.brows.html.md
@@ -6729,20 +8379,21 @@ The names of the style specs that ship with `cutan`, sorted.
 
 ### Modules
 
-| [`audio`](_autosummary/cutan.audio.html.md#module-cutan.audio)           | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.   |
-|-------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
-| [`bench`](_autosummary/cutan.bench.html.md#module-cutan.bench)           | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.       |
-| [`characters`](_autosummary/cutan.characters.html.md#module-cutan.characters) | Character art system: Spine-shaped descriptor + SVG sidecars.                                |
-| [`compile`](_autosummary/cutan.compile.html.md#module-cutan.compile)       | The cut-out genre's compile passes, their lowering hooks and the visuals of its runtime.     |
-| [`conftest`](_autosummary/cutan.conftest.html.md#module-cutan.conftest)     | Doctest collection for `cutan`: `nw` is an optional dependency of `cutan.nw` only.           |
-| [`expression`](_autosummary/cutan.expression.html.md#module-cutan.expression) | Facial expression for the cutout face (an#98, epic #9 Wave 6).                               |
-| [`genre`](_autosummary/cutan.genre.html.md#module-cutan.genre)           | The cut-out animation genre, declared as one object.                                         |
-| [`impacts`](_autosummary/cutan.impacts.html.md#module-cutan.impacts)       | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                |
-| [`library`](_autosummary/cutan.library.html.md#module-cutan.library)       | The character analyser: legs, arms, views and mouth chart, derived from the rig.             |
-| [`motion`](_autosummary/cutan.motion.html.md#module-cutan.motion)         | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.         |
-| [`runtime`](_autosummary/cutan.runtime.html.md#module-cutan.runtime)       | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).    |
-| [`styles`](_autosummary/cutan.styles.html.md#module-cutan.styles)         | The named cut-out style specs, shipped as package data (cutan#4).                            |
-| [`verify`](_autosummary/cutan.verify.html.md#module-cutan.verify)         | The cut-out style lint: measures a render against a named style spec.                        |
+| [`audio`](_autosummary/cutan.audio.html.md#module-cutan.audio)           | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.                 |
+|-------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| [`bench`](_autosummary/cutan.bench.html.md#module-cutan.bench)           | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.                     |
+| [`carve`](_autosummary/cutan.carve.html.md#module-cutan.carve)           | Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cutan#10). |
+| [`characters`](_autosummary/cutan.characters.html.md#module-cutan.characters) | Character art system: Spine-shaped descriptor + SVG sidecars.                                              |
+| [`compile`](_autosummary/cutan.compile.html.md#module-cutan.compile)       | The cut-out genre's compile passes, their lowering hooks and the visuals of its runtime.                   |
+| [`conftest`](_autosummary/cutan.conftest.html.md#module-cutan.conftest)     | Doctest collection for `cutan`: `nw` is an optional dependency of `cutan.nw` only.                         |
+| [`expression`](_autosummary/cutan.expression.html.md#module-cutan.expression) | Facial expression for the cutout face (an#98, epic #9 Wave 6).                                             |
+| [`genre`](_autosummary/cutan.genre.html.md#module-cutan.genre)           | The cut-out animation genre, declared as one object.                                                       |
+| [`impacts`](_autosummary/cutan.impacts.html.md#module-cutan.impacts)       | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                              |
+| [`library`](_autosummary/cutan.library.html.md#module-cutan.library)       | The character analyser: legs, arms, views and mouth chart, derived from the rig.                           |
+| [`motion`](_autosummary/cutan.motion.html.md#module-cutan.motion)         | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.                       |
+| [`runtime`](_autosummary/cutan.runtime.html.md#module-cutan.runtime)       | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).                  |
+| [`styles`](_autosummary/cutan.styles.html.md#module-cutan.styles)         | The named cut-out style specs, shipped as package data (cutan#4).                                          |
+| [`verify`](_autosummary/cutan.verify.html.md#module-cutan.verify)         | The cut-out style lint: measures a render against a named style spec.                                      |
 
 
 # _autosummary/cutan.impacts.cli.html.md
@@ -9036,7 +10687,7 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-05 15:14 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c"><code>fa9e7a6</code></a> on branch <code>main</code>, for **cutan 0.0.7** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-05 17:00 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/e9f102f9a350973381836ff8c5e32cb24cc276a7"><code>e9f102f</code></a> on branch <code>main</code>, for **cutan 0.0.8** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -9045,7 +10696,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c"><code>fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/e9f102f9a350973381836ff8c5e32cb24cc276a7"><code>e9f102f9a350973381836ff8c5e32cb24cc276a7</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -9056,9 +10707,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37330800382">37330800382</a>     |
+| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37344809881">37344809881</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c</code> (in the history of the built commit) |
+| Event commit | <code>e9f102f9a350973381836ff8c5e32cb24cc276a7</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -9083,13 +10734,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.7/">0.0.7</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.8/">0.0.8</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout fa9e7a6d3c7d2a89b62a9c63f9ad58a207d3cf9c
+git checkout e9f102f9a350973381836ff8c5e32cb24cc276a7
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

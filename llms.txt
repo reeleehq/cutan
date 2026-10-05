@@ -14,6 +14,14 @@
 - [cutan.audio.rhubarb_lipsync](_autosummary/cutan.audio.rhubarb_lipsync.html.md): RhubarbLipSync — calls the rhubarb-lip-sync binary for phoneme-aligned visemes.
 - [cutan.audio.whisper_lipsync](_autosummary/cutan.audio.whisper_lipsync.html.md): WhisperLipSync — faster-whisper word timestamps → viseme keyframes.
 - [cutan.bench](_autosummary/cutan.bench.html.md): The cut-out genre’s bench corpus: eight scenes that use characters, and their goldens.
+- [cutan.carve](_autosummary/cutan.carve.html.md): Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cuta...
+- [cutan.carve.core](_autosummary/cutan.carve.core.html.md): The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.
+- [cutan.carve.head](_autosummary/cutan.carve.head.html.md): Head mode: a face located, the neck cut under the jaw, the head normalised on a fixed canvas.
+- [cutan.carve.mattes](_autosummary/cutan.carve.mattes.html.md): Matte strategies: which pixels of an image are the subject.
+- [cutan.carve.parts](_autosummary/cutan.carve.parts.html.md): Split a carved prop into moving parts, each with a declared pivot.
+- [cutan.carve.prop](_autosummary/cutan.carve.prop.html.md): Write a carving (or a carving split into parts) as a library-ready prop folder.
+- [cutan.carve.provenance](_autosummary/cutan.carve.provenance.html.md): Where carved pixels came from: an &#96;AssetSource&#96; for a frame of a video or an image.
+- [cutan.carve.refine](_autosummary/cutan.carve.refine.html.md): Clean a raw matte into a cut-out’s alpha: keep the subject, close it, edge it, de-spill it.
 - [cutan.characters](_autosummary/cutan.characters.html.md): Character art system: Spine-shaped descriptor + SVG sidecars.
 - [cutan.characters.brows](_autosummary/cutan.characters.brows.html.md): Brow acting: where the brows can go, what may not draw there, and the &#96;face.brows&#96; capability.
 - [cutan.characters.checks](_autosummary/cutan.characters.checks.html.md): The cut-out genre’s semantic checks: &#96;play&#96;, &#96;expression&#96;, turns, views and character refs.
@@ -62,7 +70,7 @@
 - [cutan.verify](_autosummary/cutan.verify.html.md): The cut-out style lint: measures a render against a named style spec.
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-05 15:14 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-05 17:00 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
 ## Optional
 

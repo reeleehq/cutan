@@ -1,0 +1,28 @@
+cutan.carve.head
+================
+
+.. automodule:: cutan.carve.head
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      HEAD_CANVAS
+      HEAD_FACE_H
+      HEAD_CENTRE
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      neck_cut
+      pick_face
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Face
+      InsightFaceLocator
+   

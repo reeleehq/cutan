@@ -1,0 +1,19 @@
+cutan.carve.prop
+================
+
+.. automodule:: cutan.carve.prop
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      ROOT_BONE
+      BASE_SLOT
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      write_prop
+   

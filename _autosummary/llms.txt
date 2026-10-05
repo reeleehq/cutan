@@ -12,6 +12,14 @@
 - [cutan.audio.rhubarb_lipsync](cutan.audio.rhubarb_lipsync.html.md): RhubarbLipSync — calls the rhubarb-lip-sync binary for phoneme-aligned visemes.
 - [cutan.audio.whisper_lipsync](cutan.audio.whisper_lipsync.html.md): WhisperLipSync — faster-whisper word timestamps → viseme keyframes.
 - [cutan.bench](cutan.bench.html.md): The cut-out genre’s bench corpus: eight scenes that use characters, and their goldens.
+- [cutan.carve](cutan.carve.html.md): Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cuta...
+- [cutan.carve.core](cutan.carve.core.html.md): The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.
+- [cutan.carve.head](cutan.carve.head.html.md): Head mode: a face located, the neck cut under the jaw, the head normalised on a fixed canvas.
+- [cutan.carve.mattes](cutan.carve.mattes.html.md): Matte strategies: which pixels of an image are the subject.
+- [cutan.carve.parts](cutan.carve.parts.html.md): Split a carved prop into moving parts, each with a declared pivot.
+- [cutan.carve.prop](cutan.carve.prop.html.md): Write a carving (or a carving split into parts) as a library-ready prop folder.
+- [cutan.carve.provenance](cutan.carve.provenance.html.md): Where carved pixels came from: an &#96;AssetSource&#96; for a frame of a video or an image.
+- [cutan.carve.refine](cutan.carve.refine.html.md): Clean a raw matte into a cut-out’s alpha: keep the subject, close it, edge it, de-spill it.
 - [cutan.characters](cutan.characters.html.md): Character art system: Spine-shaped descriptor + SVG sidecars.
 - [cutan.characters.brows](cutan.characters.brows.html.md): Brow acting: where the brows can go, what may not draw there, and the &#96;face.brows&#96; capability.
 - [cutan.characters.checks](cutan.characters.checks.html.md): The cut-out genre’s semantic checks: &#96;play&#96;, &#96;expression&#96;, turns, views and character refs.

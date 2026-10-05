@@ -32,6 +32,7 @@
 
    audio
    bench
+   carve
    characters
    compile
    conftest

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+
+<html :class="{ 'dark' : darkMode === true }" data-content_root="../" lang="en" x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}">
+<head>
+<script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="cutan.carve.mattes.html.md" rel="alternate" type="text/markdown"/>
+<link href="../llms.txt" rel="describedby" type="text/markdown"/>
+<link href="cutan.carve.mattes.html.md" rel="alternate" type="text/markdown"/>
+<link href="llms.txt" rel="describedby"/>
+<title>cutan.carve.mattes | cutan</title>
+<meta content="cutan.carve.mattes | cutan" property="og:title"/>
+<meta content="cutan.carve.mattes | cutan" name="twitter:title"/>
+<link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="cutan.carve.parts.html" rel="next" title="cutan.carve.parts"/>
+<link href="cutan.carve.head.html" rel="prev" title="cutan.carve.head"/>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">cutan</span>
+</a><nav class="flex items-center gap-6 text-sm font-medium">
+<a class="transition-colors hover:text-foreground/80 text-foreground/60" href="https://github.com/thorwhalen/cutan" rel="noopener nofollow">GitHub</a>
+</nav></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center gap-1">
+<button @click="darkMode = !darkMode" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" title="Toggle color scheme" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="justify-start text-sm md:!hidden bg-background" href="../index.html"><span class="font-bold text-clip whitespace-nowrap">cutan</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="flex md:hidden flex-col font-medium mt-4">
+<a href="https://github.com/thorwhalen/cutan" rel="nofollow noopener">GitHub</a>
+</nav><nav class="table w-full min-w-full my-6 lg:my-8">
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="cutan.html">cutan<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="cutan.audio.html">cutan.audio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.bench.html">cutan.bench</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="cutan.carve.html">cutan.carve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.characters.html">cutan.characters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.compile.html">cutan.compile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.conftest.html">cutan.conftest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.expression.html">cutan.expression</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.genre.html">cutan.genre</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.impacts.html">cutan.impacts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.library.html">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.motion.html">cutan.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.runtime.html">cutan.runtime</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.styles.html">cutan.styles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.verify.html">cutan.verify</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">cutan</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="../api.html">API reference</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="cutan.html">cutan</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="cutan.carve.html">cutan.carve</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">cutan.carve.mattes</span>
+</nav>
+<div id="content" role="main">
+<section id="module-cutan.carve.mattes">
+<span id="cutan-carve-mattes"></span><h1>cutan.carve.mattes<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-cutan.carve.mattes">¶</a></h1>
+<p>Matte strategies: which pixels of an image are the subject.</p>
+<p>A <strong>matte</strong> is any callable <code class="docutils literal notranslate"><span class="pre">(rgb,</span> <span class="pre">hint)</span> <span class="pre">-&gt;</span> <span class="pre">alpha</span></code>: <code class="docutils literal notranslate"><span class="pre">rgb</span></code> an <code class="docutils literal notranslate"><span class="pre">HxWx3</span></code>
+<code class="docutils literal notranslate"><span class="pre">uint8</span></code> array, <code class="docutils literal notranslate"><span class="pre">hint</span></code> a <a class="reference internal" href="#cutan.carve.mattes.Hint" title="cutan.carve.mattes.Hint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hint</span></code></a> (where the subject is, in <code class="docutils literal notranslate"><span class="pre">rgb</span></code>’s
+own pixels), and <code class="docutils literal notranslate"><span class="pre">alpha</span></code> an <code class="docutils literal notranslate"><span class="pre">HxW</span></code> <code class="docutils literal notranslate"><span class="pre">float32</span></code> array in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code> (1 is the
+subject). It is the strategy seam of <a class="reference internal" href="cutan.carve.html#cutan.carve.carve" title="cutan.carve.carve"><code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.carve.carve()</span></code></a>: no single
+method wins (cutan#10), so each is one class here, chosen by name or passed as
+an object, and two combine with <code class="docutils literal notranslate"><span class="pre">&amp;</span></code> (both say subject) and <code class="docutils literal notranslate"><span class="pre">|</span></code> (either
+does). <code class="docutils literal notranslate"><span class="pre">Polygon(points)</span> <span class="pre">&amp;</span> <span class="pre">FlatColour()</span></code> is the hand outline cleaned by a
+colour key, the recipe that won on flat cartoon frames.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="mi">255</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>       <span class="c1"># a white backdrop</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">rgb</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span> <span class="mi">20</span><span class="p">:</span><span class="mi">40</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>              <span class="c1"># a red square on it</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">FlatColour</span><span class="p">()(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">Hint</span><span class="p">())</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">]),</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+</span><span id="line-6"><span class="go">(1.0, 0.0)</span>
+</span><span id="line-7"><span class="gp">&gt;&gt;&gt; </span><span class="n">both</span> <span class="o">=</span> <span class="n">FlatColour</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">Polygon</span><span class="p">([(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)])</span>
+</span><span id="line-8"><span class="gp">&gt;&gt;&gt; </span><span class="nb">float</span><span class="p">(</span><span class="n">both</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">Hint</span><span class="p">())[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">35</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">0.5</span>         <span class="c1"># inside the key, outside the outline</span>
+</span><span id="line-9"><span class="go">True</span>
+</span><span id="line-10"><span class="gp">&gt;&gt;&gt; </span><span class="n">red</span> <span class="o">=</span> <span class="o">~</span><span class="n">FlatColour</span><span class="p">(</span><span class="n">colours</span><span class="o">=</span><span class="p">[(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">)],</span> <span class="n">connected</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="line-11"><span class="gp">&gt;&gt;&gt; </span><span class="nb">float</span><span class="p">(</span><span class="n">red</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">Hint</span><span class="p">())[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">red</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">Hint</span><span class="p">())[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</span><span id="line-12"><span class="go">(1.0, 0.0)</span>
+</span></code></pre></div>
+</div>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.carve.mattes.MATTES" title="cutan.carve.mattes.MATTES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MATTES</span></code></a></p></td>
+<td><p>The strategies by name, for <code class="docutils literal notranslate"><span class="pre">matte="&lt;name&gt;"</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.carve.mattes.as_matte" title="cutan.carve.mattes.as_matte"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_matte</span></code></a>(matte)</p></td>
+<td><p>A <a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matte</span></code></a> from a strategy's name, its recipe, a <code class="docutils literal notranslate"><span class="pre">Matte</span></code>, or any <code class="docutils literal notranslate"><span class="pre">(rgb,</span> <span class="pre">hint)</span> <span class="pre">-&gt;</span> <span class="pre">alpha</span></code> callable.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.carve.mattes.border_colours" title="cutan.carve.mattes.border_colours"><code class="xref py py-obj docutils literal notranslate"><span class="pre">border_colours</span></code></a>(rgb, *[, max_colours, ...])</p></td>
+<td><p>The dominant colours of the image's border: the backdrop of a flat frame.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.carve.mattes.register_matte" title="cutan.carve.mattes.register_matte"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_matte</span></code></a>(cls, *[, name])</p></td>
+<td><p>Make a third-party strategy nameable (<code class="docutils literal notranslate"><span class="pre">matte="&lt;name&gt;"</span></code>) and its recipes replayable: <code class="docutils literal notranslate"><span class="pre">register_matte(SamMatte)</span></code> (or as a class decorator).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.carve.mattes.Chroma" title="cutan.carve.mattes.Chroma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Chroma</span></code></a>([hue, width, min_sat, min_val, ramp])</p></td>
+<td><p>Key out a saturated backdrop by its hue band (a stage drape, a green screen).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.carve.mattes.FlatColour" title="cutan.carve.mattes.FlatColour"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FlatColour</span></code></a>([colours, tolerance, softness, ...])</p></td>
+<td><p>Key out the backdrop's flat colours, where they are connected to the border.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.carve.mattes.Focus" title="cutan.carve.mattes.Focus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Focus</span></code></a>([window])</p></td>
+<td><p>The sharp region of an image whose background is out of focus.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.carve.mattes.GrabCut" title="cutan.carve.mattes.GrabCut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GrabCut</span></code></a>([box, iterations, margin, seed])</p></td>
+<td><p>OpenCV's GrabCut inside a box around one object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.carve.mattes.Hint" title="cutan.carve.mattes.Hint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hint</span></code></a>([box, point, offset, scale])</p></td>
+<td><p>Where the subject is, in the pixels of the image the matte is given.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.carve.mattes.Levels" title="cutan.carve.mattes.Levels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Levels</span></code></a>([of, lo, range])</p></td>
+<td><p>Re-map another matte's alpha: <code class="docutils literal notranslate"><span class="pre">clip((alpha</span> <span class="pre">-</span> <span class="pre">lo)</span> <span class="pre">/</span> <span class="pre">range,</span> <span class="pre">0,</span> <span class="pre">1)</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Matte</span></code></a>()</p></td>
+<td><p>Base of the shipped strategies: a name, a recipe, and <code class="docutils literal notranslate"><span class="pre">&amp;</span></code>, <code class="docutils literal notranslate"><span class="pre">|</span></code>, <code class="docutils literal notranslate"><span class="pre">~</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.carve.mattes.MatteLike" title="cutan.carve.mattes.MatteLike"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MatteLike</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Anything that mattes: <code class="docutils literal notranslate"><span class="pre">(rgb,</span> <span class="pre">hint)</span> <span class="pre">-&gt;</span> <span class="pre">alpha</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.carve.mattes.Polygon" title="cutan.carve.mattes.Polygon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Polygon</span></code></a>([points, supersample])</p></td>
+<td><p>A hand-given outline, <code class="docutils literal notranslate"><span class="pre">[(x,</span> <span class="pre">y),</span> <span class="pre">...]</span></code> in the SOURCE image, anti-aliased.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.carve.mattes.Rembg" title="cutan.carve.mattes.Rembg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Rembg</span></code></a>([model, post_process])</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rembg</span></code>'s neural background removal (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">"cutan[rembg]"</span></code>).</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.carve.mattes.Chroma">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">Chroma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.28</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ramp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#Chroma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.Chroma" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.Chroma'">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matte</span></code></a></p>
+<p>Key out a saturated backdrop by its hue band (a stage drape, a green screen).</p>
+<p><code class="docutils literal notranslate"><span class="pre">hue</span></code>: <code class="docutils literal notranslate"><span class="pre">(low,</span> <span class="pre">high)</span></code> in degrees (<code class="docutils literal notranslate"><span class="pre">high</span> <span class="pre">&lt;</span> <span class="pre">low</span></code> wraps through red);
+<code class="docutils literal notranslate"><span class="pre">None</span></code> centres a band <code class="docutils literal notranslate"><span class="pre">width</span></code> degrees wide on the border’s median hue.
+A pixel is backdrop when its hue is in the band (<code class="docutils literal notranslate"><span class="pre">ramp</span></code> degrees soft at
+each end), its saturation above <code class="docutils literal notranslate"><span class="pre">min_sat</span></code> and its value above <code class="docutils literal notranslate"><span class="pre">min_val</span></code>
+(each with a soft ramp), so dark and grey pixels of the subject stay.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cutan.carve.mattes.Chroma.band">
+<span class="sig-name descname"><span class="pre">band</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#Chroma.band"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.Chroma.band" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.Chroma.band'">¶</a></dt>
+<dd><p>The hue band in degrees: the declared one, or the border’s.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.carve.mattes.FlatColour">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">FlatColour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">24.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">softness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seeds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#FlatColour"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.FlatColour" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.FlatColour'">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matte</span></code></a></p>
+<p>Key out the backdrop’s flat colours, where they are connected to the border.</p>
+<p><code class="docutils literal notranslate"><span class="pre">colours</span></code>: the backdrop colours (RGB); <code class="docutils literal notranslate"><span class="pre">None</span></code> reads them off the
+image’s border (<a class="reference internal" href="#cutan.carve.mattes.border_colours" title="cutan.carve.mattes.border_colours"><code class="xref py py-func docutils literal notranslate"><span class="pre">border_colours()</span></code></a>). A pixel within <code class="docutils literal notranslate"><span class="pre">tolerance</span></code> (the
+largest per-channel difference) of one is backdrop, with a <code class="docutils literal notranslate"><span class="pre">softness</span></code>
+ramp beyond it for anti-aliased edges — but only within <code class="docutils literal notranslate"><span class="pre">edge</span></code> px (source
+pixels) of the backdrop, so a subject colour a little off the backdrop’s
+(a pale grey on white) stays solid inside instead of turning see-through.
+<code class="docutils literal notranslate"><span class="pre">connected</span></code> keeps only backdrop regions that touch the image border (or
+the <code class="docutils literal notranslate"><span class="pre">seeds</span></code>), so a white interior enclosed by an outline (an eye, a
+shirt) stays in the subject.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.carve.mattes.Focus">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">Focus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#Focus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.Focus" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.Focus'">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matte</span></code></a></p>
+<p>The sharp region of an image whose background is out of focus.</p>
+<p>Local detail (the Laplacian’s magnitude, averaged over <code class="docutils literal notranslate"><span class="pre">window</span></code> px) is
+thresholded by Otsu’s method, closed, and its holes filled.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.carve.mattes.GrabCut">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">GrabCut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#GrabCut"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.GrabCut" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.GrabCut'">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matte</span></code></a></p>
+<p>OpenCV’s GrabCut inside a box around one object.</p>
+<p><code class="docutils literal notranslate"><span class="pre">box</span></code>: <code class="docutils literal notranslate"><span class="pre">(x0,</span> <span class="pre">y0,</span> <span class="pre">x1,</span> <span class="pre">y1)</span></code> in the SOURCE image; <code class="docutils literal notranslate"><span class="pre">None</span></code> takes the
+hint’s box, else the whole image less a <code class="docutils literal notranslate"><span class="pre">margin</span></code> share on each side.
+<code class="docutils literal notranslate"><span class="pre">seed</span></code> seeds OpenCV’s random generator before the cut, so a recorded
+recipe replays to the same matte.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.carve.mattes.Hint">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">Hint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">0.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#Hint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.Hint" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.Hint'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>Where the subject is, in the pixels of the image the matte is given.</p>
+<p><code class="docutils literal notranslate"><span class="pre">box</span></code> is <code class="docutils literal notranslate"><span class="pre">(x0,</span> <span class="pre">y0,</span> <span class="pre">x1,</span> <span class="pre">y1)</span></code> around the subject, <code class="docutils literal notranslate"><span class="pre">point</span></code> one pixel on
+it. <code class="docutils literal notranslate"><span class="pre">to_local</span></code> maps a point given in the SOURCE image (before the crop
+and the upscale <a class="reference internal" href="cutan.carve.html#cutan.carve.carve" title="cutan.carve.carve"><code class="xref py py-func docutils literal notranslate"><span class="pre">carve()</span></code></a> applies) into these pixels,
+for strategies that take coordinates (a polygon, a GrabCut box).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Hint</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="n">scale</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span><span class="o">.</span><span class="n">to_local</span><span class="p">([(</span><span class="mi">110</span><span class="p">,</span> <span class="mi">60</span><span class="p">)])</span>
+</span><span id="line-2"><span class="go">[(20.0, 20.0)]</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.carve.mattes.Levels">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">Levels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">of</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.35</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#Levels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.Levels" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.Levels'">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matte</span></code></a></p>
+<p>Re-map another matte’s alpha: <code class="docutils literal notranslate"><span class="pre">clip((alpha</span> <span class="pre">-</span> <span class="pre">lo)</span> <span class="pre">/</span> <span class="pre">range,</span> <span class="pre">0,</span> <span class="pre">1)</span></code>.</p>
+<p>Raising <code class="docutils literal notranslate"><span class="pre">lo</span></code> drops a neural matte’s faint halo (the head carver’s
+<code class="docutils literal notranslate"><span class="pre">edge_lo</span></code>); not the same as <code class="docutils literal notranslate"><span class="pre">choke</span></code>, which pulls the edge in by pixels.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.carve.mattes.MATTES">
+<span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">MATTES</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">dict</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#type" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">type</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><span class="pre">Matte</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'chroma':</span> <span class="pre">&lt;class</span> <span class="pre">'cutan.carve.mattes.Chroma'&gt;,</span> <span class="pre">'flat_colour':</span> <span class="pre">&lt;class</span> <span class="pre">'cutan.carve.mattes.FlatColour'&gt;,</span> <span class="pre">'focus':</span> <span class="pre">&lt;class</span> <span class="pre">'cutan.carve.mattes.Focus'&gt;,</span> <span class="pre">'grabcut':</span> <span class="pre">&lt;class</span> <span class="pre">'cutan.carve.mattes.GrabCut'&gt;,</span> <span class="pre">'levels':</span> <span class="pre">&lt;class</span> <span class="pre">'cutan.carve.mattes.Levels'&gt;,</span> <span class="pre">'polygon':</span> <span class="pre">&lt;class</span> <span class="pre">'cutan.carve.mattes.Polygon'&gt;,</span> <span class="pre">'rembg':</span> <span class="pre">&lt;class</span> <span class="pre">'cutan.carve.mattes.Rembg'&gt;}</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.MATTES" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.MATTES'">¶</a></dt>
+<dd><p>The strategies by name, for <code class="docutils literal notranslate"><span class="pre">matte="&lt;name&gt;"</span></code>.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.carve.mattes.Matte">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">Matte</span></span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#Matte"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.Matte" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.Matte'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>Base of the shipped strategies: a name, a recipe, and <code class="docutils literal notranslate"><span class="pre">&amp;</span></code>, <code class="docutils literal notranslate"><span class="pre">|</span></code>, <code class="docutils literal notranslate"><span class="pre">~</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">recipe()</span></code> is what provenance records about how a part was cut: the
+strategy’s name under <code class="docutils literal notranslate"><span class="pre">"matte"</span></code> and its constructor’s arguments (never
+the image), plain JSON. It is also data a carve can be replayed from:
+<code class="docutils literal notranslate"><span class="pre">as_matte(m.recipe())</span></code> builds the same matte.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cutan.carve.mattes.Matte.otherwise">
+<span class="sig-name descname"><span class="pre">otherwise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_coverage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#Matte.otherwise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.Matte.otherwise" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.Matte.otherwise'">¶</a></dt>
+<dd><p>This matte, or <code class="docutils literal notranslate"><span class="pre">other</span></code> when this one keeps less than <code class="docutils literal notranslate"><span class="pre">min_coverage</span></code>
+of the image (the head carver’s retry with another model on an empty matte).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matte</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.carve.mattes.MatteLike">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">MatteLike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#MatteLike"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.MatteLike" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.MatteLike'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>Anything that mattes: <code class="docutils literal notranslate"><span class="pre">(rgb,</span> <span class="pre">hint)</span> <span class="pre">-&gt;</span> <span class="pre">alpha</span></code>.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.carve.mattes.Polygon">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">Polygon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supersample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#Polygon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.Polygon" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.Polygon'">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matte</span></code></a></p>
+<p>A hand-given outline, <code class="docutils literal notranslate"><span class="pre">[(x,</span> <span class="pre">y),</span> <span class="pre">...]</span></code> in the SOURCE image, anti-aliased.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.carve.mattes.Rembg">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">Rembg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'isnet-general-use'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#Rembg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.Rembg" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.Rembg'">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matte</span></code></a></p>
+<p><code class="docutils literal notranslate"><span class="pre">rembg</span></code>’s neural background removal (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">"cutan[rembg]"</span></code>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">model</span></code>: a rembg model name (<code class="docutils literal notranslate"><span class="pre">isnet-general-use</span></code> for photos and faces,
+<code class="docutils literal notranslate"><span class="pre">isnet-anime</span></code> for drawn figures, <code class="docutils literal notranslate"><span class="pre">u2net_human_seg</span></code> for people). The
+model is downloaded by rembg on first use and its session kept for the
+process.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.carve.mattes.as_matte">
+<span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">as_matte</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matte</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#as_matte"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.as_matte" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.as_matte'">¶</a></dt>
+<dd><p>A <a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matte</span></code></a> from a strategy’s name, its recipe, a <code class="docutils literal notranslate"><span class="pre">Matte</span></code>, or any
+<code class="docutils literal notranslate"><span class="pre">(rgb,</span> <span class="pre">hint)</span> <span class="pre">-&gt;</span> <span class="pre">alpha</span></code> callable.</p>
+<p>A recipe (<code class="docutils literal notranslate"><span class="pre">Matte.recipe()</span></code>, as a carve records it) builds the same matte
+back, so a strategy with its settings is plain data (a batch spec, a CLI):</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matte</span></code></a></span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">as_matte</span><span class="p">(</span><span class="s2">"chroma"</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+</span><span id="line-2"><span class="go">'chroma'</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">as_matte</span><span class="p">({</span><span class="s2">"matte"</span><span class="p">:</span> <span class="s2">"and"</span><span class="p">,</span> <span class="s2">"of"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"matte"</span><span class="p">:</span> <span class="s2">"chroma"</span><span class="p">,</span> <span class="s2">"width"</span><span class="p">:</span> <span class="mi">40</span><span class="p">},</span>
+</span><span id="line-4"><span class="gp">... </span>                                     <span class="p">{</span><span class="s2">"matte"</span><span class="p">:</span> <span class="s2">"polygon"</span><span class="p">,</span> <span class="s2">"points"</span><span class="p">:</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">]]}]})</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">recipe</span><span class="p">()</span> <span class="o">==</span> <span class="n">as_matte</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">recipe</span><span class="p">())</span><span class="o">.</span><span class="n">recipe</span><span class="p">(),</span> <span class="n">m</span><span class="o">.</span><span class="n">recipe</span><span class="p">()[</span><span class="s2">"of"</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">"width"</span><span class="p">]</span>
+</span><span id="line-6"><span class="go">(True, 40)</span>
+</span><span id="line-7"><span class="gp">&gt;&gt;&gt; </span><span class="n">as_matte</span><span class="p">(</span><span class="s2">"rainbow"</span><span class="p">)</span>
+</span><span id="line-8"><span class="gt">Traceback (most recent call last):</span>
+</span><span id="line-9"><span class="w">  </span><span class="c">...</span>
+</span><span id="line-10"><span class="gr">ValueError</span>: <span class="n">no matte strategy 'rainbow'; the strategies are: chroma, flat_colour, ...</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.carve.mattes.border_colours">
+<span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">border_colours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_colours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_share</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#border_colours"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.border_colours" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.border_colours'">¶</a></dt>
+<dd><p>The dominant colours of the image’s border: the backdrop of a flat frame.</p>
+<p>Border pixels are binned at <code class="docutils literal notranslate"><span class="pre">bits</span></code> per channel; every bin holding at least
+<code class="docutils literal notranslate"><span class="pre">min_share</span></code> of the border (up to <code class="docutils literal notranslate"><span class="pre">max_colours</span></code>, most frequent first)
+gives one colour, the median of its pixels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]]</span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">);</span> <span class="n">img</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">230</span><span class="p">)</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">border_colours</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+</span><span id="line-3"><span class="go">[(250, 240, 230)]</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.carve.mattes.register_matte">
+<span class="sig-prename descclassname"><span class="pre">cutan.carve.mattes.</span></span><span class="sig-name descname"><span class="pre">register_matte</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/mattes.html#register_matte"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.mattes.register_matte" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.mattes.register_matte'">¶</a></dt>
+<dd><p>Make a third-party strategy nameable (<code class="docutils literal notranslate"><span class="pre">matte="&lt;name&gt;"</span></code>) and its recipes
+replayable: <code class="docutils literal notranslate"><span class="pre">register_matte(SamMatte)</span></code> (or as a class decorator). The name
+is the class’s <code class="docutils literal notranslate"><span class="pre">name</span></code>; registering a different class under a taken name
+is refused, so a recorded recipe never changes meaning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#type" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.carve.mattes.Matte" title="cutan.carve.mattes.Matte"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matte</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.Chroma'" class="reference internal" href="#cutan.carve.mattes.Chroma"><code class="docutils literal notranslate"><span class="pre">Chroma</span></code></a><ul>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.Chroma.band'" class="reference internal" href="#cutan.carve.mattes.Chroma.band"><code class="docutils literal notranslate"><span class="pre">Chroma.band()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.FlatColour'" class="reference internal" href="#cutan.carve.mattes.FlatColour"><code class="docutils literal notranslate"><span class="pre">FlatColour</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.Focus'" class="reference internal" href="#cutan.carve.mattes.Focus"><code class="docutils literal notranslate"><span class="pre">Focus</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.GrabCut'" class="reference internal" href="#cutan.carve.mattes.GrabCut"><code class="docutils literal notranslate"><span class="pre">GrabCut</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.Hint'" class="reference internal" href="#cutan.carve.mattes.Hint"><code class="docutils literal notranslate"><span class="pre">Hint</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.Levels'" class="reference internal" href="#cutan.carve.mattes.Levels"><code class="docutils literal notranslate"><span class="pre">Levels</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.MATTES'" class="reference internal" href="#cutan.carve.mattes.MATTES"><code class="docutils literal notranslate"><span class="pre">MATTES</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.Matte'" class="reference internal" href="#cutan.carve.mattes.Matte"><code class="docutils literal notranslate"><span class="pre">Matte</span></code></a><ul>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.Matte.otherwise'" class="reference internal" href="#cutan.carve.mattes.Matte.otherwise"><code class="docutils literal notranslate"><span class="pre">Matte.otherwise()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.MatteLike'" class="reference internal" href="#cutan.carve.mattes.MatteLike"><code class="docutils literal notranslate"><span class="pre">MatteLike</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.Polygon'" class="reference internal" href="#cutan.carve.mattes.Polygon"><code class="docutils literal notranslate"><span class="pre">Polygon</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.Rembg'" class="reference internal" href="#cutan.carve.mattes.Rembg"><code class="docutils literal notranslate"><span class="pre">Rembg</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.as_matte'" class="reference internal" href="#cutan.carve.mattes.as_matte"><code class="docutils literal notranslate"><span class="pre">as_matte()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.border_colours'" class="reference internal" href="#cutan.carve.mattes.border_colours"><code class="docutils literal notranslate"><span class="pre">border_colours()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.carve.mattes.register_matte'" class="reference internal" href="#cutan.carve.mattes.register_matte"><code class="docutils literal notranslate"><span class="pre">register_matte()</span></code></a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left"></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=53b53b71"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=fd10adb8"></script>
+<script defer="defer" src="../_static/theme.js?v=5db23cf8"></script>
+</body>
+</html>

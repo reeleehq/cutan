@@ -1,0 +1,65 @@
+cutan.carve
+===========
+
+.. automodule:: cutan.carve
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      as_matte
+      border_colours
+      carve
+      carve_head
+      check_requirements
+      frame_source
+      grab_frame
+      load_rgb
+      neck_cut
+      pick_face
+      register_matte
+      split_parts
+      write_prop
+      youtube_id
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CarveQuality
+      Carving
+      Chroma
+      Face
+      FlatColour
+      Focus
+      GrabCut
+      Hint
+      InsightFaceLocator
+      Levels
+      Matte
+      Part
+      PartSet
+      PartSpec
+      Polygon
+      Rembg
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      MissingDependencyError
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   core
+   head
+   mattes
+   parts
+   prop
+   provenance
+   refine

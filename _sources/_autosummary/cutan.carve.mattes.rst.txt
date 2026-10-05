@@ -1,0 +1,35 @@
+cutan.carve.mattes
+==================
+
+.. automodule:: cutan.carve.mattes
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      MATTES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      as_matte
+      border_colours
+      register_matte
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Chroma
+      FlatColour
+      Focus
+      GrabCut
+      Hint
+      Levels
+      Matte
+      MatteLike
+      Polygon
+      Rembg
+   

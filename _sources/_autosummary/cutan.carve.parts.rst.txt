@@ -1,0 +1,20 @@
+cutan.carve.parts
+=================
+
+.. automodule:: cutan.carve.parts
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      split_parts
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Part
+      PartSet
+      PartSpec
+   

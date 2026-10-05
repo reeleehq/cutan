@@ -85,6 +85,7 @@
 <li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="current reference internal expandable" href="#">cutan<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-cloak="" x-show="expanded">
 <li class="toctree-l3"><a class="reference internal" href="cutan.audio.html">cutan.audio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.bench.html">cutan.bench</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.carve.html">cutan.carve</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.characters.html">cutan.characters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.compile.html">cutan.compile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.conftest.html">cutan.conftest</a></li>
@@ -282,37 +283,40 @@ assigned by CI at merge). Level 2 is the move itself: <code class="docutils lite
 <tr class="row-even"><td><p><a class="reference internal" href="cutan.bench.html#module-cutan.bench" title="cutan.bench"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bench</span></code></a></p></td>
 <td><p>The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.characters.html#module-cutan.characters" title="cutan.characters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">characters</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.carve.html#module-cutan.carve" title="cutan.carve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">carve</span></code></a></p></td>
+<td><p>Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cutan#10).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.characters.html#module-cutan.characters" title="cutan.characters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">characters</span></code></a></p></td>
 <td><p>Character art system: Spine-shaped descriptor + SVG sidecars.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cutan.compile.html#module-cutan.compile" title="cutan.compile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compile</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.compile.html#module-cutan.compile" title="cutan.compile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compile</span></code></a></p></td>
 <td><p>The cut-out genre's compile passes, their lowering hooks and the visuals of its runtime.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.conftest.html#module-cutan.conftest" title="cutan.conftest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conftest</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.conftest.html#module-cutan.conftest" title="cutan.conftest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conftest</span></code></a></p></td>
 <td><p>Doctest collection for <code class="docutils literal notranslate"><span class="pre">cutan</span></code>: <code class="docutils literal notranslate"><span class="pre">nw</span></code> is an optional dependency of <code class="docutils literal notranslate"><span class="pre">cutan.nw</span></code> only.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cutan.expression.html#module-cutan.expression" title="cutan.expression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expression</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.expression.html#module-cutan.expression" title="cutan.expression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expression</span></code></a></p></td>
 <td><p>Facial expression for the cutout face (an#98, epic #9 Wave 6).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.genre.html#module-cutan.genre" title="cutan.genre"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genre</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.genre.html#module-cutan.genre" title="cutan.genre"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genre</span></code></a></p></td>
 <td><p>The cut-out animation genre, declared as one object.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cutan.impacts.html#module-cutan.impacts" title="cutan.impacts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">impacts</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.impacts.html#module-cutan.impacts" title="cutan.impacts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">impacts</span></code></a></p></td>
 <td><p>Synthetic impact clips with exact ground truth, for scoring sub-frame timing.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.library.html#module-cutan.library" title="cutan.library"><code class="xref py py-obj docutils literal notranslate"><span class="pre">library</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.library.html#module-cutan.library" title="cutan.library"><code class="xref py py-obj docutils literal notranslate"><span class="pre">library</span></code></a></p></td>
 <td><p>The character analyser: legs, arms, views and mouth chart, derived from the rig.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cutan.motion.html#module-cutan.motion" title="cutan.motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">motion</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.motion.html#module-cutan.motion" title="cutan.motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">motion</span></code></a></p></td>
 <td><p>The cut-out genre's motion presets: moves that name a rig's parts or swap its views.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.runtime.html#module-cutan.runtime" title="cutan.runtime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.runtime.html#module-cutan.runtime" title="cutan.runtime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime</span></code></a></p></td>
 <td><p>JavaScript the cut-out genre adds to the stage runtime (<code class="docutils literal notranslate"><span class="pre">visuals.js</span></code>: the mouth and eye).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cutan.styles.html#module-cutan.styles" title="cutan.styles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">styles</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.styles.html#module-cutan.styles" title="cutan.styles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">styles</span></code></a></p></td>
 <td><p>The named cut-out style specs, shipped as package data (cutan#4).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.verify.html#module-cutan.verify" title="cutan.verify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.verify.html#module-cutan.verify" title="cutan.verify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify</span></code></a></p></td>
 <td><p>The cut-out style lint: measures a render against a named style spec.</p></td>
 </tr>
 </tbody>
@@ -344,7 +348,7 @@ assigned by CI at merge). Level 2 is the move itself: <code class="docutils lite
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=bbaf98b3"></script>
+<script src="../_static/documentation_options.js?v=53b53b71"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
