@@ -98,8 +98,8 @@ def test_the_digest_names_the_bytes_of_the_shipped_file():
     import hashlib
 
     for name in style_specs():
-        digest = hashlib.sha256(style_spec_path(name).read_bytes()).hexdigest()
-        assert style_spec_digest(name) == digest
+        data = style_spec_path(name).read_bytes().replace(b"\r\n", b"\n")
+        assert style_spec_digest(name) == hashlib.sha256(data).hexdigest()
     assert len(set(map(style_spec_digest, style_specs()))) == len(style_specs())
 
 
@@ -152,3 +152,35 @@ def test_the_lint_cli_refuses_an_unknown_style_before_decoding(tmp_path):
     res = _run("cutan.verify.style", str(tmp_path / "x.mp4"), "pixar")
     assert res.returncode == 2
     assert "no style spec named 'pixar'" in res.stderr
+
+
+def test_the_digest_does_not_see_line_endings(monkeypatch):
+    """A Windows checkout (CRLF) holds the same spec version as the wheel (LF)."""
+    import cutan.styles as styles
+
+    lf = styles._resource("gilliam").read_bytes().replace(b"\r\n", b"\n")
+
+    class _Crlf:
+        name = "gilliam.yaml"
+
+        def is_file(self):
+            return True
+
+        def read_bytes(self):
+            return lf.replace(b"\n", b"\r\n")
+
+    want = style_spec_digest("gilliam")
+    monkeypatch.setattr(styles, "_spec_files", lambda: {"gilliam": _Crlf()})
+    assert style_spec_digest("gilliam") == want
+
+
+def test_the_cli_writes_to_a_redirected_text_stream():
+    import contextlib
+    import io
+
+    from cutan.styles.__main__ import _main
+
+    out = io.StringIO()
+    with contextlib.redirect_stdout(out):
+        assert _main(["gilliam"]) == 0
+    assert out.getvalue() == style_spec_text("gilliam")

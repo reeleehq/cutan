@@ -51,9 +51,13 @@ def _main(argv: Sequence[str]) -> int:
 
 def _write(text: str) -> None:
     """UTF-8 to stdout whatever the console's encoding (a spec may hold any character)."""
+    buffer = getattr(sys.stdout, "buffer", None)
+    if buffer is None:  # a text stream with no bytes underneath (redirected in-process)
+        sys.stdout.write(text)
+        return
     sys.stdout.flush()
-    sys.stdout.buffer.write(text.encode("utf-8"))
-    sys.stdout.buffer.flush()
+    buffer.write(text.encode("utf-8"))
+    buffer.flush()
 
 
 if __name__ == "__main__":

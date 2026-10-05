@@ -49,6 +49,7 @@ prints one, and ``python -m cutan.styles NAME --path`` prints its file's path
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import os
 import re
@@ -61,7 +62,6 @@ __all__ = [
     "STYLE_SPEC_SCHEMA_VERSION",
     "STYLE_SPEC_SUFFIX",
     "UnknownStyleError",
-    "is_style_name",
     "resolve_style_spec",
     "style_spec",
     "style_spec_digest",
@@ -106,11 +106,11 @@ def style_specs() -> list[str]:
     return sorted(_spec_files())
 
 
-def is_style_name(ref: Any) -> bool:
+def _is_style_name(ref: Any) -> bool:
     """Whether ``ref`` is spelled as a style's name: a string with no path
     separator and no suffix. Shipped or not; a ``Path`` is never a name.
 
-    >>> is_style_name('south_park'), is_style_name('./south_park'), is_style_name('x.yaml')
+    >>> _is_style_name('south_park'), _is_style_name('./south_park'), _is_style_name('x.yaml')
     (True, False, False)
     """
     if not isinstance(ref, str) or not ref:
@@ -153,8 +153,14 @@ def style_spec_text(name: str) -> str:
 
 
 def style_spec_digest(name: str) -> str:
-    """The sha256 of the style spec ``name``'s file: the version a copy was made from."""
-    return hashlib.sha256(_resource(name).read_bytes()).hexdigest()
+    """The sha256 of the style spec ``name``'s file: the version a copy was made from.
+
+    It hashes the file's bytes with line endings normalised to ``\\n`` (a
+    Windows checkout has the same spec as the wheel), so a comment-only edit
+    is a new version too.
+    """
+    data = _resource(name).read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
 
 
 def style_spec(name: str) -> dict[str, Any]:
@@ -173,10 +179,11 @@ def style_spec(name: str) -> dict[str, Any]:
 def resolve_style_spec(ref: str | os.PathLike | Mapping[str, Any]) -> dict[str, Any]:
     """A style spec as a dict, from whatever refers to one.
 
-    - a mapping is passed through (copied);
-    - a string spelled as a name (:func:`is_style_name`: no path separator, no
-      suffix) is ALWAYS the shipped spec of that name, whatever files sit in the
-      working directory (spell a local file ``./south_park``);
+    - a mapping is passed through (a deep copy);
+    - a string spelled as a name (no path separator, no suffix) is looked up
+      by name in the spec sources — today the shipped specs only — and never
+      read from a file in the working directory (spell a local file
+      ``./south_park``);
     - anything else is a path to a YAML file.
 
     >>> resolve_style_spec('reiniger')['style']
@@ -192,8 +199,8 @@ def resolve_style_spec(ref: str | os.PathLike | Mapping[str, Any]) -> dict[str, 
     FileNotFoundError: no style spec file 'oversimplified.yaml' ...
     """
     if isinstance(ref, Mapping):
-        return dict(ref)
-    if is_style_name(ref):
+        return copy.deepcopy(dict(ref))
+    if _is_style_name(ref):
         return style_spec(ref)
     path = Path(ref)
     if not path.is_file():

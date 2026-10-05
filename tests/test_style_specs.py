@@ -364,6 +364,8 @@ STALE_ABSENCE_CLAIMS = {
 }
 
 SKILL_MD = SKILL_DIR / "SKILL.md"
+#: The skill folder is in the repository, not in the sdist: skip, don't fail, there.
+_NEEDS_SKILL = pytest.mark.skipif(not SKILL_MD.exists(), reason="no .claude/skills (an sdist)")
 
 
 def _strings(obj):
@@ -389,6 +391,7 @@ def test_guidance_does_not_call_a_shipped_feature_missing(spec):
     assert not found, found
 
 
+@_NEEDS_SKILL
 def test_the_an_style_skill_does_not_call_a_shipped_feature_missing():
     import re
 
@@ -397,6 +400,7 @@ def test_the_an_style_skill_does_not_call_a_shipped_feature_missing():
     assert not found, found
 
 
+@_NEEDS_SKILL
 def test_the_skill_loads_its_specs_from_the_package_not_from_a_copy():
     """The specs are package data (cutan#4): the skill holds no copy to drift, names
     no path into a skill folder, and says how to load a spec by its name."""
