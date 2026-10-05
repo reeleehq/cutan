@@ -4,8 +4,9 @@
 cut-out styles research (``misc/docs/cutout_styles_research.md``) measured six
 styles with one fixed set of statistics; this module is that measurement,
 ported, so an agent can render, measure the same statistics on its own output,
-and adjust. The style specs that carry the ``targets`` live with the downstream
-skill (``.claude/skills/cutan-style/styles/*.yaml``).
+and adjust. The style specs that carry the ``targets`` ship with the package
+(:mod:`cutan.styles`): pass a style's name (``"south_park"``), a path to a spec
+file, or a mapping.
 
 **The estimators are the research's estimators, on purpose — with one
 measured exception.** Every threshold below is the one the six styles were
@@ -832,13 +833,35 @@ def measure_video(
     )
 
 
+def _is_style_name(spec: str) -> bool:
+    """Whether ``spec`` reads as a style's name rather than a path: one part, no suffix."""
+    path = Path(spec)
+    return not path.suffix and len(path.parts) == 1
+
+
 def load_style_spec(spec: str | Path | Mapping[str, Any]) -> dict[str, Any]:
-    """A style spec as a dict: a mapping is passed through, a path is read as YAML."""
+    """A style spec as a dict: a mapping is passed through, an existing file is
+    read as YAML, and a bare name (one part, no suffix, not a file) is a shipped
+    style (:func:`cutan.styles.style_spec`).
+
+    A file wins over a name, so ``./south_park.yaml`` edited by hand is the one
+    read when its path is given; a bare ``south_park`` is the shipped spec.
+
+    >>> load_style_spec("reiniger")["style"]
+    'reiniger'
+    >>> load_style_spec({"targets": {}})
+    {'targets': {}}
+    """
     if isinstance(spec, Mapping):
         return dict(spec)
+    path = Path(spec)
+    if isinstance(spec, str) and not path.is_file() and _is_style_name(spec):
+        from cutan.styles import style_spec
+
+        return style_spec(spec)
     import yaml
 
-    data = yaml.safe_load(Path(spec).read_text(encoding="utf-8"))
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise ValueError(f"style spec {spec} is not a mapping")
     return data
@@ -1124,7 +1147,7 @@ def _format_text(
 
 
 def _main(argv: Sequence[str]) -> int:
-    """``python -m cutan.verify.style VIDEO SPEC.yaml [--project DIR] [--json]``.
+    """``python -m cutan.verify.style VIDEO STYLE|SPEC.yaml [--project DIR] [--json]``.
 
     Prints the metrics beside the targets, one line per finding with its fix,
     and the per-shot cadence. The shots come from ``--project`` (a project
@@ -1142,7 +1165,8 @@ def _main(argv: Sequence[str]) -> int:
     )
     parser.add_argument("video", help="the rendered mp4")
     parser.add_argument(
-        "spec", help="a style spec YAML (cutan-style skill: styles/<name>.yaml)"
+        "spec",
+        help="a style name (python -m cutan.styles lists them) or a style spec YAML file",
     )
     parser.add_argument(
         "--project",
@@ -1157,6 +1181,15 @@ def _main(argv: Sequence[str]) -> int:
     )
     args = parser.parse_args(list(argv))
 
+    import yaml
+
+    from cutan.styles import UnknownStyleError
+
+    try:
+        spec = load_style_spec(args.spec)
+    except (OSError, UnknownStyleError, ValueError, yaml.YAMLError) as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 2
     project = args.project or project_of_render(args.video)
     if project is None:
         print(
@@ -1168,7 +1201,7 @@ def _main(argv: Sequence[str]) -> int:
     elif args.project is None:
         print(f"using the shot list of {project}", file=sys.stderr)
     try:
-        result = style_lint(args.video, args.spec, scene=project)
+        result = style_lint(args.video, spec, scene=project)
     except StyleLintError as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
@@ -1184,7 +1217,7 @@ def _main(argv: Sequence[str]) -> int:
             )
         )
     else:
-        print(_format_text(result, _targets_of(args.spec)[1]))
+        print(_format_text(result, _targets_of(spec)[1]))
     if result.metrics is None:
         return 2
     return 0 if all(f.severity == "info" for f in result.report.findings) else 1
