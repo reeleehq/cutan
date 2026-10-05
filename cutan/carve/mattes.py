@@ -37,6 +37,7 @@ True
 
 from __future__ import annotations
 
+import os
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol, runtime_checkable
@@ -60,6 +61,7 @@ __all__ = [
     "Rembg",
     "as_matte",
     "border_colours",
+    "register_matte",
 ]
 
 Box = tuple[float, float, float, float]
@@ -116,7 +118,7 @@ class Matte:
             for k, v in vars(self).items()
             if not k.startswith("_") and k != "name" and v is not None
         }
-        return {"matte": self.name, **params}
+        return {"matte": _registered_name(self), **params}
 
     def __and__(self, other: MatteLike) -> Matte:
         return _Combined("and", [self, as_matte(other)])
@@ -131,6 +133,15 @@ class Matte:
         """This matte, or ``other`` when this one keeps less than ``min_coverage``
         of the image (the head carver's retry with another model on an empty matte)."""
         return _Otherwise([self, as_matte(other)], min_coverage=min_coverage)
+
+
+def _registered_name(m: "Matte") -> str:
+    """The name a matte's recipe is replayed by: its registered name, else
+    ``module:qualname`` (replayable once that class is registered)."""
+    cls = type(m)
+    if MATTES.get(m.name) is cls:
+        return m.name
+    return f"{cls.__module__}:{cls.__qualname__}"
 
 
 def _plain(v: Any) -> Any:
@@ -148,6 +159,8 @@ def _plain(v: Any) -> Any:
         return {str(k): _plain(x) for k, x in v.items()}
     if v is None or isinstance(v, (bool, int, float, str)):
         return v
+    if isinstance(v, os.PathLike):
+        return os.fspath(v)
     return repr(v)
 
 
@@ -600,6 +613,24 @@ MATTES: dict[str, type[Matte]] = {
 }
 
 
+def register_matte(cls: type[Matte], *, name: str | None = None) -> type[Matte]:
+    """Make a third-party strategy nameable (``matte="<name>"``) and its recipes
+    replayable: ``register_matte(SamMatte)`` (or as a class decorator). The name
+    is the class's ``name``; registering a different class under a taken name
+    is refused, so a recorded recipe never changes meaning.
+    """
+    key = name or getattr(cls, "name", None)
+    if not key or key == "matte":
+        raise ValueError(f"{cls.__qualname__} needs a `name` to be registered under")
+    have = MATTES.get(key)
+    if have is not None and have is not cls:
+        raise ValueError(
+            f"the matte name {key!r} is taken by {have.__module__}.{have.__qualname__}"
+        )
+    MATTES[key] = cls
+    return cls
+
+
 def as_matte(matte: str | Mapping[str, Any] | MatteLike) -> Matte:
     """A :class:`Matte` from a strategy's name, its recipe, a ``Matte``, or any
     ``(rgb, hint) -> alpha`` callable.
@@ -656,11 +687,22 @@ def _from_recipe(recipe: Mapping[str, Any]) -> Matte:
             f"a carve made with the callable {params.get('ref')!r} names it but cannot "
             "be replayed from data: pass the callable itself"
         )
-    if name not in MATTES:
+    cls = MATTES.get(name)
+    if cls is None and isinstance(name, str) and ":" in name:
+        cls = next(
+            (c for c in MATTES.values() if f"{c.__module__}:{c.__qualname__}" == name),
+            None,
+        )
+    if cls is None:
+        hint = (
+            ": register its class first (cutan.carve.register_matte)"
+            if isinstance(name, str) and ":" in name
+            else ""
+        )
         raise ValueError(
-            f"no matte strategy {name!r}; the strategies are: {', '.join(sorted(MATTES))}"
+            f"no matte strategy {name!r}{hint}; the strategies are: {', '.join(sorted(MATTES))}"
         )
     try:
-        return MATTES[name](**params)
+        return cls(**params)
     except TypeError as e:
         raise ValueError(f"the {name!r} recipe {dict(recipe)} does not fit: {e}") from e

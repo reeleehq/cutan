@@ -71,13 +71,18 @@ def _provenance(
         original = carving.source
         extra["carved_from"] = original.model_dump(mode="json", exclude_none=True)
         if _looser(source, original):
-            if not relicense or not {"by", "reason"} <= set(relicense):
+            given = (
+                {k: str(relicense.get(k) or "").strip() for k in ("by", "reason")}
+                if relicense
+                else {}
+            )
+            if not all(given.get(k) for k in ("by", "reason")):
                 raise ValueError(
                     f"source= would loosen the carving's rights ({license_class(original)} "
                     f"to {license_class(source)}): pass relicense={{'by': ..., 'reason': ...}} "
                     "if that is a decision someone took"
                 )
-            extra["relicensed"] = dict(relicense)
+            extra["relicensed"] = given
     return source.model_copy(update={"extra": extra})
 
 
@@ -102,8 +107,14 @@ def write_prop(
     source: overrides the carving's provenance (its recipe and quality are
         still recorded in ``extra.carve``, its source in ``extra.carved_from``)
     ours: the pixels are the caller's own art (a carving with no source)
-    relicense: ``{"by": who, "reason": why}``, required for a ``source`` that
-        loosens the carving's licence class
+    relicense: ``{"by": who, "reason": why}`` (both non-empty), required for a
+        ``source`` that loosens the carving's licence class. Recorded in the
+        descriptor's ``source.extra.relicensed``; ``an library publish`` does not
+        read it, so say it again there (``relicense=``) when publishing.
+
+    A :class:`~cutan.carve.PartSet` is written with its carving's provenance:
+    build one with :func:`~cutan.carve.split_parts` (its parts are cut from
+    that carving), never by hand from other carvings' parts.
 
     The root bone sits at the carving's anchor. A split prop gets one bone per
     part, at its pivot, parented to the root, and one slot per part above the

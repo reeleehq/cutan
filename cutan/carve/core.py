@@ -280,6 +280,16 @@ def _clip_box(box: Box, w: int, h: int) -> tuple[int, int, int, int]:
     return x0, y0, x1, y1
 
 
+def _callable_name(fn: Any) -> str:
+    """``module:qualname`` of a function or of a callable object's class (with its model, if it says)."""
+    target = fn if hasattr(fn, "__qualname__") else type(fn)
+    name = (
+        f"{getattr(target, '__module__', '?')}:{getattr(target, '__qualname__', '?')}"
+    )
+    model = getattr(fn, "model", None)
+    return f"{name}({model})" if isinstance(model, str) else name
+
+
 def _upscale_factor(upscale: Any) -> int:
     u = float(upscale)
     if u < 1 or u != int(u):
@@ -295,6 +305,7 @@ def _quality(
     repainted: float,
     detached: int,
     point: tuple[float, float] | None,
+    neck_px: int = _NECK_PX,
 ) -> CarveQuality:
     cv2 = _cv2()
     subject = alpha > refine.SUBJECT
@@ -317,7 +328,7 @@ def _quality(
             soft = float((alpha[interior] < 0.95).mean())
     attached = 0
     if subject.any():
-        _, attached = refine.detach_bridges(subject, _NECK_PX, point=point)
+        _, attached = refine.detach_bridges(subject, neck_px, point=point)
     edge = np.concatenate([subject[0], subject[-1], subject[:, 0], subject[:, -1]])
     return CarveQuality(
         coverage=coverage,
@@ -614,21 +625,32 @@ def carve_head(
     face_h, centre: the face box is scaled to ``face_h`` px high and its
         centre put on ``centre``, unless the head would then leave the canvas
         (less ``margin``), in which case it is scaled down to fit
-    view: the view the head is drawn in (``front``, ``three_quarter``,
-        ``side``, ``back``), recorded for the step that puts it on a rig;
-        ``None`` when unknown
+    view: the view the head is drawn in, one of the rig's views (``front``,
+        ``three_quarter``, ``side``, ``back``), recorded for the step that puts
+        it on a rig; ``None`` when unknown
 
     The rest are :func:`carve`'s (``despill`` in source px: a neural matte on
-    a photo wants about 4). The part's anchor is ``centre`` (the face centre);
+    a photo wants about 4). The recipe pins the face, so a replay is
+    reproducible whether it was given or located (``meta["located_by"]`` says
+    which); a batch spec is ``{**shared_settings, **per_item}`` (the face and
+    the crop per image, the matte and the finish shared). The part's anchor is ``centre`` (the face centre);
     ``meta`` holds what a rig needs to hang it: the face box, the chin and the
     neck point, the head's bounding box, the landmarks, all on the canvas.
     """
+    from cutan.characters.schema import VIEWS
+
+    if view is not None and view not in VIEWS:
+        raise ValueError(
+            f"view is one of the rig's views {VIEWS} (or None), not {view!r}"
+        )
     cv2 = _cv2()
     rgb = load_rgb(image)
     up = _upscale_factor(upscale)
+    located_by = None
     if face is None:
-        faces = (locate or InsightFaceLocator())(rgb)
-        face = pick_face(faces, pick)
+        locator = locate or InsightFaceLocator()
+        face = pick_face(locator(rgb), pick)
+        located_by = {"locator": _callable_name(locator), "pick": pick}
     face = Face.of(face)
     fx, fy = face.centre
     crop = (
@@ -678,6 +700,7 @@ def carve_head(
         repainted=repainted,
         detached=c.detached,
         point=c.hint.point,
+        neck_px=round(_NECK_PX * s),  # the head is measured at the upscaled size
     )
     rgba = np.dstack([colours, np.round(alpha * 255).astype(np.uint8)])
 
@@ -771,6 +794,9 @@ def carve_head(
         "landmarks_on_canvas": on_canvas(face.landmarks) if face.landmarks else None,
         "scaled_to_fit": bool(k < wanted - 1e-9),
         "face_score": face.score,
+        # None: the face was given by hand; else how it was found (the recipe
+        # pins the face either way, so a replay never re-runs a detector)
+        "located_by": located_by,
     }
     return Carving(
         image=Image.fromarray(out, "RGBA"),

@@ -61,6 +61,19 @@ def youtube_id(url: str) -> str | None:
     return None
 
 
+def _public_url(url: str) -> str:
+    """``url`` without what must not be published: the user and password, the
+    query (signed-URL tokens, tracking ids) and the fragment.
+
+    >>> _public_url("https://bob:pw@cdn.example.org/a.png?X-Amz-Signature=abc#x")
+    'https://cdn.example.org/a.png'
+    """
+    parts = urlsplit(url)
+    host = parts.hostname or ""
+    netloc = f"{host}:{parts.port}" if parts.port else host
+    return urlunsplit((parts.scheme, netloc, parts.path, "", ""))
+
+
 def _url_time(url: str) -> float | None:
     """The ``t`` (or ``start``) of a URL in seconds: ``90``, ``90s``, ``1m30s``, ``1h2m3s``.
 
@@ -69,7 +82,8 @@ def _url_time(url: str) -> float | None:
     >>> _url_time("https://youtu.be/x") is None
     True
     """
-    q = dict(parse_qsl(urlsplit(url).query))
+    parts = urlsplit(url)
+    q = {**dict(parse_qsl(parts.fragment)), **dict(parse_qsl(parts.query))}  # #t=45 too
     raw = q.get("t") or q.get("start")
     if not raw:
         return None
@@ -121,8 +135,10 @@ def frame_source(
     ``"all-rights-reserved"`` (``an credits`` then lists the part as NOT
     PUBLISHABLE). A YouTube URL is normalised to its watch page (tracking
     parameters dropped) with a ``&t=`` deep link; ``t`` defaults to the URL's
-    own. A local file (a path, a ``file:`` URL) is recorded by its name only:
-    provider ``local``, the name in ``extra.file``, no path anywhere. ``t``,
+    own. Any other URL keeps its scheme, host and path only (no password, no
+    query: signed-URL tokens are credentials). A local file (a path, a
+    ``file:`` URL) is recorded by its name only: provider ``local``, the name
+    in ``extra.file``, no path anywhere; a ``data:`` URI is refused. ``t``,
     ``title`` and ``note`` go into ``extra`` beside any other keyword.
 
     >>> s = frame_source("https://www.youtube.com/watch?v=AAGIi62-sAU&si=track",
@@ -140,6 +156,10 @@ def frame_source(
     vid = youtube_id(url) if url else None
     page = None
     shown = url
+    if url and urlsplit(url).scheme.lower() == "data":
+        raise ValueError(
+            "a data: URI is the image itself, not where it came from: pass its origin"
+        )
     local = _local_name(url) if url else None
     if local is not None:
         extra["file"] = local
@@ -152,8 +172,11 @@ def frame_source(
             t = _url_time(url)
         url = _with_time(page, t) if t is not None else page
         shown = url
-    elif provider is None:
-        provider = (_host(url) if url else "") or "unknown"
+    else:
+        if url:
+            url = shown = _public_url(url)
+        if provider is None:
+            provider = (_host(url) if url else "") or "unknown"
     if t is not None:
         extra["frame_time_s"] = float(t)
     if title is not None:

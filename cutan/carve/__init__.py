@@ -61,6 +61,7 @@ from cutan.carve.mattes import (
     Rembg,
     as_matte,
     border_colours,
+    register_matte,
 )
 from cutan.carve.parts import Part, PartSet, PartSpec, split_parts
 from cutan.carve.prop import write_prop
@@ -95,6 +96,7 @@ __all__ = [
     "load_rgb",
     "neck_cut",
     "pick_face",
+    "register_matte",
     "split_parts",
     "write_prop",
     "youtube_id",

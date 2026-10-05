@@ -496,3 +496,68 @@ def test_a_carve_from_a_local_file_records_its_name_not_its_path(tmp_path):
     write_prop(part, tmp_path / "lamp")
     text = (tmp_path / "lamp" / "prop.json").read_text()
     assert str(tmp_path) not in text and "clip.png" in text
+
+
+
+# --- round 2 of the reviews --------------------------------------------------------
+
+
+def test_a_registered_third_party_matte_replays_and_an_unregistered_one_says_how():
+    from dataclasses import dataclass, field
+
+    from cutan.carve import Matte, as_matte, register_matte
+    from cutan.carve.mattes import MATTES
+
+    @dataclass
+    class LeftHalf(Matte):
+        share: float = 0.5
+        name: str = field(default="left_half_test", init=False, repr=False)
+
+        def __call__(self, rgb, hint):
+            a = np.zeros(rgb.shape[:2], np.float32)
+            a[:, : int(rgb.shape[1] * self.share)] = 1
+            return a
+
+    recipe = LeftHalf(share=0.4).recipe()
+    assert recipe["matte"].endswith(":test_a_registered_third_party_matte_replays_and_an_unregistered_one_says_how.<locals>.LeftHalf")
+    with pytest.raises(ValueError, match="register its class"):
+        as_matte(recipe)
+    try:
+        register_matte(LeftHalf)
+        assert LeftHalf(share=0.4).recipe()["matte"] == "left_half_test"
+        assert as_matte(recipe).share == 0.4  # the qualname recorded before registering replays too
+        with pytest.raises(ValueError, match="taken"):
+            register_matte(type("Other", (LeftHalf,), {}), name="left_half_test")
+    finally:
+        MATTES.pop("left_half_test", None)
+
+
+def test_a_located_face_is_pinned_in_the_recipe_and_its_locator_recorded():
+    face = _head_face()
+
+    class FakeLocator:
+        model = "fake-1"
+
+        def __call__(self, rgb):
+            return [face]
+
+    head = carve_head(_img("head"), locate=FakeLocator(), view="front")
+    assert head.meta["located_by"]["locator"].endswith("FakeLocator(fake-1)")
+    assert head.recipe["face"]["box"] == list(face.box) and head.meta["view"] == "front"
+    assert carve_head(_img("head"), face=face).meta["located_by"] is None
+    with pytest.raises(ValueError, match="rig's views"):
+        carve_head(_img("head"), face=face, view="profile")
+
+
+def test_rights_and_privacy_holes_found_in_round_two(tmp_path):
+    src = frame_source("https://www.youtube.com/watch?v=abcdefghijk", license="all-rights-reserved")
+    part = carve(_img("busy"), matte=GrabCut(box=(60, 30, 180, 185)), point=(120, 120), source=src)
+    free = AssetSource(provider="us", license="cc0-1.0")
+    for empty in ({"by": "", "reason": ""}, {"by": None, "reason": None}, {"by": " ", "reason": "x"}):
+        with pytest.raises(ValueError, match="loosen"):
+            write_prop(part, tmp_path / "x", source=free, relicense=empty)
+    signed = frame_source("https://bob:pw@cdn.example.org/a.png?X-Amz-Signature=abc&X-Amz-Credential=k",
+                          license=None)
+    assert "pw" not in json.dumps(signed.model_dump()) and "Amz" not in json.dumps(signed.model_dump())
+    with pytest.raises(ValueError, match="data: URI"):
+        frame_source("data:image/png;base64,AAAA", license=None)
