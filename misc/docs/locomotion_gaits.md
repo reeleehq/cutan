@@ -22,7 +22,7 @@ A cut-out rig realises this with legs as separate parts pivoted at the hip, and,
 | Gait (spelling) | Method | What it is | Requires | Typical use |
 |---|---|---|---|---|
 | `legs` | `loco.legged_cycle` | Seen from the side, the legs swing about the hip in opposition; facing the camera the stepping leg lifts. Body bobs once per step; arms counter-swing. | `limbs.legs` | any legged figure; the chain's first link |
-| `profile` | `loco.profile_cycle` | The four-pose cycle in profile: legs swing whatever the view in force, the body **sinks after contact and rises before the next** (down/up), a longer stride. | `limbs.legs`, `swap.view:side` | Reiniger's silhouettes, any figure drawn side-on |
+| `profile` | `loco.profile_cycle` | The four-pose cycle in profile: legs swing whatever the view in force, the body **sinks after each contact and rises before the next** (down/up, phased to the contacts; the first step has only the up pose, the last only the down), a longer stride. | `limbs.legs`, `swap.view:side` | Reiniger's silhouettes, any figure drawn side-on |
 | `shuffle` | `loco.shuffle` | Feet barely leave the ground: short quick steps, almost no bob, arms close. | `limbs.legs` | the old, the tired, the cautious; Norstein-like small steps |
 | `hem` | `loco.hem_sway` | A robe whose two hem halves are the leg slots: facing the camera they tilt in turn; the body sways and bobs. | `limbs.legs` (the hem halves) | OverSimplified robe figures carved with a split hem |
 | `waddle` | `loco.waddle` | The body rocks from foot to foot (weight shift, no knees) and bobs; legs, if any, lift in turn. | nothing | penguins, toddlers, squat figures |
@@ -37,7 +37,7 @@ How gaits compose with **turns and views**: a walk never turns the character. `l
 
 ## 3. Parameters and defaults
 
-Every gait reads the same parameters, each with a shared default (`cutan.motion.WALK_PARAM_DEFAULTS`) that a gait may override (`GAIT_DEFAULTS`); an author's value wins over both.
+Every gait reads the parameters its method declares (the genre vocabulary lists them per method), each with a shared default (`cutan.motion.WALK_PARAM_DEFAULTS`) that a gait may override (`GAIT_DEFAULTS`); an author's value wins over both.
 
 | Parameter | Shared default | Unit | Scales with the figure | Overridden by |
 |---|---|---|---|---|
@@ -45,14 +45,16 @@ Every gait reads the same parameters, each with a shared default (`cutan.motion.
 | `step_length` | 80 | scene px per step | **yes** | `shuffle` 40 |
 | `stride` | 0.35 | rad a leg swings | no | `profile` 0.45, `shuffle` 0.12, `bounce` 0.1 |
 | `lift` | 10 | px a stepping leg rises (in the figure's frame) | already does | `shuffle` 3, `waddle` 5, `bounce` 4 |
-| `bob` | 6 | px the body rises per step | **yes** | `shuffle` 1, `waddle` 4, `bounce` 8, `glide` 1.5 |
+| `bob` | 6 | px the body travels per step (`profile`: between two contacts its low is `bob/3` below contact height and its high `2·bob/3` above; the first step has only the high, the last only the low) | **yes** | `shuffle` 1, `waddle` 4, `bounce` 8, `glide` 1.5 |
 | `arm_swing` | 0.3 | rad | no | `profile` 0.35, `shuffle` 0.1, `waddle`/`bounce` 0.15, `hop`/`glide` 0 |
-| `rock` | 0.06 | rad the body rocks | no | `waddle` 0.12 |
+| `rock` | 0.06 | rad the body rocks; follows the figure's facing (with legs: onto the standing foot) | no | `waddle` 0.12 |
 | `hem_tilt` | 0.24 | rad a hem half tilts | no | |
 | `hop_height` | 18 | px the body jumps | **yes** | |
 | `lean` | 0.04 | rad a glide leans into the move | no | |
 
 **Relative to the drawn size** (an#224's comment). A descriptor rig is drawn so its view box is 345 scene px tall at scale 1 (`SCENE_PX_PER_VIEW_BOX`), so a character's drawn size is that times its stage scale. The lengths above are stated for scale 1 and multiplied by the figure's scale (its `stage.scale`, the rig as built — never the pose at the play's start, which a `pop_in` under the walk holds at 0, cutan#13): a character staged at `scale: 2` steps 160 px and bobs 12 px, where it used to shuffle 80 px steps. A leg's `lift` is in the figure's own frame and already scales with it; angles never scale. An explicit value is scene px as given.
+
+An amplitude set to **0 writes no channel** (an authored move on that property runs under the walk untouched), and every channel, the body's included, lands with a 1 ms constant tween rather than a settling `set`, so an authored move that outlasts the walk carries on. A one-step walk (any `distance` under 1.5 × `step_length`) still swings its limbs: their one extreme is mid-step.
 
 ## 4. The default chain, and choosing
 

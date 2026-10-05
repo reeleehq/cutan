@@ -206,7 +206,8 @@ def test_preset_lands_on_its_end_value_at_frame_times(name, fps, step_hz):
     """The review's catch: a 0.36 s squash at 30 fps used to be left at
     scale 0.96/1.04, and a shake under step_hz 10 stranded 8 px off rest,
     because the last frame inside the move was not its end. The settling
-    `set` each preset ends with is what lands it."""
+    `set` each preset ends with is what lands it — the walk's 1 ms constant
+    landing tween does the same (cutan#15)."""
     action = PROCEDURAL_CALLS[name]()
     ends = {}
     for f in flatten(action):

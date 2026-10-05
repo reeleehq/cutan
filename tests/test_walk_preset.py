@@ -163,12 +163,23 @@ def test_its_natural_length_is_known_before_it_is_placed(project):
         project,
         _shot([sequence(play("ned", "walk", args={"steps": 3, "step_s": 0.5}), play("ned", "hop"))]),
     )
+    # The hop's clip: the one whose `y` reaches the hop's full height above
+    # rest (the walk's bob is 6, and its 1 ms landing tween ends at the walk's end).
+    from an.motion import DFLT_HOP_HEIGHT
+
+    rest_y = next(
+        kf.value for a in doc.animations.values() for ch in a.channels
+        if ch.target == "ned" and ch.property == "y" for kf in ch.keyframes[:1]
+    )
     hop_starts = [
         p.start_time
         for t in doc.timeline.tracks
         for p in t.clips
-        if any(ch.property == "y" and ch.target == "ned" for ch in doc.animations[p.animation_id].channels)
-        and p.start_time >= 1.4
+        if any(
+            ch.property == "y" and ch.target == "ned"
+            and min(k.value for k in ch.keyframes) <= rest_y - DFLT_HOP_HEIGHT + 1e-6
+            for ch in doc.animations[p.animation_id].channels
+        )
     ]
     assert min(hop_starts) == pytest.approx(1.5)
     from an.ir.compose import duration_of

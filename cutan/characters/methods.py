@@ -158,6 +158,12 @@ def _pulse_params() -> dict[str, Any]:
     return schema_of_callable(speech_pulse, skip=("target", "rest", "beats"))
 
 
+#: Every locomotion method's version (ADR 0003 decision 2): bumped together
+#: when the walk they expand through changes for the same args. 2: walk v4
+#: (cutan#14-#16, #18, #20). A scene pinned to "1" fails validation rather
+#: than walking differently.
+LOCO_VERSION: str = "2"
+
 _LEGS_REMEDY = (
     "split the legs into two slots named leg_l/leg_r, each with its art, "
     "pivoted at the hip (an-art-package skill; `an character new` builds them)"
@@ -165,6 +171,7 @@ _LEGS_REMEDY = (
 
 LOCO_LEGGED = Method(
     "loco.legged_cycle",
+    version=LOCO_VERSION,
     aspect=LOCOMOTION,
     name="legs",
     title="legged walk cycle",
@@ -188,6 +195,7 @@ LOCO_LEGGED = Method(
 )
 LOCO_HEM = Method(
     "loco.hem_sway",
+    version=LOCO_VERSION,
     aspect=LOCOMOTION,
     name="hem",
     title="hem sway",
@@ -210,6 +218,7 @@ LOCO_HEM = Method(
 )
 LOCO_ROCK = Method(
     "loco.rock",
+    version=LOCO_VERSION,
     aspect=LOCOMOTION,
     name="rock",
     title="rock and bob",
@@ -240,6 +249,7 @@ def _gait_method(
 ) -> Method:
     return Method(
         id_,
+        version=LOCO_VERSION,
         aspect=LOCOMOTION,
         name=gait,
         title=title,
@@ -573,7 +583,7 @@ def normalise_gait_args(args: Mapping[str, Any]) -> dict[str, Any]:
     walk's (an explicit arg wins); a pin that no longer holds, or a method of
     another aspect, raises :class:`~an.semantic.VocabularyError`.
 
-    >>> normalise_gait_args({"gait": {"method": "loco.legged_cycle", "args": {"stride": 0.5}, "version": "1"}})
+    >>> normalise_gait_args({"gait": {"method": "loco.legged_cycle", "args": {"stride": 0.5}, "version": "2"}})
     {'stride': 0.5, 'gait': 'legs'}
     >>> normalise_gait_args({"gait": "hem", "distance": 80})
     {'gait': 'hem', 'distance': 80}
