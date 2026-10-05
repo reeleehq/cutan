@@ -585,9 +585,11 @@ def test_a_walk_arg_the_gait_does_not_read_is_said(gait_store):
     gait makes it a warning."""
     from cutan.characters.play import play_problems
 
-    assert play_problems(None, "walk", args={"gait": "hop", "bob": 20}) != []
-    pinned = {"gait": {"method": "loco.hop", "args": {"bob": 20}, "version": "1"}}
-    assert play_problems(None, "walk", args=pinned) != []
+    from cutan.characters.methods import LOCO_VERSION
+
+    assert any("does not read 'bob'" in p for p in play_problems(None, "walk", args={"gait": "hop", "bob": 20}))
+    pinned = {"gait": {"method": "loco.hop", "args": {"bob": 20}, "version": LOCO_VERSION}}
+    assert any("does not read 'bob'" in p for p in play_problems(None, "walk", args=pinned))
     with pytest.raises(CutoutCompileError, match="does not read 'bob'"):
         _compile(_walk_shot("gale", gait="hop", bob=20), {"characters": gait_store})
     assert any("does not read 'bob'" in f.description for f in _validate(_walk_shot("gale", gait="hop", bob=20), available_characters=gait_store).findings)
@@ -621,3 +623,73 @@ def test_a_legged_gait_asked_of_a_prop_is_recorded_and_said(tmp_path):
     assert "only a character can walk on legs" in said
     quiet = shot.model_copy(update={"actions": [PlayAction(target="p", animation="walk", args={"distance": 160, "gait": "hop"})]})
     assert not [r for r in _compile(quiet, {"props": props}).asset_resolution if r.kind == "method"]
+
+
+def test_profile_and_legs_share_their_timing():
+    """The extent resolves a `profile` the expansion may walk as `legs`
+    (the view in force is the timeline's); their lengths must agree."""
+    for name in ("step_s", "step_length"):
+        assert gait_params("profile")[name] == gait_params("legs")[name]
+
+
+def test_a_pinned_choice_is_explicit(gait_store):
+    """A pinned choice's unread arg is the author's error, said once, not also
+    warned about as the descriptor's."""
+    pinned = {"gait": {"method": "loco.hop", "args": {"bob": 20}, "version": "2"}}
+    report = _validate(_walk_shot("gale", **pinned), available_characters=gait_store)
+    said = [f for f in report.findings if "does not read 'bob'" in f.description]
+    assert len(said) == 1 and "descriptor's" not in said[0].description
+
+
+def test_gait_noop_is_refused_cleanly(store):
+    from cutan.characters.play import play_problems
+
+    assert play_problems(None, "walk", args={"gait": "noop"}) != []
+    with pytest.raises(CutoutCompileError):
+        _compile(_walk_shot("gale", gait="noop"), {"characters": store})
+
+
+def test_no_typed_view_switches_the_in_force_check_off(ned_store):
+    """The unknown-view sentinel is private: `view: "?"` (or `view: side`, which
+    poses the legs without swapping the art) does not stand for the side view
+    being in force; the profile is substituted and recorded all the same."""
+    for view in ("?", "side"):
+        shot = Shot(id="s", duration=3.0, entities=[AssetRef(kind="character", id="w", store="characters", ref="ned")],
+                    actions=[PlayAction(target="w", animation="walk", args={"gait": "profile", "steps": 3, "distance": 240, "view": view})])
+        doc = _compile(shot, {"characters": ned_store})
+        (record,) = [r for r in doc.asset_resolution if r.kind == "method"]
+        assert "swap.view:side in force" in record.detail
+
+
+@pytest.fixture()
+def legged_props(tmp_path):
+    """The lamp prop with a leg pair bolted on: a prop that CAN walk on legs."""
+    from an.stores.props import PropsStore
+
+    shutil.copytree(PROPS / "lamp", tmp_path / "stool")
+    path = tmp_path / "stool" / "prop.json"
+    d = json.loads(path.read_text())
+    d["name"] = "stool"
+    d["bones"] += [dict(d["bones"][0], name=n, parent="root", y=200.0) for n in ("leg_l", "leg_r")]
+    d["slots"] += [{"name": n, "bone": n, "draw_order": i + 1, "attachment": "off"} for i, n in enumerate(("leg_l", "leg_r"))]
+    for n in ("leg_l", "leg_r"):
+        d["skins"]["default"]["slots"][n] = {"off": d["skins"]["default"]["slots"]["body"]["off"]}
+    path.write_text(json.dumps(d))
+    return PropsStore(tmp_path)
+
+
+def test_a_prop_with_a_leg_pair_walks_the_legged_gait_it_asks_for(legged_props):
+    """cutan#22: off the registry, the limbs are read off the built parts."""
+    shot = Shot(id="s", duration=2.0, entities=[AssetRef(kind="prop", id="p", store="props", ref="stool")],
+                actions=[PlayAction(target="p", animation="walk", args={"distance": 160, "gait": "legs"})])
+    doc = _compile(shot, {"props": legged_props})
+    assert not [r for r in doc.asset_resolution if r.kind == "method"]
+    assert {"p/leg_l", "p/leg_r"} <= {ch.target for a in doc.animations.values() for ch in a.channels}
+    assert not [f for f in _validate(shot, available_props=legged_props).findings if "locomotion" in f.description]
+
+
+def test_a_parts_rig_character_is_checked_by_validate_too(gait_store):
+    """A character stored as a `parts` rig (no descriptor) resolves on its parts
+    in validate as it does in the compiler (review of #33)."""
+    shot = _walk_shot("legless", gait="hem")
+    assert any("loco.hem_sway" in f.description for f in _validate(shot, available_characters=gait_store).findings)

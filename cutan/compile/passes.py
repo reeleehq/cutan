@@ -14,7 +14,7 @@ from __future__ import annotations
 import dataclasses
 import math
 import warnings
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any, Callable
 
@@ -2382,7 +2382,7 @@ def _locomotion_args(
     warning here (an explicit gait's is `play_problems`' error, cutan#21)."""
     from cutan.characters.methods import locomotion_args, walk_arg_problems
 
-    explicit = isinstance(args.get(GAIT_ARG), str)
+    explicit = args.get(GAIT_ARG) is not None
     resolved, resolution = locomotion_args(
         entity,
         args,
@@ -2394,7 +2394,7 @@ def _locomotion_args(
         _record_substitution(resolution.substitution, resolutions)
     if not explicit:
         for problem in walk_arg_problems(resolved[GAIT_ARG], resolved):
-            warnings.warn(f"walk on {entity!r}: {problem}", stacklevel=2)
+            warnings.warn(f"walk on {entity!r}: {problem}", stacklevel=3)
     return resolved
 
 
@@ -2402,9 +2402,12 @@ def _off_registry_walk_args(
     entity: str,
     args: Mapping[str, Any],
     resolutions: list[AssetResolutionJSON] | None,
+    *,
+    parts: Iterable[str],
 ) -> dict[str, Any]:
     """A walk on an entity that does not resolve on the registry (a prop): a
-    legged gait asked of it walks the legless default, recorded (cutan#22)."""
+    legged gait asked of it with no leg pair among its built ``parts`` walks
+    the legless default, recorded (cutan#22)."""
     from cutan.characters.methods import (
         normalise_gait_args,
         off_registry_substitution,
@@ -2412,7 +2415,7 @@ def _off_registry_walk_args(
     from cutan.motion import DFLT_LEGLESS_GAIT
 
     args = normalise_gait_args(args)
-    sub = off_registry_substitution(entity, args)
+    sub = off_registry_substitution(entity, args, parts)
     if sub is None:
         return dict(args)
     _record_substitution(sub, resolutions)
@@ -2503,6 +2506,13 @@ def _with_view_and_posed_parts(
     view = args.get(VIEW_ARG)
     desc = vocab.descriptors.get(entity)
     posed_view = view
+    # The view the TIMELINE has in force (a turn before the play, else the view
+    # the art is drawn in): what a `profile` needs showing (cutan#17). The
+    # walk's own `view` arg poses the legs without swapping the art, so it
+    # does not count there.
+    in_force = facing_at(events, entity, t, view_set=view_set).view
+    if in_force is None and desc is not None:
+        in_force = desc.rest_view
     if view is None and preset_takes(action.animation, VIEW_ARG):
         view = posed_view = facing_at(events, entity, t, view_set=view_set).view
         if view is None and desc is not None:
@@ -2515,9 +2525,11 @@ def _with_view_and_posed_parts(
             action = action.model_copy(update={"args": args})
     if preset_takes(action.animation, GAIT_ARG):
         resolved = (
-            _locomotion_args(entity, args, desc, vocab, resolutions, view=view)
+            _locomotion_args(entity, args, desc, vocab, resolutions, view=in_force)
             if _on_registry(entity, vocab)
-            else _off_registry_walk_args(entity, args, resolutions)
+            else _off_registry_walk_args(
+                entity, args, resolutions, parts=_built_parts(vocab, entity)
+            )
         )
         if resolved != args:
             args = resolved

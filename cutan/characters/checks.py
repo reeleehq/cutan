@@ -671,6 +671,13 @@ def _turns_of(ctx: ValidationContext, index: int, shot: Any):
     return ctx.cached(("turns", index), lambda: _turn_resolution(shot, ctx.stores))
 
 
+def _stage_poses_of(ctx: ValidationContext, index: int, shot: Any):
+    """The shot's built stage poses (:func:`_stage_of`), once per shot across
+    the checks that read them; ``None`` when the stage does not build."""
+    _, unchecked = _rig_scope(shot, ctx.stores)
+    return ctx.cached(("stage", index), _stage_of(shot, ctx.stores, unchecked))
+
+
 def check_play_actions(ctx: ValidationContext) -> None:
     """The cut-out genre's `play` check (:func:`_check_play_actions`)."""
     _check_play_actions(ctx.shot, ctx.path, ctx.report, ctx.stores)
