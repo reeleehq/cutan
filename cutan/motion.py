@@ -642,7 +642,11 @@ def walk(
         if steps == 1 and swinging and leg_pair is not None:
             values = [y0, y0 - height, y0, y0 - height, y0]
             return unsettled(
-                target, "y", values, [half / 2] * 4, _alternating(4, DFLT_OUT_EASING, DFLT_IN_EASING)
+                target,
+                "y",
+                values,
+                [half / 2] * 4,
+                _alternating(4, DFLT_OUT_EASING, DFLT_IN_EASING),
             )
         values = [y0]
         for _ in range(steps):
