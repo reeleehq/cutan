@@ -502,7 +502,7 @@ def test_a_one_step_swinging_walk_has_its_contact_at_contact_height():
 
 
 def test_a_version_one_locomotion_pin_is_refused():
-    """review F2: the gaits expand differently (walk v3), so every method is version 2."""
+    """review F2: the gaits expand differently (walk v4), so every method is version 2."""
     from an.semantic import VocabularyError
     from cutan.characters.methods import LOCO_VERSION, normalise_gait_args
 

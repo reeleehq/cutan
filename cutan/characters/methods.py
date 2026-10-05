@@ -159,7 +159,7 @@ def _pulse_params() -> dict[str, Any]:
 
 
 #: Every locomotion method's version (ADR 0003 decision 2): bumped together
-#: when the walk they expand through changes for the same args. 2: walk v3
+#: when the walk they expand through changes for the same args. 2: walk v4
 #: (cutan#14-#16, #18, #20). A scene pinned to "1" fails validation rather
 #: than walking differently.
 LOCO_VERSION: str = "2"
