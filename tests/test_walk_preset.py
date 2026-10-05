@@ -163,12 +163,16 @@ def test_its_natural_length_is_known_before_it_is_placed(project):
         project,
         _shot([sequence(play("ned", "walk", args={"steps": 3, "step_s": 0.5}), play("ned", "hop"))]),
     )
+    # The hop's clip: the one whose `y` dips 40 px (the walk's bob is 6, and
+    # its 1 ms landing tween ends exactly at the walk's end).
     hop_starts = [
         p.start_time
         for t in doc.timeline.tracks
         for p in t.clips
-        if any(ch.property == "y" and ch.target == "ned" for ch in doc.animations[p.animation_id].channels)
-        and p.start_time >= 1.4
+        if any(
+            ch.property == "y" and ch.target == "ned" and min(k.value for k in ch.keyframes) < -20
+            for ch in doc.animations[p.animation_id].channels
+        )
     ]
     assert min(hop_starts) == pytest.approx(1.5)
     from an.ir.compose import duration_of

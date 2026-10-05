@@ -25,7 +25,7 @@ import pytest
 from an.adapters.cutout.compile import compile_shot
 from an.adapters.cutout.timeline import evaluate_timeline, timeline_from_scene
 from an.ir.compose import duration_of, flatten, parallel, sequence, set_, tween
-from an.motion import stage_poses
+from an.motion import _tweens, stage_poses
 from an.ir.schema import AssetRef, Meta, SceneIR, Shot, StagePlacement, TweenAction
 from an.ir.validate import validate_semantic
 from an.semantic import applicable, aspect, why_not
@@ -151,13 +151,24 @@ def test_the_pre_an224_gaits_expand_as_before_at_scale_one():
     assert {f.action.property for f in leaves if f.action.target == "b"} == {"x", "y", "rotation"}
 
 
-def test_profile_sinks_after_contact_and_rises_before_the_next():
+def _body_y(steps: int) -> list[float]:
     leaves = sorted(
-        (f for f in flatten(walk("p", steps=1, gait="profile", step_s=0.4))
+        (f for f in flatten(walk("p", steps=steps, gait="profile", step_s=0.4))
          if isinstance(f.action, TweenAction) and f.action.target == "p" and f.action.property == "y"),
         key=lambda f: f.start,
     )
-    assert [round(f.action.to_value, 2) for f in leaves] == [3.0, -6.0, 0.0]
+    return [round(f.action.to_value, 2) for f in leaves]
+
+
+def test_profile_sinks_after_contact_and_rises_before_the_next():
+    """cutan#18: the four poses are phased to the CONTACTS (the legs at their
+    widest, a step boundary): up before each contact, down after it; `bob` (6)
+    is the whole travel (rises 4, sinks 2). The walk starts and ends standing."""
+    # three steps: up before contact 1 | down, up between contacts | down after contact 2
+    assert _body_y(3) == [-4.0, 0.0, 2.0, -4.0, 0.0, 2.0, 0.0, 0.0]
+    # one step: its contact is mid-step
+    assert _body_y(1) == [-4.0, 0.0, 2.0, 0.0, 0.0]
+    assert _body_y(2) == [-4.0, 0.0, 2.0, 0.0, 0.0]
 
 
 def _gait_warnings(store, ref, **args):
@@ -366,3 +377,97 @@ def test_an_unchecked_entity_does_not_cost_the_others_their_context(gait_store, 
     stores = {"characters": gait_store}  # no props store: `p` is unchecked
     context = _preset_context_of({e.id: e for e in shot.entities}, {"p"}, stores, _stage_of(shot, stores, {"p"}))
     assert context("w", shot.actions[0])["gait"] == "shuffle"
+
+
+# ------------------------------------------- cutan#14, #15, #16, #18, #20 (walk v3)
+
+PARTS = {n: {"rotation": 0.0, "y": 0.0} for n in ("leg_l", "leg_r", "arm_l", "arm_r")}
+
+
+def _channel(action, target, prop):
+    return sorted(
+        (f for f in _tweens(action) if f.action.target == target and f.action.property == prop),
+        key=lambda f: f.start,
+    )
+
+
+@pytest.mark.parametrize(
+    "gait,view,legs_moving",
+    [
+        ("profile", None, {"p/leg_l", "p/leg_r"}),
+        ("legs", "side", {"p/leg_l", "p/leg_r"}),
+        ("hem", None, {"p/leg_l", "p/leg_r"}),
+        ("legs", None, {"p/leg_l"}),  # facing the camera one leg steps, the other stands
+    ],
+)
+def test_a_one_step_walk_moves_its_limbs(gait, view, legs_moving):
+    """cutan#16: `distance: 80` is one step by default; the limbs still move."""
+    w = walk("p", gait=gait, steps=1, distance=80, parts=PARTS, view=view)
+    moved = {
+        f.action.target
+        for f in _tweens(w)
+        if f.action.target != "p" and f.action.from_value != f.action.to_value
+    }
+    assert moved == legs_moving | {"p/arm_l", "p/arm_r"}
+    for name in ("p/arm_l",):  # one extreme mid-step, back to rest
+        ends = [f.action.to_value for f in _channel(w, name, "rotation")]
+        assert ends[0] != 0.0 and ends[-1] == pytest.approx(0.0)
+
+
+def test_a_profile_walk_passes_its_legs_between_contacts():
+    """cutan#18: a walk of N steps starts and ends standing and makes N-1
+    contacts; from three steps on the legs cross their rest between two."""
+    w = walk("p", gait="profile", steps=3, distance=240, parts=PARTS)
+    values = [v for f in _channel(w, "p/leg_l", "rotation") for v in (f.action.from_value, f.action.to_value)]
+    assert min(values) < 0.0 < max(values), values
+    two = walk("p", gait="profile", steps=2, distance=160, parts=PARTS)
+    assert [f.action.to_value for f in _channel(two, "p/leg_l", "rotation")] == pytest.approx([0.45, 0.0, 0.0])
+
+
+def test_profile_body_travel_per_step_is_bob():
+    w = walk("p", gait="profile", steps=2, bob=6.0, parts=PARTS)
+    ys = [v for f in _channel(w, "p", "y") for v in (f.action.from_value, f.action.to_value)]
+    assert max(ys) - min(ys) == pytest.approx(6.0)
+
+
+def test_the_body_sway_mirrors_with_the_figure():
+    """cutan#20: the sway leans onto the standing foot whichever way the figure faces."""
+
+    def first_rock(a):
+        return next(f.action.to_value for f in _channel(a, "b", "rotation"))
+
+    for gait in ("waddle", "rock", "hem"):
+        plain = walk("b", gait=gait, steps=2, arms=())
+        mirrored = walk("b", gait=gait, steps=2, arms=(), rest={"scale_x": -1.0})
+        assert first_rock(plain) > 0, gait  # over the standing leg_r (viewer's right)
+        assert first_rock(mirrored) == pytest.approx(-first_rock(plain)), gait
+
+
+def test_a_zero_amplitude_writes_no_channel():
+    """cutan#14: as `arm_swing: 0` and `lean: 0` already did."""
+    w = walk("k", gait="glide", bob=0, lean=0, steps=2, distance=100, legs=(), arms=())
+    assert {(f.action.target, f.action.property) for f in _tweens(w)} == {("k", "x")}
+    w = walk("k", gait="rock", rock=0, bob=0, steps=2, distance=100, legs=(), arms=())
+    assert {(f.action.target, f.action.property) for f in _tweens(w)} == {("k", "x")}
+    w = walk("k", gait="legs", lift=0, stride=0, bob=0, arm_swing=0, steps=2, parts=PARTS)
+    assert not _tweens(w) and duration_of(w) == pytest.approx(2 * DFLT_WALK_STEP_S)  # on the spot: still takes its time
+
+
+def test_a_zero_amplitude_walk_leaves_an_authored_tween_alone(store):
+    acts = parallel(
+        tween("w", "y", to=-100.0, duration=2.0, from_=0.0, easing="linear"),
+        PlayAction(target="w", animation="walk", args={"gait": "glide", "bob": 0, "lean": 0, "steps": 2, "distance": 100}),
+    )
+    doc = _compile(_gale_shot(acts), {"characters": store})
+    assert _pose(doc, 0.4)[("w", "y")] == pytest.approx(-20.0)
+
+
+def test_a_walk_does_not_snap_the_body_back_after_a_longer_authored_tween(store):
+    """cutan#15: the body lands with the landing tween, as the limbs do."""
+    acts = parallel(
+        tween("w", "y", to=-100.0, duration=2.0, from_=0.0, easing="linear"),
+        PlayAction(target="w", animation="walk", args={"gait": "hop", "steps": 2, "distance": 100}),
+    )
+    doc = _compile(_gale_shot(acts), {"characters": store})
+    assert _pose(doc, 2.5)[("w", "y")] == pytest.approx(-100.0)
+    assert _pose(doc, 1.0)[("w", "x")] == pytest.approx(_pose(doc, 0.8)[("w", "x")])  # and x stays landed
