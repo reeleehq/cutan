@@ -1064,13 +1064,17 @@ def check_walk_gaits(ctx) -> None:
                     continue  # the stage did not build: `cutout.play` says why
                 prefix = f"{entity}/"
                 parts = [p[len(prefix) :] for p in poses if p.startswith(prefix)]
-                sub = off_registry_substitution(entity, normalise_gait_args(args), parts)
+                sub = off_registry_substitution(
+                    entity, normalise_gait_args(args), parts
+                )
                 problems = [p for p in (substitution_problem(sub),) if p]
             else:
                 if store is None or rig.ref not in store:
                     continue
                 doc = store[rig.ref]
-                view = facing_at(events, entity, flat.start, view_set=DFLT_TURN_SET).view
+                view = facing_at(
+                    events, entity, flat.start, view_set=DFLT_TURN_SET
+                ).view
                 if view is None and isinstance(doc, Mapping):
                     view = doc.get("rest_view")
                 problems = walk_problems(
