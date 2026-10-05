@@ -75,6 +75,12 @@ __all__ = [
     "check_walk_gaits",
     "gait_problem",
     "locomotion_args",
+    "off_registry_substitution",
+    "substitution_problem",
+    "walk_arg_problems",
+    "SIDE_VIEW_IN_FORCE",
+    "UNKNOWN_VIEW",
+    "WALK_OWN_ARGS",
     "compile_profile",
     "speech_problems",
     "normalise_gait_args",
@@ -110,6 +116,30 @@ _GLIDE_PARAMS: tuple[str, ...] = ("bob", "lean", "arm_swing")
 CLOSED_VISEMES: frozenset[str] = frozenset({"A", "X"})
 #: Pulses closer than this are one syllable.
 DFLT_MIN_BEAT_GAP_S: float = 0.18
+#: The requirement a ``profile`` walk has beyond the registry's
+#: ``swap.view:side``: the side view must be the one SHOWING when the walk
+#: starts, or the legs swing in the front view and scissor (cutan#17).
+SIDE_VIEW_IN_FORCE: str = "swap.view:side in force"
+VIEW_IN_FORCE_REMEDY: str = (
+    "turn the character to its side view before the walk (`turn` with `to: "
+    "side`, or `view: side` on the walk), or carve its art in profile and "
+    "declare `rest_view: side`"
+)
+#: What a legged gait asked of an entity that resolves OFF the registry (a
+#: prop: no analyser, no legs) is told (cutan#22).
+NO_LEGS_OFF_REGISTRY_REMEDY: str = (
+    "only a character can walk on legs; walk this entity with a legless gait "
+    "(glide, hop, bounce, rock, waddle) or make it a character"
+)
+#: The walk's own arguments: where to, how many steps, the limbs, the view.
+#: Everything else a walk accepts is a gait parameter, which only the gaits
+#: that declare it read (cutan#21).
+WALK_OWN_ARGS: frozenset[str] = frozenset(
+    {"to_x", "distance", "direction", "steps", "view", "legs", "arms", "gait"}
+)
+#: "The view in force is not known" — a caller that cannot read the timeline
+#: (the CLI's capability listing); the compiler and `an validate` always can.
+UNKNOWN_VIEW: str = "?"
 
 
 def _walk_params(gait: str, names: Iterable[str]) -> dict[str, Any]:
@@ -477,19 +507,35 @@ def resolve_walk_gait(
     descriptor: Any | None,
     profile: Mapping[str, Mapping[str, Any]],
     policy: Any = None,
+    view: str | None = UNKNOWN_VIEW,
 ):
     """``(gait, resolution)`` of a walk on ``entity``: the locomotion method's spelling.
 
     The request is the walk's ``gait`` arg, else the descriptor's declared
     ``gait`` (an override of the derivation, and reported as one). An explicit
     ``legs`` arg names the limbs itself: a non-empty pair affords legs whatever
-    the derivation says, ``()`` affords none.
+    the derivation says, ``()`` affords none. ``view`` is the view in force at
+    the play's start (``None``: the rig's default drawing): a ``profile``
+    resolved while the character shows a view its legs do not swing in is
+    substituted by ``legs`` and recorded, like a missing capability
+    (cutan#17); :data:`UNKNOWN_VIEW` skips that (a caller with no timeline).
 
     >>> gait, r = resolve_walk_gait("blob", args={"gait": "hem"}, descriptor=None, profile={})
     >>> gait, r.substitution.reason, r.substitution.missing
     ('glide', 'missing', ('limbs.legs',))
+    >>> legged = {"limbs.legs": {"slots": ["leg_l", "leg_r"]}, "swap.view": {"keys": ["front", "side"]}}
+    >>> gait, r = resolve_walk_gait("ned", args={"gait": "profile"}, descriptor=None, profile=legged, view=None)
+    >>> gait, r.substitution.missing
+    ('legs', ('swap.view:side in force',))
+    >>> resolve_walk_gait("ned", args={"gait": "profile"}, descriptor=None, profile=legged, view="side")[0]
+    'profile'
     """
+    from dataclasses import replace
+
+    from an.capabilities import Substitution
     from an.semantic import resolve
+
+    from cutan.motion import WALK_SWING_VIEWS
 
     profile = dict(profile)
     legs = args.get("legs")
@@ -500,7 +546,81 @@ def resolve_walk_gait(
             profile.pop("limbs.legs", None)
     requested = args.get("gait") or getattr(descriptor, "gait", None)
     r = resolve(LOCOMOTION, profile, requested=requested, policy=policy, entity=entity)
+    if (
+        r.method.id == LOCO_PROFILE.id
+        and view != UNKNOWN_VIEW
+        and view not in WALK_SWING_VIEWS
+    ):
+        r = replace(
+            r,
+            method=LOCO_LEGGED,
+            substitution=Substitution(
+                LOCOMOTION,
+                entity,
+                requested=LOCO_PROFILE.id,
+                chosen=LOCO_LEGGED.id,
+                reason="missing",
+                requested_version=LOCO_PROFILE.version,
+                chosen_version=LOCO_LEGGED.version,
+                missing=(SIDE_VIEW_IN_FORCE,),
+                remedies={SIDE_VIEW_IN_FORCE: VIEW_IN_FORCE_REMEDY},
+            ),
+        )
     return r.method.term, r
+
+
+def off_registry_substitution(entity: str, args: Mapping[str, Any]):
+    """The record for a legged gait asked of an entity that does not resolve
+    on the capability registry (a prop: no analyser, no ``limbs.legs``): it
+    walks the legless default, and says so (cutan#22). ``None`` otherwise.
+
+    >>> off_registry_substitution("lamp", {"gait": "hem"}).sentence()
+    "lamp: locomotion 'loco.hem_sway' does not apply (missing limbs.legs); used 'loco.glide'"
+    >>> off_registry_substitution("lamp", {"gait": "hop"}) is None
+    True
+    """
+    from an.capabilities import Substitution
+    from an.semantic import lookup
+
+    from cutan.motion import LEGGED_GAITS
+
+    gait = args.get("gait")
+    if not isinstance(gait, str) or gait not in LEGGED_GAITS:
+        return None
+    asked = lookup("method", gait, aspect=LOCOMOTION)
+    return Substitution(
+        LOCOMOTION,
+        entity,
+        requested=asked.id,
+        chosen=LOCO_GLIDE.id,
+        reason="missing",
+        requested_version=asked.version,
+        chosen_version=LOCO_GLIDE.version,
+        missing=("limbs.legs",),
+        remedies={"limbs.legs": NO_LEGS_OFF_REGISTRY_REMEDY},
+    )
+
+
+def walk_arg_problems(gait: str, args: Mapping[str, Any]) -> list[str]:
+    """The gait parameters in ``args`` that ``gait`` never reads (cutan#21):
+    each is a silent no-op otherwise. ``gait`` is a spelling (one of
+    :data:`cutan.motion.GAITS`); the walk's own arguments
+    (:data:`WALK_OWN_ARGS`) are never a problem.
+
+    >>> walk_arg_problems("hop", {"bob": 20, "distance": 80, "arm_swing": 0.2})
+    ["gait 'hop' does not read 'bob' (it reads: arm_swing, hop_height, step_length, step_s)"]
+    >>> walk_arg_problems("glide", {"bob": 2})
+    []
+    """
+    from an.semantic import lookup
+
+    declared = set(lookup("method", gait, aspect=LOCOMOTION).params["properties"])
+    reads = ", ".join(sorted(declared))
+    return [
+        f"gait {gait!r} does not read {name!r} (it reads: {reads})"
+        for name in args
+        if name not in WALK_OWN_ARGS and name not in declared
+    ]
 
 
 def locomotion_args(
@@ -510,6 +630,7 @@ def locomotion_args(
     descriptor: Any | None,
     profile: Mapping[str, Mapping[str, Any]],
     policy: Any = None,
+    view: str | None = UNKNOWN_VIEW,
 ) -> tuple[dict[str, Any], Any]:
     """``(args with its gait resolved, resolution)`` of a walk on ``entity``:
     the locomotion method the registry resolves (an#248) — the author's
@@ -526,7 +647,12 @@ def locomotion_args(
     """
     args = normalise_gait_args(args)
     gait, resolution = resolve_walk_gait(
-        entity, args=args, descriptor=descriptor, profile=profile, policy=policy
+        entity,
+        args=args,
+        descriptor=descriptor,
+        profile=profile,
+        policy=policy,
+        view=view,
     )
     return {**args, "gait": gait}, resolution
 
@@ -740,17 +866,22 @@ def check_brow_acting(ctx) -> None:
 
 
 def gait_problem(
-    doc: Any, *, entity: str, args: Mapping[str, Any], art_exists: Any = None
+    doc: Any,
+    *,
+    entity: str,
+    args: Mapping[str, Any],
+    art_exists: Any = None,
+    view: str | None = UNKNOWN_VIEW,
 ) -> str | None:
     """Why a walk on ``entity`` will not use the gait it asks for (its ``gait``
     arg, else the descriptor's), with what would enable it — or ``None``.
 
     ``doc`` is the character's stored document; ``art_exists`` the store's
-    probe. The sentence is the one the compiler records (``asset_resolution``)
-    when it substitutes the method, plus each missing capability's remedy.
+    probe; ``view`` the view in force at the play's start (cutan#17). The
+    sentence is the one the compiler records (``asset_resolution``) when it
+    substitutes the method, plus each missing capability's remedy.
     """
     from cutan.characters.schema import CharacterDescriptor
-    from an.capabilities import remedy_for
     from an.ir.migrate import migrate
 
     if not isinstance(doc, Mapping) or doc.get("kind") != "CharacterDescriptor":
@@ -764,11 +895,23 @@ def gait_problem(
         args=args,
         descriptor=desc,
         profile=compile_profile(desc, art_exists=art_exists),
+        view=view,
     )
-    sub = r.substitution
+    return substitution_problem(r.substitution)
+
+
+def substitution_problem(sub) -> str | None:
+    """The sentence `an validate` reports for a ``missing`` substitution: what
+    happened, plus each missing capability's remedy (the substitution's own
+    where it carries one, else the registry's). ``None`` for no substitution
+    or a non-fatal one."""
+    from an.capabilities import remedy_for
+
     if sub is None or sub.reason != "missing":
         return None
-    fixes = "; ".join(f"{m}: {remedy_for(m)}" for m in sub.missing)
+    fixes = "; ".join(
+        f"{m}: {sub.remedies.get(m) or remedy_for(m)}" for m in sub.missing
+    )
     return f"{sub.sentence()}. To enable it — {fixes}"
 
 

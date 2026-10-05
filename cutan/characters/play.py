@@ -244,6 +244,27 @@ def preset_args(animation: str, args: Mapping[str, object] | None) -> dict:
     return out
 
 
+def preset_target_problems(animation: str, target: str) -> list[str]:
+    """Why ``animation`` cannot be played on ``target``: a preset that moves an
+    entity's PARTS (``walk``) is played on the entity, not on one of its parts
+    — a torso asked to walk would glide away from its legs, and the gait
+    resolution keys the whole character (cutan#22). Checked by the compiler
+    and by `an validate` alike.
+
+    >>> preset_target_problems("walk", "w/torso")
+    ["motion preset 'walk' moves a whole character: play it on 'w', not on its part 'w/torso'"]
+    >>> preset_target_problems("walk", "w"), preset_target_problems("point", "w/arm_r")
+    ([], [])
+    """
+    if "/" in (target or "") and preset_takes(animation, PARTS_ARG):
+        root = target.split("/", 1)[0]
+        return [
+            f"motion preset {animation!r} moves a whole character: play it on "
+            f"{root!r}, not on its part {target!r}"
+        ]
+    return []
+
+
 def _presets() -> dict[str, Callable]:
     # Lazy: `cutan.motion` imports the IR, and the IR's validator imports this.
     from cutan.motion import PRESETS
@@ -374,6 +395,17 @@ def preset_problems(
                 f"motion preset {animation!r} has no parameter {name!r} "
                 f"(it takes: {accepted})"
             )
+    if not problems and isinstance(args.get(GAIT_ARG), str):
+        # An explicit gait reads only its own parameters (cutan#21): one it
+        # never reads is an author error, said here (the compiler's verdict is
+        # validate's). A gait the descriptor or the chain supplies is checked
+        # where it is resolved (`cutout.walk_gait`), as a warning.
+        from cutan.characters.methods import walk_arg_problems
+
+        problems.extend(
+            f"motion preset {animation!r}: {p}"
+            for p in walk_arg_problems(args[GAIT_ARG], args)
+        )
     if loop:
         problems.append(
             f"motion preset {animation!r} is a one-shot: `loop: true` is for "
@@ -1266,6 +1298,7 @@ __all__ = [
     "preset_moved_nodes",
     "preset_takes",
     "preset_play_span",
+    "preset_target_problems",
     "PresetContext",
     "preset_problems",
     "primary_slot_per_bone",
