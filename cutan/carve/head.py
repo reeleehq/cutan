@@ -17,7 +17,7 @@ frames detectors usually find nothing, and a hand box is the way.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 
 import numpy as np
@@ -55,7 +55,9 @@ class Face:
     """A face in an image: its box and, when known, its jaw contour.
 
     ``box`` is ``(x0, y0, x1, y1)``; ``jaw`` a sequence of ``(x, y)`` points
-    along the jaw, ear to ear (any order, at least three); ``score`` the
+    along the jaw, ear to ear (any order, at least three); ``landmarks`` the
+    detector's full set when there is one (kept, mapped onto the canvas, so a
+    later step can place eyes and mouth without re-carving); ``score`` the
     detector's confidence (1 for a hand box).
 
     >>> f = Face((10, 20, 50, 80))
@@ -66,6 +68,7 @@ class Face:
     box: tuple[float, float, float, float]
     jaw: tuple[tuple[float, float], ...] | None = None
     score: float = 1.0
+    landmarks: tuple[tuple[float, float], ...] | None = None
 
     def __post_init__(self) -> None:
         x0, y0, x1, y1 = self.box
@@ -78,7 +81,33 @@ class Face:
             if len(jaw) < 3:
                 raise ValueError("a jaw contour needs at least three points")
             object.__setattr__(self, "jaw", jaw)
+        if self.landmarks is not None:
+            lm = tuple((float(x), float(y)) for x, y in self.landmarks)
+            object.__setattr__(self, "landmarks", lm)
         object.__setattr__(self, "box", tuple(float(v) for v in self.box))
+
+    @classmethod
+    def of(cls, face: "Face | Sequence[float] | Mapping") -> "Face":
+        """A face from a ``Face``, a box ``(x0, y0, x1, y1)``, or a mapping (``box``, ``jaw``, …).
+
+        >>> Face.of({"box": [0, 0, 10, 12], "jaw": [[0, 6], [5, 12], [10, 6]]}).chin_y
+        12.0
+        """
+        if isinstance(face, Face):
+            return face
+        if isinstance(face, Mapping):
+            keys = ("box", "jaw", "score", "landmarks")
+            return cls(**{k: v for k, v in face.items() if k in keys})
+        return cls(tuple(face))
+
+    def as_dict(self) -> dict:
+        """JSON-ready, the inverse of :meth:`of`."""
+        out: dict = {"box": list(self.box), "score": self.score}
+        if self.jaw:
+            out["jaw"] = [list(p) for p in self.jaw]
+        if self.landmarks:
+            out["landmarks"] = [list(p) for p in self.landmarks]
+        return out
 
     @property
     def width(self) -> float:
@@ -128,9 +157,14 @@ class InsightFaceLocator:
             if f.det_score < self.min_score:
                 continue
             lm = getattr(f, "landmark_2d_106", None)
-            jaw = tuple(map(tuple, lm[0:33].tolist())) if lm is not None else None
+            pts = tuple(map(tuple, lm.tolist())) if lm is not None else None
             faces.append(
-                Face(tuple(f.bbox.tolist()), jaw=jaw, score=float(f.det_score))
+                Face(
+                    tuple(f.bbox.tolist()),
+                    jaw=pts[0:33] if pts else None,
+                    landmarks=pts,
+                    score=float(f.det_score),
+                )
             )
         return faces
 

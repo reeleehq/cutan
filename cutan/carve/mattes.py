@@ -37,7 +37,7 @@ True
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol, runtime_checkable
 
@@ -53,6 +53,7 @@ __all__ = [
     "Focus",
     "GrabCut",
     "Hint",
+    "Levels",
     "Matte",
     "MatteLike",
     "Polygon",
@@ -96,10 +97,12 @@ class MatteLike(Protocol):
 
 
 class Matte:
-    """Base of the shipped strategies: a name, a recipe, and ``&`` / ``|``.
+    """Base of the shipped strategies: a name, a recipe, and ``&``, ``|``, ``~``.
 
     ``recipe()`` is what provenance records about how a part was cut: the
-    strategy's name and its parameters (never the image).
+    strategy's name under ``"matte"`` and its constructor's arguments (never
+    the image), plain JSON. It is also data a carve can be replayed from:
+    ``as_matte(m.recipe())`` builds the same matte.
     """
 
     name: str = "matte"
@@ -124,16 +127,28 @@ class Matte:
     def __invert__(self) -> Matte:
         return _Combined("not", [self])
 
+    def otherwise(self, other: MatteLike, *, min_coverage: float = 0.01) -> Matte:
+        """This matte, or ``other`` when this one keeps less than ``min_coverage``
+        of the image (the head carver's retry with another model on an empty matte)."""
+        return _Otherwise([self, as_matte(other)], min_coverage=min_coverage)
+
 
 def _plain(v: Any) -> Any:
-    """A JSON-friendly copy of a parameter (tuples to lists, arrays to lists)."""
-    if isinstance(v, np.ndarray):
-        return v.tolist()
-    if isinstance(v, (list, tuple)):
-        return [_plain(x) for x in v]
+    """A JSON-friendly copy of a parameter: tuples and arrays to lists, mattes to
+    their recipes, numpy scalars to numbers, anything else to its ``repr``."""
     if isinstance(v, Matte):
         return v.recipe()
-    return v
+    if isinstance(v, np.ndarray):
+        return v.tolist()
+    if isinstance(v, np.generic):
+        return v.item()
+    if isinstance(v, (list, tuple)):
+        return [_plain(x) for x in v]
+    if isinstance(v, dict):
+        return {str(k): _plain(x) for k, x in v.items()}
+    if v is None or isinstance(v, (bool, int, float, str)):
+        return v
+    return repr(v)
 
 
 class _Combined(Matte):
@@ -157,22 +172,68 @@ class _Combined(Matte):
         return {"matte": self.op, "of": [_recipe_of(p) for p in self._parts]}
 
 
+class _Otherwise(Matte):
+    """The first matte that keeps at least ``min_coverage`` of the image (else the last)."""
+
+    def __init__(self, parts: list[Matte], *, min_coverage: float):
+        self._parts, self.min_coverage = parts, min_coverage
+        self.name = "otherwise"
+        self._used: int | None = None
+
+    def __call__(self, rgb: np.ndarray, hint: Hint) -> np.ndarray:
+        for i, p in enumerate(self._parts):
+            a = _checked(p(rgb, hint), rgb, p)
+            if (a > 0.5).mean() >= self.min_coverage or i == len(self._parts) - 1:
+                self._used = i
+                return a
+        raise AssertionError("unreachable")  # pragma: no cover
+
+    def recipe(self) -> dict[str, Any]:
+        out = {
+            "matte": "otherwise",
+            "of": [_recipe_of(p) for p in self._parts],
+            "min_coverage": self.min_coverage,
+        }
+        if self._used is not None:
+            out["used"] = self._used
+        return out
+
+
 class _Function(Matte):
-    """A plain callable as a matte (its recipe records its qualified name)."""
+    """A plain callable as a matte; its recipe names it (``module:qualname``) but
+    cannot be replayed from data."""
 
     def __init__(self, fn: Callable[[np.ndarray, Hint], np.ndarray]):
         self._fn = fn
-        self.name = getattr(fn, "__qualname__", type(fn).__name__)
+        self.name = "callable"
 
     def __call__(self, rgb: np.ndarray, hint: Hint) -> np.ndarray:
         return self._fn(rgb, hint)
 
     def recipe(self) -> dict[str, Any]:
-        return {"matte": self.name}
+        return {"matte": "callable", **_callable_ref(self._fn)}
+
+
+def _callable_ref(fn: Any) -> dict[str, Any]:
+    import functools
+
+    if isinstance(fn, functools.partial):
+        return {
+            **_callable_ref(fn.func),
+            "args": _plain(list(fn.args)),
+            "keywords": _plain(dict(fn.keywords)),
+        }
+    module = getattr(fn, "__module__", None) or type(fn).__module__
+    qual = getattr(fn, "__qualname__", None) or type(fn).__qualname__
+    return {"ref": f"{module}:{qual}"}
 
 
 def _recipe_of(m: Any) -> dict[str, Any]:
-    return m.recipe() if isinstance(m, Matte) else {"matte": type(m).__name__}
+    return (
+        m.recipe()
+        if isinstance(m, Matte)
+        else {"matte": "callable", **_callable_ref(m)}
+    )
 
 
 def _checked(alpha: Any, rgb: np.ndarray, who: Any) -> np.ndarray:
@@ -183,6 +244,33 @@ def _checked(alpha: Any, rgb: np.ndarray, who: Any) -> np.ndarray:
             f"{a.shape}; the image is {rgb.shape[:2]}"
         )
     return np.clip(a, 0.0, 1.0)
+
+
+@dataclass
+class Levels(Matte):
+    """Re-map another matte's alpha: ``clip((alpha - lo) / range, 0, 1)``.
+
+    Raising ``lo`` drops a neural matte's faint halo (the head carver's
+    ``edge_lo``); not the same as ``choke``, which pulls the edge in by pixels.
+    """
+
+    of: Any = None
+    lo: float = 0.4
+    range: float = 0.35
+    name: str = field(default="levels", init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        if self.of is None:
+            raise ValueError(
+                "Levels needs the matte it re-maps: Levels(of=Rembg(), lo=0.4)"
+            )
+        self.of = as_matte(self.of)
+        if self.range <= 0:
+            raise ValueError(f"Levels range must be positive, not {self.range}")
+
+    def __call__(self, rgb: np.ndarray, hint: Hint) -> np.ndarray:
+        a = _checked(self.of(rgb, hint), rgb, self.of)
+        return np.clip((a - self.lo) / self.range, 0.0, 1.0).astype(np.float32)
 
 
 # ---------------------------------------------------------------------------
@@ -227,14 +315,18 @@ class FlatColour(Matte):
     ``colours``: the backdrop colours (RGB); ``None`` reads them off the
     image's border (:func:`border_colours`). A pixel within ``tolerance`` (the
     largest per-channel difference) of one is backdrop, with a ``softness``
-    ramp beyond it for anti-aliased edges. ``connected`` keeps only backdrop
-    regions that touch the image border (or the ``seeds``), so a white
-    interior enclosed by an outline (an eye, a shirt) stays in the subject.
+    ramp beyond it for anti-aliased edges — but only within ``edge`` px (source
+    pixels) of the backdrop, so a subject colour a little off the backdrop's
+    (a pale grey on white) stays solid inside instead of turning see-through.
+    ``connected`` keeps only backdrop regions that touch the image border (or
+    the ``seeds``), so a white interior enclosed by an outline (an eye, a
+    shirt) stays in the subject.
     """
 
     colours: Sequence[Sequence[int]] | None = None
     tolerance: float = 24.0
     softness: float = 16.0
+    edge: float = 2.0
     connected: bool = True
     seeds: Sequence[Point] | None = None
     name: str = field(default="flat_colour", init=False, repr=False)
@@ -248,12 +340,9 @@ class FlatColour(Matte):
         dist = np.min(
             [np.abs(img - np.asarray(c, np.int16)).max(axis=2) for c in colours], axis=0
         ).astype(np.float32)
-        backdrop = np.clip(
-            1.0 - (dist - self.tolerance) / max(self.softness, 1e-6), 0, 1
-        )
+        hard = dist <= self.tolerance
         if self.connected:
-            region = (backdrop > 0.0).astype(np.uint8)
-            n, labels = cv2.connectedComponents(region, connectivity=4)
+            n, labels = cv2.connectedComponents(hard.astype(np.uint8), connectivity=4)
             if self.seeds:
                 local = hint.to_local(self.seeds)
                 h, w = labels.shape
@@ -270,7 +359,12 @@ class FlatColour(Matte):
                     ).tolist()
                 )
             ids.discard(0)
-            backdrop = backdrop * np.isin(labels, list(ids))
+            hard = np.isin(labels, list(ids))
+        reach = max(1, round(self.edge * hint.scale))
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * reach + 1,) * 2)
+        near = cv2.dilate(hard.astype(np.uint8), kernel) > 0
+        ramp = np.clip(1.0 - (dist - self.tolerance) / max(self.softness, 1e-6), 0, 1)
+        backdrop = np.where(hard, 1.0, ramp * near)
         return (1.0 - backdrop).astype(np.float32)
 
 
@@ -341,11 +435,14 @@ class GrabCut(Matte):
 
     ``box``: ``(x0, y0, x1, y1)`` in the SOURCE image; ``None`` takes the
     hint's box, else the whole image less a ``margin`` share on each side.
+    ``seed`` seeds OpenCV's random generator before the cut, so a recorded
+    recipe replays to the same matte.
     """
 
     box: Box | None = None
     iterations: int = 8
     margin: float = 0.02
+    seed: int = 0
     name: str = field(default="grabcut", init=False, repr=False)
 
     def __call__(self, rgb: np.ndarray, hint: Hint) -> np.ndarray:
@@ -360,11 +457,19 @@ class GrabCut(Matte):
             x0, y0, x1, y1 = mx, my, w - mx, h - my
         x0, y0 = max(int(x0), 0), max(int(y0), 0)
         x1, y1 = min(int(np.ceil(x1)), w), min(int(np.ceil(y1)), h)
+        if (x0, y0, x1, y1) == (0, 0, w, h):
+            # GrabCut needs some background outside the box: a box that is the
+            # whole image gets a 1-px frame (only then: a frame changes its model)
+            x0, y0, x1, y1 = 1, 1, w - 1, h - 1
         if x1 - x0 < 2 or y1 - y0 < 2:
             raise ValueError(
-                f"the GrabCut box {(x0, y0, x1, y1)} is empty in a {w}x{h} image"
+                f"the GrabCut box {(x0, y0, x1, y1)} is empty in a {w}x{h} image "
+                "(it needs a box inside the image with a frame of background around it)"
             )
         mask = np.zeros((h, w), np.uint8)
+        cv2.setRNGSeed(
+            self.seed
+        )  # its colour models start from k-means: same seed, same matte
         bgd, fgd = np.zeros((1, 65), np.float64), np.zeros((1, 65), np.float64)
         cv2.grabCut(
             np.ascontiguousarray(rgb[..., ::-1]),
@@ -491,14 +596,23 @@ MATTES: dict[str, type[Matte]] = {
     "polygon": Polygon,
     "focus": Focus,
     "rembg": Rembg,
+    "levels": Levels,
 }
 
 
-def as_matte(matte: str | MatteLike) -> Matte:
-    """A :class:`Matte` from a strategy's name, a ``Matte``, or any ``(rgb, hint) -> alpha`` callable.
+def as_matte(matte: str | Mapping[str, Any] | MatteLike) -> Matte:
+    """A :class:`Matte` from a strategy's name, its recipe, a ``Matte``, or any
+    ``(rgb, hint) -> alpha`` callable.
+
+    A recipe (``Matte.recipe()``, as a carve records it) builds the same matte
+    back, so a strategy with its settings is plain data (a batch spec, a CLI):
 
     >>> as_matte("chroma").name
     'chroma'
+    >>> m = as_matte({"matte": "and", "of": [{"matte": "chroma", "width": 40},
+    ...                                      {"matte": "polygon", "points": [[0, 0], [9, 0], [9, 9]]}]})
+    >>> m.recipe() == as_matte(m.recipe()).recipe(), m.recipe()["of"][0]["width"]
+    (True, 40)
     >>> as_matte("rainbow")  # doctest: +ELLIPSIS
     Traceback (most recent call last):
       ...
@@ -516,8 +630,37 @@ def as_matte(matte: str | MatteLike) -> Matte:
                 "the polygon matte needs its points: Polygon([(x, y), ...])"
             )
         return MATTES[matte]()
+    if isinstance(matte, Mapping):
+        return _from_recipe(matte)
     if callable(matte):
         return _Function(matte)
     raise TypeError(
-        f"a matte is a strategy name or a callable (rgb, hint) -> alpha, not {matte!r}"
+        f"a matte is a strategy name, a recipe or a callable (rgb, hint) -> alpha, not {matte!r}"
     )
+
+
+def _from_recipe(recipe: Mapping[str, Any]) -> Matte:
+    params = dict(recipe)
+    name = params.pop("matte", None)
+    if name in ("and", "or", "not"):
+        parts = [as_matte(p) for p in params.get("of") or ()]
+        if not parts or (name == "not" and len(parts) != 1):
+            raise ValueError(f"a {name!r} recipe needs its mattes under 'of'")
+        return _Combined(name, parts)
+    if name == "otherwise":
+        params.pop("used", None)
+        parts = [as_matte(p) for p in params.pop("of", None) or ()]
+        return _Otherwise(parts, **params)
+    if name == "callable":
+        raise ValueError(
+            f"a carve made with the callable {params.get('ref')!r} names it but cannot "
+            "be replayed from data: pass the callable itself"
+        )
+    if name not in MATTES:
+        raise ValueError(
+            f"no matte strategy {name!r}; the strategies are: {', '.join(sorted(MATTES))}"
+        )
+    try:
+        return MATTES[name](**params)
+    except TypeError as e:
+        raise ValueError(f"the {name!r} recipe {dict(recipe)} does not fit: {e}") from e

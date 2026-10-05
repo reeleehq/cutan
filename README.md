@@ -23,7 +23,7 @@ an character new maya --offline
 
 ## Carving parts from a photo or a frame
 
-`cutan.carve` turns a photo or a video frame into a matted, cleaned, provenance-carrying cut-out part, and writes it as a library-ready prop folder. It needs OpenCV: `pip install "cutan[carve]"`. Add `cutan[rembg]` for the neural matte and `cutan[faces]` for the face locator; `cutan.carve.check_requirements()` lists what is installed.
+`cutan.carve` turns a photo or a video frame into a matted, cleaned, provenance-carrying cut-out part, and writes it as a library-ready prop folder. It needs OpenCV: `pip install "cutan[carve]"` (it installs `opencv-python-headless`; an environment that already has `opencv-python` or `opencv-contrib-python` works as it is, since all three provide the same `cv2`). Add `cutan[rembg]` for the neural matte and `cutan[faces]` for the face locator; `cutan.carve.check_requirements()` lists what is installed.
 
 ```python
 from cutan.carve import carve, carve_head, frame_source, write_prop, grab_frame, Polygon, FlatColour
@@ -36,7 +36,7 @@ write_prop(lamp, "assets/props/lamp")                             # prop.json + 
 head = carve_head(frame, face=(830, 170, 930, 305), matte="rembg")  # neck cut, 512² canvas, face centre as origin
 ```
 
-The matte is a strategy: `flat_colour` (the default), `chroma`, `grabcut`, `polygon`, `focus`, `rembg`, or any `(rgb, hint) -> alpha` callable. Two combine with `&` and `|`: `Polygon(outline) & FlatColour()` is a hand outline cleaned by a colour key. `split_parts` lifts moving parts off a carving, each with a pivot (clock hands off the face), and `write_prop` gives each part its own bone. Publishing the folder (`an library publish <folder> prop.<name> --package cutan --origin carved`) records the rights from the descriptor's own `source`.
+The matte is a strategy: `flat_colour` (the default), `chroma`, `grabcut`, `polygon`, `focus`, `rembg`, or any `(rgb, hint) -> alpha` callable. Two combine with `&` and `|`: `Polygon(outline) & FlatColour()` is a hand outline cleaned by a colour key. `split_parts` lifts moving parts off a carving, each with a pivot (clock hands off the face), and `write_prop` gives each part its own bone. Publishing the folder (`an library publish <folder> prop.<name> --package cutan --origin carved`) records the rights from the descriptor's own `source`; `write_prop` refuses a carving with no provenance (unless the pixels are yours: `ours=True`) and a `source=` that would loosen its licence without `relicense=`. Every coordinate is in the source's pixels, and a carving's `recipe` is its arguments by name, so `carve(frame, **part.recipe)` replays it: a batch of carves is a list of recipes.
 
 The cut-out bench corpus (`misc/bench/`), `examples/` and the demo gallery (`misc/demos/`) live here too; `cutan.bench.run_bench()` runs the corpus through `an`'s bench runner.
 

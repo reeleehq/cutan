@@ -12,14 +12,23 @@ included, so publishing it records the rights without a single flag::
 from a shell.) One pixel of the carving is one view_box unit times ``unit``,
 and each part declares its size, so the prop draws the same whatever the
 resolution the art was carved at.
+
+**Rights are never loosened by accident.** A descriptor with no ``source``
+means "we made this" to ``an``, so a carving with no provenance is refused
+unless the caller says the art is its own (``ours=True``). A ``source=`` that
+would loosen the carving's licence class is refused unless ``relicense=``
+says who decided and why (``an``'s own rule for relaxing rights); the
+carving's source is kept beside it as ``extra.carved_from`` either way.
 """
 
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Any
 
-from an.ir.assets import AssetSource
+from an.ir.assets import AssetSource, license_class
 from an.stage.props import PropDescriptor
 from cutan.carve.core import Carving
 from cutan.carve.parts import PartSet
@@ -32,6 +41,46 @@ ROOT_BONE: str = "root"
 BASE_SLOT: str = "body"
 
 
+def _looser(new: AssetSource, old: AssetSource) -> bool:
+    """Whether ``new``'s licence class is less restrictive than ``old``'s."""
+    from an.library.rights import most_restrictive
+
+    a, b = license_class(old), license_class(new)
+    return a != b and most_restrictive([a, b]) == a
+
+
+def _provenance(
+    carving: Carving,
+    source: AssetSource | None,
+    *,
+    ours: bool,
+    relicense: Mapping[str, str] | None,
+) -> AssetSource | None:
+    prov = carving.provenance()
+    if source is None:
+        if prov is None and not ours:
+            raise ValueError(
+                "this carving has no provenance, and a prop with no source reads as art "
+                "you made: pass source=frame_source(url, license=...) to carve(), or "
+                "write_prop(..., source=...) here, or ours=True if the pixels are yours"
+            )
+        return prov
+    extra = dict(source.extra or {})
+    if prov is not None:
+        extra["carve"] = prov.extra["carve"]
+        original = carving.source
+        extra["carved_from"] = original.model_dump(mode="json", exclude_none=True)
+        if _looser(source, original):
+            if not relicense or not {"by", "reason"} <= set(relicense):
+                raise ValueError(
+                    f"source= would loosen the carving's rights ({license_class(original)} "
+                    f"to {license_class(source)}): pass relicense={{'by': ..., 'reason': ...}} "
+                    "if that is a decision someone took"
+                )
+            extra["relicensed"] = dict(relicense)
+    return source.model_copy(update={"extra": extra})
+
+
 def write_prop(
     carved: Carving | PartSet,
     folder: str | Path,
@@ -41,6 +90,8 @@ def write_prop(
     max_side: float | None = None,
     display_name: str | None = None,
     source: AssetSource | None = None,
+    ours: bool = False,
+    relicense: Mapping[str, str] | None = None,
     overwrite: bool = False,
 ) -> PropDescriptor:
     """Write ``carved`` to ``folder`` as ``prop.json`` + ``parts/*.png``; return the descriptor.
@@ -49,19 +100,21 @@ def write_prop(
     unit: view_box units per carved pixel (default 1); or ``max_side``: the
         unit that makes the longer side that many units (never above 1)
     source: overrides the carving's provenance (its recipe and quality are
-        still recorded in ``extra.carve``)
+        still recorded in ``extra.carve``, its source in ``extra.carved_from``)
+    ours: the pixels are the caller's own art (a carving with no source)
+    relicense: ``{"by": who, "reason": why}``, required for a ``source`` that
+        loosens the carving's licence class
 
     The root bone sits at the carving's anchor. A split prop gets one bone per
     part, at its pivot, parented to the root, and one slot per part above the
-    base, in the order the parts were listed.
+    base, in the order the parts were listed. Nothing is written unless the
+    whole descriptor is valid.
     """
     folder = Path(folder)
     if (folder / "prop.json").exists() and not overwrite:
         raise FileExistsError(
             f"{folder / 'prop.json'} exists; pass overwrite=True to replace it"
         )
-    parts_dir = folder / "parts"
-    parts_dir.mkdir(parents=True, exist_ok=True)
     carving = carved.carving if isinstance(carved, PartSet) else carved
     w, h = carving.size
     if unit is None:
@@ -69,21 +122,16 @@ def write_prop(
     if unit <= 0:
         raise ValueError(f"unit must be positive, not {unit}")
     ax, ay = carving.anchor[0] * w, carving.anchor[1] * h
-    prov = carving.provenance()
-    if source is not None:
-        extra = {
-            **(source.extra or {}),
-            **({"carve": prov.extra["carve"]} if prov else {}),
-        }
-        prov = source.model_copy(update={"extra": extra})
+    prov = _provenance(carving, source, ours=ours, relicense=relicense)
 
-    bones = [{"name": ROOT_BONE, "parent": None}]
-    slots: list[dict] = []
+    bones: list[dict[str, Any]] = [{"name": ROOT_BONE, "parent": None}]
+    slots: list[dict[str, Any]] = []
     attachments: dict[str, dict] = {}
+    images: dict[str, Any] = {}
 
     def attach(slot: str, bone: str, image, anchor, order: int) -> None:
         path = f"parts/{slot}.png"
-        image.save(folder / path)
+        images[path] = image
         slots.append(
             {"name": slot, "bone": bone, "draw_order": order, "attachment": slot}
         )
@@ -128,10 +176,20 @@ def write_prop(
             "slots": slots,
             "skins": {"default": {"name": "default", "slots": attachments}},
             "source": prov.model_dump(mode="json", exclude_none=True) if prov else None,
-            "metadata": {"carve": {"anchor": list(carving.anchor), **carving.meta}},
+            "metadata": {
+                "carve": {
+                    "mode": carving.mode,
+                    "anchor": list(carving.anchor),
+                    **carving.meta,
+                }
+            },
         }
     )
-    (folder / "prop.json").write_text(
-        json.dumps(doc.model_dump(mode="json"), indent=2), "utf-8"
-    )
+    text = json.dumps(
+        doc.model_dump(mode="json"), indent=2
+    )  # fails before any file is written
+    (folder / "parts").mkdir(parents=True, exist_ok=True)
+    for path, image in images.items():
+        image.save(folder / path)
+    (folder / "prop.json").write_text(text, "utf-8")
     return doc

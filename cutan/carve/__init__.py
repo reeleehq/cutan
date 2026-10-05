@@ -26,8 +26,13 @@ a neural matte wins on photos, GrabCut on a single prop in a rough box.
   ``parts/`` with the source in the descriptor, recipe and quality included,
   so ``an library publish`` gets the rights by construction.
 - **Quality:** every :class:`Carving` carries :class:`CarveQuality` (coverage,
-  backdrop left on the rim, glyphs left attached, a subject cut off by the
-  crop); ``quality.warnings()`` says which look wrong.
+  backdrop left on the rim, how much de-spill repainted, a see-through
+  interior, glyphs left attached or cut off, a subject cut off by the crop);
+  ``quality.warnings()`` says which look wrong.
+- **Data, not code:** every coordinate is in the source's pixels, and a
+  carving's ``recipe`` is its arguments by name, the matte as its recipe
+  (``as_matte`` reads one back): ``carve(frame, **part.recipe)`` replays it,
+  so a batch of carves is a list of recipes.
 
 Needs OpenCV: ``pip install "cutan[carve]"`` (``check_requirements()`` lists
 what is installed). Nothing here is imported by ``import cutan``.
@@ -50,6 +55,7 @@ from cutan.carve.mattes import (
     Focus,
     GrabCut,
     Hint,
+    Levels,
     Matte,
     Polygon,
     Rembg,
@@ -71,6 +77,7 @@ __all__ = [
     "GrabCut",
     "Hint",
     "InsightFaceLocator",
+    "Levels",
     "Matte",
     "MissingDependencyError",
     "Part",

@@ -110,8 +110,9 @@ def detach_bridges(
 
     Erodes by ``radius``, keeps the eroded component under ``point`` (else the
     largest), grows it back by ``radius + 1`` inside the original mask. Returns
-    ``(mask, pieces)``: the cleaned mask and how many sizeable pieces were cut
-    off (the quality signal for glyphs left attached).
+    ``(mask, pieces)``: the cleaned mask and how many pieces it lost (connected
+    parts of what was removed, at least ``radius²`` px: a caption glyph, and also
+    a thin part thinner than ``2 * radius`` px, which erosion cannot tell apart).
 
     >>> m = np.zeros((20, 40), bool); m[2:18, 2:18] = True   # a body
     >>> m[9:11, 18:24] = True; m[6:14, 24:32] = True          # a glyph on a 2-px neck
@@ -134,10 +135,12 @@ def detach_bridges(
             main = int(labels[y, x])
     if main == 0:
         main = 1 + int(np.argmax(areas[1:]))
-    pieces = sum(1 for i in range(1, n) if i != main and areas[i] >= 4)
     grown = cv2.dilate((labels == main).astype(np.uint8), kernel, iterations=1)
     grown = cv2.dilate(grown, np.ones((3, 3), np.uint8)) > 0
-    return grown & mask.astype(bool), pieces
+    out = grown & mask.astype(bool)
+    _, _, lost = _labels(mask.astype(bool) & ~out)
+    pieces = int((lost[1:] >= max(radius * radius, 4)).sum())
+    return out, pieces
 
 
 def choke(alpha: np.ndarray, px: float) -> np.ndarray:
@@ -165,37 +168,39 @@ def feather(alpha: np.ndarray, sigma: float) -> np.ndarray:
 
 def despill(
     rgb: np.ndarray, alpha: np.ndarray, rim: int, *, solid: np.ndarray | None = None
-) -> np.ndarray:
-    """Re-paint the edge's colours from the subject's trusted pixels.
+) -> tuple[np.ndarray, float]:
+    """Re-paint the edge's colours from the subject's interior; ``(rgb, repainted share)``.
 
-    Trusted: the pixels that were solid in the matte (``solid``, the alpha
-    BEFORE any feathering; default ``alpha``) and at least ``rim`` px inside
-    its edge. Every other pixel with some alpha (the anti-aliased band, a
-    neural matte's fuzzy fringe, what feathering spread outward over the
-    backdrop) takes its colour from the nearest trusted ones: colours flow
-    outward one pixel per pass, each the mean of its known neighbours, never
-    from the backdrop. An outline stays an outline: it is solid, so it is
-    trusted. Returns a new array; pixels with no alpha keep theirs.
+    The subject is ``solid`` (the alpha BEFORE any feathering; default
+    ``alpha``) above :data:`SUBJECT`. Trusted pixels are those at least
+    ``rim`` px inside its edge (a distance, not an alpha: a soft interior is
+    still interior). Repainted: every other pixel with some alpha — the
+    anti-aliased band, a neural matte's fuzzy fringe, what feathering spread
+    over the backdrop — which is never more than ``rim`` px plus the fringe
+    from the edge. Colours flow outward from the trusted pixels one pixel per
+    pass, each the mean of its known neighbours, never from the backdrop. An
+    outline stays an outline: it is solid, so its inner part is trusted. The
+    share is of the subject's pixels, the quality signal for a de-spill that
+    repainted real content.
 
     >>> rgb = np.zeros((7, 7, 3), np.uint8); rgb[:] = (0, 0, 255)  # a blue backdrop
     >>> rgb[1:6, 1:6] = (200, 0, 0); rgb[1, 1:6] = (100, 0, 160)   # a red subject, a spilt top row
     >>> a = np.zeros((7, 7), np.float32); a[1:6, 1:6] = 1
-    >>> tuple(int(c) for c in despill(rgb, a, 1)[1, 3])
-    (200, 0, 0)
+    >>> out, share = despill(rgb, a, 1)
+    >>> tuple(int(c) for c in out[1, 3]), round(share, 2)
+    ((200, 0, 0), 0.64)
     """
     if rim <= 0:
-        return rgb
+        return rgb, 0.0
     cv2 = _cv2()
-    base = alpha if solid is None else solid
-    trusted = (
-        cv2.erode(
-            (base > 0.99).astype(np.uint8), np.ones((3, 3), np.uint8), iterations=rim
-        )
-        > 0
-    )
+    subject = ((alpha if solid is None else solid) > SUBJECT).astype(np.uint8)
+    if not subject.any():
+        return rgb, 0.0
+    inside = cv2.distanceTransform(np.pad(subject, 1), cv2.DIST_L2, 3)[1:-1, 1:-1]
+    trusted = inside > rim
     target = (alpha > 0.01) & ~trusted
     if not trusted.any() or not target.any():
-        return rgb
+        return rgb, 0.0
     col = rgb.astype(np.float32) * trusted[..., None]
     known = trusted.astype(np.float32)
     todo = target.copy()
@@ -212,4 +217,4 @@ def despill(
     out = rgb.copy()
     painted = target & (known > 0)
     out[painted] = np.clip(np.round(col[painted]), 0, 255).astype(np.uint8)
-    return out
+    return out, float((painted & (subject > 0)).sum() / subject.sum())
