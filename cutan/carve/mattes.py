@@ -30,6 +30,9 @@ name            works on                                              fails on
 >>> both = FlatColour() & Polygon([(20, 10), (30, 10), (30, 30), (20, 30)])
 >>> float(both(rgb, Hint())[20, 35]) < 0.5         # inside the key, outside the outline
 True
+>>> red = ~FlatColour(colours=[(200, 30, 30)], connected=False)
+>>> float(red(rgb, Hint())[20, 30]), float(red(rgb, Hint())[2, 2])
+(1.0, 0.0)
 """
 
 from __future__ import annotations
@@ -118,6 +121,9 @@ class Matte:
     def __or__(self, other: MatteLike) -> Matte:
         return _Combined("or", [self, as_matte(other)])
 
+    def __invert__(self) -> Matte:
+        return _Combined("not", [self])
+
 
 def _plain(v: Any) -> Any:
     """A JSON-friendly copy of a parameter (tuples to lists, arrays to lists)."""
@@ -131,7 +137,7 @@ def _plain(v: Any) -> Any:
 
 
 class _Combined(Matte):
-    """``a & b`` (pixelwise minimum) or ``a | b`` (maximum)."""
+    """``a & b`` (pixelwise minimum), ``a | b`` (maximum) or ``~a`` (``1 - a``)."""
 
     def __init__(self, op: str, parts: list[Matte]):
         self.op, self._parts = op, parts
@@ -139,6 +145,8 @@ class _Combined(Matte):
 
     def __call__(self, rgb: np.ndarray, hint: Hint) -> np.ndarray:
         alphas = [_checked(p(rgb, hint), rgb, p) for p in self._parts]
+        if self.op == "not":
+            return 1.0 - alphas[0]
         fold = np.minimum if self.op == "and" else np.maximum
         out = alphas[0]
         for a in alphas[1:]:

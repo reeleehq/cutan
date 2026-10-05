@@ -346,3 +346,29 @@ def test_the_visual_check_sheet_renders(tmp_path):
     for i in range(6):
         tile = arr[:, 256 * i : 256 * (i + 1)]
         assert (np.abs(tile - empty).max(axis=2) > 30).mean() > 0.05, f"tile {i} is empty"
+
+
+def test_a_colour_selects_a_part_through_an_inverted_key():
+    """The clock's hands are its only mid-grey: ``~FlatColour`` selects them."""
+    clock = carve(_img("clock"), point=(110, 110))
+    hub = clock.to_part([(110, 110)])[0]
+    grey = ~FlatColour(colours=[(95, 95, 100)], connected=False, tolerance=12, softness=8)
+    split = split_parts(clock, {"hands": PartSpec(mask=grey, pivot=hub, reach=10)})
+    hands = split.parts[0]
+    truth = (_mask("clock_hour") | _mask("clock_minute"))
+    full = np.zeros(truth.shape, bool)
+    x0 = round(clock.offset[0] + hands.origin[0])
+    y0 = round(clock.offset[1] + hands.origin[1])
+    a = np.asarray(hands.image)[..., 3] > 127
+    full[y0 : y0 + a.shape[0], x0 : x0 + a.shape[1]] = a
+    yy, xx = np.mgrid[: truth.shape[0], : truth.shape[1]]
+    off_hub = np.hypot(xx - 110, yy - 110) > 8  # the black hub is drawn over the hands
+    # thin strokes: a 1-px edge dominates an IoU, so measure recall, and
+    # precision against the truth widened by 2 px
+    import cv2
+
+    near = cv2.dilate(truth.astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
+    recall = (full & truth & off_hub).sum() / (truth & off_hub).sum()
+    precision = (full & near & off_hub).sum() / (full & off_hub).sum()
+    assert recall > 0.95 and precision > 0.95, (recall, precision)
+    assert (~grey).recipe()["matte"] == "not"

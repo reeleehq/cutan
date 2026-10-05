@@ -39,11 +39,14 @@ class PartSpec:
     0..1), or a matte called on the carving's RGB (``~FlatColour(colours=[grey],
     connected=False)`` selects the grey strokes). ``pivot``: ``(x, y)``.
     ``grow``: px the mask is widened by before lifting (anti-aliased strokes).
+    ``reach``: keep only the mask's pieces that come within this many px of the
+    pivot (a colour key also matches specks elsewhere: a tick's grey edge).
     """
 
     mask: Any
     pivot: Point
     grow: int = 1
+    reach: float | None = None
 
 
 @dataclass
@@ -84,6 +87,17 @@ def _mask_of(spec: MaskLike, rgb: np.ndarray) -> np.ndarray:
     return Polygon(list(spec))(rgb, Hint())
 
 
+def _within(mask: np.ndarray, point: Point, reach: float) -> np.ndarray:
+    """The components of ``mask`` with a pixel within ``reach`` px of ``point``."""
+    cv2 = _cv2()
+    n, labels = cv2.connectedComponents(mask.astype(np.uint8), connectivity=8)
+    h, w = mask.shape
+    yy, xx = np.mgrid[:h, :w]
+    close = np.hypot(xx - point[0], yy - point[1]) <= reach
+    ids = set(np.unique(labels[close & mask]).tolist()) - {0}
+    return np.isin(labels, list(ids))
+
+
 def split_parts(
     carving: Carving,
     parts: Mapping[str, PartSpec | Mapping[str, Any]],
@@ -111,6 +125,8 @@ def split_parts(
     for order, (name, spec) in reversed(list(enumerate(items, start=1))):
         spec = spec if isinstance(spec, PartSpec) else PartSpec(**spec)
         m = _mask_of(spec.mask, rgb)
+        if spec.reach is not None:
+            m = m * _within(m > refine.SUBJECT, spec.pivot, spec.reach)
         if spec.grow > 0:
             m = cv2.dilate(m, np.ones((2 * spec.grow + 1,) * 2, np.uint8))
         m = np.minimum(m, 1.0 - taken)
