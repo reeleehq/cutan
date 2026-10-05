@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-05T17:00:56Z",
+  "built_at": "2026-10-05T17:10:27Z",
   "package": {
     "name": "cutan",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "display_name": "cutan",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "e9f102f9a350973381836ff8c5e32cb24cc276a7",
-    "short_commit": "e9f102f",
+    "commit": "ca6e87ff066a2c6a698f96347dd1c53d0ec01601",
+    "short_commit": "ca6e87f",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/cutan",
-    "commit_url": "https://github.com/thorwhalen/cutan/commit/e9f102f9a350973381836ff8c5e32cb24cc276a7",
+    "commit_url": "https://github.com/thorwhalen/cutan/commit/ca6e87ff066a2c6a698f96347dd1c53d0ec01601",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/cutan",
-    "sha": "e9f102f9a350973381836ff8c5e32cb24cc276a7",
+    "sha": "ca6e87ff066a2c6a698f96347dd1c53d0ec01601",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "37344809881",
-    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/37344809881",
+    "run_id": "37346078634",
+    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/37346078634",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -56,15 +56,15 @@
   },
   "site": {
     "modules_documented": 62,
-    "objects_documented": 671
+    "objects_documented": 676
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.8",
+    "latest": "0.0.9",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout e9f102f9a350973381836ff8c5e32cb24cc276a7\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout ca6e87ff066a2c6a698f96347dd1c53d0ec01601\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

@@ -15,6 +15,7 @@ cutan.characters.play
       DESCRIPTOR_SOURCE
       PRESET_SOURCE
       RESERVED_PRESET_ARGS
+      PresetContext
       TURN_PRESET
    
    .. rubric:: Functions

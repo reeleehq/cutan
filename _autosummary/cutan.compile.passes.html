@@ -138,25 +138,28 @@ as <code class="docutils literal notranslate"><span class="pre">"cutan.compile.p
 <p class="rubric">Module Attributes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.passes.DFLT_LEG_COLOUR" title="cutan.compile.passes.DFLT_LEG_COLOUR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_LEG_COLOUR</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.passes.PLACEHOLDER_PARTS" title="cutan.compile.passes.PLACEHOLDER_PARTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PLACEHOLDER_PARTS</span></code></a></p></td>
+<td><p>The parts the built-in placeholder rig draws when a character ref has no descriptor and no <code class="docutils literal notranslate"><span class="pre">parts</span></code>: arms, no legs (so a walk on it glides).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.compile.passes.DFLT_LEG_COLOUR" title="cutan.compile.passes.DFLT_LEG_COLOUR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_LEG_COLOUR</span></code></a></p></td>
 <td><p>The procedural rig's leg colour — a literal the palette table never carried, which is why it is a named constant rather than two copies of a string.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.compile.passes.DFLT_PUPIL_COLOUR" title="cutan.compile.passes.DFLT_PUPIL_COLOUR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_PUPIL_COLOUR</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.passes.DFLT_PUPIL_COLOUR" title="cutan.compile.passes.DFLT_PUPIL_COLOUR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_PUPIL_COLOUR</span></code></a></p></td>
 <td><p>The procedural rig's pupil colour.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.passes.COARTICULATION_ENABLED" title="cutan.compile.passes.COARTICULATION_ENABLED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">COARTICULATION_ENABLED</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.compile.passes.COARTICULATION_ENABLED" title="cutan.compile.passes.COARTICULATION_ENABLED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">COARTICULATION_ENABLED</span></code></a></p></td>
 <td><p>Co-articulation on/off (an#97).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.compile.passes.PROCEDURAL_MOUTH_KEYS" title="cutan.compile.passes.PROCEDURAL_MOUTH_KEYS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PROCEDURAL_MOUTH_KEYS</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.passes.PROCEDURAL_MOUTH_KEYS" title="cutan.compile.passes.PROCEDURAL_MOUTH_KEYS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PROCEDURAL_MOUTH_KEYS</span></code></a></p></td>
 <td><p>The procedural (drawn) mouth's swap vocabulary, DECLARED as data on its visual exactly as the runtime declares it (<code class="code docutils literal notranslate"><span class="pre">g._anDrawSets</span> <span class="pre">=</span> <span class="pre">{viseme:</span> <span class="pre">...}</span></code>) and as an SVG mouth carries its projection.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.passes.EYE_NODE_NAMES" title="cutan.compile.passes.EYE_NODE_NAMES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EYE_NODE_NAMES</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.compile.passes.EYE_NODE_NAMES" title="cutan.compile.passes.EYE_NODE_NAMES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EYE_NODE_NAMES</span></code></a></p></td>
 <td><p>the default rig's eye slots ARE its node names, on both the procedural and the descriptor path.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.compile.passes.PUPIL_NODE_NAMES" title="cutan.compile.passes.PUPIL_NODE_NAMES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PUPIL_NODE_NAMES</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.passes.PUPIL_NODE_NAMES" title="cutan.compile.passes.PUPIL_NODE_NAMES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PUPIL_NODE_NAMES</span></code></a></p></td>
 <td><p>The pupil nodes of the gaze stack (an#99); a rig without them takes gaze as a no-op.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.passes.GAZE_ELLIPSE_MARGIN" title="cutan.compile.passes.GAZE_ELLIPSE_MARGIN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GAZE_ELLIPSE_MARGIN</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.compile.passes.GAZE_ELLIPSE_MARGIN" title="cutan.compile.passes.GAZE_ELLIPSE_MARGIN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GAZE_ELLIPSE_MARGIN</span></code></a></p></td>
 <td><p>The summed gaze (x, y), in axis units, is clamped to a circle of this radius — the declared travel maps the unit circle onto the sclera's inner ellipse, and 0.95 keeps the whole pupil disc inside it at every angle (measured on the synthesized eye: 1.0 pokes out by 2% of the ellipse at the diagonal).</p></td>
 </tr>
 </tbody>
@@ -166,6 +169,9 @@ as <code class="docutils literal notranslate"><span class="pre">"cutan.compile.p
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.passes.blink_phase" title="cutan.compile.passes.blink_phase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blink_phase</span></code></a>(entity_id)</p></td>
 <td><p>The entity's blink phase in [0, 1): the runtime's rule, ported exactly.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.compile.passes.preset_context_of" title="cutan.compile.passes.preset_context_of"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preset_context_of</span></code></a>(vocab)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(entity_id,</span> <span class="pre">play)</span> <span class="pre">-&gt;</span> <span class="pre">PresetContext</span></code> for the extent resolver (<code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.characters.play.play_extent_for()</span></code>): exactly the <code class="docutils literal notranslate"><span class="pre">gait</span></code> and <code class="docutils literal notranslate"><span class="pre">scale</span></code> <code class="xref py py-func docutils literal notranslate"><span class="pre">_with_view_and_posed_parts()</span></code> will fill in before the expansion, read off the same vocabulary, so a <code class="docutils literal notranslate"><span class="pre">sequence</span></code> waits for what the walk runs (cutan#12).</p></td>
 </tr>
 </tbody>
 </table>
@@ -214,6 +220,12 @@ and 0.95 keeps the whole pupil disc inside it at every angle (measured on
 the synthesized eye: 1.0 pokes out by 2% of the ellipse at the diagonal).</p>
 </dd></dl>
 <dl class="py data">
+<dt class="sig sig-object py" id="cutan.compile.passes.PLACEHOLDER_PARTS">
+<span class="sig-prename descclassname"><span class="pre">cutan.compile.passes.</span></span><span class="sig-name descname"><span class="pre">PLACEHOLDER_PARTS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">tuple</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('head',</span> <span class="pre">'torso',</span> <span class="pre">'left_arm',</span> <span class="pre">'right_arm')</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.passes.PLACEHOLDER_PARTS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.passes.PLACEHOLDER_PARTS'">¶</a></dt>
+<dd><p>The parts the built-in placeholder rig draws when a character ref has no
+descriptor and no <code class="docutils literal notranslate"><span class="pre">parts</span></code>: arms, no legs (so a walk on it glides).</p>
+</dd></dl>
+<dl class="py data">
 <dt class="sig sig-object py" id="cutan.compile.passes.PROCEDURAL_MOUTH_KEYS">
 <span class="sig-prename descclassname"><span class="pre">cutan.compile.passes.</span></span><span class="sig-name descname"><span class="pre">PROCEDURAL_MOUTH_KEYS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">dict</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'A':</span> <span class="pre">'A',</span> <span class="pre">'B':</span> <span class="pre">'B',</span> <span class="pre">'C':</span> <span class="pre">'C',</span> <span class="pre">'D':</span> <span class="pre">'D',</span> <span class="pre">'E':</span> <span class="pre">'E',</span> <span class="pre">'F':</span> <span class="pre">'F',</span> <span class="pre">'G':</span> <span class="pre">'G',</span> <span class="pre">'H':</span> <span class="pre">'H',</span> <span class="pre">'X':</span> <span class="pre">'X'}</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.passes.PROCEDURAL_MOUTH_KEYS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.passes.PROCEDURAL_MOUTH_KEYS'">¶</a></dt>
 <dd><p>The procedural (drawn) mouth’s swap vocabulary, DECLARED as data on its
@@ -242,6 +254,17 @@ whose visual carries a <code class="code docutils literal notranslate"><span cla
 </span></code></pre></div>
 </div>
 </dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.compile.passes.preset_context_of">
+<span class="sig-prename descclassname"><span class="pre">cutan.compile.passes.</span></span><span class="sig-name descname"><span class="pre">preset_context_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/compile/passes.html#preset_context_of"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.passes.preset_context_of" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.passes.preset_context_of'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">(entity_id,</span> <span class="pre">play)</span> <span class="pre">-&gt;</span> <span class="pre">PresetContext</span></code> for the extent resolver
+(<code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.characters.play.play_extent_for()</span></code>): exactly the <code class="docutils literal notranslate"><span class="pre">gait</span></code> and
+<code class="docutils literal notranslate"><span class="pre">scale</span></code> <code class="xref py py-func docutils literal notranslate"><span class="pre">_with_view_and_posed_parts()</span></code> will fill in before the
+expansion, read off the same vocabulary, so a <code class="docutils literal notranslate"><span class="pre">sequence</span></code> waits for what
+the walk runs (cutan#12).</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
@@ -251,9 +274,11 @@ whose visual carries a <code class="code docutils literal notranslate"><span cla
 <li><a :data-current="activeSection === '#cutan.compile.passes.DFLT_PUPIL_COLOUR'" class="reference internal" href="#cutan.compile.passes.DFLT_PUPIL_COLOUR"><code class="docutils literal notranslate"><span class="pre">DFLT_PUPIL_COLOUR</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.compile.passes.EYE_NODE_NAMES'" class="reference internal" href="#cutan.compile.passes.EYE_NODE_NAMES"><code class="docutils literal notranslate"><span class="pre">EYE_NODE_NAMES</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.compile.passes.GAZE_ELLIPSE_MARGIN'" class="reference internal" href="#cutan.compile.passes.GAZE_ELLIPSE_MARGIN"><code class="docutils literal notranslate"><span class="pre">GAZE_ELLIPSE_MARGIN</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.compile.passes.PLACEHOLDER_PARTS'" class="reference internal" href="#cutan.compile.passes.PLACEHOLDER_PARTS"><code class="docutils literal notranslate"><span class="pre">PLACEHOLDER_PARTS</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.compile.passes.PROCEDURAL_MOUTH_KEYS'" class="reference internal" href="#cutan.compile.passes.PROCEDURAL_MOUTH_KEYS"><code class="docutils literal notranslate"><span class="pre">PROCEDURAL_MOUTH_KEYS</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.compile.passes.PUPIL_NODE_NAMES'" class="reference internal" href="#cutan.compile.passes.PUPIL_NODE_NAMES"><code class="docutils literal notranslate"><span class="pre">PUPIL_NODE_NAMES</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.compile.passes.blink_phase'" class="reference internal" href="#cutan.compile.passes.blink_phase"><code class="docutils literal notranslate"><span class="pre">blink_phase()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.compile.passes.preset_context_of'" class="reference internal" href="#cutan.compile.passes.preset_context_of"><code class="docutils literal notranslate"><span class="pre">preset_context_of()</span></code></a></li>
 </ul>
 </div>
 </aside>
@@ -267,7 +292,7 @@ whose visual carries a <code class="code docutils literal notranslate"><span cla
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=53b53b71"></script>
+<script src="../_static/documentation_options.js?v=f7cdbf68"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

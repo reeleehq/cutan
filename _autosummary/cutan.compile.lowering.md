@@ -66,7 +66,9 @@ Replace each `play` of a motion preset by the tweens and sets it stands for.
 
 #### extent_resolver(vocab)
 
-`play -> seconds` for a play that names no duration, read off its descriptor.
+`play -> seconds` for a play that names no duration, read off its
+descriptor — and, for a walk, off the gait and scale the expansion will
+fill in ([`cutan.compile.passes.preset_context_of()`](cutan.compile.passes.md#cutan.compile.passes.preset_context_of), cutan#12).
 
 * **Return type:**
   [`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[[`Any`](https://docs.python.org/3/library/typing.html#typing.Any)], [`float`](https://docs.python.org/3/builtins/functions.html#float)]

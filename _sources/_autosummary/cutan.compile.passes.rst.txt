@@ -8,6 +8,7 @@ cutan.compile.passes
 
    .. autosummary::
    
+      PLACEHOLDER_PARTS
       DFLT_LEG_COLOUR
       DFLT_PUPIL_COLOUR
       COARTICULATION_ENABLED
@@ -21,4 +22,5 @@ cutan.compile.passes
    .. autosummary::
    
       blink_phase
+      preset_context_of
    

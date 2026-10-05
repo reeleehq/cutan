@@ -93,7 +93,7 @@ the skill, the demos, the vocabulary and the `play` fallback
 ([`cutan.characters.play.play_source()`](cutan.characters.play.html.md#cutan.characters.play.play_source), an#166) read. A genre preset wins a
 name the core also has.
 
-### cutan.motion.PRESET_VERSIONS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'crawl': '1', 'hop': '1', 'nod': '1', 'point': '1', 'pop_in': '1', 'shake': '1', 'slide_in': '1', 'slide_out': '1', 'speech_pulse': '1', 'squash_stretch': '1', 'turn': '1', 'waddle': '1', 'walk': '2'}*
+### cutan.motion.PRESET_VERSIONS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'crawl': '1', 'hop': '1', 'nod': '1', 'point': '1', 'pop_in': '1', 'shake': '1', 'slide_in': '1', 'slide_out': '1', 'speech_pulse': '1', 'squash_stretch': '1', 'turn': '1', 'waddle': '1', 'walk': '3'}*
 
 [`PRESETS`](#cutan.motion.PRESETS)’ vocabulary versions.
 
@@ -263,7 +263,7 @@ so it is the one that needs `rest` in a multi-character shot.
 0.6
 ```
 
-### cutan.motion.walk(target, , to_x=None, distance=None, direction=None, steps=None, step_s=None, step_length=None, stride=None, lift=None, bob=None, arm_swing=None, rock=None, hem_tilt=None, hop_height=None, lean=None, view=None, gait=None, legs=None, arms=None, parts=None, rest=None)
+### cutan.motion.walk(target, , to_x=None, distance=None, direction=None, steps=None, step_s=None, step_length=None, stride=None, lift=None, bob=None, arm_swing=None, rock=None, hem_tilt=None, hop_height=None, lean=None, view=None, gait=None, legs=None, arms=None, parts=None, rest=None, scale=None)
 
 Walk: the body travels on `x` while the gait moves it — legs that
 alternate, a hop, a bounce, a glide (an#214, an#224).
@@ -313,10 +313,14 @@ descriptor’s, else the chain). A legged gait on a rig with no leg pair
 walks the legless default too.
 
 **Size.** `step_length`, `bob` and `hop_height` default to lengths
-for a figure at drawn scale 1, multiplied by the figure’s scale — the
-`scale_y` of `rest`, which carries its stage scale — so a character
-staged at `scale: 2` strides twice as far (an#224). Pass them to set
-scene px outright.
+for a figure at drawn scale 1, multiplied by `scale`, the figure’s drawn
+scale — its STAGE scale (`stage.scale`, the rig as built), which the
+compiler fills in when the walk is played by name — so a character staged
+at `scale: 2` strides twice as far (an#224). Pass them to set scene px
+outright. Called from Python with no `scale`, the `scale_y` of
+`rest` stands in; that is the pose at the play’s start, which a
+`pop_in` running under the walk holds at 0 (cutan#13) — refused, naming
+the scale — so the compiler never relies on it.
 
 **Legs and arms.** `legs`/`arms` name the two limb nodes; by default
 the first pair in [`WALK_LEG_NAMES`](#cutan.motion.WALK_LEG_NAMES) / `WALK_ARM_NAMES` that the
@@ -351,6 +355,8 @@ then `walk`.
 >>> [f.action.to_value for f in _tweens(walk("k", distance=160, rest={"scale_y": 2.0}, legs=()))
 ...  if f.action.property == "x"]
 [160.0]
+>>> duration_of(walk("k", distance=160, scale=2.0, legs=())), duration_of(walk("k", distance=160, legs=()))
+(0.4, 0.8)
 ```
 
 * **Return type:**

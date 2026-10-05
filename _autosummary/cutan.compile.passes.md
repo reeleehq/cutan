@@ -10,8 +10,9 @@ as `"cutan.compile.passes:<name>"`) and the character rig builder.
 
 ### Module Attributes
 
-| [`DFLT_LEG_COLOUR`](#cutan.compile.passes.DFLT_LEG_COLOUR)        | The procedural rig's leg colour — a literal the palette table never carried, which is why it is a named constant rather than two copies of a string.                                                                                                                                                         |
+| [`PLACEHOLDER_PARTS`](#cutan.compile.passes.PLACEHOLDER_PARTS)      | The parts the built-in placeholder rig draws when a character ref has no descriptor and no `parts`: arms, no legs (so a walk on it glides).                                                                                                                                                                  |
 |-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`DFLT_LEG_COLOUR`](#cutan.compile.passes.DFLT_LEG_COLOUR)        | The procedural rig's leg colour — a literal the palette table never carried, which is why it is a named constant rather than two copies of a string.                                                                                                                                                         |
 | [`DFLT_PUPIL_COLOUR`](#cutan.compile.passes.DFLT_PUPIL_COLOUR)      | The procedural rig's pupil colour.                                                                                                                                                                                                                                                                           |
 | [`COARTICULATION_ENABLED`](#cutan.compile.passes.COARTICULATION_ENABLED) | Co-articulation on/off (an#97).                                                                                                                                                                                                                                                                              |
 | [`PROCEDURAL_MOUTH_KEYS`](#cutan.compile.passes.PROCEDURAL_MOUTH_KEYS)  | The procedural (drawn) mouth's swap vocabulary, DECLARED as data on its visual exactly as the runtime declares it (`g._anDrawSets = {viseme: ...}`) and as an SVG mouth carries its projection.                                                                                                              |
@@ -21,8 +22,9 @@ as `"cutan.compile.passes:<name>"`) and the character rig builder.
 
 ### Functions
 
-| [`blink_phase`](#cutan.compile.passes.blink_phase)(entity_id)   | The entity's blink phase in [0, 1): the runtime's rule, ported exactly.   |
-|---------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| [`blink_phase`](#cutan.compile.passes.blink_phase)(entity_id)   | The entity's blink phase in [0, 1): the runtime's rule, ported exactly.                                                                                                                                                                                                                           |
+|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`preset_context_of`](#cutan.compile.passes.preset_context_of)(vocab) | `(entity_id, play) -> PresetContext` for the extent resolver (`cutan.characters.play.play_extent_for()`): exactly the `gait` and `scale` `_with_view_and_posed_parts()` will fill in before the expansion, read off the same vocabulary, so a `sequence` waits for what the walk runs (cutan#12). |
 
 ### cutan.compile.passes.COARTICULATION_ENABLED *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
 
@@ -61,6 +63,11 @@ The summed gaze (x, y), in axis units, is clamped to a circle of this radius
 and 0.95 keeps the whole pupil disc inside it at every angle (measured on
 the synthesized eye: 1.0 pokes out by 2% of the ellipse at the diagonal).
 
+### cutan.compile.passes.PLACEHOLDER_PARTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('head', 'torso', 'left_arm', 'right_arm')*
+
+The parts the built-in placeholder rig draws when a character ref has no
+descriptor and no `parts`: arms, no legs (so a walk on it glides).
+
 ### cutan.compile.passes.PROCEDURAL_MOUTH_KEYS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E', 'F': 'F', 'G': 'G', 'H': 'H', 'X': 'X'}*
 
 The procedural (drawn) mouth’s swap vocabulary, DECLARED as data on its
@@ -85,3 +92,11 @@ The entity’s blink phase in [0, 1): the runtime’s rule, ported exactly.
 >>> blink_phase("charlie")
 0.762
 ```
+
+### cutan.compile.passes.preset_context_of(vocab)
+
+`(entity_id, play) -> PresetContext` for the extent resolver
+(`cutan.characters.play.play_extent_for()`): exactly the `gait` and
+`scale` `_with_view_and_posed_parts()` will fill in before the
+expansion, read off the same vocabulary, so a `sequence` waits for what
+the walk runs (cutan#12).

@@ -60,15 +60,16 @@ so an author never passes `rest`.
 
 ### Module Attributes
 
-| [`BONE_TRACK_PROPERTIES`](#cutan.characters.play.BONE_TRACK_PROPERTIES)   | Descriptor bone-track properties → `(runtime property, unit factor)`.                                                                     |
-|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| [`RIG_SCALED_PROPERTIES`](#cutan.characters.play.RIG_SCALED_PROPERTIES)   | Bone-track properties whose values are view-box LENGTHS, so a renderer scales them by the rig's view-box → scene-pixel factor.            |
-| [`ROOT_BONE`](#cutan.characters.play.ROOT_BONE)               | a track on it animates the entity's container node rather than any slot.                                                                  |
-| [`HEAD_BONE`](#cutan.characters.play.HEAD_BONE)               | The bone whose primary slot's nested slots are the FACE — what `face_overlay=false` suppresses.                                           |
-| [`DESCRIPTOR_SOURCE`](#cutan.characters.play.DESCRIPTOR_SOURCE)       | the entity descriptor's own `animations`…                                                                                                 |
-| [`PRESET_SOURCE`](#cutan.characters.play.PRESET_SOURCE)           | …or, for a name it does not declare, [`cutan.motion.PRESETS`](cutan.motion.md#cutan.motion.PRESETS) (an#166). |
-| [`RESERVED_PRESET_ARGS`](#cutan.characters.play.RESERVED_PRESET_ARGS)    | the target is the play's own, and the rest pose is read off the built scene.                                                              |
-| [`TURN_PRESET`](#cutan.characters.play.TURN_PRESET)             | a turn opens from the side the character faces NOW, which only the timeline knows.                                                        |
+| [`BONE_TRACK_PROPERTIES`](#cutan.characters.play.BONE_TRACK_PROPERTIES)   | Descriptor bone-track properties → `(runtime property, unit factor)`.                                                                                                                                                                                                                                                                         |
+|--------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`RIG_SCALED_PROPERTIES`](#cutan.characters.play.RIG_SCALED_PROPERTIES)   | Bone-track properties whose values are view-box LENGTHS, so a renderer scales them by the rig's view-box → scene-pixel factor.                                                                                                                                                                                                                |
+| [`ROOT_BONE`](#cutan.characters.play.ROOT_BONE)               | a track on it animates the entity's container node rather than any slot.                                                                                                                                                                                                                                                                      |
+| [`HEAD_BONE`](#cutan.characters.play.HEAD_BONE)               | The bone whose primary slot's nested slots are the FACE — what `face_overlay=false` suppresses.                                                                                                                                                                                                                                               |
+| [`DESCRIPTOR_SOURCE`](#cutan.characters.play.DESCRIPTOR_SOURCE)       | the entity descriptor's own `animations`…                                                                                                                                                                                                                                                                                                     |
+| [`PRESET_SOURCE`](#cutan.characters.play.PRESET_SOURCE)           | …or, for a name it does not declare, [`cutan.motion.PRESETS`](cutan.motion.md#cutan.motion.PRESETS) (an#166).                                                                                                                                                                                                     |
+| [`RESERVED_PRESET_ARGS`](#cutan.characters.play.RESERVED_PRESET_ARGS)    | the target is the play's own, the rest pose is read off the built scene, and a figure's drawn `scale` is its stage scale (a length in scene px is passed outright).                                                                                                                                                                           |
+| [`PresetContext`](#cutan.characters.play.PresetContext)           | What the compiler fills into a preset play's args beyond what the author wrote, as far as the play's LENGTH depends on it (cutan#12): a walk's resolved `gait` and the figure's drawn `scale` ([`cutan.characters.methods.walk_preset_context()`](cutan.characters.methods.md#cutan.characters.methods.walk_preset_context)). |
+| [`TURN_PRESET`](#cutan.characters.play.TURN_PRESET)             | a turn opens from the side the character faces NOW, which only the timeline knows.                                                                                                                                                                                                                                                            |
 
 ### Functions
 
@@ -82,8 +83,8 @@ so an author never passes `rest`.
 | [`play_source`](#cutan.characters.play.play_source)(desc, animation)                     | Which library a `play` of `animation` resolves in — [`DESCRIPTOR_SOURCE`](#cutan.characters.play.DESCRIPTOR_SOURCE) when `desc` declares it (the descriptor WINS a name a preset also has), else [`PRESET_SOURCE`](#cutan.characters.play.PRESET_SOURCE) when a motion preset has it.                                                                        |
 | [`preset_moved_node`](#cutan.characters.play.preset_moved_node)(action_target, animation)      | The ONE node path a preset play moves — `<target>/head` for a `nod`, the target itself for the rest.                                                                                                                                                                                                                                                                   |
 | [`preset_moved_nodes`](#cutan.characters.play.preset_moved_nodes)(action_target, animation)     | Every node path a preset play moves.                                                                                                                                                                                                                                                                                                                                   |
-| [`preset_takes`](#cutan.characters.play.preset_takes)(animation, name)                    | Whether the motion preset `animation` has the keyword `name`.                                                                                                                                                                                                                                                                                                          |
-| [`preset_play_span`](#cutan.characters.play.preset_play_span)(action)                         | How long a preset `play` runs, in seconds: its `duration` when set, else the preset's natural length divided by `speed`.                                                                                                                                                                                                                                               |
+| [`preset_takes`](#cutan.characters.play.preset_takes)(animation, name)                    | Whether the motion preset `animation` has the keyword `name` (`False` for a name that is no preset: a descriptor animation takes nothing).                                                                                                                                                                                                                             |
+| [`preset_play_span`](#cutan.characters.play.preset_play_span)(action[, context])              | How long a preset `play` runs, in seconds: its `duration` when set, else the preset's natural length divided by `speed`.                                                                                                                                                                                                                                               |
 | [`preset_problems`](#cutan.characters.play.preset_problems)(animation, \*[, args, ...])      | Why a `play` of the motion preset `animation` cannot expand.                                                                                                                                                                                                                                                                                                           |
 | [`primary_slot_per_bone`](#cutan.characters.play.primary_slot_per_bone)(desc)                      | `{bone name: the slot that IS that bone}`, when one exists.                                                                                                                                                                                                                                                                                                            |
 | [`resolve_play`](#cutan.characters.play.resolve_play)(desc, animation, \*[, art_exists])  | Resolve `animation` of `desc` into renderer-ready tracks, or raise [`PlayResolutionError`](#cutan.characters.play.PlayResolutionError) listing every problem found.                                                                                                                                                                                                   |
@@ -158,10 +159,21 @@ Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueEr
 
 A `play` that cannot resolve; `problems` lists every reason found.
 
-### cutan.characters.play.RESERVED_PRESET_ARGS *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'parts', 'rest', 'target'})*
+### cutan.characters.play.PresetContext
+
+What the compiler fills into a preset play’s args beyond what the author
+wrote, as far as the play’s LENGTH depends on it (cutan#12): a walk’s
+resolved `gait` and the figure’s drawn `scale`
+([`cutan.characters.methods.walk_preset_context()`](cutan.characters.methods.md#cutan.characters.methods.walk_preset_context)). Keys a preset does
+not take are ignored.
+
+alias of [`Mapping`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`object`](https://docs.python.org/3/builtins/functions.html#object)]
+
+### cutan.characters.play.RESERVED_PRESET_ARGS *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'parts', 'rest', 'scale', 'target'})*
 
 the target is
-the play’s own, and the rest pose is read off the built scene.
+the play’s own, the rest pose is read off the built scene, and a figure’s
+drawn `scale` is its stage scale (a length in scene px is passed outright).
 
 * **Type:**
   Preset parameters an author may NOT pass through `args`
@@ -356,12 +368,14 @@ paths, relative to it) is what a multi-node preset chooses its limbs from;
 ['charlie/head']
 ```
 
-### cutan.characters.play.preset_play_span(action)
+### cutan.characters.play.preset_play_span(action, context=None)
 
 How long a preset `play` runs, in seconds: its `duration` when set,
 else the preset’s natural length divided by `speed`. What a
 `sequence` advances by is `play_extent()`, which is this for a preset
-source.
+source. `context` is what the compiler adds to the args before expanding
+([`PresetContext`](#cutan.characters.play.PresetContext)): a walk’s length depends on its resolved gait and
+the figure’s scale, so the extent must see them too (cutan#12).
 
 * **Return type:**
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
@@ -372,6 +386,9 @@ source.
 0.5
 >>> preset_play_span(PlayAction(target="a", animation="hop", speed=2.0))
 0.25
+>>> walk = PlayAction(target="a", animation="walk", args={"distance": 160})
+>>> round(preset_play_span(walk), 6), round(preset_play_span(walk, {"scale": 2.0}), 6)
+(0.8, 0.4)
 ```
 
 ### cutan.characters.play.preset_problems(animation, , args=None, duration=None, speed=1.0, loop=None)
@@ -387,14 +404,15 @@ building it (at the identity pose), so a value the preset itself refuses —
 
 ### cutan.characters.play.preset_takes(animation, name)
 
-Whether the motion preset `animation` has the keyword `name`.
+Whether the motion preset `animation` has the keyword `name`
+(`False` for a name that is no preset: a descriptor animation takes nothing).
 
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 ```pycon
->>> preset_takes("walk", "parts"), preset_takes("hop", "parts")
-(True, False)
+>>> preset_takes("walk", "parts"), preset_takes("hop", "parts"), preset_takes("blink", "parts")
+(True, False, False)
 ```
 
 ### cutan.characters.play.primary_slot_per_bone(desc)

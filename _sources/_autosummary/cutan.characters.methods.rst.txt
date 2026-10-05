@@ -20,6 +20,7 @@ cutan.characters.methods
       check_declared_speech
       check_walk_gaits
       gait_problem
+      locomotion_args
       compile_profile
       speech_problems
       normalise_gait_args
@@ -27,6 +28,7 @@ cutan.characters.methods
       speech_plan
       substitution_record
       syllable_beats
+      walk_preset_context
    
    .. rubric:: Classes
 
