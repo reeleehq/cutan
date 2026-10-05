@@ -2036,9 +2036,7 @@ def _build_character_casts(work: Path) -> Path:
                 mouth_variants=CAST_MOUTH_FORMS,
                 **knobs,
             )
-        pack = StylePack(
-            **style_spec(style)["live"]["style_pack"]
-        )
+        pack = StylePack(**style_spec(style)["live"]["style_pack"])
         (pane / "assets" / "styles").mkdir(parents=True, exist_ok=True)
         (pane / "assets" / "styles" / f"{pack.name}.json").write_text(
             json.dumps(json.loads(pack.model_dump_json()), indent=2), encoding="utf-8"
