@@ -24,6 +24,7 @@ from cutan.characters.play import (
     preset_moved_nodes,
     preset_play_span,
     preset_takes,
+    preset_target_problems,
     resolve_turns,
     slot_node_path,
     swap_art_missing,
@@ -223,7 +224,9 @@ def _check_play_actions(
             entity = rigs.get(entity_id)
             is_character = entity is not None and entity.kind == "character"
             desc = play_descriptor(entity_id)
-            problems = play_problems(
+            problems = preset_target_problems(
+                leaf.animation, leaf.target
+            ) + play_problems(
                 desc,
                 leaf.animation,
                 art_exists=(
@@ -666,6 +669,13 @@ def check_character_refs(ctx: ValidationContext) -> None:
 
 def _turns_of(ctx: ValidationContext, index: int, shot: Any):
     return ctx.cached(("turns", index), lambda: _turn_resolution(shot, ctx.stores))
+
+
+def _stage_poses_of(ctx: ValidationContext, index: int, shot: Any):
+    """The shot's built stage poses (:func:`_stage_of`), once per shot across
+    the checks that read them; ``None`` when the stage does not build."""
+    _, unchecked = _rig_scope(shot, ctx.stores)
+    return ctx.cached(("stage", index), _stage_of(shot, ctx.stores, unchecked))
 
 
 def check_play_actions(ctx: ValidationContext) -> None:

@@ -50,7 +50,7 @@ def store(tmp_path):
     return s
 
 
-def _old_args(entity, args, desc, vocab, resolutions):
+def _old_args(entity, args, desc, vocab, resolutions, **_view):
     """The pre-an#248 rule: the author's gait, else the descriptor's; else unset."""
     gait = args.get("gait") or getattr(desc, "gait", None)
     return {**args, "gait": gait} if gait else dict(args)
