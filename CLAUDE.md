@@ -16,6 +16,7 @@ cutan/expression/     expression presets, axes, bindings, the face provider
 cutan/compile/        passes.py (the cut-out passes over an.stage.compile), lowering.py (play/expression lowering, swap declaration), coarticulate.py, gaze.py
 cutan/audio/          lip-sync providers (offline, rhubarb, whisper, word timings)
 cutan/impacts/        impact choreography and ground truth;  cutan/verify/style.py: the style lint;  cutan/library.py: the character analyser
+cutan/carve/          photo/frame → matted, provenance-carrying part: matte strategies, refine, head mode, split_parts, write_prop (cutan[carve])
 cutan/styles/         the named style specs (*.yaml, package data) and their loader: style_spec(name), style_specs(); python -m cutan.styles
 cutan/motion.py       the rig presets (nod, point, turn, walk, waddle, speech_pulse; an#322) and PRESETS, the table a `play` resolves in
 cutan/runtime/        visuals.js: the procedural mouth and eye, registered through the stage runtime's anRegisterVisual

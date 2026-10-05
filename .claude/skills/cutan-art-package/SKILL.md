@@ -73,6 +73,7 @@ a required part may ship in either format. Rules, all checked by
 - **Swap keys may be on different canvases.** Each key of a swap set (visemes,
   eyelids, views) is drawn with its OWN box, anchor and offset — a closed
   mouth on a thin canvas no longer squashes the open ones. Same for SVG.
+- **Carve with `cutan.carve`, not a script of your own** (`pip install "cutan[carve]"`): `carve(frame, matte=..., point=...)` for a part, `carve_head(...)` for a head (neck cut under the jaw, 512² canvas, the face centre as the origin), `split_parts` for moving pieces with pivots, `write_prop` for the folder. On flat cartoon frames the default `flat_colour` key (or `Polygon(outline) & FlatColour()`) beats `rembg`; `grabcut` for one prop in a rough box; `rembg` for photos. Read `part.quality.warnings()` before using a part. `frame_source(url, t=..., license=...)` carries the provenance into the descriptor.
 - **Record provenance.** Art carved from footage you do not own is
   `license: "all-rights-reserved"` (or the free-text "all rights reserved —
   private study only"): `an credits` lists it under **NOT PUBLISHABLE** and a
