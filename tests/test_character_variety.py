@@ -28,6 +28,8 @@ from pathlib import Path
 import pydantic
 import pytest
 
+from cutan.characters.brows import BROW_DROP, BROW_SLOTS
+
 from an.adapters.cutout.compile import CutoutCompileWarning, compile_shot
 from cutan.characters import new_character
 from cutan.characters.colour_roles import recolour_svg
@@ -57,11 +59,16 @@ DESCRIPTOR_KEYS = (
 #: Re-taken for cutan#66: the filled closed lid (`eye_*_closed.svg`) reaches
 #: `LID_COVER_PAD` units past the eye white, so no ring shows round a closed
 #: eye; every other file and field is unchanged.
+#: Re-taken for cutan#61 (expressions legible at the style framing): the brows
+#: rest `BROW_DROP` lower on the factory head (their attachments' y) and draw
+#: with `BROW_STROKE` 7.5; mouth forms curve twice as far (`SMILE_CURVE_GAIN`)
+#: with a `LIP_STROKE` of 3, and `angry` is a default form (`viseme@angry`); the
+#: eyes gain a `HALF` lid (`eye_*_half.svg`, `cutan.characters.lids`).
 GOLDEN_FACTORY_DIGESTS = {
-    "kyle": "8492ad9f93d520ab",
-    "stan": "e54c040d292dcab6",
-    "maya": "34fbfb2177cb37de",
-    "nobody": "fb07afe83cf339d0",
+    "kyle": "6b5ce0863525e16e",
+    "stan": "5dd584862961ced7",
+    "maya": "36434a2a23221c89",
+    "nobody": "c844a53ae591c0ed",
 }
 
 
@@ -198,6 +205,7 @@ def test_head_scale_scales_the_head_and_its_whole_face(tmp_path):
         assert (w1, h1) == pytest.approx((w0 * s, h0 * s)), part
     skin = _desc(big).skins["default"].slots
     for slot, (x, y) in FACE_OFFSETS.items():
+        y += BROW_DROP if slot in BROW_SLOTS else 0.0  # the factory's own brows (cutan#61)
         for att in skin[slot].values():
             assert (att.x, att.y) == pytest.approx((x * s, y * s)), slot
     assert _desc(big).gaze_travel == pytest.approx({"x": 9.0 * s, "y": 5.0 * s})

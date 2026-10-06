@@ -1,11 +1,13 @@
 """A partial lid on a rig that draws only open and closed eyelids (an#272).
 
-The ladder picks a drawing per lid state, so `lid_open -0.45` on a factory
-character (no `HALF` drawing) shows the open lid: an identical frame, which the
+The ladder picks a drawing per lid state, so `lid_open -0.45` on a rig with
+no `HALF` drawing (a factory character made before cutan#61) shows the open lid: an identical frame, which the
 end-user test then read as a cache bug. `an validate` says so, with the fix.
 """
 
 from __future__ import annotations
+
+import json
 
 from an.ir.schema import AssetRef, Meta, SceneIR, Shot
 
@@ -17,7 +19,11 @@ def _findings(tmp_path, *actions):
     from an.ir.validate import validate_semantic
     from an.stores.characters import CharactersStore
 
-    new_character(tmp_path, name="bob", use_dicebear=False, overwrite=True)
+    desc = new_character(tmp_path, name="bob", use_dicebear=False, overwrite=True)
+    # a rig with no HALF drawing (the factory draws one since cutan#61)
+    doc = json.loads(desc.read_text(encoding="utf-8"))
+    doc["asset_sets"]["eyelid"].pop("HALF")
+    desc.write_text(json.dumps(doc), encoding="utf-8")
     shot = Shot(
         id="s",
         duration=2.0,

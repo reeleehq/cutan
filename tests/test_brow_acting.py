@@ -34,6 +34,7 @@ from cutan.characters.brows import (
     ink_discs,
 )
 from cutan.characters.factory import (
+    _hat_fragment,
     DFLT_HAIR_LENGTH,
     DFLT_HAIR_STYLE,
     HAIR_LENGTHS,
@@ -63,10 +64,12 @@ def _make(tmp_path: Path, name: str = "c", **knobs) -> Path:
     return new_character(tmp_path, name=name, use_dicebear=False, **knobs).parent
 
 
-def _worn_hat_columns(svg: str) -> dict[int, tuple[float, float]]:
-    """The hat's ink per column as WORN: the written transform applied."""
+def _worn_hat_columns(svg: str, *, drawn: str) -> dict[int, tuple[float, float]]:
+    """The hat's ink per column as WORN: the written transform applied. A hat
+    that clears the brows where it is drawn has no seat: ``drawn`` is its ink."""
     m = _TRANSFORM.search(svg)
-    assert m, "a seated hat is drawn inside its seat's transform"
+    if m is None:
+        return ink_columns(ink_discs(drawn))
     if m["lift"] is not None:
         a, k, b = float(m["lift"]), 1.0, 0.0
     else:
@@ -85,7 +88,7 @@ def test_a_hat_is_worn_above_the_brows_in_every_view(tmp_path, hat, scale):
     reach = brow_range(head_scale=scale)
     for view, filename in VIEW_FILES.items():
         svg = (char / "parts" / filename).read_text(encoding="utf-8")
-        cols = _worn_hat_columns(svg)
+        cols = _worn_hat_columns(svg, drawn=_hat_fragment(hat, view, accessory="#000000"))
         dips = {c: bottom - reach[view][c] for c, (_, bottom) in cols.items() if c in reach[view]}
         assert dips and max(dips.values()) <= 0, (view, max(dips.values()))
     doc = json.loads((char / "character.json").read_text(encoding="utf-8"))
@@ -105,12 +108,13 @@ def test_one_seat_for_every_view_so_the_hat_keeps_its_shape_as_it_turns(tmp_path
 def test_the_seat_never_lifts_a_crown_out_of_the_head_drawing(tmp_path, hat):
     """Lifted no higher than the canvas allows (a crown the drawing already
     clipped stays where it was): the rest is flattening, never clipping."""
-    from cutan.characters.factory import _hat_fragment
-
     drawn = min(t for t, _ in ink_columns(ink_discs(_hat_fragment(hat, "front", accessory="#000000"))).values())
     for scale in SCALES:
         char = _make(tmp_path / f"{scale}", hat=hat, head_scale=scale)
-        worn = _worn_hat_columns((char / "parts" / "head.svg").read_text(encoding="utf-8"))
+        worn = _worn_hat_columns(
+            (char / "parts" / "head.svg").read_text(encoding="utf-8"),
+            drawn=_hat_fragment(hat, "front", accessory="#000000"),
+        )
         assert min(t for t, _ in worn.values()) >= min(drawn, 0.0) - 1e-6
 
 
@@ -124,14 +128,15 @@ def test_a_hat_that_cannot_clear_a_tiny_heads_brows_is_recorded(tmp_path):
     from an.semantic.describe import describe_asset
 
     load()
-    out = cli_new("tiny", out_dir=str(tmp_path), offline=True, hat="cap", head_scale=0.3)
+    # below the brows' rest since cutan#61, a cap clears every head from 0.3 up
+    out = cli_new("tiny", out_dir=str(tmp_path), offline=True, hat="cap", head_scale=0.2)
     assert "covers the brows" in out
     doc = json.loads((tmp_path / "tiny" / "character.json").read_text(encoding="utf-8"))
     # derived from the knobs and the recorded seat, never stored (an#284)
     assert not doc.get("occluded")
     from cutan.characters.brows import brow_cover
 
-    assert brow_cover(CharacterDescriptor.model_validate(doc)) == "the cap hat at head_scale 0.3"
+    assert brow_cover(CharacterDescriptor.model_validate(doc)) == "the cap hat at head_scale 0.2"
     described = describe_asset(doc, art_in_dir(tmp_path / "tiny", exclude=("character.json",)))
     assert "face.brows" not in described["affordances"]
     expression = described["aspects"]["expression"]

@@ -492,10 +492,12 @@ class TestSvgCharacterCompile:
         assert left_eye.visual.asset_sets["eyelid"] == {
             "OPEN": "maya.left_eye.open",
             "CLOSED": "maya.left_eye.closed",
+            "HALF": "maya.left_eye.half",
         }
         assert right_eye.visual.asset_sets["eyelid"] == {
             "OPEN": "maya.right_eye.open",
             "CLOSED": "maya.right_eye.closed",
+            "HALF": "maya.right_eye.half",
         }
 
     def test_no_descriptor_falls_back_to_procedural(self):

@@ -47,7 +47,10 @@ _DEFAULT_PALETTE: dict[str, str] = {
 #: middle, so the line curves: a ``viseme@happy`` rest mouth is a closed smile,
 #: ``viseme@sad`` a frown. At ``DEFAULT_MOUTH_VARIANTS``' 0.35 the corners of
 #: the idle line rise about a sixth of its half width.
-SMILE_CURVE_GAIN: float = 0.5
+SMILE_CURVE_GAIN: float = 1.0
+#: The lip line's width in the mouth canvas: wide enough that a form (a smile,
+#: a frown) still reads at full-figure framing (cutan#61; was 2).
+LIP_STROKE: float = 3.0
 
 
 # Per-shape geometry parameters. Each entry describes a quad-arc lens
@@ -134,7 +137,7 @@ def _shape_svg(
         f'<path d="M {left_x:.2f} {corner_y:.2f} '
         f"Q {cx:.2f} {top_ctrl_y:.2f} {right_x:.2f} {corner_y:.2f} "
         f'Q {cx:.2f} {bot_ctrl_y:.2f} {left_x:.2f} {corner_y:.2f} Z" '
-        f'fill="{fill}" stroke="{lip}" stroke-width="2" stroke-linejoin="round"/>'
+        f'fill="{fill}" stroke="{lip}" stroke-width="{LIP_STROKE:g}" stroke-linejoin="round"/>'
     )
 
     overlays: list[str] = []
@@ -176,8 +179,8 @@ def _shape_svg(
 #: `viseme@<form>` set per entry, its shapes drawn with this corner upturn
 #: added (an#98). Every preset that prefers a form the character lacks falls
 #: back to `viseme` with a warning, so the default covers the two forms the
-#: most-authored presets (`happy`/`amused`, `sad`) ask for.
-DEFAULT_MOUTH_VARIANTS: dict[str, float] = {"happy": 0.35, "sad": -0.35}
+#: most-authored presets (`happy`/`amused`, `sad`, `angry`: cutan#61) ask for.
+DEFAULT_MOUTH_VARIANTS: dict[str, float] = {"happy": 0.35, "sad": -0.35, "angry": -0.25}
 
 
 def mouth_attachment_name(shape: str, form: str | None = None) -> str:

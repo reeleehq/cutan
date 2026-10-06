@@ -362,9 +362,8 @@ def _parse_variants(spec: str) -> dict[str, float]:
 
 
 #: Corner upturn per mouth form for the forms without a default variant
-#: (art direction; the same knob `DEFAULT_MOUTH_VARIANTS` sets for happy/sad).
+#: (art direction; the same knob `DEFAULT_MOUTH_VARIANTS` sets for happy, sad and angry).
 _VARIANT_SMILE: dict[str, float] = {
-    "angry": -0.25,
     "surprised": 0.0,
     "afraid": -0.15,
     "disgusted": -0.3,
