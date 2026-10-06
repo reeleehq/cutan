@@ -53,8 +53,8 @@ __all__ = [
 
 #: Bump when the derivation can answer differently for the same input.
 #: 0.2.0: ``face.brows`` (an#252). 0.3.0: a factory head's brow cover is
-#: derived from its knobs and recorded seat, ``occluded`` only an override (an#284).
-CHARACTER_ANALYSER_VERSION: str = "0.3.0"
+#: derived from its knobs and recorded seat, ``occluded`` only an override (an#284). 0.4.0: ``rig.hierarchy`` (an#340).
+CHARACTER_ANALYSER_VERSION: str = "0.4.0"
 #: The chart name of the nine Rhubarb mouth shapes (A–H, X) — ``an``'s default.
 MOUTH_CHART_RHUBARB: str = "rhubarb9"
 #: The chart name of any other viseme set.
@@ -281,6 +281,12 @@ def character_affordances(
     brows = brow_affordance(desc, drawn)
     if brows is not None:
         out[FACE_BROWS.name] = brows
+
+    # The rig's structure (an#340): a nested chain, derived by the stage's own
+    # rule, the one the core's `prop` analyser uses too.
+    from an.stage.rig import rig_affordances
+
+    out.update(rig_affordances(desc))
     return out
 
 

@@ -351,7 +351,19 @@ def _limb_pair(
         return tuple(names) if names else None  # type: ignore[return-value]
     if parts is None:
         return candidates[0]
-    return next((pair for pair in candidates if all(n in parts for n in pair)), None)
+    # By SLOT name, the path's last segment: in `nesting: bones` (an#340) a leg
+    # is built under its hip (`torso/left_leg`), and the walk moves that node.
+    by_slot: dict[str, str] = {}
+    for path in parts:
+        by_slot.setdefault(path.rsplit("/", 1)[-1], path)
+    return next(
+        (
+            (by_slot[pair[0]], by_slot[pair[1]])
+            for pair in candidates
+            if all(n in by_slot for n in pair)
+        ),
+        None,
+    )
 
 
 def gait_params(

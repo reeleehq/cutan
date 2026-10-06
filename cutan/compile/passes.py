@@ -52,6 +52,7 @@ from cutan.characters.play import (
     resolve_turns,
     sampled_deviations,
     slot_node_path,
+    suppressed_slots,
 )
 from an.ir.compose import FlatAction
 from cutan.characters.registration import PlayAction
@@ -113,6 +114,7 @@ from an.stage.compile import (  # noqa: E402
     note_raster_rig,
 )
 from an.stage.rig import (  # noqa: E402  (the public rig builder, an#338)
+    RigError,
     art_src,
     build_rig_subtree,
     part_probe,
@@ -632,17 +634,26 @@ def _build_character_subtree(
             untagged = _core_roles_left_untagged(entity, char_meta, style_pack)
             if untagged and skipped is not None:
                 skipped.add(f"{entity.id} ({', '.join(untagged)})")
-        return build_rig_subtree(
-            entity,
-            char_meta,
-            textures=textures if textures is not None else {},
-            probe=part_probe(characters_store),
-            resolutions=resolutions,
-            texture_srcs=srcs or None,
-            digest=raster_digest(characters_store),
-            descriptor_model=CharacterDescriptor,
-            document_kind=CHARACTER_DOCUMENT_KIND,
+        # The genre, not the stage, knows which slots a baked face suppresses
+        # (an#340): every slot nested under the head bone's primary slot.
+        desc = CharacterDescriptor.model_validate(
+            migrate(dict(char_meta), kind=CHARACTER_DOCUMENT_KIND.name)
         )
+        try:
+            return build_rig_subtree(
+                entity,
+                char_meta,
+                textures=textures if textures is not None else {},
+                probe=part_probe(characters_store),
+                resolutions=resolutions,
+                texture_srcs=srcs or None,
+                digest=raster_digest(characters_store),
+                descriptor_model=CharacterDescriptor,
+                document_kind=CHARACTER_DOCUMENT_KIND,
+                skip_slots=suppressed_slots(desc),
+            )
+        except RigError as e:
+            raise CutoutCompileError(f"character {entity.id!r}: {e}") from e
 
     declared_parts = char_meta.get("parts")
     if declared_parts:
@@ -2366,6 +2377,18 @@ def _expand_preset_plays(
                 else lambda path, t=flat.start: pose_at(path, t)
             )
             parts_of = None
+            if vocab is not None:
+                # The entity's built part paths: a multi-part preset chooses its
+                # limbs from them, a one-part one (`nod`) finds its part by slot
+                # name in a nested chain (an#340).
+                def parts_of(entity: str) -> list[str]:
+                    prefix = f"{entity}/"
+                    return [
+                        p[len(prefix) :]
+                        for p in vocab.node_transforms
+                        if p.startswith(prefix)
+                    ]
+
             if preset_takes(action.animation, PARTS_ARG) and vocab is not None:
                 action, rest_of = _with_view_and_posed_parts(
                     action,
@@ -2376,14 +2399,6 @@ def _expand_preset_plays(
                     resolutions=resolutions,
                     policy=policy,
                 )
-
-                def parts_of(entity: str) -> list[str]:
-                    prefix = f"{entity}/"
-                    return [
-                        p[len(prefix) :]
-                        for p in vocab.node_transforms
-                        if p.startswith(prefix)
-                    ]
 
             if (
                 step_hz

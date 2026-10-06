@@ -37,7 +37,13 @@ from cutan.characters.schema import (
 from cutan.characters.svg_utils import SVG_NS, extract_pivots
 from cutan.motion import DFLT_LEGLESS_GAIT, WALK_LEG_NAMES
 from an.stage.raster import RASTER_SUFFIXES, has_alpha, image_size, is_raster
-from an.stage.rig import rig_origin_problems, rig_rest_problems
+from an.stage.rig import (
+    chain_draw_order_problems,
+    chain_pose_problems,
+    rig_origin_problems,
+    rig_problems,
+    rig_rest_problems,
+)
 from an.verify._base import Finding, VerificationReport
 
 #: Elements an art package may not contain.
@@ -807,6 +813,22 @@ def _check_rig_origin(
     """
     if descriptor is None:
         return
+    for problem in rig_problems(descriptor):
+        report.add(
+            BLOCKING,
+            "character.json#rig",
+            f"{who}: {problem}",
+            "Every bone's parent and every slot's bone must be a declared bone, "
+            "and the bones a tree.",
+        )
+    for problem in chain_draw_order_problems(descriptor) + chain_pose_problems(descriptor):
+        report.add(
+            ADVISORY,
+            "character.json#rig",
+            f"{who}: {problem} (compiling a shot refuses it)",
+            "The stage draws a nested part over its parent and needs a node for "
+            "every posed bone; or keep `nesting: flat`.",
+        )
     for problem in rig_origin_problems(descriptor) + rig_rest_problems(descriptor):
         report.add(
             ADVISORY,
