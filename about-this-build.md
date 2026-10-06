@@ -2,20 +2,20 @@
 
 # About this build
 
-This documentation was built on **2026-10-06 14:53 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/c48ce7c920c035d923474dc5ce29c5ebade79300"><code>c48ce7c</code></a> on branch <code>main</code>, for **cutan 0.0.44** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-06 14:58 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/3d64acc327574f6fef228d9ce9b1e3d072a2b13e"><code>3d64acc</code></a> on branch <code>main</code>, for **cutan 0.0.45** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.44) is behind the latest release on PyPI (0.0.45): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.45) is behind the latest release on PyPI (0.0.46): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/c48ce7c920c035d923474dc5ce29c5ebade79300"><code>c48ce7c920c035d923474dc5ce29c5ebade79300</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/3d64acc327574f6fef228d9ce9b1e3d072a2b13e"><code>3d64acc327574f6fef228d9ce9b1e3d072a2b13e</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
-| Tags at this commit | <code>0.0.44</code>                                                                                                                                     |
+| Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
 | Remote              | <code>https://github.com/thorwhalen/cutan</code>                                                                                                        |
 
@@ -24,9 +24,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37481643932">37481643932</a>     |
+| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37482924997">37482924997</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>70b1644a185115480511dab116b033d019e27458</code> (in the history of the built commit) |
+| Event commit | <code>3d64acc327574f6fef228d9ce9b1e3d072a2b13e</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -35,7 +35,7 @@ The documentation and the package may be misaligned:
 | epythet  | 0.2.12  |
 | Sphinx   | 9.1.0   |
 | docutils | 0.22.4  |
-| Python   | 3.12.15 |
+| Python   | 3.12.14 |
 
 ## Configuration as resolved
 
@@ -51,13 +51,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.45/">0.0.45</a>, newer than the documented version (0.0.44).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.46/">0.0.46</a>, newer than the documented version (0.0.45).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout c48ce7c920c035d923474dc5ce29c5ebade79300
+git checkout 3d64acc327574f6fef228d9ce9b1e3d072a2b13e
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

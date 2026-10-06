@@ -10,6 +10,7 @@ cutan.characters.mouth\_set
    
       DEFAULT_MOUTH_VIEWBOX
       SMILE_CURVE_GAIN
+      LIP_STROKE
       DEFAULT_MOUTH_VARIANTS
    
    .. rubric:: Functions

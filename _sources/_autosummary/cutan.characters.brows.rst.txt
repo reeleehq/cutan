@@ -14,6 +14,7 @@ cutan.characters.brows
       HAT_BROW_CLEARANCE
       HAT_CROWN_MIN_Y
       HAT_MIN_FLATTEN
+      BROW_SLOTS
    
    .. rubric:: Functions
 

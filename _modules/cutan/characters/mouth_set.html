@@ -226,214 +226,217 @@
 </span><span id="line-47"><span class="c1">#: middle, so the line curves: a ``viseme@happy`` rest mouth is a closed smile,</span>
 </span><span id="line-48"><span class="c1">#: ``viseme@sad`` a frown. At ``DEFAULT_MOUTH_VARIANTS``' 0.35 the corners of</span>
 </span><span id="line-49"><span class="c1">#: the idle line rise about a sixth of its half width.</span>
-</span><span id="line-50"><span class="n">SMILE_CURVE_GAIN</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
-</span><span id="line-51">
-</span><span id="line-52">
-</span><span id="line-53"><span class="c1"># Per-shape geometry parameters. Each entry describes a quad-arc lens</span>
-</span><span id="line-54"><span class="c1"># mouth, optionally with teeth and/or tongue overlays. Field meanings:</span>
-</span><span id="line-55"><span class="c1">#   width:  full mouth width as a fraction of the canvas width</span>
-</span><span id="line-56"><span class="c1">#   height: full mouth height as a fraction of the canvas height</span>
-</span><span id="line-57"><span class="c1">#   open:   0..1 — how much to bulge the bottom lip downward</span>
-</span><span id="line-58"><span class="c1">#   smile:  -1..1 — corner upturn (positive = smile)</span>
-</span><span id="line-59"><span class="c1">#   teeth:  draw upper-teeth band (used for G/F-style "teeth on lip")</span>
-</span><span id="line-60"><span class="c1">#   tongue: draw a tongue dot (used for H "long L")</span>
-</span><span id="line-61"><span class="n">_SHAPES</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-62">    <span class="s2">"x"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.30</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">},</span>  <span class="c1"># idle</span>
-</span><span id="line-63">    <span class="s2">"a"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.07</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.10</span><span class="p">},</span>  <span class="c1"># M/B/P</span>
-</span><span id="line-64">    <span class="s2">"b"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="line-65">        <span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.36</span><span class="p">,</span>
-</span><span id="line-66">        <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.18</span><span class="p">,</span>
-</span><span id="line-67">        <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
-</span><span id="line-68">        <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-69">        <span class="s2">"teeth"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="line-70">    <span class="p">},</span>  <span class="c1"># K/S/T/EE</span>
-</span><span id="line-71">    <span class="s2">"c"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.42</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>  <span class="c1"># EH/AE</span>
-</span><span id="line-72">    <span class="s2">"d"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.46</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.50</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>  <span class="c1"># AA wide-open</span>
-</span><span id="line-73">    <span class="s2">"e"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.34</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.42</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span> <span class="s2">"smile"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">},</span>  <span class="c1"># AO/ER rounded</span>
-</span><span id="line-74">    <span class="s2">"f"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.22</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.34</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s2">"smile"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.10</span><span class="p">},</span>  <span class="c1"># UW/OW puckered</span>
-</span><span id="line-75">    <span class="s2">"g"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="line-76">        <span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.36</span><span class="p">,</span>
-</span><span id="line-77">        <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.14</span><span class="p">,</span>
-</span><span id="line-78">        <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
-</span><span id="line-79">        <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-80">        <span class="s2">"teeth"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="line-81">    <span class="p">},</span>  <span class="c1"># F/V teeth-on-lip</span>
-</span><span id="line-82">    <span class="s2">"h"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="line-83">        <span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.30</span><span class="p">,</span>
-</span><span id="line-84">        <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.13</span><span class="p">,</span>
-</span><span id="line-85">        <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span>
-</span><span id="line-86">        <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-87">        <span class="s2">"tongue"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="line-88">    <span class="p">},</span>  <span class="c1"># L</span>
-</span><span id="line-89"><span class="p">}</span>
-</span><span id="line-90">
-</span><span id="line-91">
-</span><span id="line-92"><span class="k">def</span><span class="w"> </span><span class="nf">_shape_svg</span><span class="p">(</span>
-</span><span id="line-93">    <span class="n">shape</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-94">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-95">    <span class="n">canvas</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
-</span><span id="line-96">    <span class="n">palette</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-</span><span id="line-97">    <span class="n">smile</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-98"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-99"><span class="w">    </span><span class="sd">"""Render one mouth shape as an SVG document string.</span>
-</span><span id="line-100">
-</span><span id="line-101"><span class="sd">    ``smile`` curves the shape (positive = smile, negative = frown) — the one</span>
-</span><span id="line-102"><span class="sd">    knob behind a ``viseme@&lt;form&gt;`` variant set (an#98): every shape keeps its</span>
-</span><span id="line-103"><span class="sd">    opening, only the corners move, against the middle, by ``smile`` ×</span>
-</span><span id="line-104"><span class="sd">    :data:`SMILE_CURVE_GAIN` × the half width. (Until an#253 the variant's</span>
-</span><span id="line-105"><span class="sd">    smile shifted the whole mouth down with its corners, so a happy mouth was</span>
-</span><span id="line-106"><span class="sd">    the neutral one moved by two pixels.) ``smile=0`` draws the shape exactly</span>
-</span><span id="line-107"><span class="sd">    as the neutral set always has.</span>
-</span><span id="line-108"><span class="sd">    """</span>
-</span><span id="line-109">    <span class="n">cw</span><span class="p">,</span> <span class="n">ch</span> <span class="o">=</span> <span class="n">canvas</span>
-</span><span id="line-110">    <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">cw</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">ch</span> <span class="o">/</span> <span class="mf">2.0</span>
-</span><span id="line-111">    <span class="n">s</span> <span class="o">=</span> <span class="n">_SHAPES</span><span class="p">[</span><span class="n">shape</span><span class="p">]</span>
-</span><span id="line-112">
-</span><span id="line-113">    <span class="n">half_w</span> <span class="o">=</span> <span class="p">(</span><span class="n">cw</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s2">"width"</span><span class="p">]))</span> <span class="o">/</span> <span class="mf">2.0</span>
-</span><span id="line-114">    <span class="n">half_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">ch</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s2">"height"</span><span class="p">]))</span> <span class="o">/</span> <span class="mf">2.0</span>
-</span><span id="line-115">    <span class="n">smile_y</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s2">"smile"</span><span class="p">])))</span> <span class="o">*</span> <span class="n">half_h</span> <span class="o">*</span> <span class="mf">1.5</span>
-</span><span id="line-116">    <span class="c1"># y points down: a smile lifts the corners (a smaller y)</span>
-</span><span id="line-117">    <span class="n">corner_y</span> <span class="o">=</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">smile_y</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">smile</span><span class="p">)</span> <span class="o">*</span> <span class="n">SMILE_CURVE_GAIN</span> <span class="o">*</span> <span class="n">half_w</span>
-</span><span id="line-118">    <span class="n">open_amt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s2">"open"</span><span class="p">])</span>
-</span><span id="line-119">
-</span><span id="line-120">    <span class="c1"># Top lip: lifted slightly with smile offset; its control point is above.</span>
-</span><span id="line-121">    <span class="n">top_ctrl_y</span> <span class="o">=</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">smile_y</span> <span class="o">-</span> <span class="n">half_h</span> <span class="o">*</span> <span class="mf">0.7</span>
-</span><span id="line-122">    <span class="c1"># Bottom lip: openness pushes the control point down.</span>
-</span><span id="line-123">    <span class="n">bot_ctrl_y</span> <span class="o">=</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">smile_y</span> <span class="o">+</span> <span class="n">half_h</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">open_amt</span><span class="p">)</span>
-</span><span id="line-124">
-</span><span id="line-125">    <span class="n">left_x</span> <span class="o">=</span> <span class="n">cx</span> <span class="o">-</span> <span class="n">half_w</span>
-</span><span id="line-126">    <span class="n">right_x</span> <span class="o">=</span> <span class="n">cx</span> <span class="o">+</span> <span class="n">half_w</span>
+</span><span id="line-50"><span class="n">SMILE_CURVE_GAIN</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+</span><span id="line-51"><span class="c1">#: The lip line's width in the mouth canvas: wide enough that a form (a smile,</span>
+</span><span id="line-52"><span class="c1">#: a frown) still reads at full-figure framing (cutan#61; was 2).</span>
+</span><span id="line-53"><span class="n">LIP_STROKE</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">3.0</span>
+</span><span id="line-54">
+</span><span id="line-55">
+</span><span id="line-56"><span class="c1"># Per-shape geometry parameters. Each entry describes a quad-arc lens</span>
+</span><span id="line-57"><span class="c1"># mouth, optionally with teeth and/or tongue overlays. Field meanings:</span>
+</span><span id="line-58"><span class="c1">#   width:  full mouth width as a fraction of the canvas width</span>
+</span><span id="line-59"><span class="c1">#   height: full mouth height as a fraction of the canvas height</span>
+</span><span id="line-60"><span class="c1">#   open:   0..1 — how much to bulge the bottom lip downward</span>
+</span><span id="line-61"><span class="c1">#   smile:  -1..1 — corner upturn (positive = smile)</span>
+</span><span id="line-62"><span class="c1">#   teeth:  draw upper-teeth band (used for G/F-style "teeth on lip")</span>
+</span><span id="line-63"><span class="c1">#   tongue: draw a tongue dot (used for H "long L")</span>
+</span><span id="line-64"><span class="n">_SHAPES</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-65">    <span class="s2">"x"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.30</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">},</span>  <span class="c1"># idle</span>
+</span><span id="line-66">    <span class="s2">"a"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.07</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.10</span><span class="p">},</span>  <span class="c1"># M/B/P</span>
+</span><span id="line-67">    <span class="s2">"b"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-68">        <span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.36</span><span class="p">,</span>
+</span><span id="line-69">        <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.18</span><span class="p">,</span>
+</span><span id="line-70">        <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+</span><span id="line-71">        <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-72">        <span class="s2">"teeth"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="line-73">    <span class="p">},</span>  <span class="c1"># K/S/T/EE</span>
+</span><span id="line-74">    <span class="s2">"c"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.42</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>  <span class="c1"># EH/AE</span>
+</span><span id="line-75">    <span class="s2">"d"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.46</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.50</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>  <span class="c1"># AA wide-open</span>
+</span><span id="line-76">    <span class="s2">"e"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.34</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.42</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span> <span class="s2">"smile"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">},</span>  <span class="c1"># AO/ER rounded</span>
+</span><span id="line-77">    <span class="s2">"f"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.22</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.34</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s2">"smile"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.10</span><span class="p">},</span>  <span class="c1"># UW/OW puckered</span>
+</span><span id="line-78">    <span class="s2">"g"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-79">        <span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.36</span><span class="p">,</span>
+</span><span id="line-80">        <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.14</span><span class="p">,</span>
+</span><span id="line-81">        <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+</span><span id="line-82">        <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-83">        <span class="s2">"teeth"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="line-84">    <span class="p">},</span>  <span class="c1"># F/V teeth-on-lip</span>
+</span><span id="line-85">    <span class="s2">"h"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-86">        <span class="s2">"width"</span><span class="p">:</span> <span class="mf">0.30</span><span class="p">,</span>
+</span><span id="line-87">        <span class="s2">"height"</span><span class="p">:</span> <span class="mf">0.13</span><span class="p">,</span>
+</span><span id="line-88">        <span class="s2">"open"</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span>
+</span><span id="line-89">        <span class="s2">"smile"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-90">        <span class="s2">"tongue"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="line-91">    <span class="p">},</span>  <span class="c1"># L</span>
+</span><span id="line-92"><span class="p">}</span>
+</span><span id="line-93">
+</span><span id="line-94">
+</span><span id="line-95"><span class="k">def</span><span class="w"> </span><span class="nf">_shape_svg</span><span class="p">(</span>
+</span><span id="line-96">    <span class="n">shape</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-97">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-98">    <span class="n">canvas</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+</span><span id="line-99">    <span class="n">palette</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+</span><span id="line-100">    <span class="n">smile</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-101"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-102"><span class="w">    </span><span class="sd">"""Render one mouth shape as an SVG document string.</span>
+</span><span id="line-103">
+</span><span id="line-104"><span class="sd">    ``smile`` curves the shape (positive = smile, negative = frown) — the one</span>
+</span><span id="line-105"><span class="sd">    knob behind a ``viseme@&lt;form&gt;`` variant set (an#98): every shape keeps its</span>
+</span><span id="line-106"><span class="sd">    opening, only the corners move, against the middle, by ``smile`` ×</span>
+</span><span id="line-107"><span class="sd">    :data:`SMILE_CURVE_GAIN` × the half width. (Until an#253 the variant's</span>
+</span><span id="line-108"><span class="sd">    smile shifted the whole mouth down with its corners, so a happy mouth was</span>
+</span><span id="line-109"><span class="sd">    the neutral one moved by two pixels.) ``smile=0`` draws the shape exactly</span>
+</span><span id="line-110"><span class="sd">    as the neutral set always has.</span>
+</span><span id="line-111"><span class="sd">    """</span>
+</span><span id="line-112">    <span class="n">cw</span><span class="p">,</span> <span class="n">ch</span> <span class="o">=</span> <span class="n">canvas</span>
+</span><span id="line-113">    <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">cw</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">ch</span> <span class="o">/</span> <span class="mf">2.0</span>
+</span><span id="line-114">    <span class="n">s</span> <span class="o">=</span> <span class="n">_SHAPES</span><span class="p">[</span><span class="n">shape</span><span class="p">]</span>
+</span><span id="line-115">
+</span><span id="line-116">    <span class="n">half_w</span> <span class="o">=</span> <span class="p">(</span><span class="n">cw</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s2">"width"</span><span class="p">]))</span> <span class="o">/</span> <span class="mf">2.0</span>
+</span><span id="line-117">    <span class="n">half_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">ch</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s2">"height"</span><span class="p">]))</span> <span class="o">/</span> <span class="mf">2.0</span>
+</span><span id="line-118">    <span class="n">smile_y</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s2">"smile"</span><span class="p">])))</span> <span class="o">*</span> <span class="n">half_h</span> <span class="o">*</span> <span class="mf">1.5</span>
+</span><span id="line-119">    <span class="c1"># y points down: a smile lifts the corners (a smaller y)</span>
+</span><span id="line-120">    <span class="n">corner_y</span> <span class="o">=</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">smile_y</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">smile</span><span class="p">)</span> <span class="o">*</span> <span class="n">SMILE_CURVE_GAIN</span> <span class="o">*</span> <span class="n">half_w</span>
+</span><span id="line-121">    <span class="n">open_amt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s2">"open"</span><span class="p">])</span>
+</span><span id="line-122">
+</span><span id="line-123">    <span class="c1"># Top lip: lifted slightly with smile offset; its control point is above.</span>
+</span><span id="line-124">    <span class="n">top_ctrl_y</span> <span class="o">=</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">smile_y</span> <span class="o">-</span> <span class="n">half_h</span> <span class="o">*</span> <span class="mf">0.7</span>
+</span><span id="line-125">    <span class="c1"># Bottom lip: openness pushes the control point down.</span>
+</span><span id="line-126">    <span class="n">bot_ctrl_y</span> <span class="o">=</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">smile_y</span> <span class="o">+</span> <span class="n">half_h</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">open_amt</span><span class="p">)</span>
 </span><span id="line-127">
-</span><span id="line-128">    <span class="n">fill</span> <span class="o">=</span> <span class="n">palette</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"fill"</span><span class="p">,</span> <span class="n">_DEFAULT_PALETTE</span><span class="p">[</span><span class="s2">"fill"</span><span class="p">])</span>
-</span><span id="line-129">    <span class="n">lip</span> <span class="o">=</span> <span class="n">palette</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"lip"</span><span class="p">,</span> <span class="n">_DEFAULT_PALETTE</span><span class="p">[</span><span class="s2">"lip"</span><span class="p">])</span>
-</span><span id="line-130">    <span class="n">teeth</span> <span class="o">=</span> <span class="n">palette</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"teeth"</span><span class="p">,</span> <span class="n">_DEFAULT_PALETTE</span><span class="p">[</span><span class="s2">"teeth"</span><span class="p">])</span>
-</span><span id="line-131">    <span class="n">tongue</span> <span class="o">=</span> <span class="n">palette</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tongue"</span><span class="p">,</span> <span class="n">_DEFAULT_PALETTE</span><span class="p">[</span><span class="s2">"tongue"</span><span class="p">])</span>
-</span><span id="line-132">
-</span><span id="line-133">    <span class="n">body</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-134">        <span class="sa">f</span><span class="s1">'&lt;path d="M </span><span class="si">{</span><span class="n">left_x</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">corner_y</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> '</span>
-</span><span id="line-135">        <span class="sa">f</span><span class="s2">"Q </span><span class="si">{</span><span class="n">cx</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">top_ctrl_y</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">right_x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">corner_y</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> "</span>
-</span><span id="line-136">        <span class="sa">f</span><span class="s1">'Q </span><span class="si">{</span><span class="n">cx</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">bot_ctrl_y</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">left_x</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">corner_y</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> Z" '</span>
-</span><span id="line-137">        <span class="sa">f</span><span class="s1">'fill="</span><span class="si">{</span><span class="n">fill</span><span class="si">}</span><span class="s1">" stroke="</span><span class="si">{</span><span class="n">lip</span><span class="si">}</span><span class="s1">" stroke-width="2" stroke-linejoin="round"/&gt;'</span>
-</span><span id="line-138">    <span class="p">)</span>
-</span><span id="line-139">
-</span><span id="line-140">    <span class="n">overlays</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-141">    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"teeth"</span><span class="p">):</span>
-</span><span id="line-142">        <span class="c1"># Upper-teeth strip just below the top lip.</span>
-</span><span id="line-143">        <span class="n">teeth_w</span> <span class="o">=</span> <span class="n">half_w</span> <span class="o">*</span> <span class="mf">1.2</span>
-</span><span id="line-144">        <span class="n">teeth_h</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">half_h</span> <span class="o">*</span> <span class="mf">0.18</span><span class="p">)</span>
-</span><span id="line-145">        <span class="n">teeth_y</span> <span class="o">=</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">smile_y</span> <span class="o">-</span> <span class="n">teeth_h</span> <span class="o">*</span> <span class="mf">0.2</span>
-</span><span id="line-146">        <span class="n">overlays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-147">            <span class="sa">f</span><span class="s1">'&lt;rect x="</span><span class="si">{</span><span class="n">cx</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">teeth_w</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" y="</span><span class="si">{</span><span class="n">teeth_y</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" '</span>
-</span><span id="line-148">            <span class="sa">f</span><span class="s1">'width="</span><span class="si">{</span><span class="n">teeth_w</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" height="</span><span class="si">{</span><span class="n">teeth_h</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" '</span>
-</span><span id="line-149">            <span class="sa">f</span><span class="s1">'fill="</span><span class="si">{</span><span class="n">teeth</span><span class="si">}</span><span class="s1">" rx="1.5"/&gt;'</span>
-</span><span id="line-150">        <span class="p">)</span>
-</span><span id="line-151">    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tongue"</span><span class="p">):</span>
-</span><span id="line-152">        <span class="c1"># Small tongue dot below midline.</span>
-</span><span id="line-153">        <span class="n">tongue_rx</span> <span class="o">=</span> <span class="n">half_w</span> <span class="o">*</span> <span class="mf">0.32</span>
-</span><span id="line-154">        <span class="n">tongue_ry</span> <span class="o">=</span> <span class="n">half_h</span> <span class="o">*</span> <span class="mf">0.40</span>
-</span><span id="line-155">        <span class="n">tongue_cy</span> <span class="o">=</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">smile_y</span> <span class="o">+</span> <span class="n">half_h</span> <span class="o">*</span> <span class="mf">0.20</span>
-</span><span id="line-156">        <span class="n">overlays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-157">            <span class="sa">f</span><span class="s1">'&lt;ellipse cx="</span><span class="si">{</span><span class="n">cx</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" cy="</span><span class="si">{</span><span class="n">tongue_cy</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" '</span>
-</span><span id="line-158">            <span class="sa">f</span><span class="s1">'rx="</span><span class="si">{</span><span class="n">tongue_rx</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" ry="</span><span class="si">{</span><span class="n">tongue_ry</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" '</span>
-</span><span id="line-159">            <span class="sa">f</span><span class="s1">'fill="</span><span class="si">{</span><span class="n">tongue</span><span class="si">}</span><span class="s1">"/&gt;'</span>
-</span><span id="line-160">        <span class="p">)</span>
-</span><span id="line-161">
-</span><span id="line-162">    <span class="n">body_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"mouth_</span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-163">    <span class="k">return</span> <span class="p">(</span>
-</span><span id="line-164">        <span class="s1">'&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span><span class="se">\n</span><span class="s1">'</span>
-</span><span id="line-165">        <span class="sa">f</span><span class="s1">'&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 </span><span class="si">{</span><span class="n">cw</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">ch</span><span class="si">}</span><span class="s1">" '</span>
-</span><span id="line-166">        <span class="sa">f</span><span class="s1">'width="</span><span class="si">{</span><span class="n">cw</span><span class="si">}</span><span class="s1">" height="</span><span class="si">{</span><span class="n">ch</span><span class="si">}</span><span class="s1">"&gt;'</span>
-</span><span id="line-167">        <span class="sa">f</span><span class="s1">'&lt;g id="</span><span class="si">{</span><span class="n">body_id</span><span class="si">}</span><span class="s1">"&gt;'</span>
-</span><span id="line-168">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">body</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-169">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">overlays</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-170">        <span class="s2">"&lt;/g&gt;"</span>
-</span><span id="line-171">        <span class="s2">"&lt;/svg&gt;"</span>
-</span><span id="line-172">    <span class="p">)</span>
-</span><span id="line-173">
-</span><span id="line-174">
-</span><span id="line-175"><span class="c1">#: The mouth-form variants a synthesized character gets by default: a</span>
-</span><span id="line-176"><span class="c1">#: `viseme@&lt;form&gt;` set per entry, its shapes drawn with this corner upturn</span>
-</span><span id="line-177"><span class="c1">#: added (an#98). Every preset that prefers a form the character lacks falls</span>
-</span><span id="line-178"><span class="c1">#: back to `viseme` with a warning, so the default covers the two forms the</span>
-</span><span id="line-179"><span class="c1">#: most-authored presets (`happy`/`amused`, `sad`) ask for.</span>
-</span><span id="line-180"><span class="n">DEFAULT_MOUTH_VARIANTS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"happy"</span><span class="p">:</span> <span class="mf">0.35</span><span class="p">,</span> <span class="s2">"sad"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.35</span><span class="p">}</span>
-</span><span id="line-181">
-</span><span id="line-182">
+</span><span id="line-128">    <span class="n">left_x</span> <span class="o">=</span> <span class="n">cx</span> <span class="o">-</span> <span class="n">half_w</span>
+</span><span id="line-129">    <span class="n">right_x</span> <span class="o">=</span> <span class="n">cx</span> <span class="o">+</span> <span class="n">half_w</span>
+</span><span id="line-130">
+</span><span id="line-131">    <span class="n">fill</span> <span class="o">=</span> <span class="n">palette</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"fill"</span><span class="p">,</span> <span class="n">_DEFAULT_PALETTE</span><span class="p">[</span><span class="s2">"fill"</span><span class="p">])</span>
+</span><span id="line-132">    <span class="n">lip</span> <span class="o">=</span> <span class="n">palette</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"lip"</span><span class="p">,</span> <span class="n">_DEFAULT_PALETTE</span><span class="p">[</span><span class="s2">"lip"</span><span class="p">])</span>
+</span><span id="line-133">    <span class="n">teeth</span> <span class="o">=</span> <span class="n">palette</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"teeth"</span><span class="p">,</span> <span class="n">_DEFAULT_PALETTE</span><span class="p">[</span><span class="s2">"teeth"</span><span class="p">])</span>
+</span><span id="line-134">    <span class="n">tongue</span> <span class="o">=</span> <span class="n">palette</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tongue"</span><span class="p">,</span> <span class="n">_DEFAULT_PALETTE</span><span class="p">[</span><span class="s2">"tongue"</span><span class="p">])</span>
+</span><span id="line-135">
+</span><span id="line-136">    <span class="n">body</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-137">        <span class="sa">f</span><span class="s1">'&lt;path d="M </span><span class="si">{</span><span class="n">left_x</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">corner_y</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> '</span>
+</span><span id="line-138">        <span class="sa">f</span><span class="s2">"Q </span><span class="si">{</span><span class="n">cx</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">top_ctrl_y</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">right_x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">corner_y</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> "</span>
+</span><span id="line-139">        <span class="sa">f</span><span class="s1">'Q </span><span class="si">{</span><span class="n">cx</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">bot_ctrl_y</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">left_x</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">corner_y</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> Z" '</span>
+</span><span id="line-140">        <span class="sa">f</span><span class="s1">'fill="</span><span class="si">{</span><span class="n">fill</span><span class="si">}</span><span class="s1">" stroke="</span><span class="si">{</span><span class="n">lip</span><span class="si">}</span><span class="s1">" stroke-width="</span><span class="si">{</span><span class="n">LIP_STROKE</span><span class="si">:</span><span class="s1">g</span><span class="si">}</span><span class="s1">" stroke-linejoin="round"/&gt;'</span>
+</span><span id="line-141">    <span class="p">)</span>
+</span><span id="line-142">
+</span><span id="line-143">    <span class="n">overlays</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-144">    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"teeth"</span><span class="p">):</span>
+</span><span id="line-145">        <span class="c1"># Upper-teeth strip just below the top lip.</span>
+</span><span id="line-146">        <span class="n">teeth_w</span> <span class="o">=</span> <span class="n">half_w</span> <span class="o">*</span> <span class="mf">1.2</span>
+</span><span id="line-147">        <span class="n">teeth_h</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">half_h</span> <span class="o">*</span> <span class="mf">0.18</span><span class="p">)</span>
+</span><span id="line-148">        <span class="n">teeth_y</span> <span class="o">=</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">smile_y</span> <span class="o">-</span> <span class="n">teeth_h</span> <span class="o">*</span> <span class="mf">0.2</span>
+</span><span id="line-149">        <span class="n">overlays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-150">            <span class="sa">f</span><span class="s1">'&lt;rect x="</span><span class="si">{</span><span class="n">cx</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">teeth_w</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" y="</span><span class="si">{</span><span class="n">teeth_y</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" '</span>
+</span><span id="line-151">            <span class="sa">f</span><span class="s1">'width="</span><span class="si">{</span><span class="n">teeth_w</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" height="</span><span class="si">{</span><span class="n">teeth_h</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" '</span>
+</span><span id="line-152">            <span class="sa">f</span><span class="s1">'fill="</span><span class="si">{</span><span class="n">teeth</span><span class="si">}</span><span class="s1">" rx="1.5"/&gt;'</span>
+</span><span id="line-153">        <span class="p">)</span>
+</span><span id="line-154">    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tongue"</span><span class="p">):</span>
+</span><span id="line-155">        <span class="c1"># Small tongue dot below midline.</span>
+</span><span id="line-156">        <span class="n">tongue_rx</span> <span class="o">=</span> <span class="n">half_w</span> <span class="o">*</span> <span class="mf">0.32</span>
+</span><span id="line-157">        <span class="n">tongue_ry</span> <span class="o">=</span> <span class="n">half_h</span> <span class="o">*</span> <span class="mf">0.40</span>
+</span><span id="line-158">        <span class="n">tongue_cy</span> <span class="o">=</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">smile_y</span> <span class="o">+</span> <span class="n">half_h</span> <span class="o">*</span> <span class="mf">0.20</span>
+</span><span id="line-159">        <span class="n">overlays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-160">            <span class="sa">f</span><span class="s1">'&lt;ellipse cx="</span><span class="si">{</span><span class="n">cx</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" cy="</span><span class="si">{</span><span class="n">tongue_cy</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" '</span>
+</span><span id="line-161">            <span class="sa">f</span><span class="s1">'rx="</span><span class="si">{</span><span class="n">tongue_rx</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" ry="</span><span class="si">{</span><span class="n">tongue_ry</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">" '</span>
+</span><span id="line-162">            <span class="sa">f</span><span class="s1">'fill="</span><span class="si">{</span><span class="n">tongue</span><span class="si">}</span><span class="s1">"/&gt;'</span>
+</span><span id="line-163">        <span class="p">)</span>
+</span><span id="line-164">
+</span><span id="line-165">    <span class="n">body_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"mouth_</span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-166">    <span class="k">return</span> <span class="p">(</span>
+</span><span id="line-167">        <span class="s1">'&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span><span class="se">\n</span><span class="s1">'</span>
+</span><span id="line-168">        <span class="sa">f</span><span class="s1">'&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 </span><span class="si">{</span><span class="n">cw</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">ch</span><span class="si">}</span><span class="s1">" '</span>
+</span><span id="line-169">        <span class="sa">f</span><span class="s1">'width="</span><span class="si">{</span><span class="n">cw</span><span class="si">}</span><span class="s1">" height="</span><span class="si">{</span><span class="n">ch</span><span class="si">}</span><span class="s1">"&gt;'</span>
+</span><span id="line-170">        <span class="sa">f</span><span class="s1">'&lt;g id="</span><span class="si">{</span><span class="n">body_id</span><span class="si">}</span><span class="s1">"&gt;'</span>
+</span><span id="line-171">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">body</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-172">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">overlays</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-173">        <span class="s2">"&lt;/g&gt;"</span>
+</span><span id="line-174">        <span class="s2">"&lt;/svg&gt;"</span>
+</span><span id="line-175">    <span class="p">)</span>
+</span><span id="line-176">
+</span><span id="line-177">
+</span><span id="line-178"><span class="c1">#: The mouth-form variants a synthesized character gets by default: a</span>
+</span><span id="line-179"><span class="c1">#: `viseme@&lt;form&gt;` set per entry, its shapes drawn with this corner upturn</span>
+</span><span id="line-180"><span class="c1">#: added (an#98). Every preset that prefers a form the character lacks falls</span>
+</span><span id="line-181"><span class="c1">#: back to `viseme` with a warning, so the default covers the two forms the</span>
+</span><span id="line-182"><span class="c1">#: most-authored presets (`happy`/`amused`, `sad`, `angry`: cutan#61) ask for.</span>
+</span><span id="line-183"><span class="n">DEFAULT_MOUTH_VARIANTS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"happy"</span><span class="p">:</span> <span class="mf">0.35</span><span class="p">,</span> <span class="s2">"sad"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.35</span><span class="p">,</span> <span class="s2">"angry"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.25</span><span class="p">}</span>
+</span><span id="line-184">
+</span><span id="line-185">
 <div class="viewcode-block" id="mouth_attachment_name">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.mouth_set.html#cutan.characters.mouth_attachment_name">[docs]</a>
-</span><span id="line-183"><span class="k">def</span><span class="w"> </span><span class="nf">mouth_attachment_name</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-184"><span class="w">    </span><span class="sd">"""The attachment (and file stem) of one mouth drawing.</span>
-</span><span id="line-185">
-</span><span id="line-186"><span class="sd">    &gt;&gt;&gt; mouth_attachment_name("a"), mouth_attachment_name("a", "happy")</span>
-</span><span id="line-187"><span class="sd">    ('mouth_a', 'mouth_a_happy')</span>
-</span><span id="line-188"><span class="sd">    """</span>
-</span><span id="line-189">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"mouth_</span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">form</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"mouth_</span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">form</span><span class="si">}</span><span class="s2">"</span></div>
+</span><span id="line-186"><span class="k">def</span><span class="w"> </span><span class="nf">mouth_attachment_name</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-187"><span class="w">    </span><span class="sd">"""The attachment (and file stem) of one mouth drawing.</span>
+</span><span id="line-188">
+</span><span id="line-189"><span class="sd">    &gt;&gt;&gt; mouth_attachment_name("a"), mouth_attachment_name("a", "happy")</span>
+</span><span id="line-190"><span class="sd">    ('mouth_a', 'mouth_a_happy')</span>
+</span><span id="line-191"><span class="sd">    """</span>
+</span><span id="line-192">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"mouth_</span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">form</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"mouth_</span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">form</span><span class="si">}</span><span class="s2">"</span></div>
 
-</span><span id="line-190">
-</span><span id="line-191">
+</span><span id="line-193">
+</span><span id="line-194">
 <div class="viewcode-block" id="generate_default_mouths">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.mouth_set.html#cutan.characters.generate_default_mouths">[docs]</a>
-</span><span id="line-192"><span class="k">def</span><span class="w"> </span><span class="nf">generate_default_mouths</span><span class="p">(</span>
-</span><span id="line-193">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-194">    <span class="n">canvas</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_MOUTH_VIEWBOX</span><span class="p">,</span>
-</span><span id="line-195">    <span class="n">palette</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-196">    <span class="n">shapes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">MOUTH_SHAPES</span><span class="p">,</span>
-</span><span id="line-197">    <span class="n">smile</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-198">    <span class="n">form</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-199"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-200"><span class="w">    </span><span class="sd">"""Return ``{"mouth_&lt;letter&gt;[_&lt;form&gt;]": &lt;svg-string&gt;, ...}`` for every shape.</span>
-</span><span id="line-201">
-</span><span id="line-202"><span class="sd">    &gt;&gt;&gt; svgs = generate_default_mouths()</span>
-</span><span id="line-203"><span class="sd">    &gt;&gt;&gt; 'mouth_x' in svgs and 'viewBox' in svgs['mouth_x']</span>
-</span><span id="line-204"><span class="sd">    True</span>
-</span><span id="line-205"><span class="sd">    &gt;&gt;&gt; sorted(generate_default_mouths(shapes=["a"], smile=0.35, form="happy"))</span>
-</span><span id="line-206"><span class="sd">    ['mouth_a_happy']</span>
-</span><span id="line-207"><span class="sd">    """</span>
-</span><span id="line-208">    <span class="n">pal</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_DEFAULT_PALETTE</span><span class="p">)</span>
-</span><span id="line-209">    <span class="k">if</span> <span class="n">palette</span><span class="p">:</span>
-</span><span id="line-210">        <span class="n">pal</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">palette</span><span class="p">)</span>
-</span><span id="line-211">    <span class="k">return</span> <span class="p">{</span>
-</span><span id="line-212">        <span class="n">mouth_attachment_name</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span> <span class="n">_shape_svg</span><span class="p">(</span>
-</span><span id="line-213">            <span class="n">shape</span><span class="p">,</span> <span class="n">canvas</span><span class="o">=</span><span class="n">canvas</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">pal</span><span class="p">,</span> <span class="n">smile</span><span class="o">=</span><span class="n">smile</span>
-</span><span id="line-214">        <span class="p">)</span>
-</span><span id="line-215">        <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapes</span>
-</span><span id="line-216">    <span class="p">}</span></div>
+</span><span id="line-195"><span class="k">def</span><span class="w"> </span><span class="nf">generate_default_mouths</span><span class="p">(</span>
+</span><span id="line-196">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-197">    <span class="n">canvas</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_MOUTH_VIEWBOX</span><span class="p">,</span>
+</span><span id="line-198">    <span class="n">palette</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-199">    <span class="n">shapes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">MOUTH_SHAPES</span><span class="p">,</span>
+</span><span id="line-200">    <span class="n">smile</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-201">    <span class="n">form</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-202"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-203"><span class="w">    </span><span class="sd">"""Return ``{"mouth_&lt;letter&gt;[_&lt;form&gt;]": &lt;svg-string&gt;, ...}`` for every shape.</span>
+</span><span id="line-204">
+</span><span id="line-205"><span class="sd">    &gt;&gt;&gt; svgs = generate_default_mouths()</span>
+</span><span id="line-206"><span class="sd">    &gt;&gt;&gt; 'mouth_x' in svgs and 'viewBox' in svgs['mouth_x']</span>
+</span><span id="line-207"><span class="sd">    True</span>
+</span><span id="line-208"><span class="sd">    &gt;&gt;&gt; sorted(generate_default_mouths(shapes=["a"], smile=0.35, form="happy"))</span>
+</span><span id="line-209"><span class="sd">    ['mouth_a_happy']</span>
+</span><span id="line-210"><span class="sd">    """</span>
+</span><span id="line-211">    <span class="n">pal</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_DEFAULT_PALETTE</span><span class="p">)</span>
+</span><span id="line-212">    <span class="k">if</span> <span class="n">palette</span><span class="p">:</span>
+</span><span id="line-213">        <span class="n">pal</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">palette</span><span class="p">)</span>
+</span><span id="line-214">    <span class="k">return</span> <span class="p">{</span>
+</span><span id="line-215">        <span class="n">mouth_attachment_name</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span> <span class="n">_shape_svg</span><span class="p">(</span>
+</span><span id="line-216">            <span class="n">shape</span><span class="p">,</span> <span class="n">canvas</span><span class="o">=</span><span class="n">canvas</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">pal</span><span class="p">,</span> <span class="n">smile</span><span class="o">=</span><span class="n">smile</span>
+</span><span id="line-217">        <span class="p">)</span>
+</span><span id="line-218">        <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapes</span>
+</span><span id="line-219">    <span class="p">}</span></div>
 
-</span><span id="line-217">
-</span><span id="line-218">
+</span><span id="line-220">
+</span><span id="line-221">
 <div class="viewcode-block" id="write_default_mouths">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.mouth_set.html#cutan.characters.write_default_mouths">[docs]</a>
-</span><span id="line-219"><span class="k">def</span><span class="w"> </span><span class="nf">write_default_mouths</span><span class="p">(</span>
-</span><span id="line-220">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
-</span><span id="line-221">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-222">    <span class="n">canvas</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_MOUTH_VIEWBOX</span><span class="p">,</span>
-</span><span id="line-223">    <span class="n">palette</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-224">    <span class="n">shapes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">MOUTH_SHAPES</span><span class="p">,</span>
-</span><span id="line-225">    <span class="n">variants</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-226"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-</span><span id="line-227"><span class="w">    </span><span class="sd">"""Write the default mouth SVGs into ``out_dir`` (created if missing),</span>
-</span><span id="line-228"><span class="sd">    plus one ``mouth_&lt;shape&gt;_&lt;form&gt;.svg`` per shape for every ``variants``</span>
-</span><span id="line-229"><span class="sd">    entry (``{form: smile offset}``; ``None`` = none).</span>
-</span><span id="line-230">
-</span><span id="line-231"><span class="sd">    Returns the list of paths written: the neutral set in shape order, then</span>
-</span><span id="line-232"><span class="sd">    each variant's.</span>
-</span><span id="line-233"><span class="sd">    """</span>
-</span><span id="line-234">    <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
-</span><span id="line-235">    <span class="n">out</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-236">    <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-237">    <span class="n">batches</span> <span class="o">=</span> <span class="p">[</span><span class="n">generate_default_mouths</span><span class="p">(</span><span class="n">canvas</span><span class="o">=</span><span class="n">canvas</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">shapes</span><span class="o">=</span><span class="n">shapes</span><span class="p">)]</span>
-</span><span id="line-238">    <span class="k">for</span> <span class="n">form</span><span class="p">,</span> <span class="n">smile</span> <span class="ow">in</span> <span class="p">(</span><span class="n">variants</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="line-239">        <span class="n">batches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-240">            <span class="n">generate_default_mouths</span><span class="p">(</span>
-</span><span id="line-241">                <span class="n">canvas</span><span class="o">=</span><span class="n">canvas</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">shapes</span><span class="o">=</span><span class="n">shapes</span><span class="p">,</span> <span class="n">smile</span><span class="o">=</span><span class="n">smile</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">form</span>
-</span><span id="line-242">            <span class="p">)</span>
-</span><span id="line-243">        <span class="p">)</span>
-</span><span id="line-244">    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
-</span><span id="line-245">        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">svg</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="line-246">            <span class="n">path</span> <span class="o">=</span> <span class="n">out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.svg"</span>
-</span><span id="line-247">            <span class="n">_drawn</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">svg</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
-</span><span id="line-248">            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</span><span id="line-249">    <span class="k">return</span> <span class="n">written</span></div>
+</span><span id="line-222"><span class="k">def</span><span class="w"> </span><span class="nf">write_default_mouths</span><span class="p">(</span>
+</span><span id="line-223">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+</span><span id="line-224">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-225">    <span class="n">canvas</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_MOUTH_VIEWBOX</span><span class="p">,</span>
+</span><span id="line-226">    <span class="n">palette</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-227">    <span class="n">shapes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">MOUTH_SHAPES</span><span class="p">,</span>
+</span><span id="line-228">    <span class="n">variants</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-229"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+</span><span id="line-230"><span class="w">    </span><span class="sd">"""Write the default mouth SVGs into ``out_dir`` (created if missing),</span>
+</span><span id="line-231"><span class="sd">    plus one ``mouth_&lt;shape&gt;_&lt;form&gt;.svg`` per shape for every ``variants``</span>
+</span><span id="line-232"><span class="sd">    entry (``{form: smile offset}``; ``None`` = none).</span>
+</span><span id="line-233">
+</span><span id="line-234"><span class="sd">    Returns the list of paths written: the neutral set in shape order, then</span>
+</span><span id="line-235"><span class="sd">    each variant's.</span>
+</span><span id="line-236"><span class="sd">    """</span>
+</span><span id="line-237">    <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+</span><span id="line-238">    <span class="n">out</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-239">    <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-240">    <span class="n">batches</span> <span class="o">=</span> <span class="p">[</span><span class="n">generate_default_mouths</span><span class="p">(</span><span class="n">canvas</span><span class="o">=</span><span class="n">canvas</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">shapes</span><span class="o">=</span><span class="n">shapes</span><span class="p">)]</span>
+</span><span id="line-241">    <span class="k">for</span> <span class="n">form</span><span class="p">,</span> <span class="n">smile</span> <span class="ow">in</span> <span class="p">(</span><span class="n">variants</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="line-242">        <span class="n">batches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-243">            <span class="n">generate_default_mouths</span><span class="p">(</span>
+</span><span id="line-244">                <span class="n">canvas</span><span class="o">=</span><span class="n">canvas</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">shapes</span><span class="o">=</span><span class="n">shapes</span><span class="p">,</span> <span class="n">smile</span><span class="o">=</span><span class="n">smile</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">form</span>
+</span><span id="line-245">            <span class="p">)</span>
+</span><span id="line-246">        <span class="p">)</span>
+</span><span id="line-247">    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
+</span><span id="line-248">        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">svg</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="line-249">            <span class="n">path</span> <span class="o">=</span> <span class="n">out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.svg"</span>
+</span><span id="line-250">            <span class="n">_drawn</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">svg</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span><span id="line-251">            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span id="line-252">    <span class="k">return</span> <span class="n">written</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -448,7 +451,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=78cc6f98"></script>
+    <script src="../../../_static/documentation_options.js?v=dcb4eb81"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -26,6 +26,7 @@ True
 | [`DEFAULT_MOUTH_VIEWBOX`](#cutan.characters.mouth_set.DEFAULT_MOUTH_VIEWBOX)   | Mouth canvas viewBox (width, height) — small per-shape and centered so the anchor is always (0.5, 0.5).                    |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 | [`SMILE_CURVE_GAIN`](#cutan.characters.mouth_set.SMILE_CURVE_GAIN)        | How far a variant's `smile` lifts the mouth's corners, as a fraction of the shape's half width per unit of smile (an#253). |
+| [`LIP_STROKE`](#cutan.characters.mouth_set.LIP_STROKE)              | wide enough that a form (a smile, a frown) still reads at full-figure framing (cutan#61; was 2).                           |
 | [`DEFAULT_MOUTH_VARIANTS`](#cutan.characters.mouth_set.DEFAULT_MOUTH_VARIANTS)  | a `viseme@<form>` set per entry, its shapes drawn with this corner upturn added (an#98).                                   |
 
 ### Functions
@@ -35,13 +36,13 @@ True
 | [`mouth_attachment_name`](#cutan.characters.mouth_set.mouth_attachment_name)(shape[, form])             | The attachment (and file stem) of one mouth drawing.                                                                                                                                |
 | [`write_default_mouths`](#cutan.characters.mouth_set.write_default_mouths)(out_dir, \*[, canvas, ...]) | Write the default mouth SVGs into `out_dir` (created if missing), plus one `mouth_<shape>_<form>.svg` per shape for every `variants` entry (`{form: smile offset}`; `None` = none). |
 
-### cutan.characters.mouth_set.DEFAULT_MOUTH_VARIANTS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]* *= {'happy': 0.35, 'sad': -0.35}*
+### cutan.characters.mouth_set.DEFAULT_MOUTH_VARIANTS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]* *= {'angry': -0.25, 'happy': 0.35, 'sad': -0.35}*
 
 a
 `viseme@<form>` set per entry, its shapes drawn with this corner upturn
 added (an#98). Every preset that prefers a form the character lacks falls
 back to `viseme` with a warning, so the default covers the two forms the
-most-authored presets (`happy`/`amused`, `sad`) ask for.
+most-authored presets (`happy`/`amused`, `sad`, `angry`: cutan#61) ask for.
 
 * **Type:**
   The mouth-form variants a synthesized character gets by default
@@ -51,7 +52,15 @@ most-authored presets (`happy`/`amused`, `sad`) ask for.
 Mouth canvas viewBox (width, height) — small per-shape and centered so the
 anchor is always (0.5, 0.5).
 
-### cutan.characters.mouth_set.SMILE_CURVE_GAIN *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+### cutan.characters.mouth_set.LIP_STROKE *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 3.0*
+
+wide enough that a form (a smile,
+a frown) still reads at full-figure framing (cutan#61; was 2).
+
+* **Type:**
+  The lip line’s width in the mouth canvas
+
+### cutan.characters.mouth_set.SMILE_CURVE_GAIN *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 1.0*
 
 How far a variant’s `smile` lifts the mouth’s corners, as a fraction of the
 shape’s half width per unit of smile (an#253). The corners move against the

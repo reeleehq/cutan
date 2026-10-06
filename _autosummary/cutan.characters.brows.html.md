@@ -24,9 +24,10 @@ expression falls to the lids, the gaze and the mouth (an#252). So:
   slots with art on an overlay face, and nothing recorded over them. The cut-out genre’s `expression` aspect
   requires it for its full-face method ([`cutan.characters.methods`](cutan.characters.methods.html.md#module-cutan.characters.methods)).
 
-Hair is not measured here: the brows’ outer ends meet the hairline by design
-(the default hair has always run under them), so a hair style is held to the
-default hairline instead (tests), never to the brows’ range.
+Hair is not measured here: since cutan#61 the brows rest below the default
+hairline (`BROW_DROP`; before, their outer ends
+ran into the fringe and read as hair), so a hair style is held to the default
+hairline instead (tests), never to the brows’ range.
 
 Units: the offline head is drawn in an [`HEAD_ART_SIZE`](#cutan.characters.brows.HEAD_ART_SIZE) square; the rig
 draws it [`REFERENCE_HEAD_HEIGHT`](cutan.characters.schema.html.md#cutan.characters.schema.REFERENCE_HEAD_HEIGHT) × `head_scale`
@@ -41,22 +42,23 @@ bigger head; a band drawn across the forehead is lifted clear of it:
 
 ```pycon
 >>> round(BROW_REST_TOP, 1)
-22.8
+25.1
 >>> [round(min(brow_range(head_scale=s)["front"].values()), 1) for s in (1.0, 1.7)]
-[19.5, 20.3]
+[21.8, 22.6]
 >>> seat_above_brows({"front": '<rect x="20" y="20" width="40" height="4"/>'}, head_scale=1.0)
-Seat(transform='translate(0 -5.47)', covers=False)
+Seat(transform='translate(0 -3.18)', covers=False)
 ```
 
 ### Module Attributes
 
-| [`HEAD_ART_SIZE`](#cutan.characters.brows.HEAD_ART_SIZE)      | The offline head's drawing is this many units square (its `viewBox`).                                                                                  |
-|---------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`BROW_CANVAS`](#cutan.characters.brows.BROW_CANVAS)        | its canvas (view-box units at head scale 1), the stroke, and how far each end tilts from the level.                                                    |
-| [`BROWS_FEATURE`](#cutan.characters.brows.BROWS_FEATURE)      | The face features a drawing can be recorded as covering (`occluded` keys).                                                                             |
-| [`HAT_BROW_CLEARANCE`](#cutan.characters.brows.HAT_BROW_CLEARANCE) | Head units left between a hat's lowest ink and the brows' highest reach — about the outline's width, so a raised brow never touches the brim's line.   |
-| [`HAT_CROWN_MIN_Y`](#cutan.characters.brows.HAT_CROWN_MIN_Y)    | How high a lifted hat's crown may go (head units from the drawing's top edge): above it the crown would be clipped by the head's canvas.               |
-| [`HAT_MIN_FLATTEN`](#cutan.characters.brows.HAT_MIN_FLATTEN)    | The flattest a hat is drawn (its height kept, as a fraction) to seat it above the brows; past it the hat keeps this shape and the overlap is recorded. |
+| [`HEAD_ART_SIZE`](#cutan.characters.brows.HEAD_ART_SIZE)      | The offline head's drawing is this many units square (its `viewBox`).                                                                                                                                                                                                                                                                                                                                                                                                     |
+|---------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`BROW_CANVAS`](#cutan.characters.brows.BROW_CANVAS)        | its canvas (view-box units at head scale 1), the stroke, and how far each end tilts from the level.                                                                                                                                                                                                                                                                                                                                                                       |
+| [`BROWS_FEATURE`](#cutan.characters.brows.BROWS_FEATURE)      | The face features a drawing can be recorded as covering (`occluded` keys).                                                                                                                                                                                                                                                                                                                                                                                                |
+| [`HAT_BROW_CLEARANCE`](#cutan.characters.brows.HAT_BROW_CLEARANCE) | Head units left between a hat's lowest ink and the brows' highest reach — about the outline's width, so a raised brow never touches the brim's line.                                                                                                                                                                                                                                                                                                                      |
+| [`HAT_CROWN_MIN_Y`](#cutan.characters.brows.HAT_CROWN_MIN_Y)    | How high a lifted hat's crown may go (head units from the drawing's top edge): above it the crown would be clipped by the head's canvas.                                                                                                                                                                                                                                                                                                                                  |
+| [`HAT_MIN_FLATTEN`](#cutan.characters.brows.HAT_MIN_FLATTEN)    | The flattest a hat is drawn (its height kept, as a fraction) to seat it above the brows; past it the hat keeps this shape and the overlap is recorded.                                                                                                                                                                                                                                                                                                                    |
+| [`BROW_SLOTS`](#cutan.characters.brows.BROW_SLOTS)         | The factory's brow slots, and how far below the default face layout ([`FACE_OFFSETS`](cutan.characters.schema.html.md#cutan.characters.schema.FACE_OFFSETS)) the factory hangs them on its own head, in view_box units (cutan#61): about 2.5 of the head drawing's 80 units, so their outer ends clear the hairline — the fringe ran into them, and a brow in the hair's colour over the hair is a brow nobody sees — and they keep their gap above the eyes. |
 
 ### Functions
 
@@ -86,6 +88,16 @@ the stroke, and how far each end tilts from the level.
 
 * **Type:**
   The factory’s brow drawing
+
+### cutan.characters.brows.BROW_SLOTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('left_brow', 'right_brow')*
+
+The factory’s brow slots, and how far below the default face layout
+([`FACE_OFFSETS`](cutan.characters.schema.html.md#cutan.characters.schema.FACE_OFFSETS)) the factory hangs them on
+its own head, in view_box units (cutan#61): about 2.5 of the head drawing’s
+80 units, so their outer ends clear the hairline — the fringe ran into them,
+and a brow in the hair’s colour over the hair is a brow nobody sees — and
+they keep their gap above the eyes. Only new factory heads take it (a
+descriptor stores its offsets); a promoted or DiceBear head keeps the layout.
 
 ### cutan.characters.brows.HAT_BROW_CLEARANCE *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 1.0*
 
