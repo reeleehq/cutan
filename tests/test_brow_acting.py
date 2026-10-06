@@ -403,3 +403,96 @@ def test_a_narrowed_brow_in_a_view_narrows_its_acting_range(monkeypatch):
         monkeypatch.setattr(factory, "view_poses", lambda *a, f=factor, **k: squashed(*a, factor=f, **k))
         lows[factor] = min(brow_range(views=["three_quarter"], presets=["neutral"])["three_quarter"])
     assert lows[0.5] >= lows[1.0] + 4  # half a brow's half-width, about 4.9 head units
+
+
+# --- the fall recorded in the compiled scene (an#283) -------------------------------
+
+
+def _compile_strict(scene, store):
+    from an.adapters.cutout.compile import compile_shot
+
+    return compile_shot(scene.timeline[0], {"characters": store}, strict_assets=True)
+
+
+def test_strict_assets_refuses_an_expression_on_brows_that_cannot_act(tmp_path):
+    """The acceptance of an#283: the fall is in `asset_resolution`, so
+    `--strict-assets` sees it, naming `face.brows` and the remedy."""
+    from an.adapters.cutout.compile import CutoutCompileError
+    from cutan.expression.registration import expression
+    from an.ir.schema import Dialogue
+    from an.stores.characters import CharactersStore
+
+    _make(tmp_path, name="tiny", hat="beanie", head_scale=0.25)
+    store = CharactersStore(tmp_path)
+    with pytest.raises(CutoutCompileError, match="face.brows") as e:
+        _compile_strict(_scene_with("tiny", expression("c", "surprised")), store)
+    assert "the beanie hat" in str(e.value) and "--head-scale" in str(e.value)
+    line = Dialogue(speaker="c", text="Oh!", emotion="surprised", start=0.2, duration=0.5)
+    with pytest.raises(CutoutCompileError, match="face.brows"):
+        _compile_strict(_scene_with("tiny", dialogue=[line]), store)
+    # without strict it renders, said once per character, not once per expression
+    import warnings
+
+    from an.adapters.cutout.compile import compile_shot
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        scene = compile_shot(
+            _scene_with("tiny", expression("c", "surprised"), dialogue=[line]).timeline[0],
+            {"characters": store},
+        )
+    records = [r for r in scene.asset_resolution if r.store == "expression"]
+    assert len(records) == 1 and records[0].fallback and records[0].resolved == "expr.without_brows"
+
+
+def test_nothing_is_recorded_for_a_face_with_no_brows_to_lose(tmp_path):
+    """A neutral face, brows that can act, a baked face and a face with no brow
+    slots record nothing: strict compiles them all."""
+    from cutan.expression.registration import expression
+    from an.ir.schema import Dialogue
+    from an.stores.characters import CharactersStore
+
+    _make(tmp_path, name="tiny", hat="beanie", head_scale=0.25)
+    _make(tmp_path, name="big", hat="beanie", head_scale=1.7)
+    for name, edit in (("baked", "baked"), ("browless", "browless")):
+        char = _make(tmp_path, name=name, hat="beanie", head_scale=0.25)
+        path = char / "character.json"
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        if edit == "baked":
+            doc["face_overlay"] = False
+        else:  # no brow slot at all: the binding moves none
+            doc["slots"] = [s for s in doc["slots"] if s["name"] not in ("left_brow", "right_brow")]
+            for skin in doc["skins"].values():
+                for slot in ("left_brow", "right_brow"):
+                    skin["slots"].pop(slot, None)
+        path.write_text(json.dumps(doc), encoding="utf-8")
+    store = CharactersStore(tmp_path)
+    _compile_strict(_scene_with("tiny", expression("c", "neutral")), store)
+    _compile_strict(_scene_with("big", expression("c", "surprised")), store)
+    _compile_strict(_scene_with("browless", expression("c", "surprised")), store)
+    # a baked face takes the dialogue sugar (an authored expression is refused);
+    # its speech falls to the pulse (its own record), its expression records nothing
+    import warnings
+
+    from an.adapters.cutout.compile import compile_shot
+
+    line = Dialogue(speaker="c", text="Oh!", emotion="surprised", start=0.2, duration=0.5)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        scene = compile_shot(
+            _scene_with("baked", dialogue=[line]).timeline[0], {"characters": store}
+        )
+    assert not [r for r in scene.asset_resolution if r.store == "expression"]
+
+
+def test_validate_sees_brow_art_that_is_missing(tmp_path):
+    """Validate reads the store's art probe, as the compiler does (review L4 of
+    #278): brows with no art are a loss it reports, not only a hat."""
+    from cutan.expression.registration import expression
+    from an.stores.characters import CharactersStore
+
+    char = _make(tmp_path, name="big", hat="beanie", head_scale=1.7)
+    (char / "parts" / "brow_l.svg").unlink()
+    store = CharactersStore(tmp_path)
+    (hit,) = _brow_warnings(_scene_with("big", expression("c", "surprised")), store)
+    assert "its brow slots have no art" in hit.description

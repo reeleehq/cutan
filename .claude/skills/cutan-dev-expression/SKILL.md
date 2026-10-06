@@ -101,6 +101,8 @@ unknown leaf). An unknown preset is a validate **error**. Every name the retired
 accepted (`neutral happy sad angry surprised skeptical amused thinking`) stays a preset —
 live content authors `amused`.
 
+**Brows that cannot act are recorded, in one place** (an#283). `cutan.characters.methods.brow_loss(desc, profile, entity=)` is THE rule: only an overlay face whose binding moves brow slots, and which cannot act with them (a recorded `occluded` cover, or brow art the store lacks), falls to `expr.without_brows`. A baked face, a descriptor with no brow slots and a procedural rig have nothing to lose and record nothing. The face pass records it once per character an expression in the shot asks to move the brows of (`_record_brow_losses`, a `method` entry whose detail carries the remedy, fatal under `--strict-assets`). `an validate`'s `cutout.brow_acting` warns with the same sentence and passes the store's art probe, so missing brow art shows there too.
+
 ## 5. Gaze (shipped in PR-D, #99)
 
 Three sibling slots per eye under `head`, no nesting, no runtime mask: `<side>_sclera` →
