@@ -107,6 +107,26 @@ def test_environment_is_a_preset_or_a_valid_descriptor(spec):
         assert d.characters_after is None or d.characters_after in names
 
 
+#: Half the height of a 4K frame (2160 px): the lowest edge a frame reaches,
+#: in scene pixels from the stage centre, at the largest resolution served.
+_FRAME_BOTTOM_4K: float = 2160 / 2
+
+
+def test_the_lowest_band_reaches_the_bottom_of_any_frame(spec):
+    """an never rescales a plane, so a band that stops at y = 350 shows the sky
+    under the ground at 1080p (~200 px) and at 720p (~20 px) alike (an#414).
+    The last sized band drawn must run past the bottom of a 4K frame."""
+    env = spec["live"].get("environment") or {}
+    if "descriptor" not in env:
+        return
+    bands = [p for p in EnvironmentDescriptor(**env["descriptor"]).planes if p.size]
+    if not bands:
+        return
+    lowest = max(bands, key=lambda p: p.offset[1] + p.size[1] / 2)
+    bottom = lowest.offset[1] + lowest.size[1] / 2
+    assert bottom >= _FRAME_BOTTOM_4K, (spec["style"], lowest.name, bottom)
+
+
 def test_camera_moves_exist(spec):
     cam = spec["live"]["camera"]
     assert cam["default"] in CAMERA_MOVES

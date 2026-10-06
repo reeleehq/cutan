@@ -10,15 +10,18 @@ live:
     fps: 30                  # smooth: no step_hz
     default_easing: ease_in_out     # smooth; name the overshoot Bezier on pop-ins only
   environment:
-    # plane offsets and sizes are scene pixels from the stage centre at the default
-    # 1920x1080; scale them with meta.resolution
+    # plane offsets and sizes are scene pixels from the stage centre, the same at
+    # every resolution (an never rescales a plane). The bottom bands keep their top
+    # edge and run 1000 px down, so they reach the frame's bottom at any
+    # resolution up to 4K (they used to stop near y = 350: the bottom of a 720p
+    # frame, with ~200 px of the sky showing under the ground at 1080p, an#414)
     descriptor:              # an.environments.EnvironmentDescriptor; list order is draw order
       name: deep_field
       planes:
         - {name: field, art: {kind: fill, color: "#060e3d"}, depth: 0.0}
         - {name: far_stars, art: {kind: fill, color: "#291275"}, depth: 0.4, offset: [0, -60], size: [4000, 60]}
         - {name: near_stars, art: {kind: fill, color: "#5e2cb5"}, depth: 0.7, offset: [0, 80], size: [4000, 40]}
-        - {name: foreground, art: {kind: fill, color: "#010210"}, depth: 1.3, offset: [0, 260], size: [6000, 200]}
+        - {name: foreground, art: {kind: fill, color: "#010210"}, depth: 1.3, offset: [0, 660], size: [6000, 1000]}
       characters_after: near_stars
   camera:
     default: push_in         # continuous slow pushes and pulls

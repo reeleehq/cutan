@@ -11,15 +11,18 @@ live:
     default_easing: ease_in_out     # naturalistic, studied movement
     step_hz: 12              # an estimate: the source cadence is not established
   environment:
-    # plane offsets and sizes are scene pixels from the stage centre at the default
-    # 1920x1080; scale them with meta.resolution
+    # plane offsets and sizes are scene pixels from the stage centre, the same at
+    # every resolution (an never rescales a plane). The bottom bands keep their top
+    # edge and run 1000 px down, so they reach the frame's bottom at any
+    # resolution up to 4K (they used to stop near y = 350: the bottom of a 720p
+    # frame, with ~200 px of the sky showing under the ground at 1080p, an#414)
     descriptor:              # blue-tinted translucent layers on a backlit glass table
       name: glass_table
       planes:
         - {name: backlight, art: {kind: fill, color: "#0068e5"}, depth: 0.2}
         - {name: far_hills, art: {kind: fill, color: "#048def"}, depth: 0.5, offset: [0, 120], size: [5000, 200]}
-        - {name: near_ground, art: {kind: fill, color: "#011945"}, depth: 0.8, offset: [0, 240], size: [5000, 160]}
-        - {name: foreground_reeds, art: {kind: fill, color: "#000000"}, depth: 1.2, offset: [0, 300], size: [6000, 80]}
+        - {name: near_ground, art: {kind: fill, color: "#011945"}, depth: 0.8, offset: [0, 660], size: [5000, 1000]}
+        - {name: foreground_reeds, art: {kind: fill, color: "#000000"}, depth: 1.2, offset: [0, 760], size: [6000, 1000]}
       characters_after: near_ground
   camera:
     default: hold
