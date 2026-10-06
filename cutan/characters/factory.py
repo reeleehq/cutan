@@ -801,7 +801,8 @@ def _record_step(desc_path: Path, func, args, kwargs) -> None:
     meta = descriptor.metadata
     recipe = (
         {"version": RECIPE_VERSION, "steps": []}
-        if func.__name__ == "new_character" or not isinstance(meta.get(RECIPE_KEY), dict)
+        if func.__name__ == "new_character"
+        or not isinstance(meta.get(RECIPE_KEY), dict)
         else dict(meta[RECIPE_KEY])
     )
     if params is None or recipe.get("replayable") is False:
