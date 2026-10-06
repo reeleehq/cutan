@@ -22,18 +22,20 @@ A cut-out rig realises this with legs as separate parts pivoted at the hip, and,
 | Gait (spelling) | Method | What it is | Requires | Typical use |
 |---|---|---|---|---|
 | `legs` | `loco.legged_cycle` | Seen from the side, the legs swing about the hip in opposition; facing the camera the stepping leg lifts. Body bobs once per step; arms counter-swing. | `limbs.legs` | any legged figure; the chain's first link |
-| `profile` | `loco.profile_cycle` | The four-pose cycle in profile: legs swing whatever the view in force, the body **sinks after each contact and rises before the next** (down/up, phased to the contacts; the first step has only the up pose, the last only the down), a longer stride. | `limbs.legs`, `swap.view:side` | Reiniger's silhouettes, any figure drawn side-on |
+| `profile` | `loco.profile_cycle` | The four-pose cycle in profile: with a side or three-quarter view in force the legs swing in opposition and the body **sinks after each contact and rises before the next** (down/up, phased to the contacts; the first step has only the up pose, the last only the down), a longer stride. Asked while another view shows, it walks as `legs` (recorded, warned). | `limbs.legs`, `swap.view:side` | Reiniger's silhouettes, any figure drawn side-on |
 | `shuffle` | `loco.shuffle` | Feet barely leave the ground: short quick steps, almost no bob, arms close. | `limbs.legs` | the old, the tired, the cautious; Norstein-like small steps |
-| `hem` | `loco.hem_sway` | A robe whose two hem halves are the leg slots: facing the camera they tilt in turn; the body sways and bobs. | `limbs.legs` (the hem halves) | OverSimplified robe figures carved with a split hem |
-| `waddle` | `loco.waddle` | The body rocks from foot to foot (weight shift, no knees) and bobs; legs, if any, lift in turn. | nothing | penguins, toddlers, squat figures |
+| `hem` | `loco.hem_sway` | A robe whose two hem halves are the leg slots: facing the camera they tilt about the hip as mirror images (both out, then both in: the hem opens and closes), the body sways and bobs; in a side or three-quarter view they swing like legs by `stride` and the sway is dropped (`hem_tilt` and `rock` have no effect there). | `limbs.legs` (the hem halves) | OverSimplified robe figures carved with a split hem |
+| `waddle` | `loco.waddle` | The body rocks from foot to foot (weight shift, no knees) and bobs; legs, if any, lift in turn (in every view). Not the `waddle` *preset* (`play: waddle`, an older rock-and-bob on the spot or with `travel`), which has its own, unscaled numbers. | nothing | penguins, toddlers, squat figures |
 | `hop` | `loco.hop` | The whole figure jumps on every step. | nothing | birds, gleeful characters, a cartoon "boing" |
-| `bounce` | `loco.bounce` | The body bobs on every step while it slides; legs, if any, only flick. | nothing | South Park's walk [6] |
+| `bounce` | `loco.bounce` | The body bobs on every step while it slides; legs, if any, flick (lift facing the camera, a small swing in profile) and the arms swing a little. | nothing | South Park's walk [6] |
 | `glide` | `loco.glide` | The figure slides, leaning slightly into the move with a gentle bob; no limb moves. | nothing | robe figures, ghosts, sacks; Kurzgesagt-style floating; **the default without legs** |
-| `rock` | `loco.rock` | No leg moves: the body rocks side to side about its root and bobs. | nothing | the pre-an#224 legless walk, kept as a choice |
+| `rock` | `loco.rock` | No leg moves: the body rocks side to side about its origin (mid-body on a descriptor rig, so the planted feet drift sideways by about 3% of its height at the default `rock`) and bobs; the arms swing. | nothing | the pre-an#224 legless walk, kept as a choice |
 
 What each needs, in the capability grammar of `an.capabilities`: `limbs.legs` is two leg slots with art, pivoted at the hip; `swap.view:side` is a side view, either the art's rest view (`rest_view: side`) or a turnaround key (`an character add-views`). A requirement-free gait uses what it finds: `waddle` and `bounce` move a leg pair when there is one, and every gait swings the arms (`limbs.arms`) when its `arm_swing` is not 0.
 
-How gaits compose with **turns and views**: a walk never turns the character. `legs`, `shuffle` and `bounce` read the view in force (a `side`/`three_quarter` view swings the legs, any other lifts them); `profile` always swings; the requirement-free gaits move the body only, so they read the same in every view. The classic walk-off stays `turn` then `walk`.
+How gaits compose with **turns and views**: a walk never turns the character. `legs`, `shuffle`, `hem` and `bounce` read the view in force (a `side`/`three_quarter` view swings the legs, any other lifts or tilts them); `profile` swings when a side or three-quarter view is in force and walks as `legs` otherwise; `waddle` lifts in every view; `hop` and `glide` move the body only, and `rock` the body and the arms, so those three read the same in every view. The classic walk-off stays `turn` then `walk`.
+
+An amplitude set to **0 writes no channel** (an authored move on that property runs under the walk untouched), and every channel, the body's included, lands with a 1 ms constant tween rather than a settling `set`, so an authored move that outlasts the walk carries on. A one-step walk (any `distance` under 1.5 × `step_length`) still swings its limbs: their one extreme is mid-step.
 
 ## 3. Parameters and defaults
 
@@ -54,24 +56,22 @@ Every gait reads the parameters its method declares (the genre vocabulary lists 
 
 **Relative to the drawn size** (an#224's comment). A descriptor rig is drawn so its view box is 345 scene px tall at scale 1 (`SCENE_PX_PER_VIEW_BOX`), so a character's drawn size is that times its stage scale. The lengths above are stated for scale 1 and multiplied by the figure's scale (its `stage.scale`, the rig as built — never the pose at the play's start, which a `pop_in` under the walk holds at 0, cutan#13): a character staged at `scale: 2` steps 160 px and bobs 12 px, where it used to shuffle 80 px steps. A leg's `lift` is in the figure's own frame and already scales with it; angles never scale. An explicit value is scene px as given.
 
-An amplitude set to **0 writes no channel** (an authored move on that property runs under the walk untouched), and every channel, the body's included, lands with a 1 ms constant tween rather than a settling `set`, so an authored move that outlasts the walk carries on. A one-step walk (any `distance` under 1.5 × `step_length`) still swings its limbs: their one extreme is mid-step.
-
 ## 4. The default chain, and choosing
 
 `legs` (if the rig affords `limbs.legs`) → `glide` (requires nothing).
 
-- A chain ends at its first requirement-free method, so it has exactly one requirement-free link. The plan's "legged → hop → glide" cannot be a chain (hop and glide both require nothing). `glide` is the last link because it moves a figure **without pretending a structure it does not have**: the pre-an#224 `rock` tilted the whole figure about its feet like a metronome, which is what read as strange on OverSimplified's robe figures, and a hop is a characterisation, not a neutral default.
-- A walk is played on the character, never on one of its parts (refused by `an validate` and the compiler). A prop can walk too, with a legless gait: a legged gait asked of it glides, recorded and warned. A gait parameter the chosen gait never reads is refused when the gait is explicit (`args: {gait: hop, bob: 20}`, a pinned choice's args included) and warned about when the gait is the descriptor's or the chain's.
+- A chain ends at its first requirement-free method, so it has exactly one requirement-free link. The plan's "legged → hop → glide" cannot be a chain (hop and glide both require nothing). `glide` is the last link because it moves a figure **without pretending a structure it does not have**: the pre-an#224 `rock` tilted the whole figure about its origin like a metronome, which is what read as strange on OverSimplified's robe figures, and a hop is a characterisation, not a neutral default.
 - An author picks a gait explicitly: `args: {gait: hop}` on the `walk` play, or `"gait": "bounce"` in `character.json` for every walk of that character, or a version-pinned choice `{method: loco.bounce, args: {bob: 10}, version: "1"}`.
-- `profile` also needs its side view **in force** when the walk starts (a turn to `side` before it, or art drawn in profile; the walk's own `view` arg poses the legs without swapping the art, so it does not count): a character that affords a side view but is showing its front walks `legs` instead, recorded and warned with that remedy — otherwise its legs would swing in the front view and scissor.
+- `profile` also needs its side view **in force** when the walk starts (a turn to `side` before it, or art drawn in profile; the walk's own `view` arg poses the legs without swapping the art, so it does not count): a character that affords a side view but is showing its front walks `legs` instead, recorded and warned with that remedy — otherwise its legs would swing in the front view and scissor. `an character capabilities` lists `profile` as applying whenever the rig affords a side view; whether that view is showing is the timeline's to say, so the walk and `an validate` decide it per play.
 - When the asked gait does not apply, the walk uses the chain's choice and the substitution is **recorded** (`asset_resolution`, a warning, fatal under `--strict-assets`); `an validate` says it before any render (`cutout.walk_gait`), naming the missing capability and its remedy; `an character capabilities <name>` lists every gait that applies and why each other one does not.
+- A walk is played on the character, never on one of its parts (refused by `an validate` and the compiler). A prop can walk too, with a legless gait: a legged gait asked of it glides, recorded and warned. A gait parameter the chosen gait never reads is refused when the gait is explicit (`args: {gait: hop, bob: 20}`, a pinned choice's args included) and warned about when the gait is the descriptor's or the chain's.
 - A style that always walks one way (South Park bounces even when its characters have legs) is ADR 0002's **policy**; the matcher takes one (`resolve(..., policy=)`), but no style document is read by the compiler yet, so today a style is applied through each character's declared `gait`.
 
 ## 5. Per style, as the Alice & Bob comparison renders them
 
 | Style | Characters | Gait |
 |---|---|---|
-| South Park | carved legs | `bounce` (the show's slide-and-bob) |
+| South Park | carved legs | `bounce` (the show's slide-and-bob), declared per character (`"gait": "bounce"`) until the style's `policy:` is read by the compiler (cutan#9). The shipped spec and the `cutan-style` skill still walk with the older `waddle` *preset* (`play: waddle`, see the `waddle` row): the two coexist until the policy lands. |
 | OverSimplified | robe figures | `glide` (the default without legs; `hem` once the hem is carved in two) |
 | Reiniger | jointed silhouettes in profile | `profile` |
 

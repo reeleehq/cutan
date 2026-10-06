@@ -97,9 +97,7 @@ Two more declared facts about carved art, both in `character.json`:
 - **`rest_view`** — the view the default art is drawn in, when it is not the
   front: a figure carved only in profile says `"side"`, and `walk` swings its
   legs without being told.
-- **`gait`** — `"hem"` when the leg slots are the two halves of a robe's hem
-  (a walk tilts them in turn and sways the body), `"rock"` for a figure with
-  nothing to step with.
+- **`gait`** — `"hem"` when the leg slots are the two halves of a robe's hem (a walk tilts them as mirror images and sways the body). Leave it unset for a figure with nothing to step with: it glides (the chain's default); `"rock"`, `"hop"`, `"bounce"` and `"waddle"` are characterisations to ask for. (`an character validate` still requires the `leg_l`/`leg_r` slots of the contract even for such a figure: cutan#35.)
 
 ## The four things that actually matter
 

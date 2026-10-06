@@ -438,9 +438,10 @@ class CharacterDescriptor(_CharModel):
     rest_view: Optional[str] = None
 
     #: This character's default walk ``gait`` (one of :data:`GAITS`, an#220);
-    #: an author's ``gait`` arg overrides it. ``None`` = ``legs`` when the rig
-    #: builds a leg pair, else ``rock``. A robe figure whose leg slots are hem
-    #: halves declares ``"hem"`` once, here, rather than on every walk.
+    #: an author's ``gait`` arg overrides it. ``None`` = the locomotion chain:
+    #: ``legs`` when the rig affords a leg pair, else ``glide`` (an#224). A robe
+    #: figure whose leg slots are hem halves declares ``"hem"`` once, here,
+    #: rather than on every walk.
     #: Omitted from the stored document when unset.
     gait: Optional[str] = None
 

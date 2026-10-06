@@ -248,7 +248,8 @@ LOCO_HEM = Method(
     title="hem sway",
     description=(
         "a robe figure's walk: the leg slots are the two halves of the hem, which "
-        "tilt in turn about the hip while the body sways and bobs"
+        "tilt about the hip as mirror images (the hem opens and closes) while the "
+        "body sways and bobs facing the camera; in profile they swing like legs"
     ),
     params=_walk_params("hem", _HEM_PARAMS),
     requires=("limbs.legs",),

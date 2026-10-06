@@ -2853,7 +2853,7 @@ DEMOS: tuple[Demo, ...] = (
             "A robe figure whose parts are PNGs drawn at a quarter of the rig's "
             "resolution — each attachment declares its width, so nothing is "
             "resampled — walks in on a `hem` gait (the two halves of its hem tilt "
-            "in turn under a swaying, bobbing body), speaks, turns to profile, and "
+            "as mirror images under a swaying, bobbing body), speaks, turns to profile, and "
             "blinks and speaks there on the profile's OWN eye and mouth "
             "(`eyelid@side`, `viseme@side`), then walks off with its legs swinging. "
             "Limits: a descriptor `play` (a blink) keeps the view it started in, "

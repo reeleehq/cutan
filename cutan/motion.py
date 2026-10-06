@@ -81,9 +81,9 @@ DFLT_WALK_STRIDE: float = 0.35  # radians a leg swings either side (side view)
 DFLT_WALK_LIFT: float = 10.0  # scene px a stepping leg rises (front view)
 DFLT_WALK_BOB: float = 6.0  # scene px the body travels per step (its whole bob)
 DFLT_WALK_ARM_SWING: float = 0.3  # radians
-DFLT_WALK_ROCK: float = 0.06  # radians, a legless figure's side-to-side rock
-#: Radians each hem half tilts about its hip, in turn, in a ``hem`` gait seen
-#: from the front (an#220) — what read on a carved robe figure, where lifting
+DFLT_WALK_ROCK: float = 0.06  # radians, the body's side-to-side sway (rock, waddle, hem)
+#: Radians each hem half tilts about its hip (the two as mirror images: the
+#: hem opens and closes) in a ``hem`` gait seen from the front (an#220) — what read on a carved robe figure, where lifting
 #: one half by ``lift`` px barely showed.
 DFLT_WALK_HEM_TILT: float = 0.24
 #: Every channel of a walk — a limb's and the body's (cutan#15) — ends with a
@@ -94,7 +94,8 @@ DFLT_WALK_HEM_TILT: float = 0.24
 #: on the property ends — it lets later motion carry on.
 WALK_LANDING_S: Seconds = 1e-3
 #: Leg and arm node names a walk looks for, in order: the rig contract's
-#: (descriptor rigs, ``an character new``), then the procedural placeholder's.
+#: (descriptor rigs, ``an character new``), then a ``parts`` rig's (the
+#: built-in placeholder draws arms and no legs: it glides).
 WALK_LEG_NAMES: tuple[tuple[str, str], ...] = (
     ("leg_l", "leg_r"),
     ("left_leg", "right_leg"),
@@ -436,8 +437,10 @@ def walk(
     - ``shuffle``: ``legs`` with the feet barely leaving the ground — short,
       quick steps, no bob to speak of.
     - ``hem``: a robe whose leg slots are the two halves of its hem: facing
-      the camera the halves TILT in turn by ``hem_tilt`` radians while the body
-      sways by ``rock`` and bobs (in a profile they swing like legs).
+      the camera the halves TILT by ``hem_tilt`` radians as mirror images (the
+      hem opens and closes) while the body sways by ``rock`` and bobs; in a
+      side or three-quarter view they swing like legs by ``stride`` and the
+      sway is dropped.
     - ``waddle``: the body rocks ``rock`` from foot to foot and bobs; legs, if
       any, lift in turn.
     - ``hop``: the body jumps ``hop_height`` px on every step.
