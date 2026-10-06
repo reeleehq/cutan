@@ -377,3 +377,17 @@ def test_a_shot_list_that_is_not_this_video_is_flagged(tmp_path):
     mp4 = _encode(frames, 24, tmp_path / "v.mp4")
     result = style_lint(mp4, {"cuts_per_min": [0, 100]}, shot_durations=[1.0, 3.0])
     assert any("do not describe the same film" in f.description for f in result.report.findings)
+
+
+def test_a_one_shot_film_is_not_told_to_split_its_shot():
+    """cutan#64: the Reiniger guidance keeps continuous action on one set as one
+    shot whatever the cut-rate target says, and the lint advised the opposite."""
+    from cutan.verify.style import ONE_SHOT_FIX, check_targets
+
+    one = measure_style(_moving(48, every=2), fps=24.0, shot_durations=[2.0])
+    findings = check_targets(one, {"cuts_per_min": [3, 5], "mean_shot_s": [6, 20]})
+    assert {f.severity for f in findings} == {"info"}
+    assert all(f.suggested_fix == ONE_SHOT_FIX and "split" not in f.suggested_fix for f in findings)
+    two = measure_style(_moving(48, every=2), fps=24.0, shot_durations=[0.25, 1.75])
+    (cut,) = check_targets(two, {"cuts_per_min": [100, 200]})
+    assert cut.severity == "warning" and "split long shots" in cut.suggested_fix
