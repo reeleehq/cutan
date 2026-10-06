@@ -12,7 +12,7 @@ description: Use when making a cut-out animated character video with `an`: rigge
 - **Actions on a character:** `play` (a descriptor animation or a motion preset such as `hop`, `nod`, `walk`, `turn`), `expression` (a preset or axes on the face), and the dialogue sugar `maya [happy]: Hi!` (at an intensity from 0 to 1: `maya [angry 0.4]: Fine.`, an#253). An expression whose preset has a mouth form (`happy`, `sad`, `angry`, ...) shows that form on the mouth while the character is silent, and a line under it speaks on the same set. This needs the character's `viseme@<form>` set: `an character new` makes `happy` and `sad`; add another with `an character mouths <name> --variants angry`. `an validate` and the compiler say when one is missing (an#253). Lines are lip-synced by the `offline` provider by default; `--lipsync rhubarb` or `whisper` choose another.
 - **Styles:** the `cutan-style` skill applies a named style spec to a scene, renders, and lints the render against its targets (`python -m cutan.verify.style`).
 - **Parts carved from a photo or a frame:** `cutan.carve` (`pip install "cutan[carve]"`): matte, neck cut, de-spill, normalise, and a prop folder whose descriptor carries the source; the `cutan-art-package` skill says how a carved part becomes a character's.
-- **Impacts:** `an impacts clip` renders controlled test footage with exact ground truth.
+- **Impacts:** `an impacts clip` renders controlled test footage with exact ground truth. `--rise-sd/--fall-sd/--brake-sd` spread each stroke's timings (recorded per event in `truth.json`), and `--arc-radius` swings the ball on an arc instead of a straight fall (cutan#27).
 - **Changing cutan itself:** `cutan/CLAUDE.md` and the `cutan-dev-*` skills.
 
 ## Turning and facing
