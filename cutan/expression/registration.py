@@ -175,8 +175,8 @@ def parse_emotion(content: str) -> dict[str, Any]:
             value = float(level)
         except ValueError:
             raise ValueError(
-                f"has [{text}]: after the emotion comes its intensity, a number "
-                "from 0 to 1 (`[angry 0.4]`)"
+                f"has [{text}], which is not an emotion name, nor a name and its "
+                "intensity from 0 to 1 (`[angry 0.4]`)"
             ) from None
         if not 0.0 <= value <= 1.0:
             raise ValueError(f"has [{text}]: an intensity runs from 0 to 1")
