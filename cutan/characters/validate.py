@@ -43,6 +43,7 @@ from an.stage.rig import (
     rig_origin_problems,
     rig_problems,
     rig_rest_problems,
+    rest_pose_protection,
 )
 from an.verify._base import Finding, VerificationReport
 
@@ -294,12 +295,12 @@ def validate_character(
             # 0.3.0 model default `eyelid` set would be checked against
             # un-renamed `eye_l_open` attachments and every one of them would
             # fail its own validator (an#87 review).
-            descriptor = CharacterDescriptor.model_validate(
-                migrate(
-                    json.loads(desc_path.read_text(encoding="utf-8")),
-                    kind=CHARACTER_DOCUMENT_KIND.name,
-                )
-            )
+            raw_doc = json.loads(desc_path.read_text(encoding="utf-8"))
+            migrated_doc = migrate(dict(raw_doc), kind=CHARACTER_DOCUMENT_KIND.name)
+            descriptor = CharacterDescriptor.model_validate(migrated_doc)
+            protected = rest_pose_protection(raw_doc, migrated_doc, kind="character")
+            if protected:  # an#407: the migration kept the pose; say why
+                report.add(ADVISORY, "character.json#rig", f"{who}: {protected}", None)
         except (ValueError, json.JSONDecodeError) as e:
             report.add(
                 BLOCKING, "character.json", f"{who}'s descriptor is invalid: {e}", None
