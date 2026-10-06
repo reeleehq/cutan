@@ -75,15 +75,17 @@ def _factory_digest(char_dir: Path) -> str:
 
 
 def _drop_factory_stamps(desc: dict) -> None:
-    """Remove the per-part provenance stamps the factory adds (an#236), in place.
+    """Remove the provenance the factory adds — per-part stamps (an#236) and its recipe (an#292) — in place.
 
     They record that the factory drew each part (``cc0``, pinned to the part's
     digest) for the asset library; they are not art or rig. Dropping exactly
     them keeps this golden what it says it is — the pre-knob art and rig —
     and still fails on any other change to an attachment.
     """
-    from cutan.characters.factory import FACTORY_PROVIDER
+    from cutan.characters.factory import FACTORY_PROVIDER, RECIPE_KEY
 
+    # The recipe (an#292) is provenance too: how to re-derive the parts, not art.
+    (desc.get("metadata") or {}).pop(RECIPE_KEY, None)
     for skin in (desc.get("skins") or {}).values():
         for attachments in (skin.get("slots") or {}).values():
             for att in attachments.values():

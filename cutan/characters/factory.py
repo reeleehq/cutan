@@ -20,7 +20,9 @@ from __future__ import annotations
 from an.credits import FACTORY_LICENSE, FACTORY_PROVIDER  # noqa: F401  (core vocabulary)
 
 import contextlib
+import contextvars
 import functools
+import inspect
 import hashlib
 import math
 import re
@@ -762,6 +764,53 @@ def _check_style_is_usable(style: str, *, acknowledge_attribution: bool) -> None
     )
 
 
+#: The descriptor ``metadata`` key holding the factory's recipe (an#292): every
+#: drawing call that made the character, in order, with its parameters — so
+#: the factory's bytes can be re-derived anywhere (:func:`redraw_digests`).
+RECIPE_KEY: str = "factory"
+#: The version of the recipe's format.
+RECIPE_VERSION: int = 1
+#: The drawing calls a recipe may replay, by name.
+_REPLAYABLE: tuple[str, ...] = ("new_character", "add_gaze", "add_views")
+#: Parameters a recipe never records: where the folder is, and whether to overwrite it.
+_NOT_RECIPE: frozenset[str] = frozenset({"out_dir", "char_dir", "overwrite"})
+#: How deep in drawing calls this thread is: only the outermost call is a step.
+_RECIPE_DEPTH: contextvars.ContextVar[int] = contextvars.ContextVar(
+    "factory_recipe_depth", default=0
+)
+
+
+def _jsonable(value):
+    """``value`` as JSON (tuples as lists), or raise ``TypeError``."""
+    return json.loads(json.dumps(value))
+
+
+def _record_step(desc_path: Path, func, args, kwargs) -> None:
+    """Append this call, with every parameter it ran with, to the descriptor's recipe."""
+    bound = inspect.signature(func).bind(*args, **kwargs)
+    bound.apply_defaults()
+    try:
+        params = _jsonable(
+            {k: v for k, v in bound.arguments.items() if k not in _NOT_RECIPE}
+        )
+    except TypeError:
+        params = None  # a parameter JSON cannot hold: the recipe cannot replay
+    descriptor = CharacterDescriptor.model_validate_json(
+        Path(desc_path).read_text(encoding="utf-8")
+    )
+    meta = descriptor.metadata
+    recipe = (
+        {"version": RECIPE_VERSION, "steps": []}
+        if func.__name__ == "new_character" or not isinstance(meta.get(RECIPE_KEY), dict)
+        else dict(meta[RECIPE_KEY])
+    )
+    if params is None or recipe.get("replayable") is False:
+        recipe["replayable"] = False
+    recipe["steps"] = [*recipe.get("steps", []), {"call": func.__name__, "params": params}]
+    meta[RECIPE_KEY] = recipe
+    Path(desc_path).write_text(descriptor.model_dump_json(indent=2), encoding="utf-8")
+
+
 def _records_what_it_drew(func):
     """Run a drawing function with its writes logged, then record what it drew (an#269).
 
@@ -774,9 +823,15 @@ def _records_what_it_drew(func):
 
     @functools.wraps(func)
     def run(*args, **kwargs):
-        with _drawn.drawing() as wrote:
-            desc_path = func(*args, **kwargs)
-            _record_drawn(Path(desc_path).parent, wrote)
+        token = _RECIPE_DEPTH.set(_RECIPE_DEPTH.get() + 1)
+        try:
+            with _drawn.drawing() as wrote:
+                desc_path = func(*args, **kwargs)
+                _record_drawn(Path(desc_path).parent, wrote)
+        finally:
+            _RECIPE_DEPTH.reset(token)
+        if _RECIPE_DEPTH.get() == 0:  # the outermost drawing call is the step
+            _record_step(Path(desc_path), func, args, kwargs)
         return desc_path
 
     return run
@@ -2328,3 +2383,66 @@ def add_views(char_dir: str | Path) -> Path:
             if view != DFLT_VIEW
         },
     )
+
+
+def _replayable(meta: Mapping) -> list[dict] | None:
+    """The recipe's steps if the factory can replay them offline, else ``None``."""
+    recipe = meta.get(RECIPE_KEY)
+    if not isinstance(recipe, dict) or recipe.get("version") != RECIPE_VERSION:
+        return None
+    steps = recipe.get("steps") or []
+    if (
+        recipe.get("replayable") is False
+        or not steps
+        or steps[0].get("call") != "new_character"
+        or any(s.get("call") not in _REPLAYABLE or s.get("params") is None for s in steps)
+    ):
+        return None
+    if meta.get("dicebear_style") and not meta.get("dicebear_error"):
+        # A DiceBear head came from the network, at a moving API version: it
+        # cannot be re-derived offline, and nor can what was drawn around it.
+        return None
+    return steps
+
+
+@functools.lru_cache(maxsize=64)
+def _redraw(steps_json: str) -> tuple[tuple[str, str], ...]:
+    import tempfile
+
+    steps = json.loads(steps_json)
+    with tempfile.TemporaryDirectory(prefix="an-factory-redraw-") as tmp:
+        first = dict(steps[0]["params"])
+        # A head the network did not provide was drawn by the factory.
+        first["use_dicebear"] = False
+        desc = new_character(tmp, **first)
+        char_dir = Path(desc).parent
+        for step in steps[1:]:
+            globals()[step["call"]](char_dir, **step["params"])
+        return tuple(
+            sorted(
+                (p.relative_to(char_dir).as_posix(), hashlib.sha256(p.read_bytes()).hexdigest())
+                for p in char_dir.rglob("*")
+                if p.is_file() and p.name != "character.json"
+            )
+        )
+
+
+def redraw_digests(descriptor: Mapping) -> dict[str, str]:
+    """``{path: sha256}`` of every file the factory draws from ``descriptor``'s recipe (an#292).
+
+    The factory is deterministic: replaying the recorded drawing calls, with
+    their recorded parameters, into a scratch folder re-derives the very
+    bytes — anywhere, on any machine. Whatever bytes it draws are the
+    factory's own work, so a recipe can only ever confirm the factory's
+    output: carved or hand-drawn bytes are never what it draws. ``{}`` when the
+    descriptor records no replayable recipe (none, an older format, a DiceBear
+    head, a parameter JSON could not hold). Memoised per recipe.
+    """
+    meta = (descriptor or {}).get("metadata") or {}
+    steps = _replayable(meta)
+    if steps is None:
+        return {}
+    try:
+        return dict(_redraw(json.dumps(steps, sort_keys=True)))
+    except Exception:  # noqa: BLE001 — a recipe this factory cannot replay confirms nothing
+        return {}
