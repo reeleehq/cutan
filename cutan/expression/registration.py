@@ -12,7 +12,7 @@ What the cut-out genre (:mod:`cutan.genre`) registers from here:
 Plain declarations: importing this module registers nothing.
 
 >>> EXPRESSION.name, EMOTION.opener, EMOTION.parse(" Happy ")
-('expression', '[', 'happy')
+('expression', '[', {'emotion': 'happy'})
 """
 
 from __future__ import annotations
@@ -152,17 +152,45 @@ def write_expression_md(leaf: ExpressionAction) -> dict[str, Any]:
     return entry
 
 
-def parse_emotion(content: str) -> str:
-    """``[happy]``'s content to the line's emotion, lower-cased; refuse a non-name."""
-    emotion = content.strip()
-    if not EMOTION_NAME_RE.fullmatch(emotion):
-        raise ValueError(f"has [{emotion}], which is not an emotion name")
-    return emotion.lower()
+#: The Dialogue field an ``[emotion level]`` sets beside the emotion (an#253).
+EMOTION_INTENSITY_FIELD: str = "emotion_intensity"
+
+
+def parse_emotion(content: str) -> dict[str, Any]:
+    """``[happy]``'s content to the line's emotion, lower-cased, and ``[angry
+    0.4]``'s to the emotion and its intensity (0..1, an#253); refuse anything
+    else.
+
+    >>> parse_emotion("Happy"), parse_emotion(" angry 0.4 ")
+    ({'emotion': 'happy'}, {'emotion': 'angry', 'emotion_intensity': 0.4})
+    """
+    text = content.strip()
+    name, _, level = text.partition(" ")
+    if not EMOTION_NAME_RE.fullmatch(name):
+        raise ValueError(f"has [{text}], which is not an emotion name")
+    out: dict[str, Any] = {"emotion": name.lower()}
+    level = level.strip()
+    if level:
+        try:
+            value = float(level)
+        except ValueError:
+            raise ValueError(
+                f"has [{text}]: after the emotion comes its intensity, a number "
+                "from 0 to 1 (`[angry 0.4]`)"
+            ) from None
+        if not 0.0 <= value <= 1.0:
+            raise ValueError(f"has [{text}]: an intensity runs from 0 to 1")
+        out[EMOTION_INTENSITY_FIELD] = value
+    return out
 
 
 def format_emotion(line: Any) -> str | None:
-    """The ``[…]`` content for ``line``, or ``None`` when it carries no emotion."""
-    return line.emotion or None
+    """The ``[…]`` content for ``line`` (``angry 0.4`` with an intensity), or
+    ``None`` when it carries no emotion."""
+    if not line.emotion:
+        return None
+    level = getattr(line, EMOTION_INTENSITY_FIELD, None)
+    return line.emotion if level is None else f"{line.emotion} {level:g}"
 
 
 EXPRESSION = ActionKind(
@@ -182,6 +210,7 @@ EMOTION = DialogueSugar(
     format=format_emotion,
     description=(
         "`speaker [emotion]: text` — an expression over the line, desugared in "
-        "memory by the expression provider"
+        "memory by the expression provider; `[emotion 0.4]` at that intensity"
     ),
+    fields=(EMOTION_INTENSITY_FIELD,),
 )

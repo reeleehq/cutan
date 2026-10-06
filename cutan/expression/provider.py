@@ -33,7 +33,7 @@ from __future__ import annotations
 import math
 from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Protocol
+from typing import Any, Protocol
 
 from cutan.expression.axes import AXES
 from cutan.expression.presets import mouth_form_of, preset_axes
@@ -109,11 +109,19 @@ def expression_spans(shot: Shot, entity_id: str) -> list[ExpressionSpan]:
                 start=float(line.start),
                 end=float(min(line.start + line.duration, shot.duration)),
                 preset=emotion,
+                intensity=_line_intensity(line),
                 blend=DIALOGUE_EMOTION_BLEND_S,
                 source="dialogue",
             )
         )
     return spans
+
+
+def _line_intensity(line: Any) -> float:
+    """A dialogue line's emotion intensity: its ``emotion_intensity``
+    (``[angry 0.4]``, an#253), else full."""
+    level = getattr(line, "emotion_intensity", None)
+    return 1.0 if level is None else float(level)
 
 
 #: The `[emotion]` sugar ramps in and out over this; it is a comment on the
