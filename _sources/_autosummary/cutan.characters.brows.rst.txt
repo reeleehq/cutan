@@ -20,11 +20,13 @@ cutan.characters.brows
    .. autosummary::
    
       brow_affordance
+      brow_cover
       brow_slots
       brow_path_d
       brow_range
       ink_columns
       seat_above_brows
+      seat_overlap
    
    .. rubric:: Classes
 

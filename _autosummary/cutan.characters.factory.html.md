@@ -28,6 +28,7 @@ problem routes the way every other verifier’s does (an#78).
 | [`PUPIL_COLOUR`](#cutan.characters.factory.PUPIL_COLOUR)             | The pupil, in its own part (or the pre-gaze open eye).                                                                                                                                                                                                                                                                                                      |
 | [`DFLT_HAND_COLOUR`](#cutan.characters.factory.DFLT_HAND_COLOUR)         | Default hand, trouser and brow colours — the literals the factory always drew.                                                                                                                                                                                                                                                                              |
 | [`HATS`](#cutan.characters.factory.HATS)                     | The hats [`new_character()`](#cutan.characters.factory.new_character) can draw.                                                                                                                                                                                                                                                                         |
+| [`FACTORY_ART_PROVENANCE`](#cutan.characters.factory.FACTORY_ART_PROVENANCE)   | The `art_provenance` of a head the factory drew (its knobs re-draw it).                                                                                                                                                                                                                                                                                     |
 | [`HAIR_STYLES`](#cutan.characters.factory.HAIR_STYLES)              | `peak` (the factory's original hair, a widow's peak — the default), `bald`, `bun` (the hair gathered in a bun on the crown) and `curly` (a halo of curls around the crown).                                                                                                                                                                                 |
 | [`HAIR_LENGTHS`](#cutan.characters.factory.HAIR_LENGTHS)             | `short` (nothing below the crown — the default), `medium` (falling beside the face to the jaw) and `long` (past the chin, in locks that keep clear of the neck and the collar).                                                                                                                                                                             |
 | [`MAX_HEAD_SCALE`](#cutan.characters.factory.MAX_HEAD_SCALE)           | The largest head scale accepted — past it the head no longer fits the 1024-unit view box above a regular body.                                                                                                                                                                                                                                              |
@@ -45,7 +46,9 @@ problem routes the way every other verifier’s does (an#78).
 | [`add_gaze`](#cutan.characters.factory.add_gaze)(char_dir, \*[, skin, overwrite_eyes])   | Give a character the eye stack (an#99): three sibling slots per eye under the head — `<side>_sclera` (white fill) below `<side>_pupil` below `<side>_eye` (the existing slot, now the lid, drawn above the pupil) — with synthesized parts, an outline-only open eye, a FILLED closed lid, the `gaze_travel` clamp, and draw orders that put the lid over the pupil.                                  |
 |---------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`add_views`](#cutan.characters.factory.add_views)(char_dir)                              | Give a factory character its turnaround (an#197): `back`, `side` and `three_quarter` head and torso art beside the front, a `view` swap set projected onto those two slots, and a pose per view (`swap_poses`) — so `{kind: set, target: <entity>, property: view, value: side}` or [`cutan.motion.turn()`](cutan.motion.html.md#cutan.motion.turn) turns the whole character. |
+| [`brow_cover_unknowable`](#cutan.characters.factory.brow_cover_unknowable)(desc)                      | Whether `desc` is a factory head with a hat whose drawing is not the factory's for its recorded knobs (edited by hand), so its brow cover cannot be derived: only a declared `occluded` can say (an#284).                                                                                                                                                                                             |
 | [`declare_mouth_variants`](#cutan.characters.factory.declare_mouth_variants)(descriptor, variants)     | Declare a `viseme@<form>` set per variant on `descriptor` — the set's keys map to `mouth_<shape>_<form>` attachments, which are added to the default skin's `mouth` slot with the neutral mouth's geometry.                                                                                                                                                                                           |
+| [`derived_brow_cover`](#cutan.characters.factory.derived_brow_cover)(desc)                         | What covers a FACTORY head's brows, derived from its recorded knobs (an#284, ADR 0002 decision 2): its hat, as drawn (`_worn_seat()`), measured against the brows' acting range ([`seat_overlap()`](cutan.characters.brows.html.md#cutan.characters.brows.seat_overlap)).                                                                                                                |
 | [`factory_descriptor_source`](#cutan.characters.factory.factory_descriptor_source)(source_svg)            | The descriptor-level source of a character this factory drew, pinned to its drawing.                                                                                                                                                                                                                                                                                                                  |
 | [`factory_source`](#cutan.characters.factory.factory_source)(data)                             | The per-part source of a part this factory drew, pinned to its bytes.                                                                                                                                                                                                                                                                                                                                 |
 | [`gaze_travel_for`](#cutan.characters.factory.gaze_travel_for)([rx, ry, pupil_r])               | The pupil's travel per axis, in view-box units: the sclera's clearance minus the pupil's radius — the semi-axes of the inner ellipse the gaze axes' unit circle maps onto.                                                                                                                                                                                                                            |
@@ -118,6 +121,10 @@ the sclera, the pupil and the lid outline agree (an#99).
 ### cutan.characters.factory.FACE_SLOTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('left_eye', 'right_eye', 'left_sclera', 'right_sclera', 'left_pupil', 'right_pupil', 'mouth', 'left_brow', 'right_brow')*
 
 The face slots of the default rig with the eye stack (an#99).
+
+### cutan.characters.factory.FACTORY_ART_PROVENANCE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'fallback_geometric'*
+
+The `art_provenance` of a head the factory drew (its knobs re-draw it).
 
 ### cutan.characters.factory.FACTORY_AUTHOR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'an (generated locally)'*
 
@@ -269,6 +276,15 @@ touched: a shot that never sets a view renders byte-identically.
 * **Return type:**
   [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
 
+### cutan.characters.factory.brow_cover_unknowable(desc)
+
+Whether `desc` is a factory head with a hat whose drawing is not the
+factory’s for its recorded knobs (edited by hand), so its brow cover cannot
+be derived: only a declared `occluded` can say (an#284).
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
 ### cutan.characters.factory.declare_mouth_variants(descriptor, variants)
 
 Declare a `viseme@<form>` set per variant on `descriptor` — the set’s
@@ -278,6 +294,22 @@ neutral set is the SSOT for which shapes exist; a variant mirrors it.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.factory.derived_brow_cover(desc)
+
+What covers a FACTORY head’s brows, derived from its recorded knobs
+(an#284, ADR 0002 decision 2): its hat, as drawn (`_worn_seat()`),
+measured against the brows’ acting range
+([`seat_overlap()`](cutan.characters.brows.html.md#cutan.characters.brows.seat_overlap)). `None` when nothing does,
+when the head is not the factory’s (drawn art: an illustrator declares
+`occluded`), or when it cannot be told (an edited factory head).
+
+Derived, never stored: a character made before hats were seated (an#252)
+reports the brim that covers its brows, and the answer follows the
+measurement if the brows’ range moves.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.characters.factory.factory_descriptor_source(source_svg)
 

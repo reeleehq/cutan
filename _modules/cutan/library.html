@@ -208,299 +208,301 @@
 </span><span id="line-29"><span class="sd">``face.mouth``         an overlay face (``face_overlay``) whose ``viseme``   the chart (``rhubarb9``</span>
 </span><span id="line-30"><span class="sd">                       set has drawings                                      or ``custom``)</span>
 </span><span id="line-31"><span class="sd">``face.brows``         an overlay face whose two brow slots have art, with   —</span>
-</span><span id="line-32"><span class="sd">                       nothing recorded over them (``occluded``, an#252)</span>
-</span><span id="line-33"><span class="sd">=====================  ====================================================  ==========================</span>
-</span><span id="line-34"><span class="sd">"""</span>
-</span><span id="line-35">
-</span><span id="line-36"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-</span><span id="line-37">
-</span><span id="line-38"><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
-</span><span id="line-39"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
-</span><span id="line-40">
-</span><span id="line-41"><span class="kn">from</span><span class="w"> </span><span class="nn">an.capabilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyser</span><span class="p">,</span> <span class="n">Capability</span>
-</span><span id="line-42">
-</span><span id="line-43"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-44">    <span class="s2">"CHARACTER_ANALYSER"</span><span class="p">,</span>
-</span><span id="line-45">    <span class="s2">"CHARACTER_ANALYSER_VERSION"</span><span class="p">,</span>
-</span><span id="line-46">    <span class="s2">"CHARACTER_CAPABILITIES"</span><span class="p">,</span>
-</span><span id="line-47">    <span class="s2">"MOUTH_CHART_RHUBARB"</span><span class="p">,</span>
-</span><span id="line-48">    <span class="s2">"character_affordances"</span><span class="p">,</span>
-</span><span id="line-49">    <span class="s2">"renders_as_placeholder"</span><span class="p">,</span>
-</span><span id="line-50"><span class="p">]</span>
-</span><span id="line-51">
-</span><span id="line-52"><span class="c1">#: Bump when the derivation can answer differently for the same input.</span>
-</span><span id="line-53"><span class="c1">#: 0.2.0: ``face.brows`` (an#252).</span>
-</span><span id="line-54"><span class="n">CHARACTER_ANALYSER_VERSION</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"0.2.0"</span>
-</span><span id="line-55"><span class="c1">#: The chart name of the nine Rhubarb mouth shapes (A–H, X) — ``an``'s default.</span>
-</span><span id="line-56"><span class="n">MOUTH_CHART_RHUBARB</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb9"</span>
-</span><span id="line-57"><span class="c1">#: The chart name of any other viseme set.</span>
-</span><span id="line-58"><span class="n">MOUTH_CHART_CUSTOM</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"custom"</span>
-</span><span id="line-59">
-</span><span id="line-60"><span class="n">LIMBS_LEGS</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
-</span><span id="line-61">    <span class="s2">"limbs.legs"</span><span class="p">,</span>
-</span><span id="line-62">    <span class="n">description</span><span class="o">=</span><span class="s2">"a pair of leg slots with art that a legged walk swings"</span><span class="p">,</span>
-</span><span id="line-63">    <span class="n">remedy</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-64">        <span class="s2">"add two leg slots named leg_l/leg_r (or left_leg/right_leg) with their art, "</span>
-</span><span id="line-65">        <span class="s2">"pivoted at the hip; `an character new` builds them (an-art-package skill)"</span>
-</span><span id="line-66">    <span class="p">),</span>
-</span><span id="line-67"><span class="p">)</span>
-</span><span id="line-68"><span class="n">LIMBS_ARMS</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
-</span><span id="line-69">    <span class="s2">"limbs.arms"</span><span class="p">,</span>
-</span><span id="line-70">    <span class="n">description</span><span class="o">=</span><span class="s2">"a pair of arm slots with art that a walk swings and gestures move"</span><span class="p">,</span>
-</span><span id="line-71">    <span class="n">remedy</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-72">        <span class="s2">"add two arm slots named arm_l/arm_r (or left_arm/right_arm) with their art, "</span>
-</span><span id="line-73">        <span class="s2">"pivoted at the shoulder (an-art-package skill)"</span>
-</span><span id="line-74">    <span class="p">),</span>
-</span><span id="line-75"><span class="p">)</span>
-</span><span id="line-76"><span class="n">SWAP_VIEW</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
-</span><span id="line-77">    <span class="s2">"swap.view"</span><span class="p">,</span>
-</span><span id="line-78">    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-79">        <span class="s2">"the turnaround views the character can show (keys); swappable=true when a "</span>
-</span><span id="line-80">        <span class="s2">"`view` swap set lets it turn"</span>
-</span><span id="line-81">    <span class="p">),</span>
-</span><span id="line-82">    <span class="n">remedy</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-83">        <span class="s2">"add turnaround art and list it in the `view` swap set: "</span>
-</span><span id="line-84">        <span class="s2">"`an character add-views &lt;dir&gt;` for an offline character, else draw the views"</span>
-</span><span id="line-85">    <span class="p">),</span>
-</span><span id="line-86">    <span class="n">command</span><span class="o">=</span><span class="s2">"an character add-views"</span><span class="p">,</span>
-</span><span id="line-87"><span class="p">)</span>
-</span><span id="line-88"><span class="n">FACE_MOUTH</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
-</span><span id="line-89">    <span class="s2">"face.mouth"</span><span class="p">,</span>
-</span><span id="line-90">    <span class="n">description</span><span class="o">=</span><span class="s2">"an overlay mouth with a viseme chart that lip-sync drives (keys: the chart)"</span><span class="p">,</span>
-</span><span id="line-91">    <span class="n">remedy</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-92">        <span class="s2">"give the character an overlay mouth: a `mouth` slot with the viseme set's "</span>
-</span><span id="line-93">        <span class="s2">"drawings (`an character mouths &lt;dir&gt;` writes the default nine) and "</span>
-</span><span id="line-94">        <span class="s2">"face_overlay: true — a face baked into the head art cannot lip-sync"</span>
-</span><span id="line-95">    <span class="p">),</span>
-</span><span id="line-96">    <span class="n">command</span><span class="o">=</span><span class="s2">"an character mouths"</span><span class="p">,</span>
-</span><span id="line-97"><span class="p">)</span>
-</span><span id="line-98">
-</span><span id="line-99"><span class="n">FACE_BROWS</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
-</span><span id="line-100">    <span class="s2">"face.brows"</span><span class="p">,</span>
-</span><span id="line-101">    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-102">        <span class="s2">"two brows on an overlay face that an expression raises, lowers and "</span>
-</span><span id="line-103">        <span class="s2">"angles, with nothing recorded over their acting range (slots: the brow slots)"</span>
-</span><span id="line-104">    <span class="p">),</span>
-</span><span id="line-105">    <span class="n">remedy</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-106">        <span class="s2">"give the overlay face two brow slots (left_brow/right_brow) with their art, "</span>
-</span><span id="line-107">        <span class="s2">"and keep hats off the brows' acting range: a factory hat that cannot sit "</span>
-</span><span id="line-108">        <span class="s2">"above them is recorded in character.json's `occluded` — `an character new` "</span>
-</span><span id="line-109">        <span class="s2">"with a larger --head-scale, another --hat or --hat none; for drawn art, "</span>
-</span><span id="line-110">        <span class="s2">"redraw the cover above the brows and remove its `occluded` entry"</span>
-</span><span id="line-111">    <span class="p">),</span>
-</span><span id="line-112"><span class="p">)</span>
-</span><span id="line-113">
-</span><span id="line-114">
-</span><span id="line-115"><span class="k">def</span><span class="w"> </span><span class="nf">_attachments_with_art</span><span class="p">(</span><span class="n">desc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">art</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-</span><span id="line-116"><span class="w">    </span><span class="sd">"""``{slot: {attachment names whose file is present}}`` across every skin."""</span>
-</span><span id="line-117">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span id="line-118">    <span class="k">for</span> <span class="n">skin</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">skins</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-</span><span id="line-119">        <span class="k">for</span> <span class="n">slot</span><span class="p">,</span> <span class="n">attachments</span> <span class="ow">in</span> <span class="n">skin</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="line-120">            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">att</span> <span class="ow">in</span> <span class="n">attachments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="line-121">                <span class="k">if</span> <span class="n">att</span><span class="o">.</span><span class="n">path</span> <span class="ow">in</span> <span class="n">art</span><span class="p">:</span>
-</span><span id="line-122">                    <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">slot</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-</span><span id="line-123">    <span class="k">return</span> <span class="n">out</span>
-</span><span id="line-124">
-</span><span id="line-125">
-</span><span id="line-126"><span class="k">def</span><span class="w"> </span><span class="nf">_keys_with_art</span><span class="p">(</span>
-</span><span id="line-127">    <span class="n">swap_set</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">drawn</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
-</span><span id="line-128"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-129"><span class="w">    </span><span class="sd">"""The keys of a swap set whose selected attachment is drawn in some slot."""</span>
-</span><span id="line-130">    <span class="n">names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="o">*</span><span class="n">drawn</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">if</span> <span class="n">drawn</span> <span class="k">else</span> <span class="nb">set</span><span class="p">()</span>
-</span><span id="line-131">    <span class="k">return</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">swap_set</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
-</span><span id="line-132">
-</span><span id="line-133">
+</span><span id="line-32"><span class="sd">                       nothing over them: a factory hat measured over their</span>
+</span><span id="line-33"><span class="sd">                       range (an#284), or a declared ``occluded`` override</span>
+</span><span id="line-34"><span class="sd">=====================  ====================================================  ==========================</span>
+</span><span id="line-35"><span class="sd">"""</span>
+</span><span id="line-36">
+</span><span id="line-37"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+</span><span id="line-38">
+</span><span id="line-39"><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
+</span><span id="line-40"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+</span><span id="line-41">
+</span><span id="line-42"><span class="kn">from</span><span class="w"> </span><span class="nn">an.capabilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyser</span><span class="p">,</span> <span class="n">Capability</span>
+</span><span id="line-43">
+</span><span id="line-44"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-45">    <span class="s2">"CHARACTER_ANALYSER"</span><span class="p">,</span>
+</span><span id="line-46">    <span class="s2">"CHARACTER_ANALYSER_VERSION"</span><span class="p">,</span>
+</span><span id="line-47">    <span class="s2">"CHARACTER_CAPABILITIES"</span><span class="p">,</span>
+</span><span id="line-48">    <span class="s2">"MOUTH_CHART_RHUBARB"</span><span class="p">,</span>
+</span><span id="line-49">    <span class="s2">"character_affordances"</span><span class="p">,</span>
+</span><span id="line-50">    <span class="s2">"renders_as_placeholder"</span><span class="p">,</span>
+</span><span id="line-51"><span class="p">]</span>
+</span><span id="line-52">
+</span><span id="line-53"><span class="c1">#: Bump when the derivation can answer differently for the same input.</span>
+</span><span id="line-54"><span class="c1">#: 0.2.0: ``face.brows`` (an#252). 0.3.0: a factory head's brow cover is</span>
+</span><span id="line-55"><span class="c1">#: derived from its knobs and recorded seat, ``occluded`` only an override (an#284).</span>
+</span><span id="line-56"><span class="n">CHARACTER_ANALYSER_VERSION</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"0.3.0"</span>
+</span><span id="line-57"><span class="c1">#: The chart name of the nine Rhubarb mouth shapes (A–H, X) — ``an``'s default.</span>
+</span><span id="line-58"><span class="n">MOUTH_CHART_RHUBARB</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb9"</span>
+</span><span id="line-59"><span class="c1">#: The chart name of any other viseme set.</span>
+</span><span id="line-60"><span class="n">MOUTH_CHART_CUSTOM</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"custom"</span>
+</span><span id="line-61">
+</span><span id="line-62"><span class="n">LIMBS_LEGS</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
+</span><span id="line-63">    <span class="s2">"limbs.legs"</span><span class="p">,</span>
+</span><span id="line-64">    <span class="n">description</span><span class="o">=</span><span class="s2">"a pair of leg slots with art that a legged walk swings"</span><span class="p">,</span>
+</span><span id="line-65">    <span class="n">remedy</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-66">        <span class="s2">"add two leg slots named leg_l/leg_r (or left_leg/right_leg) with their art, "</span>
+</span><span id="line-67">        <span class="s2">"pivoted at the hip; `an character new` builds them (an-art-package skill)"</span>
+</span><span id="line-68">    <span class="p">),</span>
+</span><span id="line-69"><span class="p">)</span>
+</span><span id="line-70"><span class="n">LIMBS_ARMS</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
+</span><span id="line-71">    <span class="s2">"limbs.arms"</span><span class="p">,</span>
+</span><span id="line-72">    <span class="n">description</span><span class="o">=</span><span class="s2">"a pair of arm slots with art that a walk swings and gestures move"</span><span class="p">,</span>
+</span><span id="line-73">    <span class="n">remedy</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-74">        <span class="s2">"add two arm slots named arm_l/arm_r (or left_arm/right_arm) with their art, "</span>
+</span><span id="line-75">        <span class="s2">"pivoted at the shoulder (an-art-package skill)"</span>
+</span><span id="line-76">    <span class="p">),</span>
+</span><span id="line-77"><span class="p">)</span>
+</span><span id="line-78"><span class="n">SWAP_VIEW</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
+</span><span id="line-79">    <span class="s2">"swap.view"</span><span class="p">,</span>
+</span><span id="line-80">    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-81">        <span class="s2">"the turnaround views the character can show (keys); swappable=true when a "</span>
+</span><span id="line-82">        <span class="s2">"`view` swap set lets it turn"</span>
+</span><span id="line-83">    <span class="p">),</span>
+</span><span id="line-84">    <span class="n">remedy</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-85">        <span class="s2">"add turnaround art and list it in the `view` swap set: "</span>
+</span><span id="line-86">        <span class="s2">"`an character add-views &lt;dir&gt;` for an offline character, else draw the views"</span>
+</span><span id="line-87">    <span class="p">),</span>
+</span><span id="line-88">    <span class="n">command</span><span class="o">=</span><span class="s2">"an character add-views"</span><span class="p">,</span>
+</span><span id="line-89"><span class="p">)</span>
+</span><span id="line-90"><span class="n">FACE_MOUTH</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
+</span><span id="line-91">    <span class="s2">"face.mouth"</span><span class="p">,</span>
+</span><span id="line-92">    <span class="n">description</span><span class="o">=</span><span class="s2">"an overlay mouth with a viseme chart that lip-sync drives (keys: the chart)"</span><span class="p">,</span>
+</span><span id="line-93">    <span class="n">remedy</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-94">        <span class="s2">"give the character an overlay mouth: a `mouth` slot with the viseme set's "</span>
+</span><span id="line-95">        <span class="s2">"drawings (`an character mouths &lt;dir&gt;` writes the default nine) and "</span>
+</span><span id="line-96">        <span class="s2">"face_overlay: true — a face baked into the head art cannot lip-sync"</span>
+</span><span id="line-97">    <span class="p">),</span>
+</span><span id="line-98">    <span class="n">command</span><span class="o">=</span><span class="s2">"an character mouths"</span><span class="p">,</span>
+</span><span id="line-99"><span class="p">)</span>
+</span><span id="line-100">
+</span><span id="line-101"><span class="n">FACE_BROWS</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
+</span><span id="line-102">    <span class="s2">"face.brows"</span><span class="p">,</span>
+</span><span id="line-103">    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-104">        <span class="s2">"two brows on an overlay face that an expression raises, lowers and "</span>
+</span><span id="line-105">        <span class="s2">"angles, with nothing recorded over their acting range (slots: the brow slots)"</span>
+</span><span id="line-106">    <span class="p">),</span>
+</span><span id="line-107">    <span class="n">remedy</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-108">        <span class="s2">"give the overlay face two brow slots (left_brow/right_brow) with their art, "</span>
+</span><span id="line-109">        <span class="s2">"and keep hats off the brows' acting range: a factory hat that cannot sit "</span>
+</span><span id="line-110">        <span class="s2">"above them is recorded in character.json's `occluded` — `an character new` "</span>
+</span><span id="line-111">        <span class="s2">"with a larger --head-scale, another --hat or --hat none; for drawn art, "</span>
+</span><span id="line-112">        <span class="s2">"redraw the cover above the brows and remove its `occluded` entry"</span>
+</span><span id="line-113">    <span class="p">),</span>
+</span><span id="line-114"><span class="p">)</span>
+</span><span id="line-115">
+</span><span id="line-116">
+</span><span id="line-117"><span class="k">def</span><span class="w"> </span><span class="nf">_attachments_with_art</span><span class="p">(</span><span class="n">desc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">art</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="line-118"><span class="w">    </span><span class="sd">"""``{slot: {attachment names whose file is present}}`` across every skin."""</span>
+</span><span id="line-119">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-120">    <span class="k">for</span> <span class="n">skin</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">skins</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+</span><span id="line-121">        <span class="k">for</span> <span class="n">slot</span><span class="p">,</span> <span class="n">attachments</span> <span class="ow">in</span> <span class="n">skin</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="line-122">            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">att</span> <span class="ow">in</span> <span class="n">attachments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="line-123">                <span class="k">if</span> <span class="n">att</span><span class="o">.</span><span class="n">path</span> <span class="ow">in</span> <span class="n">art</span><span class="p">:</span>
+</span><span id="line-124">                    <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">slot</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-125">    <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-126">
+</span><span id="line-127">
+</span><span id="line-128"><span class="k">def</span><span class="w"> </span><span class="nf">_keys_with_art</span><span class="p">(</span>
+</span><span id="line-129">    <span class="n">swap_set</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">drawn</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+</span><span id="line-130"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-131"><span class="w">    </span><span class="sd">"""The keys of a swap set whose selected attachment is drawn in some slot."""</span>
+</span><span id="line-132">    <span class="n">names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="o">*</span><span class="n">drawn</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">if</span> <span class="n">drawn</span> <span class="k">else</span> <span class="nb">set</span><span class="p">()</span>
+</span><span id="line-133">    <span class="k">return</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">swap_set</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+</span><span id="line-134">
+</span><span id="line-135">
 <div class="viewcode-block" id="renders_as_placeholder">
 <a class="viewcode-back" href="../../_autosummary/cutan.library.html#cutan.library.renders_as_placeholder">[docs]</a>
-</span><span id="line-134"><span class="k">def</span><span class="w"> </span><span class="nf">renders_as_placeholder</span><span class="p">(</span><span class="n">doc</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-135"><span class="w">    </span><span class="sd">"""Whether the compiler would draw this character only as its placeholder stand-in.</span>
-</span><span id="line-136">
-</span><span id="line-137"><span class="sd">    &gt;&gt;&gt; renders_as_placeholder({"name": "alice"}), renders_as_placeholder({"parts": ["head"]})</span>
-</span><span id="line-138"><span class="sd">    (True, False)</span>
-</span><span id="line-139"><span class="sd">    """</span>
-</span><span id="line-140">    <span class="k">return</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"CharacterDescriptor"</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"parts"</span><span class="p">)</span></div>
+</span><span id="line-136"><span class="k">def</span><span class="w"> </span><span class="nf">renders_as_placeholder</span><span class="p">(</span><span class="n">doc</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-137"><span class="w">    </span><span class="sd">"""Whether the compiler would draw this character only as its placeholder stand-in.</span>
+</span><span id="line-138">
+</span><span id="line-139"><span class="sd">    &gt;&gt;&gt; renders_as_placeholder({"name": "alice"}), renders_as_placeholder({"parts": ["head"]})</span>
+</span><span id="line-140"><span class="sd">    (True, False)</span>
+</span><span id="line-141"><span class="sd">    """</span>
+</span><span id="line-142">    <span class="k">return</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"CharacterDescriptor"</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"parts"</span><span class="p">)</span></div>
 
-</span><span id="line-141">
-</span><span id="line-142">
-</span><span id="line-143"><span class="k">def</span><span class="w"> </span><span class="nf">_parts_rig_affordances</span><span class="p">(</span>
-</span><span id="line-144">    <span class="n">doc</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-</span><span id="line-145">    <span class="n">leg_names</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span>
-</span><span id="line-146">    <span class="n">arm_names</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span>
-</span><span id="line-147"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-</span><span id="line-148"><span class="w">    </span><span class="sd">"""A procedural rig: what the compiler builds from ``parts`` — mirrored, not re-guessed.</span>
-</span><span id="line-149">
-</span><span id="line-150"><span class="sd">    The same branch as ``_build_character_subtree``: a document that is not a</span>
-</span><span id="line-151"><span class="sd">    ``CharacterDescriptor`` is drawn from its declared ``parts``, one node per</span>
-</span><span id="line-152"><span class="sd">    part, with a drawn mouth on the head. A document that declares no parts is</span>
-</span><span id="line-153"><span class="sd">    drawn as the compiler's PLACEHOLDER — a recorded fallback (fatal under</span>
-</span><span id="line-154"><span class="sd">    ``--strict-assets``), not this asset's rig — so it affords nothing but the</span>
-</span><span id="line-155"><span class="sd">    rest view: a stand-in must never answer a search for arms or a mouth.</span>
-</span><span id="line-156"><span class="sd">    """</span>
-</span><span id="line-157">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.compile.passes</span><span class="w"> </span><span class="kn">import</span> <span class="n">PROCEDURAL_MOUTH_KEYS</span>
-</span><span id="line-158">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_VISEME_MAP</span><span class="p">,</span> <span class="n">DFLT_VIEW</span>
-</span><span id="line-159">
-</span><span id="line-160">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-161">        <span class="n">SWAP_VIEW</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="line-162">            <span class="s2">"keys"</span><span class="p">:</span> <span class="p">[</span><span class="n">DFLT_VIEW</span><span class="p">],</span>
-</span><span id="line-163">            <span class="s2">"rest"</span><span class="p">:</span> <span class="n">DFLT_VIEW</span><span class="p">,</span>
-</span><span id="line-164">            <span class="s2">"swappable"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-165">            <span class="s2">"overrides"</span><span class="p">:</span> <span class="p">[],</span>
-</span><span id="line-166">        <span class="p">}</span>
-</span><span id="line-167">    <span class="p">}</span>
-</span><span id="line-168">    <span class="k">if</span> <span class="n">renders_as_placeholder</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
-</span><span id="line-169">        <span class="k">return</span> <span class="n">out</span>
-</span><span id="line-170">    <span class="n">parts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">"parts"</span><span class="p">])</span>
-</span><span id="line-171">    <span class="k">for</span> <span class="n">cap</span><span class="p">,</span> <span class="n">names</span> <span class="ow">in</span> <span class="p">((</span><span class="n">LIMBS_LEGS</span><span class="p">,</span> <span class="n">leg_names</span><span class="p">),</span> <span class="p">(</span><span class="n">LIMBS_ARMS</span><span class="p">,</span> <span class="n">arm_names</span><span class="p">)):</span>
-</span><span id="line-172">        <span class="n">pair</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">names</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">n</span> <span class="ow">in</span> <span class="n">parts</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">p</span><span class="p">)),</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-173">        <span class="k">if</span> <span class="n">pair</span><span class="p">:</span>
-</span><span id="line-174">            <span class="n">out</span><span class="p">[</span><span class="n">cap</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"slots"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">pair</span><span class="p">)}</span>
-</span><span id="line-175">    <span class="k">if</span> <span class="s2">"head"</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">:</span>
-</span><span id="line-176">        <span class="n">keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">PROCEDURAL_MOUTH_KEYS</span><span class="p">))</span>
-</span><span id="line-177">        <span class="n">chart</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-178">            <span class="n">MOUTH_CHART_RHUBARB</span>
-</span><span id="line-179">            <span class="k">if</span> <span class="n">keys</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">DEFAULT_VISEME_MAP</span><span class="p">)</span>
-</span><span id="line-180">            <span class="k">else</span> <span class="n">MOUTH_CHART_CUSTOM</span>
-</span><span id="line-181">        <span class="p">)</span>
-</span><span id="line-182">        <span class="n">out</span><span class="p">[</span><span class="n">FACE_MOUTH</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-183">            <span class="s2">"keys"</span><span class="p">:</span> <span class="p">[</span><span class="n">chart</span><span class="p">],</span>
-</span><span id="line-184">            <span class="s2">"chart"</span><span class="p">:</span> <span class="n">chart</span><span class="p">,</span>
-</span><span id="line-185">            <span class="s2">"shapes"</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">),</span>
-</span><span id="line-186">            <span class="s2">"complete"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="line-187">            <span class="s2">"variants"</span><span class="p">:</span> <span class="p">[],</span>
-</span><span id="line-188">        <span class="p">}</span>
-</span><span id="line-189">    <span class="k">return</span> <span class="n">out</span>
-</span><span id="line-190">
-</span><span id="line-191">
+</span><span id="line-143">
+</span><span id="line-144">
+</span><span id="line-145"><span class="k">def</span><span class="w"> </span><span class="nf">_parts_rig_affordances</span><span class="p">(</span>
+</span><span id="line-146">    <span class="n">doc</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+</span><span id="line-147">    <span class="n">leg_names</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span>
+</span><span id="line-148">    <span class="n">arm_names</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span>
+</span><span id="line-149"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+</span><span id="line-150"><span class="w">    </span><span class="sd">"""A procedural rig: what the compiler builds from ``parts`` — mirrored, not re-guessed.</span>
+</span><span id="line-151">
+</span><span id="line-152"><span class="sd">    The same branch as ``_build_character_subtree``: a document that is not a</span>
+</span><span id="line-153"><span class="sd">    ``CharacterDescriptor`` is drawn from its declared ``parts``, one node per</span>
+</span><span id="line-154"><span class="sd">    part, with a drawn mouth on the head. A document that declares no parts is</span>
+</span><span id="line-155"><span class="sd">    drawn as the compiler's PLACEHOLDER — a recorded fallback (fatal under</span>
+</span><span id="line-156"><span class="sd">    ``--strict-assets``), not this asset's rig — so it affords nothing but the</span>
+</span><span id="line-157"><span class="sd">    rest view: a stand-in must never answer a search for arms or a mouth.</span>
+</span><span id="line-158"><span class="sd">    """</span>
+</span><span id="line-159">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.compile.passes</span><span class="w"> </span><span class="kn">import</span> <span class="n">PROCEDURAL_MOUTH_KEYS</span>
+</span><span id="line-160">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_VISEME_MAP</span><span class="p">,</span> <span class="n">DFLT_VIEW</span>
+</span><span id="line-161">
+</span><span id="line-162">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-163">        <span class="n">SWAP_VIEW</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-164">            <span class="s2">"keys"</span><span class="p">:</span> <span class="p">[</span><span class="n">DFLT_VIEW</span><span class="p">],</span>
+</span><span id="line-165">            <span class="s2">"rest"</span><span class="p">:</span> <span class="n">DFLT_VIEW</span><span class="p">,</span>
+</span><span id="line-166">            <span class="s2">"swappable"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-167">            <span class="s2">"overrides"</span><span class="p">:</span> <span class="p">[],</span>
+</span><span id="line-168">        <span class="p">}</span>
+</span><span id="line-169">    <span class="p">}</span>
+</span><span id="line-170">    <span class="k">if</span> <span class="n">renders_as_placeholder</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+</span><span id="line-171">        <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-172">    <span class="n">parts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">"parts"</span><span class="p">])</span>
+</span><span id="line-173">    <span class="k">for</span> <span class="n">cap</span><span class="p">,</span> <span class="n">names</span> <span class="ow">in</span> <span class="p">((</span><span class="n">LIMBS_LEGS</span><span class="p">,</span> <span class="n">leg_names</span><span class="p">),</span> <span class="p">(</span><span class="n">LIMBS_ARMS</span><span class="p">,</span> <span class="n">arm_names</span><span class="p">)):</span>
+</span><span id="line-174">        <span class="n">pair</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">names</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">n</span> <span class="ow">in</span> <span class="n">parts</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">p</span><span class="p">)),</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-175">        <span class="k">if</span> <span class="n">pair</span><span class="p">:</span>
+</span><span id="line-176">            <span class="n">out</span><span class="p">[</span><span class="n">cap</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"slots"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">pair</span><span class="p">)}</span>
+</span><span id="line-177">    <span class="k">if</span> <span class="s2">"head"</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">:</span>
+</span><span id="line-178">        <span class="n">keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">PROCEDURAL_MOUTH_KEYS</span><span class="p">))</span>
+</span><span id="line-179">        <span class="n">chart</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-180">            <span class="n">MOUTH_CHART_RHUBARB</span>
+</span><span id="line-181">            <span class="k">if</span> <span class="n">keys</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">DEFAULT_VISEME_MAP</span><span class="p">)</span>
+</span><span id="line-182">            <span class="k">else</span> <span class="n">MOUTH_CHART_CUSTOM</span>
+</span><span id="line-183">        <span class="p">)</span>
+</span><span id="line-184">        <span class="n">out</span><span class="p">[</span><span class="n">FACE_MOUTH</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-185">            <span class="s2">"keys"</span><span class="p">:</span> <span class="p">[</span><span class="n">chart</span><span class="p">],</span>
+</span><span id="line-186">            <span class="s2">"chart"</span><span class="p">:</span> <span class="n">chart</span><span class="p">,</span>
+</span><span id="line-187">            <span class="s2">"shapes"</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">),</span>
+</span><span id="line-188">            <span class="s2">"complete"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="line-189">            <span class="s2">"variants"</span><span class="p">:</span> <span class="p">[],</span>
+</span><span id="line-190">        <span class="p">}</span>
+</span><span id="line-191">    <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-192">
+</span><span id="line-193">
 <div class="viewcode-block" id="character_affordances">
 <a class="viewcode-back" href="../../_autosummary/cutan.library.html#cutan.library.character_affordances">[docs]</a>
-</span><span id="line-192"><span class="k">def</span><span class="w"> </span><span class="nf">character_affordances</span><span class="p">(</span>
-</span><span id="line-193">    <span class="n">doc</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">art</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-</span><span id="line-194"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-</span><span id="line-195"><span class="w">    </span><span class="sd">"""The capabilities a character descriptor and its art afford.</span>
-</span><span id="line-196">
-</span><span id="line-197"><span class="sd">    doc: the character descriptor document (any schema version; migrated first)</span>
-</span><span id="line-198"><span class="sd">    art: the files present, ``{relative path: ContentRef JSON}`` (``parts/head.svg``, …)</span>
-</span><span id="line-199">
-</span><span id="line-200"><span class="sd">    Gait is deliberately not here: which walk methods apply is the capability</span>
-</span><span id="line-201"><span class="sd">    matcher's answer (``applicable("locomotion", asset)``, ADR 0002), derived from</span>
-</span><span id="line-202"><span class="sd">    ``limbs.legs``, not a second fact about the asset.</span>
-</span><span id="line-203">
-</span><span id="line-204"><span class="sd">    &gt;&gt;&gt; from cutan.characters.schema import CharacterDescriptor</span>
-</span><span id="line-205"><span class="sd">    &gt;&gt;&gt; doc = CharacterDescriptor(name="blob").model_dump(mode="json")</span>
-</span><span id="line-206"><span class="sd">    &gt;&gt;&gt; sorted(character_affordances(doc, art={}))   # a descriptor with no art</span>
-</span><span id="line-207"><span class="sd">    ['swap.view']</span>
-</span><span id="line-208"><span class="sd">    """</span>
-</span><span id="line-209">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-</span><span id="line-210">        <span class="n">DEFAULT_VISEME_MAP</span><span class="p">,</span>
-</span><span id="line-211">        <span class="n">DFLT_VIEW</span><span class="p">,</span>
-</span><span id="line-212">        <span class="n">VIEW_CHANNEL</span><span class="p">,</span>
-</span><span id="line-213">        <span class="n">VIEW_VARIANT_SEP</span><span class="p">,</span>
-</span><span id="line-214">        <span class="n">VIEWS</span><span class="p">,</span>
-</span><span id="line-215">        <span class="n">VISEME_CHANNEL</span><span class="p">,</span>
-</span><span id="line-216">        <span class="n">CharacterDescriptor</span><span class="p">,</span>
-</span><span id="line-217">    <span class="p">)</span>
-</span><span id="line-218">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.migrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">migrate</span>
-</span><span id="line-219">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">WALK_ARM_NAMES</span><span class="p">,</span> <span class="n">WALK_LEG_NAMES</span>
-</span><span id="line-220">
-</span><span id="line-221">    <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">!=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_fields</span><span class="p">[</span><span class="s2">"kind"</span><span class="p">]</span><span class="o">.</span><span class="n">default</span><span class="p">:</span>
-</span><span id="line-222">        <span class="c1"># Not a descriptor: the compiler draws the procedural rig from the</span>
-</span><span id="line-223">        <span class="c1"># declared `parts` (or its placeholder), with no art files at all.</span>
-</span><span id="line-224">        <span class="k">return</span> <span class="n">_parts_rig_affordances</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">WALK_LEG_NAMES</span><span class="p">,</span> <span class="n">WALK_ARM_NAMES</span><span class="p">)</span>
-</span><span id="line-225">    <span class="n">desc</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
-</span><span id="line-226">        <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">doc</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"CharacterDescriptor"</span><span class="p">)</span>
-</span><span id="line-227">    <span class="p">)</span>
-</span><span id="line-228">    <span class="n">drawn</span> <span class="o">=</span> <span class="n">_attachments_with_art</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">art</span><span class="p">)</span>
-</span><span id="line-229">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span id="line-230">
-</span><span id="line-231">    <span class="k">def</span><span class="w"> </span><span class="nf">limb_pair</span><span class="p">(</span><span class="n">candidates</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-232">        <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">candidates</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">n</span> <span class="ow">in</span> <span class="n">drawn</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">p</span><span class="p">)),</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-233">
-</span><span id="line-234">    <span class="n">legs</span> <span class="o">=</span> <span class="n">limb_pair</span><span class="p">(</span><span class="n">WALK_LEG_NAMES</span><span class="p">)</span>
-</span><span id="line-235">    <span class="k">if</span> <span class="n">legs</span><span class="p">:</span>
-</span><span id="line-236">        <span class="n">out</span><span class="p">[</span><span class="n">LIMBS_LEGS</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"slots"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">legs</span><span class="p">)}</span>
-</span><span id="line-237">    <span class="n">arms</span> <span class="o">=</span> <span class="n">limb_pair</span><span class="p">(</span><span class="n">WALK_ARM_NAMES</span><span class="p">)</span>
-</span><span id="line-238">    <span class="k">if</span> <span class="n">arms</span><span class="p">:</span>
-</span><span id="line-239">        <span class="n">out</span><span class="p">[</span><span class="n">LIMBS_ARMS</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"slots"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">arms</span><span class="p">)}</span>
-</span><span id="line-240">
-</span><span id="line-241">    <span class="n">rest</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">rest_view</span> <span class="ow">or</span> <span class="n">DFLT_VIEW</span>
-</span><span id="line-242">    <span class="n">view_set</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">VIEW_CHANNEL</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
-</span><span id="line-243">    <span class="n">turnable</span> <span class="o">=</span> <span class="n">_keys_with_art</span><span class="p">(</span><span class="n">view_set</span><span class="p">,</span> <span class="n">drawn</span><span class="p">)</span>
-</span><span id="line-244">    <span class="n">views</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-</span><span id="line-245">        <span class="p">{</span><span class="n">rest</span><span class="p">,</span> <span class="o">*</span><span class="n">turnable</span><span class="p">},</span>
-</span><span id="line-246">        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="p">(</span><span class="n">VIEWS</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">VIEWS</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">VIEWS</span><span class="p">),</span> <span class="n">v</span><span class="p">),</span>
-</span><span id="line-247">    <span class="p">)</span>
-</span><span id="line-248">    <span class="n">out</span><span class="p">[</span><span class="n">SWAP_VIEW</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-249">        <span class="s2">"keys"</span><span class="p">:</span> <span class="n">views</span><span class="p">,</span>
-</span><span id="line-250">        <span class="s2">"rest"</span><span class="p">:</span> <span class="n">rest</span><span class="p">,</span>
-</span><span id="line-251">        <span class="s2">"swappable"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">turnable</span><span class="p">),</span>
-</span><span id="line-252">        <span class="s2">"overrides"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"rest_view"</span><span class="p">]</span> <span class="k">if</span> <span class="n">desc</span><span class="o">.</span><span class="n">rest_view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[],</span>
-</span><span id="line-253">    <span class="p">}</span>
-</span><span id="line-254">
-</span><span id="line-255">    <span class="n">visemes</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">VISEME_CHANNEL</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
-</span><span id="line-256">    <span class="n">shapes</span> <span class="o">=</span> <span class="n">_keys_with_art</span><span class="p">(</span><span class="n">visemes</span><span class="p">,</span> <span class="n">drawn</span><span class="p">)</span> <span class="k">if</span> <span class="n">desc</span><span class="o">.</span><span class="n">face_overlay</span> <span class="k">else</span> <span class="p">[]</span>
-</span><span id="line-257">    <span class="k">if</span> <span class="n">shapes</span><span class="p">:</span>
-</span><span id="line-258">        <span class="n">chart</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-259">            <span class="n">MOUTH_CHART_RHUBARB</span>
-</span><span id="line-260">            <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">visemes</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">DEFAULT_VISEME_MAP</span><span class="p">)</span>
-</span><span id="line-261">            <span class="k">else</span> <span class="n">MOUTH_CHART_CUSTOM</span>
-</span><span id="line-262">        <span class="p">)</span>
-</span><span id="line-263">        <span class="n">variants</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-</span><span id="line-264">            <span class="n">name</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="n">VIEW_VARIANT_SEP</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
-</span><span id="line-265">            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span>
-</span><span id="line-266">            <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">VISEME_CHANNEL</span> <span class="o">+</span> <span class="n">VIEW_VARIANT_SEP</span><span class="p">)</span>
-</span><span id="line-267">        <span class="p">)</span>
-</span><span id="line-268">        <span class="n">out</span><span class="p">[</span><span class="n">FACE_MOUTH</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-269">            <span class="s2">"keys"</span><span class="p">:</span> <span class="p">[</span><span class="n">chart</span><span class="p">],</span>
-</span><span id="line-270">            <span class="s2">"chart"</span><span class="p">:</span> <span class="n">chart</span><span class="p">,</span>
-</span><span id="line-271">            <span class="s2">"shapes"</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">shapes</span><span class="p">),</span>
-</span><span id="line-272">            <span class="s2">"complete"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">visemes</span><span class="p">),</span>
-</span><span id="line-273">            <span class="s2">"variants"</span><span class="p">:</span> <span class="n">variants</span><span class="p">,</span>
-</span><span id="line-274">        <span class="p">}</span>
-</span><span id="line-275">
-</span><span id="line-276">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.brows</span><span class="w"> </span><span class="kn">import</span> <span class="n">brow_affordance</span>
+</span><span id="line-194"><span class="k">def</span><span class="w"> </span><span class="nf">character_affordances</span><span class="p">(</span>
+</span><span id="line-195">    <span class="n">doc</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">art</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</span><span id="line-196"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+</span><span id="line-197"><span class="w">    </span><span class="sd">"""The capabilities a character descriptor and its art afford.</span>
+</span><span id="line-198">
+</span><span id="line-199"><span class="sd">    doc: the character descriptor document (any schema version; migrated first)</span>
+</span><span id="line-200"><span class="sd">    art: the files present, ``{relative path: ContentRef JSON}`` (``parts/head.svg``, …)</span>
+</span><span id="line-201">
+</span><span id="line-202"><span class="sd">    Gait is deliberately not here: which walk methods apply is the capability</span>
+</span><span id="line-203"><span class="sd">    matcher's answer (``applicable("locomotion", asset)``, ADR 0002), derived from</span>
+</span><span id="line-204"><span class="sd">    ``limbs.legs``, not a second fact about the asset.</span>
+</span><span id="line-205">
+</span><span id="line-206"><span class="sd">    &gt;&gt;&gt; from cutan.characters.schema import CharacterDescriptor</span>
+</span><span id="line-207"><span class="sd">    &gt;&gt;&gt; doc = CharacterDescriptor(name="blob").model_dump(mode="json")</span>
+</span><span id="line-208"><span class="sd">    &gt;&gt;&gt; sorted(character_affordances(doc, art={}))   # a descriptor with no art</span>
+</span><span id="line-209"><span class="sd">    ['swap.view']</span>
+</span><span id="line-210"><span class="sd">    """</span>
+</span><span id="line-211">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-212">        <span class="n">DEFAULT_VISEME_MAP</span><span class="p">,</span>
+</span><span id="line-213">        <span class="n">DFLT_VIEW</span><span class="p">,</span>
+</span><span id="line-214">        <span class="n">VIEW_CHANNEL</span><span class="p">,</span>
+</span><span id="line-215">        <span class="n">VIEW_VARIANT_SEP</span><span class="p">,</span>
+</span><span id="line-216">        <span class="n">VIEWS</span><span class="p">,</span>
+</span><span id="line-217">        <span class="n">VISEME_CHANNEL</span><span class="p">,</span>
+</span><span id="line-218">        <span class="n">CharacterDescriptor</span><span class="p">,</span>
+</span><span id="line-219">    <span class="p">)</span>
+</span><span id="line-220">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.migrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">migrate</span>
+</span><span id="line-221">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">WALK_ARM_NAMES</span><span class="p">,</span> <span class="n">WALK_LEG_NAMES</span>
+</span><span id="line-222">
+</span><span id="line-223">    <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">!=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_fields</span><span class="p">[</span><span class="s2">"kind"</span><span class="p">]</span><span class="o">.</span><span class="n">default</span><span class="p">:</span>
+</span><span id="line-224">        <span class="c1"># Not a descriptor: the compiler draws the procedural rig from the</span>
+</span><span id="line-225">        <span class="c1"># declared `parts` (or its placeholder), with no art files at all.</span>
+</span><span id="line-226">        <span class="k">return</span> <span class="n">_parts_rig_affordances</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">WALK_LEG_NAMES</span><span class="p">,</span> <span class="n">WALK_ARM_NAMES</span><span class="p">)</span>
+</span><span id="line-227">    <span class="n">desc</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
+</span><span id="line-228">        <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">doc</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"CharacterDescriptor"</span><span class="p">)</span>
+</span><span id="line-229">    <span class="p">)</span>
+</span><span id="line-230">    <span class="n">drawn</span> <span class="o">=</span> <span class="n">_attachments_with_art</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">art</span><span class="p">)</span>
+</span><span id="line-231">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-232">
+</span><span id="line-233">    <span class="k">def</span><span class="w"> </span><span class="nf">limb_pair</span><span class="p">(</span><span class="n">candidates</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-234">        <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">candidates</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">n</span> <span class="ow">in</span> <span class="n">drawn</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">p</span><span class="p">)),</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-235">
+</span><span id="line-236">    <span class="n">legs</span> <span class="o">=</span> <span class="n">limb_pair</span><span class="p">(</span><span class="n">WALK_LEG_NAMES</span><span class="p">)</span>
+</span><span id="line-237">    <span class="k">if</span> <span class="n">legs</span><span class="p">:</span>
+</span><span id="line-238">        <span class="n">out</span><span class="p">[</span><span class="n">LIMBS_LEGS</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"slots"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">legs</span><span class="p">)}</span>
+</span><span id="line-239">    <span class="n">arms</span> <span class="o">=</span> <span class="n">limb_pair</span><span class="p">(</span><span class="n">WALK_ARM_NAMES</span><span class="p">)</span>
+</span><span id="line-240">    <span class="k">if</span> <span class="n">arms</span><span class="p">:</span>
+</span><span id="line-241">        <span class="n">out</span><span class="p">[</span><span class="n">LIMBS_ARMS</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"slots"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">arms</span><span class="p">)}</span>
+</span><span id="line-242">
+</span><span id="line-243">    <span class="n">rest</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">rest_view</span> <span class="ow">or</span> <span class="n">DFLT_VIEW</span>
+</span><span id="line-244">    <span class="n">view_set</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">VIEW_CHANNEL</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+</span><span id="line-245">    <span class="n">turnable</span> <span class="o">=</span> <span class="n">_keys_with_art</span><span class="p">(</span><span class="n">view_set</span><span class="p">,</span> <span class="n">drawn</span><span class="p">)</span>
+</span><span id="line-246">    <span class="n">views</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+</span><span id="line-247">        <span class="p">{</span><span class="n">rest</span><span class="p">,</span> <span class="o">*</span><span class="n">turnable</span><span class="p">},</span>
+</span><span id="line-248">        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="p">(</span><span class="n">VIEWS</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">VIEWS</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">VIEWS</span><span class="p">),</span> <span class="n">v</span><span class="p">),</span>
+</span><span id="line-249">    <span class="p">)</span>
+</span><span id="line-250">    <span class="n">out</span><span class="p">[</span><span class="n">SWAP_VIEW</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-251">        <span class="s2">"keys"</span><span class="p">:</span> <span class="n">views</span><span class="p">,</span>
+</span><span id="line-252">        <span class="s2">"rest"</span><span class="p">:</span> <span class="n">rest</span><span class="p">,</span>
+</span><span id="line-253">        <span class="s2">"swappable"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">turnable</span><span class="p">),</span>
+</span><span id="line-254">        <span class="s2">"overrides"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"rest_view"</span><span class="p">]</span> <span class="k">if</span> <span class="n">desc</span><span class="o">.</span><span class="n">rest_view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[],</span>
+</span><span id="line-255">    <span class="p">}</span>
+</span><span id="line-256">
+</span><span id="line-257">    <span class="n">visemes</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">VISEME_CHANNEL</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+</span><span id="line-258">    <span class="n">shapes</span> <span class="o">=</span> <span class="n">_keys_with_art</span><span class="p">(</span><span class="n">visemes</span><span class="p">,</span> <span class="n">drawn</span><span class="p">)</span> <span class="k">if</span> <span class="n">desc</span><span class="o">.</span><span class="n">face_overlay</span> <span class="k">else</span> <span class="p">[]</span>
+</span><span id="line-259">    <span class="k">if</span> <span class="n">shapes</span><span class="p">:</span>
+</span><span id="line-260">        <span class="n">chart</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-261">            <span class="n">MOUTH_CHART_RHUBARB</span>
+</span><span id="line-262">            <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">visemes</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">DEFAULT_VISEME_MAP</span><span class="p">)</span>
+</span><span id="line-263">            <span class="k">else</span> <span class="n">MOUTH_CHART_CUSTOM</span>
+</span><span id="line-264">        <span class="p">)</span>
+</span><span id="line-265">        <span class="n">variants</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+</span><span id="line-266">            <span class="n">name</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="n">VIEW_VARIANT_SEP</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+</span><span id="line-267">            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span>
+</span><span id="line-268">            <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">VISEME_CHANNEL</span> <span class="o">+</span> <span class="n">VIEW_VARIANT_SEP</span><span class="p">)</span>
+</span><span id="line-269">        <span class="p">)</span>
+</span><span id="line-270">        <span class="n">out</span><span class="p">[</span><span class="n">FACE_MOUTH</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-271">            <span class="s2">"keys"</span><span class="p">:</span> <span class="p">[</span><span class="n">chart</span><span class="p">],</span>
+</span><span id="line-272">            <span class="s2">"chart"</span><span class="p">:</span> <span class="n">chart</span><span class="p">,</span>
+</span><span id="line-273">            <span class="s2">"shapes"</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">shapes</span><span class="p">),</span>
+</span><span id="line-274">            <span class="s2">"complete"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">visemes</span><span class="p">),</span>
+</span><span id="line-275">            <span class="s2">"variants"</span><span class="p">:</span> <span class="n">variants</span><span class="p">,</span>
+</span><span id="line-276">        <span class="p">}</span>
 </span><span id="line-277">
-</span><span id="line-278">    <span class="n">brows</span> <span class="o">=</span> <span class="n">brow_affordance</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">drawn</span><span class="p">)</span>
-</span><span id="line-279">    <span class="k">if</span> <span class="n">brows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-280">        <span class="n">out</span><span class="p">[</span><span class="n">FACE_BROWS</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">brows</span>
-</span><span id="line-281">    <span class="k">return</span> <span class="n">out</span></div>
+</span><span id="line-278">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.brows</span><span class="w"> </span><span class="kn">import</span> <span class="n">brow_affordance</span>
+</span><span id="line-279">
+</span><span id="line-280">    <span class="n">brows</span> <span class="o">=</span> <span class="n">brow_affordance</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">drawn</span><span class="p">)</span>
+</span><span id="line-281">    <span class="k">if</span> <span class="n">brows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-282">        <span class="n">out</span><span class="p">[</span><span class="n">FACE_BROWS</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">brows</span>
+</span><span id="line-283">    <span class="k">return</span> <span class="n">out</span></div>
 
-</span><span id="line-282">
-</span><span id="line-283">
-</span><span id="line-284"><span class="c1">#: The capabilities the character analyser derives (declared by the cut-out genre).</span>
-</span><span id="line-285"><span class="n">CHARACTER_CAPABILITIES</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Capability</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-286">    <span class="n">LIMBS_LEGS</span><span class="p">,</span>
-</span><span id="line-287">    <span class="n">LIMBS_ARMS</span><span class="p">,</span>
-</span><span id="line-288">    <span class="n">SWAP_VIEW</span><span class="p">,</span>
-</span><span id="line-289">    <span class="n">FACE_MOUTH</span><span class="p">,</span>
-</span><span id="line-290">    <span class="n">FACE_BROWS</span><span class="p">,</span>
-</span><span id="line-291"><span class="p">)</span>
-</span><span id="line-292"><span class="c1">#: The character analyser (declared by the cut-out genre, registered with it).</span>
-</span><span id="line-293"><span class="n">CHARACTER_ANALYSER</span><span class="p">:</span> <span class="n">Analyser</span> <span class="o">=</span> <span class="n">Analyser</span><span class="p">(</span>
-</span><span id="line-294">    <span class="s2">"character"</span><span class="p">,</span>
-</span><span id="line-295">    <span class="n">CHARACTER_ANALYSER_VERSION</span><span class="p">,</span>
-</span><span id="line-296">    <span class="n">character_affordances</span><span class="p">,</span>
-</span><span id="line-297">    <span class="n">declares</span><span class="o">=</span><span class="p">(</span><span class="s2">"rest_view"</span><span class="p">,</span> <span class="s2">"face_overlay"</span><span class="p">,</span> <span class="s2">"gait"</span><span class="p">,</span> <span class="s2">"speech"</span><span class="p">,</span> <span class="s2">"occluded"</span><span class="p">),</span>
-</span><span id="line-298"><span class="p">)</span>
-</span><span id="line-299">
-</span><span id="line-300">
-</span><span id="line-301"><span class="k">def</span><span class="w"> </span><span class="nf">publish_warning</span><span class="p">(</span><span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-302"><span class="w">    </span><span class="sd">"""The ``library.publish_warning`` service: what to tell a publisher whose</span>
-</span><span id="line-303"><span class="sd">    ``character`` would draw only the placeholder rig (``None``: nothing to say).</span>
-</span><span id="line-304">
-</span><span id="line-305"><span class="sd">    &gt;&gt;&gt; publish_warning("character", {"name": "alice"}).startswith("is neither")</span>
-</span><span id="line-306"><span class="sd">    True</span>
-</span><span id="line-307"><span class="sd">    &gt;&gt;&gt; publish_warning("character", {"parts": ["head"]}) is None</span>
+</span><span id="line-284">
+</span><span id="line-285">
+</span><span id="line-286"><span class="c1">#: The capabilities the character analyser derives (declared by the cut-out genre).</span>
+</span><span id="line-287"><span class="n">CHARACTER_CAPABILITIES</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Capability</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-288">    <span class="n">LIMBS_LEGS</span><span class="p">,</span>
+</span><span id="line-289">    <span class="n">LIMBS_ARMS</span><span class="p">,</span>
+</span><span id="line-290">    <span class="n">SWAP_VIEW</span><span class="p">,</span>
+</span><span id="line-291">    <span class="n">FACE_MOUTH</span><span class="p">,</span>
+</span><span id="line-292">    <span class="n">FACE_BROWS</span><span class="p">,</span>
+</span><span id="line-293"><span class="p">)</span>
+</span><span id="line-294"><span class="c1">#: The character analyser (declared by the cut-out genre, registered with it).</span>
+</span><span id="line-295"><span class="n">CHARACTER_ANALYSER</span><span class="p">:</span> <span class="n">Analyser</span> <span class="o">=</span> <span class="n">Analyser</span><span class="p">(</span>
+</span><span id="line-296">    <span class="s2">"character"</span><span class="p">,</span>
+</span><span id="line-297">    <span class="n">CHARACTER_ANALYSER_VERSION</span><span class="p">,</span>
+</span><span id="line-298">    <span class="n">character_affordances</span><span class="p">,</span>
+</span><span id="line-299">    <span class="n">declares</span><span class="o">=</span><span class="p">(</span><span class="s2">"rest_view"</span><span class="p">,</span> <span class="s2">"face_overlay"</span><span class="p">,</span> <span class="s2">"gait"</span><span class="p">,</span> <span class="s2">"speech"</span><span class="p">,</span> <span class="s2">"occluded"</span><span class="p">),</span>
+</span><span id="line-300"><span class="p">)</span>
+</span><span id="line-301">
+</span><span id="line-302">
+</span><span id="line-303"><span class="k">def</span><span class="w"> </span><span class="nf">publish_warning</span><span class="p">(</span><span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-304"><span class="w">    </span><span class="sd">"""The ``library.publish_warning`` service: what to tell a publisher whose</span>
+</span><span id="line-305"><span class="sd">    ``character`` would draw only the placeholder rig (``None``: nothing to say).</span>
+</span><span id="line-306">
+</span><span id="line-307"><span class="sd">    &gt;&gt;&gt; publish_warning("character", {"name": "alice"}).startswith("is neither")</span>
 </span><span id="line-308"><span class="sd">    True</span>
-</span><span id="line-309"><span class="sd">    &gt;&gt;&gt; publish_warning("prop", {"name": "alice"}) is None</span>
+</span><span id="line-309"><span class="sd">    &gt;&gt;&gt; publish_warning("character", {"parts": ["head"]}) is None</span>
 </span><span id="line-310"><span class="sd">    True</span>
-</span><span id="line-311"><span class="sd">    """</span>
-</span><span id="line-312">    <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"character"</span> <span class="ow">and</span> <span class="n">renders_as_placeholder</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
-</span><span id="line-313">        <span class="k">return</span> <span class="p">(</span>
-</span><span id="line-314">            <span class="s2">"is neither a CharacterDescriptor nor a rig with 'parts': the compiler "</span>
-</span><span id="line-315">            <span class="s2">"would draw only its placeholder stand-in (fatal under --strict-assets), "</span>
-</span><span id="line-316">            <span class="s2">"so it affords nothing but its rest view"</span>
-</span><span id="line-317">        <span class="p">)</span>
-</span><span id="line-318">    <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-311"><span class="sd">    &gt;&gt;&gt; publish_warning("prop", {"name": "alice"}) is None</span>
+</span><span id="line-312"><span class="sd">    True</span>
+</span><span id="line-313"><span class="sd">    """</span>
+</span><span id="line-314">    <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"character"</span> <span class="ow">and</span> <span class="n">renders_as_placeholder</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+</span><span id="line-315">        <span class="k">return</span> <span class="p">(</span>
+</span><span id="line-316">            <span class="s2">"is neither a CharacterDescriptor nor a rig with 'parts': the compiler "</span>
+</span><span id="line-317">            <span class="s2">"would draw only its placeholder stand-in (fatal under --strict-assets), "</span>
+</span><span id="line-318">            <span class="s2">"so it affords nothing but its rest view"</span>
+</span><span id="line-319">        <span class="p">)</span>
+</span><span id="line-320">    <span class="k">return</span> <span class="kc">None</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -514,7 +516,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=3294188c"></script>
+    <script src="../../_static/documentation_options.js?v=f91d8841"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

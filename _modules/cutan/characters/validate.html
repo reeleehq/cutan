@@ -906,293 +906,289 @@
 </span><span id="line-724"><span class="k">def</span><span class="w"> </span><span class="nf">_check_unseated_hat</span><span class="p">(</span>
 </span><span id="line-725">    <span class="n">descriptor</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="n">VerificationReport</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">who</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="line-726"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-727"><span class="w">    </span><span class="sd">"""A factory character made before hats were worn above the brows (an#252)</span>
-</span><span id="line-728"><span class="sd">    may wear its brim over them, and nothing records it (``occluded`` is</span>
-</span><span id="line-729"><span class="sd">    written only by the seating factory). Until brow cover is derived from the</span>
-</span><span id="line-730"><span class="sd">    art (ADR 0002), say so: a recorded ``hat_seat`` marks a seated hat."""</span>
-</span><span id="line-731">    <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-732">        <span class="k">return</span>
-</span><span id="line-733">    <span class="n">meta</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">metadata</span>
-</span><span id="line-734">    <span class="k">if</span> <span class="p">(</span>
-</span><span id="line-735">        <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"art_provenance"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"fallback_geometric"</span>
-</span><span id="line-736">        <span class="ow">and</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"hat"</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"none"</span><span class="p">)</span>
-</span><span id="line-737">        <span class="ow">and</span> <span class="s2">"hat_seat"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">meta</span>
-</span><span id="line-738">        <span class="ow">and</span> <span class="s2">"brows"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">occluded</span>
-</span><span id="line-739">    <span class="p">):</span>
-</span><span id="line-740">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-</span><span id="line-741">            <span class="n">ADVISORY</span><span class="p">,</span>
-</span><span id="line-742">            <span class="s2">"character.json#metadata.hat"</span><span class="p">,</span>
-</span><span id="line-743">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2"> wears a </span><span class="si">{</span><span class="n">meta</span><span class="p">[</span><span class="s1">'hat'</span><span class="p">]</span><span class="si">!r}</span><span class="s2"> hat drawn before hats were seated above "</span>
-</span><span id="line-744">            <span class="s2">"the brows (an#252): its brim may cover them, so brow expressions may "</span>
-</span><span id="line-745">            <span class="s2">"not read, and `an character capabilities` cannot tell"</span><span class="p">,</span>
-</span><span id="line-746">            <span class="s2">"Re-make it with `an character new --offline` and the same knobs (the "</span>
-</span><span id="line-747">            <span class="s2">"hat is then worn above the brows), or declare "</span>
-</span><span id="line-748">            <span class="s1">'`"occluded": {"brows": "the hat"}` in character.json if they are covered.'</span><span class="p">,</span>
-</span><span id="line-749">        <span class="p">)</span>
-</span><span id="line-750">
-</span><span id="line-751">
-</span><span id="line-752"><span class="k">def</span><span class="w"> </span><span class="nf">_check_declared_speech</span><span class="p">(</span>
-</span><span id="line-753">    <span class="n">descriptor</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="n">VerificationReport</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">who</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-754"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-755"><span class="w">    </span><span class="sd">"""A declared ``speech`` must name a speech method at a current version</span>
-</span><span id="line-756"><span class="sd">    (an#248): it is resolved on the capability registry, so a typo or a stale</span>
-</span><span id="line-757"><span class="sd">    pin would otherwise only surface at compile."""</span>
-</span><span id="line-758">    <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">speech</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-759">        <span class="k">return</span>
-</span><span id="line-760">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">speech_problems</span>
-</span><span id="line-761">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.genres</span><span class="w"> </span><span class="kn">import</span> <span class="n">load</span>
-</span><span id="line-762">
-</span><span id="line-763">    <span class="n">load</span><span class="p">()</span>
-</span><span id="line-764">    <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">speech_problems</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">speech</span><span class="p">):</span>
-</span><span id="line-765">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-</span><span id="line-766">            <span class="n">BLOCKING</span><span class="p">,</span>
-</span><span id="line-767">            <span class="s2">"character.json#speech"</span><span class="p">,</span>
-</span><span id="line-768">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-769">            <span class="s2">"Declare a speech method (`pulse`, `mouth_chart`, or "</span>
-</span><span id="line-770">            <span class="s2">"`{method: pulse, args: </span><span class="si">{strength: 0}</span><span class="s2">}` for a mime), or remove `speech`."</span><span class="p">,</span>
-</span><span id="line-771">        <span class="p">)</span>
-</span><span id="line-772">
-</span><span id="line-773">
-</span><span id="line-774"><span class="k">def</span><span class="w"> </span><span class="nf">_check_face_overlay_declaration</span><span class="p">(</span>
-</span><span id="line-775">    <span class="n">descriptor</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="n">VerificationReport</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">who</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-776"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-777"><span class="w">    </span><span class="sd">"""A baked-face provenance with `face_overlay=True` is almost certainly a</span>
-</span><span id="line-778"><span class="sd">    mistake — the overlay eyes/brows/mouth will draw over the baked face.</span>
-</span><span id="line-779">
-</span><span id="line-780"><span class="sd">    Before 0.3.0 the provenance string WAS the switch; a descriptor written</span>
-</span><span id="line-781"><span class="sd">    to that convention at the current schema version declares the opposite</span>
-</span><span id="line-782"><span class="sd">    of what its author meant, and nothing infers it any more (a declared</span>
-</span><span id="line-783"><span class="sd">    fact is only worth having if nothing second-guesses it). Advisory, since</span>
-</span><span id="line-784"><span class="sd">    a hand-drawn "external" avatar with real overlay parts is legitimate.</span>
-</span><span id="line-785"><span class="sd">    """</span>
-</span><span id="line-786">    <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">face_overlay</span><span class="p">:</span>
-</span><span id="line-787">        <span class="k">return</span>
-</span><span id="line-788">    <span class="n">provenance</span> <span class="o">=</span> <span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"art_provenance"</span><span class="p">)</span>
-</span><span id="line-789">    <span class="k">if</span> <span class="n">provenance</span> <span class="ow">in</span> <span class="n">_BAKED_FACE_PROVENANCES</span><span class="p">:</span>
-</span><span id="line-790">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-</span><span id="line-791">            <span class="n">ADVISORY</span><span class="p">,</span>
-</span><span id="line-792">            <span class="s2">"character.json#face_overlay"</span><span class="p">,</span>
-</span><span id="line-793">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2"> declares face_overlay=true but its art_provenance is "</span>
-</span><span id="line-794">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">provenance</span><span class="si">!r}</span><span class="s2">, which usually means the face is baked into the "</span>
-</span><span id="line-795">            <span class="s2">"head art — the overlay eyes/brows/mouth will draw over it"</span><span class="p">,</span>
-</span><span id="line-796">            <span class="s2">"Set face_overlay: false if the face is baked in (the compiler "</span>
-</span><span id="line-797">            <span class="s2">"reads only that field now), or leave it if the avatar really "</span>
-</span><span id="line-798">            <span class="s2">"has separate face parts."</span><span class="p">,</span>
-</span><span id="line-799">        <span class="p">)</span>
-</span><span id="line-800">
-</span><span id="line-801">
-</span><span id="line-802"><span class="k">def</span><span class="w"> </span><span class="nf">_check_rig_origin</span><span class="p">(</span>
-</span><span id="line-803">    <span class="n">descriptor</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="n">VerificationReport</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">who</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-804"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-805"><span class="w">    </span><span class="sd">"""A declared ``origin`` is finite and inside the view_box (an#338).</span>
-</span><span id="line-806">
-</span><span id="line-807"><span class="sd">    Advisory: the stage's own rule (``an.stage.rig.rig_origin_problems``), the</span>
-</span><span id="line-808"><span class="sd">    one ``an validate`` applies to every rig entity, so the two agree.</span>
-</span><span id="line-809"><span class="sd">    """</span>
-</span><span id="line-810">    <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-811">        <span class="k">return</span>
-</span><span id="line-812">    <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">rig_origin_problems</span><span class="p">(</span><span class="n">descriptor</span><span class="p">):</span>
-</span><span id="line-813">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-</span><span id="line-814">            <span class="n">ADVISORY</span><span class="p">,</span>
-</span><span id="line-815">            <span class="s2">"character.json#origin"</span><span class="p">,</span>
-</span><span id="line-816">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-817">            <span class="s2">"The origin is the point of the art that lands at `stage.at`, in "</span>
-</span><span id="line-818">            <span class="s2">"view_box units (the bones' units); unset, the rig is placed by the "</span>
-</span><span id="line-819">            <span class="s2">"middle of its bones."</span><span class="p">,</span>
-</span><span id="line-820">        <span class="p">)</span>
-</span><span id="line-821">
-</span><span id="line-822">
-</span><span id="line-823"><span class="k">def</span><span class="w"> </span><span class="nf">_check_joint_names</span><span class="p">(</span>
-</span><span id="line-824">    <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-</span><span id="line-825">    <span class="n">descriptor</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-826">    <span class="n">report</span><span class="p">:</span> <span class="n">VerificationReport</span><span class="p">,</span>
-</span><span id="line-827"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-828"><span class="w">    </span><span class="sd">"""A pivot id that is also a part id is ambiguous, structurally.</span>
-</span><span id="line-829">
-</span><span id="line-830"><span class="sd">    `_find_by_id` prefers the `&lt;g&gt;` over a same-id `&lt;circle&gt;` precisely because</span>
-</span><span id="line-831"><span class="sd">    this collision happens. That is a workaround for a missing namespace, and</span>
-</span><span id="line-832"><span class="sd">    this is the check that makes the namespace real: if a drawing calls a joint</span>
-</span><span id="line-833"><span class="sd">    `head` and also calls a part `head`, extraction picks one by a rule nobody</span>
-</span><span id="line-834"><span class="sd">    reading the drawing can see.</span>
-</span><span id="line-835"><span class="sd">    """</span>
-</span><span id="line-836">    <span class="n">canonical</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">directory</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.svg"</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-837">    <span class="k">if</span> <span class="n">canonical</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-727"><span class="w">    </span><span class="sd">"""A factory head's brow cover is DERIVED from its knobs and recorded seat</span>
+</span><span id="line-728"><span class="sd">    (an#284: a character made before hats were seated reports the brim that</span>
+</span><span id="line-729"><span class="sd">    covers its brows), so nothing is said for one the factory can identify.</span>
+</span><span id="line-730"><span class="sd">    Said only for a hatted factory head whose drawing is not the factory's</span>
+</span><span id="line-731"><span class="sd">    (edited by hand), whose cover nothing can derive."""</span>
+</span><span id="line-732">    <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s2">"brows"</span> <span class="ow">in</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">occluded</span><span class="p">:</span>
+</span><span id="line-733">        <span class="k">return</span>
+</span><span id="line-734">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">brow_cover_unknowable</span>
+</span><span id="line-735">
+</span><span id="line-736">    <span class="k">if</span> <span class="n">brow_cover_unknowable</span><span class="p">(</span><span class="n">descriptor</span><span class="p">):</span>
+</span><span id="line-737">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+</span><span id="line-738">            <span class="n">ADVISORY</span><span class="p">,</span>
+</span><span id="line-739">            <span class="s2">"character.json#metadata.hat"</span><span class="p">,</span>
+</span><span id="line-740">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2">'s head art is not the factory's drawing for its recorded knobs "</span>
+</span><span id="line-741">            <span class="sa">f</span><span class="s2">"(edited?), so whether its </span><span class="si">{</span><span class="n">descriptor</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'hat'</span><span class="p">)</span><span class="si">!r}</span><span class="s2"> hat covers "</span>
+</span><span id="line-742">            <span class="s2">"the brows cannot be derived, and `an character capabilities` assumes it does not"</span><span class="p">,</span>
+</span><span id="line-743">            <span class="s1">'`"occluded": {"brows": "the hat"}` in character.json if the brows are '</span>
+</span><span id="line-744">            <span class="s2">"covered; or re-make the character with `an character new --offline`."</span><span class="p">,</span>
+</span><span id="line-745">        <span class="p">)</span>
+</span><span id="line-746">
+</span><span id="line-747">
+</span><span id="line-748"><span class="k">def</span><span class="w"> </span><span class="nf">_check_declared_speech</span><span class="p">(</span>
+</span><span id="line-749">    <span class="n">descriptor</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="n">VerificationReport</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">who</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-750"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-751"><span class="w">    </span><span class="sd">"""A declared ``speech`` must name a speech method at a current version</span>
+</span><span id="line-752"><span class="sd">    (an#248): it is resolved on the capability registry, so a typo or a stale</span>
+</span><span id="line-753"><span class="sd">    pin would otherwise only surface at compile."""</span>
+</span><span id="line-754">    <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">speech</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-755">        <span class="k">return</span>
+</span><span id="line-756">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">speech_problems</span>
+</span><span id="line-757">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.genres</span><span class="w"> </span><span class="kn">import</span> <span class="n">load</span>
+</span><span id="line-758">
+</span><span id="line-759">    <span class="n">load</span><span class="p">()</span>
+</span><span id="line-760">    <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">speech_problems</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">speech</span><span class="p">):</span>
+</span><span id="line-761">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+</span><span id="line-762">            <span class="n">BLOCKING</span><span class="p">,</span>
+</span><span id="line-763">            <span class="s2">"character.json#speech"</span><span class="p">,</span>
+</span><span id="line-764">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-765">            <span class="s2">"Declare a speech method (`pulse`, `mouth_chart`, or "</span>
+</span><span id="line-766">            <span class="s2">"`{method: pulse, args: </span><span class="si">{strength: 0}</span><span class="s2">}` for a mime), or remove `speech`."</span><span class="p">,</span>
+</span><span id="line-767">        <span class="p">)</span>
+</span><span id="line-768">
+</span><span id="line-769">
+</span><span id="line-770"><span class="k">def</span><span class="w"> </span><span class="nf">_check_face_overlay_declaration</span><span class="p">(</span>
+</span><span id="line-771">    <span class="n">descriptor</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="n">VerificationReport</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">who</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-772"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-773"><span class="w">    </span><span class="sd">"""A baked-face provenance with `face_overlay=True` is almost certainly a</span>
+</span><span id="line-774"><span class="sd">    mistake — the overlay eyes/brows/mouth will draw over the baked face.</span>
+</span><span id="line-775">
+</span><span id="line-776"><span class="sd">    Before 0.3.0 the provenance string WAS the switch; a descriptor written</span>
+</span><span id="line-777"><span class="sd">    to that convention at the current schema version declares the opposite</span>
+</span><span id="line-778"><span class="sd">    of what its author meant, and nothing infers it any more (a declared</span>
+</span><span id="line-779"><span class="sd">    fact is only worth having if nothing second-guesses it). Advisory, since</span>
+</span><span id="line-780"><span class="sd">    a hand-drawn "external" avatar with real overlay parts is legitimate.</span>
+</span><span id="line-781"><span class="sd">    """</span>
+</span><span id="line-782">    <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">face_overlay</span><span class="p">:</span>
+</span><span id="line-783">        <span class="k">return</span>
+</span><span id="line-784">    <span class="n">provenance</span> <span class="o">=</span> <span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"art_provenance"</span><span class="p">)</span>
+</span><span id="line-785">    <span class="k">if</span> <span class="n">provenance</span> <span class="ow">in</span> <span class="n">_BAKED_FACE_PROVENANCES</span><span class="p">:</span>
+</span><span id="line-786">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+</span><span id="line-787">            <span class="n">ADVISORY</span><span class="p">,</span>
+</span><span id="line-788">            <span class="s2">"character.json#face_overlay"</span><span class="p">,</span>
+</span><span id="line-789">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2"> declares face_overlay=true but its art_provenance is "</span>
+</span><span id="line-790">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">provenance</span><span class="si">!r}</span><span class="s2">, which usually means the face is baked into the "</span>
+</span><span id="line-791">            <span class="s2">"head art — the overlay eyes/brows/mouth will draw over it"</span><span class="p">,</span>
+</span><span id="line-792">            <span class="s2">"Set face_overlay: false if the face is baked in (the compiler "</span>
+</span><span id="line-793">            <span class="s2">"reads only that field now), or leave it if the avatar really "</span>
+</span><span id="line-794">            <span class="s2">"has separate face parts."</span><span class="p">,</span>
+</span><span id="line-795">        <span class="p">)</span>
+</span><span id="line-796">
+</span><span id="line-797">
+</span><span id="line-798"><span class="k">def</span><span class="w"> </span><span class="nf">_check_rig_origin</span><span class="p">(</span>
+</span><span id="line-799">    <span class="n">descriptor</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="n">VerificationReport</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">who</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-800"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-801"><span class="w">    </span><span class="sd">"""A declared ``origin`` is finite and inside the view_box (an#338).</span>
+</span><span id="line-802">
+</span><span id="line-803"><span class="sd">    Advisory: the stage's own rule (``an.stage.rig.rig_origin_problems``), the</span>
+</span><span id="line-804"><span class="sd">    one ``an validate`` applies to every rig entity, so the two agree.</span>
+</span><span id="line-805"><span class="sd">    """</span>
+</span><span id="line-806">    <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-807">        <span class="k">return</span>
+</span><span id="line-808">    <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">rig_origin_problems</span><span class="p">(</span><span class="n">descriptor</span><span class="p">):</span>
+</span><span id="line-809">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+</span><span id="line-810">            <span class="n">ADVISORY</span><span class="p">,</span>
+</span><span id="line-811">            <span class="s2">"character.json#origin"</span><span class="p">,</span>
+</span><span id="line-812">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-813">            <span class="s2">"The origin is the point of the art that lands at `stage.at`, in "</span>
+</span><span id="line-814">            <span class="s2">"view_box units (the bones' units); unset, the rig is placed by the "</span>
+</span><span id="line-815">            <span class="s2">"middle of its bones."</span><span class="p">,</span>
+</span><span id="line-816">        <span class="p">)</span>
+</span><span id="line-817">
+</span><span id="line-818">
+</span><span id="line-819"><span class="k">def</span><span class="w"> </span><span class="nf">_check_joint_names</span><span class="p">(</span>
+</span><span id="line-820">    <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+</span><span id="line-821">    <span class="n">descriptor</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-822">    <span class="n">report</span><span class="p">:</span> <span class="n">VerificationReport</span><span class="p">,</span>
+</span><span id="line-823"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-824"><span class="w">    </span><span class="sd">"""A pivot id that is also a part id is ambiguous, structurally.</span>
+</span><span id="line-825">
+</span><span id="line-826"><span class="sd">    `_find_by_id` prefers the `&lt;g&gt;` over a same-id `&lt;circle&gt;` precisely because</span>
+</span><span id="line-827"><span class="sd">    this collision happens. That is a workaround for a missing namespace, and</span>
+</span><span id="line-828"><span class="sd">    this is the check that makes the namespace real: if a drawing calls a joint</span>
+</span><span id="line-829"><span class="sd">    `head` and also calls a part `head`, extraction picks one by a rule nobody</span>
+</span><span id="line-830"><span class="sd">    reading the drawing can see.</span>
+</span><span id="line-831"><span class="sd">    """</span>
+</span><span id="line-832">    <span class="n">canonical</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">directory</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.svg"</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-833">    <span class="k">if</span> <span class="n">canonical</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-834">        <span class="k">return</span>
+</span><span id="line-835">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-836">        <span class="n">pivots</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">extract_pivots</span><span class="p">(</span><span class="n">canonical</span><span class="p">))</span>
+</span><span id="line-837">    <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">ET</span><span class="o">.</span><span class="n">ParseError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
 </span><span id="line-838">        <span class="k">return</span>
-</span><span id="line-839">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-840">        <span class="n">pivots</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">extract_pivots</span><span class="p">(</span><span class="n">canonical</span><span class="p">))</span>
-</span><span id="line-841">    <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">ET</span><span class="o">.</span><span class="n">ParseError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
-</span><span id="line-842">        <span class="k">return</span>
-</span><span id="line-843">    <span class="n">part_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">Path</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span> <span class="k">for</span> <span class="n">rel</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_iter_parts</span><span class="p">(</span><span class="n">directory</span><span class="p">)}</span>
-</span><span id="line-844">    <span class="k">for</span> <span class="n">clash</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">pivots</span> <span class="o">&amp;</span> <span class="n">part_ids</span><span class="p">):</span>
-</span><span id="line-845">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-</span><span id="line-846">            <span class="n">ADVISORY</span><span class="p">,</span>
-</span><span id="line-847">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">canonical</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">#</span><span class="si">{</span><span class="n">clash</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-848">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">clash</span><span class="si">!r}</span><span class="s2"> names both a joint and a part"</span><span class="p">,</span>
-</span><span id="line-849">            <span class="s2">"Rename the joint. Extraction resolves the collision by preferring "</span>
-</span><span id="line-850">            <span class="s2">"the group, which is a rule the drawing does not show."</span><span class="p">,</span>
-</span><span id="line-851">        <span class="p">)</span>
-</span><span id="line-852">
-</span><span id="line-853">
+</span><span id="line-839">    <span class="n">part_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">Path</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span> <span class="k">for</span> <span class="n">rel</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_iter_parts</span><span class="p">(</span><span class="n">directory</span><span class="p">)}</span>
+</span><span id="line-840">    <span class="k">for</span> <span class="n">clash</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">pivots</span> <span class="o">&amp;</span> <span class="n">part_ids</span><span class="p">):</span>
+</span><span id="line-841">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+</span><span id="line-842">            <span class="n">ADVISORY</span><span class="p">,</span>
+</span><span id="line-843">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">canonical</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">#</span><span class="si">{</span><span class="n">clash</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-844">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">clash</span><span class="si">!r}</span><span class="s2"> names both a joint and a part"</span><span class="p">,</span>
+</span><span id="line-845">            <span class="s2">"Rename the joint. Extraction resolves the collision by preferring "</span>
+</span><span id="line-846">            <span class="s2">"the group, which is a rule the drawing does not show."</span><span class="p">,</span>
+</span><span id="line-847">        <span class="p">)</span>
+</span><span id="line-848">
+</span><span id="line-849">
 <div class="viewcode-block" id="format_report">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.validate.html#cutan.characters.format_report">[docs]</a>
-</span><span id="line-854"><span class="k">def</span><span class="w"> </span><span class="nf">format_report</span><span class="p">(</span><span class="n">report</span><span class="p">:</span> <span class="n">VerificationReport</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-855"><span class="w">    </span><span class="sd">"""A short human-readable rendering, for the CLI."""</span>
-</span><span id="line-856">    <span class="n">verdict</span> <span class="o">=</span> <span class="s2">"OK"</span> <span class="k">if</span> <span class="n">report</span><span class="o">.</span><span class="n">passed</span> <span class="k">else</span> <span class="s2">"FAILED"</span>
-</span><span id="line-857">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"character </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">verdict</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">findings</span><span class="p">)</span><span class="si">}</span><span class="s2"> finding(s))"</span><span class="p">]</span>
-</span><span id="line-858">    <span class="k">for</span> <span class="n">finding</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">findings</span><span class="p">:</span>
-</span><span id="line-859">        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  [</span><span class="si">{</span><span class="n">finding</span><span class="o">.</span><span class="n">severity</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">finding</span><span class="o">.</span><span class="n">ir_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">finding</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-860">        <span class="k">if</span> <span class="n">finding</span><span class="o">.</span><span class="n">suggested_fix</span><span class="p">:</span>
-</span><span id="line-861">            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      -&gt; </span><span class="si">{</span><span class="n">finding</span><span class="o">.</span><span class="n">suggested_fix</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-862">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+</span><span id="line-850"><span class="k">def</span><span class="w"> </span><span class="nf">format_report</span><span class="p">(</span><span class="n">report</span><span class="p">:</span> <span class="n">VerificationReport</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-851"><span class="w">    </span><span class="sd">"""A short human-readable rendering, for the CLI."""</span>
+</span><span id="line-852">    <span class="n">verdict</span> <span class="o">=</span> <span class="s2">"OK"</span> <span class="k">if</span> <span class="n">report</span><span class="o">.</span><span class="n">passed</span> <span class="k">else</span> <span class="s2">"FAILED"</span>
+</span><span id="line-853">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"character </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">verdict</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">findings</span><span class="p">)</span><span class="si">}</span><span class="s2"> finding(s))"</span><span class="p">]</span>
+</span><span id="line-854">    <span class="k">for</span> <span class="n">finding</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">findings</span><span class="p">:</span>
+</span><span id="line-855">        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  [</span><span class="si">{</span><span class="n">finding</span><span class="o">.</span><span class="n">severity</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">finding</span><span class="o">.</span><span class="n">ir_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">finding</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-856">        <span class="k">if</span> <span class="n">finding</span><span class="o">.</span><span class="n">suggested_fix</span><span class="p">:</span>
+</span><span id="line-857">            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      -&gt; </span><span class="si">{</span><span class="n">finding</span><span class="o">.</span><span class="n">suggested_fix</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-858">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
-</span><span id="line-863">
-</span><span id="line-864">
+</span><span id="line-859">
+</span><span id="line-860">
 <div class="viewcode-block" id="render_contract">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.validate.html#cutan.characters.render_contract">[docs]</a>
-</span><span id="line-865"><span class="k">def</span><span class="w"> </span><span class="nf">render_contract</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-866"><span class="w">    </span><span class="sd">"""The artist-facing spec, generated from the schema and the checks above.</span>
-</span><span id="line-867">
-</span><span id="line-868"><span class="sd">    Every line here is read out of a live object: the required parts and mouth</span>
-</span><span id="line-869"><span class="sd">    shapes from :mod:`cutan.characters.schema`, the slot and attachment layout from</span>
-</span><span id="line-870"><span class="sd">    a freshly-built descriptor, the prohibitions from</span>
-</span><span id="line-871"><span class="sd">    :data:`PROHIBITED_ELEMENTS`, and the drawable set from</span>
-</span><span id="line-872"><span class="sd">    :data:`DRAWABLE_ELEMENTS`. Nothing is retyped, so the document and the</span>
-</span><span id="line-873"><span class="sd">    validator cannot disagree.</span>
-</span><span id="line-874"><span class="sd">    """</span>
-</span><span id="line-875">    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"example"</span><span class="p">)</span>
-</span><span id="line-876">    <span class="n">skin</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">skins</span><span class="p">[</span><span class="s2">"default"</span><span class="p">]</span>
-</span><span id="line-877">    <span class="n">view_box</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">view_box</span>
-</span><span id="line-878">
-</span><span id="line-879">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-880">        <span class="sa">f</span><span class="s2">"# Art package contract (character schema </span><span class="si">{</span><span class="n">descriptor</span><span class="o">.</span><span class="n">schema_version</span><span class="si">}</span><span class="s2">)"</span><span class="p">,</span>
+</span><span id="line-861"><span class="k">def</span><span class="w"> </span><span class="nf">render_contract</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-862"><span class="w">    </span><span class="sd">"""The artist-facing spec, generated from the schema and the checks above.</span>
+</span><span id="line-863">
+</span><span id="line-864"><span class="sd">    Every line here is read out of a live object: the required parts and mouth</span>
+</span><span id="line-865"><span class="sd">    shapes from :mod:`cutan.characters.schema`, the slot and attachment layout from</span>
+</span><span id="line-866"><span class="sd">    a freshly-built descriptor, the prohibitions from</span>
+</span><span id="line-867"><span class="sd">    :data:`PROHIBITED_ELEMENTS`, and the drawable set from</span>
+</span><span id="line-868"><span class="sd">    :data:`DRAWABLE_ELEMENTS`. Nothing is retyped, so the document and the</span>
+</span><span id="line-869"><span class="sd">    validator cannot disagree.</span>
+</span><span id="line-870"><span class="sd">    """</span>
+</span><span id="line-871">    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"example"</span><span class="p">)</span>
+</span><span id="line-872">    <span class="n">skin</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">skins</span><span class="p">[</span><span class="s2">"default"</span><span class="p">]</span>
+</span><span id="line-873">    <span class="n">view_box</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">view_box</span>
+</span><span id="line-874">
+</span><span id="line-875">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-876">        <span class="sa">f</span><span class="s2">"# Art package contract (character schema </span><span class="si">{</span><span class="n">descriptor</span><span class="o">.</span><span class="n">schema_version</span><span class="si">}</span><span class="s2">)"</span><span class="p">,</span>
+</span><span id="line-877">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-878">        <span class="s2">"Everything below is checked offline by `an character validate`."</span><span class="p">,</span>
+</span><span id="line-879">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-880">        <span class="s2">"## Layout"</span><span class="p">,</span>
 </span><span id="line-881">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-882">        <span class="s2">"Everything below is checked offline by `an character validate`."</span><span class="p">,</span>
-</span><span id="line-883">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-884">        <span class="s2">"## Layout"</span><span class="p">,</span>
-</span><span id="line-885">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-886">        <span class="s2">"    &lt;name&gt;/"</span><span class="p">,</span>
-</span><span id="line-887">        <span class="s2">"      character.json        the descriptor: bones, slots, skins, asset_sets"</span><span class="p">,</span>
-</span><span id="line-888">        <span class="s2">"      &lt;name&gt;.svg            the canonical drawing, with a &lt;g id='skeleton'&gt;"</span><span class="p">,</span>
-</span><span id="line-889">        <span class="s2">"      parts/                one SVG (or PNG) per attachment"</span><span class="p">,</span>
-</span><span id="line-890">        <span class="s2">"        mouth/              the viseme set"</span><span class="p">,</span>
-</span><span id="line-891">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-892">        <span class="s2">"## Coordinate space"</span><span class="p">,</span>
-</span><span id="line-893">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-894">        <span class="sa">f</span><span class="s2">"All positions are in view_box units; the default is </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">view_box</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span><span class="p">,</span>
-</span><span id="line-895">        <span class="s2">"A bone's position is relative to its parent; an attachment's is relative"</span><span class="p">,</span>
-</span><span id="line-896">        <span class="s2">"to its bone. The whole rig is scaled by one uniform factor at compile"</span><span class="p">,</span>
-</span><span id="line-897">        <span class="s2">"time, so **aspect ratio is intrinsic to the art** — a part is placed and"</span><span class="p">,</span>
-</span><span id="line-898">        <span class="s2">"uniformly scaled, never stretched to fit a box."</span><span class="p">,</span>
-</span><span id="line-899">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-900">        <span class="s2">"## Joints"</span><span class="p">,</span>
-</span><span id="line-901">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-902">        <span class="s1">'Draw a `&lt;g id="skeleton"&gt;` of named `&lt;circle&gt;` elements; each bone names'</span><span class="p">,</span>
-</span><span id="line-903">        <span class="s2">"the joint it stands for, and those coordinates become the rig:"</span><span class="p">,</span>
-</span><span id="line-904">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-905">    <span class="p">]</span>
-</span><span id="line-906">    <span class="k">for</span> <span class="n">bone</span> <span class="ow">in</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">bones</span><span class="p">:</span>
-</span><span id="line-907">        <span class="n">joint</span> <span class="o">=</span> <span class="n">bone</span><span class="o">.</span><span class="n">pivot</span> <span class="ow">or</span> <span class="s2">"(no joint; keeps its default placement)"</span>
-</span><span id="line-908">        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"    </span><span class="si">{</span><span class="n">bone</span><span class="o">.</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> &lt;- </span><span class="si">{</span><span class="n">joint</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-909">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
+</span><span id="line-882">        <span class="s2">"    &lt;name&gt;/"</span><span class="p">,</span>
+</span><span id="line-883">        <span class="s2">"      character.json        the descriptor: bones, slots, skins, asset_sets"</span><span class="p">,</span>
+</span><span id="line-884">        <span class="s2">"      &lt;name&gt;.svg            the canonical drawing, with a &lt;g id='skeleton'&gt;"</span><span class="p">,</span>
+</span><span id="line-885">        <span class="s2">"      parts/                one SVG (or PNG) per attachment"</span><span class="p">,</span>
+</span><span id="line-886">        <span class="s2">"        mouth/              the viseme set"</span><span class="p">,</span>
+</span><span id="line-887">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-888">        <span class="s2">"## Coordinate space"</span><span class="p">,</span>
+</span><span id="line-889">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-890">        <span class="sa">f</span><span class="s2">"All positions are in view_box units; the default is </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">view_box</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span><span class="p">,</span>
+</span><span id="line-891">        <span class="s2">"A bone's position is relative to its parent; an attachment's is relative"</span><span class="p">,</span>
+</span><span id="line-892">        <span class="s2">"to its bone. The whole rig is scaled by one uniform factor at compile"</span><span class="p">,</span>
+</span><span id="line-893">        <span class="s2">"time, so **aspect ratio is intrinsic to the art** — a part is placed and"</span><span class="p">,</span>
+</span><span id="line-894">        <span class="s2">"uniformly scaled, never stretched to fit a box."</span><span class="p">,</span>
+</span><span id="line-895">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-896">        <span class="s2">"## Joints"</span><span class="p">,</span>
+</span><span id="line-897">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-898">        <span class="s1">'Draw a `&lt;g id="skeleton"&gt;` of named `&lt;circle&gt;` elements; each bone names'</span><span class="p">,</span>
+</span><span id="line-899">        <span class="s2">"the joint it stands for, and those coordinates become the rig:"</span><span class="p">,</span>
+</span><span id="line-900">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-901">    <span class="p">]</span>
+</span><span id="line-902">    <span class="k">for</span> <span class="n">bone</span> <span class="ow">in</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">bones</span><span class="p">:</span>
+</span><span id="line-903">        <span class="n">joint</span> <span class="o">=</span> <span class="n">bone</span><span class="o">.</span><span class="n">pivot</span> <span class="ow">or</span> <span class="s2">"(no joint; keeps its default placement)"</span>
+</span><span id="line-904">        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"    </span><span class="si">{</span><span class="n">bone</span><span class="o">.</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> &lt;- </span><span class="si">{</span><span class="n">joint</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-905">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
+</span><span id="line-906">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-907">        <span class="s2">"A joint id must not also be a part id."</span><span class="p">,</span>
+</span><span id="line-908">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-909">        <span class="s2">"## Required parts"</span><span class="p">,</span>
 </span><span id="line-910">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-911">        <span class="s2">"A joint id must not also be a part id."</span><span class="p">,</span>
+</span><span id="line-911">        <span class="s2">"    "</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">REQUIRED_PARTS</span><span class="p">),</span>
 </span><span id="line-912">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-913">        <span class="s2">"## Required parts"</span><span class="p">,</span>
-</span><span id="line-914">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-915">        <span class="s2">"    "</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">REQUIRED_PARTS</span><span class="p">),</span>
-</span><span id="line-916">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-917">        <span class="sa">f</span><span class="s2">"    (</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">LEG_PARTS</span><span class="p">)</span><span class="si">}</span><span class="s2"> only for a figure with legs: one whose skins draw"</span><span class="p">,</span>
-</span><span id="line-918">        <span class="sa">f</span><span class="s2">"    no leg slot walks </span><span class="si">{</span><span class="n">DFLT_LEGLESS_GAIT</span><span class="si">}</span><span class="s2">, cutan#35)"</span><span class="p">,</span>
+</span><span id="line-913">        <span class="sa">f</span><span class="s2">"    (</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">LEG_PARTS</span><span class="p">)</span><span class="si">}</span><span class="s2"> only for a figure with legs: one whose skins draw"</span><span class="p">,</span>
+</span><span id="line-914">        <span class="sa">f</span><span class="s2">"    no leg slot walks </span><span class="si">{</span><span class="n">DFLT_LEGLESS_GAIT</span><span class="si">}</span><span class="s2">, cutan#35)"</span><span class="p">,</span>
+</span><span id="line-915">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-916">        <span class="sa">f</span><span class="s2">"    mouth/: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">'mouth_'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">MOUTH_SHAPES</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-917">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-918">        <span class="s2">"## Slots and their attachments"</span><span class="p">,</span>
 </span><span id="line-919">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-920">        <span class="sa">f</span><span class="s2">"    mouth/: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">'mouth_'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">MOUTH_SHAPES</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-921">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-922">        <span class="s2">"## Slots and their attachments"</span><span class="p">,</span>
-</span><span id="line-923">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-924">    <span class="p">]</span>
-</span><span id="line-925">    <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">slots</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">draw_order</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">)):</span>
-</span><span id="line-926">        <span class="n">available</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">skin</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">slot</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">{}))</span>
-</span><span id="line-927">        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-928">            <span class="sa">f</span><span class="s2">"    </span><span class="si">{</span><span class="n">slot</span><span class="o">.</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;11</span><span class="si">}</span><span class="s2"> bone=</span><span class="si">{</span><span class="n">slot</span><span class="o">.</span><span class="n">bone</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> draw_order=</span><span class="si">{</span><span class="n">slot</span><span class="o">.</span><span class="n">draw_order</span><span class="si">}</span><span class="s2">  "</span>
-</span><span id="line-929">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-930">        <span class="p">)</span>
-</span><span id="line-931">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
-</span><span id="line-932">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-933">        <span class="s2">"A slot's name is its scene-graph node name, which is what `scene.md`"</span><span class="p">,</span>
-</span><span id="line-934">        <span class="s2">"targets. Attachment names are a separate namespace and follow the files."</span><span class="p">,</span>
-</span><span id="line-935">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-936">        <span class="s2">"## Every part SVG"</span><span class="p">,</span>
-</span><span id="line-937">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-938">        <span class="s2">"  - declares a viewBox, and `width`/`height` matching its extent"</span><span class="p">,</span>
-</span><span id="line-939">        <span class="s2">"    (otherwise the art is letterboxed inside its own texture)"</span><span class="p">,</span>
-</span><span id="line-940">        <span class="s2">"  - contains at least one of: "</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">DRAWABLE_ELEMENTS</span><span class="p">)),</span>
-</span><span id="line-941">        <span class="s2">"  - contains none of:"</span><span class="p">,</span>
-</span><span id="line-942">    <span class="p">]</span>
-</span><span id="line-943">    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">why</span> <span class="ow">in</span> <span class="n">PROHIBITED_ELEMENTS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="line-944">        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      &lt;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&gt; — </span><span class="si">{</span><span class="n">why</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-945">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
-</span><span id="line-946">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-947">        <span class="s2">"## Raster parts"</span><span class="p">,</span>
-</span><span id="line-948">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-949">        <span class="s2">"A part may instead be raster: "</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">RASTER_SUFFIXES</span><span class="p">)</span> <span class="o">+</span> <span class="s2">" (an#211) —"</span><span class="p">,</span>
-</span><span id="line-950">        <span class="s2">"art carved from a scan or a frame keeps its shading. Point the"</span><span class="p">,</span>
-</span><span id="line-951">        <span class="s2">"attachment's `path` at it (`parts/head.png`); a required part may ship"</span><span class="p">,</span>
-</span><span id="line-952">        <span class="s2">"in any of these formats. Every raster part"</span><span class="p">,</span>
-</span><span id="line-953">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-954">        <span class="s2">"  - has an alpha channel (a PNG with transparency), or it draws its"</span><span class="p">,</span>
-</span><span id="line-955">        <span class="s2">"    whole rectangle, background and all"</span><span class="p">,</span>
-</span><span id="line-956">        <span class="s2">"  - draws something (not fully transparent)"</span><span class="p">,</span>
-</span><span id="line-957">        <span class="s2">"  - is drawn at its pixel size x the rig's one uniform scale, like an"</span><span class="p">,</span>
-</span><span id="line-958">        <span class="s2">"    SVG part at its width/height — one pixel is one view_box unit —"</span><span class="p">,</span>
-</span><span id="line-959">        <span class="s2">"    unless the attachment declares `width` and/or `height` (view_box"</span><span class="p">,</span>
-</span><span id="line-960">        <span class="s2">"    units, an#220): a declared size wins, so art carved at any"</span><span class="p">,</span>
-</span><span id="line-961">        <span class="s2">"    resolution is sized without resampling. One of the two is enough —"</span><span class="p">,</span>
-</span><span id="line-962">        <span class="s2">"    the other follows the art's aspect; with both, the art is contained"</span><span class="p">,</span>
-</span><span id="line-963">        <span class="s2">"    in the box, never stretched"</span><span class="p">,</span>
-</span><span id="line-964">        <span class="s2">"  - is NOT recoloured by a style pack (its colours are pixels); outline"</span><span class="p">,</span>
-</span><span id="line-965">        <span class="s2">"    and shadow treatments still apply"</span><span class="p">,</span>
-</span><span id="line-966">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-967">        <span class="s2">"Swap keys (visemes, eyelids, views) may be drawn on canvases of"</span><span class="p">,</span>
-</span><span id="line-968">        <span class="s2">"different sizes: each key is placed with its own box, anchor and offset."</span><span class="p">,</span>
-</span><span id="line-969">    <span class="p">]</span>
-</span><span id="line-970">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_VIEW</span><span class="p">,</span> <span class="n">VIEW_CHANNEL</span><span class="p">,</span> <span class="n">VIEWS</span>
-</span><span id="line-971">
-</span><span id="line-972">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
-</span><span id="line-973">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-974">        <span class="s2">"## Optional: views (a turnaround)"</span><span class="p">,</span>
-</span><span id="line-975">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-976">        <span class="sa">f</span><span class="s2">"To let a scene turn the character, declare a `</span><span class="si">{</span><span class="n">VIEW_CHANNEL</span><span class="si">}</span><span class="s2">` asset set whose"</span><span class="p">,</span>
-</span><span id="line-977">        <span class="sa">f</span><span class="s2">"keys are views (</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">VIEWS</span><span class="p">)</span><span class="si">}</span><span class="s2">; `side` faces the viewer's RIGHT —"</span><span class="p">,</span>
-</span><span id="line-978">        <span class="s2">"a negative scale_x mirrors it) and whose values are attachment names"</span><span class="p">,</span>
-</span><span id="line-979">        <span class="s2">"carried by every slot whose art changes with the view (the head and"</span><span class="p">,</span>
-</span><span id="line-980">        <span class="sa">f</span><span class="s2">"torso, typically; `</span><span class="si">{</span><span class="n">DFLT_VIEW</span><span class="si">}</span><span class="s2">` names the slot's default art). Draw each"</span><span class="p">,</span>
-</span><span id="line-981">        <span class="s2">"view on the same canvas as the default part where you can (a key on another"</span><span class="p">,</span>
-</span><span id="line-982">        <span class="s2">"canvas is placed by its own box, anchor and offset — an#211)."</span><span class="p">,</span>
-</span><span id="line-983">        <span class="s2">"Then say what else each view does in `swap_poses` —"</span><span class="p">,</span>
-</span><span id="line-984">        <span class="sa">f</span><span class="s1">'`</span><span class="se">{{</span><span class="s1">"</span><span class="si">{</span><span class="n">VIEW_CHANNEL</span><span class="si">}</span><span class="s1">": </span><span class="se">{{</span><span class="s1">"back": </span><span class="se">{{</span><span class="s1">"mouth": </span><span class="se">{{</span><span class="s1">"alpha": 0</span><span class="se">}}}}}}}}</span><span class="s1">`:'</span><span class="p">,</span>
-</span><span id="line-985">        <span class="s2">"x/y offsets (view_box units), scale_x/scale_y/alpha factors, per slot."</span><span class="p">,</span>
-</span><span id="line-986">        <span class="s2">"The back view hides the face this way; a profile hides the far eye."</span><span class="p">,</span>
-</span><span id="line-987">        <span class="s2">"`an character new --offline` draws all of this for its own characters."</span><span class="p">,</span>
-</span><span id="line-988">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-989">        <span class="s2">"A face drawn differently in a view gets its OWN set rather than being"</span><span class="p">,</span>
-</span><span id="line-990">        <span class="s2">"hidden (an#220): `eyelid@side` ({OPEN, CLOSED} -&gt; the profile's eye"</span><span class="p">,</span>
-</span><span id="line-991">        <span class="s2">"attachments, on the eye slots) and `viseme@side` (the profile's mouth"</span><span class="p">,</span>
-</span><span id="line-992">        <span class="s2">"shapes, on the mouth slot) are used whenever that view is in force —"</span><span class="p">,</span>
-</span><span id="line-993">        <span class="s2">"blinks, expressions and lip-sync keep running in profile. Art drawn"</span><span class="p">,</span>
-</span><span id="line-994">        <span class="s2">"only in profile (no front at all) declares `rest_view: side` instead."</span><span class="p">,</span>
-</span><span id="line-995">        <span class="s2">"A robe whose leg slots are the two halves of its hem declares"</span><span class="p">,</span>
-</span><span id="line-996">        <span class="s2">"`gait: hem`, so a walk tilts the halves (as mirror images) and sways the body."</span><span class="p">,</span>
-</span><span id="line-997">    <span class="p">]</span>
-</span><span id="line-998">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
-</span><span id="line-999">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-1000">        <span class="s2">"## Provenance"</span><span class="p">,</span>
-</span><span id="line-1001">        <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-1002">        <span class="s2">"Populate `source` unless the art is your own. A licence defect is the"</span><span class="p">,</span>
-</span><span id="line-1003">        <span class="s2">"only failure that reaches backwards through finished work. A part"</span><span class="p">,</span>
-</span><span id="line-1004">        <span class="s2">"whose art came from elsewhere than the rest (another clip, a CC0"</span><span class="p">,</span>
-</span><span id="line-1005">        <span class="s2">"prop) carries its own `source` on its attachment; `an credits` lists"</span><span class="p">,</span>
-</span><span id="line-1006">        <span class="s2">"each (an#220)."</span><span class="p">,</span>
-</span><span id="line-1007">    <span class="p">]</span>
-</span><span id="line-1008">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+</span><span id="line-920">    <span class="p">]</span>
+</span><span id="line-921">    <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">slots</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">draw_order</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">)):</span>
+</span><span id="line-922">        <span class="n">available</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">skin</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">slot</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">{}))</span>
+</span><span id="line-923">        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-924">            <span class="sa">f</span><span class="s2">"    </span><span class="si">{</span><span class="n">slot</span><span class="o">.</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;11</span><span class="si">}</span><span class="s2"> bone=</span><span class="si">{</span><span class="n">slot</span><span class="o">.</span><span class="n">bone</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> draw_order=</span><span class="si">{</span><span class="n">slot</span><span class="o">.</span><span class="n">draw_order</span><span class="si">}</span><span class="s2">  "</span>
+</span><span id="line-925">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-926">        <span class="p">)</span>
+</span><span id="line-927">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
+</span><span id="line-928">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-929">        <span class="s2">"A slot's name is its scene-graph node name, which is what `scene.md`"</span><span class="p">,</span>
+</span><span id="line-930">        <span class="s2">"targets. Attachment names are a separate namespace and follow the files."</span><span class="p">,</span>
+</span><span id="line-931">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-932">        <span class="s2">"## Every part SVG"</span><span class="p">,</span>
+</span><span id="line-933">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-934">        <span class="s2">"  - declares a viewBox, and `width`/`height` matching its extent"</span><span class="p">,</span>
+</span><span id="line-935">        <span class="s2">"    (otherwise the art is letterboxed inside its own texture)"</span><span class="p">,</span>
+</span><span id="line-936">        <span class="s2">"  - contains at least one of: "</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">DRAWABLE_ELEMENTS</span><span class="p">)),</span>
+</span><span id="line-937">        <span class="s2">"  - contains none of:"</span><span class="p">,</span>
+</span><span id="line-938">    <span class="p">]</span>
+</span><span id="line-939">    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">why</span> <span class="ow">in</span> <span class="n">PROHIBITED_ELEMENTS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="line-940">        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      &lt;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&gt; — </span><span class="si">{</span><span class="n">why</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-941">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
+</span><span id="line-942">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-943">        <span class="s2">"## Raster parts"</span><span class="p">,</span>
+</span><span id="line-944">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-945">        <span class="s2">"A part may instead be raster: "</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">RASTER_SUFFIXES</span><span class="p">)</span> <span class="o">+</span> <span class="s2">" (an#211) —"</span><span class="p">,</span>
+</span><span id="line-946">        <span class="s2">"art carved from a scan or a frame keeps its shading. Point the"</span><span class="p">,</span>
+</span><span id="line-947">        <span class="s2">"attachment's `path` at it (`parts/head.png`); a required part may ship"</span><span class="p">,</span>
+</span><span id="line-948">        <span class="s2">"in any of these formats. Every raster part"</span><span class="p">,</span>
+</span><span id="line-949">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-950">        <span class="s2">"  - has an alpha channel (a PNG with transparency), or it draws its"</span><span class="p">,</span>
+</span><span id="line-951">        <span class="s2">"    whole rectangle, background and all"</span><span class="p">,</span>
+</span><span id="line-952">        <span class="s2">"  - draws something (not fully transparent)"</span><span class="p">,</span>
+</span><span id="line-953">        <span class="s2">"  - is drawn at its pixel size x the rig's one uniform scale, like an"</span><span class="p">,</span>
+</span><span id="line-954">        <span class="s2">"    SVG part at its width/height — one pixel is one view_box unit —"</span><span class="p">,</span>
+</span><span id="line-955">        <span class="s2">"    unless the attachment declares `width` and/or `height` (view_box"</span><span class="p">,</span>
+</span><span id="line-956">        <span class="s2">"    units, an#220): a declared size wins, so art carved at any"</span><span class="p">,</span>
+</span><span id="line-957">        <span class="s2">"    resolution is sized without resampling. One of the two is enough —"</span><span class="p">,</span>
+</span><span id="line-958">        <span class="s2">"    the other follows the art's aspect; with both, the art is contained"</span><span class="p">,</span>
+</span><span id="line-959">        <span class="s2">"    in the box, never stretched"</span><span class="p">,</span>
+</span><span id="line-960">        <span class="s2">"  - is NOT recoloured by a style pack (its colours are pixels); outline"</span><span class="p">,</span>
+</span><span id="line-961">        <span class="s2">"    and shadow treatments still apply"</span><span class="p">,</span>
+</span><span id="line-962">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-963">        <span class="s2">"Swap keys (visemes, eyelids, views) may be drawn on canvases of"</span><span class="p">,</span>
+</span><span id="line-964">        <span class="s2">"different sizes: each key is placed with its own box, anchor and offset."</span><span class="p">,</span>
+</span><span id="line-965">    <span class="p">]</span>
+</span><span id="line-966">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_VIEW</span><span class="p">,</span> <span class="n">VIEW_CHANNEL</span><span class="p">,</span> <span class="n">VIEWS</span>
+</span><span id="line-967">
+</span><span id="line-968">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
+</span><span id="line-969">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-970">        <span class="s2">"## Optional: views (a turnaround)"</span><span class="p">,</span>
+</span><span id="line-971">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-972">        <span class="sa">f</span><span class="s2">"To let a scene turn the character, declare a `</span><span class="si">{</span><span class="n">VIEW_CHANNEL</span><span class="si">}</span><span class="s2">` asset set whose"</span><span class="p">,</span>
+</span><span id="line-973">        <span class="sa">f</span><span class="s2">"keys are views (</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">VIEWS</span><span class="p">)</span><span class="si">}</span><span class="s2">; `side` faces the viewer's RIGHT —"</span><span class="p">,</span>
+</span><span id="line-974">        <span class="s2">"a negative scale_x mirrors it) and whose values are attachment names"</span><span class="p">,</span>
+</span><span id="line-975">        <span class="s2">"carried by every slot whose art changes with the view (the head and"</span><span class="p">,</span>
+</span><span id="line-976">        <span class="sa">f</span><span class="s2">"torso, typically; `</span><span class="si">{</span><span class="n">DFLT_VIEW</span><span class="si">}</span><span class="s2">` names the slot's default art). Draw each"</span><span class="p">,</span>
+</span><span id="line-977">        <span class="s2">"view on the same canvas as the default part where you can (a key on another"</span><span class="p">,</span>
+</span><span id="line-978">        <span class="s2">"canvas is placed by its own box, anchor and offset — an#211)."</span><span class="p">,</span>
+</span><span id="line-979">        <span class="s2">"Then say what else each view does in `swap_poses` —"</span><span class="p">,</span>
+</span><span id="line-980">        <span class="sa">f</span><span class="s1">'`</span><span class="se">{{</span><span class="s1">"</span><span class="si">{</span><span class="n">VIEW_CHANNEL</span><span class="si">}</span><span class="s1">": </span><span class="se">{{</span><span class="s1">"back": </span><span class="se">{{</span><span class="s1">"mouth": </span><span class="se">{{</span><span class="s1">"alpha": 0</span><span class="se">}}}}}}}}</span><span class="s1">`:'</span><span class="p">,</span>
+</span><span id="line-981">        <span class="s2">"x/y offsets (view_box units), scale_x/scale_y/alpha factors, per slot."</span><span class="p">,</span>
+</span><span id="line-982">        <span class="s2">"The back view hides the face this way; a profile hides the far eye."</span><span class="p">,</span>
+</span><span id="line-983">        <span class="s2">"`an character new --offline` draws all of this for its own characters."</span><span class="p">,</span>
+</span><span id="line-984">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-985">        <span class="s2">"A face drawn differently in a view gets its OWN set rather than being"</span><span class="p">,</span>
+</span><span id="line-986">        <span class="s2">"hidden (an#220): `eyelid@side` ({OPEN, CLOSED} -&gt; the profile's eye"</span><span class="p">,</span>
+</span><span id="line-987">        <span class="s2">"attachments, on the eye slots) and `viseme@side` (the profile's mouth"</span><span class="p">,</span>
+</span><span id="line-988">        <span class="s2">"shapes, on the mouth slot) are used whenever that view is in force —"</span><span class="p">,</span>
+</span><span id="line-989">        <span class="s2">"blinks, expressions and lip-sync keep running in profile. Art drawn"</span><span class="p">,</span>
+</span><span id="line-990">        <span class="s2">"only in profile (no front at all) declares `rest_view: side` instead."</span><span class="p">,</span>
+</span><span id="line-991">        <span class="s2">"A robe whose leg slots are the two halves of its hem declares"</span><span class="p">,</span>
+</span><span id="line-992">        <span class="s2">"`gait: hem`, so a walk tilts the halves (as mirror images) and sways the body."</span><span class="p">,</span>
+</span><span id="line-993">    <span class="p">]</span>
+</span><span id="line-994">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
+</span><span id="line-995">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-996">        <span class="s2">"## Provenance"</span><span class="p">,</span>
+</span><span id="line-997">        <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-998">        <span class="s2">"Populate `source` unless the art is your own. A licence defect is the"</span><span class="p">,</span>
+</span><span id="line-999">        <span class="s2">"only failure that reaches backwards through finished work. A part"</span><span class="p">,</span>
+</span><span id="line-1000">        <span class="s2">"whose art came from elsewhere than the rest (another clip, a CC0"</span><span class="p">,</span>
+</span><span id="line-1001">        <span class="s2">"prop) carries its own `source` on its attachment; `an credits` lists"</span><span class="p">,</span>
+</span><span id="line-1002">        <span class="s2">"each (an#220)."</span><span class="p">,</span>
+</span><span id="line-1003">    <span class="p">]</span>
+</span><span id="line-1004">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -1207,7 +1203,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=3294188c"></script>
+    <script src="../../../_static/documentation_options.js?v=f91d8841"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -1,4 +1,4 @@
-> built 2026-10-06 12:49 UTC from 8432e0d (main) · cutan 0.0.23. Details: build_info.json
+> built 2026-10-06 12:55 UTC from 048540e (main) · cutan 0.0.24. Details: build_info.json
 
 # index.html.md
 
@@ -520,7 +520,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'eye', 'mouth', 'rect', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'eye', 'rect', 'mouth', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -2274,13 +2274,15 @@ Seat(transform='translate(0 -5.47)', covers=False)
 
 ### Functions
 
-| [`brow_affordance`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_affordance)(desc, drawn)                       | `face.brows`'s params for a descriptor whose drawn slots are `drawn`, or `None`.   |
-|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| [`brow_slots`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_slots)(desc)                                   | The slots the character's own expression binding moves on a brow axis.             |
-| [`brow_path_d`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_path_d)(side)                                  | The path of the factory's brow on `side` (`l` or `r`) in its canvas.               |
-| [`brow_range`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_range)(\*[, head_scale, views, presets])       | `{view: {column: top}}`: the highest the brows' ink reaches, per head-unit column. |
-| [`ink_columns`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.ink_columns)(discs)                                 | `{column: (top, bottom)}` of ink, per head-unit column (`round(x)`).               |
-| [`seat_above_brows`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.seat_above_brows)(fragments, \*[, head_scale, ...]) | Seat a hat, drawn as `{view: svg fragment}` in head units, above the brows' range. |
+| [`brow_affordance`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_affordance)(desc, drawn)                       | `face.brows`'s params for a descriptor whose drawn slots are `drawn`, or `None`.                                                                                                                                                                                 |
+|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`brow_cover`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_cover)(desc)                                   | What covers the brows' acting range, or `None` (an#284).                                                                                                                                                                                                         |
+| [`brow_slots`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_slots)(desc)                                   | The slots the character's own expression binding moves on a brow axis.                                                                                                                                                                                           |
+| [`brow_path_d`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_path_d)(side)                                  | The path of the factory's brow on `side` (`l` or `r`) in its canvas.                                                                                                                                                                                             |
+| [`brow_range`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_range)(\*[, head_scale, views, presets])       | `{view: {column: top}}`: the highest the brows' ink reaches, per head-unit column.                                                                                                                                                                               |
+| [`ink_columns`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.ink_columns)(discs)                                 | `{column: (top, bottom)}` of ink, per head-unit column (`round(x)`).                                                                                                                                                                                             |
+| [`seat_above_brows`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.seat_above_brows)(fragments, \*[, head_scale, ...]) | Seat a hat, drawn as `{view: svg fragment}` in head units, above the brows' range.                                                                                                                                                                               |
+| [`seat_overlap`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.seat_overlap)(fragments, seat, \*[, head_scale])    | How far a hat, drawn as `{view: svg fragment}` and worn at `seat` (a transform [`seat_above_brows()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.seat_above_brows) wrote, `None`: where it is drawn), dips into the brows' acting range: positive means it covers them (an#284). |
 
 ### Classes
 
@@ -2331,7 +2333,8 @@ whether it still covers the brows’ range there (`covers`).
 
 Afforded when the face is an overlay (`face_overlay`), the binding moves
 a brow ([`brow_slots()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_slots)) and every slot it moves on a brow axis has
-art, and the descriptor records nothing over the brows (`occluded`).
+art, and nothing covers them ([`brow_cover()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_cover): a declared `occluded`,
+or a factory hat measured over them, an#284).
 The slots are the solver’s own binding’s, so the capability and the solver
 cannot disagree about which slots act.
 
@@ -2347,6 +2350,19 @@ cannot disagree about which slots act.
 >>> brow_affordance(d, {"left_brow": {"brow_l"}, "right_brow": {"brow_r"}}) is None
 True
 ```
+
+### cutan.characters.brows.brow_cover(desc)
+
+What covers the brows’ acting range, or `None` (an#284).
+
+The descriptor’s declared `occluded` entry (an illustrator’s override,
+for drawn art), else what is DERIVED from a factory head’s recorded knobs
+([`cutan.characters.factory.derived_brow_cover()`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.derived_brow_cover): its hat, as drawn,
+measured against [`brow_range()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.brow_range)). One answer for the capability, the
+compiler’s record and `an validate`.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.characters.brows.brow_path_d(side)
 
@@ -2418,6 +2434,23 @@ overlaps the range (it never claims a clearance it did not measure).
 
 * **Return type:**
   [`Seat`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.Seat)
+
+### cutan.characters.brows.seat_overlap(fragments, seat, , head_scale=1.0)
+
+How far a hat, drawn as `{view: svg fragment}` and worn at `seat` (a
+transform [`seat_above_brows()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.seat_above_brows) wrote, `None`: where it is drawn),
+dips into the brows’ acting range: positive means it covers them (an#284).
+
+The inverse of [`seat_above_brows()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.seat_above_brows) on its own transforms, so a
+character’s recorded seat is measured, not re-chosen.
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+```pycon
+>>> seat_overlap({"front": ""}, None)
+-inf
+```
 
 
 # _autosummary/cutan.characters.checks.html.md
@@ -3093,6 +3126,7 @@ problem routes the way every other verifier’s does (an#78).
 | [`PUPIL_COLOUR`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.PUPIL_COLOUR)             | The pupil, in its own part (or the pre-gaze open eye).                                                                                                                                                                                                                                                                                                      |
 | [`DFLT_HAND_COLOUR`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.DFLT_HAND_COLOUR)         | Default hand, trouser and brow colours — the literals the factory always drew.                                                                                                                                                                                                                                                                              |
 | [`HATS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.HATS)                     | The hats [`new_character()`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.new_character) can draw.                                                                                                                                                                                                                                                                         |
+| [`FACTORY_ART_PROVENANCE`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.FACTORY_ART_PROVENANCE)   | The `art_provenance` of a head the factory drew (its knobs re-draw it).                                                                                                                                                                                                                                                                                     |
 | [`HAIR_STYLES`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.HAIR_STYLES)              | `peak` (the factory's original hair, a widow's peak — the default), `bald`, `bun` (the hair gathered in a bun on the crown) and `curly` (a halo of curls around the crown).                                                                                                                                                                                 |
 | [`HAIR_LENGTHS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.HAIR_LENGTHS)             | `short` (nothing below the crown — the default), `medium` (falling beside the face to the jaw) and `long` (past the chin, in locks that keep clear of the neck and the collar).                                                                                                                                                                             |
 | [`MAX_HEAD_SCALE`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.MAX_HEAD_SCALE)           | The largest head scale accepted — past it the head no longer fits the 1024-unit view box above a regular body.                                                                                                                                                                                                                                              |
@@ -3110,7 +3144,9 @@ problem routes the way every other verifier’s does (an#78).
 | [`add_gaze`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.add_gaze)(char_dir, \*[, skin, overwrite_eyes])   | Give a character the eye stack (an#99): three sibling slots per eye under the head — `<side>_sclera` (white fill) below `<side>_pupil` below `<side>_eye` (the existing slot, now the lid, drawn above the pupil) — with synthesized parts, an outline-only open eye, a FILLED closed lid, the `gaze_travel` clamp, and draw orders that put the lid over the pupil.                                  |
 |---------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`add_views`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.add_views)(char_dir)                              | Give a factory character its turnaround (an#197): `back`, `side` and `three_quarter` head and torso art beside the front, a `view` swap set projected onto those two slots, and a pose per view (`swap_poses`) — so `{kind: set, target: <entity>, property: view, value: side}` or [`cutan.motion.turn()`](_autosummary/cutan.motion.html.md#cutan.motion.turn) turns the whole character. |
+| [`brow_cover_unknowable`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.brow_cover_unknowable)(desc)                      | Whether `desc` is a factory head with a hat whose drawing is not the factory's for its recorded knobs (edited by hand), so its brow cover cannot be derived: only a declared `occluded` can say (an#284).                                                                                                                                                                                             |
 | [`declare_mouth_variants`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.declare_mouth_variants)(descriptor, variants)     | Declare a `viseme@<form>` set per variant on `descriptor` — the set's keys map to `mouth_<shape>_<form>` attachments, which are added to the default skin's `mouth` slot with the neutral mouth's geometry.                                                                                                                                                                                           |
+| [`derived_brow_cover`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.derived_brow_cover)(desc)                         | What covers a FACTORY head's brows, derived from its recorded knobs (an#284, ADR 0002 decision 2): its hat, as drawn (`_worn_seat()`), measured against the brows' acting range ([`seat_overlap()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.seat_overlap)).                                                                                                                |
 | [`factory_descriptor_source`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.factory_descriptor_source)(source_svg)            | The descriptor-level source of a character this factory drew, pinned to its drawing.                                                                                                                                                                                                                                                                                                                  |
 | [`factory_source`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.factory_source)(data)                             | The per-part source of a part this factory drew, pinned to its bytes.                                                                                                                                                                                                                                                                                                                                 |
 | [`gaze_travel_for`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.gaze_travel_for)([rx, ry, pupil_r])               | The pupil's travel per axis, in view-box units: the sclera's clearance minus the pupil's radius — the semi-axes of the inner ellipse the gaze axes' unit circle maps onto.                                                                                                                                                                                                                            |
@@ -3183,6 +3219,10 @@ the sclera, the pupil and the lid outline agree (an#99).
 ### cutan.characters.factory.FACE_SLOTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('left_eye', 'right_eye', 'left_sclera', 'right_sclera', 'left_pupil', 'right_pupil', 'mouth', 'left_brow', 'right_brow')*
 
 The face slots of the default rig with the eye stack (an#99).
+
+### cutan.characters.factory.FACTORY_ART_PROVENANCE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'fallback_geometric'*
+
+The `art_provenance` of a head the factory drew (its knobs re-draw it).
 
 ### cutan.characters.factory.FACTORY_AUTHOR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'an (generated locally)'*
 
@@ -3334,6 +3374,15 @@ touched: a shot that never sets a view renders byte-identically.
 * **Return type:**
   [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
 
+### cutan.characters.factory.brow_cover_unknowable(desc)
+
+Whether `desc` is a factory head with a hat whose drawing is not the
+factory’s for its recorded knobs (edited by hand), so its brow cover cannot
+be derived: only a declared `occluded` can say (an#284).
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
 ### cutan.characters.factory.declare_mouth_variants(descriptor, variants)
 
 Declare a `viseme@<form>` set per variant on `descriptor` — the set’s
@@ -3343,6 +3392,22 @@ neutral set is the SSOT for which shapes exist; a variant mirrors it.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.factory.derived_brow_cover(desc)
+
+What covers a FACTORY head’s brows, derived from its recorded knobs
+(an#284, ADR 0002 decision 2): its hat, as drawn (`_worn_seat()`),
+measured against the brows’ acting range
+([`seat_overlap()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.seat_overlap)). `None` when nothing does,
+when the head is not the factory’s (drawn art: an illustrator declares
+`occluded`), or when it cannot be told (an edited factory head).
+
+Derived, never stored: a character made before hats were seated (an#252)
+reports the brim that covers its brows, and the answer follows the
+measurement if the brows’ range moves.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.characters.factory.factory_descriptor_source(source_svg)
 
@@ -10219,13 +10284,13 @@ declares [`CHARACTER_CAPABILITIES`](_autosummary/cutan.library.html.md#cutan.lib
 `capabilities` and `analysers` fields (`cutan.genre.CUTOUT`), so
 they register with the genre, owned by it, and come out with it.
 
-| capability   | afforded when                                                                                           | `keys`                                 |
-|--------------|---------------------------------------------------------------------------------------------------------|----------------------------------------|
-| `limbs.legs` | a leg pair `walk` resolves, both with art                                                               | —                                      |
-| `limbs.arms` | an arm pair `walk` resolves, both with art                                                              | —                                      |
-| `swap.view`  | always: the rest view, plus every `view` key with<br/>art (`swappable`: whether it can turn at all)     | the views it can show                  |
-| `face.mouth` | an overlay face (`face_overlay`) whose `viseme`<br/>set has drawings                                    | the chart (`rhubarb9`<br/>or `custom`) |
-| `face.brows` | an overlay face whose two brow slots have art, with<br/>nothing recorded over them (`occluded`, an#252) | —                                      |
+| capability   | afforded when                                                                                                                                                      | `keys`                                 |
+|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------|
+| `limbs.legs` | a leg pair `walk` resolves, both with art                                                                                                                          | —                                      |
+| `limbs.arms` | an arm pair `walk` resolves, both with art                                                                                                                         | —                                      |
+| `swap.view`  | always: the rest view, plus every `view` key with<br/>art (`swappable`: whether it can turn at all)                                                                | the views it can show                  |
+| `face.mouth` | an overlay face (`face_overlay`) whose `viseme`<br/>set has drawings                                                                                               | the chart (`rhubarb9`<br/>or `custom`) |
+| `face.brows` | an overlay face whose two brow slots have art, with<br/>nothing over them: a factory hat measured over their<br/>range (an#284), or a declared `occluded` override | —                                      |
 
 ### Module Attributes
 
@@ -10241,14 +10306,15 @@ they register with the genre, owned by it, and come out with it.
 |------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
 | [`renders_as_placeholder`](_autosummary/cutan.library.html.md#cutan.library.renders_as_placeholder)(doc)       | Whether the compiler would draw this character only as its placeholder stand-in. |
 
-### cutan.library.CHARACTER_ANALYSER *: Analyser* *= Analyser(kind='character', version='0.2.0', subject='asset', declares=('rest_view', 'face_overlay', 'gait', 'speech', 'occluded'))*
+### cutan.library.CHARACTER_ANALYSER *: Analyser* *= Analyser(kind='character', version='0.3.0', subject='asset', declares=('rest_view', 'face_overlay', 'gait', 'speech', 'occluded'))*
 
 The character analyser (declared by the cut-out genre, registered with it).
 
-### cutan.library.CHARACTER_ANALYSER_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '0.2.0'*
+### cutan.library.CHARACTER_ANALYSER_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '0.3.0'*
 
 Bump when the derivation can answer differently for the same input.
-0.2.0: `face.brows` (an#252).
+0.2.0: `face.brows` (an#252). 0.3.0: a factory head’s brow cover is
+derived from its knobs and recorded seat, `occluded` only an override (an#284).
 
 ### cutan.library.CHARACTER_CAPABILITIES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Capability, ...]* *= (Capability(name='limbs.legs', description='a pair of leg slots with art that a legged walk swings', remedy='add two leg slots named leg_l/leg_r (or left_leg/right_leg) with their art, pivoted at the hip; \`an character new\` builds them (an-art-package skill)', subject='asset', command=None, version='1'), Capability(name='limbs.arms', description='a pair of arm slots with art that a walk swings and gestures move', remedy='add two arm slots named arm_l/arm_r (or left_arm/right_arm) with their art, pivoted at the shoulder (an-art-package skill)', subject='asset', command=None, version='1'), Capability(name='swap.view', description='the turnaround views the character can show (keys); swappable=true when a \`view\` swap set lets it turn', remedy='add turnaround art and list it in the \`view\` swap set: \`an character add-views <dir>\` for an offline character, else draw the views', subject='asset', command='an character add-views', version='1'), Capability(name='face.mouth', description='an overlay mouth with a viseme chart that lip-sync drives (keys: the chart)', remedy="give the character an overlay mouth: a \`mouth\` slot with the viseme set's drawings (\`an character mouths <dir>\` writes the default nine) and face_overlay: true — a face baked into the head art cannot lip-sync", subject='asset', command='an character mouths', version='1'), Capability(name='face.brows', description='two brows on an overlay face that an expression raises, lowers and angles, with nothing recorded over their acting range (slots: the brow slots)', remedy="give the overlay face two brow slots (left_brow/right_brow) with their art, and keep hats off the brows' acting range: a factory hat that cannot sit above them is recorded in character.json's \`occluded\` — \`an character new\` with a larger --head-scale, another --hat or --hat none; for drawn art, redraw the cover above the brows and remove its \`occluded\` entry", subject='asset', command=None, version='1'))*
 
@@ -11445,20 +11511,20 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-06 12:49 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/8432e0dda24fc31fc4a10968d83a40f870ee8a31"><code>8432e0d</code></a> on branch <code>main</code>, for **cutan 0.0.23** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-06 12:55 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/048540ea3d36ad4374edf4ca4e7b022fe450d47c"><code>048540e</code></a> on branch <code>main</code>, for **cutan 0.0.24** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.23) is behind the latest release on PyPI (0.0.24): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.24) is behind the latest release on PyPI (0.0.25): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/8432e0dda24fc31fc4a10968d83a40f870ee8a31"><code>8432e0dda24fc31fc4a10968d83a40f870ee8a31</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/048540ea3d36ad4374edf4ca4e7b022fe450d47c"><code>048540ea3d36ad4374edf4ca4e7b022fe450d47c</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
-| Tags at this commit | <code>0.0.23</code>                                                                                                                                     |
+| Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
 | Remote              | <code>https://github.com/thorwhalen/cutan</code>                                                                                                        |
 
@@ -11467,9 +11533,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37465487860">37465487860</a>     |
+| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37466474913">37466474913</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>0fa4141e858df36a5fc2223c4e068476dc418f72</code> (in the history of the built commit) |
+| Event commit | <code>048540ea3d36ad4374edf4ca4e7b022fe450d47c</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -11494,13 +11560,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.24/">0.0.24</a>, newer than the documented version (0.0.23).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.25/">0.0.25</a>, newer than the documented version (0.0.24).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout 8432e0dda24fc31fc4a10968d83a40f870ee8a31
+git checkout 048540ea3d36ad4374edf4ca4e7b022fe450d47c
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

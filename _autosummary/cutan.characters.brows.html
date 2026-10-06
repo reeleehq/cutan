@@ -201,20 +201,26 @@ bigger head; a band drawn across the forehead is lifted clear of it:</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.brows.brow_affordance" title="cutan.characters.brows.brow_affordance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">brow_affordance</span></code></a>(desc, drawn)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">face.brows</span></code>'s params for a descriptor whose drawn slots are <code class="docutils literal notranslate"><span class="pre">drawn</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.brows.brow_slots" title="cutan.characters.brows.brow_slots"><code class="xref py py-obj docutils literal notranslate"><span class="pre">brow_slots</span></code></a>(desc)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.brows.brow_cover" title="cutan.characters.brows.brow_cover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">brow_cover</span></code></a>(desc)</p></td>
+<td><p>What covers the brows' acting range, or <code class="docutils literal notranslate"><span class="pre">None</span></code> (an#284).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.brows.brow_slots" title="cutan.characters.brows.brow_slots"><code class="xref py py-obj docutils literal notranslate"><span class="pre">brow_slots</span></code></a>(desc)</p></td>
 <td><p>The slots the character's own expression binding moves on a brow axis.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.brows.brow_path_d" title="cutan.characters.brows.brow_path_d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">brow_path_d</span></code></a>(side)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.brows.brow_path_d" title="cutan.characters.brows.brow_path_d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">brow_path_d</span></code></a>(side)</p></td>
 <td><p>The path of the factory's brow on <code class="docutils literal notranslate"><span class="pre">side</span></code> (<code class="docutils literal notranslate"><span class="pre">l</span></code> or <code class="docutils literal notranslate"><span class="pre">r</span></code>) in its canvas.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.brows.brow_range" title="cutan.characters.brows.brow_range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">brow_range</span></code></a>(*[, head_scale, views, presets])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.brows.brow_range" title="cutan.characters.brows.brow_range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">brow_range</span></code></a>(*[, head_scale, views, presets])</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{view:</span> <span class="pre">{column:</span> <span class="pre">top}}</span></code>: the highest the brows' ink reaches, per head-unit column.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.brows.ink_columns" title="cutan.characters.brows.ink_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ink_columns</span></code></a>(discs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.brows.ink_columns" title="cutan.characters.brows.ink_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ink_columns</span></code></a>(discs)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{column:</span> <span class="pre">(top,</span> <span class="pre">bottom)}</span></code> of ink, per head-unit column (<code class="docutils literal notranslate"><span class="pre">round(x)</span></code>).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.brows.seat_above_brows" title="cutan.characters.brows.seat_above_brows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seat_above_brows</span></code></a>(fragments, *[, head_scale, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.brows.seat_above_brows" title="cutan.characters.brows.seat_above_brows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seat_above_brows</span></code></a>(fragments, *[, head_scale, ...])</p></td>
 <td><p>Seat a hat, drawn as <code class="docutils literal notranslate"><span class="pre">{view:</span> <span class="pre">svg</span> <span class="pre">fragment}</span></code> in head units, above the brows' range.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.brows.seat_overlap" title="cutan.characters.brows.seat_overlap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seat_overlap</span></code></a>(fragments, seat, *[, head_scale])</p></td>
+<td><p>How far a hat, drawn as <code class="docutils literal notranslate"><span class="pre">{view:</span> <span class="pre">svg</span> <span class="pre">fragment}</span></code> and worn at <code class="docutils literal notranslate"><span class="pre">seat</span></code> (a transform <a class="reference internal" href="#cutan.characters.brows.seat_above_brows" title="cutan.characters.brows.seat_above_brows"><code class="xref py py-func docutils literal notranslate"><span class="pre">seat_above_brows()</span></code></a> wrote, <code class="docutils literal notranslate"><span class="pre">None</span></code>: where it is drawn), dips into the brows' acting range: positive means it covers them (an#284).</p></td>
 </tr>
 </tbody>
 </table>
@@ -280,7 +286,8 @@ whether it still covers the brows’ range there (<code class="docutils literal 
 <dd><p><code class="docutils literal notranslate"><span class="pre">face.brows</span></code>’s params for a descriptor whose drawn slots are <code class="docutils literal notranslate"><span class="pre">drawn</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 <p>Afforded when the face is an overlay (<code class="docutils literal notranslate"><span class="pre">face_overlay</span></code>), the binding moves
 a brow (<a class="reference internal" href="#cutan.characters.brows.brow_slots" title="cutan.characters.brows.brow_slots"><code class="xref py py-func docutils literal notranslate"><span class="pre">brow_slots()</span></code></a>) and every slot it moves on a brow axis has
-art, and the descriptor records nothing over the brows (<code class="docutils literal notranslate"><span class="pre">occluded</span></code>).
+art, and nothing covers them (<a class="reference internal" href="#cutan.characters.brows.brow_cover" title="cutan.characters.brows.brow_cover"><code class="xref py py-func docutils literal notranslate"><span class="pre">brow_cover()</span></code></a>: a declared <code class="docutils literal notranslate"><span class="pre">occluded</span></code>,
+or a factory hat measured over them, an#284).
 The slots are the solver’s own binding’s, so the capability and the solver
 cannot disagree about which slots act.</p>
 <dl class="field-list simple">
@@ -297,6 +304,21 @@ cannot disagree about which slots act.</p>
 </span><span id="line-7"><span class="go">True</span>
 </span></code></pre></div>
 </div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.brows.brow_cover">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.brows.</span></span><span class="sig-name descname"><span class="pre">brow_cover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">desc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/brows.html#brow_cover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.brows.brow_cover" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.brows.brow_cover'">¶</a></dt>
+<dd><p>What covers the brows’ acting range, or <code class="docutils literal notranslate"><span class="pre">None</span></code> (an#284).</p>
+<p>The descriptor’s declared <code class="docutils literal notranslate"><span class="pre">occluded</span></code> entry (an illustrator’s override,
+for drawn art), else what is DERIVED from a factory head’s recorded knobs
+(<a class="reference internal" href="cutan.characters.factory.html#cutan.characters.factory.derived_brow_cover" title="cutan.characters.factory.derived_brow_cover"><code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.characters.factory.derived_brow_cover()</span></code></a>: its hat, as drawn,
+measured against <a class="reference internal" href="#cutan.characters.brows.brow_range" title="cutan.characters.brows.brow_range"><code class="xref py py-func docutils literal notranslate"><span class="pre">brow_range()</span></code></a>). One answer for the capability, the
+compiler’s record and <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.characters.brows.brow_path_d">
@@ -378,6 +400,24 @@ overlaps the range (it never claims a clearance it did not measure).</p>
 </dd>
 </dl>
 </dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.brows.seat_overlap">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.brows.</span></span><span class="sig-name descname"><span class="pre">seat_overlap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fragments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seat</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">head_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/brows.html#seat_overlap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.brows.seat_overlap" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.brows.seat_overlap'">¶</a></dt>
+<dd><p>How far a hat, drawn as <code class="docutils literal notranslate"><span class="pre">{view:</span> <span class="pre">svg</span> <span class="pre">fragment}</span></code> and worn at <code class="docutils literal notranslate"><span class="pre">seat</span></code> (a
+transform <a class="reference internal" href="#cutan.characters.brows.seat_above_brows" title="cutan.characters.brows.seat_above_brows"><code class="xref py py-func docutils literal notranslate"><span class="pre">seat_above_brows()</span></code></a> wrote, <code class="docutils literal notranslate"><span class="pre">None</span></code>: where it is drawn),
+dips into the brows’ acting range: positive means it covers them (an#284).</p>
+<p>The inverse of <a class="reference internal" href="#cutan.characters.brows.seat_above_brows" title="cutan.characters.brows.seat_above_brows"><code class="xref py py-func docutils literal notranslate"><span class="pre">seat_above_brows()</span></code></a> on its own transforms, so a
+character’s recorded seat is measured, not re-chosen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">seat_overlap</span><span class="p">({</span><span class="s2">"front"</span><span class="p">:</span> <span class="s2">""</span><span class="p">},</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">-inf</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
@@ -390,11 +430,13 @@ overlaps the range (it never claims a clearance it did not measure).</p>
 <li><a :data-current="activeSection === '#cutan.characters.brows.HEAD_ART_SIZE'" class="reference internal" href="#cutan.characters.brows.HEAD_ART_SIZE"><code class="docutils literal notranslate"><span class="pre">HEAD_ART_SIZE</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.brows.Seat'" class="reference internal" href="#cutan.characters.brows.Seat"><code class="docutils literal notranslate"><span class="pre">Seat</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.brows.brow_affordance'" class="reference internal" href="#cutan.characters.brows.brow_affordance"><code class="docutils literal notranslate"><span class="pre">brow_affordance()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.brows.brow_cover'" class="reference internal" href="#cutan.characters.brows.brow_cover"><code class="docutils literal notranslate"><span class="pre">brow_cover()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.brows.brow_path_d'" class="reference internal" href="#cutan.characters.brows.brow_path_d"><code class="docutils literal notranslate"><span class="pre">brow_path_d()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.brows.brow_range'" class="reference internal" href="#cutan.characters.brows.brow_range"><code class="docutils literal notranslate"><span class="pre">brow_range()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.brows.brow_slots'" class="reference internal" href="#cutan.characters.brows.brow_slots"><code class="docutils literal notranslate"><span class="pre">brow_slots()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.brows.ink_columns'" class="reference internal" href="#cutan.characters.brows.ink_columns"><code class="docutils literal notranslate"><span class="pre">ink_columns()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.brows.seat_above_brows'" class="reference internal" href="#cutan.characters.brows.seat_above_brows"><code class="docutils literal notranslate"><span class="pre">seat_above_brows()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.brows.seat_overlap'" class="reference internal" href="#cutan.characters.brows.seat_overlap"><code class="docutils literal notranslate"><span class="pre">seat_overlap()</span></code></a></li>
 </ul>
 </div>
 </aside>
@@ -408,7 +450,7 @@ overlaps the range (it never claims a clearance it did not measure).</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=3294188c"></script>
+<script src="../_static/documentation_options.js?v=f91d8841"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

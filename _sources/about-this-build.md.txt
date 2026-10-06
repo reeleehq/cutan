@@ -5,21 +5,21 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-10-06 12:49 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/8432e0dda24fc31fc4a10968d83a40f870ee8a31"><code>8432e0d</code></a> on branch <code>main</code>, for **cutan 0.0.23** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-06 12:55 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/048540ea3d36ad4374edf4ca4e7b022fe450d47c"><code>048540e</code></a> on branch <code>main</code>, for **cutan 0.0.24** (from <code>pyproject.toml</code>).
 
 :::{warning}
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.23) is behind the latest release on PyPI (0.0.24): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.24) is behind the latest release on PyPI (0.0.25): `pip install cutan` gives newer code than these docs describe.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/thorwhalen/cutan/commit/8432e0dda24fc31fc4a10968d83a40f870ee8a31"><code>8432e0dda24fc31fc4a10968d83a40f870ee8a31</code></a> |
+| Commit | <a href="https://github.com/thorwhalen/cutan/commit/048540ea3d36ad4374edf4ca4e7b022fe450d47c"><code>048540ea3d36ad4374edf4ca4e7b022fe450d47c</code></a> |
 | Branch | <code>main</code> |
-| Tags at this commit | <code>0.0.23</code> |
+| Tags at this commit | none |
 | Working tree | clean |
 | Remote | <code>https://github.com/thorwhalen/cutan</code> |
 
@@ -28,9 +28,9 @@ The documentation and the package may be misaligned:
 | | |
 |---|---|
 | Repository | <code>thorwhalen/cutan</code> |
-| Run | <a href="https://github.com/thorwhalen/cutan/actions/runs/37465487860">37465487860</a> |
+| Run | <a href="https://github.com/thorwhalen/cutan/actions/runs/37466474913">37466474913</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>0fa4141e858df36a5fc2223c4e068476dc418f72</code> (in the history of the built commit) |
+| Event commit | <code>048540ea3d36ad4374edf4ca4e7b022fe450d47c</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -55,13 +55,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.24/">0.0.24</a>, newer than the documented version (0.0.23).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.25/">0.0.25</a>, newer than the documented version (0.0.24).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout 8432e0dda24fc31fc4a10968d83a40f870ee8a31
+git checkout 048540ea3d36ad4374edf4ca4e7b022fe450d47c
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

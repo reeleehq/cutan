@@ -60,13 +60,15 @@ Seat(transform='translate(0 -5.47)', covers=False)
 
 ### Functions
 
-| [`brow_affordance`](#cutan.characters.brows.brow_affordance)(desc, drawn)                       | `face.brows`'s params for a descriptor whose drawn slots are `drawn`, or `None`.   |
-|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| [`brow_slots`](#cutan.characters.brows.brow_slots)(desc)                                   | The slots the character's own expression binding moves on a brow axis.             |
-| [`brow_path_d`](#cutan.characters.brows.brow_path_d)(side)                                  | The path of the factory's brow on `side` (`l` or `r`) in its canvas.               |
-| [`brow_range`](#cutan.characters.brows.brow_range)(\*[, head_scale, views, presets])       | `{view: {column: top}}`: the highest the brows' ink reaches, per head-unit column. |
-| [`ink_columns`](#cutan.characters.brows.ink_columns)(discs)                                 | `{column: (top, bottom)}` of ink, per head-unit column (`round(x)`).               |
-| [`seat_above_brows`](#cutan.characters.brows.seat_above_brows)(fragments, \*[, head_scale, ...]) | Seat a hat, drawn as `{view: svg fragment}` in head units, above the brows' range. |
+| [`brow_affordance`](#cutan.characters.brows.brow_affordance)(desc, drawn)                       | `face.brows`'s params for a descriptor whose drawn slots are `drawn`, or `None`.                                                                                                                                                                                 |
+|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`brow_cover`](#cutan.characters.brows.brow_cover)(desc)                                   | What covers the brows' acting range, or `None` (an#284).                                                                                                                                                                                                         |
+| [`brow_slots`](#cutan.characters.brows.brow_slots)(desc)                                   | The slots the character's own expression binding moves on a brow axis.                                                                                                                                                                                           |
+| [`brow_path_d`](#cutan.characters.brows.brow_path_d)(side)                                  | The path of the factory's brow on `side` (`l` or `r`) in its canvas.                                                                                                                                                                                             |
+| [`brow_range`](#cutan.characters.brows.brow_range)(\*[, head_scale, views, presets])       | `{view: {column: top}}`: the highest the brows' ink reaches, per head-unit column.                                                                                                                                                                               |
+| [`ink_columns`](#cutan.characters.brows.ink_columns)(discs)                                 | `{column: (top, bottom)}` of ink, per head-unit column (`round(x)`).                                                                                                                                                                                             |
+| [`seat_above_brows`](#cutan.characters.brows.seat_above_brows)(fragments, \*[, head_scale, ...]) | Seat a hat, drawn as `{view: svg fragment}` in head units, above the brows' range.                                                                                                                                                                               |
+| [`seat_overlap`](#cutan.characters.brows.seat_overlap)(fragments, seat, \*[, head_scale])    | How far a hat, drawn as `{view: svg fragment}` and worn at `seat` (a transform [`seat_above_brows()`](#cutan.characters.brows.seat_above_brows) wrote, `None`: where it is drawn), dips into the brows' acting range: positive means it covers them (an#284). |
 
 ### Classes
 
@@ -117,7 +119,8 @@ whether it still covers the brows’ range there (`covers`).
 
 Afforded when the face is an overlay (`face_overlay`), the binding moves
 a brow ([`brow_slots()`](#cutan.characters.brows.brow_slots)) and every slot it moves on a brow axis has
-art, and the descriptor records nothing over the brows (`occluded`).
+art, and nothing covers them ([`brow_cover()`](#cutan.characters.brows.brow_cover): a declared `occluded`,
+or a factory hat measured over them, an#284).
 The slots are the solver’s own binding’s, so the capability and the solver
 cannot disagree about which slots act.
 
@@ -133,6 +136,19 @@ cannot disagree about which slots act.
 >>> brow_affordance(d, {"left_brow": {"brow_l"}, "right_brow": {"brow_r"}}) is None
 True
 ```
+
+### cutan.characters.brows.brow_cover(desc)
+
+What covers the brows’ acting range, or `None` (an#284).
+
+The descriptor’s declared `occluded` entry (an illustrator’s override,
+for drawn art), else what is DERIVED from a factory head’s recorded knobs
+([`cutan.characters.factory.derived_brow_cover()`](cutan.characters.factory.md#cutan.characters.factory.derived_brow_cover): its hat, as drawn,
+measured against [`brow_range()`](#cutan.characters.brows.brow_range)). One answer for the capability, the
+compiler’s record and `an validate`.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.characters.brows.brow_path_d(side)
 
@@ -204,3 +220,20 @@ overlaps the range (it never claims a clearance it did not measure).
 
 * **Return type:**
   [`Seat`](#cutan.characters.brows.Seat)
+
+### cutan.characters.brows.seat_overlap(fragments, seat, , head_scale=1.0)
+
+How far a hat, drawn as `{view: svg fragment}` and worn at `seat` (a
+transform [`seat_above_brows()`](#cutan.characters.brows.seat_above_brows) wrote, `None`: where it is drawn),
+dips into the brows’ acting range: positive means it covers them (an#284).
+
+The inverse of [`seat_above_brows()`](#cutan.characters.brows.seat_above_brows) on its own transforms, so a
+character’s recorded seat is measured, not re-chosen.
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+```pycon
+>>> seat_overlap({"front": ""}, None)
+-inf
+```

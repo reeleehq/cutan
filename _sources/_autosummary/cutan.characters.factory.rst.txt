@@ -15,6 +15,7 @@ cutan.characters.factory
       PUPIL_COLOUR
       DFLT_HAND_COLOUR
       HATS
+      FACTORY_ART_PROVENANCE
       HAIR_STYLES
       HAIR_LENGTHS
       MAX_HEAD_SCALE
@@ -33,7 +34,9 @@ cutan.characters.factory
    
       add_gaze
       add_views
+      brow_cover_unknowable
       declare_mouth_variants
+      derived_brow_cover
       factory_descriptor_source
       factory_source
       gaze_travel_for
