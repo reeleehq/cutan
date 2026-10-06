@@ -131,6 +131,7 @@ CUTOUT_SERVICES: dict[str, str] = {
     "lipsync.rhubarb": "cutan.audio:rhubarb_factory",
     "lipsync.whisper": "cutan.audio:whisper_factory",
     "credits.legacy_source": "cutan.characters.licenses:reconstruct_legacy_source",
+    "credits.factory_redraw": "cutan.characters.factory:redraw_digests",
     "library.publish_warning": "cutan.library:publish_warning",
     "expression.known_presets": "cutan.expression:known_presets",
 }
