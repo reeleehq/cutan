@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-06T13:16:27Z",
+  "built_at": "2026-10-06T13:18:07Z",
   "package": {
     "name": "cutan",
-    "version": "0.0.28",
+    "version": "0.0.29",
     "display_name": "cutan",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "eebe7b24ddd48c792a676ff04d947aecd8da2df6",
-    "short_commit": "eebe7b2",
+    "commit": "ff247f8ec7aa45b30181e66fbbafccb99eb004ee",
+    "short_commit": "ff247f8",
     "branch": "main",
     "tags": [
-      "0.0.28"
+      "0.0.29"
     ],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/cutan",
-    "commit_url": "https://github.com/thorwhalen/cutan/commit/eebe7b24ddd48c792a676ff04d947aecd8da2df6",
+    "commit_url": "https://github.com/thorwhalen/cutan/commit/ff247f8ec7aa45b30181e66fbbafccb99eb004ee",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/cutan",
-    "sha": "acfd354a8e28568abf5d7e05083ad9c5af3e3ee8",
+    "sha": "711811c2a38a0815c9f0a1e75ec445b3b13060a5",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "37468953926",
-    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/37468953926",
+    "run_id": "37469043188",
+    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/37469043188",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -62,11 +62,11 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.28",
+    "latest": "0.0.29",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout eebe7b24ddd48c792a676ff04d947aecd8da2df6\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout ff247f8ec7aa45b30181e66fbbafccb99eb004ee\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,
