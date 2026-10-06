@@ -1203,23 +1203,9 @@ def _record_drawn(char_dir: Path, wrote: Mapping[str, str]) -> None:
     """
     import warnings
 
-    from an.credits import is_factory_stamp
     from an.library.registry import RegistryError, record_generated
 
-    raw = json.loads((char_dir / "character.json").read_text(encoding="utf-8"))
-    stamps = [(raw.get("source_svg"), raw.get("source"))] + [
-        (att.get("path"), att.get("source"))
-        for skin in (raw.get("skins") or {}).values()
-        for slot in (skin.get("slots") or {}).values()
-        for att in slot.values()
-        if isinstance(att, dict)
-    ]
-    digests = set()
-    for rel, stamp in stamps:
-        if not rel or not is_factory_stamp(stamp) or not stamp.get("sha256"):
-            continue
-        if wrote.get(str((char_dir / rel).resolve())) == stamp["sha256"]:
-            digests.add(stamp["sha256"])
+    digests = set(_stamped_writes(char_dir, wrote).values())
     try:
         record_generated(sorted(digests), generator=FACTORY_PROVIDER)
     except RegistryError as e:
@@ -2404,46 +2390,112 @@ def add_views(char_dir: str | Path) -> Path:
     )
 
 
-def _replayable(meta: Mapping) -> list[dict] | None:
-    """The recipe's steps if the factory can replay them offline, else ``None``."""
+#: The most drawing steps a recipe may replay, and the most bytes of JSON its
+#: parameters may take: the replay runs on whoever reads the descriptor, so
+#: its cost is bounded here, not by the recipe's author (review-292 R3).
+MAX_RECIPE_STEPS: int = 8
+MAX_RECIPE_BYTES: int = 16_384
+#: A character name the replay accepts: one plain folder name (review-292 R1).
+_SAFE_NAME = re.compile(r"[A-Za-z0-9_][A-Za-z0-9._-]{0,63}")
+#: The calls a recipe may replay AFTER its first step (never a second
+#: `new_character`: one drawing per recipe, review-292 R2).
+_LATER_STEPS: tuple[str, ...] = ("add_gaze", "add_views")
+
+
+def _replay_params(call: str, params) -> dict | None:
+    """``params`` for ``call``, kept only if every key is one the call records, else ``None``."""
+    if not isinstance(params, dict):
+        return None
+    func = globals()[call]
+    allowed = set(inspect.signature(func).parameters) - _NOT_RECIPE
+    if set(params) - allowed:
+        return None
+    return dict(params)
+
+
+def _replayable(meta: Mapping) -> list[tuple[str, dict]] | None:
+    """``[(call, params)]`` the factory may replay offline, or ``None``.
+
+    Refused: no recipe or another format; more than :data:`MAX_RECIPE_STEPS`
+    steps or :data:`MAX_RECIPE_BYTES` of parameters; a first step that is not
+    ``new_character``, a later one that is not ``add_gaze``/``add_views``; a
+    parameter the call does not record (``out_dir``, ``overwrite``, anything
+    unknown); a ``name`` that is not one plain folder name; a DiceBear head
+    (from the network, at a moving API version).
+    """
     recipe = meta.get(RECIPE_KEY)
     if not isinstance(recipe, dict) or recipe.get("version") != RECIPE_VERSION:
         return None
-    steps = recipe.get("steps") or []
-    if (
-        recipe.get("replayable") is False
-        or not steps
-        or steps[0].get("call") != "new_character"
-        or any(s.get("call") not in _REPLAYABLE or s.get("params") is None for s in steps)
-    ):
+    steps = recipe.get("steps")
+    if recipe.get("replayable") is False or not isinstance(steps, list) or not steps:
+        return None
+    if len(steps) > MAX_RECIPE_STEPS or len(json.dumps(steps)) > MAX_RECIPE_BYTES:
+        return None
+    out: list[tuple[str, dict]] = []
+    for i, step in enumerate(steps):
+        call = step.get("call") if isinstance(step, dict) else None
+        allowed = ("new_character",) if i == 0 else _LATER_STEPS
+        if call not in allowed:
+            return None
+        params = _replay_params(call, step.get("params"))
+        if params is None:
+            return None
+        out.append((call, params))
+    name = out[0][1].get("name")
+    if not isinstance(name, str) or not _SAFE_NAME.fullmatch(name) or ".." in name:
         return None
     if meta.get("dicebear_style") and not meta.get("dicebear_error"):
-        # A DiceBear head came from the network, at a moving API version: it
-        # cannot be re-derived offline, and nor can what was drawn around it.
         return None
-    return steps
+    return out
+
+
+def _code_identity() -> tuple[int, ...]:
+    """What the replay's result depends on besides the recipe: the drawing code as loaded."""
+    return tuple(
+        id(globals()[n])
+        for n in ("new_character", "add_gaze", "add_views", "stamp_factory_parts")
+    )
 
 
 @functools.lru_cache(maxsize=64)
-def _redraw(steps_json: str) -> tuple[tuple[str, str], ...]:
+def _redraw(steps_json: str, code: tuple[int, ...]) -> tuple[tuple[str, str], ...]:
+    """``(path, sha256)`` of each file the replay WROTE and stamped as the factory's."""
     import tempfile
 
+    del code  # part of the memo key only
     steps = json.loads(steps_json)
     with tempfile.TemporaryDirectory(prefix="an-factory-redraw-") as tmp:
-        first = dict(steps[0]["params"])
-        # A head the network did not provide was drawn by the factory.
-        first["use_dicebear"] = False
-        desc = new_character(tmp, **first)
-        char_dir = Path(desc).parent
-        for step in steps[1:]:
-            globals()[step["call"]](char_dir, **step["params"])
-        return tuple(
-            sorted(
-                (p.relative_to(char_dir).as_posix(), hashlib.sha256(p.read_bytes()).hexdigest())
-                for p in char_dir.rglob("*")
-                if p.is_file() and p.name != "character.json"
-            )
-        )
+        root = Path(tmp).resolve()
+        with _drawn.drawing() as wrote:
+            first = {**steps[0][1], "use_dicebear": False}  # never the network
+            char_dir = Path(new_character(root, **first)).parent.resolve()
+            if char_dir.parent != root:
+                return ()
+            for call, params in steps[1:]:
+                globals()[call](char_dir, **params)
+        return tuple(sorted(_stamped_writes(char_dir, wrote).items()))
+
+
+def _stamped_writes(char_dir: Path, wrote: Mapping[str, str]) -> dict[str, str]:
+    """``{relative path: sha256}`` of every file at ``char_dir`` the factory's own stamp
+    pins AND the log ``wrote`` says this drawing wrote exactly so (an#269, review-292 R4)."""
+    from an.credits import is_factory_stamp
+
+    raw = json.loads((char_dir / "character.json").read_text(encoding="utf-8"))
+    stamps = [(raw.get("source_svg"), raw.get("source"))] + [
+        (att.get("path"), att.get("source"))
+        for skin in (raw.get("skins") or {}).values()
+        for slot in (skin.get("slots") or {}).values()
+        for att in slot.values()
+        if isinstance(att, dict)
+    ]
+    out: dict[str, str] = {}
+    for rel, stamp in stamps:
+        if not rel or not is_factory_stamp(stamp) or not stamp.get("sha256"):
+            continue
+        if wrote.get(str((char_dir / rel).resolve())) == stamp["sha256"]:
+            out[rel] = stamp["sha256"]
+    return out
 
 
 def redraw_digests(descriptor: Mapping) -> dict[str, str]:
@@ -2462,6 +2514,6 @@ def redraw_digests(descriptor: Mapping) -> dict[str, str]:
     if steps is None:
         return {}
     try:
-        return dict(_redraw(json.dumps(steps, sort_keys=True)))
+        return dict(_redraw(json.dumps(steps, sort_keys=True), _code_identity()))
     except Exception:  # noqa: BLE001 — a recipe this factory cannot replay confirms nothing
         return {}

@@ -74,3 +74,67 @@ def test_what_cannot_be_replayed_confirms_nothing(tmp_path, edit):
 
 def test_the_core_reaches_it_as_a_service():
     assert service("credits.factory_redraw") is redraw_digests
+
+
+# ---------------------------------------------------------------- review round
+
+
+def _with_steps(char: Path, steps: list) -> dict:
+    desc = _desc(char)
+    desc["metadata"][RECIPE_KEY]["steps"] = steps
+    return desc
+
+
+def test_r1_a_recipe_cannot_reach_outside_its_scratch_folder(tmp_path):
+    """A `name` that is a path, or `overwrite`, never reaches the factory."""
+    char = new_character(tmp_path, name="kim", use_dicebear=False).parent
+    precious = tmp_path / "precious"
+    precious.mkdir()
+    (precious / "keep.txt").write_text("mine", encoding="utf-8")
+    params = _desc(char)["metadata"][RECIPE_KEY]["steps"][0]["params"]
+    for bad in (
+        {**params, "name": str(precious)},
+        {**params, "name": "../escaped"},
+        {**params, "overwrite": True},
+        {**params, "out_dir": str(precious)},
+        {**params, "unknown_knob": 1},
+    ):
+        assert redraw_digests(_with_steps(char, [{"call": "new_character", "params": bad}])) == {}
+    assert (precious / "keep.txt").read_text(encoding="utf-8") == "mine"
+    assert not (tmp_path / "escaped").exists()
+
+
+def test_r2_no_second_drawing_and_never_the_network(tmp_path):
+    char = new_character(tmp_path, name="kim", use_dicebear=False).parent
+    first = _desc(char)["metadata"][RECIPE_KEY]["steps"][0]
+    nested = {"call": "new_character", "params": {**first["params"], "name": "x",
+                                                  "use_dicebear": True, "style": "adventurer"}}
+    assert redraw_digests(_with_steps(char, [first, nested])) == {}
+    assert redraw_digests(_with_steps(char, [first, {"params": {}}])) == {}
+
+
+def test_r3_a_recipe_is_bounded(tmp_path):
+    char = new_character(tmp_path, name="kim", use_dicebear=False).parent
+    first = _desc(char)["metadata"][RECIPE_KEY]["steps"][0]
+    views = {"call": "add_views", "params": {}}
+    assert redraw_digests(_with_steps(char, [first, *[views] * 20])) == {}
+
+
+def test_r4_only_what_the_replay_wrote_and_stamped_counts(tmp_path, monkeypatch):
+    """Bytes swapped into the folder outside the factory's writes are not proved,
+    even while the swap is in force; and a memo never outlives the code it ran."""
+    from cutan.characters import factory
+
+    carved = b"<svg>a head nobody has seen</svg>"
+    original = factory.stamp_factory_parts
+
+    def swap_then_stamp(char_dir, paths, **kwargs):
+        (Path(char_dir) / "parts" / "head.svg").write_bytes(carved)
+        return original(char_dir, paths, **kwargs)
+
+    monkeypatch.setattr(factory, "stamp_factory_parts", swap_then_stamp)
+    char = new_character(tmp_path, name="zed", use_dicebear=False, views=False, gaze=False).parent
+    swapped = hashlib.sha256(carved).hexdigest()
+    assert redraw_digests(_desc(char)).get("parts/head.svg") != swapped
+    monkeypatch.setattr(factory, "stamp_factory_parts", original)
+    assert redraw_digests(_desc(char)).get("parts/head.svg") != swapped
