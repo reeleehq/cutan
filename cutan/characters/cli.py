@@ -22,7 +22,7 @@ import os
 import tempfile
 import textwrap
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from cutan.characters.factory import DFLT_HAIR_LENGTH, DFLT_HAIR_STYLE
 from cutan.characters.factory import new_character as _new_character
@@ -372,59 +372,24 @@ def capabilities(
         )
     doc = json.loads(descriptor.read_text(encoding="utf-8"))
     art = art_in_dir(target, exclude=(descriptor.name,))
-    described = describe_asset(doc, art)
+    policy, label = _style_policy(style) if style else (None, "the policy")
+    described = describe_asset(doc, art, policy=policy)
     if style:
-        _under_style(described, doc, art, style)
+        described["style"] = label
     if as_json:
         return json.dumps(described, indent=2, sort_keys=True)
-    text = format_description(described, name=name)
-    if style:
-        lines = [
-            f"{aspect}: under {info['under_style']['style']}: "
-            f"{info['under_style']['method']} ({info['under_style']['source']})"
-            + (
-                f", only while {', '.join(info['under_style']['while'])} is showing"
-                if info["under_style"].get("while")
-                else ""
-            )
-            for aspect, info in described["aspects"].items()
-            if "under_style" in info
-        ]
-        text += "\n\n" + "\n".join(lines)
-    return text
+    return format_description(described, name=name, policy_label=label)
 
 
-def _under_style(described: dict, doc: dict, art, style: str) -> None:
-    """Add, per aspect, what it resolves to under ``style``'s policy (in place)."""
-    from an.capabilities import affordances
-    from an.semantic import aspect as aspect_of
-    from an.semantic import resolve
-
+def _style_policy(style: str) -> tuple[Any, str]:
+    """``(policy, label)`` of a style spec (a name, a path): its checked
+    ``policy`` block and the name it goes by. The core's ``describe_asset``
+    resolves every aspect under it (an#348), by the compiler's precedence."""
     from cutan.styles import check_policy, resolve_style_spec
 
     spec = resolve_style_spec(style)
     label = spec.get("style") or style
-    policy = check_policy(spec.get("policy"), where=f"style {label!r}")
-    profile = affordances(doc, art, kind=described["kind"])
-    declared = described.get("declared") or {}
-    for name, info in described["aspects"].items():
-        asp = aspect_of(name)
-        request = declared.get(asp.declared_by) if asp.declared_by else None
-        r = resolve(
-            name,
-            profile,
-            requested=request,
-            policy=policy,
-            entity_kind=described["kind"],
-        )
-        info["under_style"] = {
-            "style": label,
-            "method": r.method.id,
-            "source": r.source,
-        }
-        views = [str(t) for t in r.method.requires if str(t).startswith("swap.view")]
-        if views:  # resolved without a view: it runs only while that view shows
-            info["under_style"]["while"] = views
+    return check_policy(spec.get("policy"), where=f"style {label!r}"), label
 
 
 def silhouette(

@@ -23,6 +23,7 @@ from an.stores._common import art_exists_for
 from cutan.characters.play import play_extent_for
 from cutan.characters.schema import CHARACTER_DOCUMENT_KIND, CharacterDescriptor
 from cutan.compile.passes import (
+    POLICY_PRODUCT,
     _expand_preset_plays,
     preset_context_of,
     _resolve_play,
@@ -42,17 +43,21 @@ class PlayLowering:
     ) -> Callable[[Any], float]:
         """``play -> seconds`` for a play that names no duration, read off its
         descriptor — and, for a walk, off the gait and scale the expansion will
-        fill in (:func:`cutan.compile.passes.preset_context_of`, cutan#12).
-        ``products`` is the shot's compile products (an#348), not read yet."""
+        fill in (:func:`cutan.compile.passes.preset_context_of`, cutan#12),
+        under the scene's policy the policy pass left in ``products`` (an#348)."""
         return play_extent_for(
             lambda entity_id: vocab.descriptors.get(entity_id) if vocab else None,
-            context_of=preset_context_of(vocab),
+            context_of=preset_context_of(
+                vocab, policy=(products or {}).get(POLICY_PRODUCT)
+            ),
         )
 
     def expand(self, flat_list: list, *, products: Any = None, **kw: Any) -> list:
-        """Replace each ``play`` of a motion preset by the tweens and sets it stands for.
-        ``products`` is the shot's compile products (an#348), not read yet."""
-        return _expand_preset_plays(flat_list, **kw)
+        """Replace each ``play`` of a motion preset by the tweens and sets it stands
+        for, a walk's gait under the scene's policy (``products``, an#348)."""
+        return _expand_preset_plays(
+            flat_list, policy=(products or {}).get(POLICY_PRODUCT), **kw
+        )
 
     def view_of(self, entity_swaps: Any, vocab: Any, *, duration: float):
         """``flat -> the view its entity is in then``, for characters with per-view face sets."""

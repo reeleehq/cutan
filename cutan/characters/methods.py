@@ -571,7 +571,10 @@ def resolve_walk_gait(
             profile["limbs.legs"] = {"slots": list(legs), "overrides": ["legs arg"]}
         else:
             profile.pop("limbs.legs", None)
-    requested = args.get("gait") or getattr(descriptor, "gait", None)
+    # the walk's gait is the request; the character's declared one is placed by
+    # the core's one precedence rule (DECLARED_OUTRANKS_POLICY, cutan#36)
+    requested = args.get("gait") or None
+    declared = getattr(descriptor, "gait", None)
     side_afforded = "side" in (profile.get("swap.view") or {}).get("keys", ())
     side_not_showing = (
         view is not UNKNOWN_VIEW and view not in WALK_SWING_VIEWS and side_afforded
@@ -582,7 +585,14 @@ def resolve_walk_gait(
         profile["swap.view"] = views
     # against the profile as it stands in this view: a profile cycle the view
     # does not show is a skipped policy entry (cutan#17), not a choice
-    r = resolve(LOCOMOTION, profile, requested=requested, policy=policy, entity=entity)
+    r = resolve(
+        LOCOMOTION,
+        profile,
+        requested=requested,
+        declared=declared,
+        policy=policy,
+        entity=entity,
+    )
     if on_skip is not None:
         for method, missing in r.skipped:
             on_skip(method, missing)
@@ -697,26 +707,16 @@ def locomotion_args(
     ``sequence`` waits for, :func:`walk_preset_context`), so the two cannot
     disagree about which gait runs (cutan#12).
 
-    The scene's policy (cutan#9: the shot's over the style's) arrives as the
-    internal ``_policy`` arg the compiler's policy pass writes, or as
-    ``policy``; it orders the methods when nothing is requested (its entries
-    that do not apply go to ``on_skip``), and the chosen entry's OWN args join
-    the walk's under them (never the method's defaults, which the gait scales
-    to the figure). A malformed policy raises
-    :class:`~cutan.styles.policy.PolicyError`.
+    ``policy`` is the scene's (cutan#9: the shot's over the style's, which the
+    compiler's policy pass leaves in its products, an#348); it orders the
+    methods when nothing is requested (its entries that do not apply go to
+    ``on_skip``), and the chosen entry's OWN args join the walk's under them
+    (never the method's defaults, which the gait scales to the figure).
 
     >>> args, r = locomotion_args("blob", {"gait": "hem", "distance": 80}, descriptor=None, profile={})
     >>> args["gait"], r.substitution.reason
     ('glide', 'missing')
     """
-    from cutan.characters.play import POLICY_ARG
-
-    args = dict(args)
-    block = args.pop(POLICY_ARG, None)
-    if policy is None and block:
-        from cutan.styles.policy import check_policy
-
-        policy = check_policy(block, where="the scene's policy")
     args = normalise_gait_args(args)
     gait, resolution = resolve_walk_gait(
         entity,
@@ -727,17 +727,8 @@ def locomotion_args(
         view=view,
         on_skip=on_skip,
     )
-    if resolution.source == "policy":
-        from an.semantic import Policy
-
-        own = next(
-            (
-                c.args
-                for c in Policy.of(policy).choices(LOCOMOTION)
-                if c.method == resolution.method.id
-            ),
-            {},
-        )
+    if resolution.source == "policy" and resolution.choice is not None:
+        own = dict(resolution.choice.args)
         return {**own, **args, "gait": gait}, resolution
     return {**args, "gait": gait}, resolution
 
@@ -750,6 +741,7 @@ def walk_preset_context(
     profile: Mapping[str, Mapping[str, Any]] | None,
     scale: float,
     parts: Iterable[str] | None = None,
+    policy: Any = None,
 ) -> dict[str, Any]:
     """What the compiler adds to a ``walk`` play's args before expanding it, as
     far as the walk's LENGTH depends on it: the resolved ``gait`` (when the
@@ -779,7 +771,7 @@ def walk_preset_context(
 
     try:
         resolved, _ = locomotion_args(
-            entity, args, descriptor=descriptor, profile=profile
+            entity, args, descriptor=descriptor, profile=profile, policy=policy
         )
     except (VocabularyError, ValueError, TypeError):
         return out  # a bad gait is `cutout.play`'s to report; no extent
@@ -962,12 +954,14 @@ def gait_problem(
     args: Mapping[str, Any],
     art_exists: Any = None,
     view: Any = UNKNOWN_VIEW,
+    policy: Any = None,
 ) -> str | None:
     """Why a walk on ``entity`` will not use the gait it asks for (its ``gait``
     arg, else the descriptor's), with what would enable it — or ``None``.
 
     ``doc`` is the character's stored document; ``art_exists`` the store's
-    probe; ``view`` the view in force at the play's start (cutan#17). The
+    probe; ``view`` the view in force at the play's start (cutan#17);
+    ``policy`` the scene's, as the compiler resolves under it. The
     sentence is the one the compiler records (``asset_resolution``) when it
     substitutes the method, plus each missing capability's remedy.
     """
@@ -985,6 +979,7 @@ def gait_problem(
         args=args,
         descriptor=desc,
         profile=compile_profile(desc, art_exists=art_exists),
+        policy=policy,
         view=view,
     )
     return substitution_problem(r.substitution)
@@ -1012,6 +1007,7 @@ def walk_problems(
     args: Mapping[str, Any],
     art_exists: Any = None,
     view: Any = UNKNOWN_VIEW,
+    policy: Any = None,
 ) -> list[str]:
     """Everything `an validate` says about one ``walk`` on a character, each a
     warning: the gait it asks for will not be used (:func:`gait_problem`), and
@@ -1038,13 +1034,15 @@ def walk_problems(
         return []
     explicit = args.get("gait") is not None
     resolved, r = locomotion_args(
-        entity, args, descriptor=desc, profile=profile, view=view
+        entity, args, descriptor=desc, profile=profile, view=view, policy=policy
     )
     out: list[str] = []
     if (problem := substitution_problem(r.substitution)) is not None:
         out.append(problem)
     if not explicit:
-        source = "descriptor's" if r.source == "request" else "chain's"
+        source = {"request": "descriptor's", "policy": "policy's"}.get(
+            r.source, "chain's"
+        )
         out.extend(
             f"{entity}: {p} — this walk's gait is the {source}"
             for p in walk_arg_problems(resolved["gait"], resolved)
@@ -1071,6 +1069,7 @@ def check_walk_gaits(ctx) -> None:
 
     from cutan.characters.checks import _stage_poses_of, _turns_of
     from cutan.characters.play import facing_at
+    from cutan.styles.policy import policy_in_force
     from cutan.motion import DFLT_TURN_SET
 
     rigs, unchecked = _rig_scope(ctx.shot, ctx.stores)
@@ -1125,6 +1124,7 @@ def check_walk_gaits(ctx) -> None:
                     args=args,
                     art_exists=art_exists_for(store, rig.ref),
                     view=view,
+                    policy=policy_in_force(ctx),
                 )
         except (VocabularyError, ValidationError, ValueError, TypeError):
             continue  # a malformed gait or descriptor is `cutout.play`'s to report
@@ -1265,13 +1265,13 @@ def speech_plan(
         if not is_character(speaker):
             continue
         if speaker not in resolved:
-            requested = getattr(descriptor_of(speaker), "speech", None)
+            # the declared method is placed by the core's one precedence rule
+            # (DECLARED_OUTRANKS_POLICY, cutan#36), as a walk's declared gait is
             r = resolve(
                 SPEECH,
                 profile_of(speaker),
-                requested=requested,
-                # a declared method that cannot be honoured falls to the chain
-                policy=None if requested is not None else policy,
+                declared=getattr(descriptor_of(speaker), "speech", None),
+                policy=policy,
                 entity=speaker,
             )
             resolved[speaker] = r

@@ -81,13 +81,16 @@ def _preset_context_of(
     unchecked: set[str],
     stores: Mapping[str, Any],
     stage: Any,
+    *,
+    policy: Any = None,
 ):
     """``(entity_id, play) -> PresetContext`` for validate's extent resolver:
     what :func:`cutan.compile.passes.preset_context_of` reads off the compiler's
     vocabulary, read off the same built stage (``stage``: :func:`_stage_of`)
     — the target's built scale and limbs — and the same descriptor and art,
     so validate places a ``sequence``'s later siblings where compile does
-    (cutan#12). No context for an entity whose store was not supplied
+    (cutan#12), under the same ``policy`` (the shot's over the style pack's,
+    :func:`cutan.styles.policy.policy_in_force`). No context for an entity whose store was not supplied
     (``unchecked``: the check did not run) or a target the stage did not
     build."""
     from cutan.characters.methods import (
@@ -146,6 +149,7 @@ def _preset_context_of(
             descriptor=descriptor,
             profile=profile,
             scale=abs(float(poses[target]["scale_y"])),
+            policy=policy,
             parts=None
             if profile is not None
             else [p[len(prefix) :] for p in poses if p.startswith(prefix)],
@@ -155,7 +159,12 @@ def _preset_context_of(
 
 
 def _check_play_actions(
-    shot, path: str, report: "ValidationReport", stores: Mapping[str, Any]
+    shot,
+    path: str,
+    report: "ValidationReport",
+    stores: Mapping[str, Any],
+    *,
+    policy: Any = None,
 ) -> None:
     """A `play` must resolve against its target's descriptor animations, or a
     motion preset — checked HERE, before the author pays for TTS or a Chromium
@@ -210,7 +219,7 @@ def _check_play_actions(
             return None
 
     preset_context = _preset_context_of(
-        rigs, unchecked, stores, _stage_of(shot, stores, unchecked)
+        rigs, unchecked, stores, _stage_of(shot, stores, unchecked), policy=policy
     )
     play_extent = play_extent_for(extent_descriptor, context_of=preset_context)
     for k, action in enumerate(shot.actions):
@@ -424,7 +433,7 @@ def _check_whole_character_swap(
 
 
 def _turn_resolution(
-    shot, stores: Mapping[str, Any]
+    shot, stores: Mapping[str, Any], *, policy: Any = None
 ) -> tuple[TurnResolution, list[int]] | None:
     """The shot's flat timeline with its turns resolved the way the compiler
     resolves them (:func:`cutan.characters.play.resolve_turns`, an#203), and the
@@ -452,7 +461,11 @@ def _turn_resolution(
     extent = play_extent_for(
         descriptor_of,
         context_of=_preset_context_of(
-            all_rigs, unchecked, stores, _stage_of(shot, stores, unchecked)
+            all_rigs,
+            unchecked,
+            stores,
+            _stage_of(shot, stores, unchecked),
+            policy=policy,
         ),
     )
     origin: list[int] = []
@@ -668,7 +681,14 @@ def check_character_refs(ctx: ValidationContext) -> None:
 
 
 def _turns_of(ctx: ValidationContext, index: int, shot: Any):
-    return ctx.cached(("turns", index), lambda: _turn_resolution(shot, ctx.stores))
+    from cutan.styles.policy import policy_in_force
+
+    return ctx.cached(
+        ("turns", index),
+        lambda: _turn_resolution(
+            shot, ctx.stores, policy=policy_in_force(ctx, shot=shot, index=index)
+        ),
+    )
 
 
 def _stage_poses_of(ctx: ValidationContext, index: int, shot: Any):
@@ -680,7 +700,11 @@ def _stage_poses_of(ctx: ValidationContext, index: int, shot: Any):
 
 def check_play_actions(ctx: ValidationContext) -> None:
     """The cut-out genre's `play` check (:func:`_check_play_actions`)."""
-    _check_play_actions(ctx.shot, ctx.path, ctx.report, ctx.stores)
+    from cutan.styles.policy import policy_in_force
+
+    _check_play_actions(
+        ctx.shot, ctx.path, ctx.report, ctx.stores, policy=policy_in_force(ctx)
+    )
 
 
 def check_expression_actions(ctx: ValidationContext) -> None:
