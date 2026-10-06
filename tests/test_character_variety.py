@@ -54,11 +54,14 @@ DESCRIPTOR_KEYS = (
 #: Re-taken for an#253: the `viseme@happy`/`viseme@sad` mouths are redrawn as a
 #: curve (the corners move, not the whole mouth); every other file and field
 #: is unchanged, and `tests/test_silent_mouth.py` pins the neutral mouth's path.
+#: Re-taken for cutan#66: the filled closed lid (`eye_*_closed.svg`) reaches
+#: `LID_COVER_PAD` units past the eye white, so no ring shows round a closed
+#: eye; every other file and field is unchanged.
 GOLDEN_FACTORY_DIGESTS = {
-    "kyle": "1643f2c548f05583",
-    "stan": "b9b252d8d44ec312",
-    "maya": "bd838257a4e56506",
-    "nobody": "6c44e6b983d758f3",
+    "kyle": "8492ad9f93d520ab",
+    "stan": "e54c040d292dcab6",
+    "maya": "34fbfb2177cb37de",
+    "nobody": "fb07afe83cf339d0",
 }
 
 
