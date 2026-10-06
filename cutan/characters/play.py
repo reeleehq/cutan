@@ -191,7 +191,9 @@ def suppressed_slots(desc: CharacterDescriptor) -> frozenset[str]:
     # The face is the slots ON the head bone, in either nesting: a part on a
     # child bone of the head (a hat, `nesting: bones`, an#340) nests under the
     # head too but is not the face the art bakes in.
-    return frozenset(s.name for s in desc.slots if s.bone == HEAD_BONE and s.name != head_slot)
+    return frozenset(
+        s.name for s in desc.slots if s.bone == HEAD_BONE and s.name != head_slot
+    )
 
 
 def active_skin(desc: CharacterDescriptor) -> Skin:
@@ -718,7 +720,9 @@ def preset_moved_node(action_target: str, animation: str, args=None) -> str:
 PART_ARG = "part"
 
 
-def resolve_part_arg(animation: str, args=None, *, parts: Iterable[str] | None = None) -> dict:
+def resolve_part_arg(
+    animation: str, args=None, *, parts: Iterable[str] | None = None
+) -> dict:
     """``args`` with a one-part preset's ``part`` named by its SLOT resolved to
     its node path among the entity's built ``parts`` (an#340).
 
@@ -1115,7 +1119,9 @@ class _RigFacts:
     def has_art(self, attachment: Attachment) -> bool:
         return self.art_exists is None or self.art_exists(attachment.path)
 
-    def unbuilt_reason(self, slot_name: str, _seen: frozenset[str] = frozenset()) -> str | None:
+    def unbuilt_reason(
+        self, slot_name: str, _seen: frozenset[str] = frozenset()
+    ) -> str | None:
         """Why the rig builder would NOT build ``slot_name``'s node, or None."""
         if slot_name in _seen:
             return (

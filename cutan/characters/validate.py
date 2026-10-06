@@ -821,7 +821,9 @@ def _check_rig_origin(
             "Every bone's parent and every slot's bone must be a declared bone, "
             "and the bones a tree.",
         )
-    for problem in chain_draw_order_problems(descriptor) + chain_pose_problems(descriptor):
+    for problem in chain_draw_order_problems(descriptor) + chain_pose_problems(
+        descriptor
+    ):
         report.add(
             ADVISORY,
             "character.json#rig",
