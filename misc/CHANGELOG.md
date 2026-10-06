@@ -4,6 +4,7 @@
 
 - **The changelog merges as a union** (`.gitattributes`: `misc/CHANGELOG.md merge=union`): two branches adding a line under the same date rebase without a conflict.
 
+- **An interleaved chain is no longer "refused" by `an character validate`** (with thorwhalen/an#430): the stage paints it from a global part order, so the advisory says which engine capability it needs (`engine.paint_order:global`) instead of claiming compile refuses it.
 - **End-user test fixes** (an#407, an#410): `an character validate` says when the migration kept a character's bone rotation unapplied (`rest_rotation: false` written onto a pre-0.4.0 file) and how to apply it; `stage_extent` accepts the `character.json` dict.
 - **The locomotion-resolution tests moved here from `an`** (thorwhalen/an#427): `tests/test_locomotion_resolution.py` drives the matcher over cutan's own `loco.*` and `speech.*` methods, so a new gait fails this repository, never an `an` PR.
 
