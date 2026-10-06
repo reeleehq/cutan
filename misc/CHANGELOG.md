@@ -2,6 +2,7 @@
 
 ## 2026-10-06
 
+- **The bones' rest pose** (an#339, R2 of an#331): `CHARACTER_SCHEMA_VERSION` 0.4.0 through the stage's `register_rest_pose_migration` (writes `rest_rotation: false` only onto a 0.3.0 rig whose bones carry a rotation or scale); `validate_character` advises on a rest-rotated bone whose part is offset; `REQUIRED_AN_API_LEVEL` 4. Every descriptor read already goes through `migrate` (`_rig_document` returns the migrated document).
 - **A declared `occluded` is reported under `overrides`** (an#381): the character analyser declares `overrides=character_overrides` (the core hook from thorwhalen/an#388), so `an character capabilities` lists `occluded` among the overrides when a declared cover keeps `face.brows` from a face with brows. Reporting only; the analyser version is unchanged.
 - **A character has a specimen** (cutan#40, an#347): the `character` kind declares `specimen=character_specimen`, a short cut-out shot casting the character alone, at rest and facing the camera, so `an library sheet` draws the character instead of a grey placeholder.
 - **Impacts: per-stroke variability and an arc fall** (cutan#27, for thoremin's air-drum benchmarks):
