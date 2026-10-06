@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cutan"
-version = "0.0.18"
+version = "0.0.19"
 description = "Cut-out animation for an: rigged characters, faces, lip-sync and styles, as a genre package on the an core."
 readme = "README.md"
 requires-python = ">=3.10"
