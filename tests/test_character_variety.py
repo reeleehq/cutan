@@ -51,11 +51,14 @@ DESCRIPTOR_KEYS = (
 #: Taken from the factory BEFORE the knobs existed (every SVG it writes, plus
 #: `DESCRIPTOR_KEYS`). If a later change moves one on purpose, re-take it and
 #: say why in the PR — this is the "defaults reproduce today's output" guard.
+#: Re-taken for an#253: the `viseme@happy`/`viseme@sad` mouths are redrawn as a
+#: curve (the corners move, not the whole mouth); every other file and field
+#: is unchanged, and `tests/test_silent_mouth.py` pins the neutral mouth's path.
 GOLDEN_FACTORY_DIGESTS = {
-    "kyle": "edc362cc65443bc4",
-    "stan": "5653f424b643c17b",
-    "maya": "21db2602f0d688f3",
-    "nobody": "17e3ce903b4b0374",
+    "kyle": "1643f2c548f05583",
+    "stan": "b9b252d8d44ec312",
+    "maya": "bd838257a4e56506",
+    "nobody": "6c44e6b983d758f3",
 }
 
 

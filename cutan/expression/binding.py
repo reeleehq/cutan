@@ -207,6 +207,43 @@ def declared_mouth_variants(desc: CharacterDescriptor) -> dict[str, str]:
     }
 
 
+def missing_mouth_form(
+    desc: CharacterDescriptor | None, preset: str | None, *, who: str | None = None
+) -> str | None:
+    """Why ``preset``'s mouth form will not show on ``desc`` — the descriptor
+    declares no ``viseme@<form>`` set, so the mouth stays on the neutral chart,
+    silent or speaking (an#253) — with the command that adds it; ``None`` when
+    the preset has no form, the set exists, or there is no overlay mouth to
+    change (a baked face, a rig with no ``viseme`` set).
+
+    One sentence for ``an validate`` (an ``expression`` and a dialogue
+    ``[emotion]``) and the compiler's silent-mouth hold.
+
+    >>> d = CharacterDescriptor(name="ned", asset_sets={"viseme": {"X": "mouth_x"}})
+    >>> missing_mouth_form(d, "angry")
+    "ned declares no 'viseme@angry' set, so under 'angry' its mouth keeps the neutral chart, silent or speaking: add it with `an character mouths ned --variants angry`"
+    >>> missing_mouth_form(d, "thinking") is None
+    True
+    """
+    try:
+        form = mouth_form_of(preset)
+    except (KeyError, ValueError):
+        return None  # an unknown preset is `expression_problems`' error
+    if desc is None or form is None or not desc.face_overlay:
+        return None
+    if VISEME_CHANNEL not in desc.asset_sets:
+        return None
+    variant = variant_set_name(form)
+    if variant in desc.asset_sets:
+        return None
+    who = who or desc.name
+    return (
+        f"{who} declares no {variant!r} set, so under {preset!r} its mouth keeps "
+        f"the neutral chart, silent or speaking: add it with "
+        f"`an character mouths {desc.name} --variants {form}`"
+    )
+
+
 def resolve_mouth_set(
     desc: CharacterDescriptor,
     preset: str | None,
@@ -320,6 +357,7 @@ __all__ = [
     "default_binding",
     "expression_problems",
     "preset_axes",
+    "missing_mouth_form",
     "resolve_mouth_set",
     "touches_gaze",
     "variant_set_name",
