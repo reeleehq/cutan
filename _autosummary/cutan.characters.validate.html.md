@@ -26,6 +26,8 @@ that cannot land.
 | [`DRAWABLE_ELEMENTS`](#cutan.characters.validate.DRAWABLE_ELEMENTS)         | Elements that put ink on the canvas.                                                                                                    |
 | [`BLOCKING`](#cutan.characters.validate.BLOCKING)                  | Severity for a problem that stops the part rendering correctly.                                                                         |
 | [`ADVISORY`](#cutan.characters.validate.ADVISORY)                  | Severity for a problem worth fixing that still renders.                                                                                 |
+| [`NOTE`](#cutan.characters.validate.NOTE)                      | Severity for a fact about the art worth knowing, not a problem.                                                                         |
+| [`LEG_PARTS`](#cutan.characters.validate.LEG_PARTS)                 | nothing steps, so its walks glide (the locomotion chain's last link) and nothing reads them.                                            |
 | [`DECLARED_ASPECT_TOLERANCE`](#cutan.characters.validate.DECLARED_ASPECT_TOLERANCE) | How far a declared box's aspect may differ from its art's before the containment is worth saying (a rounding of a pixel or two is not). |
 
 ### Functions
@@ -52,6 +54,19 @@ containment is worth saying (a rounding of a pixel or two is not).
 
 Elements that put ink on the canvas. A part containing none of these is
 blank, whatever else it contains.
+
+### cutan.characters.validate.LEG_PARTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('leg_l', 'leg_r')*
+
+nothing
+steps, so its walks glide (the locomotion chain’s last link) and nothing
+reads them. Required again as soon as a skin draws a leg slot.
+
+* **Type:**
+  The required parts a figure with no leg pair leaves out (cutan#35)
+
+### cutan.characters.validate.NOTE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'info'*
+
+Severity for a fact about the art worth knowing, not a problem.
 
 ### cutan.characters.validate.PART_SUFFIXES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('.svg', '.png', '.jpg', '.jpeg', '.webp')*
 

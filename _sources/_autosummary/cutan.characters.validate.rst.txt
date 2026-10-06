@@ -13,6 +13,8 @@ cutan.characters.validate
       DRAWABLE_ELEMENTS
       BLOCKING
       ADVISORY
+      NOTE
+      LEG_PARTS
       DECLARED_ASPECT_TOLERANCE
    
    .. rubric:: Functions
