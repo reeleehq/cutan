@@ -75,6 +75,8 @@ __all__ = [
     "policy_of",
     "policy_problems",
     "style_pack",
+    "style_voice",
+    "check_style_copies",
 ]
 
 #: The file suffix of a style spec in this package.
@@ -236,3 +238,6 @@ from cutan.styles.policy import (  # noqa: E402
     policy_problems,
     style_pack,
 )
+
+# Copies of a spec and whether they are stale (cutan#19).
+from cutan.styles.copies import check_style_copies, style_voice  # noqa: E402

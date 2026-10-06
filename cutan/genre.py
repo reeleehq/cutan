@@ -40,6 +40,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 from an.genres import CompilePass, Genre, RuntimeScript, SemanticCheck
+from cutan.styles.copies import check_style_copies
 from cutan.styles.policy import check_shot_policy
 
 from cutan import GENRE_NAME, LIBRARY_NAME, require_an
@@ -225,6 +226,16 @@ CUTOUT = Genre(
             _checks.check_character_refs,
             order=100.5,
             description="a character ref missing from the store draws the placeholder rig",
+        ),
+        SemanticCheck(
+            "cutout.style_copies",
+            check_style_copies,
+            stage="scene",
+            order=50,
+            description=(
+                "the style pack and the voices copied from a style spec are not "
+                "stale against the installed spec (cutan#19)"
+            ),
         ),
         SemanticCheck(
             "cutout.view_continuity",
