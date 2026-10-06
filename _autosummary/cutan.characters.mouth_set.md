@@ -23,9 +23,10 @@ True
 
 ### Module Attributes
 
-| [`DEFAULT_MOUTH_VIEWBOX`](#cutan.characters.mouth_set.DEFAULT_MOUTH_VIEWBOX)   | Mouth canvas viewBox (width, height) — small per-shape and centered so the anchor is always (0.5, 0.5).   |
-|--------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
-| [`DEFAULT_MOUTH_VARIANTS`](#cutan.characters.mouth_set.DEFAULT_MOUTH_VARIANTS)  | a `viseme@<form>` set per entry, its shapes drawn with this corner upturn added (an#98).                  |
+| [`DEFAULT_MOUTH_VIEWBOX`](#cutan.characters.mouth_set.DEFAULT_MOUTH_VIEWBOX)   | Mouth canvas viewBox (width, height) — small per-shape and centered so the anchor is always (0.5, 0.5).                    |
+|--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| [`SMILE_CURVE_GAIN`](#cutan.characters.mouth_set.SMILE_CURVE_GAIN)        | How far a variant's `smile` lifts the mouth's corners, as a fraction of the shape's half width per unit of smile (an#253). |
+| [`DEFAULT_MOUTH_VARIANTS`](#cutan.characters.mouth_set.DEFAULT_MOUTH_VARIANTS)  | a `viseme@<form>` set per entry, its shapes drawn with this corner upturn added (an#98).                                   |
 
 ### Functions
 
@@ -49,6 +50,14 @@ most-authored presets (`happy`/`amused`, `sad`) ask for.
 
 Mouth canvas viewBox (width, height) — small per-shape and centered so the
 anchor is always (0.5, 0.5).
+
+### cutan.characters.mouth_set.SMILE_CURVE_GAIN *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+
+How far a variant’s `smile` lifts the mouth’s corners, as a fraction of the
+shape’s half width per unit of smile (an#253). The corners move against the
+middle, so the line curves: a `viseme@happy` rest mouth is a closed smile,
+`viseme@sad` a frown. At `DEFAULT_MOUTH_VARIANTS`’ 0.35 the corners of
+the idle line rise about a sixth of its half width.
 
 ### cutan.characters.mouth_set.generate_default_mouths(, canvas=(256, 128), palette=None, shapes=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x'), smile=0.0, form=None)
 

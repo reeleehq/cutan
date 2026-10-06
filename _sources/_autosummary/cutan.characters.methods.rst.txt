@@ -18,6 +18,8 @@ cutan.characters.methods
 
    .. autosummary::
    
+      brow_loss
+      brow_moving_entities
       check_brow_acting
       check_declared_speech
       check_walk_gaits

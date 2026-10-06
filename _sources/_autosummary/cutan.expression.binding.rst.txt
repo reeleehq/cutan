@@ -22,6 +22,7 @@ cutan.expression.binding
       default_binding
       expression_problems
       preset_axes
+      missing_mouth_form
       resolve_mouth_set
       touches_gaze
       variant_set_name

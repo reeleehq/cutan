@@ -45,15 +45,16 @@ True
 
 ### Functions
 
-| [`binding_for`](#cutan.expression.binding.binding_for)(desc)                              | The descriptor's declared `expression_binding` (additive field), else the default.                                               |
-|-------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| [`declared_mouth_variants`](#cutan.expression.binding.declared_mouth_variants)(desc)                  | `{form: set name}` for every `viseme@<form>` set the descriptor declares.                                                        |
-| [`default_binding`](#cutan.expression.binding.default_binding)(desc)                          | The binding the default rig implies, from the slots it actually has.                                                             |
-| [`expression_problems`](#cutan.expression.binding.expression_problems)(desc, \*, preset[, axes])  | Every reason an expression cannot resolve on `desc` — empty means it can.                                                        |
-| [`preset_axes`](#cutan.expression.binding.preset_axes)(preset, \*[, axes, intensity])     | The numeric axis offsets an expression asks for: the preset's, with `axes` layered over them, scaled by `intensity` and clamped. |
-| [`resolve_mouth_set`](#cutan.expression.binding.resolve_mouth_set)(desc, preset, \*, keys_used) | Which mouth set a line under `preset` uses — the one chain, shared.                                                              |
-| [`touches_gaze`](#cutan.expression.binding.touches_gaze)(axes)                             | Whether any of `axes` is a gaze axis (a no-op on a rig without pupils).                                                          |
-| [`variant_set_name`](#cutan.expression.binding.variant_set_name)(form)                         | The swap-set name for a mouth form (`@` is a legal set-name character).                                                          |
+| [`binding_for`](#cutan.expression.binding.binding_for)(desc)                              | The descriptor's declared `expression_binding` (additive field), else the default.                                                                                                                                                                                                                                                               |
+|-------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`declared_mouth_variants`](#cutan.expression.binding.declared_mouth_variants)(desc)                  | `{form: set name}` for every `viseme@<form>` set the descriptor declares.                                                                                                                                                                                                                                                                        |
+| [`default_binding`](#cutan.expression.binding.default_binding)(desc)                          | The binding the default rig implies, from the slots it actually has.                                                                                                                                                                                                                                                                             |
+| [`expression_problems`](#cutan.expression.binding.expression_problems)(desc, \*, preset[, axes])  | Every reason an expression cannot resolve on `desc` — empty means it can.                                                                                                                                                                                                                                                                        |
+| [`preset_axes`](#cutan.expression.binding.preset_axes)(preset, \*[, axes, intensity])     | The numeric axis offsets an expression asks for: the preset's, with `axes` layered over them, scaled by `intensity` and clamped.                                                                                                                                                                                                                 |
+| [`missing_mouth_form`](#cutan.expression.binding.missing_mouth_form)(desc, preset, \*[, who])    | Why `preset`'s mouth form will not show on `desc` — the descriptor declares no `viseme@<form>` set, so the mouth stays on the neutral chart, silent or speaking (an#253) — with the command that adds it; `None` when the preset has no form, the set exists, or there is no overlay mouth to change (a baked face, a rig with no `viseme` set). |
+| [`resolve_mouth_set`](#cutan.expression.binding.resolve_mouth_set)(desc, preset, \*, keys_used) | Which mouth set a line under `preset` uses — the one chain, shared.                                                                                                                                                                                                                                                                              |
+| [`touches_gaze`](#cutan.expression.binding.touches_gaze)(axes)                             | Whether any of `axes` is a gaze axis (a no-op on a rig without pupils).                                                                                                                                                                                                                                                                          |
+| [`variant_set_name`](#cutan.expression.binding.variant_set_name)(form)                         | The swap-set name for a mouth form (`@` is a legal set-name character).                                                                                                                                                                                                                                                                          |
 
 ### Classes
 
@@ -157,6 +158,28 @@ Shared by `an validate` (each becomes an error Finding) and the compiler
 >>> expression_problems(CharacterDescriptor(name="m"), preset="joyful", who="m")
 ["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]
 >>> expression_problems(CharacterDescriptor(name="m", face_overlay=False), preset="happy", who="m")[0].startswith("'m' has its face baked")
+True
+```
+
+### cutan.expression.binding.missing_mouth_form(desc, preset, , who=None)
+
+Why `preset`’s mouth form will not show on `desc` — the descriptor
+declares no `viseme@<form>` set, so the mouth stays on the neutral chart,
+silent or speaking (an#253) — with the command that adds it; `None` when
+the preset has no form, the set exists, or there is no overlay mouth to
+change (a baked face, a rig with no `viseme` set).
+
+One sentence for `an validate` (an `expression` and a dialogue
+`[emotion]`) and the compiler’s silent-mouth hold.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+```pycon
+>>> d = CharacterDescriptor(name="ned", asset_sets={"viseme": {"X": "mouth_x"}})
+>>> missing_mouth_form(d, "angry")
+"ned declares no 'viseme@angry' set, so under 'angry' its mouth keeps the neutral chart, silent or speaking: add it with `an character mouths ned --variants angry`"
+>>> missing_mouth_form(d, "thinking") is None
 True
 ```
 

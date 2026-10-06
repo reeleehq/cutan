@@ -9,6 +9,7 @@ cutan.characters.mouth\_set
    .. autosummary::
    
       DEFAULT_MOUTH_VIEWBOX
+      SMILE_CURVE_GAIN
       DEFAULT_MOUTH_VARIANTS
    
    .. rubric:: Functions
