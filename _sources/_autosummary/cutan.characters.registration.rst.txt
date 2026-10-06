@@ -8,6 +8,7 @@ cutan.characters.registration
 
    .. autosummary::
    
+      character_specimen
       default_play_extent
       play
       play_duration

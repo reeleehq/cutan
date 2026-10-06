@@ -434,6 +434,33 @@
 </span><span id="line-237">        <span class="s2">"the stage engine; its nodes are stage nodes"</span>
 </span><span id="line-238">    <span class="p">),</span>
 </span><span id="line-239"><span class="p">)</span>
+</span><span id="line-240">
+</span><span id="line-241">
+<div class="viewcode-block" id="character_specimen">
+<a class="viewcode-back" href="../../../_autosummary/cutan.characters.registration.html#cutan.characters.registration.character_specimen">[docs]</a>
+</span><span id="line-242"><span class="k">def</span><span class="w"> </span><span class="nf">character_specimen</span><span class="p">(</span><span class="n">ref</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+</span><span id="line-243"><span class="w">    </span><span class="sd">"""The shot that shows one character on its own (an#347's</span>
+</span><span id="line-244"><span class="sd">    ``EntityKind.specimen``, cutan#40): the character at rest, facing the camera</span>
+</span><span id="line-245"><span class="sd">    (its rest view, untouched), alone, so the rig builder places its root at</span>
+</span><span id="line-246"><span class="sd">    the stage centre. ``an library sheet`` draws its first frame on a canvas</span>
+</span><span id="line-247"><span class="sd">    sized from the descriptor's ``view_box`` and trims it to what it shows.</span>
+</span><span id="line-248">
+</span><span id="line-249"><span class="sd">    &gt;&gt;&gt; from an.ir.schema import AssetRef</span>
+</span><span id="line-250"><span class="sd">    &gt;&gt;&gt; shot = character_specimen(AssetRef(kind="character", id="ned", store="characters", ref="ned"))</span>
+</span><span id="line-251"><span class="sd">    &gt;&gt;&gt; shot.renderer, [e.id for e in shot.entities], shot.actions</span>
+</span><span id="line-252"><span class="sd">    ('cutout', ['ned'], [])</span>
+</span><span id="line-253"><span class="sd">    """</span>
+</span><span id="line-254">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">SPECIMEN_DURATION</span><span class="p">,</span> <span class="n">SPECIMEN_SHOT_ID</span><span class="p">,</span> <span class="n">Shot</span>
+</span><span id="line-255">
+</span><span id="line-256">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan</span><span class="w"> </span><span class="kn">import</span> <span class="n">RENDERER_NAME</span>
+</span><span id="line-257">
+</span><span id="line-258">    <span class="k">return</span> <span class="n">Shot</span><span class="p">(</span>
+</span><span id="line-259">        <span class="nb">id</span><span class="o">=</span><span class="n">SPECIMEN_SHOT_ID</span><span class="p">,</span>
+</span><span id="line-260">        <span class="n">renderer</span><span class="o">=</span><span class="n">RENDERER_NAME</span><span class="p">,</span>
+</span><span id="line-261">        <span class="n">duration</span><span class="o">=</span><span class="n">SPECIMEN_DURATION</span><span class="p">,</span>
+</span><span id="line-262">        <span class="n">entities</span><span class="o">=</span><span class="p">[</span><span class="n">ref</span><span class="p">],</span>
+</span><span id="line-263">    <span class="p">)</span></div>
+
 </span></code></pre></div>
     </div></div>
           </main>
@@ -447,7 +474,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=5d650c58"></script>
+    <script src="../../../_static/documentation_options.js?v=6a9d8632"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

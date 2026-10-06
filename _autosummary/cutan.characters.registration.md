@@ -20,12 +20,13 @@ Plain declarations: importing this module registers nothing.
 
 ### Functions
 
-| [`default_play_extent`](#cutan.characters.registration.default_play_extent)(action)                  | A duration-less play's extent when no descriptor is known: a motion preset's natural length over `speed`, else `0.0`.   |
-|-----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| [`play`](#cutan.characters.registration.play)(target, animation, \*[, duration, ...]) | Play a named animation of the target entity's descriptor (an#7).                                                        |
-| [`play_duration`](#cutan.characters.registration.play_duration)(action, extent)                | The span a `play` occupies: its `duration`, else its natural extent.                                                    |
-| [`read_play_md`](#cutan.characters.registration.read_play_md)(item, \*, index)                | `{kind: play, target, animation, [duration], [speed], [loop], [args]}`.                                                 |
-| [`write_play_md`](#cutan.characters.registration.write_play_md)(leaf)                          | The `scene.md` entry for `leaf` (`read_play_md`'s inverse).                                                             |
+| [`character_specimen`](#cutan.characters.registration.character_specimen)(ref)                      | The shot that shows one character on its own (an#347's `EntityKind.specimen`, cutan#40): the character at rest, facing the camera (its rest view, untouched), alone, so the rig builder places its root at the stage centre.   |
+|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`default_play_extent`](#cutan.characters.registration.default_play_extent)(action)                  | A duration-less play's extent when no descriptor is known: a motion preset's natural length over `speed`, else `0.0`.                                                                                                          |
+| [`play`](#cutan.characters.registration.play)(target, animation, \*[, duration, ...]) | Play a named animation of the target entity's descriptor (an#7).                                                                                                                                                               |
+| [`play_duration`](#cutan.characters.registration.play_duration)(action, extent)                | The span a `play` occupies: its `duration`, else its natural extent.                                                                                                                                                           |
+| [`read_play_md`](#cutan.characters.registration.read_play_md)(item, \*, index)                | `{kind: play, target, animation, [duration], [speed], [loop], [args]}`.                                                                                                                                                        |
+| [`write_play_md`](#cutan.characters.registration.write_play_md)(leaf)                          | The `scene.md` entry for `leaf` (`read_play_md`'s inverse).                                                                                                                                                                    |
 
 ### Classes
 
@@ -71,6 +72,24 @@ refused; `rest` is never one — it is read off the built scene.
 #### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True, 'validate_by_alias': True, 'validate_by_name': True}*
 
 Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+### cutan.characters.registration.character_specimen(ref)
+
+The shot that shows one character on its own (an#347’s
+`EntityKind.specimen`, cutan#40): the character at rest, facing the camera
+(its rest view, untouched), alone, so the rig builder places its root at
+the stage centre. `an library sheet` draws its first frame on a canvas
+sized from the descriptor’s `view_box` and trims it to what it shows.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+```pycon
+>>> from an.ir.schema import AssetRef
+>>> shot = character_specimen(AssetRef(kind="character", id="ned", store="characters", ref="ned"))
+>>> shot.renderer, [e.id for e in shot.entities], shot.actions
+('cutout', ['ned'], [])
+```
 
 ### cutan.characters.registration.default_play_extent(action)
 
