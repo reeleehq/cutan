@@ -2,6 +2,7 @@
 
 ## 2026-10-06
 
+- **The offline and Rhubarb lip-syncs are free and repeatable** (cutan#29, an#311): both declare `repeatable = True` and `billed = False`, so `an cache gc` re-makes a missing viseme track in memory under the default `lipsync=offline` instead of skipping the knob set. Rhubarb gains `check_available()`, raising the typed `RhubarbNotFoundError` with the install hint, so a machine without the binary makes the line unkeyable rather than refusing the collection. Whisper stays undeclared (it downloads weights).
 - **The genre's vocabulary rows live in this skill** (an#354): `.claude/skills/cutan/SKILL.md` carries the generated table of the presets, methods and kinds cutan contributes (`python -m an.semantic.docs --write ... --owner cutout_animation`), checked by `tests/test_skill_vocabulary.py`; `an`'s skill lists only the core names, so a change here can no longer redden an `an` PR.
 
 ## 2026-10-05
