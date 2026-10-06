@@ -24,9 +24,9 @@ as `"cutan.compile.passes:<name>"`) and the character rig builder.
 
 ### Functions
 
-| [`blink_phase`](#cutan.compile.passes.blink_phase)(entity_id)   | The entity's blink phase in [0, 1): the runtime's rule, ported exactly.                                                                                                                                                                                                                           |
-|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`preset_context_of`](#cutan.compile.passes.preset_context_of)(vocab) | `(entity_id, play) -> PresetContext` for the extent resolver (`cutan.characters.play.play_extent_for()`): exactly the `gait` and `scale` `_with_view_and_posed_parts()` will fill in before the expansion, read off the same vocabulary, so a `sequence` waits for what the walk runs (cutan#12). |
+| [`blink_phase`](#cutan.compile.passes.blink_phase)(entity_id)                 | The entity's blink phase in [0, 1): the runtime's rule, ported exactly.                                                                                                                                                                                                                                                   |
+|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`preset_context_of`](#cutan.compile.passes.preset_context_of)(vocab, \*[, policy]) | `(entity_id, play) -> PresetContext` for the extent resolver (`cutan.characters.play.play_extent_for()`): exactly the `gait` and `scale` `_with_view_and_posed_parts()` will fill in before the expansion, read off the same vocabulary under the same `policy`, so a `sequence` waits for what the walk runs (cutan#12). |
 
 ### cutan.compile.passes.COARTICULATION_ENABLED *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
 
@@ -107,10 +107,10 @@ The entity’s blink phase in [0, 1): the runtime’s rule, ported exactly.
 0.762
 ```
 
-### cutan.compile.passes.preset_context_of(vocab)
+### cutan.compile.passes.preset_context_of(vocab, , policy=None)
 
 `(entity_id, play) -> PresetContext` for the extent resolver
 (`cutan.characters.play.play_extent_for()`): exactly the `gait` and
 `scale` `_with_view_and_posed_parts()` will fill in before the
-expansion, read off the same vocabulary, so a `sequence` waits for what
-the walk runs (cutan#12).
+expansion, read off the same vocabulary under the same `policy`, so a
+`sequence` waits for what the walk runs (cutan#12).

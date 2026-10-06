@@ -147,10 +147,16 @@ shot, then the style, then the aspect’s default chain. Where each lives:</p>
 carried into the project by the StylePack <a class="reference internal" href="#cutan.styles.policy.style_pack" title="cutan.styles.policy.style_pack"><code class="xref py py-func docutils literal notranslate"><span class="pre">style_pack()</span></code></a> builds (its
 <code class="docutils literal notranslate"><span class="pre">policy</span></code> field), the document a scene names in <code class="docutils literal notranslate"><span class="pre">meta.style_pack</span></code>. A
 snapshot, like every copy of a spec: the pack records the spec’s digest;</p></li>
-<li><p><strong>the shot</strong>: a <code class="docutils literal notranslate"><span class="pre">policy</span></code> field on the shot. <code class="docutils literal notranslate"><span class="pre">an</span></code>’s <code class="docutils literal notranslate"><span class="pre">scene.md</span></code> reader
-keeps only the shot keys it knows, so today it is read from <code class="docutils literal notranslate"><span class="pre">ir/scene.json</span></code>
-or set in Python, not from a <code class="docutils literal notranslate"><span class="pre">yaml</span> <span class="pre">shot</span></code> block (thorwhalen/an#348).</p></li>
+<li><p><strong>the shot</strong>: its <code class="docutils literal notranslate"><span class="pre">policy</span></code> field (<code class="docutils literal notranslate"><span class="pre">Shot.policy</span></code>, declared by <code class="docutils literal notranslate"><span class="pre">an</span></code>
+since thorwhalen/an#348), written in its <code class="docutils literal notranslate"><span class="pre">yaml</span> <span class="pre">shot</span></code> block, in
+<code class="docutils literal notranslate"><span class="pre">ir/scene.json</span></code> or in Python.</p></li>
 </ul>
+<p>Where a character’s DECLARED <code class="docutils literal notranslate"><span class="pre">gait</span></code>/<code class="docutils literal notranslate"><span class="pre">speech</span></code> sits is the core matcher’s one
+rule (<code class="docutils literal notranslate"><span class="pre">an.semantic.matcher.DECLARED_OUTRANKS_POLICY</span></code>, cutan#36): today it is
+the request. The compiler hands the policy to the <code class="docutils literal notranslate"><span class="pre">play</span></code> lowering through its
+products (<a class="reference internal" href="cutan.compile.passes.html#cutan.compile.passes.POLICY_PRODUCT" title="cutan.compile.passes.POLICY_PRODUCT"><code class="xref py py-data docutils literal notranslate"><span class="pre">cutan.compile.passes.POLICY_PRODUCT</span></code></a>); <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code> layers
+the same two documents (<a class="reference internal" href="#cutan.styles.policy.policy_in_force" title="cutan.styles.policy.policy_in_force"><code class="xref py py-func docutils literal notranslate"><span class="pre">policy_in_force()</span></code></a>, the pack read from the
+<code class="docutils literal notranslate"><span class="pre">styles</span></code> store), so the two resolve every walk alike.</p>
 <p>A policy choice is information, not a warning: a character that could walk on
 legs but bounces under South Park records a <code class="docutils literal notranslate"><span class="pre">policy</span></code> resolution beside its
 stand-ins, so the choice is visible and never silent.</p>
@@ -174,13 +180,16 @@ stand-ins, so the choice is visible and never silent.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.styles.policy.layered_policy" title="cutan.styles.policy.layered_policy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layered_policy</span></code></a>(*[, shot, style_pack])</p></td>
 <td><p>The policy in force: <code class="docutils literal notranslate"><span class="pre">shot</span></code> over <code class="docutils literal notranslate"><span class="pre">style_pack</span></code> (each checked).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.styles.policy.policy_of" title="cutan.styles.policy.policy_of"><code class="xref py py-obj docutils literal notranslate"><span class="pre">policy_of</span></code></a>(obj)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.styles.policy.policy_in_force" title="cutan.styles.policy.policy_in_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">policy_in_force</span></code></a>(ctx, *[, shot, index])</p></td>
+<td><p>The policy the compiler will resolve a shot's aspects under: its <code class="docutils literal notranslate"><span class="pre">policy</span></code> over the scene's style pack's (<a class="reference internal" href="#cutan.styles.policy.layered_policy" title="cutan.styles.policy.layered_policy"><code class="xref py py-func docutils literal notranslate"><span class="pre">layered_policy()</span></code></a>), once per shot; <code class="docutils literal notranslate"><span class="pre">None</span></code> when neither has one or either is malformed (<code class="xref py py-func docutils literal notranslate"><span class="pre">check_shot_policy()</span></code> reports that).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.styles.policy.policy_of" title="cutan.styles.policy.policy_of"><code class="xref py py-obj docutils literal notranslate"><span class="pre">policy_of</span></code></a>(obj)</p></td>
 <td><p>The policy block an object carries: a <code class="docutils literal notranslate"><span class="pre">policy</span></code> field (declared or extra) or key; else <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.styles.policy.policy_problems" title="cutan.styles.policy.policy_problems"><code class="xref py py-obj docutils literal notranslate"><span class="pre">policy_problems</span></code></a>(policy)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.styles.policy.policy_problems" title="cutan.styles.policy.policy_problems"><code class="xref py py-obj docutils literal notranslate"><span class="pre">policy_problems</span></code></a>(policy)</p></td>
 <td><p>What is wrong with a <code class="docutils literal notranslate"><span class="pre">policy</span></code> block, one sentence each (empty when it is sound).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.styles.policy.style_pack" title="cutan.styles.policy.style_pack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">style_pack</span></code></a>(spec)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.styles.policy.style_pack" title="cutan.styles.policy.style_pack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">style_pack</span></code></a>(spec)</p></td>
 <td><p>The StylePack a project saves for a style: its <code class="docutils literal notranslate"><span class="pre">live.style_pack</span></code> (a bare pack named after the style when the spec has none), its <code class="docutils literal notranslate"><span class="pre">policy</span></code>, and the spec it was copied from (name and digest) in <code class="docutils literal notranslate"><span class="pre">metadata</span></code>.</p></td>
 </tr>
 </tbody>
@@ -233,6 +242,20 @@ there would be accepted and do nothing, so it is refused).</p>
 <p>Each argument is anything <a class="reference internal" href="#cutan.styles.policy.policy_of" title="cutan.styles.policy.policy_of"><code class="xref py py-func docutils literal notranslate"><span class="pre">policy_of()</span></code></a> reads (or <code class="docutils literal notranslate"><span class="pre">None</span></code>). The
 author’s explicit request is not here: the matcher puts it first
 (<code class="docutils literal notranslate"><span class="pre">resolve(...,</span> <span class="pre">requested=)</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.styles.policy.policy_in_force">
+<span class="sig-prename descclassname"><span class="pre">cutan.styles.policy.</span></span><span class="sig-name descname"><span class="pre">policy_in_force</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">shot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/styles/policy.html#policy_in_force"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.styles.policy.policy_in_force" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.styles.policy.policy_in_force'">¶</a></dt>
+<dd><p>The policy the compiler will resolve a shot’s aspects under: its
+<code class="docutils literal notranslate"><span class="pre">policy</span></code> over the scene’s style pack’s (<a class="reference internal" href="#cutan.styles.policy.layered_policy" title="cutan.styles.policy.layered_policy"><code class="xref py py-func docutils literal notranslate"><span class="pre">layered_policy()</span></code></a>), once per
+shot; <code class="docutils literal notranslate"><span class="pre">None</span></code> when neither has one or either is malformed
+(<code class="xref py py-func docutils literal notranslate"><span class="pre">check_shot_policy()</span></code> reports that). The shot is the check’s current
+one unless <code class="docutils literal notranslate"><span class="pre">shot</span></code> and <code class="docutils literal notranslate"><span class="pre">index</span></code> name another (a scene-stage check).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
@@ -304,6 +327,7 @@ style’s name, a path, a mapping). Save it as the skill’s step 3 says:
 <li><a :data-current="activeSection === '#cutan.styles.policy.PolicyError'" class="reference internal" href="#cutan.styles.policy.PolicyError"><code class="docutils literal notranslate"><span class="pre">PolicyError</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.policy.check_policy'" class="reference internal" href="#cutan.styles.policy.check_policy"><code class="docutils literal notranslate"><span class="pre">check_policy()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.policy.layered_policy'" class="reference internal" href="#cutan.styles.policy.layered_policy"><code class="docutils literal notranslate"><span class="pre">layered_policy()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.styles.policy.policy_in_force'" class="reference internal" href="#cutan.styles.policy.policy_in_force"><code class="docutils literal notranslate"><span class="pre">policy_in_force()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.policy.policy_of'" class="reference internal" href="#cutan.styles.policy.policy_of"><code class="docutils literal notranslate"><span class="pre">policy_of()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.policy.policy_problems'" class="reference internal" href="#cutan.styles.policy.policy_problems"><code class="docutils literal notranslate"><span class="pre">policy_problems()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.policy.style_pack'" class="reference internal" href="#cutan.styles.policy.style_pack"><code class="docutils literal notranslate"><span class="pre">style_pack()</span></code></a></li>
@@ -320,7 +344,7 @@ style’s name, a path, a mapping). Save it as the skill’s step 3 says:
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=8bafd125"></script>
+<script src="../_static/documentation_options.js?v=2fd7553c"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

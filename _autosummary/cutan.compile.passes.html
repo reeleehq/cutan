@@ -176,8 +176,8 @@ as <code class="docutils literal notranslate"><span class="pre">"cutan.compile.p
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.passes.blink_phase" title="cutan.compile.passes.blink_phase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blink_phase</span></code></a>(entity_id)</p></td>
 <td><p>The entity's blink phase in [0, 1): the runtime's rule, ported exactly.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.compile.passes.preset_context_of" title="cutan.compile.passes.preset_context_of"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preset_context_of</span></code></a>(vocab)</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">(entity_id,</span> <span class="pre">play)</span> <span class="pre">-&gt;</span> <span class="pre">PresetContext</span></code> for the extent resolver (<code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.characters.play.play_extent_for()</span></code>): exactly the <code class="docutils literal notranslate"><span class="pre">gait</span></code> and <code class="docutils literal notranslate"><span class="pre">scale</span></code> <code class="xref py py-func docutils literal notranslate"><span class="pre">_with_view_and_posed_parts()</span></code> will fill in before the expansion, read off the same vocabulary, so a <code class="docutils literal notranslate"><span class="pre">sequence</span></code> waits for what the walk runs (cutan#12).</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.compile.passes.preset_context_of" title="cutan.compile.passes.preset_context_of"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preset_context_of</span></code></a>(vocab, *[, policy])</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(entity_id,</span> <span class="pre">play)</span> <span class="pre">-&gt;</span> <span class="pre">PresetContext</span></code> for the extent resolver (<code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.characters.play.play_extent_for()</span></code>): exactly the <code class="docutils literal notranslate"><span class="pre">gait</span></code> and <code class="docutils literal notranslate"><span class="pre">scale</span></code> <code class="xref py py-func docutils literal notranslate"><span class="pre">_with_view_and_posed_parts()</span></code> will fill in before the expansion, read off the same vocabulary under the same <code class="docutils literal notranslate"><span class="pre">policy</span></code>, so a <code class="docutils literal notranslate"><span class="pre">sequence</span></code> waits for what the walk runs (cutan#12).</p></td>
 </tr>
 </tbody>
 </table>
@@ -278,12 +278,12 @@ whose visual carries a <code class="code docutils literal notranslate"><span cla
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.compile.passes.preset_context_of">
-<span class="sig-prename descclassname"><span class="pre">cutan.compile.passes.</span></span><span class="sig-name descname"><span class="pre">preset_context_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/compile/passes.html#preset_context_of"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.passes.preset_context_of" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.passes.preset_context_of'">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cutan.compile.passes.</span></span><span class="sig-name descname"><span class="pre">preset_context_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/compile/passes.html#preset_context_of"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.passes.preset_context_of" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.passes.preset_context_of'">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">(entity_id,</span> <span class="pre">play)</span> <span class="pre">-&gt;</span> <span class="pre">PresetContext</span></code> for the extent resolver
 (<code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.characters.play.play_extent_for()</span></code>): exactly the <code class="docutils literal notranslate"><span class="pre">gait</span></code> and
 <code class="docutils literal notranslate"><span class="pre">scale</span></code> <code class="xref py py-func docutils literal notranslate"><span class="pre">_with_view_and_posed_parts()</span></code> will fill in before the
-expansion, read off the same vocabulary, so a <code class="docutils literal notranslate"><span class="pre">sequence</span></code> waits for what
-the walk runs (cutan#12).</p>
+expansion, read off the same vocabulary under the same <code class="docutils literal notranslate"><span class="pre">policy</span></code>, so a
+<code class="docutils literal notranslate"><span class="pre">sequence</span></code> waits for what the walk runs (cutan#12).</p>
 <dl class="field-list simple">
 </dl>
 </dd></dl>
@@ -316,7 +316,7 @@ the walk runs (cutan#12).</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=8bafd125"></script>
+<script src="../_static/documentation_options.js?v=2fd7553c"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

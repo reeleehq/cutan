@@ -17,6 +17,7 @@ cutan.styles.policy
    
       check_policy
       layered_policy
+      policy_in_force
       policy_of
       policy_problems
       style_pack

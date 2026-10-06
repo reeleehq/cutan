@@ -59,8 +59,8 @@ The clip of one descriptor `play` (the presets were expanded already).
 
 #### expand(flat_list, , products=None, \*\*kw)
 
-Replace each `play` of a motion preset by the tweens and sets it stands for.
-`products` is the shot’s compile products (an#348), not read yet.
+Replace each `play` of a motion preset by the tweens and sets it stands
+for, a walk’s gait under the scene’s policy (`products`, an#348).
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
@@ -69,8 +69,8 @@ Replace each `play` of a motion preset by the tweens and sets it stands for.
 
 `play -> seconds` for a play that names no duration, read off its
 descriptor — and, for a walk, off the gait and scale the expansion will
-fill in ([`cutan.compile.passes.preset_context_of()`](cutan.compile.passes.html.md#cutan.compile.passes.preset_context_of), cutan#12).
-`products` is the shot’s compile products (an#348), not read yet.
+fill in ([`cutan.compile.passes.preset_context_of()`](cutan.compile.passes.html.md#cutan.compile.passes.preset_context_of), cutan#12),
+under the scene’s policy the policy pass left in `products` (an#348).
 
 * **Return type:**
   [`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[[`Any`](https://docs.python.org/3/library/typing.html#typing.Any)], [`float`](https://docs.python.org/3/builtins/functions.html#float)]
