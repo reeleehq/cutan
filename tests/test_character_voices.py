@@ -96,11 +96,16 @@ def test_two_characters_speak_two_voices_at_two_pitches(tmp_path):
     produce_audio_for_scene(scene, mall, tts=tts, lipsync=lip)
     carl, ned = scene.timeline[0].dialogue
     assert tts.voices == ["Junior", "Ralph"]
+    # The effects reach the key as the pipeline normalises them (an#376 adds the
+    # chain's version to every effected key): build the expectation the same way
+    # rather than spelling the normalised form out here.
+    from an.audio.effects import normalize_effects
+
     assert carl.audio_ref == audio_key(
-        "Hi!", "carl_voice", "sine", {"pitch_semitones": 5.0}, provider_voice="Junior"
+        "Hi!", "carl_voice", "sine", normalize_effects({"pitch_semitones": 5}), provider_voice="Junior"
     )
     assert ned.audio_ref == audio_key(
-        "Bye.", "ned_voice", "sine", {"pitch_semitones": 2.0}, provider_voice="Ralph"
+        "Bye.", "ned_voice", "sine", normalize_effects({"pitch_semitones": 2}), provider_voice="Ralph"
     )
     # Pitched differently: the two lines' audio differs though the TTS is one sine.
     assert mall["audio"][carl.audio_ref] != mall["audio"][ned.audio_ref]
