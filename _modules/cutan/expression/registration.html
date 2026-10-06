@@ -371,8 +371,8 @@
 </span><span id="line-175">            <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
 </span><span id="line-176">        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
 </span><span id="line-177">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="line-178">                <span class="sa">f</span><span class="s2">"has [</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">]: after the emotion comes its intensity, a number "</span>
-</span><span id="line-179">                <span class="s2">"from 0 to 1 (`[angry 0.4]`)"</span>
+</span><span id="line-178">                <span class="sa">f</span><span class="s2">"has [</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">], which is not an emotion name, nor a name and its "</span>
+</span><span id="line-179">                <span class="s2">"intensity from 0 to 1 (`[angry 0.4]`)"</span>
 </span><span id="line-180">            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 </span><span id="line-181">        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
 </span><span id="line-182">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"has [</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">]: an intensity runs from 0 to 1"</span><span class="p">)</span>
@@ -427,7 +427,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=f91d8841"></script>
+    <script src="../../../_static/documentation_options.js?v=5d650c58"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
