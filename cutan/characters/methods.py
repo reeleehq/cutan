@@ -70,6 +70,8 @@ __all__ = [
     "EXPRESSION",
     "LOCOMOTION",
     "SPEECH",
+    "brow_loss",
+    "brow_moving_entities",
     "check_brow_acting",
     "check_declared_speech",
     "check_walk_gaits",
@@ -865,31 +867,31 @@ def _brow_moves(preset: str | None, axes: Mapping[str, float] | None = None) -> 
     return any(moved.get(a) for a in BROW_AXES)
 
 
-def brow_acting_problem(doc: Any, *, entity: str) -> str | None:
-    """Why ``entity``'s brows cannot act (its expression falls to
-    ``expr.without_brows``), with the remedy — or ``None`` when they can, or when
-    the character has no brow slots at all (nothing it ever had is lost).
+def brow_loss(desc: Any, profile: Mapping[str, Any], *, entity: str):
+    """The expression aspect's fall to ``expr.without_brows`` for one character,
+    as a :class:`~an.semantic.Resolution` carrying the ``missing``
+    substitution, or ``None`` when its brows can act.
 
-    ``doc`` is the character's stored document; a procedural rig (no
-    descriptor) has no brows to lose.
+    THE rule for who records it (an#283), shared by the compiler (the record
+    ``--strict-assets`` refuses), ``an validate`` and :func:`brow_acting_problem`:
+    only a character that HAS brows to lose — an overlay face whose binding
+    moves brow slots — and cannot act with them (covered, or their art
+    missing). A baked face (``face_overlay: false``, a DiceBear head), a
+    descriptor with no brow slots, or a procedural rig (no descriptor) has
+    nothing to lose and records nothing. ``profile`` is the analyser's answer
+    for what compiled (:func:`compile_profile`, with the store's art probe).
     """
     from cutan.characters.brows import brow_slots
-    from cutan.characters.schema import CharacterDescriptor
-    from an.ir.migrate import migrate
     from an.semantic import resolve
 
-    if not isinstance(doc, Mapping) or doc.get("kind") != "CharacterDescriptor":
+    if desc is None or not desc.face_overlay or not brow_slots(desc):
         return None
-    desc = CharacterDescriptor.model_validate(
-        migrate(dict(doc), kind="CharacterDescriptor")
-    )
-    if not desc.face_overlay or not brow_slots(desc):
-        return None  # a face whose binding moves no brow has nothing to lose
-    r = resolve(
-        EXPRESSION, compile_profile(desc), entity=entity, entity_kind=CHARACTER_KIND
-    )
-    if r.substitution is None:
-        return None
+    r = resolve(EXPRESSION, profile, entity=entity, entity_kind=CHARACTER_KIND)
+    return r if r.substitution is not None else None
+
+
+def brow_loss_sentence(desc: Any, r: Any) -> str:
+    """What :func:`brow_loss` found, said with its cause and the remedy."""
     from cutan.characters.brows import BROWS_FEATURE
 
     cover = desc.occluded.get(BROWS_FEATURE)
@@ -897,16 +899,62 @@ def brow_acting_problem(doc: Any, *, entity: str) -> str | None:
     remedy = EXPR_FULL_FACE.remedies["face.brows"]
     return (
         f"{why}, so the brows cannot be seen acting: the expression reads through "
-        f"the lids, the gaze and the mouth only ({r.method.id}). To act with the "
-        f"brows: {remedy}"
+        f"the lids, the gaze and the mouth only ({r.method.id}; missing "
+        f"{', '.join(r.substitution.missing)}). To act with the brows: {remedy}"
     )
+
+
+def brow_acting_problem(
+    doc: Any, *, entity: str, art_exists: Any = None
+) -> str | None:
+    """Why ``entity``'s brows cannot act (its expression falls to
+    ``expr.without_brows``), with the remedy — or ``None`` when they can, or when
+    the character has no brows to lose (:func:`brow_loss`).
+
+    ``doc`` is the character's stored document; ``art_exists`` the store's
+    probe (without it, brow art is assumed present, so only a cover is seen).
+    """
+    from cutan.characters.schema import CharacterDescriptor
+    from an.ir.migrate import migrate
+
+    if not isinstance(doc, Mapping) or doc.get("kind") != "CharacterDescriptor":
+        return None
+    desc = CharacterDescriptor.model_validate(
+        migrate(dict(doc), kind="CharacterDescriptor")
+    )
+    r = brow_loss(desc, compile_profile(desc, art_exists=art_exists), entity=entity)
+    return None if r is None else brow_loss_sentence(desc, r)
+
+
+def brow_moving_entities(shot: Any) -> dict[str, list[str]]:
+    """``{entity: [IR paths]}``: the shot's expressions (an ``expression`` leaf,
+    or a dialogue line's ``[emotion]``) that move a character's brows, where
+    each is written (``actions/<k>``, ``dialogue/<j>/emotion``)."""
+    from an.ir.compose import flatten
+
+    out: dict[str, list[str]] = {}
+    for k, action in enumerate(shot.actions or ()):
+        for flat in flatten(action):
+            leaf = flat.action
+            if getattr(leaf, "kind", None) != "expression":
+                continue
+            if _brow_moves(leaf.preset, leaf.axes):
+                entity = (getattr(leaf, "target", "") or "").split("/", 1)[0]
+                out.setdefault(entity, []).append(f"actions/{k}")
+    for j, line in enumerate(shot.dialogue or ()):
+        emotion = (line.emotion or "").strip().lower()
+        if emotion and _brow_moves(emotion):
+            out.setdefault(line.speaker, []).append(f"dialogue/{j}/emotion")
+    return out
 
 
 def check_brow_acting(ctx) -> None:
     """The cut-out genre's semantic check: an expression that moves the brows of
     a character whose brows cannot act is reported (a warning) — the expression
-    aspect's recorded fall to ``expr.without_brows`` (an#252)."""
-    from an.ir.compose import flatten
+    aspect's recorded fall to ``expr.without_brows`` (an#252), by the rule the
+    compiler records it with (:func:`brow_loss`, an#283), the store's art probe
+    included."""
+    from an.stores._common import art_exists_for
 
     store = ctx.stores.get("characters")
     if store is None:
@@ -916,35 +964,19 @@ def check_brow_acting(ctx) -> None:
         for e in ctx.shot.entities
         if e.kind == CHARACTER_KIND and e.ref in store
     }
-    problems: dict[str, str | None] = {}
-
-    def problem(entity: str) -> str | None:
-        if entity not in problems:
-            try:
-                doc = store[refs[entity]]
-            except KeyError:
-                doc = None
-            problems[entity] = brow_acting_problem(doc, entity=entity)
-        return problems[entity]
-
-    for k, action in enumerate(ctx.shot.actions or ()):
-        for flat in flatten(action):
-            leaf = flat.action
-            if getattr(leaf, "kind", None) != "expression":
-                continue
-            entity = (getattr(leaf, "target", "") or "").split("/", 1)[0]
-            if entity not in refs or not _brow_moves(leaf.preset, leaf.axes):
-                continue
-            if (p := problem(entity)) is not None:
-                ctx.report.add("warning", f"{ctx.path}/actions/{k}", f"{entity}: {p}")
-    for j, line in enumerate(ctx.shot.dialogue or ()):
-        emotion = (line.emotion or "").strip().lower()
-        if not emotion or line.speaker not in refs or not _brow_moves(emotion):
+    for entity, paths in brow_moving_entities(ctx.shot).items():
+        if entity not in refs:
             continue
-        if (p := problem(line.speaker)) is not None:
-            ctx.report.add(
-                "warning", f"{ctx.path}/dialogue/{j}/emotion", f"{line.speaker}: {p}"
-            )
+        try:
+            doc = store[refs[entity]]
+        except KeyError:
+            continue
+        problem = brow_acting_problem(
+            doc, entity=entity, art_exists=art_exists_for(store, refs[entity])
+        )
+        if problem is not None:
+            for path in paths:
+                ctx.report.add("warning", f"{ctx.path}/{path}", f"{entity}: {problem}")
 
 
 def gait_problem(

@@ -472,7 +472,10 @@ def _viseme_pass(state: CompileState) -> None:
 def _face_pass(state: CompileState) -> None:
     """Cut-out: the face (an#98) -- blinks, expressions, gaze and the silent mouth
     form; one channel per (node, property). An entity nothing expresses on gets
-    its blink clips exactly as before (an#88)."""
+    its blink clips exactly as before (an#88). A character whose brows an
+    expression moves but cannot act gets the expression aspect's fall recorded
+    (an#283), which ``--strict-assets`` refuses."""
+    _record_brow_losses(state.shot, state.vocab, state.resolutions)
     state.blink_phases, state.gaze_seeds = _add_face_clips(
         state.shot,
         state.animations,
@@ -484,6 +487,36 @@ def _face_pass(state: CompileState) -> None:
         poses=state.poses,
         view_spans=state.view_spans,
     )
+
+
+def _record_brow_losses(
+    shot: Shot,
+    vocab: _SwapVocabulary | None,
+    resolutions: list[AssetResolutionJSON] | None,
+) -> None:
+    """The expression aspect's fall (``expr.full_face`` -> ``expr.without_brows``),
+    recorded once per character an expression in this shot asks to move the
+    brows of, by the one rule :func:`cutan.characters.methods.brow_loss` (an#283).
+    The record's detail is the sentence ``an validate`` warns with, remedy
+    included."""
+    from cutan.characters.methods import (
+        brow_loss,
+        brow_loss_sentence,
+        brow_moving_entities,
+        substitution_record,
+    )
+
+    if vocab is None or resolutions is None:
+        return
+    for entity in brow_moving_entities(shot):
+        desc = vocab.descriptors.get(entity)
+        if not _on_registry(entity, vocab) or desc is None:
+            continue
+        r = brow_loss(desc, _character_profile(entity, vocab), entity=entity)
+        if r is not None:
+            record = substitution_record(r.substitution)
+            record["detail"] = f"{entity}: {brow_loss_sentence(desc, r)}"
+            resolutions.append(AssetResolutionJSON(**record))
 
 
 def _build_character_entity(entity: AssetRef, build: SceneBuild) -> None:
