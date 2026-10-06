@@ -2,6 +2,7 @@
 
 ## 2026-10-06
 
+- **Nested characters and the library's package, in the cutan skill** (an#450, an#455): the generated rig-paths table has a `nesting: bones` row (its paths follow the chain: `c/torso/arm_r`, `c/torso/head/mouth`); the addressing prose says when the rigs are flat; a verified recipe adds an elbow to a factory character (the arm split by viewBox crops, a `fore_r` bone with a rest bend); and the skill says `an library find` reads the `an` library unless `--package cutan`.
 - **The changelog merges as a union** (`.gitattributes`: `misc/CHANGELOG.md merge=union`): two branches adding a line under the same date rebase without a conflict.
 
 - **An interleaved chain is no longer "refused" by `an character validate`** (with thorwhalen/an#430): the stage paints it from a global part order, so the advisory says which engine capability it needs (`engine.paint_order:global`) instead of claiming compile refuses it.

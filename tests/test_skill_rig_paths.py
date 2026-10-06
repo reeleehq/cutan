@@ -10,6 +10,7 @@ states (which side each arm hangs on).
 
 from __future__ import annotations
 
+import json
 import re
 import warnings
 from pathlib import Path
@@ -33,6 +34,7 @@ ENTITY = "c"
 RIGS = (
     ("`an character new --offline` (default)", "made", {}),
     ("`new_character(..., gaze=False)`", "no_gaze", {"gaze": False}),
+    ("the default rig with `\"nesting\": \"bones\"` (an#340)", "nested", {"nesting": "bones"}),
     ("no descriptor (the placeholder rig)", "missing", None),
 )
 
@@ -50,9 +52,15 @@ def _rigs_mall(root: Path):
     mall = build_project_mall(root)
     for _label, ref, kwargs in RIGS:
         if kwargs is not None:
-            new_character(
+            kwargs = dict(kwargs)
+            nesting = kwargs.pop("nesting", None)
+            made = new_character(
                 root / "assets" / "characters", name=ref, use_dicebear=False, **kwargs
             )
+            if nesting:  # a descriptor field, not a factory knob
+                doc = json.loads(made.read_text(encoding="utf-8"))
+                doc["nesting"] = nesting
+                made.write_text(json.dumps(doc, indent=2), encoding="utf-8")
     return mall
 
 
