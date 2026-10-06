@@ -237,3 +237,27 @@ CHARACTER = EntityKind(
         "the stage engine; its nodes are stage nodes"
     ),
 )
+
+
+def character_specimen(ref: Any) -> Any:
+    """The shot that shows one character on its own (an#347's
+    ``EntityKind.specimen``, cutan#40): the character at rest, facing the camera
+    (its rest view, untouched), alone, so the rig builder places its root at
+    the stage centre. ``an library sheet`` draws its first frame on a canvas
+    sized from the descriptor's ``view_box`` and trims it to what it shows.
+
+    >>> from an.ir.schema import AssetRef
+    >>> shot = character_specimen(AssetRef(kind="character", id="ned", store="characters", ref="ned"))
+    >>> shot.renderer, [e.id for e in shot.entities], shot.actions
+    ('cutout', ['ned'], [])
+    """
+    from an.ir.schema import SPECIMEN_DURATION, SPECIMEN_SHOT_ID, Shot
+
+    from cutan import RENDERER_NAME
+
+    return Shot(
+        id=SPECIMEN_SHOT_ID,
+        renderer=RENDERER_NAME,
+        duration=SPECIMEN_DURATION,
+        entities=[ref],
+    )

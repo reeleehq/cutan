@@ -2,6 +2,7 @@
 
 ## 2026-10-06
 
+- **A character has a specimen** (cutan#40, an#347): the `character` kind declares `specimen=character_specimen`, a short cut-out shot casting the character alone, at rest and facing the camera, so `an library sheet` draws the character instead of a grey placeholder.
 - **Silhouette styles keep their faces readable, and a short turn on twos never vanishes** (an#273):
   - The Reiniger spec declares cut-out eyes (`live.characters.part_tints`: white scleras, since a part's tint replaces the root's). `tests/test_style_specs.py` checks each part against the nodes an offline character is built with.
   - A `turn` played by name gets the shot's `step_hz`; one whose halves are shorter than a step is a hard swap at its midpoint, not a squash a stepped frame catches edge-on (`turn` version 2).
