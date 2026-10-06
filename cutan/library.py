@@ -292,6 +292,8 @@ CHARACTER_CAPABILITIES: tuple[Capability, ...] = (
     FACE_MOUTH,
     FACE_BROWS,
 )
+
+
 #: The character analyser (declared by the cut-out genre, registered with it).
 def character_overrides(doc: Mapping[str, Any], art: Mapping[str, Any]) -> list[str]:
     """The declared fields that REMOVED a capability (an#381): ``occluded``
@@ -314,7 +316,11 @@ def character_overrides(doc: Mapping[str, Any], art: Mapping[str, Any]) -> list[
     desc = CharacterDescriptor.model_validate(
         migrate(dict(doc), kind="CharacterDescriptor")
     )
-    if BROWS_FEATURE in (desc.occluded or {}) and desc.face_overlay and brow_slots(desc):
+    if (
+        BROWS_FEATURE in (desc.occluded or {})
+        and desc.face_overlay
+        and brow_slots(desc)
+    ):
         return ["occluded"]
     return []
 
