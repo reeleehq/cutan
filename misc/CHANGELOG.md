@@ -2,6 +2,8 @@
 
 ## 2026-10-06
 
+- **The locomotion-resolution tests moved here from `an`** (thorwhalen/an#427): `tests/test_locomotion_resolution.py` drives the matcher over cutan's own `loco.*` and `speech.*` methods, so a new gait fails this repository, never an `an` PR.
+
 - **The `an character` sub-commands are pinned here** (with thorwhalen/an#424): a literal list beside `cutan.characters.cli._dispatch_funcs`, so a new sub-command is pinned by the genre and no longer breaks `an`'s CLI test.
 - **Skill: what `voxy` is** (an#399, end-user test finding 9): `cutan-style`'s voice-acting step named `voxy.voice_id()` without saying what `voxy` is; it now gives `an voices list --provider elevenlabs` first and says `voxy` is a separate, optional voice facade.
 - **Kurzgesagt wipes are live** (an#390): `live.transitions.wipe` (`{kind: wipe, duration: 0.5, direction: left}`). The guidance no longer calls wipes unbuilt, and the stale-claim guard refuses a spec that does.
