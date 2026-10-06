@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-06
+
+- **The genre's vocabulary rows live in this skill** (an#354): `.claude/skills/cutan/SKILL.md` carries the generated table of the presets, methods and kinds cutan contributes (`python -m an.semantic.docs --write ... --owner cutout_animation`), checked by `tests/test_skill_vocabulary.py`; `an`'s skill lists only the core names, so a change here can no longer redden an `an` PR.
+
 ## 2026-10-05
 
 - **Docs and coverage** (cutan#23, #24, #25): a legless figure glides, not rocks, everywhere it is said (the descriptor's `gait` field, the art-package skill, a test docstring); `misc/docs/locomotion_gaits.md` says what the gaits do (the hem halves tilt as mirror images, and swing like legs in profile; `waddle` and `bounce` move their legs by view; `rock` rocks about the origin; the `waddle` preset and the `waddle` gait are two things; South Park's `bounce` is declared per character until cutan#9); the gait test walks a `parts` rig with legs beside the legless placeholder, which `WALK_LEG_NAMES`'s comment no longer credits with legs.
