@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-06T14:44:59Z",
+  "built_at": "2026-10-06T14:47:08Z",
   "package": {
     "name": "cutan",
-    "version": "0.0.42",
+    "version": "0.0.43",
     "display_name": "cutan",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "7535efc9f72ad72ff001b9502d6f5dd25848b284",
-    "short_commit": "7535efc",
+    "commit": "70b1644a185115480511dab116b033d019e27458",
+    "short_commit": "70b1644",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/cutan",
-    "commit_url": "https://github.com/thorwhalen/cutan/commit/7535efc9f72ad72ff001b9502d6f5dd25848b284",
+    "commit_url": "https://github.com/thorwhalen/cutan/commit/70b1644a185115480511dab116b033d019e27458",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/cutan",
-    "sha": "a4644020cddb50078d9075034b22a145de339e13",
+    "sha": "7535efc9f72ad72ff001b9502d6f5dd25848b284",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "37480724283",
-    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/37480724283",
+    "run_id": "37481100859",
+    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/37481100859",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -60,11 +60,11 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.42",
+    "latest": "0.0.43",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout 7535efc9f72ad72ff001b9502d6f5dd25848b284\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout 70b1644a185115480511dab116b033d019e27458\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,
