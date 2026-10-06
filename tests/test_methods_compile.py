@@ -427,3 +427,23 @@ def test_an_unhonourable_speech_declaration_fails_validate_and_compile_by_name(d
         compile_shot(shot, {"characters": store})
     char_report = validate_character(tmp_path / "typo", name="typo")
     assert any("speech" in f.ir_path for f in char_report.findings), char_report.findings
+
+
+def test_a_pulse_waits_for_the_first_word_after_a_breath(store, tmp_path):
+    """an#272 finding 11: with word timings (measured on the audio), the head
+    dips when the word is heard, not when an offline viseme track says the
+    mouth opens, which ignores the breath before it."""
+    _baked(store, tmp_path)
+    shot = _speaking("baked")
+    line = shot.dialogue[0].model_copy(
+        update={"word_timings": [WordTimingIR(text="hello", start=0.35, end=0.6),
+                                 WordTimingIR(text="there", start=0.7, end=0.95)]}
+    )
+    assert syllable_beats(line) == [0.35, 0.7]  # the 0.1 s viseme onset is in the breath
+    scene = compile_shot(shot.model_copy(update={"dialogue": [line]}),
+                         {"characters": CharactersStore(tmp_path)})
+    head = _head(scene)
+    # the line starts at 0.5 s: nothing during the breath, a dip one attack after each word
+    assert head(0.5 + 0.1 + 0.06) == pytest.approx(1.0)
+    assert head(0.5 + 0.35 + 0.06) == pytest.approx(1.06)
+    assert head(0.5 + 0.7 + 0.06) == pytest.approx(1.06)

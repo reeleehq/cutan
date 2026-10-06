@@ -31,7 +31,11 @@ from cutan.characters.play import (
     swap_slots,
 )
 from cutan.characters.schema import DFLT_VIEW, VIEW_CHANNEL, CharacterDescriptor
-from cutan.expression.binding import expression_problems, missing_mouth_form
+from cutan.expression.binding import (
+    expression_problems,
+    lid_rung_problems,
+    missing_mouth_form,
+)
 from an.ir.compose import flatten
 from an.ir.migrate import migrate
 from an.ir.schema import SceneIR
@@ -345,6 +349,14 @@ def _check_expression_actions(
                 missing := missing_mouth_form(desc, leaf.preset, who=repr(entity_id))
             ) is not None:
                 report.add("warning", f"{path}/actions/{k}", missing)
+            for problem in lid_rung_problems(
+                desc,
+                leaf.preset,
+                axes=leaf.axes,
+                intensity=leaf.intensity,
+                who=repr(entity_id),
+            ):
+                report.add("warning", f"{path}/actions/{k}", problem)
     for j, line in enumerate(shot.dialogue):
         emotion = (line.emotion or "").strip().lower()
         if not emotion:
@@ -356,6 +368,14 @@ def _check_expression_actions(
             missing := missing_mouth_form(desc, emotion, who=repr(line.speaker))
         ) is not None:
             report.add("warning", f"{path}/dialogue/{j}/emotion", missing)
+        intensity = getattr(line, "emotion_intensity", None)
+        for problem in lid_rung_problems(
+            desc,
+            emotion,
+            intensity=1.0 if intensity is None else intensity,
+            who=repr(line.speaker),
+        ):
+            report.add("warning", f"{path}/dialogue/{j}/emotion", problem)
         if desc is not None and not desc.face_overlay:
             report.add(
                 "warning",

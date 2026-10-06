@@ -125,6 +125,95 @@ def render_silhouette(
     return out
 
 
+#: Square frame the stage draws each figure in, and the output size, in px.
+DFLT_SILHOUETTE_SIZE: int = 512
+#: Luminance below which a pixel of the tinted render is the figure.
+SILHOUETTE_THRESHOLD: int = 128
+#: Each figure gets one shot this long; one frame is taken from its middle.
+_SHOT_S: float = 1.0
+#: The style pack that makes the stage's backdrop white behind a black figure.
+_BACKDROP_PACK: str = "silhouette"
+
+
+def render_character_silhouettes(
+    char_dirs: dict[str, str | Path],
+    out_dir: str | Path,
+    *,
+    size: int = DFLT_SILHOUETTE_SIZE,
+) -> dict[str, Path]:
+    """Silhouettes of characters AS THE STAGE DRAWS THEM: ``{name: png}``.
+
+    Each character (a folder holding ``character.json``) is rendered by the
+    cut-out renderer in a throwaway project, alone in the frame, its root
+    tinted black over a white backdrop, so the silhouette is the figure a
+    viewer sees: its build, head scale, hat and pose (an#272). The old path
+    rasterised the factory's composite ``<name>.svg``, which draws none of
+    those, so two different figures compared as identical. One render for all,
+    one shot each, every figure placed the same way, so IoUs compare shapes.
+
+    Needs the stage renderer (Playwright Chromium) and ffmpeg. Writes only
+    under ``out_dir``, never into a character's folder.
+    """
+    import shutil
+    import warnings
+
+    from an import init
+    from an.ir.schema import AssetRef, Meta, Resolution, SceneIR, SetAction, Shot
+    from an.project import load
+    from an.render import render
+    from an.styles import StylePack
+    from an.verify.media import extract_frames
+
+    Image, _ = _ensure_pil()
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    names = list(char_dirs)
+    with tempfile.TemporaryDirectory() as tmp:
+        root = init(Path(tmp) / "silhouettes")
+        for name, src in char_dirs.items():
+            shutil.copytree(Path(src), root / "assets" / "characters" / name)
+        mall = load(root).mall
+        mall["styles"][_BACKDROP_PACK] = StylePack(
+            name=_BACKDROP_PACK, roles={"sky": "#ffffff", "ground": "#ffffff"}
+        ).model_dump(mode="json")
+        shots = [
+            Shot(
+                id=f"s{i}",
+                duration=_SHOT_S,
+                entities=[
+                    AssetRef(kind="character", id="c", store="characters", ref=name)
+                ],
+                actions=[
+                    SetAction(target="c", property="tint", value="#000000", at=0.0)
+                ],
+            )
+            for i, name in enumerate(names)
+        ]
+        mall["scenes"]["main"] = SceneIR(
+            meta=Meta(
+                fps=12,
+                resolution=Resolution(width=size, height=size),
+                style_pack=_BACKDROP_PACK,
+            ),
+            timeline=shots,
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")  # a tool's render, not the user's film
+            mp4 = render(load(root), auto_audio=False)
+        frames = extract_frames(mp4, Path(tmp) / "frames", fps=1.0 / _SHOT_S)
+        result: dict[str, Path] = {}
+        for name, frame in zip(names, frames):
+            grey = Image.open(frame).convert("L")
+            mask = grey.point(lambda v: 0 if v < SILHOUETTE_THRESHOLD else 255)
+            path = out / f"{name}.png"
+            mask.convert("RGB").save(path)
+            result[name] = path
+    missing = [n for n in names if n not in result]
+    if missing:
+        raise RuntimeError(f"the silhouette render gave no frame for {missing}")
+    return result
+
+
 def compare_silhouettes(
     a: str | Path, b: str | Path, *, size: tuple[int, int] = (256, 256)
 ) -> float:
