@@ -276,7 +276,7 @@ def lid_rung_problems(
 
     >>> d = CharacterDescriptor(name="bob", asset_sets={"eyelid": {"OPEN": "o", "CLOSED": "c"}})
     >>> lid_rung_problems(d, None, axes={"lid_open_l": -0.45})
-    ["bob's eyelids have no 'HALF' drawing, so lid_open_l -0.45 shows 'OPEN' (its eyelid set: CLOSED, OPEN): add a HALF eyelid drawing to the set, or use -0.85 or lower to close the lid"]
+    ["bob's eyelids have no 'HALF' drawing, so lid_open_l -0.45 shows 'OPEN' (its eyelid set: CLOSED, OPEN): add a HALF eyelid drawing to the set (`an character add-half-lid bob` makes one from the rig's own lids), or use -0.85 or lower to close the lid"]
     >>> lid_rung_problems(d, None, axes={"lid_open_l": -0.9})
     []
     """
@@ -299,7 +299,8 @@ def lid_rung_problems(
         shown = lid_key(value, available=keys)
         if wanted != shown:
             fix = f"add a {wanted} eyelid drawing to the set" + (
-                f", or use {LID_CLOSED_BELOW:g} or lower to close the lid"
+                f" (`an character add-half-lid {desc.name}` makes one from the "
+                f"rig's own lids), or use {LID_CLOSED_BELOW:g} or lower to close the lid"
                 if wanted == LID_KEY_HALF
                 else ""
             )
