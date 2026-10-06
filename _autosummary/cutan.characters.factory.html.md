@@ -419,12 +419,14 @@ screen. Missing files are skipped.
 How far a character’s art reaches above and below its stage point, in
 scene pixels at `stage.scale: 1`: `{"top", "feet", "height"}`.
 
-The stage point (`stage.at`) is not the feet: the compiler places a rig
+The stage point (`stage.at`) is the rig’s declared `origin` when it
+has one (an#338); otherwise it is not the feet: the compiler places a rig
 by the middle of its bones’ extent, between the neck and the feet, so
 where the feet land depends on the build and the head scale (a squat
 figure’s feet sit about half as far below the point as a tall one’s).
-Read from the compiler’s own placement rule and the head’s art, so this is
-what the compiled scene does, not a second guess at it. Multiply by
+Read from the compiler’s own placement rule (`an.stage.rig.rig_origin`)
+and the head’s art, so this is what the compiled scene does, not a second
+guess at it. Multiply by
 `stage.scale`. The head reaches its drawing’s top edge (a hat stays
 inside it).
 

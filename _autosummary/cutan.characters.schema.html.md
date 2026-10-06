@@ -119,7 +119,7 @@ owns a schema is the one that knows its version field.
 
 ### *class* cutan.characters.schema.CharacterDescriptor(\*\*data)
 
-Bases: `RigModel`
+Bases: `RigDocument`
 
 The on-disk character schema. Saved as `character.json`.
 

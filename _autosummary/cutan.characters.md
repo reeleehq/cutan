@@ -166,7 +166,7 @@ Optional pivot name — must match a circle in the SVG `skeleton` group.
 
 ### *class* cutan.characters.CharacterDescriptor(\*\*data)
 
-Bases: `RigModel`
+Bases: `RigDocument`
 
 The on-disk character schema. Saved as `character.json`.
 

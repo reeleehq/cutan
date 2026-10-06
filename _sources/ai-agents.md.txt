@@ -37,7 +37,7 @@ Source: [`.claude/skills/cutan-dev-lipsync`](https://github.com/thorwhalen/cutan
 
 ### `cutan-dev-rig-contract`
 
-How a character descriptor becomes a scene tree in the `an` repo — which fields are load-bearing, which are declared and dead, and the invariants that broke when they were ignored. Use when touching `_build_svg_character_subtree`, `cutan/characters/schema.py`, `extract_part`/`promote`, the descriptor→scene mapping, part sizing or placement, `viseme_map`/`asset_sets`, the character migration, or anything that decides what an illustrator's art does on screen. Triggers on "the art doesn't change anything", "part is stretched", "aspect ratio", "bones", "slots", "skins", "attachment", "view_box", "descriptor", "rig", "missing part", "white rectangle", "an character validate".
+How a character descriptor becomes a scene tree in the `an` repo — which fields are load-bearing, which are declared and dead, and the invariants that broke when they were ignored. Use when touching `an.stage.rig.build_rig_subtree` (the old `_build_svg_character_subtree`), `cutan/characters/schema.py`, `extract_part`/`promote`, the descriptor→scene mapping, part sizing or placement, `viseme_map`/`asset_sets`, the character migration, or anything that decides what an illustrator's art does on screen. Triggers on "the art doesn't change anything", "part is stretched", "aspect ratio", "bones", "slots", "skins", "attachment", "view_box", "descriptor", "rig", "missing part", "white rectangle", "an character validate".
 
 Source: [`.claude/skills/cutan-dev-rig-contract`](https://github.com/thorwhalen/cutan/tree/HEAD/.claude/skills/cutan-dev-rig-contract).
 

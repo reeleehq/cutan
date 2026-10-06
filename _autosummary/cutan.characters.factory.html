@@ -668,12 +668,14 @@ screen. Missing files are skipped.</p>
 <span class="sig-prename descclassname"><span class="pre">cutan.characters.factory.</span></span><span class="sig-name descname"><span class="pre">stage_extent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">desc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/factory.html#stage_extent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.factory.stage_extent" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.factory.stage_extent'">¶</a></dt>
 <dd><p>How far a character’s art reaches above and below its stage point, in
 scene pixels at <code class="docutils literal notranslate"><span class="pre">stage.scale:</span> <span class="pre">1</span></code>: <code class="docutils literal notranslate"><span class="pre">{"top",</span> <span class="pre">"feet",</span> <span class="pre">"height"}</span></code>.</p>
-<p>The stage point (<code class="docutils literal notranslate"><span class="pre">stage.at</span></code>) is not the feet: the compiler places a rig
+<p>The stage point (<code class="docutils literal notranslate"><span class="pre">stage.at</span></code>) is the rig’s declared <code class="docutils literal notranslate"><span class="pre">origin</span></code> when it
+has one (an#338); otherwise it is not the feet: the compiler places a rig
 by the middle of its bones’ extent, between the neck and the feet, so
 where the feet land depends on the build and the head scale (a squat
 figure’s feet sit about half as far below the point as a tall one’s).
-Read from the compiler’s own placement rule and the head’s art, so this is
-what the compiled scene does, not a second guess at it. Multiply by
+Read from the compiler’s own placement rule (<code class="docutils literal notranslate"><span class="pre">an.stage.rig.rig_origin</span></code>)
+and the head’s art, so this is what the compiled scene does, not a second
+guess at it. Multiply by
 <code class="docutils literal notranslate"><span class="pre">stage.scale</span></code>. The head reaches its drawing’s top edge (a hat stays
 inside it).</p>
 <dl class="field-list simple">
@@ -822,7 +824,7 @@ slots a rig has (a rig without the eye stack has no pupils to pose).</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=63b572e7"></script>
+<script src="../_static/documentation_options.js?v=8bafd125"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
