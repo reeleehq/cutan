@@ -4,8 +4,10 @@
 
 This documentation was built on **2026-10-06 13:18 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/ff247f8ec7aa45b30181e66fbbafccb99eb004ee"><code>ff247f8</code></a> on branch <code>main</code>, for **cutan 0.0.29** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.29) is behind the latest release on PyPI (0.0.30): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
@@ -22,9 +24,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37469043188">37469043188</a>     |
+| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37469192400">37469192400</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>711811c2a38a0815c9f0a1e75ec445b3b13060a5</code> (in the history of the built commit) |
+| Event commit | <code>a0ec288060201fd3f0aa496d00f74abc58c19aa1</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -49,7 +51,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.29/">0.0.29</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.30/">0.0.30</a>, newer than the documented version (0.0.29).
 
 ## Reproduce
 

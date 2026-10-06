@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-06T13:18:07Z",
+  "built_at": "2026-10-06T13:18:55Z",
   "package": {
     "name": "cutan",
     "version": "0.0.29",
@@ -23,12 +23,12 @@
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/cutan",
-    "sha": "711811c2a38a0815c9f0a1e75ec445b3b13060a5",
+    "sha": "a0ec288060201fd3f0aa496d00f74abc58c19aa1",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "37469043188",
-    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/37469043188",
+    "run_id": "37469192400",
+    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/37469192400",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -62,14 +62,16 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.29",
-    "relation": "same",
+    "latest": "0.0.30",
+    "relation": "behind",
     "error": null
   },
   "reproduce": "git clone https://github.com/thorwhalen/cutan && cd cutan\ngit checkout ff247f8ec7aa45b30181e66fbbafccb99eb004ee\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": true,
-    "notes": []
+    "aligned": false,
+    "notes": [
+      "The documented version (0.0.29) is behind the latest release on PyPI (0.0.30): `pip install cutan` gives newer code than these docs describe."
+    ]
   }
 }
