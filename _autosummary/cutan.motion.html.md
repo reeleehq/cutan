@@ -30,7 +30,7 @@ the genre’s presets into it.
 
 | [`WALK_LANDING_S`](#cutan.motion.WALK_LANDING_S)    | Every channel of a walk — a limb's and the body's (cutan#15) — ends with a constant tween this long at its end value instead of a settling `set`: it lands the value exactly (a held tween END is evaluated at its own end, which float drift cannot put a grid step early), and unlike a `set` — whose hold outranks a view's pose channel, and holds again when a longer authored tween on the property ends — it lets later motion carry on.   |
 |--------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`WALK_LEG_NAMES`](#cutan.motion.WALK_LEG_NAMES)    | the rig contract's (descriptor rigs, `an character new`), then the procedural placeholder's.                                                                                                                                                                                                                                                                                                                                                      |
+| [`WALK_LEG_NAMES`](#cutan.motion.WALK_LEG_NAMES)    | the rig contract's (descriptor rigs, `an character new`), then a `parts` rig's (the built-in placeholder draws arms and no legs: it glides).                                                                                                                                                                                                                                                                                                      |
 | [`GAITS`](#cutan.motion.GAITS)             | persisted in character descriptors and `play` args (`cutan.characters.schema.GAITS`), so a spelling is never renamed.                                                                                                                                                                                                                                                                                                                             |
 | [`LEGGED_GAITS`](#cutan.motion.LEGGED_GAITS)      | The gaits that move a leg pair — and need one (the `limbs.legs` capability).                                                                                                                                                                                                                                                                                                                                                                      |
 | [`DFLT_LEGLESS_GAIT`](#cutan.motion.DFLT_LEGLESS_GAIT) | the locomotion chain's last link.                                                                                                                                                                                                                                                                                                                                                                                                                 |
@@ -113,7 +113,8 @@ on the property ends — it lets later motion carry on.
 ### cutan.motion.WALK_LEG_NAMES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)], ...]* *= (('leg_l', 'leg_r'), ('left_leg', 'right_leg'))*
 
 the rig contract’s
-(descriptor rigs, `an character new`), then the procedural placeholder’s.
+(descriptor rigs, `an character new`), then a `parts` rig’s (the
+built-in placeholder draws arms and no legs: it glides).
 
 * **Type:**
   Leg and arm node names a walk looks for, in order
@@ -297,8 +298,10 @@ walk’s length (`steps × step_s`) is known before it is placed and a
 - `shuffle`: `legs` with the feet barely leaving the ground — short,
   quick steps, no bob to speak of.
 - `hem`: a robe whose leg slots are the two halves of its hem: facing
-  the camera the halves TILT in turn by `hem_tilt` radians while the body
-  sways by `rock` and bobs (in a profile they swing like legs).
+  the camera the halves TILT by `hem_tilt` radians as mirror images (the
+  hem opens and closes) while the body sways by `rock` and bobs; in a
+  side or three-quarter view they swing like legs by `stride` and the
+  sway is dropped.
 - `waddle`: the body rocks `rock` from foot to foot and bobs; legs, if
   any, lift in turn.
 - `hop`: the body jumps `hop_height` px on every step.

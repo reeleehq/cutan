@@ -242,9 +242,10 @@ provenance/licensing metadata.
 #### gait *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
 
 This character’s default walk `gait` (one of `GAITS`, an#220);
-an author’s `gait` arg overrides it. `None` = `legs` when the rig
-builds a leg pair, else `rock`. A robe figure whose leg slots are hem
-halves declares `"hem"` once, here, rather than on every walk.
+an author’s `gait` arg overrides it. `None` = the locomotion chain:
+`legs` when the rig affords a leg pair, else `glide` (an#224). A robe
+figure whose leg slots are hem halves declares `"hem"` once, here,
+rather than on every walk.
 Omitted from the stored document when unset.
 
 #### gaze_travel *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
