@@ -580,13 +580,12 @@ def resolve_walk_gait(
         views = dict(profile["swap.view"])
         views["keys"] = [k for k in views["keys"] if k != "side"]
         profile["swap.view"] = views
-    if policy is not None and requested is None:  # a request is not ordered by a policy
-        from cutan.styles.policy import applicable_policy
-
-        # against the profile as it stands in this view: a profile cycle the
-        # view does not show is skipped (cutan#17), not chosen
-        policy = applicable_policy(policy, LOCOMOTION, profile, on_skip=on_skip)
+    # against the profile as it stands in this view: a profile cycle the view
+    # does not show is a skipped policy entry (cutan#17), not a choice
     r = resolve(LOCOMOTION, profile, requested=requested, policy=policy, entity=entity)
+    if on_skip is not None:
+        for method, missing in r.skipped:
+            on_skip(method, missing)
     sub = r.substitution
     if side_not_showing and sub is not None and "swap.view:side" in sub.missing:
         r = replace(
@@ -1215,14 +1214,6 @@ def _authored_pulse_speakers(shot) -> set[str]:
     return out
 
 
-def _applicable(policy: Any, aspect: str, profile, on_skip=None) -> Any:
-    if policy is None:
-        return None
-    from cutan.styles.policy import applicable_policy
-
-    return applicable_policy(policy, aspect, profile, on_skip=on_skip)
-
-
 def speech_plan(
     shot,
     *,
@@ -1275,26 +1266,19 @@ def speech_plan(
             continue
         if speaker not in resolved:
             requested = getattr(descriptor_of(speaker), "speech", None)
-            profile = profile_of(speaker)
-            skipped: list[tuple[str, tuple[str, ...]]] = []
             r = resolve(
                 SPEECH,
-                profile,
+                profile_of(speaker),
                 requested=requested,
-                policy=(
-                    None
-                    if requested is not None
-                    else _applicable(
-                        policy, SPEECH, profile, lambda m, t: skipped.append((m, t))
-                    )
-                ),
+                # a declared method that cannot be honoured falls to the chain
+                policy=None if requested is not None else policy,
                 entity=speaker,
             )
             resolved[speaker] = r
             if r.substitution is not None and record is not None:
                 record(r.substitution)
             if record_skip is not None:
-                for method, missing in skipped:
+                for method, missing in r.skipped:
                     record_skip(speaker, method, r.method.id, missing)
         r = resolved[speaker]
         if (

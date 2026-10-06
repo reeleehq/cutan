@@ -160,7 +160,7 @@ def test_a_walk_on_a_part_fails_the_same_way_under_a_policy(store):
 
 
 def test_a_policy_head_that_does_not_apply_is_skipped_not_fatal(store):
-    """an#334's case, worked around here: the first APPLICABLE entry of the order wins."""
+    """an#334's case, now the matcher's own: the first APPLICABLE entry of the order wins."""
     mall = {"characters": store}
     shot = _walk_shot("legless").model_copy(
         update={"policy": {"locomotion": ["loco.hem_sway", "loco.glide"]}})

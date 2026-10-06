@@ -37,17 +37,21 @@ CHARACTERS_STORE: str = "characters"
 class PlayLowering:
     """The ``play`` action kind, as the stage compiler lowers it (an#7, an#166, an#220)."""
 
-    def extent_resolver(self, vocab: Any) -> Callable[[Any], float]:
+    def extent_resolver(
+        self, vocab: Any, *, products: Any = None
+    ) -> Callable[[Any], float]:
         """``play -> seconds`` for a play that names no duration, read off its
         descriptor — and, for a walk, off the gait and scale the expansion will
-        fill in (:func:`cutan.compile.passes.preset_context_of`, cutan#12)."""
+        fill in (:func:`cutan.compile.passes.preset_context_of`, cutan#12).
+        ``products`` is the shot's compile products (an#348), not read yet."""
         return play_extent_for(
             lambda entity_id: vocab.descriptors.get(entity_id) if vocab else None,
             context_of=preset_context_of(vocab),
         )
 
-    def expand(self, flat_list: list, **kw: Any) -> list:
-        """Replace each ``play`` of a motion preset by the tweens and sets it stands for."""
+    def expand(self, flat_list: list, *, products: Any = None, **kw: Any) -> list:
+        """Replace each ``play`` of a motion preset by the tweens and sets it stands for.
+        ``products`` is the shot's compile products (an#348), not read yet."""
         return _expand_preset_plays(flat_list, **kw)
 
     def view_of(self, entity_swaps: Any, vocab: Any, *, duration: float):
@@ -70,7 +74,7 @@ class PlayLowering:
 class ExpressionLowering:
     """The ``expression`` action kind: the face solver's input, so it makes no clip of its own."""
 
-    def extent_resolver(self, vocab: Any) -> None:
+    def extent_resolver(self, vocab: Any, *, products: Any = None) -> None:
         return None
 
     def expand(self, flat_list: list, **kw: Any) -> list:

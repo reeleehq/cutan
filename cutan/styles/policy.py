@@ -35,7 +35,6 @@ __all__ = [
     "APPLIED_ASPECTS",
     "POLICY_KEY",
     "PolicyError",
-    "applicable_policy",
     "check_policy",
     "layered_policy",
     "policy_of",
@@ -247,44 +246,6 @@ def style_pack(spec: Any) -> Any:
         origin["sha256"] = hashlib.sha256(raw).hexdigest()
     pack["metadata"] = {**(pack.get("metadata") or {}), "style_spec": origin}
     return StylePack(**pack)
-
-
-def applicable_policy(
-    policy: Any,
-    aspect: str,
-    profile: Mapping[str, Any],
-    *,
-    on_skip: Callable[[str, tuple[str, ...]], None] | None = None,
-) -> Any:
-    """``policy`` with ``aspect``'s order cut to the methods that apply to ``profile``.
-
-    A policy is an order: its first APPLICABLE entry wins (ADR 0002). The
-    core matcher today treats the order's head as a request (an#334), so a
-    head that does not apply (a profile cycle on a figure with no side view)
-    would be recorded as a fatal ``missing`` substitution. Handing it only the
-    entries that apply gives the order's own meaning: the first of them is a
-    non-fatal ``policy`` choice, and none applying leaves the chain to decide.
-    Each entry passed over before the first applicable one is reported to
-    ``on_skip(method id, missing terms)``, so a skip is recorded, never silent
-    (ADR 0002 decision 6). Drop this once
-    an#334 lands.
-    """
-    S = _registry()
-    p = S.Policy.of(policy)
-    kept = []
-    for c in p.choices(aspect):
-        gaps = S.why_not(c, profile)
-        if gaps:
-            # only the entries passed over on the way to the winner are news;
-            # one after it was never needed
-            if on_skip is not None and not kept:
-                on_skip(c.method, tuple(g.term for g in gaps))
-        else:
-            kept.append(c)
-    order = {a: cs for a, cs in p.order.items() if a != aspect}
-    if kept:
-        order[aspect] = tuple(kept)
-    return S.Policy(order)
 
 
 def _is_cutout(shot: Any) -> bool:
