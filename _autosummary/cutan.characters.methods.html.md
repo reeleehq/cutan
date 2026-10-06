@@ -376,12 +376,27 @@ it fatal.
 
 Syllable onsets of a dialogue line, in seconds from its start.
 
-From the line’s viseme track (a syllable starts where the mouth opens out
-of a closed shape), else its word timings (one beat per word), else one
-beat at its start. Beats closer than `min_gap_s` merge.
+The line’s word timings, when its provider has them, are the authority:
+they are measured on the audio, so a beat never falls in a leading breath
+or a pause (an#272: a pulse dipped 0.35 s before “Hi” was heard). Each
+word starts a beat, and the viseme track’s syllables (where the mouth
+opens out of a closed shape) add beats INSIDE a word’s window, never
+outside every word. With no word timings: the viseme track’s syllables,
+else one beat at the line’s start. Beats closer than `min_gap_s` merge.
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+```pycon
+>>> from types import SimpleNamespace as NS
+>>> track = NS(keyframes=[NS(time=0.0, viseme="B"), NS(time=0.4, viseme="X"),
+...                       NS(time=0.7, viseme="C")])
+>>> syllable_beats(NS(viseme_track=track, word_timings=None, duration=1.2))
+[0.0, 0.7]
+>>> words = [NS(start=0.35, end=1.0)]  # a breath before the word
+>>> syllable_beats(NS(viseme_track=track, word_timings=words, duration=1.2))
+[0.35, 0.7]
+```
 
 ### cutan.characters.methods.walk_arg_problems(gait, args)
 

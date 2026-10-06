@@ -4,6 +4,12 @@ cutan.characters.cli
 .. automodule:: cutan.characters.cli
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      SILHOUETTE_ARTIFACTS
+   
    .. rubric:: Functions
 
    .. autosummary::

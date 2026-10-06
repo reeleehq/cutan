@@ -144,17 +144,41 @@ typically the sweet spot for visually-distinct characters.</p>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Skip the doctest body — it requires Playwright with Chromium installed.</span>
 </span></code></pre></div>
 </div>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.silhouette.DFLT_SILHOUETTE_SIZE" title="cutan.characters.silhouette.DFLT_SILHOUETTE_SIZE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_SILHOUETTE_SIZE</span></code></a></p></td>
+<td><p>Square frame the stage draws each figure in, and the output size, in px.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.silhouette.SILHOUETTE_THRESHOLD" title="cutan.characters.silhouette.SILHOUETTE_THRESHOLD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SILHOUETTE_THRESHOLD</span></code></a></p></td>
+<td><p>Luminance below which a pixel of the tinted render is the figure.</p></td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.silhouette.compare_silhouettes" title="cutan.characters.silhouette.compare_silhouettes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compare_silhouettes</span></code></a>(a, b, *[, size])</p></td>
 <td><p>Return IoU between two silhouette PNGs (0..1; lower = more distinct).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.silhouette.render_silhouette" title="cutan.characters.silhouette.render_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render_silhouette</span></code></a>(svg_source, out_png, *[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.silhouette.render_character_silhouettes" title="cutan.characters.silhouette.render_character_silhouettes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render_character_silhouettes</span></code></a>(char_dirs, ...)</p></td>
+<td><p>Silhouettes of characters AS THE STAGE DRAWS THEM: <code class="docutils literal notranslate"><span class="pre">{name:</span> <span class="pre">png}</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.silhouette.render_silhouette" title="cutan.characters.silhouette.render_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render_silhouette</span></code></a>(svg_source, out_png, *[, ...])</p></td>
 <td><p>Render an SVG to a binary silhouette PNG (black on white).</p></td>
 </tr>
 </tbody>
 </table>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.characters.silhouette.DFLT_SILHOUETTE_SIZE">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.silhouette.</span></span><span class="sig-name descname"><span class="pre">DFLT_SILHOUETTE_SIZE</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">int</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">512</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.silhouette.DFLT_SILHOUETTE_SIZE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.silhouette.DFLT_SILHOUETTE_SIZE'">¶</a></dt>
+<dd><p>Square frame the stage draws each figure in, and the output size, in px.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.characters.silhouette.SILHOUETTE_THRESHOLD">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.silhouette.</span></span><span class="sig-name descname"><span class="pre">SILHOUETTE_THRESHOLD</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">int</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">128</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.silhouette.SILHOUETTE_THRESHOLD" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.silhouette.SILHOUETTE_THRESHOLD'">¶</a></dt>
+<dd><p>Luminance below which a pixel of the tinted render is the figure.</p>
+</dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.characters.silhouette.compare_silhouettes">
 <span class="sig-prename descclassname"><span class="pre">cutan.characters.silhouette.</span></span><span class="sig-name descname"><span class="pre">compare_silhouettes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(256,</span> <span class="pre">256)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/silhouette.html#compare_silhouettes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.silhouette.compare_silhouettes" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.silhouette.compare_silhouettes'">¶</a></dt>
@@ -171,6 +195,25 @@ pixels is computed.</p>
 </span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Tested via test suite, not doctest, since it requires Playwright.</span>
 </span></code></pre></div>
 </div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.silhouette.render_character_silhouettes">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.silhouette.</span></span><span class="sig-name descname"><span class="pre">render_character_silhouettes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_dirs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/silhouette.html#render_character_silhouettes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.silhouette.render_character_silhouettes" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.silhouette.render_character_silhouettes'">¶</a></dt>
+<dd><p>Silhouettes of characters AS THE STAGE DRAWS THEM: <code class="docutils literal notranslate"><span class="pre">{name:</span> <span class="pre">png}</span></code>.</p>
+<p>Each character (a folder holding <code class="docutils literal notranslate"><span class="pre">character.json</span></code>) is rendered by the
+cut-out renderer in a throwaway project, alone in the frame, its root
+tinted black over a white backdrop, so the silhouette is the figure a
+viewer sees: its build, head scale, hat and pose (an#272). The old path
+rasterised the factory’s composite <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;.svg</span></code>, which draws none of
+those, so two different figures compared as identical. One render for all,
+one shot each, every figure placed the same way, so IoUs compare shapes.</p>
+<p>Needs the stage renderer (Playwright Chromium) and ffmpeg. Writes only
+under <code class="docutils literal notranslate"><span class="pre">out_dir</span></code>, never into a character’s folder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.characters.silhouette.render_silhouette">
@@ -190,7 +233,10 @@ background with the given color.</p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
+<li><a :data-current="activeSection === '#cutan.characters.silhouette.DFLT_SILHOUETTE_SIZE'" class="reference internal" href="#cutan.characters.silhouette.DFLT_SILHOUETTE_SIZE"><code class="docutils literal notranslate"><span class="pre">DFLT_SILHOUETTE_SIZE</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.silhouette.SILHOUETTE_THRESHOLD'" class="reference internal" href="#cutan.characters.silhouette.SILHOUETTE_THRESHOLD"><code class="docutils literal notranslate"><span class="pre">SILHOUETTE_THRESHOLD</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.silhouette.compare_silhouettes'" class="reference internal" href="#cutan.characters.silhouette.compare_silhouettes"><code class="docutils literal notranslate"><span class="pre">compare_silhouettes()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.silhouette.render_character_silhouettes'" class="reference internal" href="#cutan.characters.silhouette.render_character_silhouettes"><code class="docutils literal notranslate"><span class="pre">render_character_silhouettes()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.silhouette.render_silhouette'" class="reference internal" href="#cutan.characters.silhouette.render_silhouette"><code class="docutils literal notranslate"><span class="pre">render_silhouette()</span></code></a></li>
 </ul>
 </div>
@@ -205,7 +251,7 @@ background with the given color.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=056c92e6"></script>
+<script src="../_static/documentation_options.js?v=a11416ff"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

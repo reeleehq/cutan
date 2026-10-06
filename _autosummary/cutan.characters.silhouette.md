@@ -19,11 +19,26 @@ typically the sweet spot for visually-distinct characters.
 >>> # Skip the doctest body — it requires Playwright with Chromium installed.
 ```
 
+### Module Attributes
+
+| [`DFLT_SILHOUETTE_SIZE`](#cutan.characters.silhouette.DFLT_SILHOUETTE_SIZE)   | Square frame the stage draws each figure in, and the output size, in px.   |
+|-------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| [`SILHOUETTE_THRESHOLD`](#cutan.characters.silhouette.SILHOUETTE_THRESHOLD)   | Luminance below which a pixel of the tinted render is the figure.          |
+
 ### Functions
 
 | [`compare_silhouettes`](#cutan.characters.silhouette.compare_silhouettes)(a, b, \*[, size])             | Return IoU between two silhouette PNGs (0..1; lower = more distinct).   |
 |----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`render_character_silhouettes`](#cutan.characters.silhouette.render_character_silhouettes)(char_dirs, ...)      | Silhouettes of characters AS THE STAGE DRAWS THEM: `{name: png}`.       |
 | [`render_silhouette`](#cutan.characters.silhouette.render_silhouette)(svg_source, out_png, \*[, ...]) | Render an SVG to a binary silhouette PNG (black on white).              |
+
+### cutan.characters.silhouette.DFLT_SILHOUETTE_SIZE *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 512*
+
+Square frame the stage draws each figure in, and the output size, in px.
+
+### cutan.characters.silhouette.SILHOUETTE_THRESHOLD *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 128*
+
+Luminance below which a pixel of the tinted render is the figure.
 
 ### cutan.characters.silhouette.compare_silhouettes(a, b, , size=(256, 256))
 
@@ -40,6 +55,24 @@ pixels is computed.
 >>> # Two identical silhouettes → IoU = 1.0; two empty → 0.0 (no overlap).
 >>> # Tested via test suite, not doctest, since it requires Playwright.
 ```
+
+### cutan.characters.silhouette.render_character_silhouettes(char_dirs, out_dir, , size=512)
+
+Silhouettes of characters AS THE STAGE DRAWS THEM: `{name: png}`.
+
+Each character (a folder holding `character.json`) is rendered by the
+cut-out renderer in a throwaway project, alone in the frame, its root
+tinted black over a white backdrop, so the silhouette is the figure a
+viewer sees: its build, head scale, hat and pose (an#272). The old path
+rasterised the factory’s composite `<name>.svg`, which draws none of
+those, so two different figures compared as identical. One render for all,
+one shot each, every figure placed the same way, so IoUs compare shapes.
+
+Needs the stage renderer (Playwright Chromium) and ffmpeg. Writes only
+under `out_dir`, never into a character’s folder.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]
 
 ### cutan.characters.silhouette.render_silhouette(svg_source, out_png, , size=(256, 256), background='#ffffff')
 

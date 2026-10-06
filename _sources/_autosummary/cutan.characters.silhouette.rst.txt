@@ -4,10 +4,18 @@ cutan.characters.silhouette
 .. automodule:: cutan.characters.silhouette
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DFLT_SILHOUETTE_SIZE
+      SILHOUETTE_THRESHOLD
+   
    .. rubric:: Functions
 
    .. autosummary::
    
       compare_silhouettes
+      render_character_silhouettes
       render_silhouette
    

@@ -1116,474 +1116,489 @@
 </span><span id="line-904">    <span class="p">)</span>
 </span><span id="line-905">
 </span><span id="line-906">
-</span><span id="line-907"><span class="k">def</span><span class="w"> </span><span class="nf">brow_acting_problem</span><span class="p">(</span>
-</span><span id="line-908">    <span class="n">doc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">art_exists</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-909"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-910"><span class="w">    </span><span class="sd">"""Why ``entity``'s brows cannot act (its expression falls to</span>
-</span><span id="line-911"><span class="sd">    ``expr.without_brows``), with the remedy — or ``None`` when they can, or when</span>
-</span><span id="line-912"><span class="sd">    the character has no brows to lose (:func:`brow_loss`).</span>
-</span><span id="line-913">
-</span><span id="line-914"><span class="sd">    ``doc`` is the character's stored document; ``art_exists`` the store's</span>
-</span><span id="line-915"><span class="sd">    probe (without it, brow art is assumed present, so only a cover is seen).</span>
-</span><span id="line-916"><span class="sd">    """</span>
-</span><span id="line-917">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterDescriptor</span>
-</span><span id="line-918">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.migrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">migrate</span>
-</span><span id="line-919">
-</span><span id="line-920">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="ow">or</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"CharacterDescriptor"</span><span class="p">:</span>
-</span><span id="line-921">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-922">    <span class="n">desc</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
-</span><span id="line-923">        <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">doc</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"CharacterDescriptor"</span><span class="p">)</span>
-</span><span id="line-924">    <span class="p">)</span>
-</span><span id="line-925">    <span class="n">r</span> <span class="o">=</span> <span class="n">brow_loss</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">compile_profile</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists</span><span class="p">),</span> <span class="n">entity</span><span class="o">=</span><span class="n">entity</span><span class="p">)</span>
-</span><span id="line-926">    <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">brow_loss_sentence</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
-</span><span id="line-927">
-</span><span id="line-928">
+</span><span id="line-907"><span class="k">def</span><span class="w"> </span><span class="nf">brow_acting_problem</span><span class="p">(</span><span class="n">doc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">art_exists</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-908"><span class="w">    </span><span class="sd">"""Why ``entity``'s brows cannot act (its expression falls to</span>
+</span><span id="line-909"><span class="sd">    ``expr.without_brows``), with the remedy — or ``None`` when they can, or when</span>
+</span><span id="line-910"><span class="sd">    the character has no brows to lose (:func:`brow_loss`).</span>
+</span><span id="line-911">
+</span><span id="line-912"><span class="sd">    ``doc`` is the character's stored document; ``art_exists`` the store's</span>
+</span><span id="line-913"><span class="sd">    probe (without it, brow art is assumed present, so only a cover is seen).</span>
+</span><span id="line-914"><span class="sd">    """</span>
+</span><span id="line-915">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterDescriptor</span>
+</span><span id="line-916">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.migrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">migrate</span>
+</span><span id="line-917">
+</span><span id="line-918">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="ow">or</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"CharacterDescriptor"</span><span class="p">:</span>
+</span><span id="line-919">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-920">    <span class="n">desc</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
+</span><span id="line-921">        <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">doc</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"CharacterDescriptor"</span><span class="p">)</span>
+</span><span id="line-922">    <span class="p">)</span>
+</span><span id="line-923">    <span class="n">r</span> <span class="o">=</span> <span class="n">brow_loss</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">compile_profile</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists</span><span class="p">),</span> <span class="n">entity</span><span class="o">=</span><span class="n">entity</span><span class="p">)</span>
+</span><span id="line-924">    <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">brow_loss_sentence</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+</span><span id="line-925">
+</span><span id="line-926">
 <div class="viewcode-block" id="brow_moving_entities">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.methods.html#cutan.characters.methods.brow_moving_entities">[docs]</a>
-</span><span id="line-929"><span class="k">def</span><span class="w"> </span><span class="nf">brow_moving_entities</span><span class="p">(</span><span class="n">shot</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-</span><span id="line-930"><span class="w">    </span><span class="sd">"""``{entity: [IR paths]}``: the shot's expressions (an ``expression`` leaf,</span>
-</span><span id="line-931"><span class="sd">    or a dialogue line's ``[emotion]``) that move a character's brows, where</span>
-</span><span id="line-932"><span class="sd">    each is written (``actions/&lt;k&gt;``, ``dialogue/&lt;j&gt;/emotion``)."""</span>
-</span><span id="line-933">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten</span>
-</span><span id="line-934">
-</span><span id="line-935">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span id="line-936">    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shot</span><span class="o">.</span><span class="n">actions</span> <span class="ow">or</span> <span class="p">()):</span>
-</span><span id="line-937">        <span class="k">for</span> <span class="n">flat</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">action</span><span class="p">):</span>
-</span><span id="line-938">            <span class="n">leaf</span> <span class="o">=</span> <span class="n">flat</span><span class="o">.</span><span class="n">action</span>
-</span><span id="line-939">            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">leaf</span><span class="p">,</span> <span class="s2">"kind"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"expression"</span><span class="p">:</span>
-</span><span id="line-940">                <span class="k">continue</span>
-</span><span id="line-941">            <span class="k">if</span> <span class="n">_brow_moves</span><span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">preset</span><span class="p">,</span> <span class="n">leaf</span><span class="o">.</span><span class="n">axes</span><span class="p">):</span>
-</span><span id="line-942">                <span class="n">entity</span> <span class="o">=</span> <span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">leaf</span><span class="p">,</span> <span class="s2">"target"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="line-943">                <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"actions/</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-944">    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shot</span><span class="o">.</span><span class="n">dialogue</span> <span class="ow">or</span> <span class="p">()):</span>
-</span><span id="line-945">        <span class="n">emotion</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">emotion</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-</span><span id="line-946">        <span class="k">if</span> <span class="n">emotion</span> <span class="ow">and</span> <span class="n">_brow_moves</span><span class="p">(</span><span class="n">emotion</span><span class="p">):</span>
-</span><span id="line-947">            <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">speaker</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"dialogue/</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">/emotion"</span><span class="p">)</span>
-</span><span id="line-948">    <span class="k">return</span> <span class="n">out</span></div>
+</span><span id="line-927"><span class="k">def</span><span class="w"> </span><span class="nf">brow_moving_entities</span><span class="p">(</span><span class="n">shot</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="line-928"><span class="w">    </span><span class="sd">"""``{entity: [IR paths]}``: the shot's expressions (an ``expression`` leaf,</span>
+</span><span id="line-929"><span class="sd">    or a dialogue line's ``[emotion]``) that move a character's brows, where</span>
+</span><span id="line-930"><span class="sd">    each is written (``actions/&lt;k&gt;``, ``dialogue/&lt;j&gt;/emotion``)."""</span>
+</span><span id="line-931">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten</span>
+</span><span id="line-932">
+</span><span id="line-933">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-934">    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shot</span><span class="o">.</span><span class="n">actions</span> <span class="ow">or</span> <span class="p">()):</span>
+</span><span id="line-935">        <span class="k">for</span> <span class="n">flat</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">action</span><span class="p">):</span>
+</span><span id="line-936">            <span class="n">leaf</span> <span class="o">=</span> <span class="n">flat</span><span class="o">.</span><span class="n">action</span>
+</span><span id="line-937">            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">leaf</span><span class="p">,</span> <span class="s2">"kind"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"expression"</span><span class="p">:</span>
+</span><span id="line-938">                <span class="k">continue</span>
+</span><span id="line-939">            <span class="k">if</span> <span class="n">_brow_moves</span><span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">preset</span><span class="p">,</span> <span class="n">leaf</span><span class="o">.</span><span class="n">axes</span><span class="p">):</span>
+</span><span id="line-940">                <span class="n">entity</span> <span class="o">=</span> <span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">leaf</span><span class="p">,</span> <span class="s2">"target"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="line-941">                <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"actions/</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-942">    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shot</span><span class="o">.</span><span class="n">dialogue</span> <span class="ow">or</span> <span class="p">()):</span>
+</span><span id="line-943">        <span class="n">emotion</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">emotion</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="line-944">        <span class="k">if</span> <span class="n">emotion</span> <span class="ow">and</span> <span class="n">_brow_moves</span><span class="p">(</span><span class="n">emotion</span><span class="p">):</span>
+</span><span id="line-945">            <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">speaker</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"dialogue/</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">/emotion"</span><span class="p">)</span>
+</span><span id="line-946">    <span class="k">return</span> <span class="n">out</span></div>
 
-</span><span id="line-949">
-</span><span id="line-950">
+</span><span id="line-947">
+</span><span id="line-948">
 <div class="viewcode-block" id="check_brow_acting">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.methods.html#cutan.characters.methods.check_brow_acting">[docs]</a>
-</span><span id="line-951"><span class="k">def</span><span class="w"> </span><span class="nf">check_brow_acting</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-952"><span class="w">    </span><span class="sd">"""The cut-out genre's semantic check: an expression that moves the brows of</span>
-</span><span id="line-953"><span class="sd">    a character whose brows cannot act is reported (a warning) — the expression</span>
-</span><span id="line-954"><span class="sd">    aspect's recorded fall to ``expr.without_brows`` (an#252), by the rule the</span>
-</span><span id="line-955"><span class="sd">    compiler records it with (:func:`brow_loss`, an#283), the store's art probe</span>
-</span><span id="line-956"><span class="sd">    included."""</span>
-</span><span id="line-957">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stores._common</span><span class="w"> </span><span class="kn">import</span> <span class="n">art_exists_for</span>
-</span><span id="line-958">
-</span><span id="line-959">    <span class="n">store</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">stores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"characters"</span><span class="p">)</span>
-</span><span id="line-960">    <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-961">        <span class="k">return</span>
-</span><span id="line-962">    <span class="n">refs</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-963">        <span class="n">e</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">ref</span>
-</span><span id="line-964">        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="o">.</span><span class="n">entities</span>
-</span><span id="line-965">        <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">CHARACTER_KIND</span> <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">ref</span> <span class="ow">in</span> <span class="n">store</span>
-</span><span id="line-966">    <span class="p">}</span>
-</span><span id="line-967">    <span class="k">for</span> <span class="n">entity</span><span class="p">,</span> <span class="n">paths</span> <span class="ow">in</span> <span class="n">brow_moving_entities</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="line-968">        <span class="k">if</span> <span class="n">entity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">refs</span><span class="p">:</span>
-</span><span id="line-969">            <span class="k">continue</span>
-</span><span id="line-970">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-971">            <span class="n">doc</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">refs</span><span class="p">[</span><span class="n">entity</span><span class="p">]]</span>
-</span><span id="line-972">        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-</span><span id="line-973">            <span class="k">continue</span>
-</span><span id="line-974">        <span class="n">problem</span> <span class="o">=</span> <span class="n">brow_acting_problem</span><span class="p">(</span>
-</span><span id="line-975">            <span class="n">doc</span><span class="p">,</span> <span class="n">entity</span><span class="o">=</span><span class="n">entity</span><span class="p">,</span> <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists_for</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">refs</span><span class="p">[</span><span class="n">entity</span><span class="p">])</span>
-</span><span id="line-976">        <span class="p">)</span>
-</span><span id="line-977">        <span class="k">if</span> <span class="n">problem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-978">            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
-</span><span id="line-979">                <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"warning"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ctx</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+</span><span id="line-949"><span class="k">def</span><span class="w"> </span><span class="nf">check_brow_acting</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-950"><span class="w">    </span><span class="sd">"""The cut-out genre's semantic check: an expression that moves the brows of</span>
+</span><span id="line-951"><span class="sd">    a character whose brows cannot act is reported (a warning) — the expression</span>
+</span><span id="line-952"><span class="sd">    aspect's recorded fall to ``expr.without_brows`` (an#252), by the rule the</span>
+</span><span id="line-953"><span class="sd">    compiler records it with (:func:`brow_loss`, an#283), the store's art probe</span>
+</span><span id="line-954"><span class="sd">    included."""</span>
+</span><span id="line-955">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stores._common</span><span class="w"> </span><span class="kn">import</span> <span class="n">art_exists_for</span>
+</span><span id="line-956">
+</span><span id="line-957">    <span class="n">store</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">stores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"characters"</span><span class="p">)</span>
+</span><span id="line-958">    <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-959">        <span class="k">return</span>
+</span><span id="line-960">    <span class="n">refs</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-961">        <span class="n">e</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">ref</span>
+</span><span id="line-962">        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="o">.</span><span class="n">entities</span>
+</span><span id="line-963">        <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">CHARACTER_KIND</span> <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">ref</span> <span class="ow">in</span> <span class="n">store</span>
+</span><span id="line-964">    <span class="p">}</span>
+</span><span id="line-965">    <span class="k">for</span> <span class="n">entity</span><span class="p">,</span> <span class="n">paths</span> <span class="ow">in</span> <span class="n">brow_moving_entities</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="line-966">        <span class="k">if</span> <span class="n">entity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">refs</span><span class="p">:</span>
+</span><span id="line-967">            <span class="k">continue</span>
+</span><span id="line-968">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-969">            <span class="n">doc</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">refs</span><span class="p">[</span><span class="n">entity</span><span class="p">]]</span>
+</span><span id="line-970">        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+</span><span id="line-971">            <span class="k">continue</span>
+</span><span id="line-972">        <span class="n">problem</span> <span class="o">=</span> <span class="n">brow_acting_problem</span><span class="p">(</span>
+</span><span id="line-973">            <span class="n">doc</span><span class="p">,</span> <span class="n">entity</span><span class="o">=</span><span class="n">entity</span><span class="p">,</span> <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists_for</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">refs</span><span class="p">[</span><span class="n">entity</span><span class="p">])</span>
+</span><span id="line-974">        <span class="p">)</span>
+</span><span id="line-975">        <span class="k">if</span> <span class="n">problem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-976">            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+</span><span id="line-977">                <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"warning"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ctx</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
-</span><span id="line-980">
-</span><span id="line-981">
+</span><span id="line-978">
+</span><span id="line-979">
 <div class="viewcode-block" id="gait_problem">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.methods.html#cutan.characters.methods.gait_problem">[docs]</a>
-</span><span id="line-982"><span class="k">def</span><span class="w"> </span><span class="nf">gait_problem</span><span class="p">(</span>
-</span><span id="line-983">    <span class="n">doc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-</span><span id="line-984">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-985">    <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-986">    <span class="n">args</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-</span><span id="line-987">    <span class="n">art_exists</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-988">    <span class="n">view</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">UNKNOWN_VIEW</span><span class="p">,</span>
-</span><span id="line-989">    <span class="n">policy</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-990"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-991"><span class="w">    </span><span class="sd">"""Why a walk on ``entity`` will not use the gait it asks for (its ``gait``</span>
-</span><span id="line-992"><span class="sd">    arg, else the descriptor's), with what would enable it — or ``None``.</span>
-</span><span id="line-993">
-</span><span id="line-994"><span class="sd">    ``doc`` is the character's stored document; ``art_exists`` the store's</span>
-</span><span id="line-995"><span class="sd">    probe; ``view`` the view in force at the play's start (cutan#17);</span>
-</span><span id="line-996"><span class="sd">    ``policy`` the scene's, as the compiler resolves under it. The</span>
-</span><span id="line-997"><span class="sd">    sentence is the one the compiler records (``asset_resolution``) when it</span>
-</span><span id="line-998"><span class="sd">    substitutes the method, plus each missing capability's remedy.</span>
-</span><span id="line-999"><span class="sd">    """</span>
-</span><span id="line-1000">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterDescriptor</span>
-</span><span id="line-1001">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.migrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">migrate</span>
-</span><span id="line-1002">
-</span><span id="line-1003">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="ow">or</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"CharacterDescriptor"</span><span class="p">:</span>
-</span><span id="line-1004">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-1005">    <span class="n">desc</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
-</span><span id="line-1006">        <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">doc</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"CharacterDescriptor"</span><span class="p">)</span>
-</span><span id="line-1007">    <span class="p">)</span>
-</span><span id="line-1008">    <span class="n">args</span> <span class="o">=</span> <span class="n">normalise_gait_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-</span><span id="line-1009">    <span class="n">_</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">resolve_walk_gait</span><span class="p">(</span>
-</span><span id="line-1010">        <span class="n">entity</span><span class="p">,</span>
-</span><span id="line-1011">        <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
-</span><span id="line-1012">        <span class="n">descriptor</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span>
-</span><span id="line-1013">        <span class="n">profile</span><span class="o">=</span><span class="n">compile_profile</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists</span><span class="p">),</span>
-</span><span id="line-1014">        <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span>
-</span><span id="line-1015">        <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span>
-</span><span id="line-1016">    <span class="p">)</span>
-</span><span id="line-1017">    <span class="k">return</span> <span class="n">substitution_problem</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">substitution</span><span class="p">)</span></div>
+</span><span id="line-980"><span class="k">def</span><span class="w"> </span><span class="nf">gait_problem</span><span class="p">(</span>
+</span><span id="line-981">    <span class="n">doc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="line-982">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-983">    <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-984">    <span class="n">args</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+</span><span id="line-985">    <span class="n">art_exists</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-986">    <span class="n">view</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">UNKNOWN_VIEW</span><span class="p">,</span>
+</span><span id="line-987">    <span class="n">policy</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-988"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-989"><span class="w">    </span><span class="sd">"""Why a walk on ``entity`` will not use the gait it asks for (its ``gait``</span>
+</span><span id="line-990"><span class="sd">    arg, else the descriptor's), with what would enable it — or ``None``.</span>
+</span><span id="line-991">
+</span><span id="line-992"><span class="sd">    ``doc`` is the character's stored document; ``art_exists`` the store's</span>
+</span><span id="line-993"><span class="sd">    probe; ``view`` the view in force at the play's start (cutan#17);</span>
+</span><span id="line-994"><span class="sd">    ``policy`` the scene's, as the compiler resolves under it. The</span>
+</span><span id="line-995"><span class="sd">    sentence is the one the compiler records (``asset_resolution``) when it</span>
+</span><span id="line-996"><span class="sd">    substitutes the method, plus each missing capability's remedy.</span>
+</span><span id="line-997"><span class="sd">    """</span>
+</span><span id="line-998">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterDescriptor</span>
+</span><span id="line-999">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.migrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">migrate</span>
+</span><span id="line-1000">
+</span><span id="line-1001">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="ow">or</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"CharacterDescriptor"</span><span class="p">:</span>
+</span><span id="line-1002">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-1003">    <span class="n">desc</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
+</span><span id="line-1004">        <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">doc</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"CharacterDescriptor"</span><span class="p">)</span>
+</span><span id="line-1005">    <span class="p">)</span>
+</span><span id="line-1006">    <span class="n">args</span> <span class="o">=</span> <span class="n">normalise_gait_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</span><span id="line-1007">    <span class="n">_</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">resolve_walk_gait</span><span class="p">(</span>
+</span><span id="line-1008">        <span class="n">entity</span><span class="p">,</span>
+</span><span id="line-1009">        <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+</span><span id="line-1010">        <span class="n">descriptor</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span>
+</span><span id="line-1011">        <span class="n">profile</span><span class="o">=</span><span class="n">compile_profile</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists</span><span class="p">),</span>
+</span><span id="line-1012">        <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span>
+</span><span id="line-1013">        <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span>
+</span><span id="line-1014">    <span class="p">)</span>
+</span><span id="line-1015">    <span class="k">return</span> <span class="n">substitution_problem</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">substitution</span><span class="p">)</span></div>
 
-</span><span id="line-1018">
-</span><span id="line-1019">
+</span><span id="line-1016">
+</span><span id="line-1017">
 <div class="viewcode-block" id="substitution_problem">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.methods.html#cutan.characters.methods.substitution_problem">[docs]</a>
-</span><span id="line-1020"><span class="k">def</span><span class="w"> </span><span class="nf">substitution_problem</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-1021"><span class="w">    </span><span class="sd">"""The sentence `an validate` reports for a ``missing`` substitution: what</span>
-</span><span id="line-1022"><span class="sd">    happened, plus each missing capability's remedy (the substitution's own</span>
-</span><span id="line-1023"><span class="sd">    where it carries one, else the registry's). ``None`` for no substitution</span>
-</span><span id="line-1024"><span class="sd">    or a non-fatal one."""</span>
-</span><span id="line-1025">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.capabilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">remedy_for</span>
-</span><span id="line-1026">
-</span><span id="line-1027">    <span class="k">if</span> <span class="n">sub</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">sub</span><span class="o">.</span><span class="n">reason</span> <span class="o">!=</span> <span class="s2">"missing"</span><span class="p">:</span>
-</span><span id="line-1028">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-1029">    <span class="n">fixes</span> <span class="o">=</span> <span class="s2">"; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span><span id="line-1030">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">sub</span><span class="o">.</span><span class="n">remedies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">remedy_for</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">sub</span><span class="o">.</span><span class="n">missing</span>
-</span><span id="line-1031">    <span class="p">)</span>
-</span><span id="line-1032">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">sub</span><span class="o">.</span><span class="n">sentence</span><span class="p">()</span><span class="si">}</span><span class="s2">. To enable it — </span><span class="si">{</span><span class="n">fixes</span><span class="si">}</span><span class="s2">"</span></div>
+</span><span id="line-1018"><span class="k">def</span><span class="w"> </span><span class="nf">substitution_problem</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-1019"><span class="w">    </span><span class="sd">"""The sentence `an validate` reports for a ``missing`` substitution: what</span>
+</span><span id="line-1020"><span class="sd">    happened, plus each missing capability's remedy (the substitution's own</span>
+</span><span id="line-1021"><span class="sd">    where it carries one, else the registry's). ``None`` for no substitution</span>
+</span><span id="line-1022"><span class="sd">    or a non-fatal one."""</span>
+</span><span id="line-1023">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.capabilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">remedy_for</span>
+</span><span id="line-1024">
+</span><span id="line-1025">    <span class="k">if</span> <span class="n">sub</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">sub</span><span class="o">.</span><span class="n">reason</span> <span class="o">!=</span> <span class="s2">"missing"</span><span class="p">:</span>
+</span><span id="line-1026">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-1027">    <span class="n">fixes</span> <span class="o">=</span> <span class="s2">"; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span><span id="line-1028">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">sub</span><span class="o">.</span><span class="n">remedies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">remedy_for</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">sub</span><span class="o">.</span><span class="n">missing</span>
+</span><span id="line-1029">    <span class="p">)</span>
+</span><span id="line-1030">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">sub</span><span class="o">.</span><span class="n">sentence</span><span class="p">()</span><span class="si">}</span><span class="s2">. To enable it — </span><span class="si">{</span><span class="n">fixes</span><span class="si">}</span><span class="s2">"</span></div>
 
-</span><span id="line-1033">
-</span><span id="line-1034">
+</span><span id="line-1031">
+</span><span id="line-1032">
 <div class="viewcode-block" id="walk_problems">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.methods.html#cutan.characters.methods.walk_problems">[docs]</a>
-</span><span id="line-1035"><span class="k">def</span><span class="w"> </span><span class="nf">walk_problems</span><span class="p">(</span>
-</span><span id="line-1036">    <span class="n">doc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-</span><span id="line-1037">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-1038">    <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-1039">    <span class="n">args</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-</span><span id="line-1040">    <span class="n">art_exists</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-1041">    <span class="n">view</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">UNKNOWN_VIEW</span><span class="p">,</span>
-</span><span id="line-1042">    <span class="n">policy</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-1043"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-1044"><span class="w">    </span><span class="sd">"""Everything `an validate` says about one ``walk`` on a character, each a</span>
-</span><span id="line-1045"><span class="sd">    warning: the gait it asks for will not be used (:func:`gait_problem`), and</span>
-</span><span id="line-1046"><span class="sd">    a gait parameter the gait it WILL use never reads (cutan#21) — when the</span>
-</span><span id="line-1047"><span class="sd">    gait is the descriptor's or the chain's; an explicit gait's (a spelling,</span>
-</span><span id="line-1048"><span class="sd">    a method id or a pinned choice) unread parameter is `play_problems`' error.</span>
-</span><span id="line-1049"><span class="sd">    ``doc`` is the character's stored document: a ``CharacterDescriptor``, or</span>
-</span><span id="line-1050"><span class="sd">    a ``parts`` rig (resolved on its parts, as the compiler does); anything</span>
-</span><span id="line-1051"><span class="sd">    else is `cutout.play`'s to report.</span>
-</span><span id="line-1052"><span class="sd">    """</span>
-</span><span id="line-1053">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterDescriptor</span>
-</span><span id="line-1054">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.migrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">migrate</span>
-</span><span id="line-1055">
-</span><span id="line-1056">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
-</span><span id="line-1057">        <span class="k">return</span> <span class="p">[]</span>
-</span><span id="line-1058">    <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"CharacterDescriptor"</span><span class="p">:</span>
-</span><span id="line-1059">        <span class="n">desc</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
-</span><span id="line-1060">            <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">doc</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"CharacterDescriptor"</span><span class="p">)</span>
-</span><span id="line-1061">        <span class="p">)</span>
-</span><span id="line-1062">        <span class="n">profile</span> <span class="o">=</span> <span class="n">compile_profile</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists</span><span class="p">)</span>
-</span><span id="line-1063">    <span class="k">elif</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"parts"</span><span class="p">):</span>
-</span><span id="line-1064">        <span class="n">desc</span><span class="p">,</span> <span class="n">profile</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">compile_profile</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">built_parts</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">"parts"</span><span class="p">]))</span>
-</span><span id="line-1065">    <span class="k">else</span><span class="p">:</span>
-</span><span id="line-1066">        <span class="k">return</span> <span class="p">[]</span>
-</span><span id="line-1067">    <span class="n">explicit</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"gait"</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="line-1068">    <span class="n">resolved</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">locomotion_args</span><span class="p">(</span>
-</span><span id="line-1069">        <span class="n">entity</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="n">policy</span>
-</span><span id="line-1070">    <span class="p">)</span>
-</span><span id="line-1071">    <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-1072">    <span class="k">if</span> <span class="p">(</span><span class="n">problem</span> <span class="o">:=</span> <span class="n">substitution_problem</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">substitution</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-1073">        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
-</span><span id="line-1074">    <span class="k">if</span> <span class="ow">not</span> <span class="n">explicit</span><span class="p">:</span>
-</span><span id="line-1075">        <span class="n">source</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"request"</span><span class="p">:</span> <span class="s2">"descriptor's"</span><span class="p">,</span> <span class="s2">"policy"</span><span class="p">:</span> <span class="s2">"policy's"</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-</span><span id="line-1076">            <span class="n">r</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="s2">"chain's"</span>
-</span><span id="line-1077">        <span class="p">)</span>
-</span><span id="line-1078">        <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-</span><span id="line-1079">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> — this walk's gait is the </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-1080">            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">walk_arg_problems</span><span class="p">(</span><span class="n">resolved</span><span class="p">[</span><span class="s2">"gait"</span><span class="p">],</span> <span class="n">resolved</span><span class="p">)</span>
-</span><span id="line-1081">        <span class="p">)</span>
-</span><span id="line-1082">    <span class="k">return</span> <span class="n">out</span></div>
+</span><span id="line-1033"><span class="k">def</span><span class="w"> </span><span class="nf">walk_problems</span><span class="p">(</span>
+</span><span id="line-1034">    <span class="n">doc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="line-1035">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-1036">    <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-1037">    <span class="n">args</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+</span><span id="line-1038">    <span class="n">art_exists</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-1039">    <span class="n">view</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">UNKNOWN_VIEW</span><span class="p">,</span>
+</span><span id="line-1040">    <span class="n">policy</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-1041"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-1042"><span class="w">    </span><span class="sd">"""Everything `an validate` says about one ``walk`` on a character, each a</span>
+</span><span id="line-1043"><span class="sd">    warning: the gait it asks for will not be used (:func:`gait_problem`), and</span>
+</span><span id="line-1044"><span class="sd">    a gait parameter the gait it WILL use never reads (cutan#21) — when the</span>
+</span><span id="line-1045"><span class="sd">    gait is the descriptor's or the chain's; an explicit gait's (a spelling,</span>
+</span><span id="line-1046"><span class="sd">    a method id or a pinned choice) unread parameter is `play_problems`' error.</span>
+</span><span id="line-1047"><span class="sd">    ``doc`` is the character's stored document: a ``CharacterDescriptor``, or</span>
+</span><span id="line-1048"><span class="sd">    a ``parts`` rig (resolved on its parts, as the compiler does); anything</span>
+</span><span id="line-1049"><span class="sd">    else is `cutout.play`'s to report.</span>
+</span><span id="line-1050"><span class="sd">    """</span>
+</span><span id="line-1051">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterDescriptor</span>
+</span><span id="line-1052">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.migrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">migrate</span>
+</span><span id="line-1053">
+</span><span id="line-1054">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+</span><span id="line-1055">        <span class="k">return</span> <span class="p">[]</span>
+</span><span id="line-1056">    <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"CharacterDescriptor"</span><span class="p">:</span>
+</span><span id="line-1057">        <span class="n">desc</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
+</span><span id="line-1058">            <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">doc</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"CharacterDescriptor"</span><span class="p">)</span>
+</span><span id="line-1059">        <span class="p">)</span>
+</span><span id="line-1060">        <span class="n">profile</span> <span class="o">=</span> <span class="n">compile_profile</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists</span><span class="p">)</span>
+</span><span id="line-1061">    <span class="k">elif</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"parts"</span><span class="p">):</span>
+</span><span id="line-1062">        <span class="n">desc</span><span class="p">,</span> <span class="n">profile</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">compile_profile</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">built_parts</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">"parts"</span><span class="p">]))</span>
+</span><span id="line-1063">    <span class="k">else</span><span class="p">:</span>
+</span><span id="line-1064">        <span class="k">return</span> <span class="p">[]</span>
+</span><span id="line-1065">    <span class="n">explicit</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"gait"</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="line-1066">    <span class="n">resolved</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">locomotion_args</span><span class="p">(</span>
+</span><span id="line-1067">        <span class="n">entity</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="n">policy</span>
+</span><span id="line-1068">    <span class="p">)</span>
+</span><span id="line-1069">    <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-1070">    <span class="k">if</span> <span class="p">(</span><span class="n">problem</span> <span class="o">:=</span> <span class="n">substitution_problem</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">substitution</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-1071">        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
+</span><span id="line-1072">    <span class="k">if</span> <span class="ow">not</span> <span class="n">explicit</span><span class="p">:</span>
+</span><span id="line-1073">        <span class="n">source</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"request"</span><span class="p">:</span> <span class="s2">"descriptor's"</span><span class="p">,</span> <span class="s2">"policy"</span><span class="p">:</span> <span class="s2">"policy's"</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+</span><span id="line-1074">            <span class="n">r</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="s2">"chain's"</span>
+</span><span id="line-1075">        <span class="p">)</span>
+</span><span id="line-1076">        <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+</span><span id="line-1077">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> — this walk's gait is the </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-1078">            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">walk_arg_problems</span><span class="p">(</span><span class="n">resolved</span><span class="p">[</span><span class="s2">"gait"</span><span class="p">],</span> <span class="n">resolved</span><span class="p">)</span>
+</span><span id="line-1079">        <span class="p">)</span>
+</span><span id="line-1080">    <span class="k">return</span> <span class="n">out</span></div>
 
-</span><span id="line-1083">
-</span><span id="line-1084">
+</span><span id="line-1081">
+</span><span id="line-1082">
 <div class="viewcode-block" id="check_walk_gaits">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.methods.html#cutan.characters.methods.check_walk_gaits">[docs]</a>
-</span><span id="line-1085"><span class="k">def</span><span class="w"> </span><span class="nf">check_walk_gaits</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-1086"><span class="w">    </span><span class="sd">"""The cut-out genre's semantic check: a ``walk`` whose requested gait the</span>
-</span><span id="line-1087"><span class="sd">    entity cannot honour is reported (a warning, before any render), with the</span>
-</span><span id="line-1088"><span class="sd">    gait it will walk instead and what would make the asked one apply (an#224,</span>
-</span><span id="line-1089"><span class="sd">    ADR 0002 decision 6): a missing capability, the side view not in force</span>
-</span><span id="line-1090"><span class="sd">    for a ``profile`` (cutan#17), a legged gait asked of a prop with no legs</span>
-</span><span id="line-1091"><span class="sd">    (cutan#22) — and a gait parameter the walk's gait never reads (cutan#21).</span>
-</span><span id="line-1092"><span class="sd">    The view in force is read off the timeline the way the compiler reads it</span>
-</span><span id="line-1093"><span class="sd">    (:func:`cutan.characters.checks._turns_of`), a prop's limbs off the built</span>
-</span><span id="line-1094"><span class="sd">    stage (:func:`cutan.characters.checks._stage_poses_of`)."""</span>
-</span><span id="line-1095">    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
-</span><span id="line-1096">
-</span><span id="line-1097">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten</span>
-</span><span id="line-1098">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">_rig_scope</span>
-</span><span id="line-1099">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">VocabularyError</span>
-</span><span id="line-1100">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stores._common</span><span class="w"> </span><span class="kn">import</span> <span class="n">art_exists_for</span>
-</span><span id="line-1101">
-</span><span id="line-1102">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.checks</span><span class="w"> </span><span class="kn">import</span> <span class="n">_stage_poses_of</span><span class="p">,</span> <span class="n">_turns_of</span>
-</span><span id="line-1103">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.play</span><span class="w"> </span><span class="kn">import</span> <span class="n">facing_at</span>
-</span><span id="line-1104">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">policy_in_force</span>
-</span><span id="line-1105">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_TURN_SET</span>
-</span><span id="line-1106">
-</span><span id="line-1107">    <span class="n">rigs</span><span class="p">,</span> <span class="n">unchecked</span> <span class="o">=</span> <span class="n">_rig_scope</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">stores</span><span class="p">)</span>
-</span><span id="line-1108">    <span class="n">resolved</span> <span class="o">=</span> <span class="n">_turns_of</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">)</span>
-</span><span id="line-1109">    <span class="k">if</span> <span class="n">resolved</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-1110">        <span class="n">resolution</span><span class="p">,</span> <span class="n">origin</span> <span class="o">=</span> <span class="n">resolved</span>
-</span><span id="line-1111">        <span class="n">flats</span><span class="p">,</span> <span class="n">events</span> <span class="o">=</span> <span class="n">resolution</span><span class="o">.</span><span class="n">flats</span><span class="p">,</span> <span class="n">resolution</span><span class="o">.</span><span class="n">events</span>
-</span><span id="line-1112">    <span class="k">else</span><span class="p">:</span>
-</span><span id="line-1113">        <span class="c1"># No characters store: no character is checked (`unchecked`), but a</span>
-</span><span id="line-1114">        <span class="c1"># prop's walk still is, off a plain flatten (no turn to read).</span>
-</span><span id="line-1115">        <span class="n">flats</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">events</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
-</span><span id="line-1116">        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="o">.</span><span class="n">actions</span> <span class="ow">or</span> <span class="p">()):</span>
-</span><span id="line-1117">            <span class="k">for</span> <span class="n">flat</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">action</span><span class="p">):</span>
-</span><span id="line-1118">                <span class="n">flats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flat</span><span class="p">)</span>
-</span><span id="line-1119">                <span class="n">origin</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-</span><span id="line-1120">    <span class="k">for</span> <span class="n">flat</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">flats</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
-</span><span id="line-1121">        <span class="n">leaf</span> <span class="o">=</span> <span class="n">flat</span><span class="o">.</span><span class="n">action</span>
-</span><span id="line-1122">        <span class="k">if</span> <span class="p">(</span>
-</span><span id="line-1123">            <span class="nb">getattr</span><span class="p">(</span><span class="n">leaf</span><span class="p">,</span> <span class="s2">"kind"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"play"</span>
-</span><span id="line-1124">            <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">leaf</span><span class="p">,</span> <span class="s2">"animation"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="n">WALK_PRESET</span>
-</span><span id="line-1125">        <span class="p">):</span>
-</span><span id="line-1126">            <span class="k">continue</span>
-</span><span id="line-1127">        <span class="n">entity</span> <span class="o">=</span> <span class="n">leaf</span><span class="o">.</span><span class="n">target</span>
-</span><span id="line-1128">        <span class="n">rig</span> <span class="o">=</span> <span class="n">rigs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span>
-</span><span id="line-1129">        <span class="k">if</span> <span class="n">rig</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">unchecked</span> <span class="ow">or</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">entity</span><span class="p">:</span>
-</span><span id="line-1130">            <span class="k">continue</span>  <span class="c1"># a part target is `cutout.play`'s error (cutan#22)</span>
-</span><span id="line-1131">        <span class="n">args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">args</span> <span class="ow">or</span> <span class="p">{})</span>
-</span><span id="line-1132">        <span class="n">store</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">stores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rig</span><span class="o">.</span><span class="n">store</span><span class="p">)</span> <span class="k">if</span> <span class="n">rig</span><span class="o">.</span><span class="n">store</span> <span class="k">else</span> <span class="kc">None</span>
-</span><span id="line-1133">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-1134">            <span class="k">if</span> <span class="n">rig</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="n">CHARACTER_KIND</span><span class="p">:</span>
-</span><span id="line-1135">                <span class="n">poses</span> <span class="o">=</span> <span class="n">_stage_poses_of</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">)</span>
-</span><span id="line-1136">                <span class="k">if</span> <span class="n">poses</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-1137">                    <span class="k">continue</span>  <span class="c1"># the stage did not build: `cutout.play` says why</span>
-</span><span id="line-1138">                <span class="n">prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity</span><span class="si">}</span><span class="s2">/"</span>
-</span><span id="line-1139">                <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">poses</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)]</span>
-</span><span id="line-1140">                <span class="n">sub</span> <span class="o">=</span> <span class="n">off_registry_substitution</span><span class="p">(</span>
-</span><span id="line-1141">                    <span class="n">entity</span><span class="p">,</span> <span class="n">normalise_gait_args</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="n">parts</span>
-</span><span id="line-1142">                <span class="p">)</span>
-</span><span id="line-1143">                <span class="n">problems</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="n">substitution_problem</span><span class="p">(</span><span class="n">sub</span><span class="p">),)</span> <span class="k">if</span> <span class="n">p</span><span class="p">]</span>
-</span><span id="line-1144">            <span class="k">else</span><span class="p">:</span>
-</span><span id="line-1145">                <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">rig</span><span class="o">.</span><span class="n">ref</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">store</span><span class="p">:</span>
-</span><span id="line-1146">                    <span class="k">continue</span>
-</span><span id="line-1147">                <span class="n">doc</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">rig</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span>
-</span><span id="line-1148">                <span class="n">view</span> <span class="o">=</span> <span class="n">facing_at</span><span class="p">(</span>
-</span><span id="line-1149">                    <span class="n">events</span><span class="p">,</span> <span class="n">entity</span><span class="p">,</span> <span class="n">flat</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">view_set</span><span class="o">=</span><span class="n">DFLT_TURN_SET</span>
-</span><span id="line-1150">                <span class="p">)</span><span class="o">.</span><span class="n">view</span>
-</span><span id="line-1151">                <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
-</span><span id="line-1152">                    <span class="n">view</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rest_view"</span><span class="p">)</span>
-</span><span id="line-1153">                <span class="n">problems</span> <span class="o">=</span> <span class="n">walk_problems</span><span class="p">(</span>
-</span><span id="line-1154">                    <span class="n">doc</span><span class="p">,</span>
-</span><span id="line-1155">                    <span class="n">entity</span><span class="o">=</span><span class="n">entity</span><span class="p">,</span>
-</span><span id="line-1156">                    <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
-</span><span id="line-1157">                    <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists_for</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">rig</span><span class="o">.</span><span class="n">ref</span><span class="p">),</span>
-</span><span id="line-1158">                    <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span>
-</span><span id="line-1159">                    <span class="n">policy</span><span class="o">=</span><span class="n">policy_in_force</span><span class="p">(</span><span class="n">ctx</span><span class="p">),</span>
-</span><span id="line-1160">                <span class="p">)</span>
-</span><span id="line-1161">        <span class="k">except</span> <span class="p">(</span><span class="n">VocabularyError</span><span class="p">,</span> <span class="n">ValidationError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
-</span><span id="line-1162">            <span class="k">continue</span>  <span class="c1"># a malformed gait or descriptor is `cutout.play`'s to report</span>
-</span><span id="line-1163">        <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">problems</span><span class="p">:</span>
-</span><span id="line-1164">            <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"warning"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ctx</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">/actions/</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">problem</span><span class="p">)</span></div>
+</span><span id="line-1083"><span class="k">def</span><span class="w"> </span><span class="nf">check_walk_gaits</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-1084"><span class="w">    </span><span class="sd">"""The cut-out genre's semantic check: a ``walk`` whose requested gait the</span>
+</span><span id="line-1085"><span class="sd">    entity cannot honour is reported (a warning, before any render), with the</span>
+</span><span id="line-1086"><span class="sd">    gait it will walk instead and what would make the asked one apply (an#224,</span>
+</span><span id="line-1087"><span class="sd">    ADR 0002 decision 6): a missing capability, the side view not in force</span>
+</span><span id="line-1088"><span class="sd">    for a ``profile`` (cutan#17), a legged gait asked of a prop with no legs</span>
+</span><span id="line-1089"><span class="sd">    (cutan#22) — and a gait parameter the walk's gait never reads (cutan#21).</span>
+</span><span id="line-1090"><span class="sd">    The view in force is read off the timeline the way the compiler reads it</span>
+</span><span id="line-1091"><span class="sd">    (:func:`cutan.characters.checks._turns_of`), a prop's limbs off the built</span>
+</span><span id="line-1092"><span class="sd">    stage (:func:`cutan.characters.checks._stage_poses_of`)."""</span>
+</span><span id="line-1093">    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+</span><span id="line-1094">
+</span><span id="line-1095">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten</span>
+</span><span id="line-1096">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">_rig_scope</span>
+</span><span id="line-1097">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">VocabularyError</span>
+</span><span id="line-1098">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stores._common</span><span class="w"> </span><span class="kn">import</span> <span class="n">art_exists_for</span>
+</span><span id="line-1099">
+</span><span id="line-1100">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.checks</span><span class="w"> </span><span class="kn">import</span> <span class="n">_stage_poses_of</span><span class="p">,</span> <span class="n">_turns_of</span>
+</span><span id="line-1101">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.play</span><span class="w"> </span><span class="kn">import</span> <span class="n">facing_at</span>
+</span><span id="line-1102">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">policy_in_force</span>
+</span><span id="line-1103">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_TURN_SET</span>
+</span><span id="line-1104">
+</span><span id="line-1105">    <span class="n">rigs</span><span class="p">,</span> <span class="n">unchecked</span> <span class="o">=</span> <span class="n">_rig_scope</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">stores</span><span class="p">)</span>
+</span><span id="line-1106">    <span class="n">resolved</span> <span class="o">=</span> <span class="n">_turns_of</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">)</span>
+</span><span id="line-1107">    <span class="k">if</span> <span class="n">resolved</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-1108">        <span class="n">resolution</span><span class="p">,</span> <span class="n">origin</span> <span class="o">=</span> <span class="n">resolved</span>
+</span><span id="line-1109">        <span class="n">flats</span><span class="p">,</span> <span class="n">events</span> <span class="o">=</span> <span class="n">resolution</span><span class="o">.</span><span class="n">flats</span><span class="p">,</span> <span class="n">resolution</span><span class="o">.</span><span class="n">events</span>
+</span><span id="line-1110">    <span class="k">else</span><span class="p">:</span>
+</span><span id="line-1111">        <span class="c1"># No characters store: no character is checked (`unchecked`), but a</span>
+</span><span id="line-1112">        <span class="c1"># prop's walk still is, off a plain flatten (no turn to read).</span>
+</span><span id="line-1113">        <span class="n">flats</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">events</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+</span><span id="line-1114">        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="o">.</span><span class="n">actions</span> <span class="ow">or</span> <span class="p">()):</span>
+</span><span id="line-1115">            <span class="k">for</span> <span class="n">flat</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">action</span><span class="p">):</span>
+</span><span id="line-1116">                <span class="n">flats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flat</span><span class="p">)</span>
+</span><span id="line-1117">                <span class="n">origin</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+</span><span id="line-1118">    <span class="k">for</span> <span class="n">flat</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">flats</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+</span><span id="line-1119">        <span class="n">leaf</span> <span class="o">=</span> <span class="n">flat</span><span class="o">.</span><span class="n">action</span>
+</span><span id="line-1120">        <span class="k">if</span> <span class="p">(</span>
+</span><span id="line-1121">            <span class="nb">getattr</span><span class="p">(</span><span class="n">leaf</span><span class="p">,</span> <span class="s2">"kind"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"play"</span>
+</span><span id="line-1122">            <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">leaf</span><span class="p">,</span> <span class="s2">"animation"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="n">WALK_PRESET</span>
+</span><span id="line-1123">        <span class="p">):</span>
+</span><span id="line-1124">            <span class="k">continue</span>
+</span><span id="line-1125">        <span class="n">entity</span> <span class="o">=</span> <span class="n">leaf</span><span class="o">.</span><span class="n">target</span>
+</span><span id="line-1126">        <span class="n">rig</span> <span class="o">=</span> <span class="n">rigs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span>
+</span><span id="line-1127">        <span class="k">if</span> <span class="n">rig</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">unchecked</span> <span class="ow">or</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">entity</span><span class="p">:</span>
+</span><span id="line-1128">            <span class="k">continue</span>  <span class="c1"># a part target is `cutout.play`'s error (cutan#22)</span>
+</span><span id="line-1129">        <span class="n">args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">args</span> <span class="ow">or</span> <span class="p">{})</span>
+</span><span id="line-1130">        <span class="n">store</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">stores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rig</span><span class="o">.</span><span class="n">store</span><span class="p">)</span> <span class="k">if</span> <span class="n">rig</span><span class="o">.</span><span class="n">store</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span id="line-1131">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-1132">            <span class="k">if</span> <span class="n">rig</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="n">CHARACTER_KIND</span><span class="p">:</span>
+</span><span id="line-1133">                <span class="n">poses</span> <span class="o">=</span> <span class="n">_stage_poses_of</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">)</span>
+</span><span id="line-1134">                <span class="k">if</span> <span class="n">poses</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-1135">                    <span class="k">continue</span>  <span class="c1"># the stage did not build: `cutout.play` says why</span>
+</span><span id="line-1136">                <span class="n">prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity</span><span class="si">}</span><span class="s2">/"</span>
+</span><span id="line-1137">                <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">poses</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)]</span>
+</span><span id="line-1138">                <span class="n">sub</span> <span class="o">=</span> <span class="n">off_registry_substitution</span><span class="p">(</span>
+</span><span id="line-1139">                    <span class="n">entity</span><span class="p">,</span> <span class="n">normalise_gait_args</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="n">parts</span>
+</span><span id="line-1140">                <span class="p">)</span>
+</span><span id="line-1141">                <span class="n">problems</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="n">substitution_problem</span><span class="p">(</span><span class="n">sub</span><span class="p">),)</span> <span class="k">if</span> <span class="n">p</span><span class="p">]</span>
+</span><span id="line-1142">            <span class="k">else</span><span class="p">:</span>
+</span><span id="line-1143">                <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">rig</span><span class="o">.</span><span class="n">ref</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">store</span><span class="p">:</span>
+</span><span id="line-1144">                    <span class="k">continue</span>
+</span><span id="line-1145">                <span class="n">doc</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">rig</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span>
+</span><span id="line-1146">                <span class="n">view</span> <span class="o">=</span> <span class="n">facing_at</span><span class="p">(</span>
+</span><span id="line-1147">                    <span class="n">events</span><span class="p">,</span> <span class="n">entity</span><span class="p">,</span> <span class="n">flat</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">view_set</span><span class="o">=</span><span class="n">DFLT_TURN_SET</span>
+</span><span id="line-1148">                <span class="p">)</span><span class="o">.</span><span class="n">view</span>
+</span><span id="line-1149">                <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+</span><span id="line-1150">                    <span class="n">view</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rest_view"</span><span class="p">)</span>
+</span><span id="line-1151">                <span class="n">problems</span> <span class="o">=</span> <span class="n">walk_problems</span><span class="p">(</span>
+</span><span id="line-1152">                    <span class="n">doc</span><span class="p">,</span>
+</span><span id="line-1153">                    <span class="n">entity</span><span class="o">=</span><span class="n">entity</span><span class="p">,</span>
+</span><span id="line-1154">                    <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+</span><span id="line-1155">                    <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists_for</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">rig</span><span class="o">.</span><span class="n">ref</span><span class="p">),</span>
+</span><span id="line-1156">                    <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span>
+</span><span id="line-1157">                    <span class="n">policy</span><span class="o">=</span><span class="n">policy_in_force</span><span class="p">(</span><span class="n">ctx</span><span class="p">),</span>
+</span><span id="line-1158">                <span class="p">)</span>
+</span><span id="line-1159">        <span class="k">except</span> <span class="p">(</span><span class="n">VocabularyError</span><span class="p">,</span> <span class="n">ValidationError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+</span><span id="line-1160">            <span class="k">continue</span>  <span class="c1"># a malformed gait or descriptor is `cutout.play`'s to report</span>
+</span><span id="line-1161">        <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">problems</span><span class="p">:</span>
+</span><span id="line-1162">            <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"warning"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ctx</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">/actions/</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">problem</span><span class="p">)</span></div>
 
-</span><span id="line-1165">
-</span><span id="line-1166">
+</span><span id="line-1163">
+</span><span id="line-1164">
 <div class="viewcode-block" id="substitution_record">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.methods.html#cutan.characters.methods.substitution_record">[docs]</a>
-</span><span id="line-1167"><span class="k">def</span><span class="w"> </span><span class="nf">substitution_record</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">entity_ref</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="line-1168"><span class="w">    </span><span class="sd">"""A :class:`~an.capabilities.Substitution` as an ``asset_resolution`` entry.</span>
-</span><span id="line-1169">
-</span><span id="line-1170"><span class="sd">    The compiled document's record generalised (ADR 0002 decision 6):</span>
-</span><span id="line-1171"><span class="sd">    ``kind: method``, ``store`` the aspect, ``ref`` what was asked for,</span>
-</span><span id="line-1172"><span class="sd">    ``resolved`` what was used, ``fallback`` whether ``--strict-assets`` makes</span>
-</span><span id="line-1173"><span class="sd">    it fatal.</span>
-</span><span id="line-1174"><span class="sd">    """</span>
-</span><span id="line-1175">    <span class="k">return</span> <span class="p">{</span>
-</span><span id="line-1176">        <span class="s2">"id"</span><span class="p">:</span> <span class="n">sub</span><span class="o">.</span><span class="n">entity</span><span class="p">,</span>
-</span><span id="line-1177">        <span class="s2">"kind"</span><span class="p">:</span> <span class="s2">"method"</span><span class="p">,</span>
-</span><span id="line-1178">        <span class="s2">"store"</span><span class="p">:</span> <span class="n">sub</span><span class="o">.</span><span class="n">aspect</span><span class="p">,</span>
-</span><span id="line-1179">        <span class="s2">"ref"</span><span class="p">:</span> <span class="n">sub</span><span class="o">.</span><span class="n">requested</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-1180">        <span class="s2">"resolved"</span><span class="p">:</span> <span class="n">sub</span><span class="o">.</span><span class="n">chosen</span><span class="p">,</span>
-</span><span id="line-1181">        <span class="s2">"fallback"</span><span class="p">:</span> <span class="n">sub</span><span class="o">.</span><span class="n">fatal</span><span class="p">,</span>
-</span><span id="line-1182">        <span class="s2">"detail"</span><span class="p">:</span> <span class="n">sub</span><span class="o">.</span><span class="n">sentence</span><span class="p">(),</span>
-</span><span id="line-1183">    <span class="p">}</span></div>
+</span><span id="line-1165"><span class="k">def</span><span class="w"> </span><span class="nf">substitution_record</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">entity_ref</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="line-1166"><span class="w">    </span><span class="sd">"""A :class:`~an.capabilities.Substitution` as an ``asset_resolution`` entry.</span>
+</span><span id="line-1167">
+</span><span id="line-1168"><span class="sd">    The compiled document's record generalised (ADR 0002 decision 6):</span>
+</span><span id="line-1169"><span class="sd">    ``kind: method``, ``store`` the aspect, ``ref`` what was asked for,</span>
+</span><span id="line-1170"><span class="sd">    ``resolved`` what was used, ``fallback`` whether ``--strict-assets`` makes</span>
+</span><span id="line-1171"><span class="sd">    it fatal.</span>
+</span><span id="line-1172"><span class="sd">    """</span>
+</span><span id="line-1173">    <span class="k">return</span> <span class="p">{</span>
+</span><span id="line-1174">        <span class="s2">"id"</span><span class="p">:</span> <span class="n">sub</span><span class="o">.</span><span class="n">entity</span><span class="p">,</span>
+</span><span id="line-1175">        <span class="s2">"kind"</span><span class="p">:</span> <span class="s2">"method"</span><span class="p">,</span>
+</span><span id="line-1176">        <span class="s2">"store"</span><span class="p">:</span> <span class="n">sub</span><span class="o">.</span><span class="n">aspect</span><span class="p">,</span>
+</span><span id="line-1177">        <span class="s2">"ref"</span><span class="p">:</span> <span class="n">sub</span><span class="o">.</span><span class="n">requested</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-1178">        <span class="s2">"resolved"</span><span class="p">:</span> <span class="n">sub</span><span class="o">.</span><span class="n">chosen</span><span class="p">,</span>
+</span><span id="line-1179">        <span class="s2">"fallback"</span><span class="p">:</span> <span class="n">sub</span><span class="o">.</span><span class="n">fatal</span><span class="p">,</span>
+</span><span id="line-1180">        <span class="s2">"detail"</span><span class="p">:</span> <span class="n">sub</span><span class="o">.</span><span class="n">sentence</span><span class="p">(),</span>
+</span><span id="line-1181">    <span class="p">}</span></div>
 
-</span><span id="line-1184">
-</span><span id="line-1185">
+</span><span id="line-1182">
+</span><span id="line-1183">
 <div class="viewcode-block" id="syllable_beats">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.methods.html#cutan.characters.methods.syllable_beats">[docs]</a>
-</span><span id="line-1186"><span class="k">def</span><span class="w"> </span><span class="nf">syllable_beats</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">min_gap_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_MIN_BEAT_GAP_S</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-</span><span id="line-1187"><span class="w">    </span><span class="sd">"""Syllable onsets of a dialogue line, in seconds from its start.</span>
-</span><span id="line-1188">
-</span><span id="line-1189"><span class="sd">    From the line's viseme track (a syllable starts where the mouth opens out</span>
-</span><span id="line-1190"><span class="sd">    of a closed shape), else its word timings (one beat per word), else one</span>
-</span><span id="line-1191"><span class="sd">    beat at its start. Beats closer than ``min_gap_s`` merge.</span>
-</span><span id="line-1192"><span class="sd">    """</span>
-</span><span id="line-1193">    <span class="n">times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-1194">    <span class="n">track</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">"viseme_track"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-1195">    <span class="k">if</span> <span class="n">track</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">track</span><span class="o">.</span><span class="n">keyframes</span><span class="p">:</span>
-</span><span id="line-1196">        <span class="n">closed</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="line-1197">        <span class="k">for</span> <span class="n">kf</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">track</span><span class="o">.</span><span class="n">keyframes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">time</span><span class="p">)):</span>
-</span><span id="line-1198">            <span class="n">shape</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">kf</span><span class="o">.</span><span class="n">viseme</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-</span><span id="line-1199">            <span class="k">if</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">CLOSED_VISEMES</span><span class="p">:</span>
-</span><span id="line-1200">                <span class="n">closed</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="line-1201">            <span class="k">elif</span> <span class="n">closed</span><span class="p">:</span>
-</span><span id="line-1202">                <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">kf</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
-</span><span id="line-1203">                <span class="n">closed</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="line-1204">    <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">"word_timings"</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="line-1205">        <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">word_timings</span><span class="p">]</span>
-</span><span id="line-1206">    <span class="k">else</span><span class="p">:</span>
-</span><span id="line-1207">        <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span>
-</span><span id="line-1208">    <span class="n">end</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"inf"</span><span class="p">)</span>
-</span><span id="line-1209">    <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-1210">    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
-</span><span id="line-1211">        <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">end</span><span class="p">:</span>
-</span><span id="line-1212">            <span class="k">continue</span>
-</span><span id="line-1213">        <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="n">t</span> <span class="o">-</span> <span class="n">out</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">min_gap_s</span><span class="p">:</span>
-</span><span id="line-1214">            <span class="k">continue</span>
-</span><span id="line-1215">        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-</span><span id="line-1216">    <span class="k">return</span> <span class="n">out</span> <span class="ow">or</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span></div>
+</span><span id="line-1184"><span class="k">def</span><span class="w"> </span><span class="nf">syllable_beats</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">min_gap_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_MIN_BEAT_GAP_S</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+</span><span id="line-1185"><span class="w">    </span><span class="sd">"""Syllable onsets of a dialogue line, in seconds from its start.</span>
+</span><span id="line-1186">
+</span><span id="line-1187"><span class="sd">    The line's word timings, when its provider has them, are the authority:</span>
+</span><span id="line-1188"><span class="sd">    they are measured on the audio, so a beat never falls in a leading breath</span>
+</span><span id="line-1189"><span class="sd">    or a pause (an#272: a pulse dipped 0.35 s before "Hi" was heard). Each</span>
+</span><span id="line-1190"><span class="sd">    word starts a beat, and the viseme track's syllables (where the mouth</span>
+</span><span id="line-1191"><span class="sd">    opens out of a closed shape) add beats INSIDE a word's window, never</span>
+</span><span id="line-1192"><span class="sd">    outside every word. With no word timings: the viseme track's syllables,</span>
+</span><span id="line-1193"><span class="sd">    else one beat at the line's start. Beats closer than ``min_gap_s`` merge.</span>
+</span><span id="line-1194">
+</span><span id="line-1195"><span class="sd">    &gt;&gt;&gt; from types import SimpleNamespace as NS</span>
+</span><span id="line-1196"><span class="sd">    &gt;&gt;&gt; track = NS(keyframes=[NS(time=0.0, viseme="B"), NS(time=0.4, viseme="X"),</span>
+</span><span id="line-1197"><span class="sd">    ...                       NS(time=0.7, viseme="C")])</span>
+</span><span id="line-1198"><span class="sd">    &gt;&gt;&gt; syllable_beats(NS(viseme_track=track, word_timings=None, duration=1.2))</span>
+</span><span id="line-1199"><span class="sd">    [0.0, 0.7]</span>
+</span><span id="line-1200"><span class="sd">    &gt;&gt;&gt; words = [NS(start=0.35, end=1.0)]  # a breath before the word</span>
+</span><span id="line-1201"><span class="sd">    &gt;&gt;&gt; syllable_beats(NS(viseme_track=track, word_timings=words, duration=1.2))</span>
+</span><span id="line-1202"><span class="sd">    [0.35, 0.7]</span>
+</span><span id="line-1203"><span class="sd">    """</span>
+</span><span id="line-1204">    <span class="n">syllables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-1205">    <span class="n">track</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">"viseme_track"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-1206">    <span class="k">if</span> <span class="n">track</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">track</span><span class="o">.</span><span class="n">keyframes</span><span class="p">:</span>
+</span><span id="line-1207">        <span class="n">closed</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="line-1208">        <span class="k">for</span> <span class="n">kf</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">track</span><span class="o">.</span><span class="n">keyframes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">time</span><span class="p">)):</span>
+</span><span id="line-1209">            <span class="n">shape</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">kf</span><span class="o">.</span><span class="n">viseme</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+</span><span id="line-1210">            <span class="k">if</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">CLOSED_VISEMES</span><span class="p">:</span>
+</span><span id="line-1211">                <span class="n">closed</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="line-1212">            <span class="k">elif</span> <span class="n">closed</span><span class="p">:</span>
+</span><span id="line-1213">                <span class="n">syllables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">kf</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+</span><span id="line-1214">                <span class="n">closed</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="line-1215">    <span class="n">words</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">"word_timings"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+</span><span id="line-1216">    <span class="k">if</span> <span class="n">words</span><span class="p">:</span>
+</span><span id="line-1217">        <span class="n">windows</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">start</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">end</span><span class="p">))</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span><span class="p">]</span>
+</span><span id="line-1218">        <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">windows</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
+</span><span id="line-1219">            <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">syllables</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">a</span> <span class="o">&lt;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">b</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">windows</span><span class="p">)</span>
+</span><span id="line-1220">        <span class="p">]</span>
+</span><span id="line-1221">    <span class="k">else</span><span class="p">:</span>
+</span><span id="line-1222">        <span class="n">times</span> <span class="o">=</span> <span class="n">syllables</span> <span class="ow">or</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span>
+</span><span id="line-1223">    <span class="n">end</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"inf"</span><span class="p">)</span>
+</span><span id="line-1224">    <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-1225">    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
+</span><span id="line-1226">        <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">end</span><span class="p">:</span>
+</span><span id="line-1227">            <span class="k">continue</span>
+</span><span id="line-1228">        <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="n">t</span> <span class="o">-</span> <span class="n">out</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">min_gap_s</span><span class="p">:</span>
+</span><span id="line-1229">            <span class="k">continue</span>
+</span><span id="line-1230">        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+</span><span id="line-1231">    <span class="k">return</span> <span class="n">out</span> <span class="ow">or</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span></div>
 
-</span><span id="line-1217">
-</span><span id="line-1218">
+</span><span id="line-1232">
+</span><span id="line-1233">
 <div class="viewcode-block" id="SpeechPlan">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.methods.html#cutan.characters.methods.SpeechPlan">[docs]</a>
-</span><span id="line-1219"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-1220"><span class="k">class</span><span class="w"> </span><span class="nc">SpeechPlan</span><span class="p">:</span>
-</span><span id="line-1221"><span class="w">    </span><span class="sd">"""What the speech aspect decided for a shot: the actions it adds, and the</span>
-</span><span id="line-1222"><span class="sd">    speakers whose lip-sync it switched off (the viseme pass skips them)."""</span>
-</span><span id="line-1223">
-</span><span id="line-1224">    <span class="n">actions</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">()</span>
-</span><span id="line-1225">    <span class="n">no_lip_sync</span><span class="p">:</span> <span class="nb">frozenset</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span></div>
+</span><span id="line-1234"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-1235"><span class="k">class</span><span class="w"> </span><span class="nc">SpeechPlan</span><span class="p">:</span>
+</span><span id="line-1236"><span class="w">    </span><span class="sd">"""What the speech aspect decided for a shot: the actions it adds, and the</span>
+</span><span id="line-1237"><span class="sd">    speakers whose lip-sync it switched off (the viseme pass skips them)."""</span>
+</span><span id="line-1238">
+</span><span id="line-1239">    <span class="n">actions</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">()</span>
+</span><span id="line-1240">    <span class="n">no_lip_sync</span><span class="p">:</span> <span class="nb">frozenset</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span></div>
 
-</span><span id="line-1226">
-</span><span id="line-1227">
-</span><span id="line-1228"><span class="c1">#: The motion preset ``speech.pose_only`` expands to.</span>
-</span><span id="line-1229"><span class="n">PULSE_PRESET</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"speech_pulse"</span>
-</span><span id="line-1230">
-</span><span id="line-1231">
-</span><span id="line-1232"><span class="k">def</span><span class="w"> </span><span class="nf">_authored_pulse_speakers</span><span class="p">(</span><span class="n">shot</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-1233"><span class="w">    </span><span class="sd">"""Speakers the author already pulses with an explicit ``play: speech_pulse``."""</span>
-</span><span id="line-1234">    <span class="n">out</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-</span><span id="line-1235">    <span class="n">stack</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">shot</span><span class="o">.</span><span class="n">actions</span> <span class="ow">or</span> <span class="p">())</span>
-</span><span id="line-1236">    <span class="k">while</span> <span class="n">stack</span><span class="p">:</span>
-</span><span id="line-1237">        <span class="n">a</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-</span><span id="line-1238">        <span class="n">stack</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"children"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">())</span>
-</span><span id="line-1239">        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"child"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-1240">            <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">child</span><span class="p">)</span>
-</span><span id="line-1241">        <span class="k">if</span> <span class="p">(</span>
-</span><span id="line-1242">            <span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"kind"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"play"</span>
-</span><span id="line-1243">            <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"animation"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">PULSE_PRESET</span>
-</span><span id="line-1244">        <span class="p">):</span>
-</span><span id="line-1245">            <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-</span><span id="line-1246">    <span class="k">return</span> <span class="n">out</span>
-</span><span id="line-1247">
-</span><span id="line-1248">
+</span><span id="line-1241">
+</span><span id="line-1242">
+</span><span id="line-1243"><span class="c1">#: The motion preset ``speech.pose_only`` expands to.</span>
+</span><span id="line-1244"><span class="n">PULSE_PRESET</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"speech_pulse"</span>
+</span><span id="line-1245">
+</span><span id="line-1246">
+</span><span id="line-1247"><span class="k">def</span><span class="w"> </span><span class="nf">_authored_pulse_speakers</span><span class="p">(</span><span class="n">shot</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-1248"><span class="w">    </span><span class="sd">"""Speakers the author already pulses with an explicit ``play: speech_pulse``."""</span>
+</span><span id="line-1249">    <span class="n">out</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+</span><span id="line-1250">    <span class="n">stack</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">shot</span><span class="o">.</span><span class="n">actions</span> <span class="ow">or</span> <span class="p">())</span>
+</span><span id="line-1251">    <span class="k">while</span> <span class="n">stack</span><span class="p">:</span>
+</span><span id="line-1252">        <span class="n">a</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+</span><span id="line-1253">        <span class="n">stack</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"children"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">())</span>
+</span><span id="line-1254">        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"child"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-1255">            <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">child</span><span class="p">)</span>
+</span><span id="line-1256">        <span class="k">if</span> <span class="p">(</span>
+</span><span id="line-1257">            <span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"kind"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"play"</span>
+</span><span id="line-1258">            <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"animation"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">PULSE_PRESET</span>
+</span><span id="line-1259">        <span class="p">):</span>
+</span><span id="line-1260">            <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+</span><span id="line-1261">    <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-1262">
+</span><span id="line-1263">
 <div class="viewcode-block" id="speech_plan">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.methods.html#cutan.characters.methods.speech_plan">[docs]</a>
-</span><span id="line-1249"><span class="k">def</span><span class="w"> </span><span class="nf">speech_plan</span><span class="p">(</span>
-</span><span id="line-1250">    <span class="n">shot</span><span class="p">,</span>
-</span><span id="line-1251">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-1252">    <span class="n">is_character</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">],</span>
-</span><span id="line-1253">    <span class="n">profile_of</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
-</span><span id="line-1254">    <span class="n">descriptor_of</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-1255">    <span class="n">has_part</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">],</span>
-</span><span id="line-1256">    <span class="n">record</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-1257">    <span class="n">policy</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-1258">    <span class="n">record_skip</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-1259"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpeechPlan</span><span class="p">:</span>
-</span><span id="line-1260"><span class="w">    </span><span class="sd">"""Resolve the speech aspect ONCE per speaking character, and say what it adds.</span>
-</span><span id="line-1261">
-</span><span id="line-1262"><span class="sd">    The request is the character's declared ``speech`` (a method spelling or a</span>
-</span><span id="line-1263"><span class="sd">    ``{method, args, version}`` choice); ``policy`` is the shot/style policy.</span>
-</span><span id="line-1264"><span class="sd">    The one resolution decides both halves: a speaker resolved to anything but</span>
-</span><span id="line-1265"><span class="sd">    ``speech.mouth_chart`` gets no viseme channel (:attr:`SpeechPlan.no_lip_sync`),</span>
-</span><span id="line-1266"><span class="sd">    and one resolved to ``speech.pose_only`` gets a ``speech_pulse`` play at each</span>
-</span><span id="line-1267"><span class="sd">    syllable onset of each timed line — one play per syllable, each built at the</span>
-</span><span id="line-1268"><span class="sd">    head's pose at that instant, so it rides an authored head-scale tween rather</span>
-</span><span id="line-1269"><span class="sd">    than overwriting it; a syllable that starts while the speaker's previous pulse</span>
-</span><span id="line-1270"><span class="sd">    is still running is skipped, so the head always settles back. ``strength: 0``</span>
-</span><span id="line-1271"><span class="sd">    is a mime: no pulse at all. An authored ``play: speech_pulse`` on the speaker</span>
-</span><span id="line-1272"><span class="sd">    replaces the automatic pulses (nothing is added beside it), but it is not a</span>
-</span><span id="line-1273"><span class="sd">    declaration: the fall from the mouth chart is still recorded, and only a</span>
-</span><span id="line-1274"><span class="sd">    declared ``speech`` makes it the request. Substitutions (a declared method</span>
-</span><span id="line-1275"><span class="sd">    the rig cannot honour; the fall from the mouth chart to the pulse) go to</span>
-</span><span id="line-1276"><span class="sd">    ``record``, once per speaker. A declared ``speech`` naming no method of the</span>
-</span><span id="line-1277"><span class="sd">    aspect, or pinned to a stale version, raises</span>
-</span><span id="line-1278"><span class="sd">    :class:`~an.semantic.VocabularyError` naming the aspect's methods</span>
-</span><span id="line-1279"><span class="sd">    (:func:`speech_problems` is ``an validate``'s side of it).</span>
-</span><span id="line-1280"><span class="sd">    """</span>
-</span><span id="line-1281">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">delay</span><span class="p">,</span> <span class="n">sequence</span>
-</span><span id="line-1282">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.registration</span><span class="w"> </span><span class="kn">import</span> <span class="n">play</span>
-</span><span id="line-1283">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve</span>
-</span><span id="line-1284">
-</span><span id="line-1285">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">WALK_LANDING_S</span>
-</span><span id="line-1286">
-</span><span id="line-1287">    <span class="n">authored</span> <span class="o">=</span> <span class="n">_authored_pulse_speakers</span><span class="p">(</span><span class="n">shot</span><span class="p">)</span>
-</span><span id="line-1288">    <span class="n">resolved</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span id="line-1289">    <span class="n">busy_until</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span id="line-1290">    <span class="n">actions</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-1291">    <span class="n">lines</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-</span><span id="line-1292">        <span class="p">(</span><span class="n">ln</span> <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="n">shot</span><span class="o">.</span><span class="n">dialogue</span> <span class="ow">or</span> <span class="p">()),</span>
-</span><span id="line-1293">        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">ln</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"inf"</span><span class="p">)</span> <span class="k">if</span> <span class="n">ln</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">ln</span><span class="o">.</span><span class="n">start</span><span class="p">),</span>
-</span><span id="line-1294">    <span class="p">)</span>
-</span><span id="line-1295">    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-</span><span id="line-1296">        <span class="n">speaker</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">speaker</span>
-</span><span id="line-1297">        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_character</span><span class="p">(</span><span class="n">speaker</span><span class="p">):</span>
-</span><span id="line-1298">            <span class="k">continue</span>
-</span><span id="line-1299">        <span class="k">if</span> <span class="n">speaker</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">resolved</span><span class="p">:</span>
-</span><span id="line-1300">            <span class="c1"># the declared method is placed by the core's one precedence rule</span>
-</span><span id="line-1301">            <span class="c1"># (DECLARED_OUTRANKS_POLICY, cutan#36), as a walk's declared gait is</span>
-</span><span id="line-1302">            <span class="n">r</span> <span class="o">=</span> <span class="n">resolve</span><span class="p">(</span>
-</span><span id="line-1303">                <span class="n">SPEECH</span><span class="p">,</span>
-</span><span id="line-1304">                <span class="n">profile_of</span><span class="p">(</span><span class="n">speaker</span><span class="p">),</span>
-</span><span id="line-1305">                <span class="n">declared</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">descriptor_of</span><span class="p">(</span><span class="n">speaker</span><span class="p">),</span> <span class="s2">"speech"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-</span><span id="line-1306">                <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span>
-</span><span id="line-1307">                <span class="n">entity</span><span class="o">=</span><span class="n">speaker</span><span class="p">,</span>
-</span><span id="line-1308">            <span class="p">)</span>
-</span><span id="line-1309">            <span class="n">resolved</span><span class="p">[</span><span class="n">speaker</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
-</span><span id="line-1310">            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">substitution</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-1311">                <span class="n">record</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">substitution</span><span class="p">)</span>
-</span><span id="line-1312">            <span class="k">if</span> <span class="n">record_skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-1313">                <span class="k">for</span> <span class="n">method</span><span class="p">,</span> <span class="n">missing</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">skipped</span><span class="p">:</span>
-</span><span id="line-1314">                    <span class="n">record_skip</span><span class="p">(</span><span class="n">speaker</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">missing</span><span class="p">)</span>
-</span><span id="line-1315">        <span class="n">r</span> <span class="o">=</span> <span class="n">resolved</span><span class="p">[</span><span class="n">speaker</span><span class="p">]</span>
-</span><span id="line-1316">        <span class="k">if</span> <span class="p">(</span>
-</span><span id="line-1317">            <span class="n">r</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">SPEECH_PULSE</span><span class="o">.</span><span class="n">id</span>
-</span><span id="line-1318">            <span class="ow">or</span> <span class="n">speaker</span> <span class="ow">in</span> <span class="n">authored</span>
-</span><span id="line-1319">            <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span>
-</span><span id="line-1320">            <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="kc">None</span>
-</span><span id="line-1321">            <span class="ow">or</span> <span class="ow">not</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"strength"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
-</span><span id="line-1322">        <span class="p">):</span>
-</span><span id="line-1323">            <span class="k">continue</span>
-</span><span id="line-1324">        <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"part"</span><span class="p">,</span> <span class="s2">"beats"</span><span class="p">)}</span>
-</span><span id="line-1325">        <span class="n">part</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"part"</span><span class="p">,</span> <span class="s2">"head"</span><span class="p">)</span>
-</span><span id="line-1326">        <span class="n">args</span><span class="p">[</span><span class="s2">"part"</span><span class="p">]</span> <span class="o">=</span> <span class="n">part</span> <span class="k">if</span> <span class="n">part</span> <span class="ow">and</span> <span class="n">has_part</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">speaker</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span>
-</span><span id="line-1327">        <span class="n">length</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-1328">            <span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"attack"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
-</span><span id="line-1329">            <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"release"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
-</span><span id="line-1330">            <span class="o">+</span> <span class="n">WALK_LANDING_S</span>
-</span><span id="line-1331">        <span class="p">)</span>
-</span><span id="line-1332">        <span class="k">for</span> <span class="n">beat</span> <span class="ow">in</span> <span class="n">syllable_beats</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
-</span><span id="line-1333">            <span class="n">at</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">+</span> <span class="n">beat</span>
-</span><span id="line-1334">            <span class="c1"># A beat inside a pulse still running (long args, overlapping lines)</span>
-</span><span id="line-1335">            <span class="c1"># is dropped: a pulse built on a mid-pulse pose would settle above</span>
-</span><span id="line-1336">            <span class="c1"># rest and ratchet the head up (review-256 R2-1).</span>
-</span><span id="line-1337">            <span class="k">if</span> <span class="n">at</span> <span class="o">&lt;</span> <span class="n">busy_until</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">speaker</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"-inf"</span><span class="p">)):</span>
-</span><span id="line-1338">                <span class="k">continue</span>
-</span><span id="line-1339">            <span class="n">busy_until</span><span class="p">[</span><span class="n">speaker</span><span class="p">]</span> <span class="o">=</span> <span class="n">at</span> <span class="o">+</span> <span class="n">length</span>
-</span><span id="line-1340">            <span class="n">pulse</span> <span class="o">=</span> <span class="n">play</span><span class="p">(</span><span class="n">speaker</span><span class="p">,</span> <span class="n">PULSE_PRESET</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="n">args</span><span class="p">,</span> <span class="s2">"beats"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]})</span>
-</span><span id="line-1341">            <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sequence</span><span class="p">(</span><span class="n">delay</span><span class="p">(</span><span class="n">at</span><span class="p">),</span> <span class="n">pulse</span><span class="p">)</span> <span class="k">if</span> <span class="n">at</span> <span class="k">else</span> <span class="n">pulse</span><span class="p">)</span>
-</span><span id="line-1342">    <span class="k">return</span> <span class="n">SpeechPlan</span><span class="p">(</span>
-</span><span id="line-1343">        <span class="nb">tuple</span><span class="p">(</span><span class="n">actions</span><span class="p">),</span>
-</span><span id="line-1344">        <span class="nb">frozenset</span><span class="p">(</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">resolved</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">SPEECH_CHART</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
-</span><span id="line-1345">    <span class="p">)</span></div>
+</span><span id="line-1264"><span class="k">def</span><span class="w"> </span><span class="nf">speech_plan</span><span class="p">(</span>
+</span><span id="line-1265">    <span class="n">shot</span><span class="p">,</span>
+</span><span id="line-1266">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-1267">    <span class="n">is_character</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">],</span>
+</span><span id="line-1268">    <span class="n">profile_of</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
+</span><span id="line-1269">    <span class="n">descriptor_of</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-1270">    <span class="n">has_part</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">],</span>
+</span><span id="line-1271">    <span class="n">record</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-1272">    <span class="n">policy</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-1273">    <span class="n">record_skip</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-1274"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpeechPlan</span><span class="p">:</span>
+</span><span id="line-1275"><span class="w">    </span><span class="sd">"""Resolve the speech aspect ONCE per speaking character, and say what it adds.</span>
+</span><span id="line-1276">
+</span><span id="line-1277"><span class="sd">    The request is the character's declared ``speech`` (a method spelling or a</span>
+</span><span id="line-1278"><span class="sd">    ``{method, args, version}`` choice); ``policy`` is the shot/style policy.</span>
+</span><span id="line-1279"><span class="sd">    The one resolution decides both halves: a speaker resolved to anything but</span>
+</span><span id="line-1280"><span class="sd">    ``speech.mouth_chart`` gets no viseme channel (:attr:`SpeechPlan.no_lip_sync`),</span>
+</span><span id="line-1281"><span class="sd">    and one resolved to ``speech.pose_only`` gets a ``speech_pulse`` play at each</span>
+</span><span id="line-1282"><span class="sd">    syllable onset of each timed line — one play per syllable, each built at the</span>
+</span><span id="line-1283"><span class="sd">    head's pose at that instant, so it rides an authored head-scale tween rather</span>
+</span><span id="line-1284"><span class="sd">    than overwriting it; a syllable that starts while the speaker's previous pulse</span>
+</span><span id="line-1285"><span class="sd">    is still running is skipped, so the head always settles back. ``strength: 0``</span>
+</span><span id="line-1286"><span class="sd">    is a mime: no pulse at all. An authored ``play: speech_pulse`` on the speaker</span>
+</span><span id="line-1287"><span class="sd">    replaces the automatic pulses (nothing is added beside it), but it is not a</span>
+</span><span id="line-1288"><span class="sd">    declaration: the fall from the mouth chart is still recorded, and only a</span>
+</span><span id="line-1289"><span class="sd">    declared ``speech`` makes it the request. Substitutions (a declared method</span>
+</span><span id="line-1290"><span class="sd">    the rig cannot honour; the fall from the mouth chart to the pulse) go to</span>
+</span><span id="line-1291"><span class="sd">    ``record``, once per speaker. A declared ``speech`` naming no method of the</span>
+</span><span id="line-1292"><span class="sd">    aspect, or pinned to a stale version, raises</span>
+</span><span id="line-1293"><span class="sd">    :class:`~an.semantic.VocabularyError` naming the aspect's methods</span>
+</span><span id="line-1294"><span class="sd">    (:func:`speech_problems` is ``an validate``'s side of it).</span>
+</span><span id="line-1295"><span class="sd">    """</span>
+</span><span id="line-1296">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">delay</span><span class="p">,</span> <span class="n">sequence</span>
+</span><span id="line-1297">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.registration</span><span class="w"> </span><span class="kn">import</span> <span class="n">play</span>
+</span><span id="line-1298">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve</span>
+</span><span id="line-1299">
+</span><span id="line-1300">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">WALK_LANDING_S</span>
+</span><span id="line-1301">
+</span><span id="line-1302">    <span class="n">authored</span> <span class="o">=</span> <span class="n">_authored_pulse_speakers</span><span class="p">(</span><span class="n">shot</span><span class="p">)</span>
+</span><span id="line-1303">    <span class="n">resolved</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-1304">    <span class="n">busy_until</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-1305">    <span class="n">actions</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-1306">    <span class="n">lines</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+</span><span id="line-1307">        <span class="p">(</span><span class="n">ln</span> <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="n">shot</span><span class="o">.</span><span class="n">dialogue</span> <span class="ow">or</span> <span class="p">()),</span>
+</span><span id="line-1308">        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">ln</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"inf"</span><span class="p">)</span> <span class="k">if</span> <span class="n">ln</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">ln</span><span class="o">.</span><span class="n">start</span><span class="p">),</span>
+</span><span id="line-1309">    <span class="p">)</span>
+</span><span id="line-1310">    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+</span><span id="line-1311">        <span class="n">speaker</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">speaker</span>
+</span><span id="line-1312">        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_character</span><span class="p">(</span><span class="n">speaker</span><span class="p">):</span>
+</span><span id="line-1313">            <span class="k">continue</span>
+</span><span id="line-1314">        <span class="k">if</span> <span class="n">speaker</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">resolved</span><span class="p">:</span>
+</span><span id="line-1315">            <span class="c1"># the declared method is placed by the core's one precedence rule</span>
+</span><span id="line-1316">            <span class="c1"># (DECLARED_OUTRANKS_POLICY, cutan#36), as a walk's declared gait is</span>
+</span><span id="line-1317">            <span class="n">r</span> <span class="o">=</span> <span class="n">resolve</span><span class="p">(</span>
+</span><span id="line-1318">                <span class="n">SPEECH</span><span class="p">,</span>
+</span><span id="line-1319">                <span class="n">profile_of</span><span class="p">(</span><span class="n">speaker</span><span class="p">),</span>
+</span><span id="line-1320">                <span class="n">declared</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">descriptor_of</span><span class="p">(</span><span class="n">speaker</span><span class="p">),</span> <span class="s2">"speech"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+</span><span id="line-1321">                <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span>
+</span><span id="line-1322">                <span class="n">entity</span><span class="o">=</span><span class="n">speaker</span><span class="p">,</span>
+</span><span id="line-1323">            <span class="p">)</span>
+</span><span id="line-1324">            <span class="n">resolved</span><span class="p">[</span><span class="n">speaker</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
+</span><span id="line-1325">            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">substitution</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-1326">                <span class="n">record</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">substitution</span><span class="p">)</span>
+</span><span id="line-1327">            <span class="k">if</span> <span class="n">record_skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-1328">                <span class="k">for</span> <span class="n">method</span><span class="p">,</span> <span class="n">missing</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">skipped</span><span class="p">:</span>
+</span><span id="line-1329">                    <span class="n">record_skip</span><span class="p">(</span><span class="n">speaker</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">missing</span><span class="p">)</span>
+</span><span id="line-1330">        <span class="n">r</span> <span class="o">=</span> <span class="n">resolved</span><span class="p">[</span><span class="n">speaker</span><span class="p">]</span>
+</span><span id="line-1331">        <span class="k">if</span> <span class="p">(</span>
+</span><span id="line-1332">            <span class="n">r</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">SPEECH_PULSE</span><span class="o">.</span><span class="n">id</span>
+</span><span id="line-1333">            <span class="ow">or</span> <span class="n">speaker</span> <span class="ow">in</span> <span class="n">authored</span>
+</span><span id="line-1334">            <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span>
+</span><span id="line-1335">            <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="kc">None</span>
+</span><span id="line-1336">            <span class="ow">or</span> <span class="ow">not</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"strength"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+</span><span id="line-1337">        <span class="p">):</span>
+</span><span id="line-1338">            <span class="k">continue</span>
+</span><span id="line-1339">        <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"part"</span><span class="p">,</span> <span class="s2">"beats"</span><span class="p">)}</span>
+</span><span id="line-1340">        <span class="n">part</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"part"</span><span class="p">,</span> <span class="s2">"head"</span><span class="p">)</span>
+</span><span id="line-1341">        <span class="n">args</span><span class="p">[</span><span class="s2">"part"</span><span class="p">]</span> <span class="o">=</span> <span class="n">part</span> <span class="k">if</span> <span class="n">part</span> <span class="ow">and</span> <span class="n">has_part</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">speaker</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span>
+</span><span id="line-1342">        <span class="n">length</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-1343">            <span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"attack"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+</span><span id="line-1344">            <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"release"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+</span><span id="line-1345">            <span class="o">+</span> <span class="n">WALK_LANDING_S</span>
+</span><span id="line-1346">        <span class="p">)</span>
+</span><span id="line-1347">        <span class="k">for</span> <span class="n">beat</span> <span class="ow">in</span> <span class="n">syllable_beats</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+</span><span id="line-1348">            <span class="n">at</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">+</span> <span class="n">beat</span>
+</span><span id="line-1349">            <span class="c1"># A beat inside a pulse still running (long args, overlapping lines)</span>
+</span><span id="line-1350">            <span class="c1"># is dropped: a pulse built on a mid-pulse pose would settle above</span>
+</span><span id="line-1351">            <span class="c1"># rest and ratchet the head up (review-256 R2-1).</span>
+</span><span id="line-1352">            <span class="k">if</span> <span class="n">at</span> <span class="o">&lt;</span> <span class="n">busy_until</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">speaker</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"-inf"</span><span class="p">)):</span>
+</span><span id="line-1353">                <span class="k">continue</span>
+</span><span id="line-1354">            <span class="n">busy_until</span><span class="p">[</span><span class="n">speaker</span><span class="p">]</span> <span class="o">=</span> <span class="n">at</span> <span class="o">+</span> <span class="n">length</span>
+</span><span id="line-1355">            <span class="n">pulse</span> <span class="o">=</span> <span class="n">play</span><span class="p">(</span><span class="n">speaker</span><span class="p">,</span> <span class="n">PULSE_PRESET</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="n">args</span><span class="p">,</span> <span class="s2">"beats"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]})</span>
+</span><span id="line-1356">            <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sequence</span><span class="p">(</span><span class="n">delay</span><span class="p">(</span><span class="n">at</span><span class="p">),</span> <span class="n">pulse</span><span class="p">)</span> <span class="k">if</span> <span class="n">at</span> <span class="k">else</span> <span class="n">pulse</span><span class="p">)</span>
+</span><span id="line-1357">    <span class="k">return</span> <span class="n">SpeechPlan</span><span class="p">(</span>
+</span><span id="line-1358">        <span class="nb">tuple</span><span class="p">(</span><span class="n">actions</span><span class="p">),</span>
+</span><span id="line-1359">        <span class="nb">frozenset</span><span class="p">(</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">resolved</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">SPEECH_CHART</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+</span><span id="line-1360">    <span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -1598,7 +1613,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=056c92e6"></script>
+    <script src="../../../_static/documentation_options.js?v=a11416ff"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

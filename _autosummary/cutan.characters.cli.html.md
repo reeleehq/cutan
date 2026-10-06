@@ -16,6 +16,11 @@ Subcommands (used as `an character <verb> ...`):
 - `silhouette`— rasterize silhouettes; for two characters, also IoU.
 - `preview`   — open an HTML viewer cycling visemes + idle animation.
 
+### Module Attributes
+
+| [`SILHOUETTE_ARTIFACTS`](#cutan.characters.cli.SILHOUETTE_ARTIFACTS)   | Where silhouettes go, under the project the characters belong to (never a character's own folder: that folder is the published asset, an#272).   |
+|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+
 ### Functions
 
 | [`add_gaze`](#cutan.characters.cli.add_gaze)(name[, out_dir, overwrite_eyes])         | Give `name` the eye stack (an#99): sclera and pupil slots under each lid, a filled closed lid, and the `gaze_travel` clamp — so `gaze_x` / `gaze_y` and the ambient saccades move its pupils.   |
@@ -29,6 +34,11 @@ Subcommands (used as `an character <verb> ...`):
 | [`record`](#cutan.characters.cli.record)(name[, out_dir, output, duration, ...])    | Record a character's preview HTML to mp4.                                                                                                                                                       |
 | [`silhouette`](#cutan.characters.cli.silhouette)(name[, other, out_dir, output, size])  | Render a black silhouette for `name` (and optionally compare to `other`).                                                                                                                       |
 | [`validate`](#cutan.characters.cli.validate)(name[, out_dir])                         | Validate a character's directory structure and descriptor.                                                                                                                                      |
+
+### cutan.characters.cli.SILHOUETTE_ARTIFACTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('artifacts', 'silhouettes')*
+
+Where silhouettes go, under the project the characters belong to (never a
+character’s own folder: that folder is the published asset, an#272).
 
 ### cutan.characters.cli.add_gaze(name, out_dir='', overwrite_eyes=False)
 
@@ -194,13 +204,19 @@ width / height: video resolution (default 640x480)
 
 Render a black silhouette for `name` (and optionally compare to `other`).
 
-When two names are given, prints both silhouettes’ paths and an IoU
-score (0..1; lower means more visually distinct).
+The silhouette is the figure as the stage draws it (build, head scale, hat:
+an#272), tinted black on white. When two names are given, prints both
+silhouettes’ paths and an IoU score (0..1; lower means more visually
+distinct). Nothing is written into a character’s folder, so a later
+`an library publish` never ships a silhouette.
 
 name: character id
 other: optional second character to compare against
 out_dir: parent directory; defaults to ./assets/characters
-output: output PNG path; defaults to <character_dir>/silhouette.png
+output: output PNG path (one name only); defaults to the project’s
+
+> artifacts/silhouettes/<name>.png
+
 size: square output size in pixels (default 512)
 
 * **Return type:**

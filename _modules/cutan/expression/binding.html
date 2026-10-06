@@ -214,366 +214,436 @@
 </span><span id="line-35"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 </span><span id="line-36">
 </span><span id="line-37"><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-</span><span id="line-38"><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Iterable</span>
+</span><span id="line-38"><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span>
 </span><span id="line-39"><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 </span><span id="line-40"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
 </span><span id="line-41">
 </span><span id="line-42"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">EYELID_CHANNEL</span><span class="p">,</span> <span class="n">VISEME_CHANNEL</span><span class="p">,</span> <span class="n">CharacterDescriptor</span>
-</span><span id="line-43"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.expression.axes</span><span class="w"> </span><span class="kn">import</span> <span class="n">AXES</span><span class="p">,</span> <span class="n">GAZE_AXES</span>
-</span><span id="line-44"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.expression.presets</span><span class="w"> </span><span class="kn">import</span> <span class="n">PRESETS</span><span class="p">,</span> <span class="n">known_presets</span><span class="p">,</span> <span class="n">mouth_form_of</span><span class="p">,</span> <span class="n">preset_axes</span>
-</span><span id="line-45">
-</span><span id="line-46"><span class="c1">#: Brow travel per unit of `brow_height_*`, in the rig's view-box units</span>
-</span><span id="line-47"><span class="c1">#: (scaled to scene pixels by the entity's rig factor). Art direction; about</span>
-</span><span id="line-48"><span class="c1">#: the synthesized eye's half-height.</span>
-</span><span id="line-49"><span class="n">BROW_HEIGHT_TRAVEL</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
-</span><span id="line-50"><span class="c1">#: Brow rotation per unit of `brow_angle_*`, radians. Art direction.</span>
-</span><span id="line-51"><span class="n">BROW_ANGLE_TRAVEL</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.35</span>
-</span><span id="line-52"><span class="c1">#: Pupil travel per unit of `gaze_*`, in view-box units — the default when a</span>
-</span><span id="line-53"><span class="c1">#: descriptor declares no travel of its own (`add_gaze` writes `gaze_travel`).</span>
-</span><span id="line-54"><span class="n">GAZE_TRAVEL</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">6.0</span>
-</span><span id="line-55"><span class="c1">#: On a rig whose eye squashes instead of swapping art, a lid offset scales</span>
-</span><span id="line-56"><span class="c1">#: the eye by this much per unit.</span>
-</span><span id="line-57"><span class="n">LID_SQUASH_GAIN</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
-</span><span id="line-58">
-</span><span id="line-59"><span class="c1">#: Slot names the default binding looks for. A rig that lacks one simply has</span>
-</span><span id="line-60"><span class="c1">#: no binding for that axis — the axis is a no-op on it, which is what lets a</span>
-</span><span id="line-61"><span class="c1">#: pre-Wave-6 descriptor keep rendering unchanged.</span>
-</span><span id="line-62"><span class="n">LEFT_BROW_SLOT</span><span class="p">,</span> <span class="n">RIGHT_BROW_SLOT</span> <span class="o">=</span> <span class="s2">"left_brow"</span><span class="p">,</span> <span class="s2">"right_brow"</span>
-</span><span id="line-63"><span class="n">LEFT_EYE_SLOT</span><span class="p">,</span> <span class="n">RIGHT_EYE_SLOT</span> <span class="o">=</span> <span class="s2">"left_eye"</span><span class="p">,</span> <span class="s2">"right_eye"</span>
-</span><span id="line-64"><span class="n">LEFT_PUPIL_SLOT</span><span class="p">,</span> <span class="n">RIGHT_PUPIL_SLOT</span> <span class="o">=</span> <span class="s2">"left_pupil"</span><span class="p">,</span> <span class="s2">"right_pupil"</span>
-</span><span id="line-65">
-</span><span id="line-66">
+</span><span id="line-43"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.expression.axes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-44">    <span class="n">AXES</span><span class="p">,</span>
+</span><span id="line-45">    <span class="n">GAZE_AXES</span><span class="p">,</span>
+</span><span id="line-46">    <span class="n">LID_AXES</span><span class="p">,</span>
+</span><span id="line-47">    <span class="n">LID_CLOSED_BELOW</span><span class="p">,</span>
+</span><span id="line-48">    <span class="n">LID_KEY_CLOSED</span><span class="p">,</span>
+</span><span id="line-49">    <span class="n">LID_KEY_HALF</span><span class="p">,</span>
+</span><span id="line-50">    <span class="n">LID_KEY_OPEN</span><span class="p">,</span>
+</span><span id="line-51">    <span class="n">LID_KEY_WIDE</span><span class="p">,</span>
+</span><span id="line-52">    <span class="n">lid_key</span><span class="p">,</span>
+</span><span id="line-53"><span class="p">)</span>
+</span><span id="line-54"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.expression.presets</span><span class="w"> </span><span class="kn">import</span> <span class="n">PRESETS</span><span class="p">,</span> <span class="n">known_presets</span><span class="p">,</span> <span class="n">mouth_form_of</span><span class="p">,</span> <span class="n">preset_axes</span>
+</span><span id="line-55">
+</span><span id="line-56"><span class="c1">#: Brow travel per unit of `brow_height_*`, in the rig's view-box units</span>
+</span><span id="line-57"><span class="c1">#: (scaled to scene pixels by the entity's rig factor). Art direction; about</span>
+</span><span id="line-58"><span class="c1">#: the synthesized eye's half-height.</span>
+</span><span id="line-59"><span class="n">BROW_HEIGHT_TRAVEL</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
+</span><span id="line-60"><span class="c1">#: Brow rotation per unit of `brow_angle_*`, radians. Art direction.</span>
+</span><span id="line-61"><span class="n">BROW_ANGLE_TRAVEL</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.35</span>
+</span><span id="line-62"><span class="c1">#: Pupil travel per unit of `gaze_*`, in view-box units — the default when a</span>
+</span><span id="line-63"><span class="c1">#: descriptor declares no travel of its own (`add_gaze` writes `gaze_travel`).</span>
+</span><span id="line-64"><span class="n">GAZE_TRAVEL</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">6.0</span>
+</span><span id="line-65"><span class="c1">#: On a rig whose eye squashes instead of swapping art, a lid offset scales</span>
+</span><span id="line-66"><span class="c1">#: the eye by this much per unit.</span>
+</span><span id="line-67"><span class="n">LID_SQUASH_GAIN</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
+</span><span id="line-68">
+</span><span id="line-69"><span class="c1">#: Slot names the default binding looks for. A rig that lacks one simply has</span>
+</span><span id="line-70"><span class="c1">#: no binding for that axis — the axis is a no-op on it, which is what lets a</span>
+</span><span id="line-71"><span class="c1">#: pre-Wave-6 descriptor keep rendering unchanged.</span>
+</span><span id="line-72"><span class="n">LEFT_BROW_SLOT</span><span class="p">,</span> <span class="n">RIGHT_BROW_SLOT</span> <span class="o">=</span> <span class="s2">"left_brow"</span><span class="p">,</span> <span class="s2">"right_brow"</span>
+</span><span id="line-73"><span class="n">LEFT_EYE_SLOT</span><span class="p">,</span> <span class="n">RIGHT_EYE_SLOT</span> <span class="o">=</span> <span class="s2">"left_eye"</span><span class="p">,</span> <span class="s2">"right_eye"</span>
+</span><span id="line-74"><span class="n">LEFT_PUPIL_SLOT</span><span class="p">,</span> <span class="n">RIGHT_PUPIL_SLOT</span> <span class="o">=</span> <span class="s2">"left_pupil"</span><span class="p">,</span> <span class="s2">"right_pupil"</span>
+</span><span id="line-75">
+</span><span id="line-76">
 <div class="viewcode-block" id="ExpressionResolutionError">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.ExpressionResolutionError">[docs]</a>
-</span><span id="line-67"><span class="k">class</span><span class="w"> </span><span class="nc">ExpressionResolutionError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
-</span><span id="line-68"><span class="w">    </span><span class="sd">"""An expression that cannot resolve on a character; ``problems`` says why."""</span>
-</span><span id="line-69">
-</span><span id="line-70">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">who</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">problems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-71">        <span class="bp">self</span><span class="o">.</span><span class="n">who</span> <span class="o">=</span> <span class="n">who</span>
-</span><span id="line-72">        <span class="bp">self</span><span class="o">.</span><span class="n">problems</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">problems</span><span class="p">)</span>
-</span><span id="line-73">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s2">"expression on </span><span class="si">{</span><span class="n">who</span><span class="si">!r}</span><span class="s2">: "</span> <span class="o">+</span> <span class="s2">"; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">problems</span><span class="p">))</span></div>
+</span><span id="line-77"><span class="k">class</span><span class="w"> </span><span class="nc">ExpressionResolutionError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+</span><span id="line-78"><span class="w">    </span><span class="sd">"""An expression that cannot resolve on a character; ``problems`` says why."""</span>
+</span><span id="line-79">
+</span><span id="line-80">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">who</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">problems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-81">        <span class="bp">self</span><span class="o">.</span><span class="n">who</span> <span class="o">=</span> <span class="n">who</span>
+</span><span id="line-82">        <span class="bp">self</span><span class="o">.</span><span class="n">problems</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">problems</span><span class="p">)</span>
+</span><span id="line-83">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s2">"expression on </span><span class="si">{</span><span class="n">who</span><span class="si">!r}</span><span class="s2">: "</span> <span class="o">+</span> <span class="s2">"; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">problems</span><span class="p">))</span></div>
 
-</span><span id="line-74">
-</span><span id="line-75">
+</span><span id="line-84">
+</span><span id="line-85">
 <div class="viewcode-block" id="ChannelBinding">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.ChannelBinding">[docs]</a>
-</span><span id="line-76"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-77"><span class="k">class</span><span class="w"> </span><span class="nc">ChannelBinding</span><span class="p">:</span>
-</span><span id="line-78"><span class="w">    </span><span class="sd">"""A numeric axis driving one transform property of one slot's node."""</span>
-</span><span id="line-79">
-</span><span id="line-80">    <span class="n">axis</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-81">    <span class="n">slot</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-82">    <span class="nb">property</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-83">    <span class="n">gain</span><span class="p">:</span> <span class="nb">float</span>
-</span><span id="line-84">    <span class="c1">#: Whether the gain is a view-box length (scaled by the rig factor).</span>
-</span><span id="line-85">    <span class="n">rig_scaled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+</span><span id="line-86"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-87"><span class="k">class</span><span class="w"> </span><span class="nc">ChannelBinding</span><span class="p">:</span>
+</span><span id="line-88"><span class="w">    </span><span class="sd">"""A numeric axis driving one transform property of one slot's node."""</span>
+</span><span id="line-89">
+</span><span id="line-90">    <span class="n">axis</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-91">    <span class="n">slot</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-92">    <span class="nb">property</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-93">    <span class="n">gain</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="line-94">    <span class="c1">#: Whether the gain is a view-box length (scaled by the rig factor).</span>
+</span><span id="line-95">    <span class="n">rig_scaled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-</span><span id="line-86">
-</span><span id="line-87">
+</span><span id="line-96">
+</span><span id="line-97">
 <div class="viewcode-block" id="SetBinding">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.SetBinding">[docs]</a>
-</span><span id="line-88"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-89"><span class="k">class</span><span class="w"> </span><span class="nc">SetBinding</span><span class="p">:</span>
-</span><span id="line-90"><span class="w">    </span><span class="sd">"""A lid axis driving one slot's swap set through the ladder."""</span>
-</span><span id="line-91">
-</span><span id="line-92">    <span class="n">axis</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-93">    <span class="n">slot</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-94">    <span class="n">set_family</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">EYELID_CHANNEL</span></div>
+</span><span id="line-98"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-99"><span class="k">class</span><span class="w"> </span><span class="nc">SetBinding</span><span class="p">:</span>
+</span><span id="line-100"><span class="w">    </span><span class="sd">"""A lid axis driving one slot's swap set through the ladder."""</span>
+</span><span id="line-101">
+</span><span id="line-102">    <span class="n">axis</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-103">    <span class="n">slot</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-104">    <span class="n">set_family</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">EYELID_CHANNEL</span></div>
 
-</span><span id="line-95">
-</span><span id="line-96">
-</span><span id="line-97"><span class="n">Binding</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">ChannelBinding</span><span class="p">,</span> <span class="n">SetBinding</span><span class="p">]</span>
-</span><span id="line-98">
-</span><span id="line-99">
+</span><span id="line-105">
+</span><span id="line-106">
+</span><span id="line-107"><span class="n">Binding</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">ChannelBinding</span><span class="p">,</span> <span class="n">SetBinding</span><span class="p">]</span>
+</span><span id="line-108">
+</span><span id="line-109">
 <div class="viewcode-block" id="default_binding">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.default_binding">[docs]</a>
-</span><span id="line-100"><span class="k">def</span><span class="w"> </span><span class="nf">default_binding</span><span class="p">(</span><span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Binding</span><span class="p">]:</span>
-</span><span id="line-101"><span class="w">    </span><span class="sd">"""The binding the default rig implies, from the slots it actually has.</span>
-</span><span id="line-102">
-</span><span id="line-103"><span class="sd">    The brow angle's screen sign: PixiJS rotation is clockwise-positive with y</span>
-</span><span id="line-104"><span class="sd">    down, so on the LEFT brow (screen-left) a clockwise turn drops the inner</span>
-</span><span id="line-105"><span class="sd">    end while on the RIGHT brow it lifts it — the axis says "+ = inner end</span>
-</span><span id="line-106"><span class="sd">    up", hence ``-travel`` on the left and ``+travel`` on the right.</span>
-</span><span id="line-107"><span class="sd">    """</span>
-</span><span id="line-108">    <span class="n">slots</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">slots</span><span class="p">}</span>
-</span><span id="line-109">    <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Binding</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-110">    <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">sign</span> <span class="ow">in</span> <span class="p">(</span>
-</span><span id="line-111">        <span class="p">(</span><span class="s2">"brow_height_l"</span><span class="p">,</span> <span class="n">LEFT_BROW_SLOT</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span>  <span class="c1"># up is -y</span>
-</span><span id="line-112">        <span class="p">(</span><span class="s2">"brow_height_r"</span><span class="p">,</span> <span class="n">RIGHT_BROW_SLOT</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span>
-</span><span id="line-113">    <span class="p">):</span>
-</span><span id="line-114">        <span class="k">if</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">:</span>
-</span><span id="line-115">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-116">                <span class="n">ChannelBinding</span><span class="p">(</span>
-</span><span id="line-117">                    <span class="n">axis</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">BROW_HEIGHT_TRAVEL</span><span class="p">,</span> <span class="n">rig_scaled</span><span class="o">=</span><span class="kc">True</span>
-</span><span id="line-118">                <span class="p">)</span>
-</span><span id="line-119">            <span class="p">)</span>
+</span><span id="line-110"><span class="k">def</span><span class="w"> </span><span class="nf">default_binding</span><span class="p">(</span><span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Binding</span><span class="p">]:</span>
+</span><span id="line-111"><span class="w">    </span><span class="sd">"""The binding the default rig implies, from the slots it actually has.</span>
+</span><span id="line-112">
+</span><span id="line-113"><span class="sd">    The brow angle's screen sign: PixiJS rotation is clockwise-positive with y</span>
+</span><span id="line-114"><span class="sd">    down, so on the LEFT brow (screen-left) a clockwise turn drops the inner</span>
+</span><span id="line-115"><span class="sd">    end while on the RIGHT brow it lifts it — the axis says "+ = inner end</span>
+</span><span id="line-116"><span class="sd">    up", hence ``-travel`` on the left and ``+travel`` on the right.</span>
+</span><span id="line-117"><span class="sd">    """</span>
+</span><span id="line-118">    <span class="n">slots</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">slots</span><span class="p">}</span>
+</span><span id="line-119">    <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Binding</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="line-120">    <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">sign</span> <span class="ow">in</span> <span class="p">(</span>
-</span><span id="line-121">        <span class="p">(</span><span class="s2">"brow_angle_l"</span><span class="p">,</span> <span class="n">LEFT_BROW_SLOT</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span>
-</span><span id="line-122">        <span class="p">(</span><span class="s2">"brow_angle_r"</span><span class="p">,</span> <span class="n">RIGHT_BROW_SLOT</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+</span><span id="line-121">        <span class="p">(</span><span class="s2">"brow_height_l"</span><span class="p">,</span> <span class="n">LEFT_BROW_SLOT</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span>  <span class="c1"># up is -y</span>
+</span><span id="line-122">        <span class="p">(</span><span class="s2">"brow_height_r"</span><span class="p">,</span> <span class="n">RIGHT_BROW_SLOT</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span>
 </span><span id="line-123">    <span class="p">):</span>
 </span><span id="line-124">        <span class="k">if</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">:</span>
-</span><span id="line-125">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ChannelBinding</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="s2">"rotation"</span><span class="p">,</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">BROW_ANGLE_TRAVEL</span><span class="p">))</span>
-</span><span id="line-126">    <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">slot</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"lid_open_l"</span><span class="p">,</span> <span class="n">LEFT_EYE_SLOT</span><span class="p">),</span> <span class="p">(</span><span class="s2">"lid_open_r"</span><span class="p">,</span> <span class="n">RIGHT_EYE_SLOT</span><span class="p">)):</span>
-</span><span id="line-127">        <span class="k">if</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">:</span>
-</span><span id="line-128">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SetBinding</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">EYELID_CHANNEL</span><span class="p">))</span>
-</span><span id="line-129">    <span class="n">travel</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="s2">"gaze_travel"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
-</span><span id="line-130">    <span class="n">tx</span><span class="p">,</span> <span class="n">ty</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">travel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">GAZE_TRAVEL</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">travel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">GAZE_TRAVEL</span><span class="p">))</span>
-</span><span id="line-131">    <span class="k">if</span> <span class="n">travel</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">tx</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">ty</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-</span><span id="line-132">        <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
-</span><span id="line-133">            <span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"gaze_travel must be positive per axis, got </span><span class="si">{</span><span class="n">travel</span><span class="si">!r}</span><span class="s2">"</span><span class="p">]</span>
-</span><span id="line-134">        <span class="p">)</span>
-</span><span id="line-135">    <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="p">(</span><span class="n">LEFT_PUPIL_SLOT</span><span class="p">,</span> <span class="n">RIGHT_PUPIL_SLOT</span><span class="p">):</span>
-</span><span id="line-136">        <span class="k">if</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">:</span>
-</span><span id="line-137">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ChannelBinding</span><span class="p">(</span><span class="s2">"gaze_x"</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">,</span> <span class="n">tx</span><span class="p">,</span> <span class="n">rig_scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-</span><span id="line-138">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ChannelBinding</span><span class="p">(</span><span class="s2">"gaze_y"</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="n">ty</span><span class="p">,</span> <span class="n">rig_scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-</span><span id="line-139">    <span class="k">return</span> <span class="n">out</span></div>
+</span><span id="line-125">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-126">                <span class="n">ChannelBinding</span><span class="p">(</span>
+</span><span id="line-127">                    <span class="n">axis</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">BROW_HEIGHT_TRAVEL</span><span class="p">,</span> <span class="n">rig_scaled</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="line-128">                <span class="p">)</span>
+</span><span id="line-129">            <span class="p">)</span>
+</span><span id="line-130">    <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">sign</span> <span class="ow">in</span> <span class="p">(</span>
+</span><span id="line-131">        <span class="p">(</span><span class="s2">"brow_angle_l"</span><span class="p">,</span> <span class="n">LEFT_BROW_SLOT</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span>
+</span><span id="line-132">        <span class="p">(</span><span class="s2">"brow_angle_r"</span><span class="p">,</span> <span class="n">RIGHT_BROW_SLOT</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+</span><span id="line-133">    <span class="p">):</span>
+</span><span id="line-134">        <span class="k">if</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">:</span>
+</span><span id="line-135">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ChannelBinding</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="s2">"rotation"</span><span class="p">,</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">BROW_ANGLE_TRAVEL</span><span class="p">))</span>
+</span><span id="line-136">    <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">slot</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"lid_open_l"</span><span class="p">,</span> <span class="n">LEFT_EYE_SLOT</span><span class="p">),</span> <span class="p">(</span><span class="s2">"lid_open_r"</span><span class="p">,</span> <span class="n">RIGHT_EYE_SLOT</span><span class="p">)):</span>
+</span><span id="line-137">        <span class="k">if</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">:</span>
+</span><span id="line-138">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SetBinding</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">EYELID_CHANNEL</span><span class="p">))</span>
+</span><span id="line-139">    <span class="n">travel</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="s2">"gaze_travel"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+</span><span id="line-140">    <span class="n">tx</span><span class="p">,</span> <span class="n">ty</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">travel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">GAZE_TRAVEL</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">travel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">GAZE_TRAVEL</span><span class="p">))</span>
+</span><span id="line-141">    <span class="k">if</span> <span class="n">travel</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">tx</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">ty</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+</span><span id="line-142">        <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
+</span><span id="line-143">            <span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"gaze_travel must be positive per axis, got </span><span class="si">{</span><span class="n">travel</span><span class="si">!r}</span><span class="s2">"</span><span class="p">]</span>
+</span><span id="line-144">        <span class="p">)</span>
+</span><span id="line-145">    <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="p">(</span><span class="n">LEFT_PUPIL_SLOT</span><span class="p">,</span> <span class="n">RIGHT_PUPIL_SLOT</span><span class="p">):</span>
+</span><span id="line-146">        <span class="k">if</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">:</span>
+</span><span id="line-147">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ChannelBinding</span><span class="p">(</span><span class="s2">"gaze_x"</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">,</span> <span class="n">tx</span><span class="p">,</span> <span class="n">rig_scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</span><span id="line-148">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ChannelBinding</span><span class="p">(</span><span class="s2">"gaze_y"</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="n">ty</span><span class="p">,</span> <span class="n">rig_scaled</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</span><span id="line-149">    <span class="k">return</span> <span class="n">out</span></div>
 
-</span><span id="line-140">
-</span><span id="line-141">
+</span><span id="line-150">
+</span><span id="line-151">
 <div class="viewcode-block" id="binding_for">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.binding_for">[docs]</a>
-</span><span id="line-142"><span class="k">def</span><span class="w"> </span><span class="nf">binding_for</span><span class="p">(</span><span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Binding</span><span class="p">]:</span>
-</span><span id="line-143"><span class="w">    </span><span class="sd">"""The descriptor's declared ``expression_binding`` (additive field), else the default.</span>
-</span><span id="line-144">
-</span><span id="line-145"><span class="sd">    A declared binding is a list of dicts in the two dataclasses' shapes</span>
-</span><span id="line-146"><span class="sd">    (``{"axis", "slot", "property", "gain"[, "rig_scaled"]}`` or</span>
-</span><span id="line-147"><span class="sd">    ``{"axis", "slot", "set_family"}``). An unknown axis in it is an error.</span>
-</span><span id="line-148"><span class="sd">    """</span>
-</span><span id="line-149">    <span class="n">declared</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="s2">"expression_binding"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-150">    <span class="k">if</span> <span class="ow">not</span> <span class="n">declared</span><span class="p">:</span>
-</span><span id="line-151">        <span class="k">return</span> <span class="n">default_binding</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
-</span><span id="line-152">    <span class="n">slots</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">slots</span><span class="p">}</span>
-</span><span id="line-153">    <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Binding</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-154">    <span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">declared</span><span class="p">:</span>
-</span><span id="line-155">        <span class="n">axis</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"axis"</span><span class="p">)</span>
-</span><span id="line-156">        <span class="k">if</span> <span class="n">axis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AXES</span><span class="p">:</span>
-</span><span id="line-157">            <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
-</span><span id="line-158">                <span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"expression_binding names unknown axis </span><span class="si">{</span><span class="n">axis</span><span class="si">!r}</span><span class="s2">"</span><span class="p">]</span>
-</span><span id="line-159">            <span class="p">)</span>
-</span><span id="line-160">        <span class="k">if</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"slot"</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">:</span>
-</span><span id="line-161">            <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
-</span><span id="line-162">                <span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-</span><span id="line-163">                <span class="p">[</span>
-</span><span id="line-164">                    <span class="sa">f</span><span class="s2">"expression_binding maps </span><span class="si">{</span><span class="n">axis</span><span class="si">!r}</span><span class="s2"> onto slot </span><span class="si">{</span><span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'slot'</span><span class="p">)</span><span class="si">!r}</span><span class="s2">, "</span>
-</span><span id="line-165">                    <span class="sa">f</span><span class="s2">"which the rig does not declare (slots: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">slots</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span>
-</span><span id="line-166">                <span class="p">],</span>
-</span><span id="line-167">            <span class="p">)</span>
-</span><span id="line-168">        <span class="k">if</span> <span class="s2">"set_family"</span> <span class="ow">in</span> <span class="n">raw</span><span class="p">:</span>
-</span><span id="line-169">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SetBinding</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">"slot"</span><span class="p">]),</span> <span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">"set_family"</span><span class="p">])))</span>
-</span><span id="line-170">        <span class="k">else</span><span class="p">:</span>
-</span><span id="line-171">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-172">                <span class="n">ChannelBinding</span><span class="p">(</span>
-</span><span id="line-173">                    <span class="n">axis</span><span class="p">,</span>
-</span><span id="line-174">                    <span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">"slot"</span><span class="p">]),</span>
-</span><span id="line-175">                    <span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">"property"</span><span class="p">]),</span>
-</span><span id="line-176">                    <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">"gain"</span><span class="p">]),</span>
-</span><span id="line-177">                    <span class="n">rig_scaled</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rig_scaled"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
-</span><span id="line-178">                <span class="p">)</span>
-</span><span id="line-179">            <span class="p">)</span>
-</span><span id="line-180">    <span class="k">return</span> <span class="n">out</span></div>
+</span><span id="line-152"><span class="k">def</span><span class="w"> </span><span class="nf">binding_for</span><span class="p">(</span><span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Binding</span><span class="p">]:</span>
+</span><span id="line-153"><span class="w">    </span><span class="sd">"""The descriptor's declared ``expression_binding`` (additive field), else the default.</span>
+</span><span id="line-154">
+</span><span id="line-155"><span class="sd">    A declared binding is a list of dicts in the two dataclasses' shapes</span>
+</span><span id="line-156"><span class="sd">    (``{"axis", "slot", "property", "gain"[, "rig_scaled"]}`` or</span>
+</span><span id="line-157"><span class="sd">    ``{"axis", "slot", "set_family"}``). An unknown axis in it is an error.</span>
+</span><span id="line-158"><span class="sd">    """</span>
+</span><span id="line-159">    <span class="n">declared</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="s2">"expression_binding"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-160">    <span class="k">if</span> <span class="ow">not</span> <span class="n">declared</span><span class="p">:</span>
+</span><span id="line-161">        <span class="k">return</span> <span class="n">default_binding</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+</span><span id="line-162">    <span class="n">slots</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">slots</span><span class="p">}</span>
+</span><span id="line-163">    <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Binding</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-164">    <span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">declared</span><span class="p">:</span>
+</span><span id="line-165">        <span class="n">axis</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"axis"</span><span class="p">)</span>
+</span><span id="line-166">        <span class="k">if</span> <span class="n">axis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AXES</span><span class="p">:</span>
+</span><span id="line-167">            <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
+</span><span id="line-168">                <span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"expression_binding names unknown axis </span><span class="si">{</span><span class="n">axis</span><span class="si">!r}</span><span class="s2">"</span><span class="p">]</span>
+</span><span id="line-169">            <span class="p">)</span>
+</span><span id="line-170">        <span class="k">if</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"slot"</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">:</span>
+</span><span id="line-171">            <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
+</span><span id="line-172">                <span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+</span><span id="line-173">                <span class="p">[</span>
+</span><span id="line-174">                    <span class="sa">f</span><span class="s2">"expression_binding maps </span><span class="si">{</span><span class="n">axis</span><span class="si">!r}</span><span class="s2"> onto slot </span><span class="si">{</span><span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'slot'</span><span class="p">)</span><span class="si">!r}</span><span class="s2">, "</span>
+</span><span id="line-175">                    <span class="sa">f</span><span class="s2">"which the rig does not declare (slots: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">slots</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span>
+</span><span id="line-176">                <span class="p">],</span>
+</span><span id="line-177">            <span class="p">)</span>
+</span><span id="line-178">        <span class="k">if</span> <span class="s2">"set_family"</span> <span class="ow">in</span> <span class="n">raw</span><span class="p">:</span>
+</span><span id="line-179">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SetBinding</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">"slot"</span><span class="p">]),</span> <span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">"set_family"</span><span class="p">])))</span>
+</span><span id="line-180">        <span class="k">else</span><span class="p">:</span>
+</span><span id="line-181">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-182">                <span class="n">ChannelBinding</span><span class="p">(</span>
+</span><span id="line-183">                    <span class="n">axis</span><span class="p">,</span>
+</span><span id="line-184">                    <span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">"slot"</span><span class="p">]),</span>
+</span><span id="line-185">                    <span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">"property"</span><span class="p">]),</span>
+</span><span id="line-186">                    <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">"gain"</span><span class="p">]),</span>
+</span><span id="line-187">                    <span class="n">rig_scaled</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rig_scaled"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
+</span><span id="line-188">                <span class="p">)</span>
+</span><span id="line-189">            <span class="p">)</span>
+</span><span id="line-190">    <span class="k">return</span> <span class="n">out</span></div>
 
-</span><span id="line-181">
-</span><span id="line-182">
+</span><span id="line-191">
+</span><span id="line-192">
 <div class="viewcode-block" id="variant_set_name">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.variant_set_name">[docs]</a>
-</span><span id="line-183"><span class="k">def</span><span class="w"> </span><span class="nf">variant_set_name</span><span class="p">(</span><span class="n">form</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-184"><span class="w">    </span><span class="sd">"""The swap-set name for a mouth form (``@`` is a legal set-name character).</span>
-</span><span id="line-185">
-</span><span id="line-186"><span class="sd">    &gt;&gt;&gt; variant_set_name("happy")</span>
-</span><span id="line-187"><span class="sd">    'viseme@happy'</span>
-</span><span id="line-188"><span class="sd">    """</span>
-</span><span id="line-189">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">form</span><span class="si">}</span><span class="s2">"</span></div>
+</span><span id="line-193"><span class="k">def</span><span class="w"> </span><span class="nf">variant_set_name</span><span class="p">(</span><span class="n">form</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-194"><span class="w">    </span><span class="sd">"""The swap-set name for a mouth form (``@`` is a legal set-name character).</span>
+</span><span id="line-195">
+</span><span id="line-196"><span class="sd">    &gt;&gt;&gt; variant_set_name("happy")</span>
+</span><span id="line-197"><span class="sd">    'viseme@happy'</span>
+</span><span id="line-198"><span class="sd">    """</span>
+</span><span id="line-199">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">form</span><span class="si">}</span><span class="s2">"</span></div>
 
-</span><span id="line-190">
-</span><span id="line-191">
+</span><span id="line-200">
+</span><span id="line-201">
 <div class="viewcode-block" id="declared_mouth_variants">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.declared_mouth_variants">[docs]</a>
-</span><span id="line-192"><span class="k">def</span><span class="w"> </span><span class="nf">declared_mouth_variants</span><span class="p">(</span><span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-193"><span class="w">    </span><span class="sd">"""``{form: set name}`` for every ``viseme@&lt;form&gt;`` set the descriptor declares.</span>
-</span><span id="line-194">
-</span><span id="line-195"><span class="sd">    &gt;&gt;&gt; declared_mouth_variants(CharacterDescriptor(name="m"))</span>
-</span><span id="line-196"><span class="sd">    {}</span>
-</span><span id="line-197"><span class="sd">    """</span>
-</span><span id="line-198">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">view_variant_sets</span>
-</span><span id="line-199">
-</span><span id="line-200">    <span class="n">prefix</span> <span class="o">=</span> <span class="n">VISEME_CHANNEL</span> <span class="o">+</span> <span class="s2">"@"</span>
-</span><span id="line-201">    <span class="c1"># `viseme@side` is the mouth drawn for a VIEW (an#220), not a mouth form.</span>
-</span><span id="line-202">    <span class="n">per_view</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">view_variant_sets</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">VISEME_CHANNEL</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-</span><span id="line-203">    <span class="k">return</span> <span class="p">{</span>
-</span><span id="line-204">        <span class="n">name</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:]:</span> <span class="n">name</span>
-</span><span id="line-205">        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span>
-</span><span id="line-206">        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">per_view</span>
-</span><span id="line-207">    <span class="p">}</span></div>
-
-</span><span id="line-208">
+</span><span id="line-202"><span class="k">def</span><span class="w"> </span><span class="nf">declared_mouth_variants</span><span class="p">(</span><span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-203"><span class="w">    </span><span class="sd">"""``{form: set name}`` for every ``viseme@&lt;form&gt;`` set the descriptor declares.</span>
+</span><span id="line-204">
+</span><span id="line-205"><span class="sd">    &gt;&gt;&gt; declared_mouth_variants(CharacterDescriptor(name="m"))</span>
+</span><span id="line-206"><span class="sd">    {}</span>
+</span><span id="line-207"><span class="sd">    """</span>
+</span><span id="line-208">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">view_variant_sets</span>
 </span><span id="line-209">
+</span><span id="line-210">    <span class="n">prefix</span> <span class="o">=</span> <span class="n">VISEME_CHANNEL</span> <span class="o">+</span> <span class="s2">"@"</span>
+</span><span id="line-211">    <span class="c1"># `viseme@side` is the mouth drawn for a VIEW (an#220), not a mouth form.</span>
+</span><span id="line-212">    <span class="n">per_view</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">view_variant_sets</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">VISEME_CHANNEL</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+</span><span id="line-213">    <span class="k">return</span> <span class="p">{</span>
+</span><span id="line-214">        <span class="n">name</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:]:</span> <span class="n">name</span>
+</span><span id="line-215">        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span>
+</span><span id="line-216">        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">per_view</span>
+</span><span id="line-217">    <span class="p">}</span></div>
+
+</span><span id="line-218">
+</span><span id="line-219">
 <div class="viewcode-block" id="missing_mouth_form">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.missing_mouth_form">[docs]</a>
-</span><span id="line-210"><span class="k">def</span><span class="w"> </span><span class="nf">missing_mouth_form</span><span class="p">(</span>
-</span><span id="line-211">    <span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">preset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">who</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-212"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-213"><span class="w">    </span><span class="sd">"""Why ``preset``'s mouth form will not show on ``desc`` — the descriptor</span>
-</span><span id="line-214"><span class="sd">    declares no ``viseme@&lt;form&gt;`` set, so the mouth stays on the neutral chart,</span>
-</span><span id="line-215"><span class="sd">    silent or speaking (an#253) — with the command that adds it; ``None`` when</span>
-</span><span id="line-216"><span class="sd">    the preset has no form, the set exists, or there is no overlay mouth to</span>
-</span><span id="line-217"><span class="sd">    change (a baked face, a rig with no ``viseme`` set).</span>
-</span><span id="line-218">
-</span><span id="line-219"><span class="sd">    One sentence for ``an validate`` (an ``expression`` and a dialogue</span>
-</span><span id="line-220"><span class="sd">    ``[emotion]``) and the compiler's silent-mouth hold.</span>
-</span><span id="line-221">
-</span><span id="line-222"><span class="sd">    &gt;&gt;&gt; d = CharacterDescriptor(name="ned", asset_sets={"viseme": {"X": "mouth_x"}})</span>
-</span><span id="line-223"><span class="sd">    &gt;&gt;&gt; missing_mouth_form(d, "angry")</span>
-</span><span id="line-224"><span class="sd">    "ned declares no 'viseme@angry' set, so under 'angry' its mouth keeps the neutral chart, silent or speaking: add it with `an character mouths ned --variants angry`"</span>
-</span><span id="line-225"><span class="sd">    &gt;&gt;&gt; missing_mouth_form(d, "thinking") is None</span>
-</span><span id="line-226"><span class="sd">    True</span>
-</span><span id="line-227"><span class="sd">    """</span>
-</span><span id="line-228">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-229">        <span class="n">form</span> <span class="o">=</span> <span class="n">mouth_form_of</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
-</span><span id="line-230">    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
-</span><span id="line-231">        <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># an unknown preset is `expression_problems`' error</span>
-</span><span id="line-232">    <span class="k">if</span> <span class="n">desc</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">form</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">desc</span><span class="o">.</span><span class="n">face_overlay</span><span class="p">:</span>
-</span><span id="line-233">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-234">    <span class="k">if</span> <span class="n">VISEME_CHANNEL</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">:</span>
-</span><span id="line-235">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-236">    <span class="n">variant</span> <span class="o">=</span> <span class="n">variant_set_name</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
-</span><span id="line-237">    <span class="k">if</span> <span class="n">variant</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">:</span>
-</span><span id="line-238">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-239">    <span class="n">who</span> <span class="o">=</span> <span class="n">who</span> <span class="ow">or</span> <span class="n">desc</span><span class="o">.</span><span class="n">name</span>
-</span><span id="line-240">    <span class="k">return</span> <span class="p">(</span>
-</span><span id="line-241">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2"> declares no </span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> set, so under </span><span class="si">{</span><span class="n">preset</span><span class="si">!r}</span><span class="s2"> its mouth keeps "</span>
-</span><span id="line-242">        <span class="sa">f</span><span class="s2">"the neutral chart, silent or speaking: add it with "</span>
-</span><span id="line-243">        <span class="sa">f</span><span class="s2">"`an character mouths </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> --variants </span><span class="si">{</span><span class="n">form</span><span class="si">}</span><span class="s2">`"</span>
-</span><span id="line-244">    <span class="p">)</span></div>
+</span><span id="line-220"><span class="k">def</span><span class="w"> </span><span class="nf">missing_mouth_form</span><span class="p">(</span>
+</span><span id="line-221">    <span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">preset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">who</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-222"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-223"><span class="w">    </span><span class="sd">"""Why ``preset``'s mouth form will not show on ``desc`` — the descriptor</span>
+</span><span id="line-224"><span class="sd">    declares no ``viseme@&lt;form&gt;`` set, so the mouth stays on the neutral chart,</span>
+</span><span id="line-225"><span class="sd">    silent or speaking (an#253) — with the command that adds it; ``None`` when</span>
+</span><span id="line-226"><span class="sd">    the preset has no form, the set exists, or there is no overlay mouth to</span>
+</span><span id="line-227"><span class="sd">    change (a baked face, a rig with no ``viseme`` set).</span>
+</span><span id="line-228">
+</span><span id="line-229"><span class="sd">    One sentence for ``an validate`` (an ``expression`` and a dialogue</span>
+</span><span id="line-230"><span class="sd">    ``[emotion]``) and the compiler's silent-mouth hold.</span>
+</span><span id="line-231">
+</span><span id="line-232"><span class="sd">    &gt;&gt;&gt; d = CharacterDescriptor(name="ned", asset_sets={"viseme": {"X": "mouth_x"}})</span>
+</span><span id="line-233"><span class="sd">    &gt;&gt;&gt; missing_mouth_form(d, "angry")</span>
+</span><span id="line-234"><span class="sd">    "ned declares no 'viseme@angry' set, so under 'angry' its mouth keeps the neutral chart, silent or speaking: add it with `an character mouths ned --variants angry`"</span>
+</span><span id="line-235"><span class="sd">    &gt;&gt;&gt; missing_mouth_form(d, "thinking") is None</span>
+</span><span id="line-236"><span class="sd">    True</span>
+</span><span id="line-237"><span class="sd">    """</span>
+</span><span id="line-238">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-239">        <span class="n">form</span> <span class="o">=</span> <span class="n">mouth_form_of</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
+</span><span id="line-240">    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+</span><span id="line-241">        <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># an unknown preset is `expression_problems`' error</span>
+</span><span id="line-242">    <span class="k">if</span> <span class="n">desc</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">form</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">desc</span><span class="o">.</span><span class="n">face_overlay</span><span class="p">:</span>
+</span><span id="line-243">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-244">    <span class="k">if</span> <span class="n">VISEME_CHANNEL</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">:</span>
+</span><span id="line-245">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-246">    <span class="n">variant</span> <span class="o">=</span> <span class="n">variant_set_name</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+</span><span id="line-247">    <span class="k">if</span> <span class="n">variant</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">:</span>
+</span><span id="line-248">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-249">    <span class="n">who</span> <span class="o">=</span> <span class="n">who</span> <span class="ow">or</span> <span class="n">desc</span><span class="o">.</span><span class="n">name</span>
+</span><span id="line-250">    <span class="k">return</span> <span class="p">(</span>
+</span><span id="line-251">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2"> declares no </span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> set, so under </span><span class="si">{</span><span class="n">preset</span><span class="si">!r}</span><span class="s2"> its mouth keeps "</span>
+</span><span id="line-252">        <span class="sa">f</span><span class="s2">"the neutral chart, silent or speaking: add it with "</span>
+</span><span id="line-253">        <span class="sa">f</span><span class="s2">"`an character mouths </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> --variants </span><span class="si">{</span><span class="n">form</span><span class="si">}</span><span class="s2">`"</span>
+</span><span id="line-254">    <span class="p">)</span></div>
 
-</span><span id="line-245">
-</span><span id="line-246">
+</span><span id="line-255">
+</span><span id="line-256">
+</span><span id="line-257"><span class="c1">#: Every rung of the eyelid ladder a lid state can ask for.</span>
+</span><span id="line-258"><span class="n">_LID_RUNGS</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">LID_KEY_WIDE</span><span class="p">,</span> <span class="n">LID_KEY_OPEN</span><span class="p">,</span> <span class="n">LID_KEY_HALF</span><span class="p">,</span> <span class="n">LID_KEY_CLOSED</span><span class="p">)</span>
+</span><span id="line-259">
+</span><span id="line-260">
+<div class="viewcode-block" id="lid_rung_problems">
+<a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.lid_rung_problems">[docs]</a>
+</span><span id="line-261"><span class="k">def</span><span class="w"> </span><span class="nf">lid_rung_problems</span><span class="p">(</span>
+</span><span id="line-262">    <span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-263">    <span class="n">preset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-264">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-265">    <span class="n">axes</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-266">    <span class="n">intensity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+</span><span id="line-267">    <span class="n">who</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-268"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-269"><span class="w">    </span><span class="sd">"""What an expression's lids ask for that ``desc``'s eyelid art cannot show</span>
+</span><span id="line-270"><span class="sd">    (an#272): a rig whose ``eyelid`` set draws ``OPEN`` and ``CLOSED`` picks a</span>
+</span><span id="line-271"><span class="sd">    DRAWING per lid state (the ladder: wide, open, half, closed), so a partial</span>
+</span><span id="line-272"><span class="sd">    lid on a rig with no ``HALF`` drawing shows ``OPEN``, the same picture as no</span>
+</span><span id="line-273"><span class="sd">    expression at all. One sentence per lid axis that falls short; empty for a</span>
+</span><span id="line-274"><span class="sd">    preset with no lid, a rig whose lids squash (no closed art: continuous), or</span>
+</span><span id="line-275"><span class="sd">    a baked face.</span>
+</span><span id="line-276">
+</span><span id="line-277"><span class="sd">    &gt;&gt;&gt; d = CharacterDescriptor(name="bob", asset_sets={"eyelid": {"OPEN": "o", "CLOSED": "c"}})</span>
+</span><span id="line-278"><span class="sd">    &gt;&gt;&gt; lid_rung_problems(d, None, axes={"lid_open_l": -0.45})</span>
+</span><span id="line-279"><span class="sd">    ["bob's eyelids have no 'HALF' drawing, so lid_open_l -0.45 shows 'OPEN' (its eyelid set: CLOSED, OPEN): add a HALF eyelid drawing to the set, or use -0.85 or lower to close the lid"]</span>
+</span><span id="line-280"><span class="sd">    &gt;&gt;&gt; lid_rung_problems(d, None, axes={"lid_open_l": -0.9})</span>
+</span><span id="line-281"><span class="sd">    []</span>
+</span><span id="line-282"><span class="sd">    """</span>
+</span><span id="line-283">    <span class="k">if</span> <span class="n">desc</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">desc</span><span class="o">.</span><span class="n">face_overlay</span><span class="p">:</span>
+</span><span id="line-284">        <span class="k">return</span> <span class="p">[]</span>
+</span><span id="line-285">    <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">EYELID_CHANNEL</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}}</span>
+</span><span id="line-286">    <span class="k">if</span> <span class="n">LID_KEY_OPEN</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keys</span> <span class="ow">or</span> <span class="n">LID_KEY_CLOSED</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+</span><span id="line-287">        <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># no ladder: the lid squashes, which shows any value</span>
+</span><span id="line-288">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-289">        <span class="n">values</span> <span class="o">=</span> <span class="n">preset_axes</span><span class="p">(</span><span class="n">preset</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">intensity</span><span class="o">=</span><span class="n">intensity</span><span class="p">)</span>
+</span><span id="line-290">    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="line-291">        <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># an unknown preset or axis is `expression_problems`' error</span>
+</span><span id="line-292">    <span class="n">who</span> <span class="o">=</span> <span class="n">who</span> <span class="ow">or</span> <span class="n">desc</span><span class="o">.</span><span class="n">name</span>
+</span><span id="line-293">    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-294">    <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">LID_AXES</span><span class="p">:</span>
+</span><span id="line-295">        <span class="n">value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
+</span><span id="line-296">        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+</span><span id="line-297">            <span class="k">continue</span>
+</span><span id="line-298">        <span class="n">wanted</span> <span class="o">=</span> <span class="n">lid_key</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">available</span><span class="o">=</span><span class="n">_LID_RUNGS</span><span class="p">)</span>
+</span><span id="line-299">        <span class="n">shown</span> <span class="o">=</span> <span class="n">lid_key</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">available</span><span class="o">=</span><span class="n">keys</span><span class="p">)</span>
+</span><span id="line-300">        <span class="k">if</span> <span class="n">wanted</span> <span class="o">!=</span> <span class="n">shown</span><span class="p">:</span>
+</span><span id="line-301">            <span class="n">fix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"add a </span><span class="si">{</span><span class="n">wanted</span><span class="si">}</span><span class="s2"> eyelid drawing to the set"</span> <span class="o">+</span> <span class="p">(</span>
+</span><span id="line-302">                <span class="sa">f</span><span class="s2">", or use </span><span class="si">{</span><span class="n">LID_CLOSED_BELOW</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> or lower to close the lid"</span>
+</span><span id="line-303">                <span class="k">if</span> <span class="n">wanted</span> <span class="o">==</span> <span class="n">LID_KEY_HALF</span>
+</span><span id="line-304">                <span class="k">else</span> <span class="s2">""</span>
+</span><span id="line-305">            <span class="p">)</span>
+</span><span id="line-306">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-307">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2">'s eyelids have no </span><span class="si">{</span><span class="n">wanted</span><span class="si">!r}</span><span class="s2"> drawing, so </span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">+.2f</span><span class="si">}</span><span class="s2"> "</span>
+</span><span id="line-308">                <span class="sa">f</span><span class="s2">"shows </span><span class="si">{</span><span class="n">shown</span><span class="si">!r}</span><span class="s2"> (its eyelid set: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">))</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">fix</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-309">            <span class="p">)</span>
+</span><span id="line-310">    <span class="k">return</span> <span class="n">out</span></div>
+
+</span><span id="line-311">
+</span><span id="line-312">
 <div class="viewcode-block" id="resolve_mouth_set">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.resolve_mouth_set">[docs]</a>
-</span><span id="line-247"><span class="k">def</span><span class="w"> </span><span class="nf">resolve_mouth_set</span><span class="p">(</span>
-</span><span id="line-248">    <span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span><span class="p">,</span>
-</span><span id="line-249">    <span class="n">preset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-250">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-251">    <span class="n">keys_used</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="line-252">    <span class="n">who</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-253"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-254"><span class="w">    </span><span class="sd">"""Which mouth set a line under ``preset`` uses — the one chain, shared.</span>
-</span><span id="line-255">
-</span><span id="line-256"><span class="sd">    ``viseme@&lt;form&gt;`` if the preset prefers a form the descriptor declares and</span>
-</span><span id="line-257"><span class="sd">    that set covers ``keys_used``; else ``viseme`` with a warning naming what</span>
-</span><span id="line-258"><span class="sd">    was missing; else :class:`ExpressionResolutionError`. A descriptor with no</span>
-</span><span id="line-259"><span class="sd">    ``viseme`` set and no covering variant cannot speak at all — that is the</span>
-</span><span id="line-260"><span class="sd">    error, not a fallback.</span>
-</span><span id="line-261"><span class="sd">    """</span>
-</span><span id="line-262">    <span class="n">who</span> <span class="o">=</span> <span class="n">who</span> <span class="ow">or</span> <span class="n">desc</span><span class="o">.</span><span class="n">name</span>
-</span><span id="line-263">    <span class="n">form</span> <span class="o">=</span> <span class="n">mouth_form_of</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
-</span><span id="line-264">    <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys_used</span><span class="p">}</span>
-</span><span id="line-265">    <span class="k">if</span> <span class="n">form</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-266">        <span class="n">variant</span> <span class="o">=</span> <span class="n">variant_set_name</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
-</span><span id="line-267">        <span class="n">declared</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">variant</span><span class="p">)</span>
-</span><span id="line-268">        <span class="k">if</span> <span class="n">declared</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-269">            <span class="n">reason</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"declares no </span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> set"</span>
-</span><span id="line-270">        <span class="k">else</span><span class="p">:</span>
-</span><span id="line-271">            <span class="n">missing</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span> <span class="o">-</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">declared</span><span class="p">})</span>
-</span><span id="line-272">            <span class="k">if</span> <span class="ow">not</span> <span class="n">missing</span><span class="p">:</span>
-</span><span id="line-273">                <span class="k">return</span> <span class="n">variant</span>
-</span><span id="line-274">            <span class="n">reason</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> lacks the keys </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> this line uses"</span>
-</span><span id="line-275">        <span class="k">if</span> <span class="n">VISEME_CHANNEL</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">:</span>
-</span><span id="line-276">            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-</span><span id="line-277">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">; the neutral </span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">!r}</span><span class="s2"> set is used under "</span>
-</span><span id="line-278">                <span class="sa">f</span><span class="s2">"the </span><span class="si">{</span><span class="n">preset</span><span class="si">!r}</span><span class="s2"> expression instead (give the character a "</span>
-</span><span id="line-279">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> mouth set to change that: `an character mouths "</span>
-</span><span id="line-280">                <span class="sa">f</span><span class="s2">"--variants </span><span class="si">{</span><span class="n">form</span><span class="si">}</span><span class="s2">`)"</span><span class="p">,</span>
-</span><span id="line-281">                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-</span><span id="line-282">            <span class="p">)</span>
-</span><span id="line-283">            <span class="k">return</span> <span class="n">VISEME_CHANNEL</span>
-</span><span id="line-284">        <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
-</span><span id="line-285">            <span class="n">who</span><span class="p">,</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">, and there is no </span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">!r}</span><span class="s2"> set to fall back on"</span><span class="p">]</span>
-</span><span id="line-286">        <span class="p">)</span>
-</span><span id="line-287">    <span class="k">if</span> <span class="n">VISEME_CHANNEL</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">:</span>
-</span><span id="line-288">        <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
-</span><span id="line-289">            <span class="n">who</span><span class="p">,</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"declares no </span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">!r}</span><span class="s2"> mouth set, so it cannot speak"</span><span class="p">]</span>
-</span><span id="line-290">        <span class="p">)</span>
-</span><span id="line-291">    <span class="k">return</span> <span class="n">VISEME_CHANNEL</span></div>
+</span><span id="line-313"><span class="k">def</span><span class="w"> </span><span class="nf">resolve_mouth_set</span><span class="p">(</span>
+</span><span id="line-314">    <span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span><span class="p">,</span>
+</span><span id="line-315">    <span class="n">preset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-316">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-317">    <span class="n">keys_used</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="line-318">    <span class="n">who</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-319"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-320"><span class="w">    </span><span class="sd">"""Which mouth set a line under ``preset`` uses — the one chain, shared.</span>
+</span><span id="line-321">
+</span><span id="line-322"><span class="sd">    ``viseme@&lt;form&gt;`` if the preset prefers a form the descriptor declares and</span>
+</span><span id="line-323"><span class="sd">    that set covers ``keys_used``; else ``viseme`` with a warning naming what</span>
+</span><span id="line-324"><span class="sd">    was missing; else :class:`ExpressionResolutionError`. A descriptor with no</span>
+</span><span id="line-325"><span class="sd">    ``viseme`` set and no covering variant cannot speak at all — that is the</span>
+</span><span id="line-326"><span class="sd">    error, not a fallback.</span>
+</span><span id="line-327"><span class="sd">    """</span>
+</span><span id="line-328">    <span class="n">who</span> <span class="o">=</span> <span class="n">who</span> <span class="ow">or</span> <span class="n">desc</span><span class="o">.</span><span class="n">name</span>
+</span><span id="line-329">    <span class="n">form</span> <span class="o">=</span> <span class="n">mouth_form_of</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
+</span><span id="line-330">    <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys_used</span><span class="p">}</span>
+</span><span id="line-331">    <span class="k">if</span> <span class="n">form</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-332">        <span class="n">variant</span> <span class="o">=</span> <span class="n">variant_set_name</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+</span><span id="line-333">        <span class="n">declared</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">variant</span><span class="p">)</span>
+</span><span id="line-334">        <span class="k">if</span> <span class="n">declared</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-335">            <span class="n">reason</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"declares no </span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> set"</span>
+</span><span id="line-336">        <span class="k">else</span><span class="p">:</span>
+</span><span id="line-337">            <span class="n">missing</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span> <span class="o">-</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">declared</span><span class="p">})</span>
+</span><span id="line-338">            <span class="k">if</span> <span class="ow">not</span> <span class="n">missing</span><span class="p">:</span>
+</span><span id="line-339">                <span class="k">return</span> <span class="n">variant</span>
+</span><span id="line-340">            <span class="n">reason</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> lacks the keys </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> this line uses"</span>
+</span><span id="line-341">        <span class="k">if</span> <span class="n">VISEME_CHANNEL</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">:</span>
+</span><span id="line-342">            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+</span><span id="line-343">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">; the neutral </span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">!r}</span><span class="s2"> set is used under "</span>
+</span><span id="line-344">                <span class="sa">f</span><span class="s2">"the </span><span class="si">{</span><span class="n">preset</span><span class="si">!r}</span><span class="s2"> expression instead (give the character a "</span>
+</span><span id="line-345">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> mouth set to change that: `an character mouths "</span>
+</span><span id="line-346">                <span class="sa">f</span><span class="s2">"--variants </span><span class="si">{</span><span class="n">form</span><span class="si">}</span><span class="s2">`)"</span><span class="p">,</span>
+</span><span id="line-347">                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+</span><span id="line-348">            <span class="p">)</span>
+</span><span id="line-349">            <span class="k">return</span> <span class="n">VISEME_CHANNEL</span>
+</span><span id="line-350">        <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
+</span><span id="line-351">            <span class="n">who</span><span class="p">,</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">, and there is no </span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">!r}</span><span class="s2"> set to fall back on"</span><span class="p">]</span>
+</span><span id="line-352">        <span class="p">)</span>
+</span><span id="line-353">    <span class="k">if</span> <span class="n">VISEME_CHANNEL</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">:</span>
+</span><span id="line-354">        <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
+</span><span id="line-355">            <span class="n">who</span><span class="p">,</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"declares no </span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">!r}</span><span class="s2"> mouth set, so it cannot speak"</span><span class="p">]</span>
+</span><span id="line-356">        <span class="p">)</span>
+</span><span id="line-357">    <span class="k">return</span> <span class="n">VISEME_CHANNEL</span></div>
 
-</span><span id="line-292">
-</span><span id="line-293">
+</span><span id="line-358">
+</span><span id="line-359">
 <div class="viewcode-block" id="expression_problems">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.expression_problems">[docs]</a>
-</span><span id="line-294"><span class="k">def</span><span class="w"> </span><span class="nf">expression_problems</span><span class="p">(</span>
-</span><span id="line-295">    <span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-296">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-297">    <span class="n">preset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-298">    <span class="n">axes</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-</span><span id="line-299">    <span class="n">who</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-300"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-301"><span class="w">    </span><span class="sd">"""Every reason an expression cannot resolve on ``desc`` — empty means it can.</span>
-</span><span id="line-302">
-</span><span id="line-303"><span class="sd">    Shared by ``an validate`` (each becomes an error Finding) and the compiler</span>
-</span><span id="line-304"><span class="sd">    (which raises :class:`ExpressionResolutionError` with the same list).</span>
-</span><span id="line-305">
-</span><span id="line-306"><span class="sd">    &gt;&gt;&gt; expression_problems(CharacterDescriptor(name="m"), preset="joyful", who="m")</span>
-</span><span id="line-307"><span class="sd">    ["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]</span>
-</span><span id="line-308"><span class="sd">    &gt;&gt;&gt; expression_problems(CharacterDescriptor(name="m", face_overlay=False), preset="happy", who="m")[0].startswith("'m' has its face baked")</span>
-</span><span id="line-309"><span class="sd">    True</span>
-</span><span id="line-310"><span class="sd">    """</span>
-</span><span id="line-311">    <span class="n">problems</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-312">    <span class="k">if</span> <span class="n">preset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">preset</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PRESETS</span><span class="p">:</span>
-</span><span id="line-313">        <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-314">            <span class="sa">f</span><span class="s2">"unknown expression preset </span><span class="si">{</span><span class="n">preset</span><span class="si">!r}</span><span class="s2"> (known: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">known_presets</span><span class="p">())</span><span class="si">}</span><span class="s2">)"</span>
-</span><span id="line-315">        <span class="p">)</span>
-</span><span id="line-316">    <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
-</span><span id="line-317">        <span class="k">if</span> <span class="n">axis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AXES</span><span class="p">:</span>
-</span><span id="line-318">            <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-319">                <span class="sa">f</span><span class="s2">"unknown expression axis </span><span class="si">{</span><span class="n">axis</span><span class="si">!r}</span><span class="s2"> (known: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">AXES</span><span class="p">))</span><span class="si">}</span><span class="s2">)"</span>
-</span><span id="line-320">            <span class="p">)</span>
-</span><span id="line-321">    <span class="k">if</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-322">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-323">            <span class="n">binding_for</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
-</span><span id="line-324">        <span class="k">except</span> <span class="n">ExpressionResolutionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-325">            <span class="n">problems</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">problems</span><span class="p">)</span>
-</span><span id="line-326">    <span class="k">if</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">desc</span><span class="o">.</span><span class="n">face_overlay</span><span class="p">:</span>
-</span><span id="line-327">        <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-328">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">!r}</span><span class="s2"> has its face baked into the head art (face_overlay: false), so "</span>
-</span><span id="line-329">            <span class="s2">"there is no brow, lid or pupil node for an expression to move. Two "</span>
-</span><span id="line-330">            <span class="s2">"exits: `an character promote` a hand-drawn rig with overlay face parts "</span>
-</span><span id="line-331">            <span class="s2">"(or `an character new --offline`, whose synthesized face is overlay "</span>
-</span><span id="line-332">            <span class="s2">"art), then `an character add-gaze` for the pupils."</span>
-</span><span id="line-333">        <span class="p">)</span>
-</span><span id="line-334">    <span class="k">return</span> <span class="n">problems</span></div>
+</span><span id="line-360"><span class="k">def</span><span class="w"> </span><span class="nf">expression_problems</span><span class="p">(</span>
+</span><span id="line-361">    <span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-362">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-363">    <span class="n">preset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-364">    <span class="n">axes</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+</span><span id="line-365">    <span class="n">who</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-366"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-367"><span class="w">    </span><span class="sd">"""Every reason an expression cannot resolve on ``desc`` — empty means it can.</span>
+</span><span id="line-368">
+</span><span id="line-369"><span class="sd">    Shared by ``an validate`` (each becomes an error Finding) and the compiler</span>
+</span><span id="line-370"><span class="sd">    (which raises :class:`ExpressionResolutionError` with the same list).</span>
+</span><span id="line-371">
+</span><span id="line-372"><span class="sd">    &gt;&gt;&gt; expression_problems(CharacterDescriptor(name="m"), preset="joyful", who="m")</span>
+</span><span id="line-373"><span class="sd">    ["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]</span>
+</span><span id="line-374"><span class="sd">    &gt;&gt;&gt; expression_problems(CharacterDescriptor(name="m", face_overlay=False), preset="happy", who="m")[0].startswith("'m' has its face baked")</span>
+</span><span id="line-375"><span class="sd">    True</span>
+</span><span id="line-376"><span class="sd">    """</span>
+</span><span id="line-377">    <span class="n">problems</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-378">    <span class="k">if</span> <span class="n">preset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">preset</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PRESETS</span><span class="p">:</span>
+</span><span id="line-379">        <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-380">            <span class="sa">f</span><span class="s2">"unknown expression preset </span><span class="si">{</span><span class="n">preset</span><span class="si">!r}</span><span class="s2"> (known: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">known_presets</span><span class="p">())</span><span class="si">}</span><span class="s2">)"</span>
+</span><span id="line-381">        <span class="p">)</span>
+</span><span id="line-382">    <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
+</span><span id="line-383">        <span class="k">if</span> <span class="n">axis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AXES</span><span class="p">:</span>
+</span><span id="line-384">            <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-385">                <span class="sa">f</span><span class="s2">"unknown expression axis </span><span class="si">{</span><span class="n">axis</span><span class="si">!r}</span><span class="s2"> (known: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">AXES</span><span class="p">))</span><span class="si">}</span><span class="s2">)"</span>
+</span><span id="line-386">            <span class="p">)</span>
+</span><span id="line-387">    <span class="k">if</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-388">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-389">            <span class="n">binding_for</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+</span><span id="line-390">        <span class="k">except</span> <span class="n">ExpressionResolutionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-391">            <span class="n">problems</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">problems</span><span class="p">)</span>
+</span><span id="line-392">    <span class="k">if</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">desc</span><span class="o">.</span><span class="n">face_overlay</span><span class="p">:</span>
+</span><span id="line-393">        <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-394">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">!r}</span><span class="s2"> has its face baked into the head art (face_overlay: false), so "</span>
+</span><span id="line-395">            <span class="s2">"there is no brow, lid or pupil node for an expression to move. Two "</span>
+</span><span id="line-396">            <span class="s2">"exits: `an character promote` a hand-drawn rig with overlay face parts "</span>
+</span><span id="line-397">            <span class="s2">"(or `an character new --offline`, whose synthesized face is overlay "</span>
+</span><span id="line-398">            <span class="s2">"art), then `an character add-gaze` for the pupils."</span>
+</span><span id="line-399">        <span class="p">)</span>
+</span><span id="line-400">    <span class="k">return</span> <span class="n">problems</span></div>
 
-</span><span id="line-335">
-</span><span id="line-336">
+</span><span id="line-401">
+</span><span id="line-402">
 <div class="viewcode-block" id="touches_gaze">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.touches_gaze">[docs]</a>
-</span><span id="line-337"><span class="k">def</span><span class="w"> </span><span class="nf">touches_gaze</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-338"><span class="w">    </span><span class="sd">"""Whether any of ``axes`` is a gaze axis (a no-op on a rig without pupils).</span>
-</span><span id="line-339">
-</span><span id="line-340"><span class="sd">    &gt;&gt;&gt; touches_gaze(["gaze_x"]), touches_gaze(["brow_angle_l"])</span>
-</span><span id="line-341"><span class="sd">    (True, False)</span>
-</span><span id="line-342"><span class="sd">    """</span>
-</span><span id="line-343">    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">a</span> <span class="ow">in</span> <span class="n">GAZE_AXES</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">)</span></div>
+</span><span id="line-403"><span class="k">def</span><span class="w"> </span><span class="nf">touches_gaze</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-404"><span class="w">    </span><span class="sd">"""Whether any of ``axes`` is a gaze axis (a no-op on a rig without pupils).</span>
+</span><span id="line-405">
+</span><span id="line-406"><span class="sd">    &gt;&gt;&gt; touches_gaze(["gaze_x"]), touches_gaze(["brow_angle_l"])</span>
+</span><span id="line-407"><span class="sd">    (True, False)</span>
+</span><span id="line-408"><span class="sd">    """</span>
+</span><span id="line-409">    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">a</span> <span class="ow">in</span> <span class="n">GAZE_AXES</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">)</span></div>
 
-</span><span id="line-344">
-</span><span id="line-345">
-</span><span id="line-346"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-347">    <span class="s2">"BROW_ANGLE_TRAVEL"</span><span class="p">,</span>
-</span><span id="line-348">    <span class="s2">"BROW_HEIGHT_TRAVEL"</span><span class="p">,</span>
-</span><span id="line-349">    <span class="s2">"Binding"</span><span class="p">,</span>
-</span><span id="line-350">    <span class="s2">"ChannelBinding"</span><span class="p">,</span>
-</span><span id="line-351">    <span class="s2">"ExpressionResolutionError"</span><span class="p">,</span>
-</span><span id="line-352">    <span class="s2">"GAZE_TRAVEL"</span><span class="p">,</span>
-</span><span id="line-353">    <span class="s2">"LID_SQUASH_GAIN"</span><span class="p">,</span>
-</span><span id="line-354">    <span class="s2">"SetBinding"</span><span class="p">,</span>
-</span><span id="line-355">    <span class="s2">"binding_for"</span><span class="p">,</span>
-</span><span id="line-356">    <span class="s2">"declared_mouth_variants"</span><span class="p">,</span>
-</span><span id="line-357">    <span class="s2">"default_binding"</span><span class="p">,</span>
-</span><span id="line-358">    <span class="s2">"expression_problems"</span><span class="p">,</span>
-</span><span id="line-359">    <span class="s2">"preset_axes"</span><span class="p">,</span>
-</span><span id="line-360">    <span class="s2">"missing_mouth_form"</span><span class="p">,</span>
-</span><span id="line-361">    <span class="s2">"resolve_mouth_set"</span><span class="p">,</span>
-</span><span id="line-362">    <span class="s2">"touches_gaze"</span><span class="p">,</span>
-</span><span id="line-363">    <span class="s2">"variant_set_name"</span><span class="p">,</span>
-</span><span id="line-364"><span class="p">]</span>
+</span><span id="line-410">
+</span><span id="line-411">
+</span><span id="line-412"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-413">    <span class="s2">"BROW_ANGLE_TRAVEL"</span><span class="p">,</span>
+</span><span id="line-414">    <span class="s2">"BROW_HEIGHT_TRAVEL"</span><span class="p">,</span>
+</span><span id="line-415">    <span class="s2">"Binding"</span><span class="p">,</span>
+</span><span id="line-416">    <span class="s2">"ChannelBinding"</span><span class="p">,</span>
+</span><span id="line-417">    <span class="s2">"ExpressionResolutionError"</span><span class="p">,</span>
+</span><span id="line-418">    <span class="s2">"GAZE_TRAVEL"</span><span class="p">,</span>
+</span><span id="line-419">    <span class="s2">"LID_SQUASH_GAIN"</span><span class="p">,</span>
+</span><span id="line-420">    <span class="s2">"SetBinding"</span><span class="p">,</span>
+</span><span id="line-421">    <span class="s2">"binding_for"</span><span class="p">,</span>
+</span><span id="line-422">    <span class="s2">"declared_mouth_variants"</span><span class="p">,</span>
+</span><span id="line-423">    <span class="s2">"default_binding"</span><span class="p">,</span>
+</span><span id="line-424">    <span class="s2">"expression_problems"</span><span class="p">,</span>
+</span><span id="line-425">    <span class="s2">"preset_axes"</span><span class="p">,</span>
+</span><span id="line-426">    <span class="s2">"missing_mouth_form"</span><span class="p">,</span>
+</span><span id="line-427">    <span class="s2">"lid_rung_problems"</span><span class="p">,</span>
+</span><span id="line-428">    <span class="s2">"resolve_mouth_set"</span><span class="p">,</span>
+</span><span id="line-429">    <span class="s2">"touches_gaze"</span><span class="p">,</span>
+</span><span id="line-430">    <span class="s2">"variant_set_name"</span><span class="p">,</span>
+</span><span id="line-431"><span class="p">]</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -587,7 +657,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=056c92e6"></script>
+    <script src="../../../_static/documentation_options.js?v=a11416ff"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

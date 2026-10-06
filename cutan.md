@@ -1,4 +1,4 @@
-> built 2026-10-06 12:31 UTC from 3ceb4f0 (main) · cutan 0.0.20. Details: build_info.json
+> built 2026-10-06 12:37 UTC from a9edddd (main) · cutan 0.0.21. Details: build_info.json
 
 # index.html.md
 
@@ -520,7 +520,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse', 'mouth', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'eye', 'rect', 'mouth', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -2530,6 +2530,11 @@ Subcommands (used as `an character <verb> ...`):
 - `silhouette`— rasterize silhouettes; for two characters, also IoU.
 - `preview`   — open an HTML viewer cycling visemes + idle animation.
 
+### Module Attributes
+
+| [`SILHOUETTE_ARTIFACTS`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.SILHOUETTE_ARTIFACTS)   | Where silhouettes go, under the project the characters belong to (never a character's own folder: that folder is the published asset, an#272).   |
+|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+
 ### Functions
 
 | [`add_gaze`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.add_gaze)(name[, out_dir, overwrite_eyes])         | Give `name` the eye stack (an#99): sclera and pupil slots under each lid, a filled closed lid, and the `gaze_travel` clamp — so `gaze_x` / `gaze_y` and the ambient saccades move its pupils.   |
@@ -2543,6 +2548,11 @@ Subcommands (used as `an character <verb> ...`):
 | [`record`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.record)(name[, out_dir, output, duration, ...])    | Record a character's preview HTML to mp4.                                                                                                                                                       |
 | [`silhouette`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.silhouette)(name[, other, out_dir, output, size])  | Render a black silhouette for `name` (and optionally compare to `other`).                                                                                                                       |
 | [`validate`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.validate)(name[, out_dir])                         | Validate a character's directory structure and descriptor.                                                                                                                                      |
+
+### cutan.characters.cli.SILHOUETTE_ARTIFACTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('artifacts', 'silhouettes')*
+
+Where silhouettes go, under the project the characters belong to (never a
+character’s own folder: that folder is the published asset, an#272).
 
 ### cutan.characters.cli.add_gaze(name, out_dir='', overwrite_eyes=False)
 
@@ -2708,13 +2718,19 @@ width / height: video resolution (default 640x480)
 
 Render a black silhouette for `name` (and optionally compare to `other`).
 
-When two names are given, prints both silhouettes’ paths and an IoU
-score (0..1; lower means more visually distinct).
+The silhouette is the figure as the stage draws it (build, head scale, hat:
+an#272), tinted black on white. When two names are given, prints both
+silhouettes’ paths and an IoU score (0..1; lower means more visually
+distinct). Nothing is written into a character’s folder, so a later
+`an library publish` never ships a silhouette.
 
 name: character id
 other: optional second character to compare against
 out_dir: parent directory; defaults to ./assets/characters
-output: output PNG path; defaults to <character_dir>/silhouette.png
+output: output PNG path (one name only); defaults to the project’s
+
+> artifacts/silhouettes/<name>.png
+
 size: square output size in pixels (default 512)
 
 * **Return type:**
@@ -4966,12 +4982,27 @@ it fatal.
 
 Syllable onsets of a dialogue line, in seconds from its start.
 
-From the line’s viseme track (a syllable starts where the mouth opens out
-of a closed shape), else its word timings (one beat per word), else one
-beat at its start. Beats closer than `min_gap_s` merge.
+The line’s word timings, when its provider has them, are the authority:
+they are measured on the audio, so a beat never falls in a leading breath
+or a pause (an#272: a pulse dipped 0.35 s before “Hi” was heard). Each
+word starts a beat, and the viseme track’s syllables (where the mouth
+opens out of a closed shape) add beats INSIDE a word’s window, never
+outside every word. With no word timings: the viseme track’s syllables,
+else one beat at the line’s start. Beats closer than `min_gap_s` merge.
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+```pycon
+>>> from types import SimpleNamespace as NS
+>>> track = NS(keyframes=[NS(time=0.0, viseme="B"), NS(time=0.4, viseme="X"),
+...                       NS(time=0.7, viseme="C")])
+>>> syllable_beats(NS(viseme_track=track, word_timings=None, duration=1.2))
+[0.0, 0.7]
+>>> words = [NS(start=0.35, end=1.0)]  # a breath before the word
+>>> syllable_beats(NS(viseme_track=track, word_timings=words, duration=1.2))
+[0.35, 0.7]
+```
 
 ### cutan.characters.methods.walk_arg_problems(gait, args)
 
@@ -6517,11 +6548,26 @@ typically the sweet spot for visually-distinct characters.
 >>> # Skip the doctest body — it requires Playwright with Chromium installed.
 ```
 
+### Module Attributes
+
+| [`DFLT_SILHOUETTE_SIZE`](_autosummary/cutan.characters.silhouette.html.md#cutan.characters.silhouette.DFLT_SILHOUETTE_SIZE)   | Square frame the stage draws each figure in, and the output size, in px.   |
+|-------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| [`SILHOUETTE_THRESHOLD`](_autosummary/cutan.characters.silhouette.html.md#cutan.characters.silhouette.SILHOUETTE_THRESHOLD)   | Luminance below which a pixel of the tinted render is the figure.          |
+
 ### Functions
 
 | [`compare_silhouettes`](_autosummary/cutan.characters.silhouette.html.md#cutan.characters.silhouette.compare_silhouettes)(a, b, \*[, size])             | Return IoU between two silhouette PNGs (0..1; lower = more distinct).   |
 |----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`render_character_silhouettes`](_autosummary/cutan.characters.silhouette.html.md#cutan.characters.silhouette.render_character_silhouettes)(char_dirs, ...)      | Silhouettes of characters AS THE STAGE DRAWS THEM: `{name: png}`.       |
 | [`render_silhouette`](_autosummary/cutan.characters.silhouette.html.md#cutan.characters.silhouette.render_silhouette)(svg_source, out_png, \*[, ...]) | Render an SVG to a binary silhouette PNG (black on white).              |
+
+### cutan.characters.silhouette.DFLT_SILHOUETTE_SIZE *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 512*
+
+Square frame the stage draws each figure in, and the output size, in px.
+
+### cutan.characters.silhouette.SILHOUETTE_THRESHOLD *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 128*
+
+Luminance below which a pixel of the tinted render is the figure.
 
 ### cutan.characters.silhouette.compare_silhouettes(a, b, , size=(256, 256))
 
@@ -6538,6 +6584,24 @@ pixels is computed.
 >>> # Two identical silhouettes → IoU = 1.0; two empty → 0.0 (no overlap).
 >>> # Tested via test suite, not doctest, since it requires Playwright.
 ```
+
+### cutan.characters.silhouette.render_character_silhouettes(char_dirs, out_dir, , size=512)
+
+Silhouettes of characters AS THE STAGE DRAWS THEM: `{name: png}`.
+
+Each character (a folder holding `character.json`) is rendered by the
+cut-out renderer in a throwaway project, alone in the frame, its root
+tinted black over a white backdrop, so the silhouette is the figure a
+viewer sees: its build, head scale, hat and pose (an#272). The old path
+rasterised the factory’s composite `<name>.svg`, which draws none of
+those, so two different figures compared as identical. One render for all,
+one shot each, every figure placed the same way, so IoUs compare shapes.
+
+Needs the stage renderer (Playwright Chromium) and ffmpeg. Writes only
+under `out_dir`, never into a character’s folder.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]
 
 ### cutan.characters.silhouette.render_silhouette(svg_source, out_png, , size=(256, 256), background='#ffffff')
 
@@ -7679,16 +7743,17 @@ True
 
 ### Functions
 
-| [`binding_for`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.binding_for)(desc)                              | The descriptor's declared `expression_binding` (additive field), else the default.                                                                                                                                                                                                                                                               |
-|-------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`declared_mouth_variants`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.declared_mouth_variants)(desc)                  | `{form: set name}` for every `viseme@<form>` set the descriptor declares.                                                                                                                                                                                                                                                                        |
-| [`default_binding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.default_binding)(desc)                          | The binding the default rig implies, from the slots it actually has.                                                                                                                                                                                                                                                                             |
-| [`expression_problems`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.expression_problems)(desc, \*, preset[, axes])  | Every reason an expression cannot resolve on `desc` — empty means it can.                                                                                                                                                                                                                                                                        |
-| [`preset_axes`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.preset_axes)(preset, \*[, axes, intensity])     | The numeric axis offsets an expression asks for: the preset's, with `axes` layered over them, scaled by `intensity` and clamped.                                                                                                                                                                                                                 |
-| [`missing_mouth_form`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.missing_mouth_form)(desc, preset, \*[, who])    | Why `preset`'s mouth form will not show on `desc` — the descriptor declares no `viseme@<form>` set, so the mouth stays on the neutral chart, silent or speaking (an#253) — with the command that adds it; `None` when the preset has no form, the set exists, or there is no overlay mouth to change (a baked face, a rig with no `viseme` set). |
-| [`resolve_mouth_set`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.resolve_mouth_set)(desc, preset, \*, keys_used) | Which mouth set a line under `preset` uses — the one chain, shared.                                                                                                                                                                                                                                                                              |
-| [`touches_gaze`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.touches_gaze)(axes)                             | Whether any of `axes` is a gaze axis (a no-op on a rig without pupils).                                                                                                                                                                                                                                                                          |
-| [`variant_set_name`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.variant_set_name)(form)                         | The swap-set name for a mouth form (`@` is a legal set-name character).                                                                                                                                                                                                                                                                          |
+| [`binding_for`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.binding_for)(desc)                                | The descriptor's declared `expression_binding` (additive field), else the default.                                                                                                                                                                                                                                                               |
+|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`declared_mouth_variants`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.declared_mouth_variants)(desc)                    | `{form: set name}` for every `viseme@<form>` set the descriptor declares.                                                                                                                                                                                                                                                                        |
+| [`default_binding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.default_binding)(desc)                            | The binding the default rig implies, from the slots it actually has.                                                                                                                                                                                                                                                                             |
+| [`expression_problems`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.expression_problems)(desc, \*, preset[, axes])    | Every reason an expression cannot resolve on `desc` — empty means it can.                                                                                                                                                                                                                                                                        |
+| [`preset_axes`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.preset_axes)(preset, \*[, axes, intensity])       | The numeric axis offsets an expression asks for: the preset's, with `axes` layered over them, scaled by `intensity` and clamped.                                                                                                                                                                                                                 |
+| [`missing_mouth_form`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.missing_mouth_form)(desc, preset, \*[, who])      | Why `preset`'s mouth form will not show on `desc` — the descriptor declares no `viseme@<form>` set, so the mouth stays on the neutral chart, silent or speaking (an#253) — with the command that adds it; `None` when the preset has no form, the set exists, or there is no overlay mouth to change (a baked face, a rig with no `viseme` set). |
+| [`lid_rung_problems`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.lid_rung_problems)(desc, preset, \*[, axes, ...]) | What an expression's lids ask for that `desc`'s eyelid art cannot show (an#272): a rig whose `eyelid` set draws `OPEN` and `CLOSED` picks a DRAWING per lid state (the ladder: wide, open, half, closed), so a partial lid on a rig with no `HALF` drawing shows `OPEN`, the same picture as no expression at all.                               |
+| [`resolve_mouth_set`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.resolve_mouth_set)(desc, preset, \*, keys_used)   | Which mouth set a line under `preset` uses — the one chain, shared.                                                                                                                                                                                                                                                                              |
+| [`touches_gaze`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.touches_gaze)(axes)                               | Whether any of `axes` is a gaze axis (a no-op on a rig without pupils).                                                                                                                                                                                                                                                                          |
+| [`variant_set_name`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.variant_set_name)(form)                           | The swap-set name for a mouth form (`@` is a legal set-name character).                                                                                                                                                                                                                                                                          |
 
 ### Classes
 
@@ -7793,6 +7858,27 @@ Shared by `an validate` (each becomes an error Finding) and the compiler
 ["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]
 >>> expression_problems(CharacterDescriptor(name="m", face_overlay=False), preset="happy", who="m")[0].startswith("'m' has its face baked")
 True
+```
+
+### cutan.expression.binding.lid_rung_problems(desc, preset, , axes=None, intensity=1.0, who=None)
+
+What an expression’s lids ask for that `desc`’s eyelid art cannot show
+(an#272): a rig whose `eyelid` set draws `OPEN` and `CLOSED` picks a
+DRAWING per lid state (the ladder: wide, open, half, closed), so a partial
+lid on a rig with no `HALF` drawing shows `OPEN`, the same picture as no
+expression at all. One sentence per lid axis that falls short; empty for a
+preset with no lid, a rig whose lids squash (no closed art: continuous), or
+a baked face.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> d = CharacterDescriptor(name="bob", asset_sets={"eyelid": {"OPEN": "o", "CLOSED": "c"}})
+>>> lid_rung_problems(d, None, axes={"lid_open_l": -0.45})
+["bob's eyelids have no 'HALF' drawing, so lid_open_l -0.45 shows 'OPEN' (its eyelid set: CLOSED, OPEN): add a HALF eyelid drawing to the set, or use -0.85 or lower to close the lid"]
+>>> lid_rung_problems(d, None, axes={"lid_open_l": -0.9})
+[]
 ```
 
 ### cutan.expression.binding.missing_mouth_form(desc, preset, , who=None)
@@ -11336,18 +11422,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-06 12:31 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/3ceb4f0664943d72436e5cfef10cbf2e81cccfa3"><code>3ceb4f0</code></a> on branch <code>main</code>, for **cutan 0.0.20** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-06 12:37 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/a9edddd7fe2c32c2c4e22802c8e86e74eb06f812"><code>a9edddd</code></a> on branch <code>main</code>, for **cutan 0.0.21** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.20) is behind the latest release on PyPI (0.0.21): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.21) is behind the latest release on PyPI (0.0.22): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/3ceb4f0664943d72436e5cfef10cbf2e81cccfa3"><code>3ceb4f0664943d72436e5cfef10cbf2e81cccfa3</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/a9edddd7fe2c32c2c4e22802c8e86e74eb06f812"><code>a9edddd7fe2c32c2c4e22802c8e86e74eb06f812</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -11358,9 +11444,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37463420475">37463420475</a>     |
+| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37464136991">37464136991</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>3ceb4f0664943d72436e5cfef10cbf2e81cccfa3</code> (in the history of the built commit) |
+| Event commit | <code>a9edddd7fe2c32c2c4e22802c8e86e74eb06f812</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -11385,13 +11471,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.21/">0.0.21</a>, newer than the documented version (0.0.20).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.22/">0.0.22</a>, newer than the documented version (0.0.21).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout 3ceb4f0664943d72436e5cfef10cbf2e81cccfa3
+git checkout a9edddd7fe2c32c2c4e22802c8e86e74eb06f812
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

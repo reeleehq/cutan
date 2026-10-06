@@ -143,6 +143,14 @@ and returns a string for terminal display.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">silhouette</span></code>— rasterize silhouettes; for two characters, also IoU.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">preview</span></code>   — open an HTML viewer cycling visemes + idle animation.</p></li>
 </ul>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.SILHOUETTE_ARTIFACTS" title="cutan.characters.cli.SILHOUETTE_ARTIFACTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SILHOUETTE_ARTIFACTS</span></code></a></p></td>
+<td><p>Where silhouettes go, under the project the characters belong to (never a character's own folder: that folder is the published asset, an#272).</p></td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -178,6 +186,12 @@ and returns a string for terminal display.</p>
 </tr>
 </tbody>
 </table>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.characters.cli.SILHOUETTE_ARTIFACTS">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.cli.</span></span><span class="sig-name descname"><span class="pre">SILHOUETTE_ARTIFACTS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">tuple</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('artifacts',</span> <span class="pre">'silhouettes')</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.cli.SILHOUETTE_ARTIFACTS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.cli.SILHOUETTE_ARTIFACTS'">¶</a></dt>
+<dd><p>Where silhouettes go, under the project the characters belong to (never a
+character’s own folder: that folder is the published asset, an#272).</p>
+</dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.characters.cli.add_gaze">
 <span class="sig-prename descclassname"><span class="pre">cutan.characters.cli.</span></span><span class="sig-name descname"><span class="pre">add_gaze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite_eyes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/cli.html#add_gaze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.cli.add_gaze" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.cli.add_gaze'">¶</a></dt>
@@ -358,13 +372,19 @@ width / height: video resolution (default 640x480)</p>
 <dt class="sig sig-object py" id="cutan.characters.cli.silhouette">
 <span class="sig-prename descclassname"><span class="pre">cutan.characters.cli.</span></span><span class="sig-name descname"><span class="pre">silhouette</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/cli.html#silhouette"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.cli.silhouette" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.cli.silhouette'">¶</a></dt>
 <dd><p>Render a black silhouette for <code class="docutils literal notranslate"><span class="pre">name</span></code> (and optionally compare to <code class="docutils literal notranslate"><span class="pre">other</span></code>).</p>
-<p>When two names are given, prints both silhouettes’ paths and an IoU
-score (0..1; lower means more visually distinct).</p>
+<p>The silhouette is the figure as the stage draws it (build, head scale, hat:
+an#272), tinted black on white. When two names are given, prints both
+silhouettes’ paths and an IoU score (0..1; lower means more visually
+distinct). Nothing is written into a character’s folder, so a later
+<code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">library</span> <span class="pre">publish</span></code> never ships a silhouette.</p>
 <p>name: character id
 other: optional second character to compare against
 out_dir: parent directory; defaults to ./assets/characters
-output: output PNG path; defaults to &lt;character_dir&gt;/silhouette.png
-size: square output size in pixels (default 512)</p>
+output: output PNG path (one name only); defaults to the project’s</p>
+<blockquote>
+<div><p>artifacts/silhouettes/&lt;name&gt;.png</p>
+</div></blockquote>
+<p>size: square output size in pixels (default 512)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
@@ -387,6 +407,7 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
+<li><a :data-current="activeSection === '#cutan.characters.cli.SILHOUETTE_ARTIFACTS'" class="reference internal" href="#cutan.characters.cli.SILHOUETTE_ARTIFACTS"><code class="docutils literal notranslate"><span class="pre">SILHOUETTE_ARTIFACTS</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.add_gaze'" class="reference internal" href="#cutan.characters.cli.add_gaze"><code class="docutils literal notranslate"><span class="pre">add_gaze()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.add_views'" class="reference internal" href="#cutan.characters.cli.add_views"><code class="docutils literal notranslate"><span class="pre">add_views()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.capabilities'" class="reference internal" href="#cutan.characters.cli.capabilities"><code class="docutils literal notranslate"><span class="pre">capabilities()</span></code></a></li>
@@ -410,7 +431,7 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=056c92e6"></script>
+<script src="../_static/documentation_options.js?v=a11416ff"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -307,36 +307,128 @@
 
 </span><span id="line-126">
 </span><span id="line-127">
+</span><span id="line-128"><span class="c1">#: Square frame the stage draws each figure in, and the output size, in px.</span>
+</span><span id="line-129"><span class="n">DFLT_SILHOUETTE_SIZE</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span>
+</span><span id="line-130"><span class="c1">#: Luminance below which a pixel of the tinted render is the figure.</span>
+</span><span id="line-131"><span class="n">SILHOUETTE_THRESHOLD</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span>
+</span><span id="line-132"><span class="c1">#: Each figure gets one shot this long; one frame is taken from its middle.</span>
+</span><span id="line-133"><span class="n">_SHOT_S</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+</span><span id="line-134"><span class="c1">#: The style pack that makes the stage's backdrop white behind a black figure.</span>
+</span><span id="line-135"><span class="n">_BACKDROP_PACK</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"silhouette"</span>
+</span><span id="line-136">
+</span><span id="line-137">
+<div class="viewcode-block" id="render_character_silhouettes">
+<a class="viewcode-back" href="../../../_autosummary/cutan.characters.silhouette.html#cutan.characters.render_character_silhouettes">[docs]</a>
+</span><span id="line-138"><span class="k">def</span><span class="w"> </span><span class="nf">render_character_silhouettes</span><span class="p">(</span>
+</span><span id="line-139">    <span class="n">char_dirs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">],</span>
+</span><span id="line-140">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+</span><span id="line-141">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-142">    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DFLT_SILHOUETTE_SIZE</span><span class="p">,</span>
+</span><span id="line-143"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]:</span>
+</span><span id="line-144"><span class="w">    </span><span class="sd">"""Silhouettes of characters AS THE STAGE DRAWS THEM: ``{name: png}``.</span>
+</span><span id="line-145">
+</span><span id="line-146"><span class="sd">    Each character (a folder holding ``character.json``) is rendered by the</span>
+</span><span id="line-147"><span class="sd">    cut-out renderer in a throwaway project, alone in the frame, its root</span>
+</span><span id="line-148"><span class="sd">    tinted black over a white backdrop, so the silhouette is the figure a</span>
+</span><span id="line-149"><span class="sd">    viewer sees: its build, head scale, hat and pose (an#272). The old path</span>
+</span><span id="line-150"><span class="sd">    rasterised the factory's composite ``&lt;name&gt;.svg``, which draws none of</span>
+</span><span id="line-151"><span class="sd">    those, so two different figures compared as identical. One render for all,</span>
+</span><span id="line-152"><span class="sd">    one shot each, every figure placed the same way, so IoUs compare shapes.</span>
+</span><span id="line-153">
+</span><span id="line-154"><span class="sd">    Needs the stage renderer (Playwright Chromium) and ffmpeg. Writes only</span>
+</span><span id="line-155"><span class="sd">    under ``out_dir``, never into a character's folder.</span>
+</span><span id="line-156"><span class="sd">    """</span>
+</span><span id="line-157">    <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+</span><span id="line-158">    <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+</span><span id="line-159">
+</span><span id="line-160">    <span class="kn">from</span><span class="w"> </span><span class="nn">an</span><span class="w"> </span><span class="kn">import</span> <span class="n">init</span>
+</span><span id="line-161">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">AssetRef</span><span class="p">,</span> <span class="n">Meta</span><span class="p">,</span> <span class="n">Resolution</span><span class="p">,</span> <span class="n">SceneIR</span><span class="p">,</span> <span class="n">SetAction</span><span class="p">,</span> <span class="n">Shot</span>
+</span><span id="line-162">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.project</span><span class="w"> </span><span class="kn">import</span> <span class="n">load</span>
+</span><span id="line-163">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.render</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span>
+</span><span id="line-164">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">StylePack</span>
+</span><span id="line-165">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.verify.media</span><span class="w"> </span><span class="kn">import</span> <span class="n">extract_frames</span>
+</span><span id="line-166">
+</span><span id="line-167">    <span class="n">Image</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_ensure_pil</span><span class="p">()</span>
+</span><span id="line-168">    <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+</span><span id="line-169">    <span class="n">out</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-170">    <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">char_dirs</span><span class="p">)</span>
+</span><span id="line-171">    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+</span><span id="line-172">        <span class="n">root</span> <span class="o">=</span> <span class="n">init</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"silhouettes"</span><span class="p">)</span>
+</span><span id="line-173">        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">src</span> <span class="ow">in</span> <span class="n">char_dirs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="line-174">            <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">src</span><span class="p">),</span> <span class="n">root</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"characters"</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span>
+</span><span id="line-175">        <span class="n">mall</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">mall</span>
+</span><span id="line-176">        <span class="n">mall</span><span class="p">[</span><span class="s2">"styles"</span><span class="p">][</span><span class="n">_BACKDROP_PACK</span><span class="p">]</span> <span class="o">=</span> <span class="n">StylePack</span><span class="p">(</span>
+</span><span id="line-177">            <span class="n">name</span><span class="o">=</span><span class="n">_BACKDROP_PACK</span><span class="p">,</span> <span class="n">roles</span><span class="o">=</span><span class="p">{</span><span class="s2">"sky"</span><span class="p">:</span> <span class="s2">"#ffffff"</span><span class="p">,</span> <span class="s2">"ground"</span><span class="p">:</span> <span class="s2">"#ffffff"</span><span class="p">}</span>
+</span><span id="line-178">        <span class="p">)</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"json"</span><span class="p">)</span>
+</span><span id="line-179">        <span class="n">shots</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-180">            <span class="n">Shot</span><span class="p">(</span>
+</span><span id="line-181">                <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">"s</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-182">                <span class="n">duration</span><span class="o">=</span><span class="n">_SHOT_S</span><span class="p">,</span>
+</span><span id="line-183">                <span class="n">entities</span><span class="o">=</span><span class="p">[</span>
+</span><span id="line-184">                    <span class="n">AssetRef</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">"c"</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="s2">"characters"</span><span class="p">,</span> <span class="n">ref</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-185">                <span class="p">],</span>
+</span><span id="line-186">                <span class="n">actions</span><span class="o">=</span><span class="p">[</span>
+</span><span id="line-187">                    <span class="n">SetAction</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s2">"c"</span><span class="p">,</span> <span class="nb">property</span><span class="o">=</span><span class="s2">"tint"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">"#000000"</span><span class="p">,</span> <span class="n">at</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+</span><span id="line-188">                <span class="p">],</span>
+</span><span id="line-189">            <span class="p">)</span>
+</span><span id="line-190">            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+</span><span id="line-191">        <span class="p">]</span>
+</span><span id="line-192">        <span class="n">mall</span><span class="p">[</span><span class="s2">"scenes"</span><span class="p">][</span><span class="s2">"main"</span><span class="p">]</span> <span class="o">=</span> <span class="n">SceneIR</span><span class="p">(</span>
+</span><span id="line-193">            <span class="n">meta</span><span class="o">=</span><span class="n">Meta</span><span class="p">(</span>
+</span><span id="line-194">                <span class="n">fps</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+</span><span id="line-195">                <span class="n">resolution</span><span class="o">=</span><span class="n">Resolution</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">size</span><span class="p">),</span>
+</span><span id="line-196">                <span class="n">style_pack</span><span class="o">=</span><span class="n">_BACKDROP_PACK</span><span class="p">,</span>
+</span><span id="line-197">            <span class="p">),</span>
+</span><span id="line-198">            <span class="n">timeline</span><span class="o">=</span><span class="n">shots</span><span class="p">,</span>
+</span><span id="line-199">        <span class="p">)</span>
+</span><span id="line-200">        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+</span><span id="line-201">            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>  <span class="c1"># a tool's render, not the user's film</span>
+</span><span id="line-202">            <span class="n">mp4</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">load</span><span class="p">(</span><span class="n">root</span><span class="p">),</span> <span class="n">auto_audio</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="line-203">        <span class="n">frames</span> <span class="o">=</span> <span class="n">extract_frames</span><span class="p">(</span><span class="n">mp4</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"frames"</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">_SHOT_S</span><span class="p">)</span>
+</span><span id="line-204">        <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-205">        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">frame</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">frames</span><span class="p">):</span>
+</span><span id="line-206">            <span class="n">grey</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">"L"</span><span class="p">)</span>
+</span><span id="line-207">            <span class="n">mask</span> <span class="o">=</span> <span class="n">grey</span><span class="o">.</span><span class="n">point</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="n">SILHOUETTE_THRESHOLD</span> <span class="k">else</span> <span class="mi">255</span><span class="p">)</span>
+</span><span id="line-208">            <span class="n">path</span> <span class="o">=</span> <span class="n">out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.png"</span>
+</span><span id="line-209">            <span class="n">mask</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">"RGB"</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span id="line-210">            <span class="n">result</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span>
+</span><span id="line-211">    <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">]</span>
+</span><span id="line-212">    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+</span><span id="line-213">        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"the silhouette render gave no frame for </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-214">    <span class="k">return</span> <span class="n">result</span></div>
+
+</span><span id="line-215">
+</span><span id="line-216">
 <div class="viewcode-block" id="compare_silhouettes">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.silhouette.html#cutan.characters.compare_silhouettes">[docs]</a>
-</span><span id="line-128"><span class="k">def</span><span class="w"> </span><span class="nf">compare_silhouettes</span><span class="p">(</span>
-</span><span id="line-129">    <span class="n">a</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
-</span><span id="line-130"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="line-131"><span class="w">    </span><span class="sd">"""Return IoU between two silhouette PNGs (0..1; lower = more distinct).</span>
-</span><span id="line-132">
-</span><span id="line-133"><span class="sd">    Both images are resized to ``size``, converted to grayscale, thresholded</span>
-</span><span id="line-134"><span class="sd">    at the midpoint, and the intersection-over-union of the foreground (dark)</span>
-</span><span id="line-135"><span class="sd">    pixels is computed.</span>
-</span><span id="line-136">
-</span><span id="line-137"><span class="sd">    &gt;&gt;&gt; # Two identical silhouettes → IoU = 1.0; two empty → 0.0 (no overlap).</span>
-</span><span id="line-138"><span class="sd">    &gt;&gt;&gt; # Tested via test suite, not doctest, since it requires Playwright.</span>
-</span><span id="line-139"><span class="sd">    """</span>
-</span><span id="line-140">    <span class="n">Image</span><span class="p">,</span> <span class="n">ImageOps</span> <span class="o">=</span> <span class="n">_ensure_pil</span><span class="p">()</span>
-</span><span id="line-141">
-</span><span id="line-142">    <span class="k">def</span><span class="w"> </span><span class="nf">_mask</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">):</span>
-</span><span id="line-143">        <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">"L"</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
-</span><span id="line-144">        <span class="c1"># Foreground = dark pixels (silhouette filled with black).</span>
-</span><span id="line-145">        <span class="k">return</span> <span class="n">im</span><span class="o">.</span><span class="n">point</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="mi">128</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
-</span><span id="line-146">
-</span><span id="line-147">    <span class="n">ma</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-</span><span id="line-148">    <span class="n">mb</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-</span><span id="line-149">    <span class="n">pix_a</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ma</span><span class="o">.</span><span class="n">getdata</span><span class="p">())</span>
-</span><span id="line-150">    <span class="n">pix_b</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mb</span><span class="o">.</span><span class="n">getdata</span><span class="p">())</span>
-</span><span id="line-151">    <span class="n">inter</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pix_a</span><span class="p">,</span> <span class="n">pix_b</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">y</span><span class="p">)</span>
-</span><span id="line-152">    <span class="n">union</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pix_a</span><span class="p">,</span> <span class="n">pix_b</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">or</span> <span class="n">y</span><span class="p">)</span>
-</span><span id="line-153">    <span class="k">if</span> <span class="n">union</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="line-154">        <span class="k">return</span> <span class="mf">0.0</span>
-</span><span id="line-155">    <span class="k">return</span> <span class="n">inter</span> <span class="o">/</span> <span class="n">union</span></div>
+</span><span id="line-217"><span class="k">def</span><span class="w"> </span><span class="nf">compare_silhouettes</span><span class="p">(</span>
+</span><span id="line-218">    <span class="n">a</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
+</span><span id="line-219"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="line-220"><span class="w">    </span><span class="sd">"""Return IoU between two silhouette PNGs (0..1; lower = more distinct).</span>
+</span><span id="line-221">
+</span><span id="line-222"><span class="sd">    Both images are resized to ``size``, converted to grayscale, thresholded</span>
+</span><span id="line-223"><span class="sd">    at the midpoint, and the intersection-over-union of the foreground (dark)</span>
+</span><span id="line-224"><span class="sd">    pixels is computed.</span>
+</span><span id="line-225">
+</span><span id="line-226"><span class="sd">    &gt;&gt;&gt; # Two identical silhouettes → IoU = 1.0; two empty → 0.0 (no overlap).</span>
+</span><span id="line-227"><span class="sd">    &gt;&gt;&gt; # Tested via test suite, not doctest, since it requires Playwright.</span>
+</span><span id="line-228"><span class="sd">    """</span>
+</span><span id="line-229">    <span class="n">Image</span><span class="p">,</span> <span class="n">ImageOps</span> <span class="o">=</span> <span class="n">_ensure_pil</span><span class="p">()</span>
+</span><span id="line-230">
+</span><span id="line-231">    <span class="k">def</span><span class="w"> </span><span class="nf">_mask</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">):</span>
+</span><span id="line-232">        <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">"L"</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+</span><span id="line-233">        <span class="c1"># Foreground = dark pixels (silhouette filled with black).</span>
+</span><span id="line-234">        <span class="k">return</span> <span class="n">im</span><span class="o">.</span><span class="n">point</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="mi">128</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+</span><span id="line-235">
+</span><span id="line-236">    <span class="n">ma</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</span><span id="line-237">    <span class="n">mb</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+</span><span id="line-238">    <span class="n">pix_a</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ma</span><span class="o">.</span><span class="n">getdata</span><span class="p">())</span>
+</span><span id="line-239">    <span class="n">pix_b</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mb</span><span class="o">.</span><span class="n">getdata</span><span class="p">())</span>
+</span><span id="line-240">    <span class="n">inter</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pix_a</span><span class="p">,</span> <span class="n">pix_b</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">y</span><span class="p">)</span>
+</span><span id="line-241">    <span class="n">union</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pix_a</span><span class="p">,</span> <span class="n">pix_b</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">or</span> <span class="n">y</span><span class="p">)</span>
+</span><span id="line-242">    <span class="k">if</span> <span class="n">union</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="line-243">        <span class="k">return</span> <span class="mf">0.0</span>
+</span><span id="line-244">    <span class="k">return</span> <span class="n">inter</span> <span class="o">/</span> <span class="n">union</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -351,7 +443,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=056c92e6"></script>
+    <script src="../../../_static/documentation_options.js?v=a11416ff"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
