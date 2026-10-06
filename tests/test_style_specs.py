@@ -425,9 +425,12 @@ def test_the_styles_that_choose_against_the_chain_say_so():
 
     Left out on purpose (PR #32's review): OverSimplified's chain already does
     what the gaits doc says (robes declare `hem`, the legless glide), and a
-    `[hem_sway, ...]` policy would turn every legged figure into a hem; Reiniger's
-    `profile_cycle` applies whenever a side view exists, so as a policy it
-    would scissor a front-facing walk (#17)."""
+    `[hem_sway, ...]` policy would turn every legged figure into a hem.
+    Reiniger walks in profile while its side view shows, on legs otherwise
+    (the profile cycle needs the side view in force, #17)."""
     assert style_spec("south_park")["policy"] == {"locomotion": ["loco.bounce"]}
-    assert style_spec("reiniger")["policy"] == {"speech": ["speech.pose_only"]}
+    assert style_spec("reiniger")["policy"] == {
+        "locomotion": ["loco.profile_cycle", "loco.legged_cycle"],
+        "speech": ["speech.pose_only"],
+    }
     assert "policy" not in style_spec("oversimplified")

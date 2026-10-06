@@ -40,6 +40,7 @@ live:
     bed: {loop: true, fade_in: 2.0, fade_out: 3.0}   # the score carries the film: no dialogue, so no ducking
 
 policy:                      # cutan#9 (ADR 0002 decision 4): method orders the compiler applies; the author's request, then a shot's policy, win over it
+  locomotion: [loco.profile_cycle, loco.legged_cycle]   # the profile cycle while the side view shows (cutan#17); legs otherwise, the skip recorded
   speech: [speech.pose_only]  # a silhouette mimes: its mouth chart is drawn black on black (an#273), so speech is the head's pulse
 targets:
   top16_colour_coverage: [0.65, 0.80]   # measured 0.74, the flattest of the six

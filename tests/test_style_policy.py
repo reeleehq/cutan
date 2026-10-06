@@ -243,3 +243,30 @@ def test_a_policy_entrys_step_time_lengthens_the_walk_a_sequence_waits_for(store
         update={"policy": slow, "actions": [sequence(walk, hop)], "duration": walk_end + 2})
     seq = _compile(shot, mall)
     assert any(start >= walk_end - 1e-6 for start, _ in _tweens(seq)), "the hop did not wait"
+
+
+
+def test_reiniger_walks_in_profile_only_while_the_side_view_shows(tmp_path):
+    """The style's [profile_cycle, legged_cycle]: the profile cycle needs its side
+    view in force (#17); in front view the figure steps on its legs, the skip recorded."""
+    from an.ir.compose import set_
+    from an.ir.schema import AssetRef, Shot
+    from an.stores.characters import CharactersStore
+
+    from cutan.characters import new_character
+
+    new_character(tmp_path, name="ned", seed="ned", use_dicebear=False, overwrite=True)
+    mall = {"characters": CharactersStore(tmp_path)}
+
+    def shot(*first):
+        walk = PlayAction(target="w", animation="walk", args={"distance": 120}, start=0.1)
+        return Shot(id="w", duration=3.0, actions=[*first, walk],
+                    entities=[AssetRef(kind="character", id="w", store="characters", ref="ned")])
+
+    pack = style_pack("reiniger")
+    front = compile_shot(shot(), mall, style_pack=pack, strict_assets=True)
+    assert [(r.kind, r.ref, r.resolved) for r in front.asset_resolution if r.kind != "character"] == [
+        ("policy_skip", "loco.profile_cycle", "loco.legged_cycle")]
+    side = compile_shot(shot(set_("w", "view", "side", at=0.0)), mall, style_pack=pack,
+                        strict_assets=True)
+    assert _methods(side) == [("locomotion", "loco.legged_cycle", "loco.profile_cycle")]
