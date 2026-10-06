@@ -904,9 +904,7 @@ def brow_loss_sentence(desc: Any, r: Any) -> str:
     )
 
 
-def brow_acting_problem(
-    doc: Any, *, entity: str, art_exists: Any = None
-) -> str | None:
+def brow_acting_problem(doc: Any, *, entity: str, art_exists: Any = None) -> str | None:
     """Why ``entity``'s brows cannot act (its expression falls to
     ``expr.without_brows``), with the remedy — or ``None`` when they can, or when
     the character has no brows to lose (:func:`brow_loss`).
