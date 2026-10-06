@@ -1478,6 +1478,12 @@ EYE_CANVAS: tuple[int, int] = (64, 32)
 EYE_CENTRE: tuple[int, int] = (32, 16)
 EYE_RX, EYE_RY = 14, 10
 PUPIL_R: int = 5
+#: How much farther than the eye white the FILLED closed lid reaches, in eye
+#: view-box units (cutan#66). A lid exactly the sclera's ellipse leaves the
+#: white's anti-aliased edge showing as a light ring round a closed eye:
+#: measured at a 720p silhouette's eye size (0.34 px a unit), a grey of 63 on
+#: black with no pad, 4 with 2 units, none with 3.
+LID_COVER_PAD: int = 3
 #: The parts a rig gains with `an character add-gaze`. Optional — never in
 #: `REQUIRED_PARTS`: a pre-Wave-6 rig without them still renders, and gaze is
 #: a no-op on it.
@@ -1515,7 +1521,8 @@ def _synthesize_eye_closed(path: Path, *, side: str, fill: str | None = None) ->
     cx, cy = EYE_CENTRE
     lid = ""
     if fill is not None:
-        lid = f'<ellipse cx="{cx}" cy="{cy}" rx="{EYE_RX}" ry="{EYE_RY}" fill="{fill}" stroke="none"/>'
+        rx, ry = EYE_RX + LID_COVER_PAD, EYE_RY + LID_COVER_PAD
+        lid = f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{ry}" fill="{fill}" stroke="none"/>'
     inner = (
         lid
         + f'<path d="M {cx - 14} {cy + 2} Q {cx} {cy + 8} {cx + 14} {cy + 2}" stroke="#222" stroke-width="3" fill="none" stroke-linecap="round"/>'
