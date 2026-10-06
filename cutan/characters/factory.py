@@ -76,6 +76,7 @@ from cutan.characters.brows import (
 from cutan.characters.colour_roles import distinct_literal, normalise_hex
 from cutan.characters.lids import add_half_lid as _add_half_lid
 from cutan.characters.schema import (
+    CHARACTER_DOCUMENT_KIND,
     Bone,
     CharacterDescriptor,
     HEAD_ANCHOR,
@@ -705,7 +706,7 @@ def scale_part_files(paths, scale: float) -> None:
         )
 
 
-def stage_extent(desc: CharacterDescriptor) -> dict[str, float]:
+def stage_extent(desc: "CharacterDescriptor | Mapping[str, Any]") -> dict[str, float]:
     """How far a character's art reaches above and below its stage point, in
     scene pixels at ``stage.scale: 1``: ``{"top", "feet", "height"}``.
 
@@ -725,6 +726,13 @@ def stage_extent(desc: CharacterDescriptor) -> dict[str, float]:
     (169, 94)
     """
     from an.stage.rig import SCENE_PX_PER_VIEW_BOX, bone_positions, rig_origin
+
+    if isinstance(desc, Mapping):  # a `character.json` as read (an#410)
+        from an.ir.migrate import migrate
+
+        desc = CharacterDescriptor.model_validate(
+            migrate(dict(desc), kind=CHARACTER_DOCUMENT_KIND.name)
+        )
 
     bones = bone_positions(desc)
     origin_y = rig_origin(desc)[1]

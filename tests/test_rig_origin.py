@@ -79,3 +79,20 @@ def test_feet_origin_puts_the_stage_point_at_the_feet_for_every_build():
         plain = new_character(d, name="plain", use_dicebear=False, views=False)
         assert "origin" not in json.loads(plain.read_text(encoding="utf-8")), "the default is unchanged"
     assert set(feet.values()) == {0.0}
+
+def test_stage_extent_accepts_the_stored_dict():
+    """an#410: the skill writes `stage_extent(desc)`; a `character.json` read
+    with `json.load` works as well as the model."""
+    desc = CharacterDescriptor(name="c")
+    assert stage_extent(json.loads(desc.model_dump_json())) == stage_extent(desc)
+
+
+def test_validate_character_says_the_migration_kept_a_pose_unapplied():
+    """an#407: an old (0.3.0) character hand-edited to rotate an arm."""
+    with tempfile.TemporaryDirectory() as d:
+        doc = json.loads(CharacterDescriptor(name="c").model_dump_json())
+        doc["schema_version"] = "0.3.0"
+        next(b for b in doc["bones"] if b["name"] == "arm_l")["rotation_deg"] = 38.0
+        Path(d, "character.json").write_text(json.dumps(doc), encoding="utf-8")
+        report = validate_character(d, name="c")
+    assert any("rest_rotation: true" in f.description for f in report.findings)
