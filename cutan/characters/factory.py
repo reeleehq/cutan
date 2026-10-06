@@ -1767,14 +1767,17 @@ def _factory_half_lid(char_dir: Path) -> None:
 
     desc_path = _add_half_lid(char_dir)
     raw = json.loads(desc_path.read_text(encoding="utf-8"))
-    for slot in ((raw.get("skins") or {}).get("default") or {}).get("slots", {}).values():
+    for slot in (
+        ((raw.get("skins") or {}).get("default") or {}).get("slots", {}).values()
+    ):
         half = slot.get(HALF_ATTACHMENT)
         if isinstance(half, dict):
             path = char_dir / half["path"]
             _drawn.write_text(path, path.read_text(encoding="utf-8"), encoding="utf-8")
             half.pop("source", None)
     desc_path.write_text(
-        CharacterDescriptor.model_validate(raw).model_dump_json(indent=2), encoding="utf-8"
+        CharacterDescriptor.model_validate(raw).model_dump_json(indent=2),
+        encoding="utf-8",
     )
 
 
