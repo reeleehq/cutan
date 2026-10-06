@@ -67,11 +67,13 @@ __all__ = [
     "OCCLUDABLE_FEATURES",
     "Seat",
     "brow_affordance",
+    "brow_cover",
     "brow_slots",
     "brow_path_d",
     "brow_range",
     "ink_columns",
     "seat_above_brows",
+    "seat_overlap",
 ]
 
 # -----------------------------------------------------------------------------
@@ -439,6 +441,58 @@ def seat_above_brows(
     return Seat(transform, covers=overlap(to_top, k, margin=0.0) > 0)
 
 
+_LIFT_RE = re.compile(r"^translate\(0 (?P<a>-?[\d.]+)\)$")
+_FLATTEN_RE = re.compile(
+    r"^translate\(0 (?P<a>-?[\d.]+)\) scale\(1 (?P<k>[\d.]+)\) translate\(0 (?P<t>-?[\d.]+)\)$"
+)
+
+
+def seat_overlap(
+    fragments: Mapping[str, str], seat: str | None, *, head_scale: float = 1.0
+) -> float:
+    """How far a hat, drawn as ``{view: svg fragment}`` and worn at ``seat`` (a
+    transform :func:`seat_above_brows` wrote, ``None``: where it is drawn),
+    dips into the brows' acting range: positive means it covers them (an#284).
+
+    The inverse of :func:`seat_above_brows` on its own transforms, so a
+    character's recorded seat is measured, not re-chosen.
+
+    >>> seat_overlap({"front": ""}, None)
+    -inf
+    """
+    discs = {v: ink_discs(f) for v, f in fragments.items() if f}
+    if not any(discs.values()):
+        return -math.inf
+    reach = brow_range(head_scale=head_scale, views=[v for v in discs])
+    top = min(y - r for ds in discs.values() for _, y, r in ds)
+    to_top, k = top, 1.0
+    if seat:
+        if m := _LIFT_RE.match(seat):
+            to_top = top + float(m["a"])
+        elif m := _FLATTEN_RE.match(seat):
+            to_top, k, top = float(m["a"]), float(m["k"]), -float(m["t"])
+        else:
+            raise ValueError(f"not a hat seat this module writes: {seat!r}")
+    return _overlap(discs, reach, top=top, to_top=to_top, k=k, margin=0.0)
+
+
+def brow_cover(desc: Any) -> str | None:
+    """What covers the brows' acting range, or ``None`` (an#284).
+
+    The descriptor's declared ``occluded`` entry (an illustrator's override,
+    for drawn art), else what is DERIVED from a factory head's recorded knobs
+    (:func:`cutan.characters.factory.derived_brow_cover`: its hat, as drawn,
+    measured against :func:`brow_range`). One answer for the capability, the
+    compiler's record and ``an validate``.
+    """
+    declared = (getattr(desc, "occluded", None) or {}).get(BROWS_FEATURE)
+    if declared:
+        return declared
+    from cutan.characters.factory import derived_brow_cover
+
+    return derived_brow_cover(desc)
+
+
 # -----------------------------------------------------------------------------
 # The capability
 # -----------------------------------------------------------------------------
@@ -482,7 +536,8 @@ def brow_affordance(desc: Any, drawn: Mapping[str, Any]) -> dict[str, Any] | Non
 
     Afforded when the face is an overlay (``face_overlay``), the binding moves
     a brow (:func:`brow_slots`) and every slot it moves on a brow axis has
-    art, and the descriptor records nothing over the brows (``occluded``).
+    art, and nothing covers them (:func:`brow_cover`: a declared ``occluded``,
+    or a factory hat measured over them, an#284).
     The slots are the solver's own binding's, so the capability and the solver
     cannot disagree about which slots act.
 
@@ -499,6 +554,6 @@ def brow_affordance(desc: Any, drawn: Mapping[str, Any]) -> dict[str, Any] | Non
     slots = brow_slots(desc)
     if not slots or not all(s in drawn for s in slots):
         return None
-    if BROWS_FEATURE in (getattr(desc, "occluded", None) or {}):
+    if brow_cover(desc) is not None:
         return None
     return {"slots": slots}

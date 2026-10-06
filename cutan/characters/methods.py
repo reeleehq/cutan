@@ -894,7 +894,9 @@ def brow_loss_sentence(desc: Any, r: Any) -> str:
     """What :func:`brow_loss` found, said with its cause and the remedy."""
     from cutan.characters.brows import BROWS_FEATURE
 
-    cover = desc.occluded.get(BROWS_FEATURE)
+    from cutan.characters.brows import brow_cover
+
+    cover = brow_cover(desc)
     why = f"{cover} covers its brows" if cover else "its brow slots have no art"
     remedy = EXPR_FULL_FACE.remedies["face.brows"]
     return (

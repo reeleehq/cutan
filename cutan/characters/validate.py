@@ -724,28 +724,24 @@ _BAKED_FACE_PROVENANCES: tuple[str, ...] = ("dicebear", "external_avatar")
 def _check_unseated_hat(
     descriptor: CharacterDescriptor | None, report: VerificationReport, *, who: str
 ) -> None:
-    """A factory character made before hats were worn above the brows (an#252)
-    may wear its brim over them, and nothing records it (``occluded`` is
-    written only by the seating factory). Until brow cover is derived from the
-    art (ADR 0002), say so: a recorded ``hat_seat`` marks a seated hat."""
-    if descriptor is None:
+    """A factory head's brow cover is DERIVED from its knobs and recorded seat
+    (an#284: a character made before hats were seated reports the brim that
+    covers its brows), so nothing is said for one the factory can identify.
+    Said only for a hatted factory head whose drawing is not the factory's
+    (edited by hand), whose cover nothing can derive."""
+    if descriptor is None or "brows" in descriptor.occluded:
         return
-    meta = descriptor.metadata
-    if (
-        meta.get("art_provenance") == "fallback_geometric"
-        and meta.get("hat") not in (None, "none")
-        and "hat_seat" not in meta
-        and "brows" not in descriptor.occluded
-    ):
+    from cutan.characters.factory import brow_cover_unknowable
+
+    if brow_cover_unknowable(descriptor):
         report.add(
             ADVISORY,
             "character.json#metadata.hat",
-            f"{who} wears a {meta['hat']!r} hat drawn before hats were seated above "
-            "the brows (an#252): its brim may cover them, so brow expressions may "
-            "not read, and `an character capabilities` cannot tell",
-            "Re-make it with `an character new --offline` and the same knobs (the "
-            "hat is then worn above the brows), or declare "
-            '`"occluded": {"brows": "the hat"}` in character.json if they are covered.',
+            f"{who}'s head art is not the factory's drawing for its recorded knobs "
+            f"(edited?), so whether its {descriptor.metadata.get('hat')!r} hat covers "
+            "the brows cannot be derived, and `an character capabilities` assumes it does not",
+            '`"occluded": {"brows": "the hat"}` in character.json if the brows are '
+            "covered; or re-make the character with `an character new --offline`.",
         )
 
 

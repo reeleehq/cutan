@@ -29,7 +29,7 @@ import shutil
 import textwrap
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Mapping, Optional
+from typing import Any, Mapping, Optional
 from xml.etree import ElementTree as ET
 
 
@@ -195,6 +195,105 @@ def _hat_seat(hat: str, head_scale: float) -> Seat:
         {v: _hat_fragment(hat, v, accessory="#000000") for v in _BROW_VIEWS},
         head_scale=head_scale,
     )
+
+
+#: The ``art_provenance`` of a head the factory drew (its knobs re-draw it).
+FACTORY_ART_PROVENANCE: str = "fallback_geometric"
+
+
+def _factory_head_text(desc: Any, *, hat_seat: str | None) -> str:
+    """The ``head.svg`` text the factory writes for ``desc``'s recorded seed and
+    knobs, its hat worn at ``hat_seat`` (``None``: where it is drawn)."""
+    meta = desc.metadata
+    looks = _resolve_looks(
+        str(meta.get("seed") or desc.name),
+        _check_palette(meta.get("palette")),
+        hat=str(meta.get("hat") or DFLT_HAT),
+        hat_seat=hat_seat,
+        hair_style=str(meta.get("hair_style") or DFLT_HAIR_STYLE),
+        hair_length=str(meta.get("hair_length") or DFLT_HAIR_LENGTH),
+    )
+    height = REFERENCE_HEAD_HEIGHT * float(meta.get("head_scale") or 1.0)
+    return _head_part_text(looks.head_svg, height=height)
+
+
+#: Returned by :func:`_worn_seat` for a head that is not the factory's drawing.
+_NOT_THE_FACTORYS: object = object()
+
+
+def _worn_seat(desc: Any, hat: str, head_scale: float) -> Any:
+    """Where ``desc``'s factory hat is worn in its ``head.svg``: the recorded
+    ``metadata.hat_seat``; else, for a head stamped with its digest (an#236),
+    the seat whose drawing has that digest (today's seat, or none: drawn
+    before hats were seated, an#252); a head with no stamp predates both
+    stamps and seats, so its hat is where it was drawn. ``_NOT_THE_FACTORYS``
+    when the stamped digest is neither (the head was edited)."""
+    import hashlib
+
+    recorded = desc.metadata.get("hat_seat")
+    if recorded:
+        return str(recorded)
+    head = (desc.skins.get("default") and desc.skins["default"].slots.get("head")) or {}
+    stamp = next(
+        (
+            a.source.sha256
+            for a in head.values()
+            if a.source is not None and a.source.sha256
+        ),
+        None,
+    )
+    if stamp is None:
+        return None
+    for seat in dict.fromkeys((_hat_seat(hat, head_scale).transform, None)):
+        text = _factory_head_text(desc, hat_seat=seat)
+        if hashlib.sha256(text.encode("utf-8")).hexdigest() == stamp:
+            return seat
+    return _NOT_THE_FACTORYS
+
+
+def brow_cover_unknowable(desc: Any) -> bool:
+    """Whether ``desc`` is a factory head with a hat whose drawing is not the
+    factory's for its recorded knobs (edited by hand), so its brow cover cannot
+    be derived: only a declared ``occluded`` can say (an#284)."""
+    meta = getattr(desc, "metadata", None) or {}
+    hat = str(meta.get("hat") or DFLT_HAT)
+    if meta.get("art_provenance") != FACTORY_ART_PROVENANCE or hat not in HATS:
+        return False
+    if hat == DFLT_HAT:
+        return False
+    head_scale = float(meta.get("head_scale") or 1.0)
+    return _worn_seat(desc, hat, head_scale) is _NOT_THE_FACTORYS
+
+
+def derived_brow_cover(desc: Any) -> str | None:
+    """What covers a FACTORY head's brows, derived from its recorded knobs
+    (an#284, ADR 0002 decision 2): its hat, as drawn (:func:`_worn_seat`),
+    measured against the brows' acting range
+    (:func:`~cutan.characters.brows.seat_overlap`). ``None`` when nothing does,
+    when the head is not the factory's (drawn art: an illustrator declares
+    ``occluded``), or when it cannot be told (an edited factory head).
+
+    Derived, never stored: a character made before hats were seated (an#252)
+    reports the brim that covers its brows, and the answer follows the
+    measurement if the brows' range moves.
+    """
+    from cutan.characters.brows import seat_overlap
+
+    meta = getattr(desc, "metadata", None) or {}
+    if meta.get("art_provenance") != FACTORY_ART_PROVENANCE:
+        return None
+    hat = str(meta.get("hat") or DFLT_HAT)
+    if hat == DFLT_HAT or hat not in HATS:
+        return None
+    head_scale = float(meta.get("head_scale") or 1.0)
+    seat = _worn_seat(desc, hat, head_scale)
+    if seat is _NOT_THE_FACTORYS:
+        return None
+    fragments = {v: _hat_fragment(hat, v, accessory="#000000") for v in _BROW_VIEWS}
+    if seat_overlap(fragments, seat, head_scale=head_scale) <= 0:
+        return None
+    when = "" if seat else ", drawn before hats were seated above the brows"
+    return f"the {hat} hat at head_scale {head_scale:g}{when}"
 
 
 # -----------------------------------------------------------------------------
@@ -925,13 +1024,9 @@ def new_character(
             else {"bones": _bones_for(body, head_scale=head_scale)}
         ),
     )
-    if seat.covers and head_is_ours:
-        # Measured, not guessed: even worn as high and as flat as it goes, the
-        # hat overlaps the brows' acting range — said where the capability
-        # analyser reads it (`face.brows`), never left to a render to show.
-        descriptor.occluded = {
-            BROWS_FEATURE: f"the {hat} hat at head_scale {head_scale:g}"
-        }
+    # A hat that still covers the brows, worn as high and as flat as it goes,
+    # is NOT stored (an#284): the analyser derives it from the recorded knobs
+    # and seat (`derived_brow_cover`), so the answer never goes stale.
     declare_mouth_variants(descriptor, variants)
     descriptor.metadata["seed"] = seed_used
     # The knobs, recorded only when set — so a default character's descriptor
