@@ -231,7 +231,7 @@ def style_pack(spec: Any) -> Any:
     """
     from an.styles import StylePack
 
-    from cutan.styles import _is_style_name, resolve_style_spec, style_spec_digest
+    from cutan.styles import resolve_style_spec
 
     data = resolve_style_spec(spec)
     live = data.get("live") or {}
@@ -241,18 +241,10 @@ def style_pack(spec: Any) -> Any:
     if block is not None:
         check_policy(block, where=f"style spec {data.get('style')!r}")
         pack[POLICY_KEY] = block
-    origin = {"name": data.get("style")}
-    if _is_style_name(spec):
-        origin["sha256"] = style_spec_digest(spec)
-    elif not isinstance(
-        spec, Mapping
-    ):  # a file: the same digest rule as the shipped specs
-        import hashlib
-        from pathlib import Path
+    from cutan.styles.copies import SPEC_ORIGIN_KEY, spec_origin
 
-        raw = Path(spec).read_bytes().replace(b"\r\n", b"\n")
-        origin["sha256"] = hashlib.sha256(raw).hexdigest()
-    pack["metadata"] = {**(pack.get("metadata") or {}), "style_spec": origin}
+    origin = spec_origin(spec)
+    pack["metadata"] = {**(pack.get("metadata") or {}), SPEC_ORIGIN_KEY: origin}
     return StylePack(**pack)
 
 

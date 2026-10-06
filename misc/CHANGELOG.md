@@ -8,6 +8,7 @@
   - `truth.json` records each event's actual `rise` (schema 1.1.0) beside `fall` and `brake`.
   - `arc_radius` (`--arc-radius`) swings the ball on a circle about a pivot straight above its contact. The stroke rotates the pivot, so the curve stays exact, and the contact stays the lowest point.
   - The new fields are omitted from a spec's JSON at their defaults, so no existing clip id changes.
+- **A stale copy of a style spec is said** (cutan#19): the StylePack (`style_pack`) and a voice cast to a spec's role (new `cutan.styles.style_voice`) record `metadata.style_spec = {name, sha256}`. `an validate`'s new scene check `cutout.style_copies` warns when the pack the scene names, or a voice its lines speak with, was copied from an older version of the shipped spec, naming the call that re-derives it. A copy from a spec file, or with no record, is never compared. The genre's check list and its order against the core's checks are now pinned in cutan's own tests (`tests/test_genre_checks.py`), not in `an`'s.
 - **Silhouette styles keep their faces readable, and a short turn on twos never vanishes** (an#273):
   - The Reiniger spec declares cut-out eyes (`live.characters.part_tints`: white scleras, since a part's tint replaces the root's). `tests/test_style_specs.py` checks each part against the nodes an offline character is built with.
   - A `turn` played by name gets the shot's `step_hz`; one whose halves are shorter than a step is a hard swap at its midpoint, not a squash a stepped frame catches edge-on (`turn` version 2).
