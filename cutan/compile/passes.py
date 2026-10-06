@@ -43,6 +43,7 @@ from cutan.characters.play import (
     GAIT_ARG,
     PARTS_ARG,
     SCALE_ARG,
+    STEP_HZ_ARG,
     VIEW_ARG,
     facing_at,
     preset_takes,
@@ -2384,6 +2385,16 @@ def _expand_preset_plays(
                         if p.startswith(prefix)
                     ]
 
+            if (
+                step_hz
+                and preset_takes(action.animation, STEP_HZ_ARG)
+                and STEP_HZ_ARG not in (action.args or {})
+            ):
+                # the shot's stepped timing, for a preset whose shape depends on
+                # it (a `turn` shorter than a step swaps hard, an#273)
+                action = action.model_copy(
+                    update={"args": {**(action.args or {}), STEP_HZ_ARG: step_hz}}
+                )
             try:
                 leaves = expand_preset_play(
                     action, start=flat.start, rest_of=rest_of, parts_of=parts_of

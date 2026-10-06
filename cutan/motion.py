@@ -791,6 +791,7 @@ def turn(
     duration: Seconds = DFLT_TURN_DURATION,
     view_set: str = DFLT_TURN_SET,
     rest: Rest | None = None,
+    step_hz: float | None = None,
 ) -> Action:
     """Turn a character to the view ``to`` — the classic cut-out turn (an#197).
 
@@ -812,11 +813,21 @@ def turn(
     (the back hides it, the profile keeps one eye). ``rest`` is the entity's:
     its ``scale_x`` magnitude is where the turn opens to.
 
+    ``step_hz`` is the shot's stepped timing (the compiler fills it in when a
+    turn is played by name). A turn whose halves are shorter than one step
+    cannot show its squash: its stepped frames would sample the edge-on scale,
+    so the character vanishes for a frame (an#273, South Park on twos). Such a
+    turn is the style's HARD SWAP instead: at its midpoint the view changes and
+    ``scale_x`` takes the new facing, with no squash.
+
     >>> def lands(a):  # a tween's end value, a set's value
     ...     return a.to_value if a.kind == "tween" else a.value
     >>> [(round(f.start, 2), f.action.property, lands(f.action))
     ...  for f in flatten(turn("ned", to="side", direction="left"))]
     [(0.0, 'scale_x', 0.0), (0.15, 'view', 'side'), (0.15, 'scale_x', -1.0), (0.3, 'scale_x', -1.0)]
+    >>> [(round(f.start, 3), f.action.property, lands(f.action))  # on twos at 24 fps
+    ...  for f in flatten(turn("ned", to="side", duration=0.04, step_hz=12))]
+    [(0.02, 'view', 'side'), (0.02, 'scale_x', 1.0)]
     """
     _positive(duration=duration)
     if not isinstance(to, str) or not to:
@@ -830,6 +841,11 @@ def turn(
     before = _facing_sign("from_direction", from_direction) * s0
     after = _facing_sign("direction", direction) * s0
     half = duration / 2
+    if step_hz is not None and step_hz > 0 and half < 1.0 / float(step_hz):
+        return sequence(
+            delay(half),
+            parallel(set_(target, view_set, to), set_(target, "scale_x", after)),
+        )
     return sequence(
         tween(
             target,
@@ -976,7 +992,10 @@ RIG_PRESET_VERSIONS: dict[str, str] = {
     # the default lengths scale with the figure's drawn scale.
     # 3 (cutan#13): the drawn scale is the stage scale, not the pose at the
     # play's start (a figure resized by an authored move strides as drawn).
-    # 4 (cutan#14-#16, #18, #20): a one-step walk swings its limbs; the profile
+    # turn 2 (an#273): a turn shorter than a step is a hard swap, not a squash
+    # that vanishes on the stepped frame between.
+    "turn": "2",
+    # walk 4 (cutan#14-#16, #18, #20): a one-step walk swings its limbs; the profile
     # cycle is phased to the contacts and `bob` is its whole travel; the sway
     # mirrors with the figure; a zero amplitude writes no channel; the body
     # lands with the landing tween, not a settling set.
