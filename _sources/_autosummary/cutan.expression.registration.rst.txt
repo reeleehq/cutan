@@ -10,6 +10,7 @@ cutan.expression.registration
    
       DFLT_EXPRESSION_BLEND_S
       EMOTION_NAME_RE
+      EMOTION_INTENSITY_FIELD
    
    .. rubric:: Functions
 

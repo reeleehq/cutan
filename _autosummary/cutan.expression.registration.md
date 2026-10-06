@@ -15,24 +15,25 @@ Plain declarations: importing this module registers nothing.
 
 ```pycon
 >>> EXPRESSION.name, EMOTION.opener, EMOTION.parse(" Happy ")
-('expression', '[', 'happy')
+('expression', '[', {'emotion': 'happy'})
 ```
 
 ### Module Attributes
 
-| [`DFLT_EXPRESSION_BLEND_S`](#cutan.expression.registration.DFLT_EXPRESSION_BLEND_S)   | Default ramp in/out of an expression, seconds (0 = cut).   |
-|----------------------------------------------------------------------------|------------------------------------------------------------|
-| [`EMOTION_NAME_RE`](#cutan.expression.registration.EMOTION_NAME_RE)           | a preset name (`happy`, `wry-smile`).                      |
+| [`DFLT_EXPRESSION_BLEND_S`](#cutan.expression.registration.DFLT_EXPRESSION_BLEND_S)   | Default ramp in/out of an expression, seconds (0 = cut).                  |
+|----------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| [`EMOTION_NAME_RE`](#cutan.expression.registration.EMOTION_NAME_RE)           | a preset name (`happy`, `wry-smile`).                                     |
+| [`EMOTION_INTENSITY_FIELD`](#cutan.expression.registration.EMOTION_INTENSITY_FIELD)   | The Dialogue field an `[emotion level]` sets beside the emotion (an#253). |
 
 ### Functions
 
-| [`expression`](#cutan.expression.registration.expression)(target[, preset, axes, ...])   | Hold a facial expression on an entity (an#98).                                    |
-|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| [`expression_duration`](#cutan.expression.registration.expression_duration)(action, extent)       | An expression's span: its `duration`, else zero (it runs to the shot end).        |
-| [`format_emotion`](#cutan.expression.registration.format_emotion)(line)                      | The `[…]` content for `line`, or `None` when it carries no emotion.               |
-| [`parse_emotion`](#cutan.expression.registration.parse_emotion)(content)                    | `[happy]`'s content to the line's emotion, lower-cased; refuse a non-name.        |
-| [`read_expression_md`](#cutan.expression.registration.read_expression_md)(item, \*, index)       | `{kind: expression, target, [preset], [axes], [intensity], [duration], [blend]}`. |
-| [`write_expression_md`](#cutan.expression.registration.write_expression_md)(leaf)                 | The `scene.md` entry for `leaf` (`read_expression_md`'s inverse).                 |
+| [`expression`](#cutan.expression.registration.expression)(target[, preset, axes, ...])   | Hold a facial expression on an entity (an#98).                                                                                                     |
+|--------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`expression_duration`](#cutan.expression.registration.expression_duration)(action, extent)       | An expression's span: its `duration`, else zero (it runs to the shot end).                                                                         |
+| [`format_emotion`](#cutan.expression.registration.format_emotion)(line)                      | The `[…]` content for `line` (`angry 0.4` with an intensity), or `None` when it carries no emotion.                                                |
+| [`parse_emotion`](#cutan.expression.registration.parse_emotion)(content)                    | `[happy]`'s content to the line's emotion, lower-cased, and `[angry 0.4]`'s to the emotion and its intensity (0..1, an#253); refuse anything else. |
+| [`read_expression_md`](#cutan.expression.registration.read_expression_md)(item, \*, index)       | `{kind: expression, target, [preset], [axes], [intensity], [duration], [blend]}`.                                                                  |
+| [`write_expression_md`](#cutan.expression.registration.write_expression_md)(leaf)                 | The `scene.md` entry for `leaf` (`read_expression_md`'s inverse).                                                                                  |
 
 ### Classes
 
@@ -43,6 +44,10 @@ Plain declarations: importing this module registers nothing.
 
 Default ramp in/out of an expression, seconds (0 = cut). The dialogue
 `[emotion]` sugar uses its own in `an.expression.provider`.
+
+### cutan.expression.registration.EMOTION_INTENSITY_FIELD *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'emotion_intensity'*
+
+The Dialogue field an `[emotion level]` sets beside the emotion (an#253).
 
 ### cutan.expression.registration.EMOTION_NAME_RE *= re.compile('[\\\\w-]+')*
 
@@ -111,17 +116,25 @@ An expression’s span: its `duration`, else zero (it runs to the shot end).
 
 ### cutan.expression.registration.format_emotion(line)
 
-The `[…]` content for `line`, or `None` when it carries no emotion.
+The `[…]` content for `line` (`angry 0.4` with an intensity), or
+`None` when it carries no emotion.
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.expression.registration.parse_emotion(content)
 
-`[happy]`’s content to the line’s emotion, lower-cased; refuse a non-name.
+`[happy]`’s content to the line’s emotion, lower-cased, and `[angry
+0.4]`’s to the emotion and its intensity (0..1, an#253); refuse anything
+else.
 
 * **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+```pycon
+>>> parse_emotion("Happy"), parse_emotion(" angry 0.4 ")
+({'emotion': 'happy'}, {'emotion': 'angry', 'emotion_intensity': 0.4})
+```
 
 ### cutan.expression.registration.read_expression_md(item, , index)
 

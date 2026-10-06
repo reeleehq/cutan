@@ -93,7 +93,7 @@ the skill, the demos, the vocabulary and the `play` fallback
 ([`cutan.characters.play.play_source()`](cutan.characters.play.html.md#cutan.characters.play.play_source), an#166) read. A genre preset wins a
 name the core also has.
 
-### cutan.motion.PRESET_VERSIONS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'crawl': '1', 'hop': '1', 'nod': '1', 'point': '1', 'pop_in': '1', 'shake': '1', 'slide_in': '1', 'slide_out': '1', 'speech_pulse': '1', 'squash_stretch': '1', 'turn': '1', 'waddle': '1', 'walk': '4'}*
+### cutan.motion.PRESET_VERSIONS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'crawl': '1', 'hop': '1', 'nod': '1', 'point': '1', 'pop_in': '1', 'shake': '1', 'slide_in': '1', 'slide_out': '1', 'speech_pulse': '1', 'squash_stretch': '1', 'turn': '2', 'waddle': '1', 'walk': '4'}*
 
 [`PRESETS`](#cutan.motion.PRESETS)’ vocabulary versions.
 
@@ -212,7 +212,7 @@ speech aspect does) each pulse rides whatever the head is doing.
 [(0.0, 1.06), (0.06, 1.0), (0.3, 1.06), (0.36, 1.0), (0.46, 1.0)]
 ```
 
-### cutan.motion.turn(target, , to='back', direction='right', from_direction=None, duration=0.3, view_set='view', rest=None)
+### cutan.motion.turn(target, , to='back', direction='right', from_direction=None, duration=0.3, view_set='view', rest=None, step_hz=None)
 
 Turn a character to the view `to` — the classic cut-out turn (an#197).
 
@@ -234,6 +234,13 @@ which the compiler fans out to the head and torso and which poses the face
 (the back hides it, the profile keeps one eye). `rest` is the entity’s:
 its `scale_x` magnitude is where the turn opens to.
 
+`step_hz` is the shot’s stepped timing (the compiler fills it in when a
+turn is played by name). A turn whose halves are shorter than one step
+cannot show its squash: its stepped frames would sample the edge-on scale,
+so the character vanishes for a frame (an#273, South Park on twos). Such a
+turn is the style’s HARD SWAP instead: at its midpoint the view changes and
+`scale_x` takes the new facing, with no squash.
+
 * **Return type:**
   `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
@@ -243,6 +250,9 @@ its `scale_x` magnitude is where the turn opens to.
 >>> [(round(f.start, 2), f.action.property, lands(f.action))
 ...  for f in flatten(turn("ned", to="side", direction="left"))]
 [(0.0, 'scale_x', 0.0), (0.15, 'view', 'side'), (0.15, 'scale_x', -1.0), (0.3, 'scale_x', -1.0)]
+>>> [(round(f.start, 3), f.action.property, lands(f.action))  # on twos at 24 fps
+...  for f in flatten(turn("ned", to="side", duration=0.04, step_hz=12))]
+[(0.02, 'view', 'side'), (0.02, 'scale_x', 1.0)]
 ```
 
 ### cutan.motion.waddle(target, , steps=4, step_duration=0.3, angle=0.1, lift=6.0, travel=0.0, rest=None)

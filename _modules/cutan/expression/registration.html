@@ -191,7 +191,7 @@
 </span><span id="line-12"><span class="sd">Plain declarations: importing this module registers nothing.</span>
 </span><span id="line-13">
 </span><span id="line-14"><span class="sd">&gt;&gt;&gt; EXPRESSION.name, EMOTION.opener, EMOTION.parse(" Happy ")</span>
-</span><span id="line-15"><span class="sd">('expression', '[', 'happy')</span>
+</span><span id="line-15"><span class="sd">('expression', '[', {'emotion': 'happy'})</span>
 </span><span id="line-16"><span class="sd">"""</span>
 </span><span id="line-17">
 </span><span id="line-18"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
@@ -346,45 +346,74 @@
 
 </span><span id="line-153">
 </span><span id="line-154">
+</span><span id="line-155"><span class="c1">#: The Dialogue field an ``[emotion level]`` sets beside the emotion (an#253).</span>
+</span><span id="line-156"><span class="n">EMOTION_INTENSITY_FIELD</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"emotion_intensity"</span>
+</span><span id="line-157">
+</span><span id="line-158">
 <div class="viewcode-block" id="parse_emotion">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.registration.html#cutan.expression.registration.parse_emotion">[docs]</a>
-</span><span id="line-155"><span class="k">def</span><span class="w"> </span><span class="nf">parse_emotion</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-156"><span class="w">    </span><span class="sd">"""``[happy]``'s content to the line's emotion, lower-cased; refuse a non-name."""</span>
-</span><span id="line-157">    <span class="n">emotion</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-</span><span id="line-158">    <span class="k">if</span> <span class="ow">not</span> <span class="n">EMOTION_NAME_RE</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">emotion</span><span class="p">):</span>
-</span><span id="line-159">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"has [</span><span class="si">{</span><span class="n">emotion</span><span class="si">}</span><span class="s2">], which is not an emotion name"</span><span class="p">)</span>
-</span><span id="line-160">    <span class="k">return</span> <span class="n">emotion</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+</span><span id="line-159"><span class="k">def</span><span class="w"> </span><span class="nf">parse_emotion</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="line-160"><span class="w">    </span><span class="sd">"""``[happy]``'s content to the line's emotion, lower-cased, and ``[angry</span>
+</span><span id="line-161"><span class="sd">    0.4]``'s to the emotion and its intensity (0..1, an#253); refuse anything</span>
+</span><span id="line-162"><span class="sd">    else.</span>
+</span><span id="line-163">
+</span><span id="line-164"><span class="sd">    &gt;&gt;&gt; parse_emotion("Happy"), parse_emotion(" angry 0.4 ")</span>
+</span><span id="line-165"><span class="sd">    ({'emotion': 'happy'}, {'emotion': 'angry', 'emotion_intensity': 0.4})</span>
+</span><span id="line-166"><span class="sd">    """</span>
+</span><span id="line-167">    <span class="n">text</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span><span id="line-168">    <span class="n">name</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">" "</span><span class="p">)</span>
+</span><span id="line-169">    <span class="k">if</span> <span class="ow">not</span> <span class="n">EMOTION_NAME_RE</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+</span><span id="line-170">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"has [</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">], which is not an emotion name"</span><span class="p">)</span>
+</span><span id="line-171">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"emotion"</span><span class="p">:</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()}</span>
+</span><span id="line-172">    <span class="n">level</span> <span class="o">=</span> <span class="n">level</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span><span id="line-173">    <span class="k">if</span> <span class="n">level</span><span class="p">:</span>
+</span><span id="line-174">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-175">            <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+</span><span id="line-176">        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="line-177">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="line-178">                <span class="sa">f</span><span class="s2">"has [</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">]: after the emotion comes its intensity, a number "</span>
+</span><span id="line-179">                <span class="s2">"from 0 to 1 (`[angry 0.4]`)"</span>
+</span><span id="line-180">            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+</span><span id="line-181">        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+</span><span id="line-182">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"has [</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">]: an intensity runs from 0 to 1"</span><span class="p">)</span>
+</span><span id="line-183">        <span class="n">out</span><span class="p">[</span><span class="n">EMOTION_INTENSITY_FIELD</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+</span><span id="line-184">    <span class="k">return</span> <span class="n">out</span></div>
 
-</span><span id="line-161">
-</span><span id="line-162">
+</span><span id="line-185">
+</span><span id="line-186">
 <div class="viewcode-block" id="format_emotion">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.registration.html#cutan.expression.registration.format_emotion">[docs]</a>
-</span><span id="line-163"><span class="k">def</span><span class="w"> </span><span class="nf">format_emotion</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-164"><span class="w">    </span><span class="sd">"""The ``[…]`` content for ``line``, or ``None`` when it carries no emotion."""</span>
-</span><span id="line-165">    <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">emotion</span> <span class="ow">or</span> <span class="kc">None</span></div>
+</span><span id="line-187"><span class="k">def</span><span class="w"> </span><span class="nf">format_emotion</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-188"><span class="w">    </span><span class="sd">"""The ``[…]`` content for ``line`` (``angry 0.4`` with an intensity), or</span>
+</span><span id="line-189"><span class="sd">    ``None`` when it carries no emotion."""</span>
+</span><span id="line-190">    <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">emotion</span><span class="p">:</span>
+</span><span id="line-191">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-192">    <span class="n">level</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">EMOTION_INTENSITY_FIELD</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-193">    <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">emotion</span> <span class="k">if</span> <span class="n">level</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">line</span><span class="o">.</span><span class="n">emotion</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">level</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">"</span></div>
 
-</span><span id="line-166">
-</span><span id="line-167">
-</span><span id="line-168"><span class="n">EXPRESSION</span> <span class="o">=</span> <span class="n">ActionKind</span><span class="p">(</span>
-</span><span id="line-169">    <span class="s2">"expression"</span><span class="p">,</span>
-</span><span id="line-170">    <span class="n">ExpressionAction</span><span class="p">,</span>
-</span><span id="line-171">    <span class="n">duration</span><span class="o">=</span><span class="n">expression_duration</span><span class="p">,</span>
-</span><span id="line-172">    <span class="n">read_md</span><span class="o">=</span><span class="n">read_expression_md</span><span class="p">,</span>
-</span><span id="line-173">    <span class="n">write_md</span><span class="o">=</span><span class="n">write_expression_md</span><span class="p">,</span>
-</span><span id="line-174">    <span class="n">description</span><span class="o">=</span><span class="s2">"hold a facial expression (an expression-sheet preset) on a character"</span><span class="p">,</span>
-</span><span id="line-175"><span class="p">)</span>
-</span><span id="line-176">
-</span><span id="line-177"><span class="n">EMOTION</span> <span class="o">=</span> <span class="n">DialogueSugar</span><span class="p">(</span>
-</span><span id="line-178">    <span class="s2">"emotion"</span><span class="p">,</span>
-</span><span id="line-179">    <span class="s2">"["</span><span class="p">,</span>
-</span><span id="line-180">    <span class="s2">"emotion"</span><span class="p">,</span>
-</span><span id="line-181">    <span class="n">parse</span><span class="o">=</span><span class="n">parse_emotion</span><span class="p">,</span>
-</span><span id="line-182">    <span class="nb">format</span><span class="o">=</span><span class="n">format_emotion</span><span class="p">,</span>
-</span><span id="line-183">    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-184">        <span class="s2">"`speaker [emotion]: text` — an expression over the line, desugared in "</span>
-</span><span id="line-185">        <span class="s2">"memory by the expression provider"</span>
-</span><span id="line-186">    <span class="p">),</span>
-</span><span id="line-187"><span class="p">)</span>
+</span><span id="line-194">
+</span><span id="line-195">
+</span><span id="line-196"><span class="n">EXPRESSION</span> <span class="o">=</span> <span class="n">ActionKind</span><span class="p">(</span>
+</span><span id="line-197">    <span class="s2">"expression"</span><span class="p">,</span>
+</span><span id="line-198">    <span class="n">ExpressionAction</span><span class="p">,</span>
+</span><span id="line-199">    <span class="n">duration</span><span class="o">=</span><span class="n">expression_duration</span><span class="p">,</span>
+</span><span id="line-200">    <span class="n">read_md</span><span class="o">=</span><span class="n">read_expression_md</span><span class="p">,</span>
+</span><span id="line-201">    <span class="n">write_md</span><span class="o">=</span><span class="n">write_expression_md</span><span class="p">,</span>
+</span><span id="line-202">    <span class="n">description</span><span class="o">=</span><span class="s2">"hold a facial expression (an expression-sheet preset) on a character"</span><span class="p">,</span>
+</span><span id="line-203"><span class="p">)</span>
+</span><span id="line-204">
+</span><span id="line-205"><span class="n">EMOTION</span> <span class="o">=</span> <span class="n">DialogueSugar</span><span class="p">(</span>
+</span><span id="line-206">    <span class="s2">"emotion"</span><span class="p">,</span>
+</span><span id="line-207">    <span class="s2">"["</span><span class="p">,</span>
+</span><span id="line-208">    <span class="s2">"emotion"</span><span class="p">,</span>
+</span><span id="line-209">    <span class="n">parse</span><span class="o">=</span><span class="n">parse_emotion</span><span class="p">,</span>
+</span><span id="line-210">    <span class="nb">format</span><span class="o">=</span><span class="n">format_emotion</span><span class="p">,</span>
+</span><span id="line-211">    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-212">        <span class="s2">"`speaker [emotion]: text` — an expression over the line, desugared in "</span>
+</span><span id="line-213">        <span class="s2">"memory by the expression provider; `[emotion 0.4]` at that intensity"</span>
+</span><span id="line-214">    <span class="p">),</span>
+</span><span id="line-215">    <span class="n">fields</span><span class="o">=</span><span class="p">(</span><span class="n">EMOTION_INTENSITY_FIELD</span><span class="p">,),</span>
+</span><span id="line-216"><span class="p">)</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -398,7 +427,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=a11416ff"></script>
+    <script src="../../../_static/documentation_options.js?v=96ec9c95"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
