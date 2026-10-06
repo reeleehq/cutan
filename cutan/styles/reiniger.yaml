@@ -33,6 +33,9 @@ live:
   characters:
     generate: offline
     tint: "#000000"          # a `tint` set on each character root: a black multiply is a silhouette
+    part_tints:              # a `set` of `tint` on each of these parts of every character at `at: 0`: a part's tint REPLACES the root's (an#273), so the eyes are cut out of the black and a blink shows the black lid closing over them
+      head/left_sclera: "#ffffff"
+      head/right_sclera: "#ffffff"
     view: side               # a `set` of `view` on each character root at `at: 0` in every shot: the profile IS the silhouette; a negative `scale_x` faces left
   transitions:
     default: {kind: dissolve, duration: 1.0}   # between painted plates; the duration is an estimate

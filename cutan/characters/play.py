@@ -215,6 +215,10 @@ GAIT_ARG = "gait"
 #: the compiler fills it from the built stage placement. Reserved: an author
 #: sets a length in scene px instead.
 SCALE_ARG = "scale"
+#: The arg a preset that cares about stepped timing takes: the compiler fills
+#: in the shot's ``step_hz`` when the author did not (an#273: a ``turn`` too
+#: short to show its squash between two steps is a hard swap).
+STEP_HZ_ARG = "step_hz"
 
 
 def preset_takes(animation: str, name: str) -> bool:

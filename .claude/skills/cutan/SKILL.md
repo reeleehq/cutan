@@ -105,7 +105,7 @@ The names and methods the `cutout_animation` genre adds to the core vocabulary, 
 | `nod` | 1 | a, b-name | Dip the head `count` times (a rotation of `<target>/<part>`). |
 | `point` | 1 | a, b-name | Swing an arm out to point, hold it, and lower it again. |
 | `waddle` | 1 | a, b-name | A walk cycle for a rig with no legs to animate: rock and bob per step. |
-| `turn` | 1 | a, b-name | Turn a character to the view `to` — the classic cut-out turn. |
+| `turn` | 2 | a, b-name | Turn a character to the view `to` — the classic cut-out turn. |
 | `walk` | 4 | a, b-name | Walk: the body travels on `x` while the gait moves it — legs that alternate, a hop, a bounce, a glide (an#214, an#224). |
 | `speech_pulse` | 1 | a, b-name | Pulse a part on each syllable: speech carried without a mouth. |
 

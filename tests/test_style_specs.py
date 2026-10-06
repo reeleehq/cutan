@@ -140,9 +140,34 @@ def test_ranges_and_characters(spec):
     assert shots["range_s"][0] <= shots["mean_s"] <= shots["range_s"][1]
     chars = live["characters"]
     assert chars["generate"] in GENERATORS
-    assert set(chars) <= {"generate", "mouth_variants", "tint", "view"} | set(FACTORY_KNOBS)
-    if "tint" in chars:
-        assert chars["tint"].startswith("#") and len(chars["tint"]) == 7
+    assert set(chars) <= {"generate", "mouth_variants", "tint", "part_tints", "view"} | set(FACTORY_KNOBS)
+    for colour in [chars.get("tint"), *(chars.get("part_tints") or {}).values()]:
+        if colour is not None:
+            assert colour.startswith("#") and len(colour) == 7
+
+
+def test_a_spec_s_part_tints_name_parts_the_factory_builds(spec, tmp_path):
+    """`live.characters.part_tints` (an#273: Reiniger's cut-out eyes) are `set`s
+    of `tint` on parts of each character, so each must be a node an offline
+    character is BUILT with — read off the stage, not a constant."""
+    import warnings
+
+    from an.ir.schema import AssetRef, Shot
+    from an.motion import stage_poses
+    from an.project import init
+    from an.stores import build_project_mall
+    from cutan.characters import new_character
+
+    parts = spec["live"]["characters"].get("part_tints") or {}
+    if not parts:
+        return
+    root = init(tmp_path / "p")
+    new_character(root / "assets" / "characters", name="c", use_dicebear=False)
+    shot = Shot(id="s", entities=[AssetRef(kind="character", id="c", store="characters", ref="c")])
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        built = set(stage_poses(shot, mall=build_project_mall(root)))
+    assert {f"c/{part}" for part in parts} <= built, sorted(built)
 
 
 def test_a_spec_s_default_view_is_one_the_factory_draws(spec, tmp_path):
