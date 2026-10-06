@@ -47,6 +47,7 @@ __all__ = [
     "CHARACTER_CAPABILITIES",
     "MOUTH_CHART_RHUBARB",
     "character_affordances",
+    "character_overrides",
     "renders_as_placeholder",
 ]
 
@@ -292,11 +293,38 @@ CHARACTER_CAPABILITIES: tuple[Capability, ...] = (
     FACE_BROWS,
 )
 #: The character analyser (declared by the cut-out genre, registered with it).
+def character_overrides(doc: Mapping[str, Any], art: Mapping[str, Any]) -> list[str]:
+    """The declared fields that REMOVED a capability (an#381): ``occluded``
+    when a declared cover is what keeps ``face.brows`` from an overlay face
+    whose binding moves brows. (Overrides that show on an afforded capability
+    are in its ``overrides`` param already.)
+
+    >>> character_overrides({"kind": "CharacterDescriptor", "name": "c",
+    ...                      "occluded": {"brows": "a helmet"}}, {})
+    ['occluded']
+    >>> character_overrides({"kind": "CharacterDescriptor", "name": "c"}, {})
+    []
+    """
+    from cutan.characters.brows import BROWS_FEATURE, brow_slots
+    from cutan.characters.schema import CharacterDescriptor
+    from an.ir.migrate import migrate
+
+    if doc.get("kind") != CharacterDescriptor.model_fields["kind"].default:
+        return []
+    desc = CharacterDescriptor.model_validate(
+        migrate(dict(doc), kind="CharacterDescriptor")
+    )
+    if BROWS_FEATURE in (desc.occluded or {}) and desc.face_overlay and brow_slots(desc):
+        return ["occluded"]
+    return []
+
+
 CHARACTER_ANALYSER: Analyser = Analyser(
     "character",
     CHARACTER_ANALYSER_VERSION,
     character_affordances,
     declares=("rest_view", "face_overlay", "gait", "speech", "occluded"),
+    overrides=character_overrides,
 )
 
 
