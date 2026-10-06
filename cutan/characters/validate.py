@@ -37,7 +37,7 @@ from cutan.characters.schema import (
 from cutan.characters.svg_utils import SVG_NS, extract_pivots
 from cutan.motion import DFLT_LEGLESS_GAIT, WALK_LEG_NAMES
 from an.stage.raster import RASTER_SUFFIXES, has_alpha, image_size, is_raster
-from an.stage.rig import rig_origin_problems
+from an.stage.rig import rig_origin_problems, rig_rest_problems
 from an.verify._base import Finding, VerificationReport
 
 #: Elements an art package may not contain.
@@ -798,21 +798,23 @@ def _check_face_overlay_declaration(
 def _check_rig_origin(
     descriptor: CharacterDescriptor | None, report: VerificationReport, *, who: str
 ) -> None:
-    """A declared ``origin`` is finite and inside the view_box (an#338).
+    """A declared ``origin`` is finite and inside the view_box (an#338), and a
+    bone's rest rotation turns its part about the joint (an#339).
 
-    Advisory: the stage's own rule (``an.stage.rig.rig_origin_problems``), the
-    one ``an validate`` applies to every rig entity, so the two agree.
+    Advisory: the stage's own rules (``an.stage.rig.rig_origin_problems``,
+    ``rig_rest_problems``), the ones ``an validate`` applies to every rig
+    entity, so the two agree.
     """
     if descriptor is None:
         return
-    for problem in rig_origin_problems(descriptor):
+    for problem in rig_origin_problems(descriptor) + rig_rest_problems(descriptor):
         report.add(
             ADVISORY,
-            "character.json#origin",
+            "character.json#rig",
             f"{who}: {problem}",
             "The origin is the point of the art that lands at `stage.at`, in "
-            "view_box units (the bones' units); unset, the rig is placed by the "
-            "middle of its bones.",
+            "view_box units (the bones' units); a part turns about its node, "
+            "the bone plus the attachment's offset.",
         )
 
 

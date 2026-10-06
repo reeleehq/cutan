@@ -35,6 +35,7 @@ from cutan.characters.idle import (
     evaluate_track,
     random_blink_schedule,
 )
+from cutan.characters.schema import CHARACTER_SCHEMA_VERSION
 from cutan.characters.svg_utils import promote_inkscape_labels_to_ids
 from xml.etree import ElementTree as ET
 
@@ -81,10 +82,12 @@ class TestSchema:
                 },
             }
         )
-        # The chain runs to the CURRENT version — 0.1.0 docs cross both
-        # migrations, so this test sees the 0.3.0 shape (per-slot eye
-        # attachment keys, face_overlay, the eyelid set) too.
-        assert out["schema_version"] == "0.3.0"
+        # The chain runs to the CURRENT version — 0.1.0 docs cross every
+        # migration, so this test sees the 0.3.0 shape (per-slot eye
+        # attachment keys, face_overlay, the eyelid set) too, and the 0.4.0
+        # rest-pose step adds nothing to a rig whose bones carry no pose.
+        assert out["schema_version"] == CHARACTER_SCHEMA_VERSION == "0.4.0"
+        assert "rest_rotation" not in out
         assert out["asset_sets"]["viseme"] == {"A": "mouth_a"}
         assert "viseme_map" not in out, "a stale map beside the live one"
         assert out["slots"][0]["name"] == "left_eye"

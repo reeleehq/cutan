@@ -60,10 +60,13 @@ from an.stage.rig import (  # noqa: F401  (re-exported: the rig model lives in t
     Slot,
     attachment_box,
     omit_unset_rig_fields,
+    register_rest_pose_migration,
 )
 
 
-CHARACTER_SCHEMA_VERSION = "0.3.0"
+#: 0.4.0 (an#339): the bones' rest pose (``rotation_deg``, ``scale_*``) poses the
+#: built parts; the migration protects a 0.3.0 rig that carried one.
+CHARACTER_SCHEMA_VERSION = "0.4.0"
 
 #: The descriptor is a schema-versioned document in its own right, with its own
 #: version field. Registered here rather than in :mod:`an.ir.migrate` because
@@ -924,3 +927,9 @@ def _default_skin() -> Skin:
     }
 
     return Skin(name="default", slots=slots)
+
+
+# The bones' rest pose is applied from 0.4.0 (an#339): the stage's one
+# protective step, which writes `rest_rotation: false` only onto a 0.3.0 rig
+# whose bones carry a rotation or scale (none did when it shipped).
+register_rest_pose_migration(CHARACTER_DOCUMENT_KIND.name, "0.3.0", "0.4.0")
