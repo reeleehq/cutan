@@ -306,7 +306,8 @@ def test_the_runtime_evaluates_the_timeline_exactly_as_the_spec():
             _extract_js_block(src, "function evaluateChannel"),
             _extract_js_block(src, "function wrapTime"),
             # The write-group table and `writeGroup` sit right above it.
-            src[src.index("const RUNTIME_PROPERTIES") : src.index("// Port of `an/adapters/cutout/timeline.py::evaluate_timeline`")],
+            # Up to the evaluator's own code, never a comment's wording (an#239 N4).
+            src[src.index("const RUNTIME_PROPERTIES") : src.index("function evaluateTimeline")],
             _extract_js_block(src, "function evaluateTimeline"),
             "let scene = null;",
             f"const scenes = {json.dumps([_as_scene(tl) for tl in battery])};",
