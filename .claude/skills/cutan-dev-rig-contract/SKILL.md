@@ -112,8 +112,21 @@ record (Spine `offsetLeft/offsetBottom/originalWidth/originalHeight`; DragonBone
 `frameX/frameY/frameWidth/frameHeight`), which both runtimes add back at draw time so
 trimming does not move the art. That is the role `extract_part`'s crop origin plays.
 
-Bone *hierarchy* is not being adopted — `an`'s rigs are deliberately flat (arms are
-siblings of the torso). Bone *placement* is.
+Bone *hierarchy* is **opt-in** (an#340). By default (`nesting` unset, or `flat`) the rigs
+stay flat: arms are siblings of the torso, and a slot nests only under its own bone's
+primary slot (a face part under the head). `nesting: bones` on the descriptor nests a slot
+under the nearest ancestor bone's primary slot, to any depth: forward kinematics, a forearm
+following its upper arm, a sword on the hand's bone. `an.stage.rig.slot_parent_chain` is the
+one rule; `play.slot_parent`, `slot_node_path`, `suppressed_slots` (now transitive under the
+head slot, and passed to the builder as `skip_slots`: the stage knows no bone by name),
+`_limb_pair` and the one-part presets (`nod`'s `part`, by slot name via `resolve_part_arg`)
+all read it. In bones mode a part sits at its bone in its parent's rotated frame and does
+not inherit the parent's attachment offset; a nested part draws over its parent, so a chain
+drawn against its order is refused at compile (the stage engine's limit, phrased so). The
+default factory rig is NOT bones-ready: its arms draw behind the torso. The capability is
+`rig.hierarchy` (keys = chain roots, count = depth), derived by the stage
+(`rig_affordances`) and composed by the character analyser (0.4.0). Bone *placement* has
+been adopted all along.
 
 ### 3. The crop origin already survives. Don't add a field for it.
 

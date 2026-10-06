@@ -61,7 +61,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Union
 
-from an.stage.rig import drawn_attachment, primary_slot_per_bone
+from an.stage.rig import (
+    drawn_attachment,
+    primary_slot_per_bone,
+    slot_node_paths,
+    slot_parent_chain,
+)
 from an.stores._common import art_exists_for  # noqa: F401
 from cutan.characters.idle import evaluate_track
 from cutan.characters.schema import (
@@ -146,9 +151,10 @@ class ResolvedPlay:
 
 
 def slot_parent(desc: CharacterDescriptor, slot: Slot) -> str | None:
-    """The slot ``slot`` nests under, or ``None`` when it is a direct child."""
-    parent = primary_slot_per_bone(desc).get(slot.bone)
-    return parent if parent is not None and parent != slot.name else None
+    """The slot ``slot`` nests under, or ``None`` when it is a direct child:
+    the stage's one rule, ``an.stage.rig.slot_parent_chain`` (``nesting``
+    ``flat`` or ``bones``, an#340)."""
+    return slot_parent_chain(desc).get(slot.name)
 
 
 def slot_node_path(desc: CharacterDescriptor, slot_name: str) -> str:
@@ -160,17 +166,17 @@ def slot_node_path(desc: CharacterDescriptor, slot_name: str) -> str:
     >>> slot_node_path(CharacterDescriptor(name="m"), "torso")
     'torso'
     """
-    slot = _slot_named(desc, slot_name)
-    if slot is None:
+    if _slot_named(desc, slot_name) is None:
         raise KeyError(slot_name)
-    parent = slot_parent(desc, slot)
-    return f"{parent}/{slot_name}" if parent else slot_name
+    return slot_node_paths(desc)[slot_name]
 
 
 def suppressed_slots(desc: CharacterDescriptor) -> frozenset[str]:
     """Slots the rig builder never builds: with the face baked into the head
-    art (``face_overlay=false``), every slot nested under the HEAD BONE's
-    primary slot — keyed on the bone, not on a slot named "head".
+    art (``face_overlay=false``), every slot on the HEAD BONE but its primary
+    slot (the head itself) — keyed on the bone, not on a slot named "head".
+    The compile pass hands them to ``an.stage.rig.build_rig_subtree`` as
+    ``skip_slots``.
 
     >>> sorted(suppressed_slots(CharacterDescriptor(name="m", face_overlay=False)))
     ['left_brow', 'left_eye', 'mouth', 'right_brow', 'right_eye']
@@ -182,7 +188,10 @@ def suppressed_slots(desc: CharacterDescriptor) -> frozenset[str]:
     head_slot = primary_slot_per_bone(desc).get(HEAD_BONE)
     if head_slot is None:
         return frozenset()
-    return frozenset(s.name for s in desc.slots if slot_parent(desc, s) == head_slot)
+    # The face is the slots ON the head bone, in either nesting: a part on a
+    # child bone of the head (a hat, `nesting: bones`, an#340) nests under the
+    # head too but is not the face the art bakes in.
+    return frozenset(s.name for s in desc.slots if s.bone == HEAD_BONE and s.name != head_slot)
 
 
 def active_skin(desc: CharacterDescriptor) -> Skin:
@@ -704,6 +713,42 @@ def preset_moved_node(action_target: str, animation: str, args=None) -> str:
     return moved[0]
 
 
+#: The keyword a preset that moves ONE part of its target takes it in
+#: (``nod``'s and ``speech_pulse``'s head).
+PART_ARG = "part"
+
+
+def resolve_part_arg(animation: str, args=None, *, parts: Iterable[str] | None = None) -> dict:
+    """``args`` with a one-part preset's ``part`` named by its SLOT resolved to
+    its node path among the entity's built ``parts`` (an#340).
+
+    A ``nod`` moves ``<target>/head``; in ``nesting: bones`` the head is built
+    under its torso (``torso/head``). A part that is built as named, or whose
+    name matches no single built path's last segment, is left as given (and
+    reported unbuilt as before).
+
+    >>> resolve_part_arg("nod", {}, parts=["torso", "torso/head"])["part"]
+    'torso/head'
+    >>> resolve_part_arg("nod", {}, parts=["head", "torso"])  # built as named: as given
+    {}
+    """
+    import inspect
+
+    kwargs = preset_args(animation, args)
+    if parts is None or not preset_takes(animation, PART_ARG):
+        return kwargs
+    part = kwargs.get(PART_ARG)
+    if part is None:
+        part = inspect.signature(_presets()[animation]).parameters[PART_ARG].default
+    parts = list(parts)
+    if not part or part in parts:
+        return kwargs
+    matches = [p for p in parts if p.rsplit("/", 1)[-1] == part]
+    if len(matches) == 1:
+        kwargs[PART_ARG] = matches[0]
+    return kwargs
+
+
 def preset_moved_nodes(
     action_target: str,
     animation: str,
@@ -722,7 +767,7 @@ def preset_moved_nodes(
     """
     from an.ir.compose import flatten
 
-    kwargs = preset_args(animation, args)
+    kwargs = resolve_part_arg(animation, args, parts=parts)
     if parts is not None and preset_takes(animation, PARTS_ARG):
         kwargs[PARTS_ARG] = {p: {} for p in parts}
     tree = _presets()[animation](action_target, **kwargs)
@@ -764,7 +809,11 @@ def expand_preset_play(
     from an.ir.schema import TweenAction
 
     preset = _presets()[action.animation]
-    args = preset_args(action.animation, action.args)
+    args = resolve_part_arg(
+        action.animation,
+        action.args,
+        parts=parts_of(action.target) if parts_of is not None else None,
+    )
 
     def unbuilt(node: str) -> PlayResolutionError:
         return PlayResolutionError(
@@ -1066,8 +1115,13 @@ class _RigFacts:
     def has_art(self, attachment: Attachment) -> bool:
         return self.art_exists is None or self.art_exists(attachment.path)
 
-    def unbuilt_reason(self, slot_name: str) -> str | None:
+    def unbuilt_reason(self, slot_name: str, _seen: frozenset[str] = frozenset()) -> str | None:
         """Why the rig builder would NOT build ``slot_name``'s node, or None."""
+        if slot_name in _seen:
+            return (
+                f"slot {slot_name!r} nests under itself: the rig's bones form a "
+                "cycle, which `nesting: bones` refuses"
+            )
         slot = _slot_named(self.desc, slot_name)
         if slot is None:
             return (
@@ -1092,7 +1146,7 @@ class _RigFacts:
             )
         parent = slot_parent(self.desc, slot)
         if parent is not None:
-            why = self.unbuilt_reason(parent)
+            why = self.unbuilt_reason(parent, _seen | {slot_name})
             if why is not None:
                 return f"slot {slot_name!r} nests under an unbuilt slot: {why}"
         return None
@@ -1300,6 +1354,7 @@ __all__ = [
     "play_source",
     "preset_moved_node",
     "preset_moved_nodes",
+    "resolve_part_arg",
     "preset_takes",
     "preset_play_span",
     "preset_target_problems",

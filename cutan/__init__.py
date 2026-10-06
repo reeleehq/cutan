@@ -52,8 +52,10 @@ LIBRARY_NAME: str = "cutan"
 #: ``ActionKind.lowering``, ``EntityKind.swap_declaration`` and ``an.stage.rig``.
 #: Level 3 is the public rig builder (an#338): ``an.stage.rig.build_rig_subtree``,
 #: ``rig_origin``, ``RigDocument`` and ``omit_unset_rig_fields``. Level 4 is the rest
-#: pose (an#339): ``register_rest_pose_migration`` and ``rig_rest_problems``.
-REQUIRED_AN_API_LEVEL: int = 4
+#: pose (an#339): ``register_rest_pose_migration`` and ``rig_rest_problems``. Level 5
+#: is nested chains (an#340): ``build_rig_subtree(skip_slots=)``, ``slot_parent_chain``,
+#: ``slot_node_paths``, ``rig_affordances``, ``RigError``.
+REQUIRED_AN_API_LEVEL: int = 5
 
 
 def require_an() -> None:

@@ -1340,6 +1340,14 @@ def speech_plan(
             continue
         args = {k: v for k, v in r.args.items() if k not in ("part", "beats")}
         part = r.args.get("part", "head")
+        # The part by SLOT name, at its node path: in `nesting: bones` the head
+        # is built under the torso (an#340), and falling back to "" would pulse
+        # the whole body.
+        desc = descriptor_of(speaker)
+        if part and desc is not None:
+            from an.stage.rig import slot_node_paths
+
+            part = slot_node_paths(desc).get(part, part)
         args["part"] = part if part and has_part(f"{speaker}/{part}") else ""
         length = (
             float(args.get("attack", 0.0))

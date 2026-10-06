@@ -2,6 +2,7 @@
 
 ## 2026-10-06
 
+- **Nested chains** (an#340, R3 of an#331): `play.slot_parent`/`slot_node_path` read the stage's `slot_parent_chain`; `suppressed_slots` is transitive under the head slot and the compile pass hands it to `build_rig_subtree(skip_slots=)` (the stage no longer knows the head bone); a `RigError` is a `CutoutCompileError`; `_limb_pair` and the one-part presets (`nod`, `speech_pulse`) find their parts by slot name in a chain (`resolve_part_arg`); the character analyser composes `rig.hierarchy` (0.4.0); `REQUIRED_AN_API_LEVEL` 5.
 - **Stand a character on its feet** (an#285, its asset half): `new_character(feet_origin=True)` / `an character new --feet-origin` declares the rig's `origin` at its root bone (the ground contact), so `stage.at` is where the feet stand and every build placed at one `y` shares a floor line; the default is unchanged (the default flip is an#285's open decision).
 - **How big a speech pulse is** (cutan#67): the `cutan` skill states the measured default (the head's top moves about 6 px for about 1.5 frames at 24 fps, scale 1) and how to make it read: `speech: {method: pulse, args: {strength: …}}`, closer framing, or a nod or hop on the line's first beat.
 
