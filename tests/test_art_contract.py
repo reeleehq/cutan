@@ -240,3 +240,43 @@ def test_the_contract_lists_the_joints_bones_actually_read():
     for bone in CharacterDescriptor(name="x").bones:
         if bone.pivot:
             assert bone.pivot in text
+
+
+# -----------------------------------------------------------------------------
+# A figure with nothing to step with (cutan#35)
+# -----------------------------------------------------------------------------
+
+_CHARACTERS = Path(__file__).parent / "fixtures" / "characters"
+
+
+def _legless_gale(tmp_path, *, keep_files: bool) -> Path:
+    """`gale` with no leg slot in any skin (and, unless kept, no leg files)."""
+    shutil.copytree(_CHARACTERS / "gale", tmp_path / "gale")
+    path = tmp_path / "gale" / "character.json"
+    doc = json.loads(path.read_text())
+    for skin in doc["skins"].values():
+        for slot in ("leg_l", "leg_r"):
+            skin["slots"].pop(slot, None)
+    path.write_text(json.dumps(doc))
+    if not keep_files:
+        for part in (tmp_path / "gale" / "parts").glob("leg_*"):
+            part.unlink()
+    return tmp_path / "gale"
+
+
+@pytest.mark.parametrize("keep_files", [True, False])
+def test_a_legless_figure_validates_and_is_told_it_glides(tmp_path, keep_files):
+    report = validate_character(_legless_gale(tmp_path, keep_files=keep_files))
+    assert not [f for f in report.findings if f.severity == "error" and "leg_" in f.description]
+    (note,) = [f for f in report.findings if "no leg pair" in f.description]
+    assert note.severity == "info" and "glide" in note.description
+
+
+def test_a_figure_that_draws_a_leg_slot_still_needs_its_leg_art(tmp_path):
+    shutil.copytree(_CHARACTERS / "gale", tmp_path / "gale")
+    for part in (tmp_path / "gale" / "parts").glob("leg_*"):
+        part.unlink()
+    report = validate_character(tmp_path / "gale")
+    missing = {f.ir_path for f in report.findings if f.severity == "error"}
+    assert {"parts/leg_l.svg", "parts/leg_r.svg"} <= missing
+    assert not [f for f in report.findings if "no leg pair" in f.description]
