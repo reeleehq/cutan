@@ -68,6 +68,13 @@ __all__ = [
     "style_spec_path",
     "style_spec_text",
     "style_specs",
+    "POLICY_KEY",
+    "PolicyError",
+    "check_policy",
+    "layered_policy",
+    "policy_of",
+    "policy_problems",
+    "style_pack",
 ]
 
 #: The file suffix of a style spec in this package.
@@ -217,3 +224,15 @@ def resolve_style_spec(ref: str | os.PathLike | Mapping[str, Any]) -> dict[str, 
     if not isinstance(data, dict):
         raise ValueError(f"style spec {ref} is not a mapping")
     return data
+
+
+# The style's policy (cutan#9): imported last, it reads the specs through the functions above.
+from cutan.styles.policy import (  # noqa: E402
+    POLICY_KEY,
+    PolicyError,
+    check_policy,
+    layered_policy,
+    policy_of,
+    policy_problems,
+    style_pack,
+)

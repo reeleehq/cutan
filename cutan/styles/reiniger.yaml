@@ -39,13 +39,16 @@ live:
   sound:
     bed: {loop: true, fade_in: 2.0, fade_out: 3.0}   # the score carries the film: no dialogue, so no ducking
 
+policy:                      # cutan#9 (ADR 0002 decision 4): method orders the compiler applies; the author's request, then a shot's policy, win over it
+  speech: [speech.pose_only]  # a silhouette mimes: its mouth chart is drawn black on black (an#273), so speech is the head's pulse
 targets:
   top16_colour_coverage: [0.65, 0.80]   # measured 0.74, the flattest of the six
   cuts_per_min: [3, 5]                  # measured 4.0
 
 guidance:
   construction: black cardboard puppets of 20-50 pieces with wire hinges; rigs are flat in `an` today, so deep hierarchies are untested
-  expression: pose and profile only, no mouth animation (the profile is `live.characters.view`; turn with a `turn` play to `side`); the factory's profile is a round head with a nose, not a cut-paper face
+  expression: pose and profile only, no mouth animation; the policy makes speech the head's pulse (`speech.pose_only`; the profile is `live.characters.view`; turn with a `turn` play to `side`); the factory's profile is a round head with a nose, not a cut-paper face
+  transitions: a dissolve marks a change of time or place; continuous action on one set is a cut or a single shot, whatever the cuts-per-minute target says (an#273)
   shot_timing: shot lengths counted to the music; cut to the bed's bars by hand (nothing reads the music's tempo)
   text: ornamental-script intertitles, cyan on dark blue — an overlay text prop with an ornamental font FILE over a dark-blue fill plane; the geometric border is SVG prop art or path props
   sound: a composed score, no dialogue; bring a licensed or public-domain recording for `live.sound`'s bed

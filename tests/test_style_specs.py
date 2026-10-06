@@ -32,7 +32,7 @@ LIVE_KEYS = {
     "transitions", "sound", "voice", "glow_template",
 }
 TOP_KEYS = {
-    "style", "schema_version", "title", "cost_class", "cost_note", "live", "targets", "prosody_targets", "guidance"
+    "style", "schema_version", "title", "cost_class", "cost_note", "live", "policy", "targets", "prosody_targets", "guidance"
 }
 COST_CLASSES = {"low", "low_to_medium", "medium", "high", "very_high"}
 GENERATORS = {"offline", "promote"}
@@ -411,3 +411,23 @@ def test_the_skill_loads_its_specs_from_the_package_not_from_a_copy():
     assert "python -m cutan.styles" in text and "cutan.style_spec(" in text
     for name in SPECS:
         assert f"`{name}`" in text, f"the skill does not name the shipped style {name!r}"
+
+
+def test_a_policy_names_registered_aspects_and_their_method_ids(spec):
+    """cutan#9: a spec's `policy:` is checked against the method registry, as `live` is against the code."""
+    from cutan.styles import policy_problems
+
+    assert policy_problems(spec.get("policy")) == []
+
+
+def test_the_styles_that_choose_against_the_chain_say_so():
+    """cutan#9: South Park bounces its legged figures, a Reiniger silhouette mimes.
+
+    Left out on purpose (PR #32's review): OverSimplified's chain already does
+    what the gaits doc says (robes declare `hem`, the legless glide), and a
+    `[hem_sway, ...]` policy would turn every legged figure into a hem; Reiniger's
+    `profile_cycle` applies whenever a side view exists, so as a policy it
+    would scissor a front-facing walk (#17)."""
+    assert style_spec("south_park")["policy"] == {"locomotion": ["loco.bounce"]}
+    assert style_spec("reiniger")["policy"] == {"speech": ["speech.pose_only"]}
+    assert "policy" not in style_spec("oversimplified")

@@ -232,11 +232,18 @@ def preset_takes(animation: str, name: str) -> bool:
     return name in inspect.signature(preset).parameters
 
 
+#: The INTERNAL arg the style-policy pass writes the scene's policy into on each
+#: walk (cutan#9): never authored, read by the locomotion resolution, and
+#: dropped here, so no preset function, extent or check ever sees it.
+POLICY_ARG: str = "_policy"
+
+
 def preset_args(animation: str, args: Mapping[str, object] | None) -> dict:
     """A preset play's args as its function takes them: a walk's ``gait`` given
     as a locomotion method id or a ``{method, args, version}`` choice is spelled
-    out (an#248, :func:`cutan.characters.methods.normalise_gait_args`)."""
-    out = dict(args or {})
+    out (an#248, :func:`cutan.characters.methods.normalise_gait_args`), and the
+    internal :data:`POLICY_ARG` is dropped."""
+    out = {k: v for k, v in (args or {}).items() if k != POLICY_ARG}
     if GAIT_ARG in out and preset_takes(animation, GAIT_ARG):
         from cutan.characters.methods import normalise_gait_args
 
