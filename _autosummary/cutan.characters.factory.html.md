@@ -37,6 +37,7 @@ problem routes the way every other verifier’s does (an#78).
 | [`RECIPE_VERSION`](#cutan.characters.factory.RECIPE_VERSION)           | The version of the recipe's format.                                                                                                                                                                                                                                                                                                                         |
 | [`FACTORY_AUTHOR`](#cutan.characters.factory.FACTORY_AUTHOR)           | The provider of every per-part source the factory stamps on what it draws.                                                                                                                                                                                                                                                                                  |
 | [`EYE_CANVAS`](#cutan.characters.factory.EYE_CANVAS)               | The eye's geometry in its 64x32 canvas, shared by the four synthesizers so the sclera, the pupil and the lid outline agree (an#99).                                                                                                                                                                                                                         |
+| [`LID_COVER_PAD`](#cutan.characters.factory.LID_COVER_PAD)            | How much farther than the eye white the FILLED closed lid reaches, in eye view-box units (cutan#66).                                                                                                                                                                                                                                                        |
 | [`GAZE_PARTS`](#cutan.characters.factory.GAZE_PARTS)               | The parts a rig gains with `an character add-gaze`.                                                                                                                                                                                                                                                                                                         |
 | [`FACE_SLOTS`](#cutan.characters.factory.FACE_SLOTS)               | The face slots of the default rig with the eye stack (an#99).                                                                                                                                                                                                                                                                                               |
 | [`SIDE_EYE_SHIFT`](#cutan.characters.factory.SIDE_EYE_SHIFT)           | how far the near eye, its stack and brow slide toward the face's edge, and the mouth with them (view_box units at head_scale 1); the mouth is narrowed, seen edge-on.                                                                                                                                                                                       |
@@ -170,6 +171,14 @@ The hats [`new_character()`](#cutan.characters.factory.new_character) can draw.
 
 The roles a head’s own art carries. On a head the factory did not draw
 (DiceBear) they are left untagged everywhere, never half-tagged.
+
+### cutan.characters.factory.LID_COVER_PAD *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 3*
+
+How much farther than the eye white the FILLED closed lid reaches, in eye
+view-box units (cutan#66). A lid exactly the sclera’s ellipse leaves the
+white’s anti-aliased edge showing as a light ring round a closed eye:
+measured at a 720p silhouette’s eye size (0.34 px a unit), a grey of 63 on
+black with no pad, 4 with 2 units, none with 3.
 
 ### cutan.characters.factory.MAX_HEAD_SCALE *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 2.5*
 
@@ -381,7 +390,7 @@ inside the white at every angle without a runtime mask.
 {'x': 9.0, 'y': 5.0}
 ```
 
-### cutan.characters.factory.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short')
+### cutan.characters.factory.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False)
 
 Build a complete character on disk.
 
@@ -415,6 +424,12 @@ byte, which a golden test holds):
   > (a DiceBear face is baked into its art); ignored for a DiceBear head.
 
   Additive: a shot that never sets a view renders exactly as without it.
+- `feet_origin` (an#285) — declare the rig’s `origin` at its ROOT bone,
+  the ground contact, so `stage.at` is where the feet stand and every
+  build placed at one `y` stands on one line (`stage_extent`’s
+  `feet` is then 0). Off (the default), the stage point stays the
+  middle of the bones, as for every character made before it; whether
+  it becomes the default is an#285’s open decision.
 
 Every colour the factory draws in a role is recorded in the descriptor’s
 `colour_roles` so a style pack can recolour it later (palette swapping,

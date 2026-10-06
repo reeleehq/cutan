@@ -535,7 +535,7 @@ True
 ['mouth_a_happy']
 ```
 
-### cutan.characters.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short')
+### cutan.characters.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False)
 
 Build a complete character on disk.
 
@@ -569,6 +569,12 @@ byte, which a golden test holds):
   > (a DiceBear face is baked into its art); ignored for a DiceBear head.
 
   Additive: a shot that never sets a view renders exactly as without it.
+- `feet_origin` (an#285) — declare the rig’s `origin` at its ROOT bone,
+  the ground contact, so `stage.at` is where the feet stand and every
+  build placed at one `y` stands on one line (`stage_extent`’s
+  `feet` is then 0). Off (the default), the stage point stays the
+  middle of the bones, as for every character made before it; whether
+  it becomes the default is an#285’s open decision.
 
 Every colour the factory draws in a role is recorded in the descriptor’s
 `colour_roles` so a style pack can recolour it later (palette swapping,

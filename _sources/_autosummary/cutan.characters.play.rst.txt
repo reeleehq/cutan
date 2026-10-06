@@ -31,6 +31,7 @@ cutan.characters.play
       play_source
       preset_moved_node
       preset_moved_nodes
+      resolve_part_arg
       preset_takes
       preset_play_span
       preset_target_problems

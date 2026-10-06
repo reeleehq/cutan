@@ -1,4 +1,4 @@
-> built 2026-10-06 14:22 UTC from 07bb159 (main) · cutan 0.0.37. Details: build_info.json
+> built 2026-10-06 14:30 UTC from 3fbf9e5 (main) · cutan 0.0.38. Details: build_info.json
 
 # index.html.md
 
@@ -520,7 +520,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect', 'mouth', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'rect', 'eye', 'mouth', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -2683,7 +2683,7 @@ variants: comma-separated mouth forms (see `an character new`); “” = none
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
-### cutan.characters.cli.new(name, out_dir='', seed='', style='lorelei', voice_ref='', offline=False, acknowledge_attribution=False, overwrite=False, mouth_variants='happy,sad', palette='', build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short')
+### cutan.characters.cli.new(name, out_dir='', seed='', style='lorelei', voice_ref='', offline=False, acknowledge_attribution=False, overwrite=False, mouth_variants='happy,sad', palette='', build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False)
 
 Create a new character at `out_dir`/`name`.
 
@@ -2729,6 +2729,11 @@ views: draw the turnaround — back, side (a profile facing right) and
 
 > three_quarter beside the front, as a `view` swap set (offline head
 > only), so `play: turn` can turn the character (an#197)
+
+feet_origin: put the stage point at the feet (the rig’s root bone), so
+: `stage.at` is where the character stands and every build placed at one
+  y stands on one floor line (an#285)
+
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
@@ -3152,6 +3157,7 @@ problem routes the way every other verifier’s does (an#78).
 | [`RECIPE_VERSION`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.RECIPE_VERSION)           | The version of the recipe's format.                                                                                                                                                                                                                                                                                                                         |
 | [`FACTORY_AUTHOR`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.FACTORY_AUTHOR)           | The provider of every per-part source the factory stamps on what it draws.                                                                                                                                                                                                                                                                                  |
 | [`EYE_CANVAS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.EYE_CANVAS)               | The eye's geometry in its 64x32 canvas, shared by the four synthesizers so the sclera, the pupil and the lid outline agree (an#99).                                                                                                                                                                                                                         |
+| [`LID_COVER_PAD`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.LID_COVER_PAD)            | How much farther than the eye white the FILLED closed lid reaches, in eye view-box units (cutan#66).                                                                                                                                                                                                                                                        |
 | [`GAZE_PARTS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.GAZE_PARTS)               | The parts a rig gains with `an character add-gaze`.                                                                                                                                                                                                                                                                                                         |
 | [`FACE_SLOTS`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.FACE_SLOTS)               | The face slots of the default rig with the eye stack (an#99).                                                                                                                                                                                                                                                                                               |
 | [`SIDE_EYE_SHIFT`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.SIDE_EYE_SHIFT)           | how far the near eye, its stack and brow slide toward the face's edge, and the mouth with them (view_box units at head_scale 1); the mouth is narrowed, seen edge-on.                                                                                                                                                                                       |
@@ -3285,6 +3291,14 @@ The hats [`new_character()`](_autosummary/cutan.characters.factory.html.md#cutan
 
 The roles a head’s own art carries. On a head the factory did not draw
 (DiceBear) they are left untagged everywhere, never half-tagged.
+
+### cutan.characters.factory.LID_COVER_PAD *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 3*
+
+How much farther than the eye white the FILLED closed lid reaches, in eye
+view-box units (cutan#66). A lid exactly the sclera’s ellipse leaves the
+white’s anti-aliased edge showing as a light ring round a closed eye:
+measured at a 720p silhouette’s eye size (0.34 px a unit), a grey of 63 on
+black with no pad, 4 with 2 units, none with 3.
 
 ### cutan.characters.factory.MAX_HEAD_SCALE *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 2.5*
 
@@ -3496,7 +3510,7 @@ inside the white at every angle without a runtime mask.
 {'x': 9.0, 'y': 5.0}
 ```
 
-### cutan.characters.factory.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short')
+### cutan.characters.factory.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False)
 
 Build a complete character on disk.
 
@@ -3530,6 +3544,12 @@ byte, which a golden test holds):
   > (a DiceBear face is baked into its art); ignored for a DiceBear head.
 
   Additive: a shot that never sets a view renders exactly as without it.
+- `feet_origin` (an#285) — declare the rig’s `origin` at its ROOT bone,
+  the ground contact, so `stage.at` is where the feet stand and every
+  build placed at one `y` stands on one line (`stage_extent`’s
+  `feet` is then 0). Off (the default), the stage point stays the
+  middle of the bones, as for every character made before it; whether
+  it becomes the default is an#285’s open decision.
 
 Every colour the factory draws in a role is recorded in the descriptor’s
 `colour_roles` so a style pack can recolour it later (palette swapping,
@@ -4233,7 +4253,7 @@ True
 ['mouth_a_happy']
 ```
 
-### cutan.characters.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short')
+### cutan.characters.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False)
 
 Build a complete character on disk.
 
@@ -4267,6 +4287,12 @@ byte, which a golden test holds):
   > (a DiceBear face is baked into its art); ignored for a DiceBear head.
 
   Additive: a shot that never sets a view renders exactly as without it.
+- `feet_origin` (an#285) — declare the rig’s `origin` at its ROOT bone,
+  the ground contact, so `stage.at` is where the feet stand and every
+  build placed at one `y` stands on one line (`stage_extent`’s
+  `feet` is then 0). Off (the default), the stage point stays the
+  middle of the bones, as for every character made before it; whether
+  it becomes the default is an#285’s open decision.
 
 Every colour the factory draws in a role is recorded in the descriptor’s
 `colour_roles` so a style pack can recolour it later (palette swapping,
@@ -5466,6 +5492,7 @@ so an author never passes `rest`.
 | [`play_source`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.play_source)(desc, animation)                     | Which library a `play` of `animation` resolves in — [`DESCRIPTOR_SOURCE`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.DESCRIPTOR_SOURCE) when `desc` declares it (the descriptor WINS a name a preset also has), else [`PRESET_SOURCE`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.PRESET_SOURCE) when a motion preset has it.                                                                        |
 | [`preset_moved_node`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.preset_moved_node)(action_target, animation)      | The ONE node path a preset play moves — `<target>/head` for a `nod`, the target itself for the rest.                                                                                                                                                                                                                                                                   |
 | [`preset_moved_nodes`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.preset_moved_nodes)(action_target, animation)     | Every node path a preset play moves.                                                                                                                                                                                                                                                                                                                                   |
+| [`resolve_part_arg`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.resolve_part_arg)(animation[, args, parts])       | `args` with a one-part preset's `part` named by its SLOT resolved to its node path among the entity's built `parts` (an#340).                                                                                                                                                                                                                                          |
 | [`preset_takes`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.preset_takes)(animation, name)                    | Whether the motion preset `animation` has the keyword `name` (`False` for a name that is no preset: a descriptor animation takes nothing).                                                                                                                                                                                                                             |
 | [`preset_play_span`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.preset_play_span)(action[, context])              | How long a preset `play` runs, in seconds: its `duration` when set, else the preset's natural length divided by `speed`.                                                                                                                                                                                                                                               |
 | [`preset_target_problems`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.preset_target_problems)(animation, target)        | Why `animation` cannot be played on `target`: a preset that moves an entity's PARTS (`walk`) is played on the entity, not on one of its parts — a torso asked to walk would glide away from its legs, and the gait resolution keys the whole character (cutan#22).                                                                                                     |
@@ -5476,8 +5503,8 @@ so an author never passes `rest`.
 | [`sampled_deviations`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.sampled_deviations)(track, duration, fps)         | `(time, deviation)` pairs for a sine bone track at the frame rate — [`cutan.characters.idle.evaluate_track()`](_autosummary/cutan.characters.idle.html.md#cutan.characters.idle.evaluate_track)'s formula, sampled, so the descriptor's own evaluator stays the one definition of a sine track.                                                                       |
 | [`sine_sample_times`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.sine_sample_times)(duration, fps)                 | Frame-rate sample times for a sine track, ALWAYS ending at `duration`.                                                                                                                                                                                                                                                                                                 |
 | [`slot_node_path`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.slot_node_path)(desc, slot_name)                  | The node path of a slot RELATIVE to its entity (`head/left_eye`, `torso`) — the rig builder's nesting rule, stated once.                                                                                                                                                                                                                                               |
-| [`slot_parent`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.slot_parent)(desc, slot)                          | The slot `slot` nests under, or `None` when it is a direct child.                                                                                                                                                                                                                                                                                                      |
-| [`suppressed_slots`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.suppressed_slots)(desc)                           | Slots the rig builder never builds: with the face baked into the head art (`face_overlay=false`), every slot nested under the HEAD BONE's primary slot — keyed on the bone, not on a slot named "head".                                                                                                                                                                |
+| [`slot_parent`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.slot_parent)(desc, slot)                          | The slot `slot` nests under, or `None` when it is a direct child: the stage's one rule, `an.stage.rig.slot_parent_chain` (`nesting` `flat` or `bones`, an#340).                                                                                                                                                                                                        |
+| [`suppressed_slots`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.suppressed_slots)(desc)                           | Slots the rig builder never builds: with the face baked into the head art (`face_overlay=false`), every slot on the HEAD BONE but its primary slot (the head itself) — keyed on the bone, not on a slot named "head".                                                                                                                                                  |
 
 ### Classes
 
@@ -5838,6 +5865,26 @@ hierarchy to the nearest ancestor’s primary slot instead.
 'head'
 ```
 
+### cutan.characters.play.resolve_part_arg(animation, args=None, , parts=None)
+
+`args` with a one-part preset’s `part` named by its SLOT resolved to
+its node path among the entity’s built `parts` (an#340).
+
+A `nod` moves `<target>/head`; in `nesting: bones` the head is built
+under its torso (`torso/head`). A part that is built as named, or whose
+name matches no single built path’s last segment, is left as given (and
+reported unbuilt as before).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+```pycon
+>>> resolve_part_arg("nod", {}, parts=["torso", "torso/head"])["part"]
+'torso/head'
+>>> resolve_part_arg("nod", {}, parts=["head", "torso"])  # built as named: as given
+{}
+```
+
 ### cutan.characters.play.resolve_play(desc, animation, , art_exists=None)
 
 Resolve `animation` of `desc` into renderer-ready tracks, or raise
@@ -5925,7 +5972,9 @@ The node path of a slot RELATIVE to its entity (`head/left_eye`,
 
 ### cutan.characters.play.slot_parent(desc, slot)
 
-The slot `slot` nests under, or `None` when it is a direct child.
+The slot `slot` nests under, or `None` when it is a direct child:
+the stage’s one rule, `an.stage.rig.slot_parent_chain` (`nesting`
+`flat` or `bones`, an#340).
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -5933,8 +5982,10 @@ The slot `slot` nests under, or `None` when it is a direct child.
 ### cutan.characters.play.suppressed_slots(desc)
 
 Slots the rig builder never builds: with the face baked into the head
-art (`face_overlay=false`), every slot nested under the HEAD BONE’s
-primary slot — keyed on the bone, not on a slot named “head”.
+art (`face_overlay=false`), every slot on the HEAD BONE but its primary
+slot (the head itself) — keyed on the bone, not on a slot named “head”.
+The compile pass hands them to `an.stage.rig.build_rig_subtree` as
+`skip_slots`.
 
 * **Return type:**
   [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
@@ -9051,7 +9102,7 @@ The package whose data root holds the genre’s asset library and projects
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
-### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 4*
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 5*
 
 The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
 it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
@@ -9059,7 +9110,9 @@ assigned by CI at merge). Level 2 is the move itself: `Genre.services`,
 `ActionKind.lowering`, `EntityKind.swap_declaration` and `an.stage.rig`.
 Level 3 is the public rig builder (an#338): `an.stage.rig.build_rig_subtree`,
 `rig_origin`, `RigDocument` and `omit_unset_rig_fields`. Level 4 is the rest
-pose (an#339): `register_rest_pose_migration` and `rig_rest_problems`.
+pose (an#339): `register_rest_pose_migration` and `rig_rest_problems`. Level 5
+is nested chains (an#340): `build_rig_subtree(skip_slots=)`, `slot_parent_chain`,
+`slot_node_paths`, `rig_affordances`, `RigError`.
 
 ### cutan.require_an()
 
@@ -10534,11 +10587,11 @@ they register with the genre, owned by it, and come out with it.
 | [`character_overrides`](_autosummary/cutan.library.html.md#cutan.library.character_overrides)(doc, art)     | The declared fields that REMOVED a capability (an#381): `occluded` when a declared cover is what keeps `face.brows` from an overlay face whose binding moves brows. |
 | [`renders_as_placeholder`](_autosummary/cutan.library.html.md#cutan.library.renders_as_placeholder)(doc)       | Whether the compiler would draw this character only as its placeholder stand-in.                                                                                    |
 
-### cutan.library.CHARACTER_ANALYSER_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '0.3.0'*
+### cutan.library.CHARACTER_ANALYSER_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '0.4.0'*
 
 Bump when the derivation can answer differently for the same input.
 0.2.0: `face.brows` (an#252). 0.3.0: a factory head’s brow cover is
-derived from its knobs and recorded seat, `occluded` only an override (an#284).
+derived from its knobs and recorded seat, `occluded` only an override (an#284). 0.4.0: `rig.hierarchy` (an#340).
 
 ### cutan.library.CHARACTER_CAPABILITIES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Capability, ...]* *= (Capability(name='limbs.legs', description='a pair of leg slots with art that a legged walk swings', remedy='add two leg slots named leg_l/leg_r (or left_leg/right_leg) with their art, pivoted at the hip; \`an character new\` builds them (an-art-package skill)', subject='asset', command=None, version='1'), Capability(name='limbs.arms', description='a pair of arm slots with art that a walk swings and gestures move', remedy='add two arm slots named arm_l/arm_r (or left_arm/right_arm) with their art, pivoted at the shoulder (an-art-package skill)', subject='asset', command=None, version='1'), Capability(name='swap.view', description='the turnaround views the character can show (keys); swappable=true when a \`view\` swap set lets it turn', remedy='add turnaround art and list it in the \`view\` swap set: \`an character add-views <dir>\` for an offline character, else draw the views', subject='asset', command='an character add-views', version='1'), Capability(name='face.mouth', description='an overlay mouth with a viseme chart that lip-sync drives (keys: the chart)', remedy="give the character an overlay mouth: a \`mouth\` slot with the viseme set's drawings (\`an character mouths <dir>\` writes the default nine) and face_overlay: true — a face baked into the head art cannot lip-sync", subject='asset', command='an character mouths', version='1'), Capability(name='face.brows', description='two brows on an overlay face that an expression raises, lowers and angles, with nothing recorded over their acting range (slots: the brow slots)', remedy="give the overlay face two brow slots (left_brow/right_brow) with their art, and keep hats off the brows' acting range: a factory hat that cannot sit above them is recorded in character.json's \`occluded\` — \`an character new\` with a larger --head-scale, another --hat or --hat none; for drawn art, redraw the cover above the brows and remove its \`occluded\` entry", subject='asset', command=None, version='1'))*
 
@@ -11861,18 +11914,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-06 14:22 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/07bb1594e6ff08745c99b7cd9997b8e28d4698cc"><code>07bb159</code></a> on branch <code>main</code>, for **cutan 0.0.37** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-06 14:30 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/3fbf9e5dc595454e8901c8c7b780e0456c983e55"><code>3fbf9e5</code></a> on branch <code>main</code>, for **cutan 0.0.38** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.37) is behind the latest release on PyPI (0.0.38): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.38) is behind the latest release on PyPI (0.0.39): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/07bb1594e6ff08745c99b7cd9997b8e28d4698cc"><code>07bb1594e6ff08745c99b7cd9997b8e28d4698cc</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/3fbf9e5dc595454e8901c8c7b780e0456c983e55"><code>3fbf9e5dc595454e8901c8c7b780e0456c983e55</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -11883,9 +11936,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37477952355">37477952355</a>     |
+| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37478528994">37478528994</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>07bb1594e6ff08745c99b7cd9997b8e28d4698cc</code> (in the history of the built commit) |
+| Event commit | <code>fa580bb0a211aed2f26c3db224ec1669f515d74c</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -11910,13 +11963,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.38/">0.0.38</a>, newer than the documented version (0.0.37).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.39/">0.0.39</a>, newer than the documented version (0.0.38).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout 07bb1594e6ff08745c99b7cd9997b8e28d4698cc
+git checkout 3fbf9e5dc595454e8901c8c7b780e0456c983e55
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

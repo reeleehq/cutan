@@ -83,6 +83,7 @@ so an author never passes `rest`.
 | [`play_source`](#cutan.characters.play.play_source)(desc, animation)                     | Which library a `play` of `animation` resolves in — [`DESCRIPTOR_SOURCE`](#cutan.characters.play.DESCRIPTOR_SOURCE) when `desc` declares it (the descriptor WINS a name a preset also has), else [`PRESET_SOURCE`](#cutan.characters.play.PRESET_SOURCE) when a motion preset has it.                                                                        |
 | [`preset_moved_node`](#cutan.characters.play.preset_moved_node)(action_target, animation)      | The ONE node path a preset play moves — `<target>/head` for a `nod`, the target itself for the rest.                                                                                                                                                                                                                                                                   |
 | [`preset_moved_nodes`](#cutan.characters.play.preset_moved_nodes)(action_target, animation)     | Every node path a preset play moves.                                                                                                                                                                                                                                                                                                                                   |
+| [`resolve_part_arg`](#cutan.characters.play.resolve_part_arg)(animation[, args, parts])       | `args` with a one-part preset's `part` named by its SLOT resolved to its node path among the entity's built `parts` (an#340).                                                                                                                                                                                                                                          |
 | [`preset_takes`](#cutan.characters.play.preset_takes)(animation, name)                    | Whether the motion preset `animation` has the keyword `name` (`False` for a name that is no preset: a descriptor animation takes nothing).                                                                                                                                                                                                                             |
 | [`preset_play_span`](#cutan.characters.play.preset_play_span)(action[, context])              | How long a preset `play` runs, in seconds: its `duration` when set, else the preset's natural length divided by `speed`.                                                                                                                                                                                                                                               |
 | [`preset_target_problems`](#cutan.characters.play.preset_target_problems)(animation, target)        | Why `animation` cannot be played on `target`: a preset that moves an entity's PARTS (`walk`) is played on the entity, not on one of its parts — a torso asked to walk would glide away from its legs, and the gait resolution keys the whole character (cutan#22).                                                                                                     |
@@ -93,8 +94,8 @@ so an author never passes `rest`.
 | [`sampled_deviations`](#cutan.characters.play.sampled_deviations)(track, duration, fps)         | `(time, deviation)` pairs for a sine bone track at the frame rate — [`cutan.characters.idle.evaluate_track()`](cutan.characters.idle.html.md#cutan.characters.idle.evaluate_track)'s formula, sampled, so the descriptor's own evaluator stays the one definition of a sine track.                                                                       |
 | [`sine_sample_times`](#cutan.characters.play.sine_sample_times)(duration, fps)                 | Frame-rate sample times for a sine track, ALWAYS ending at `duration`.                                                                                                                                                                                                                                                                                                 |
 | [`slot_node_path`](#cutan.characters.play.slot_node_path)(desc, slot_name)                  | The node path of a slot RELATIVE to its entity (`head/left_eye`, `torso`) — the rig builder's nesting rule, stated once.                                                                                                                                                                                                                                               |
-| [`slot_parent`](#cutan.characters.play.slot_parent)(desc, slot)                          | The slot `slot` nests under, or `None` when it is a direct child.                                                                                                                                                                                                                                                                                                      |
-| [`suppressed_slots`](#cutan.characters.play.suppressed_slots)(desc)                           | Slots the rig builder never builds: with the face baked into the head art (`face_overlay=false`), every slot nested under the HEAD BONE's primary slot — keyed on the bone, not on a slot named "head".                                                                                                                                                                |
+| [`slot_parent`](#cutan.characters.play.slot_parent)(desc, slot)                          | The slot `slot` nests under, or `None` when it is a direct child: the stage's one rule, `an.stage.rig.slot_parent_chain` (`nesting` `flat` or `bones`, an#340).                                                                                                                                                                                                        |
+| [`suppressed_slots`](#cutan.characters.play.suppressed_slots)(desc)                           | Slots the rig builder never builds: with the face baked into the head art (`face_overlay=false`), every slot on the HEAD BONE but its primary slot (the head itself) — keyed on the bone, not on a slot named "head".                                                                                                                                                  |
 
 ### Classes
 
@@ -455,6 +456,26 @@ hierarchy to the nearest ancestor’s primary slot instead.
 'head'
 ```
 
+### cutan.characters.play.resolve_part_arg(animation, args=None, , parts=None)
+
+`args` with a one-part preset’s `part` named by its SLOT resolved to
+its node path among the entity’s built `parts` (an#340).
+
+A `nod` moves `<target>/head`; in `nesting: bones` the head is built
+under its torso (`torso/head`). A part that is built as named, or whose
+name matches no single built path’s last segment, is left as given (and
+reported unbuilt as before).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+```pycon
+>>> resolve_part_arg("nod", {}, parts=["torso", "torso/head"])["part"]
+'torso/head'
+>>> resolve_part_arg("nod", {}, parts=["head", "torso"])  # built as named: as given
+{}
+```
+
 ### cutan.characters.play.resolve_play(desc, animation, , art_exists=None)
 
 Resolve `animation` of `desc` into renderer-ready tracks, or raise
@@ -542,7 +563,9 @@ The node path of a slot RELATIVE to its entity (`head/left_eye`,
 
 ### cutan.characters.play.slot_parent(desc, slot)
 
-The slot `slot` nests under, or `None` when it is a direct child.
+The slot `slot` nests under, or `None` when it is a direct child:
+the stage’s one rule, `an.stage.rig.slot_parent_chain` (`nesting`
+`flat` or `bones`, an#340).
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -550,8 +573,10 @@ The slot `slot` nests under, or `None` when it is a direct child.
 ### cutan.characters.play.suppressed_slots(desc)
 
 Slots the rig builder never builds: with the face baked into the head
-art (`face_overlay=false`), every slot nested under the HEAD BONE’s
-primary slot — keyed on the bone, not on a slot named “head”.
+art (`face_overlay=false`), every slot on the HEAD BONE but its primary
+slot (the head itself) — keyed on the bone, not on a slot named “head”.
+The compile pass hands them to `an.stage.rig.build_rig_subtree` as
+`skip_slots`.
 
 * **Return type:**
   [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]

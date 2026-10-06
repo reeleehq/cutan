@@ -136,7 +136,7 @@ variants: comma-separated mouth forms (see `an character new`); “” = none
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
-### cutan.characters.cli.new(name, out_dir='', seed='', style='lorelei', voice_ref='', offline=False, acknowledge_attribution=False, overwrite=False, mouth_variants='happy,sad', palette='', build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short')
+### cutan.characters.cli.new(name, out_dir='', seed='', style='lorelei', voice_ref='', offline=False, acknowledge_attribution=False, overwrite=False, mouth_variants='happy,sad', palette='', build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False)
 
 Create a new character at `out_dir`/`name`.
 
@@ -182,6 +182,11 @@ views: draw the turnaround — back, side (a profile facing right) and
 
 > three_quarter beside the front, as a `view` swap set (offline head
 > only), so `play: turn` can turn the character (an#197)
+
+feet_origin: put the stage point at the feet (the rig’s root bone), so
+: `stage.at` is where the character stands and every build placed at one
+  y stands on one floor line (an#285)
+
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 

@@ -24,6 +24,7 @@ cutan.characters.factory
       RECIPE_VERSION
       FACTORY_AUTHOR
       EYE_CANVAS
+      LID_COVER_PAD
       GAZE_PARTS
       FACE_SLOTS
       SIDE_EYE_SHIFT
