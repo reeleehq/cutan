@@ -822,15 +822,23 @@ def _check_rig_origin(
             "Every bone's parent and every slot's bone must be a declared bone, "
             "and the bones a tree.",
         )
-    for problem in chain_draw_order_problems(descriptor) + chain_pose_problems(
-        descriptor
-    ):
+    for problem in chain_pose_problems(descriptor):
         report.add(
             ADVISORY,
             "character.json#rig",
             f"{who}: {problem} (compiling a shot refuses it)",
-            "The stage draws a nested part over its parent and needs a node for "
-            "every posed bone; or keep `nesting: flat`.",
+            "The stage needs a node for every posed bone in a chain; or keep "
+            "`nesting: flat`.",
+        )
+    for problem in chain_draw_order_problems(descriptor):
+        # The stage paints it from a global part order (an#430); an engine
+        # without `engine.paint_order:global` refuses it at compile.
+        report.add(
+            ADVISORY,
+            "character.json#rig",
+            f"{who}: {problem}",
+            "The stage paints this rig from a global part order "
+            "(`engine.paint_order:global`); an engine without one refuses it.",
         )
     for problem in rig_origin_problems(descriptor) + rig_rest_problems(descriptor):
         report.add(
