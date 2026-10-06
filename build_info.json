@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-06T14:14:19Z",
+  "built_at": "2026-10-06T14:17:34Z",
   "package": {
     "name": "cutan",
     "version": "0.0.36",
@@ -23,12 +23,12 @@
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/cutan",
-    "sha": "bfcea939cd12c10d6fb04fa51b6fb7eb37476bf3",
+    "sha": "001252bcab506754c13ed15691ab81036e5acfd7",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "37476502837",
-    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/37476502837",
+    "run_id": "37476707879",
+    "run_url": "https://github.com/thorwhalen/cutan/actions/runs/37476707879",
     "server_url": "https://github.com"
   },
   "tools": {

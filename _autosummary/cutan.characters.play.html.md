@@ -438,12 +438,13 @@ and by `an validate` alike.
 
 `{bone name: the slot that IS that bone}`, when one exists.
 
-Used for node nesting, which is deliberately **not** the bone hierarchy.
-The rigs here are flat by design — arms are siblings of the torso, not
-children (CLAUDE.md pillar 4) — so bone parentage decides *position* only.
-A slot nests under the primary slot of its bone when it is not that slot
-itself, which is what puts eyes and mouth under `head` and leaves every
-limb a direct child of the entity.
+The anchor of node nesting (`slot_parent_chain()`). In the default
+`flat` nesting the rigs are flat — arms are siblings of the torso, not
+children (CLAUDE.md pillar 4) — so bone parentage decides *position* only:
+a slot nests under the primary slot of its own bone when it is not that
+slot itself, which puts eyes and mouth under `head` and leaves every limb
+a direct child of the entity. `nesting: bones` (an#340) follows the bone
+hierarchy to the nearest ancestor’s primary slot instead.
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
