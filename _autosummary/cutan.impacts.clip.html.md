@@ -46,7 +46,7 @@ the video (optional — the truth and keypoints need no browser), and writes:
 | [`ImpactSpecError`](#cutan.impacts.clip.ImpactSpecError)   | A clip spec that cannot describe a clip.   |
 |--------------------------------------------------------------------|--------------------------------------------|
 
-### cutan.impacts.clip.BENCHMARK_SPEC *= ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)*
+### cutan.impacts.clip.BENCHMARK_SPEC *= ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=None, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)*
 
 an accelerando with accents and
 human, slightly drifting timing. What [`impact_set_specs()`](#cutan.impacts.clip.impact_set_specs) varies the
@@ -67,7 +67,7 @@ Seconds after the last grid beat before the clip ends.
 
 Samples per second of the dense trajectory in `trajectory.csv`.
 
-### *class* cutan.impacts.clip.ImpactClipSpec(object='stick', kind='surface', tempo=100.0, beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)
+### *class* cutan.impacts.clip.ImpactClipSpec(object='stick', kind='surface', tempo=100.0, beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=None, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -84,7 +84,14 @@ case a sub-frame estimator cannot be scored on. Set it to 0 for a metronome.
 
 Motion: `object` (`"stick"` or `"ball"`), `kind` (`"surface"` or
 `"air"`), the stroke timings `rise` / `fall` / `brake`, and
-`show_surface` (`None`: drawn for surface impacts only).
+`show_surface` (`None`: drawn for surface impacts only). Stroke-shape
+variability (cutan#27): `rise_sd` / `fall_sd` / `brake_sd` (seconds)
+draw each stroke’s own timings around those means from the seed’s stroke
+stream, never below `MIN_TIMING_FRACTION` of the mean; `truth.json`
+records each event’s actual `rise`, `fall` and `brake`. `arc_radius`
+(scene px, the ball only) swings the ball on a circle about a pivot that
+far above its contact point, instead of a straight fall: the contact is the
+arc’s lowest point and `impact_xy` is where it lands, as before.
 
 Camera ([`an.frame_clock.FrameClock`](cutan.impacts.html.md#cutan.impacts.FrameClock)): `fps`, `exposure`,
 `exposure_samples`, `timestamp_jitter_sd` (when frames are really
@@ -126,7 +133,7 @@ Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueEr
 
 A clip spec that cannot describe a clip.
 
-### cutan.impacts.clip.impact_set_specs(, base=ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0), objects=('stick', 'ball'), kinds=('surface', 'air'), fps=(24, 30, 60), exposures=(0.0, 0.5), timestamp_jitter_sds=(0.0,), seeds=(0,))
+### cutan.impacts.clip.impact_set_specs(, base=ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=None, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0), objects=('stick', 'ball'), kinds=('surface', 'air'), fps=(24, 30, 60), exposures=(0.0, 0.5), timestamp_jitter_sds=(0.0,), seeds=(0,))
 
 The cartesian product of the given axes over `base`.
 

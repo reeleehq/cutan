@@ -37,18 +37,18 @@ Or from the shell: `an impacts clip OUT_DIR` / `an impacts clip-set OUT_DIR`.
 
 ### Functions
 
-| [`ball`](#cutan.impacts.ball)(\*[, radius, x, floor_y, drop, color, ...])   | A ball moving vertically onto a floor whose top is at `floor_y`.                                                              |
-|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| [`build_stroke`](#cutan.impacts.build_stroke)(events, \*[, kind, rise, fall, ...])  | Chain rise / hold / fall segments through every executed impact.                                                              |
-| [`gaussian_humanizer`](#cutan.impacts.gaussian_humanizer)([sd, rho, bias])                | Offsets from an AR(1) Gaussian process: `o[k] = bias + rho*(o[k-1]-bias) + e`.                                                |
-| [`impact_object`](#cutan.impacts.impact_object)(name, \*\*kwargs)                    | Build a registered object by name.                                                                                            |
-| [`impact_set_specs`](#cutan.impacts.impact_set_specs)(\*[, base, objects, kinds, ...])  | The cartesian product of the given axes over `base`.                                                                          |
-| [`perform`](#cutan.impacts.perform)([tempo, beats, subdivision, ...])          | The impacts of `beats` beats of `pattern`, on `tempo`'s grid.                                                                 |
-| [`plan_impact_clip`](#cutan.impacts.plan_impact_clip)(spec)                             | Resolve `spec` into events, a stroke, frames and a Scene IR.                                                                  |
-| [`stick`](#cutan.impacts.stick)(\*[, length, thickness, pivot, ...])         | A drumstick rotating about `pivot` (its butt — the hand).                                                                     |
-| [`tempo_map`](#cutan.impacts.tempo_map)(tempo)                                   | Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](#cutan.impacts.TempoMap).                    |
-| [`write_impact_clip`](#cutan.impacts.write_impact_clip)(spec, out_dir, \*[, ...])        | Write one clip into `out_dir / (clip_dir or spec.clip_id)`; return that dir.                                                  |
-| [`write_impact_set`](#cutan.impacts.write_impact_set)(out_dir[, specs, render, ...])    | Write every clip in `specs` (default: [`impact_set_specs()`](#cutan.impacts.impact_set_specs)) plus `index.json`. |
+| [`ball`](#cutan.impacts.ball)(\*[, radius, x, floor_y, drop, ...])         | A ball moving onto a floor whose top is at `floor_y`.                                                                         |
+|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| [`build_stroke`](#cutan.impacts.build_stroke)(events, \*[, kind, rise, fall, ...]) | Chain rise / hold / fall segments through every executed impact.                                                              |
+| [`gaussian_humanizer`](#cutan.impacts.gaussian_humanizer)([sd, rho, bias])               | Offsets from an AR(1) Gaussian process: `o[k] = bias + rho*(o[k-1]-bias) + e`.                                                |
+| [`impact_object`](#cutan.impacts.impact_object)(name, \*\*kwargs)                   | Build a registered object by name.                                                                                            |
+| [`impact_set_specs`](#cutan.impacts.impact_set_specs)(\*[, base, objects, kinds, ...]) | The cartesian product of the given axes over `base`.                                                                          |
+| [`perform`](#cutan.impacts.perform)([tempo, beats, subdivision, ...])         | The impacts of `beats` beats of `pattern`, on `tempo`'s grid.                                                                 |
+| [`plan_impact_clip`](#cutan.impacts.plan_impact_clip)(spec)                            | Resolve `spec` into events, a stroke, frames and a Scene IR.                                                                  |
+| [`stick`](#cutan.impacts.stick)(\*[, length, thickness, pivot, ...])        | A drumstick rotating about `pivot` (its butt — the hand).                                                                     |
+| [`tempo_map`](#cutan.impacts.tempo_map)(tempo)                                  | Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](#cutan.impacts.TempoMap).                    |
+| [`write_impact_clip`](#cutan.impacts.write_impact_clip)(spec, out_dir, \*[, ...])       | Write one clip into `out_dir / (clip_dir or spec.clip_id)`; return that dir.                                                  |
+| [`write_impact_set`](#cutan.impacts.write_impact_set)(out_dir[, specs, render, ...])   | Write every clip in `specs` (default: [`impact_set_specs()`](#cutan.impacts.impact_set_specs)) plus `index.json`. |
 
 ### Classes
 
@@ -151,7 +151,7 @@ Per frame, the scene instants to render and average — the render seam.
 * **Type:**
   The resolved sample count
 
-### *class* cutan.impacts.ImpactClipSpec(object='stick', kind='surface', tempo=100.0, beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)
+### *class* cutan.impacts.ImpactClipSpec(object='stick', kind='surface', tempo=100.0, beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=None, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -168,7 +168,14 @@ case a sub-frame estimator cannot be scored on. Set it to 0 for a metronome.
 
 Motion: `object` (`"stick"` or `"ball"`), `kind` (`"surface"` or
 `"air"`), the stroke timings `rise` / `fall` / `brake`, and
-`show_surface` (`None`: drawn for surface impacts only).
+`show_surface` (`None`: drawn for surface impacts only). Stroke-shape
+variability (cutan#27): `rise_sd` / `fall_sd` / `brake_sd` (seconds)
+draw each stroke’s own timings around those means from the seed’s stroke
+stream, never below `MIN_TIMING_FRACTION` of the mean; `truth.json`
+records each event’s actual `rise`, `fall` and `brake`. `arc_radius`
+(scene px, the ball only) swings the ball on a circle about a pivot that
+far above its contact point, instead of a straight fall: the contact is the
+arc’s lowest point and `impact_xy` is where it lands, as before.
 
 Camera ([`an.frame_clock.FrameClock`](#cutan.impacts.FrameClock)): `fps`, `exposure`,
 `exposure_samples`, `timestamp_jitter_sd` (when frames are really
@@ -306,24 +313,39 @@ Bases: [`RuntimeError`](https://docs.python.org/3/builtins/exceptions.html#Runti
 
 The ground truth and the thing it describes disagree.
 
-### cutan.impacts.ball(, radius=18.0, x=0.0, floor_y=90.0, drop=170.0, color='#111827', surface_color='#9ca3af', surface_size=(160.0, 24.0))
+### cutan.impacts.ball(, radius=18.0, x=0.0, floor_y=90.0, drop=170.0, arc_radius=None, color='#111827', surface_color='#9ca3af', surface_size=(160.0, 24.0))
 
-A ball moving vertically onto a floor whose top is at `floor_y`.
+A ball moving onto a floor whose top is at `floor_y`.
 
 A full stroke lifts it `drop` pixels. Keypoints: `center` and
 `bottom` (its contact point).
 
+Straight by default. With `arc_radius` (cutan#27, a wide stick arc: a
+hard hit) it hangs on a circle of that radius about a pivot straight above
+its contact point, and the stroke ROTATES the pivot: the ball swings up to
+one side and falls back along the arc, its contact the arc’s lowest point.
+The angle that lifts it `drop` pixels is `acos(1 - drop / arc_radius)`;
+rotation is the one channel, affine in `h`, so the curve stays exact.
+
 * **Return type:**
   [`ImpactObject`](cutan.impacts.objects.md#cutan.impacts.objects.ImpactObject)
 
-### cutan.impacts.build_stroke(events, , kind='surface', duration, rise=0.18, fall=0.18, brake=0.03, rest_height=1.0)
+```pycon
+>>> b = ball(arc_radius=300.0)
+>>> round(b.params["arc_sweep"], 4), b.at == (0.0, b.params["pivot_y"])
+(1.1226, True)
+```
+
+### cutan.impacts.build_stroke(events, , kind='surface', duration, rise=0.18, fall=0.18, brake=0.03, rest_height=1.0, timings=None)
 
 Chain rise / hold / fall segments through every executed impact.
 
 The object starts and ends at `rest_height`; before impact `k` it is
 raised to `events[k].amplitude` (a bigger preparation, a harder hit).
 Segments tile `[0, duration]` exactly, and every impact is a segment
-boundary at precisely `t_impact`.
+boundary at precisely `t_impact`. `timings` gives each impact its own
+rise, fall and brake (one per event, cutan#27); without it every stroke
+takes `rise`, `fall` and `brake`.
 
 * **Return type:**
   [`Stroke`](cutan.impacts.stroke.md#cutan.impacts.stroke.Stroke)
@@ -367,7 +389,7 @@ Traceback (most recent call last):
 KeyError: "no impact object 'hammer'; known: ['ball', 'stick']"
 ```
 
-### cutan.impacts.impact_set_specs(, base=ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0), objects=('stick', 'ball'), kinds=('surface', 'air'), fps=(24, 30, 60), exposures=(0.0, 0.5), timestamp_jitter_sds=(0.0,), seeds=(0,))
+### cutan.impacts.impact_set_specs(, base=ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=None, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0), objects=('stick', 'ball'), kinds=('surface', 'air'), fps=(24, 30, 60), exposures=(0.0, 0.5), timestamp_jitter_sds=(0.0,), seeds=(0,))
 
 The cartesian product of the given axes over `base`.
 

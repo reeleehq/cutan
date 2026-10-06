@@ -254,188 +254,193 @@
 </span><span id="line-75">    <span class="s2">"policy_of"</span><span class="p">,</span>
 </span><span id="line-76">    <span class="s2">"policy_problems"</span><span class="p">,</span>
 </span><span id="line-77">    <span class="s2">"style_pack"</span><span class="p">,</span>
-</span><span id="line-78"><span class="p">]</span>
-</span><span id="line-79">
-</span><span id="line-80"><span class="c1">#: The file suffix of a style spec in this package.</span>
-</span><span id="line-81"><span class="n">STYLE_SPEC_SUFFIX</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">".yaml"</span>
-</span><span id="line-82">
-</span><span id="line-83"><span class="c1">#: The ``schema_version`` the shipped specs carry: bumped when a key's meaning</span>
-</span><span id="line-84"><span class="c1">#: changes, so a reader of a spec copied elsewhere knows which shape it holds.</span>
-</span><span id="line-85"><span class="n">STYLE_SPEC_SCHEMA_VERSION</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"0.1.0"</span>
-</span><span id="line-86">
-</span><span id="line-87"><span class="c1">#: What a style name may be: the spec's ``style`` key and its file's stem.</span>
-</span><span id="line-88"><span class="n">_STYLE_NAME</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[a-z][a-z0-9_]*"</span><span class="p">)</span>
-</span><span id="line-89">
-</span><span id="line-90">
+</span><span id="line-78">    <span class="s2">"style_voice"</span><span class="p">,</span>
+</span><span id="line-79">    <span class="s2">"check_style_copies"</span><span class="p">,</span>
+</span><span id="line-80"><span class="p">]</span>
+</span><span id="line-81">
+</span><span id="line-82"><span class="c1">#: The file suffix of a style spec in this package.</span>
+</span><span id="line-83"><span class="n">STYLE_SPEC_SUFFIX</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">".yaml"</span>
+</span><span id="line-84">
+</span><span id="line-85"><span class="c1">#: The ``schema_version`` the shipped specs carry: bumped when a key's meaning</span>
+</span><span id="line-86"><span class="c1">#: changes, so a reader of a spec copied elsewhere knows which shape it holds.</span>
+</span><span id="line-87"><span class="n">STYLE_SPEC_SCHEMA_VERSION</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"0.1.0"</span>
+</span><span id="line-88">
+</span><span id="line-89"><span class="c1">#: What a style name may be: the spec's ``style`` key and its file's stem.</span>
+</span><span id="line-90"><span class="n">_STYLE_NAME</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[a-z][a-z0-9_]*"</span><span class="p">)</span>
+</span><span id="line-91">
+</span><span id="line-92">
 <div class="viewcode-block" id="UnknownStyleError">
 <a class="viewcode-back" href="../../_autosummary/cutan.styles.html#cutan.UnknownStyleError">[docs]</a>
-</span><span id="line-91"><span class="k">class</span><span class="w"> </span><span class="nc">UnknownStyleError</span><span class="p">(</span><span class="ne">KeyError</span><span class="p">):</span>
-</span><span id="line-92"><span class="w">    </span><span class="sd">"""No style spec of that name ships with ``cutan``.</span>
-</span><span id="line-93">
-</span><span id="line-94"><span class="sd">    A ``KeyError`` (so a mapping or a ``ChainMap`` of spec sources falls through</span>
-</span><span id="line-95"><span class="sd">    it), and so also a ``LookupError``.</span>
-</span><span id="line-96"><span class="sd">    """</span>
-</span><span id="line-97">
-</span><span id="line-98">    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># KeyError would repr() the message, quotes and all</span>
-</span><span id="line-99">        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="k">else</span> <span class="s2">""</span></div>
+</span><span id="line-93"><span class="k">class</span><span class="w"> </span><span class="nc">UnknownStyleError</span><span class="p">(</span><span class="ne">KeyError</span><span class="p">):</span>
+</span><span id="line-94"><span class="w">    </span><span class="sd">"""No style spec of that name ships with ``cutan``.</span>
+</span><span id="line-95">
+</span><span id="line-96"><span class="sd">    A ``KeyError`` (so a mapping or a ``ChainMap`` of spec sources falls through</span>
+</span><span id="line-97"><span class="sd">    it), and so also a ``LookupError``.</span>
+</span><span id="line-98"><span class="sd">    """</span>
+</span><span id="line-99">
+</span><span id="line-100">    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># KeyError would repr() the message, quotes and all</span>
+</span><span id="line-101">        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="k">else</span> <span class="s2">""</span></div>
 
-</span><span id="line-100">
-</span><span id="line-101">
-</span><span id="line-102"><span class="k">def</span><span class="w"> </span><span class="nf">_spec_files</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="line-103"><span class="w">    </span><span class="sd">"""``{name: resource}`` for every spec file in this package."""</span>
-</span><span id="line-104">    <span class="k">return</span> <span class="p">{</span>
-</span><span id="line-105">        <span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">STYLE_SPEC_SUFFIX</span><span class="p">)]:</span> <span class="n">entry</span>
-</span><span id="line-106">        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">files</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
-</span><span id="line-107">        <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">STYLE_SPEC_SUFFIX</span><span class="p">)</span> <span class="ow">and</span> <span class="n">entry</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
-</span><span id="line-108">    <span class="p">}</span>
-</span><span id="line-109">
-</span><span id="line-110">
+</span><span id="line-102">
+</span><span id="line-103">
+</span><span id="line-104"><span class="k">def</span><span class="w"> </span><span class="nf">_spec_files</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="line-105"><span class="w">    </span><span class="sd">"""``{name: resource}`` for every spec file in this package."""</span>
+</span><span id="line-106">    <span class="k">return</span> <span class="p">{</span>
+</span><span id="line-107">        <span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">STYLE_SPEC_SUFFIX</span><span class="p">)]:</span> <span class="n">entry</span>
+</span><span id="line-108">        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">files</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
+</span><span id="line-109">        <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">STYLE_SPEC_SUFFIX</span><span class="p">)</span> <span class="ow">and</span> <span class="n">entry</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
+</span><span id="line-110">    <span class="p">}</span>
+</span><span id="line-111">
+</span><span id="line-112">
 <div class="viewcode-block" id="style_specs">
 <a class="viewcode-back" href="../../_autosummary/cutan.styles.html#cutan.style_specs">[docs]</a>
-</span><span id="line-111"><span class="k">def</span><span class="w"> </span><span class="nf">style_specs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-112"><span class="w">    </span><span class="sd">"""The names of the style specs that ship with ``cutan``, sorted."""</span>
-</span><span id="line-113">    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_spec_files</span><span class="p">())</span></div>
+</span><span id="line-113"><span class="k">def</span><span class="w"> </span><span class="nf">style_specs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-114"><span class="w">    </span><span class="sd">"""The names of the style specs that ship with ``cutan``, sorted."""</span>
+</span><span id="line-115">    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_spec_files</span><span class="p">())</span></div>
 
-</span><span id="line-114">
-</span><span id="line-115">
-</span><span id="line-116"><span class="k">def</span><span class="w"> </span><span class="nf">_is_style_name</span><span class="p">(</span><span class="n">ref</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-117"><span class="w">    </span><span class="sd">"""Whether ``ref`` is spelled as a style's name: a string with no path</span>
-</span><span id="line-118"><span class="sd">    separator and no suffix. Shipped or not; a ``Path`` is never a name.</span>
-</span><span id="line-119">
-</span><span id="line-120"><span class="sd">    &gt;&gt;&gt; _is_style_name('south_park'), _is_style_name('./south_park'), _is_style_name('x.yaml')</span>
-</span><span id="line-121"><span class="sd">    (True, False, False)</span>
-</span><span id="line-122"><span class="sd">    """</span>
-</span><span id="line-123">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ref</span><span class="p">:</span>
-</span><span id="line-124">        <span class="k">return</span> <span class="kc">False</span>
-</span><span id="line-125">    <span class="n">seps</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"/"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">}</span> <span class="o">|</span> <span class="p">({</span><span class="n">os</span><span class="o">.</span><span class="n">altsep</span><span class="p">}</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">altsep</span> <span class="k">else</span> <span class="nb">set</span><span class="p">())</span>
-</span><span id="line-126">    <span class="k">return</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span> <span class="ow">in</span> <span class="n">ref</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
-</span><span id="line-127">
-</span><span id="line-128">
-</span><span id="line-129"><span class="k">def</span><span class="w"> </span><span class="nf">_resource</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-</span><span id="line-130">    <span class="n">specs</span> <span class="o">=</span> <span class="n">_spec_files</span><span class="p">()</span>
-</span><span id="line-131">    <span class="k">if</span> <span class="p">(</span>
-</span><span id="line-132">        <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="line-133">        <span class="ow">or</span> <span class="ow">not</span> <span class="n">_STYLE_NAME</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-</span><span id="line-134">        <span class="ow">or</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">specs</span>
-</span><span id="line-135">    <span class="p">):</span>
-</span><span id="line-136">        <span class="k">raise</span> <span class="n">UnknownStyleError</span><span class="p">(</span>
-</span><span id="line-137">            <span class="sa">f</span><span class="s2">"no style spec named </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">; the specs are: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">specs</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-138">        <span class="p">)</span>
-</span><span id="line-139">    <span class="k">return</span> <span class="n">specs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-</span><span id="line-140">
-</span><span id="line-141">
+</span><span id="line-116">
+</span><span id="line-117">
+</span><span id="line-118"><span class="k">def</span><span class="w"> </span><span class="nf">_is_style_name</span><span class="p">(</span><span class="n">ref</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-119"><span class="w">    </span><span class="sd">"""Whether ``ref`` is spelled as a style's name: a string with no path</span>
+</span><span id="line-120"><span class="sd">    separator and no suffix. Shipped or not; a ``Path`` is never a name.</span>
+</span><span id="line-121">
+</span><span id="line-122"><span class="sd">    &gt;&gt;&gt; _is_style_name('south_park'), _is_style_name('./south_park'), _is_style_name('x.yaml')</span>
+</span><span id="line-123"><span class="sd">    (True, False, False)</span>
+</span><span id="line-124"><span class="sd">    """</span>
+</span><span id="line-125">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ref</span><span class="p">:</span>
+</span><span id="line-126">        <span class="k">return</span> <span class="kc">False</span>
+</span><span id="line-127">    <span class="n">seps</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"/"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">}</span> <span class="o">|</span> <span class="p">({</span><span class="n">os</span><span class="o">.</span><span class="n">altsep</span><span class="p">}</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">altsep</span> <span class="k">else</span> <span class="nb">set</span><span class="p">())</span>
+</span><span id="line-128">    <span class="k">return</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span> <span class="ow">in</span> <span class="n">ref</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
+</span><span id="line-129">
+</span><span id="line-130">
+</span><span id="line-131"><span class="k">def</span><span class="w"> </span><span class="nf">_resource</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+</span><span id="line-132">    <span class="n">specs</span> <span class="o">=</span> <span class="n">_spec_files</span><span class="p">()</span>
+</span><span id="line-133">    <span class="k">if</span> <span class="p">(</span>
+</span><span id="line-134">        <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="line-135">        <span class="ow">or</span> <span class="ow">not</span> <span class="n">_STYLE_NAME</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-136">        <span class="ow">or</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">specs</span>
+</span><span id="line-137">    <span class="p">):</span>
+</span><span id="line-138">        <span class="k">raise</span> <span class="n">UnknownStyleError</span><span class="p">(</span>
+</span><span id="line-139">            <span class="sa">f</span><span class="s2">"no style spec named </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">; the specs are: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">specs</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-140">        <span class="p">)</span>
+</span><span id="line-141">    <span class="k">return</span> <span class="n">specs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+</span><span id="line-142">
+</span><span id="line-143">
 <div class="viewcode-block" id="style_spec_path">
 <a class="viewcode-back" href="../../_autosummary/cutan.styles.html#cutan.style_spec_path">[docs]</a>
-</span><span id="line-142"><span class="k">def</span><span class="w"> </span><span class="nf">style_spec_path</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-143"><span class="w">    </span><span class="sd">"""The file of the style spec ``name`` (for a tool that reads a path).</span>
-</span><span id="line-144">
-</span><span id="line-145"><span class="sd">    Raises ``FileNotFoundError`` when ``cutan`` is imported from an archive</span>
-</span><span id="line-146"><span class="sd">    (a zipped wheel), where the spec is not a file: use :func:`style_spec_text`.</span>
-</span><span id="line-147"><span class="sd">    """</span>
-</span><span id="line-148">    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">_resource</span><span class="p">(</span><span class="n">name</span><span class="p">)))</span>
-</span><span id="line-149">    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span id="line-150">        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-</span><span id="line-151">            <span class="sa">f</span><span class="s2">"the style spec </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not a file on disk (cutan is imported from "</span>
-</span><span id="line-152">            <span class="sa">f</span><span class="s2">"an archive); read it with cutan.styles.style_spec_text(</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">)"</span>
-</span><span id="line-153">        <span class="p">)</span>
-</span><span id="line-154">    <span class="k">return</span> <span class="n">path</span></div>
+</span><span id="line-144"><span class="k">def</span><span class="w"> </span><span class="nf">style_spec_path</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-145"><span class="w">    </span><span class="sd">"""The file of the style spec ``name`` (for a tool that reads a path).</span>
+</span><span id="line-146">
+</span><span id="line-147"><span class="sd">    Raises ``FileNotFoundError`` when ``cutan`` is imported from an archive</span>
+</span><span id="line-148"><span class="sd">    (a zipped wheel), where the spec is not a file: use :func:`style_spec_text`.</span>
+</span><span id="line-149"><span class="sd">    """</span>
+</span><span id="line-150">    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">_resource</span><span class="p">(</span><span class="n">name</span><span class="p">)))</span>
+</span><span id="line-151">    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span id="line-152">        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+</span><span id="line-153">            <span class="sa">f</span><span class="s2">"the style spec </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not a file on disk (cutan is imported from "</span>
+</span><span id="line-154">            <span class="sa">f</span><span class="s2">"an archive); read it with cutan.styles.style_spec_text(</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">)"</span>
+</span><span id="line-155">        <span class="p">)</span>
+</span><span id="line-156">    <span class="k">return</span> <span class="n">path</span></div>
 
-</span><span id="line-155">
-</span><span id="line-156">
+</span><span id="line-157">
+</span><span id="line-158">
 <div class="viewcode-block" id="style_spec_text">
 <a class="viewcode-back" href="../../_autosummary/cutan.styles.html#cutan.style_spec_text">[docs]</a>
-</span><span id="line-157"><span class="k">def</span><span class="w"> </span><span class="nf">style_spec_text</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-158"><span class="w">    </span><span class="sd">"""The YAML text of the style spec ``name``, comments included."""</span>
-</span><span id="line-159">    <span class="k">return</span> <span class="n">_resource</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span></div>
+</span><span id="line-159"><span class="k">def</span><span class="w"> </span><span class="nf">style_spec_text</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-160"><span class="w">    </span><span class="sd">"""The YAML text of the style spec ``name``, comments included."""</span>
+</span><span id="line-161">    <span class="k">return</span> <span class="n">_resource</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span></div>
 
-</span><span id="line-160">
-</span><span id="line-161">
+</span><span id="line-162">
+</span><span id="line-163">
 <div class="viewcode-block" id="style_spec_digest">
 <a class="viewcode-back" href="../../_autosummary/cutan.styles.html#cutan.style_spec_digest">[docs]</a>
-</span><span id="line-162"><span class="k">def</span><span class="w"> </span><span class="nf">style_spec_digest</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-163"><span class="w">    </span><span class="sd">"""The sha256 of the style spec ``name``'s file: the version a copy was made from.</span>
-</span><span id="line-164">
-</span><span id="line-165"><span class="sd">    It hashes the file's bytes with line endings normalised to ``\\n`` (a</span>
-</span><span id="line-166"><span class="sd">    Windows checkout has the same spec as the wheel), so a comment-only edit</span>
-</span><span id="line-167"><span class="sd">    is a new version too.</span>
-</span><span id="line-168"><span class="sd">    """</span>
-</span><span id="line-169">    <span class="n">data</span> <span class="o">=</span> <span class="n">_resource</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">b</span><span class="s2">"</span><span class="se">\r\n</span><span class="s2">"</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-170">    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+</span><span id="line-164"><span class="k">def</span><span class="w"> </span><span class="nf">style_spec_digest</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-165"><span class="w">    </span><span class="sd">"""The sha256 of the style spec ``name``'s file: the version a copy was made from.</span>
+</span><span id="line-166">
+</span><span id="line-167"><span class="sd">    It hashes the file's bytes with line endings normalised to ``\\n`` (a</span>
+</span><span id="line-168"><span class="sd">    Windows checkout has the same spec as the wheel), so a comment-only edit</span>
+</span><span id="line-169"><span class="sd">    is a new version too.</span>
+</span><span id="line-170"><span class="sd">    """</span>
+</span><span id="line-171">    <span class="n">data</span> <span class="o">=</span> <span class="n">_resource</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">b</span><span class="s2">"</span><span class="se">\r\n</span><span class="s2">"</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-172">    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
 
-</span><span id="line-171">
-</span><span id="line-172">
+</span><span id="line-173">
+</span><span id="line-174">
 <div class="viewcode-block" id="style_spec">
 <a class="viewcode-back" href="../../_autosummary/cutan.styles.html#cutan.style_spec">[docs]</a>
-</span><span id="line-173"><span class="k">def</span><span class="w"> </span><span class="nf">style_spec</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="line-174"><span class="w">    </span><span class="sd">"""The style spec ``name``, parsed: a new dict on every call."""</span>
-</span><span id="line-175">    <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
-</span><span id="line-176">
-</span><span id="line-177">    <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">style_spec_text</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-</span><span id="line-178">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"style"</span><span class="p">)</span> <span class="o">!=</span> <span class="n">name</span><span class="p">:</span>
-</span><span id="line-179">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="line-180">            <span class="sa">f</span><span class="s2">"the style spec file </span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">STYLE_SPEC_SUFFIX</span><span class="si">}</span><span class="s2"> is not a mapping whose "</span>
-</span><span id="line-181">            <span class="sa">f</span><span class="s2">"`style` is </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">"</span>
-</span><span id="line-182">        <span class="p">)</span>
-</span><span id="line-183">    <span class="k">return</span> <span class="n">data</span></div>
+</span><span id="line-175"><span class="k">def</span><span class="w"> </span><span class="nf">style_spec</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="line-176"><span class="w">    </span><span class="sd">"""The style spec ``name``, parsed: a new dict on every call."""</span>
+</span><span id="line-177">    <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+</span><span id="line-178">
+</span><span id="line-179">    <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">style_spec_text</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+</span><span id="line-180">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"style"</span><span class="p">)</span> <span class="o">!=</span> <span class="n">name</span><span class="p">:</span>
+</span><span id="line-181">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="line-182">            <span class="sa">f</span><span class="s2">"the style spec file </span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">STYLE_SPEC_SUFFIX</span><span class="si">}</span><span class="s2"> is not a mapping whose "</span>
+</span><span id="line-183">            <span class="sa">f</span><span class="s2">"`style` is </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">"</span>
+</span><span id="line-184">        <span class="p">)</span>
+</span><span id="line-185">    <span class="k">return</span> <span class="n">data</span></div>
 
-</span><span id="line-184">
-</span><span id="line-185">
+</span><span id="line-186">
+</span><span id="line-187">
 <div class="viewcode-block" id="resolve_style_spec">
 <a class="viewcode-back" href="../../_autosummary/cutan.styles.html#cutan.resolve_style_spec">[docs]</a>
-</span><span id="line-186"><span class="k">def</span><span class="w"> </span><span class="nf">resolve_style_spec</span><span class="p">(</span><span class="n">ref</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span> <span class="o">|</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="line-187"><span class="w">    </span><span class="sd">"""A style spec as a dict, from whatever refers to one.</span>
-</span><span id="line-188">
-</span><span id="line-189"><span class="sd">    - a mapping is passed through (a deep copy);</span>
-</span><span id="line-190"><span class="sd">    - a string spelled as a name (no path separator, no suffix) is looked up</span>
-</span><span id="line-191"><span class="sd">      by name in the spec sources — today the shipped specs only — and never</span>
-</span><span id="line-192"><span class="sd">      read from a file in the working directory (spell a local file</span>
-</span><span id="line-193"><span class="sd">      ``./south_park``);</span>
-</span><span id="line-194"><span class="sd">    - anything else is a path to a YAML file.</span>
-</span><span id="line-195">
-</span><span id="line-196"><span class="sd">    &gt;&gt;&gt; resolve_style_spec('reiniger')['style']</span>
-</span><span id="line-197"><span class="sd">    'reiniger'</span>
-</span><span id="line-198"><span class="sd">    &gt;&gt;&gt; resolve_style_spec({'targets': {}})</span>
-</span><span id="line-199"><span class="sd">    {'targets': {}}</span>
-</span><span id="line-200">
-</span><span id="line-201"><span class="sd">    A missing file whose stem is a shipped style says how to load that one:</span>
+</span><span id="line-188"><span class="k">def</span><span class="w"> </span><span class="nf">resolve_style_spec</span><span class="p">(</span><span class="n">ref</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span> <span class="o">|</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="line-189"><span class="w">    </span><span class="sd">"""A style spec as a dict, from whatever refers to one.</span>
+</span><span id="line-190">
+</span><span id="line-191"><span class="sd">    - a mapping is passed through (a deep copy);</span>
+</span><span id="line-192"><span class="sd">    - a string spelled as a name (no path separator, no suffix) is looked up</span>
+</span><span id="line-193"><span class="sd">      by name in the spec sources — today the shipped specs only — and never</span>
+</span><span id="line-194"><span class="sd">      read from a file in the working directory (spell a local file</span>
+</span><span id="line-195"><span class="sd">      ``./south_park``);</span>
+</span><span id="line-196"><span class="sd">    - anything else is a path to a YAML file.</span>
+</span><span id="line-197">
+</span><span id="line-198"><span class="sd">    &gt;&gt;&gt; resolve_style_spec('reiniger')['style']</span>
+</span><span id="line-199"><span class="sd">    'reiniger'</span>
+</span><span id="line-200"><span class="sd">    &gt;&gt;&gt; resolve_style_spec({'targets': {}})</span>
+</span><span id="line-201"><span class="sd">    {'targets': {}}</span>
 </span><span id="line-202">
-</span><span id="line-203"><span class="sd">    &gt;&gt;&gt; resolve_style_spec('oversimplified.yaml')  # doctest: +ELLIPSIS</span>
-</span><span id="line-204"><span class="sd">    Traceback (most recent call last):</span>
-</span><span id="line-205"><span class="sd">      ...</span>
-</span><span id="line-206"><span class="sd">    FileNotFoundError: no style spec file 'oversimplified.yaml' ...</span>
-</span><span id="line-207"><span class="sd">    """</span>
-</span><span id="line-208">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
-</span><span id="line-209">        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">ref</span><span class="p">))</span>
-</span><span id="line-210">    <span class="k">if</span> <span class="n">_is_style_name</span><span class="p">(</span><span class="n">ref</span><span class="p">):</span>
-</span><span id="line-211">        <span class="k">return</span> <span class="n">style_spec</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
-</span><span id="line-212">    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
-</span><span id="line-213">    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span id="line-214">        <span class="n">hint</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-215">            <span class="sa">f</span><span class="s2">"; the shipped spec of that name is style_spec(</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="si">!r}</span><span class="s2">) "</span>
-</span><span id="line-216">            <span class="sa">f</span><span class="s2">"(pass the bare name </span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="si">!r}</span><span class="s2">)"</span>
-</span><span id="line-217">            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">stem</span> <span class="ow">in</span> <span class="n">_spec_files</span><span class="p">()</span>
-</span><span id="line-218">            <span class="k">else</span> <span class="s2">""</span>
-</span><span id="line-219">        <span class="p">)</span>
-</span><span id="line-220">        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no style spec file </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span><span class="si">!r}{</span><span class="n">hint</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-221">    <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
-</span><span id="line-222">
-</span><span id="line-223">    <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
-</span><span id="line-224">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="line-225">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"style spec </span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2"> is not a mapping"</span><span class="p">)</span>
-</span><span id="line-226">    <span class="k">return</span> <span class="n">data</span></div>
+</span><span id="line-203"><span class="sd">    A missing file whose stem is a shipped style says how to load that one:</span>
+</span><span id="line-204">
+</span><span id="line-205"><span class="sd">    &gt;&gt;&gt; resolve_style_spec('oversimplified.yaml')  # doctest: +ELLIPSIS</span>
+</span><span id="line-206"><span class="sd">    Traceback (most recent call last):</span>
+</span><span id="line-207"><span class="sd">      ...</span>
+</span><span id="line-208"><span class="sd">    FileNotFoundError: no style spec file 'oversimplified.yaml' ...</span>
+</span><span id="line-209"><span class="sd">    """</span>
+</span><span id="line-210">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+</span><span id="line-211">        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">ref</span><span class="p">))</span>
+</span><span id="line-212">    <span class="k">if</span> <span class="n">_is_style_name</span><span class="p">(</span><span class="n">ref</span><span class="p">):</span>
+</span><span id="line-213">        <span class="k">return</span> <span class="n">style_spec</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
+</span><span id="line-214">    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
+</span><span id="line-215">    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span id="line-216">        <span class="n">hint</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-217">            <span class="sa">f</span><span class="s2">"; the shipped spec of that name is style_spec(</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="si">!r}</span><span class="s2">) "</span>
+</span><span id="line-218">            <span class="sa">f</span><span class="s2">"(pass the bare name </span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="si">!r}</span><span class="s2">)"</span>
+</span><span id="line-219">            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">stem</span> <span class="ow">in</span> <span class="n">_spec_files</span><span class="p">()</span>
+</span><span id="line-220">            <span class="k">else</span> <span class="s2">""</span>
+</span><span id="line-221">        <span class="p">)</span>
+</span><span id="line-222">        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no style spec file </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span><span class="si">!r}{</span><span class="n">hint</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-223">    <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+</span><span id="line-224">
+</span><span id="line-225">    <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-226">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="line-227">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"style spec </span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2"> is not a mapping"</span><span class="p">)</span>
+</span><span id="line-228">    <span class="k">return</span> <span class="n">data</span></div>
 
-</span><span id="line-227">
-</span><span id="line-228">
-</span><span id="line-229"><span class="c1"># The style's policy (cutan#9): imported last, it reads the specs through the functions above.</span>
-</span><span id="line-230"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles.policy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: E402</span>
-</span><span id="line-231">    <span class="n">POLICY_KEY</span><span class="p">,</span>
-</span><span id="line-232">    <span class="n">PolicyError</span><span class="p">,</span>
-</span><span id="line-233">    <span class="n">check_policy</span><span class="p">,</span>
-</span><span id="line-234">    <span class="n">layered_policy</span><span class="p">,</span>
-</span><span id="line-235">    <span class="n">policy_of</span><span class="p">,</span>
-</span><span id="line-236">    <span class="n">policy_problems</span><span class="p">,</span>
-</span><span id="line-237">    <span class="n">style_pack</span><span class="p">,</span>
-</span><span id="line-238"><span class="p">)</span>
+</span><span id="line-229">
+</span><span id="line-230">
+</span><span id="line-231"><span class="c1"># The style's policy (cutan#9): imported last, it reads the specs through the functions above.</span>
+</span><span id="line-232"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles.policy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: E402</span>
+</span><span id="line-233">    <span class="n">POLICY_KEY</span><span class="p">,</span>
+</span><span id="line-234">    <span class="n">PolicyError</span><span class="p">,</span>
+</span><span id="line-235">    <span class="n">check_policy</span><span class="p">,</span>
+</span><span id="line-236">    <span class="n">layered_policy</span><span class="p">,</span>
+</span><span id="line-237">    <span class="n">policy_of</span><span class="p">,</span>
+</span><span id="line-238">    <span class="n">policy_problems</span><span class="p">,</span>
+</span><span id="line-239">    <span class="n">style_pack</span><span class="p">,</span>
+</span><span id="line-240"><span class="p">)</span>
+</span><span id="line-241">
+</span><span id="line-242"><span class="c1"># Copies of a spec and whether they are stale (cutan#19).</span>
+</span><span id="line-243"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles.copies</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_style_copies</span><span class="p">,</span> <span class="n">style_voice</span>  <span class="c1"># noqa: E402</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -449,7 +454,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=6a9d8632"></script>
+    <script src="../../_static/documentation_options.js?v=26ffa1e9"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

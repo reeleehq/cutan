@@ -38,10 +38,10 @@ True
 
 ### Functions
 
-| [`ball`](#cutan.impacts.objects.ball)(\*[, radius, x, floor_y, drop, color, ...])   | A ball moving vertically onto a floor whose top is at `floor_y`.   |
-|-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
-| [`impact_object`](#cutan.impacts.objects.impact_object)(name, \*\*kwargs)                    | Build a registered object by name.                                 |
-| [`stick`](#cutan.impacts.objects.stick)(\*[, length, thickness, pivot, ...])         | A drumstick rotating about `pivot` (its butt — the hand).          |
+| [`ball`](#cutan.impacts.objects.ball)(\*[, radius, x, floor_y, drop, ...])   | A ball moving onto a floor whose top is at `floor_y`.     |
+|----------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| [`impact_object`](#cutan.impacts.objects.impact_object)(name, \*\*kwargs)             | Build a registered object by name.                        |
+| [`stick`](#cutan.impacts.objects.stick)(\*[, length, thickness, pivot, ...])  | A drumstick rotating about `pivot` (its butt — the hand). |
 
 ### Classes
 
@@ -101,15 +101,28 @@ One animated property, AFFINE in stroke height `h`.
 (radians, or pixels). Affine is the whole contract — it is what makes an
 eased tween of the property exactly the same easing of `h`.
 
-### cutan.impacts.objects.ball(, radius=18.0, x=0.0, floor_y=90.0, drop=170.0, color='#111827', surface_color='#9ca3af', surface_size=(160.0, 24.0))
+### cutan.impacts.objects.ball(, radius=18.0, x=0.0, floor_y=90.0, drop=170.0, arc_radius=None, color='#111827', surface_color='#9ca3af', surface_size=(160.0, 24.0))
 
-A ball moving vertically onto a floor whose top is at `floor_y`.
+A ball moving onto a floor whose top is at `floor_y`.
 
 A full stroke lifts it `drop` pixels. Keypoints: `center` and
 `bottom` (its contact point).
 
+Straight by default. With `arc_radius` (cutan#27, a wide stick arc: a
+hard hit) it hangs on a circle of that radius about a pivot straight above
+its contact point, and the stroke ROTATES the pivot: the ball swings up to
+one side and falls back along the arc, its contact the arc’s lowest point.
+The angle that lifts it `drop` pixels is `acos(1 - drop / arc_radius)`;
+rotation is the one channel, affine in `h`, so the curve stays exact.
+
 * **Return type:**
   [`ImpactObject`](#cutan.impacts.objects.ImpactObject)
+
+```pycon
+>>> b = ball(arc_radius=300.0)
+>>> round(b.params["arc_sweep"], 4), b.at == (0.0, b.params["pivot_y"])
+(1.1226, True)
+```
 
 ### cutan.impacts.objects.impact_object(name, \*\*kwargs)
 

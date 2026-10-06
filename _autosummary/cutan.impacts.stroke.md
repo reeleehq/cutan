@@ -53,10 +53,11 @@ In both kinds the speed at the peak is `2 * apex / fall`.
 
 ### Classes
 
-| [`Stroke`](#cutan.impacts.stroke.Stroke)(kind, duration, segments, kinematics)   | The whole curve, plus the kinematics of every impact on it.   |
-|-------------------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| [`StrokeKinematics`](#cutan.impacts.stroke.StrokeKinematics)(index, kind, t_impact, ...)   | How the object moved into one impact.                         |
-| [`StrokeSegment`](#cutan.impacts.stroke.StrokeSegment)(t0, t1, h0, h1, easing)          | `h` goes from `h0` to `h1` over `[t0, t1]` under `easing`.    |
+| [`Stroke`](#cutan.impacts.stroke.Stroke)(kind, duration, segments, kinematics)   | The whole curve, plus the kinematics of every impact on it.                                                                                                         |
+|-------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`StrokeKinematics`](#cutan.impacts.stroke.StrokeKinematics)(index, kind, t_impact, ...)   | How the object moved into one impact.                                                                                                                               |
+| [`StrokeSegment`](#cutan.impacts.stroke.StrokeSegment)(t0, t1, h0, h1, easing)          | `h` goes from `h0` to `h1` over `[t0, t1]` under `easing`.                                                                                                          |
+| [`StrokeTiming`](#cutan.impacts.stroke.StrokeTiming)(rise, fall, brake)                | One impact's own timings (seconds): the `fall` into it, the air `brake` before it, and the `rise` out of it (cutan#27: stroke-shape variability, drawn per stroke). |
 
 ### Exceptions
 
@@ -99,7 +100,7 @@ Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueEr
 
 A stroke that cannot be built from these events.
 
-### *class* cutan.impacts.stroke.StrokeKinematics(index, kind, t_impact, t_peak_speed, peak_speed, apex, fall, brake)
+### *class* cutan.impacts.stroke.StrokeKinematics(index, kind, t_impact, t_peak_speed, peak_speed, apex, fall, brake, rise=0.0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -109,20 +110,35 @@ How the object moved into one impact.
 `brake` for an air impact; `peak_speed` is in stroke heights per second
 (multiply by the object’s stroke extent for pixels or radians).
 
+#### rise *: [float](https://docs.python.org/3/builtins/functions.html#float)*
+
+The rise out of this impact as executed (the next stroke’s preparation).
+
 ### *class* cutan.impacts.stroke.StrokeSegment(t0, t1, h0, h1, easing)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 `h` goes from `h0` to `h1` over `[t0, t1]` under `easing`.
 
-### cutan.impacts.stroke.build_stroke(events, , kind='surface', duration, rise=0.18, fall=0.18, brake=0.03, rest_height=1.0)
+### *class* cutan.impacts.stroke.StrokeTiming(rise, fall, brake)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One impact’s own timings (seconds): the `fall` into it, the air
+`brake` before it, and the `rise` out of it (cutan#27: stroke-shape
+variability, drawn per stroke). Each is the longest it may take: a fast
+tempo still shortens it to fit.
+
+### cutan.impacts.stroke.build_stroke(events, , kind='surface', duration, rise=0.18, fall=0.18, brake=0.03, rest_height=1.0, timings=None)
 
 Chain rise / hold / fall segments through every executed impact.
 
 The object starts and ends at `rest_height`; before impact `k` it is
 raised to `events[k].amplitude` (a bigger preparation, a harder hit).
 Segments tile `[0, duration]` exactly, and every impact is a segment
-boundary at precisely `t_impact`.
+boundary at precisely `t_impact`. `timings` gives each impact its own
+rise, fall and brake (one per event, cutan#27); without it every stroke
+takes `rise`, `fall` and `brake`.
 
 * **Return type:**
   [`Stroke`](#cutan.impacts.stroke.Stroke)

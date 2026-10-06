@@ -238,117 +238,129 @@
 </span><span id="line-57">    <span class="n">jitter_sd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DEFAULT_JITTER_SD</span><span class="p">,</span>
 </span><span id="line-58">    <span class="n">jitter_rho</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 </span><span id="line-59">    <span class="n">jitter_bias</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-60">    <span class="n">fps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span><span class="p">,</span>
-</span><span id="line-61">    <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-62">    <span class="n">exposure_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="line-63">    <span class="n">timestamp_jitter_sd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-64">    <span class="n">timestamp_noise_sd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-65">    <span class="n">phase</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-66">    <span class="n">timestamps</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"nominal"</span><span class="p">,</span>
-</span><span id="line-67">    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">640</span><span class="p">,</span>
-</span><span id="line-68">    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">360</span><span class="p">,</span>
-</span><span id="line-69">    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="line-70">    <span class="n">render</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="line-71"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-72"><span class="w">    </span><span class="sd">"""Write one impact clip (video + ground truth) under OUT_DIR.</span>
-</span><span id="line-73">
-</span><span id="line-74"><span class="sd">    out_dir: parent directory; the clip gets its own sub-directory</span>
-</span><span id="line-75"><span class="sd">    object: stick or ball</span>
-</span><span id="line-76"><span class="sd">    kind: surface (contact) or air (the stroke turns with nothing to hit)</span>
-</span><span id="line-77"><span class="sd">    tempo: a bpm, or beat:bpm pairs for a tempo change, e.g. 0:90,16:120</span>
-</span><span id="line-78"><span class="sd">    beats: number of beats</span>
-</span><span id="line-79"><span class="sd">    subdivision: grid steps per beat</span>
-</span><span id="line-80"><span class="sd">    pattern: per-step stroke heights, cycled; 0 is a rest, e.g. 1,0.5,0.8,0.5</span>
-</span><span id="line-81"><span class="sd">    lead_in: seconds before the first beat</span>
-</span><span id="line-82"><span class="sd">    tail: seconds after the last beat</span>
-</span><span id="line-83"><span class="sd">    jitter_sd: humanisation, seconds (standard deviation of the timing offset; 0 = metronome)</span>
-</span><span id="line-84"><span class="sd">    jitter_rho: correlation of consecutive offsets (0 = independent)</span>
-</span><span id="line-85"><span class="sd">    jitter_bias: constant lead (negative) or lag (positive), seconds</span>
-</span><span id="line-86"><span class="sd">    fps: frame rate (need not be an integer)</span>
-</span><span id="line-87"><span class="sd">    exposure: fraction of the frame period the shutter is open (0.5 = 180 degrees)</span>
-</span><span id="line-88"><span class="sd">    exposure_samples: instants averaged per open exposure (0 = automatic)</span>
-</span><span id="line-89"><span class="sd">    timestamp_jitter_sd: seconds of jitter in WHEN each frame is captured</span>
-</span><span id="line-90"><span class="sd">    timestamp_noise_sd: seconds of noise on the REPORTED timestamp only</span>
-</span><span id="line-91"><span class="sd">    phase: sub-frame offset of the camera clock, seconds</span>
-</span><span id="line-92"><span class="sd">    timestamps: what keypoints.ndjson reports as t: nominal or actual</span>
-</span><span id="line-93"><span class="sd">    width: frame width in pixels</span>
-</span><span id="line-94"><span class="sd">    height: frame height in pixels</span>
-</span><span id="line-95"><span class="sd">    seed: random seed (performance and camera streams derive from it)</span>
-</span><span id="line-96"><span class="sd">    render: render the mp4; --no-render writes the truth and keypoints only</span>
-</span><span id="line-97"><span class="sd">    """</span>
-</span><span id="line-98">    <span class="n">spec</span> <span class="o">=</span> <span class="n">ImpactClipSpec</span><span class="p">(</span>
-</span><span id="line-99">        <span class="nb">object</span><span class="o">=</span><span class="nb">object</span><span class="p">,</span>
-</span><span id="line-100">        <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
-</span><span id="line-101">        <span class="n">tempo</span><span class="o">=</span><span class="n">_tempo</span><span class="p">(</span><span class="n">tempo</span><span class="p">),</span>
-</span><span id="line-102">        <span class="n">beats</span><span class="o">=</span><span class="n">beats</span><span class="p">,</span>
-</span><span id="line-103">        <span class="n">subdivision</span><span class="o">=</span><span class="n">subdivision</span><span class="p">,</span>
-</span><span id="line-104">        <span class="n">pattern</span><span class="o">=</span><span class="n">_floats</span><span class="p">(</span><span class="n">pattern</span><span class="p">),</span>
-</span><span id="line-105">        <span class="n">lead_in</span><span class="o">=</span><span class="n">lead_in</span><span class="p">,</span>
-</span><span id="line-106">        <span class="n">tail</span><span class="o">=</span><span class="n">tail</span><span class="p">,</span>
-</span><span id="line-107">        <span class="n">jitter_sd</span><span class="o">=</span><span class="n">jitter_sd</span><span class="p">,</span>
-</span><span id="line-108">        <span class="n">jitter_rho</span><span class="o">=</span><span class="n">jitter_rho</span><span class="p">,</span>
-</span><span id="line-109">        <span class="n">jitter_bias</span><span class="o">=</span><span class="n">jitter_bias</span><span class="p">,</span>
-</span><span id="line-110">        <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span>
-</span><span id="line-111">        <span class="n">exposure</span><span class="o">=</span><span class="n">exposure</span><span class="p">,</span>
-</span><span id="line-112">        <span class="n">exposure_samples</span><span class="o">=</span><span class="n">exposure_samples</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-113">        <span class="n">timestamp_jitter_sd</span><span class="o">=</span><span class="n">timestamp_jitter_sd</span><span class="p">,</span>
-</span><span id="line-114">        <span class="n">timestamp_noise_sd</span><span class="o">=</span><span class="n">timestamp_noise_sd</span><span class="p">,</span>
-</span><span id="line-115">        <span class="n">phase</span><span class="o">=</span><span class="n">phase</span><span class="p">,</span>
-</span><span id="line-116">        <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">,</span>
-</span><span id="line-117">        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
-</span><span id="line-118">        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
-</span><span id="line-119">        <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
-</span><span id="line-120">    <span class="p">)</span>
-</span><span id="line-121">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"wrote </span><span class="si">{</span><span class="n">write_impact_clip</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span><span class="w"> </span><span class="n">out_dir</span><span class="p">,</span><span class="w"> </span><span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span></div>
+</span><span id="line-60">    <span class="n">rise_sd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-61">    <span class="n">fall_sd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-62">    <span class="n">brake_sd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-63">    <span class="n">arc_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-64">    <span class="n">fps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span><span class="p">,</span>
+</span><span id="line-65">    <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-66">    <span class="n">exposure_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</span><span id="line-67">    <span class="n">timestamp_jitter_sd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-68">    <span class="n">timestamp_noise_sd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-69">    <span class="n">phase</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-70">    <span class="n">timestamps</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"nominal"</span><span class="p">,</span>
+</span><span id="line-71">    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">640</span><span class="p">,</span>
+</span><span id="line-72">    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">360</span><span class="p">,</span>
+</span><span id="line-73">    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</span><span id="line-74">    <span class="n">render</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="line-75"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-76"><span class="w">    </span><span class="sd">"""Write one impact clip (video + ground truth) under OUT_DIR.</span>
+</span><span id="line-77">
+</span><span id="line-78"><span class="sd">    out_dir: parent directory; the clip gets its own sub-directory</span>
+</span><span id="line-79"><span class="sd">    object: stick or ball</span>
+</span><span id="line-80"><span class="sd">    kind: surface (contact) or air (the stroke turns with nothing to hit)</span>
+</span><span id="line-81"><span class="sd">    tempo: a bpm, or beat:bpm pairs for a tempo change, e.g. 0:90,16:120</span>
+</span><span id="line-82"><span class="sd">    beats: number of beats</span>
+</span><span id="line-83"><span class="sd">    subdivision: grid steps per beat</span>
+</span><span id="line-84"><span class="sd">    pattern: per-step stroke heights, cycled; 0 is a rest, e.g. 1,0.5,0.8,0.5</span>
+</span><span id="line-85"><span class="sd">    lead_in: seconds before the first beat</span>
+</span><span id="line-86"><span class="sd">    tail: seconds after the last beat</span>
+</span><span id="line-87"><span class="sd">    jitter_sd: humanisation, seconds (standard deviation of the timing offset; 0 = metronome)</span>
+</span><span id="line-88"><span class="sd">    jitter_rho: correlation of consecutive offsets (0 = independent)</span>
+</span><span id="line-89"><span class="sd">    jitter_bias: constant lead (negative) or lag (positive), seconds</span>
+</span><span id="line-90"><span class="sd">    rise_sd: spread of each stroke's rise, seconds (drawn per stroke; 0 = constant)</span>
+</span><span id="line-91"><span class="sd">    fall_sd: spread of each stroke's fall, seconds (drawn per stroke; 0 = constant)</span>
+</span><span id="line-92"><span class="sd">    brake_sd: spread of each air stroke's brake, seconds (drawn per stroke; 0 = constant)</span>
+</span><span id="line-93"><span class="sd">    arc_radius: the ball swings on a circle of this radius (px) about a pivot above its contact (0 = a straight fall)</span>
+</span><span id="line-94"><span class="sd">    fps: frame rate (need not be an integer)</span>
+</span><span id="line-95"><span class="sd">    exposure: fraction of the frame period the shutter is open (0.5 = 180 degrees)</span>
+</span><span id="line-96"><span class="sd">    exposure_samples: instants averaged per open exposure (0 = automatic)</span>
+</span><span id="line-97"><span class="sd">    timestamp_jitter_sd: seconds of jitter in WHEN each frame is captured</span>
+</span><span id="line-98"><span class="sd">    timestamp_noise_sd: seconds of noise on the REPORTED timestamp only</span>
+</span><span id="line-99"><span class="sd">    phase: sub-frame offset of the camera clock, seconds</span>
+</span><span id="line-100"><span class="sd">    timestamps: what keypoints.ndjson reports as t: nominal or actual</span>
+</span><span id="line-101"><span class="sd">    width: frame width in pixels</span>
+</span><span id="line-102"><span class="sd">    height: frame height in pixels</span>
+</span><span id="line-103"><span class="sd">    seed: random seed (performance and camera streams derive from it)</span>
+</span><span id="line-104"><span class="sd">    render: render the mp4; --no-render writes the truth and keypoints only</span>
+</span><span id="line-105"><span class="sd">    """</span>
+</span><span id="line-106">    <span class="n">spec</span> <span class="o">=</span> <span class="n">ImpactClipSpec</span><span class="p">(</span>
+</span><span id="line-107">        <span class="nb">object</span><span class="o">=</span><span class="nb">object</span><span class="p">,</span>
+</span><span id="line-108">        <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
+</span><span id="line-109">        <span class="n">tempo</span><span class="o">=</span><span class="n">_tempo</span><span class="p">(</span><span class="n">tempo</span><span class="p">),</span>
+</span><span id="line-110">        <span class="n">beats</span><span class="o">=</span><span class="n">beats</span><span class="p">,</span>
+</span><span id="line-111">        <span class="n">subdivision</span><span class="o">=</span><span class="n">subdivision</span><span class="p">,</span>
+</span><span id="line-112">        <span class="n">pattern</span><span class="o">=</span><span class="n">_floats</span><span class="p">(</span><span class="n">pattern</span><span class="p">),</span>
+</span><span id="line-113">        <span class="n">lead_in</span><span class="o">=</span><span class="n">lead_in</span><span class="p">,</span>
+</span><span id="line-114">        <span class="n">tail</span><span class="o">=</span><span class="n">tail</span><span class="p">,</span>
+</span><span id="line-115">        <span class="n">jitter_sd</span><span class="o">=</span><span class="n">jitter_sd</span><span class="p">,</span>
+</span><span id="line-116">        <span class="n">jitter_rho</span><span class="o">=</span><span class="n">jitter_rho</span><span class="p">,</span>
+</span><span id="line-117">        <span class="n">jitter_bias</span><span class="o">=</span><span class="n">jitter_bias</span><span class="p">,</span>
+</span><span id="line-118">        <span class="n">rise_sd</span><span class="o">=</span><span class="n">rise_sd</span><span class="p">,</span>
+</span><span id="line-119">        <span class="n">fall_sd</span><span class="o">=</span><span class="n">fall_sd</span><span class="p">,</span>
+</span><span id="line-120">        <span class="n">brake_sd</span><span class="o">=</span><span class="n">brake_sd</span><span class="p">,</span>
+</span><span id="line-121">        <span class="n">arc_radius</span><span class="o">=</span><span class="n">arc_radius</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-122">        <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span>
+</span><span id="line-123">        <span class="n">exposure</span><span class="o">=</span><span class="n">exposure</span><span class="p">,</span>
+</span><span id="line-124">        <span class="n">exposure_samples</span><span class="o">=</span><span class="n">exposure_samples</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-125">        <span class="n">timestamp_jitter_sd</span><span class="o">=</span><span class="n">timestamp_jitter_sd</span><span class="p">,</span>
+</span><span id="line-126">        <span class="n">timestamp_noise_sd</span><span class="o">=</span><span class="n">timestamp_noise_sd</span><span class="p">,</span>
+</span><span id="line-127">        <span class="n">phase</span><span class="o">=</span><span class="n">phase</span><span class="p">,</span>
+</span><span id="line-128">        <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">,</span>
+</span><span id="line-129">        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+</span><span id="line-130">        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+</span><span id="line-131">        <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+</span><span id="line-132">    <span class="p">)</span>
+</span><span id="line-133">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"wrote </span><span class="si">{</span><span class="n">write_impact_clip</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span><span class="w"> </span><span class="n">out_dir</span><span class="p">,</span><span class="w"> </span><span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span></div>
 
-</span><span id="line-122">
-</span><span id="line-123">
+</span><span id="line-134">
+</span><span id="line-135">
 <div class="viewcode-block" id="clip_set">
 <a class="viewcode-back" href="../../../_autosummary/cutan.impacts.cli.html#cutan.impacts.cli.clip_set">[docs]</a>
-</span><span id="line-124"><span class="k">def</span><span class="w"> </span><span class="nf">clip_set</span><span class="p">(</span>
-</span><span id="line-125">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-126">    <span class="n">objects</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"stick,ball"</span><span class="p">,</span>
-</span><span id="line-127">    <span class="n">kinds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"surface,air"</span><span class="p">,</span>
-</span><span id="line-128">    <span class="n">fps</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"24,30,60"</span><span class="p">,</span>
-</span><span id="line-129">    <span class="n">exposures</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"0,0.5"</span><span class="p">,</span>
-</span><span id="line-130">    <span class="n">timestamp_jitter_sds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"0"</span><span class="p">,</span>
-</span><span id="line-131">    <span class="n">seeds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"0"</span><span class="p">,</span>
-</span><span id="line-132">    <span class="n">render</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="line-133"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-134"><span class="w">    </span><span class="sd">"""Write a benchmark set (the product of the given axes) plus index.json.</span>
-</span><span id="line-135">
-</span><span id="line-136"><span class="sd">    Every clip shares one performance per seed — an accelerando from 96 to 132</span>
-</span><span id="line-137"><span class="sd">    BPM over 24 beats, accented, with 12 ms of drifting human timing — so clips</span>
-</span><span id="line-138"><span class="sd">    differ only in object, kind and camera.</span>
-</span><span id="line-139">
-</span><span id="line-140"><span class="sd">    out_dir: directory for the set</span>
-</span><span id="line-141"><span class="sd">    objects: comma-separated, from stick,ball</span>
-</span><span id="line-142"><span class="sd">    kinds: comma-separated, from surface,air</span>
-</span><span id="line-143"><span class="sd">    fps: comma-separated frame rates</span>
-</span><span id="line-144"><span class="sd">    exposures: comma-separated shutter fractions</span>
-</span><span id="line-145"><span class="sd">    timestamp_jitter_sds: comma-separated capture-jitter standard deviations (s)</span>
-</span><span id="line-146"><span class="sd">    seeds: comma-separated performance seeds</span>
-</span><span id="line-147"><span class="sd">    render: render the videos; --no-render writes the truth and keypoints only</span>
-</span><span id="line-148"><span class="sd">    """</span>
-</span><span id="line-149">    <span class="n">specs</span> <span class="o">=</span> <span class="n">impact_set_specs</span><span class="p">(</span>
-</span><span id="line-150">        <span class="n">base</span><span class="o">=</span><span class="n">replace</span><span class="p">(</span><span class="n">BENCHMARK_SPEC</span><span class="p">),</span>
-</span><span id="line-151">        <span class="n">objects</span><span class="o">=</span><span class="n">_words</span><span class="p">(</span><span class="n">objects</span><span class="p">),</span>
-</span><span id="line-152">        <span class="n">kinds</span><span class="o">=</span><span class="n">_words</span><span class="p">(</span><span class="n">kinds</span><span class="p">),</span>
-</span><span id="line-153">        <span class="n">fps</span><span class="o">=</span><span class="n">_floats</span><span class="p">(</span><span class="n">fps</span><span class="p">),</span>
-</span><span id="line-154">        <span class="n">exposures</span><span class="o">=</span><span class="n">_floats</span><span class="p">(</span><span class="n">exposures</span><span class="p">),</span>
-</span><span id="line-155">        <span class="n">timestamp_jitter_sds</span><span class="o">=</span><span class="n">_floats</span><span class="p">(</span><span class="n">timestamp_jitter_sds</span><span class="p">),</span>
-</span><span id="line-156">        <span class="n">seeds</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">_words</span><span class="p">(</span><span class="n">seeds</span><span class="p">)),</span>
-</span><span id="line-157">    <span class="p">)</span>
-</span><span id="line-158">
-</span><span id="line-159">    <span class="k">def</span><span class="w"> </span><span class="nf">progress</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-160">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-161">
-</span><span id="line-162">    <span class="n">root</span> <span class="o">=</span> <span class="n">write_impact_set</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
-</span><span id="line-163">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">specs</span><span class="p">)</span><span class="si">}</span><span class="s2"> clips and </span><span class="si">{</span><span class="n">root</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'index.json'</span><span class="si">}</span><span class="s2">"</span></div>
+</span><span id="line-136"><span class="k">def</span><span class="w"> </span><span class="nf">clip_set</span><span class="p">(</span>
+</span><span id="line-137">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-138">    <span class="n">objects</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"stick,ball"</span><span class="p">,</span>
+</span><span id="line-139">    <span class="n">kinds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"surface,air"</span><span class="p">,</span>
+</span><span id="line-140">    <span class="n">fps</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"24,30,60"</span><span class="p">,</span>
+</span><span id="line-141">    <span class="n">exposures</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"0,0.5"</span><span class="p">,</span>
+</span><span id="line-142">    <span class="n">timestamp_jitter_sds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"0"</span><span class="p">,</span>
+</span><span id="line-143">    <span class="n">seeds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"0"</span><span class="p">,</span>
+</span><span id="line-144">    <span class="n">render</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="line-145"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-146"><span class="w">    </span><span class="sd">"""Write a benchmark set (the product of the given axes) plus index.json.</span>
+</span><span id="line-147">
+</span><span id="line-148"><span class="sd">    Every clip shares one performance per seed — an accelerando from 96 to 132</span>
+</span><span id="line-149"><span class="sd">    BPM over 24 beats, accented, with 12 ms of drifting human timing — so clips</span>
+</span><span id="line-150"><span class="sd">    differ only in object, kind and camera.</span>
+</span><span id="line-151">
+</span><span id="line-152"><span class="sd">    out_dir: directory for the set</span>
+</span><span id="line-153"><span class="sd">    objects: comma-separated, from stick,ball</span>
+</span><span id="line-154"><span class="sd">    kinds: comma-separated, from surface,air</span>
+</span><span id="line-155"><span class="sd">    fps: comma-separated frame rates</span>
+</span><span id="line-156"><span class="sd">    exposures: comma-separated shutter fractions</span>
+</span><span id="line-157"><span class="sd">    timestamp_jitter_sds: comma-separated capture-jitter standard deviations (s)</span>
+</span><span id="line-158"><span class="sd">    seeds: comma-separated performance seeds</span>
+</span><span id="line-159"><span class="sd">    render: render the videos; --no-render writes the truth and keypoints only</span>
+</span><span id="line-160"><span class="sd">    """</span>
+</span><span id="line-161">    <span class="n">specs</span> <span class="o">=</span> <span class="n">impact_set_specs</span><span class="p">(</span>
+</span><span id="line-162">        <span class="n">base</span><span class="o">=</span><span class="n">replace</span><span class="p">(</span><span class="n">BENCHMARK_SPEC</span><span class="p">),</span>
+</span><span id="line-163">        <span class="n">objects</span><span class="o">=</span><span class="n">_words</span><span class="p">(</span><span class="n">objects</span><span class="p">),</span>
+</span><span id="line-164">        <span class="n">kinds</span><span class="o">=</span><span class="n">_words</span><span class="p">(</span><span class="n">kinds</span><span class="p">),</span>
+</span><span id="line-165">        <span class="n">fps</span><span class="o">=</span><span class="n">_floats</span><span class="p">(</span><span class="n">fps</span><span class="p">),</span>
+</span><span id="line-166">        <span class="n">exposures</span><span class="o">=</span><span class="n">_floats</span><span class="p">(</span><span class="n">exposures</span><span class="p">),</span>
+</span><span id="line-167">        <span class="n">timestamp_jitter_sds</span><span class="o">=</span><span class="n">_floats</span><span class="p">(</span><span class="n">timestamp_jitter_sds</span><span class="p">),</span>
+</span><span id="line-168">        <span class="n">seeds</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">_words</span><span class="p">(</span><span class="n">seeds</span><span class="p">)),</span>
+</span><span id="line-169">    <span class="p">)</span>
+</span><span id="line-170">
+</span><span id="line-171">    <span class="k">def</span><span class="w"> </span><span class="nf">progress</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-172">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-173">
+</span><span id="line-174">    <span class="n">root</span> <span class="o">=</span> <span class="n">write_impact_set</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
+</span><span id="line-175">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">specs</span><span class="p">)</span><span class="si">}</span><span class="s2"> clips and </span><span class="si">{</span><span class="n">root</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'index.json'</span><span class="si">}</span><span class="s2">"</span></div>
 
-</span><span id="line-164">
-</span><span id="line-165">
-</span><span id="line-166"><span class="n">_dispatch_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">clip</span><span class="p">,</span> <span class="n">clip_set</span><span class="p">]</span>
+</span><span id="line-176">
+</span><span id="line-177">
+</span><span id="line-178"><span class="n">_dispatch_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">clip</span><span class="p">,</span> <span class="n">clip_set</span><span class="p">]</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -362,7 +374,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=6a9d8632"></script>
+    <script src="../../../_static/documentation_options.js?v=26ffa1e9"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

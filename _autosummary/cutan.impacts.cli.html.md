@@ -15,7 +15,7 @@ that take real types, and these only parse the list-valued flags.
 |-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
 | [`clip_set`](#cutan.impacts.cli.clip_set)(out_dir[, objects, kinds, fps, ...])      | Write a benchmark set (the product of the given axes) plus index.json. |
 
-### cutan.impacts.cli.clip(out_dir, object='stick', kind='surface', tempo='100', beats=16, subdivision=1, pattern='1', lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, fps=30.0, exposure=0.0, exposure_samples=0, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, seed=0, render=True)
+### cutan.impacts.cli.clip(out_dir, object='stick', kind='surface', tempo='100', beats=16, subdivision=1, pattern='1', lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=0.0, fps=30.0, exposure=0.0, exposure_samples=0, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, seed=0, render=True)
 
 Write one impact clip (video + ground truth) under OUT_DIR.
 
@@ -31,6 +31,10 @@ tail: seconds after the last beat
 jitter_sd: humanisation, seconds (standard deviation of the timing offset; 0 = metronome)
 jitter_rho: correlation of consecutive offsets (0 = independent)
 jitter_bias: constant lead (negative) or lag (positive), seconds
+rise_sd: spread of each stroke’s rise, seconds (drawn per stroke; 0 = constant)
+fall_sd: spread of each stroke’s fall, seconds (drawn per stroke; 0 = constant)
+brake_sd: spread of each air stroke’s brake, seconds (drawn per stroke; 0 = constant)
+arc_radius: the ball swings on a circle of this radius (px) about a pivot above its contact (0 = a straight fall)
 fps: frame rate (need not be an integer)
 exposure: fraction of the frame period the shutter is open (0.5 = 180 degrees)
 exposure_samples: instants averaged per open exposure (0 = automatic)

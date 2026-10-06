@@ -52,7 +52,9 @@ clip with two can be described without changing any reader):
     `air` (turning point; velocity is zero at `t_impact`);
   - `t_peak_speed` (`= t_impact` for surface, `t_impact - brake` for
     air), `peak_speed` (stroke heights/s), `peak_speed_px` (the impact
-    keypoint’s px/s), `fall`, `brake` (seconds);
+    keypoint’s px/s), `fall`, `brake` and `rise` (the stroke into this
+    impact and the one out of it, as executed, seconds; drawn per stroke when
+    the spec spreads them, cutan#27);
   - `impact_xy` — the impact keypoint at `t_impact`;
   - `frames` — what the frames show: `before` (last frame whose exposure
     closed at or before the impact), `after` (first to open at or after it),
@@ -99,9 +101,10 @@ The analytic and compiled keypoints must agree to this many pixels. Both are
 double-precision evaluations of the same easing, so any real disagreement is
 orders of magnitude larger.
 
-### cutan.impacts.truth.TRUTH_SCHEMA_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '1.0.0'*
+### cutan.impacts.truth.TRUTH_SCHEMA_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '1.1.0'*
 
 Bumped on any change a reader must know about; additive fields bump MINOR.
+1.1.0: each event’s `rise` (cutan#27).
 
 ### *exception* cutan.impacts.truth.TruthMismatch
 

@@ -26,6 +26,8 @@ cutan.styles
       policy_of
       policy_problems
       style_pack
+      style_voice
+      check_style_copies
    
    .. rubric:: Exceptions
 
@@ -40,4 +42,5 @@ cutan.styles
    :toctree:
    :recursive:
 
+   copies
    policy

@@ -1,0 +1,21 @@
+cutan.styles.copies
+===================
+
+.. automodule:: cutan.styles.copies
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      SPEC_ORIGIN_KEY
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      check_style_copies
+      spec_origin
+      stale_copy_problem
+      style_voice
+   

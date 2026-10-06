@@ -179,7 +179,9 @@ continuous; each channel’s value is <code class="docutils literal notranslate"
 <code class="docutils literal notranslate"><span class="pre">air</span></code> (turning point; velocity is zero at <code class="docutils literal notranslate"><span class="pre">t_impact</span></code>);</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">t_peak_speed</span></code> (<code class="docutils literal notranslate"><span class="pre">=</span> <span class="pre">t_impact</span></code> for surface, <code class="docutils literal notranslate"><span class="pre">t_impact</span> <span class="pre">-</span> <span class="pre">brake</span></code> for
 air), <code class="docutils literal notranslate"><span class="pre">peak_speed</span></code> (stroke heights/s), <code class="docutils literal notranslate"><span class="pre">peak_speed_px</span></code> (the impact
-keypoint’s px/s), <code class="docutils literal notranslate"><span class="pre">fall</span></code>, <code class="docutils literal notranslate"><span class="pre">brake</span></code> (seconds);</p></li>
+keypoint’s px/s), <code class="docutils literal notranslate"><span class="pre">fall</span></code>, <code class="docutils literal notranslate"><span class="pre">brake</span></code> and <code class="docutils literal notranslate"><span class="pre">rise</span></code> (the stroke into this
+impact and the one out of it, as executed, seconds; drawn per stroke when
+the spec spreads them, cutan#27);</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">impact_xy</span></code> — the impact keypoint at <code class="docutils literal notranslate"><span class="pre">t_impact</span></code>;</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">frames</span></code> — what the frames show: <code class="docutils literal notranslate"><span class="pre">before</span></code> (last frame whose exposure
 closed at or before the impact), <code class="docutils literal notranslate"><span class="pre">after</span></code> (first to open at or after it),
@@ -245,8 +247,9 @@ orders of magnitude larger.</p>
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="cutan.impacts.truth.TRUTH_SCHEMA_VERSION">
-<span class="sig-prename descclassname"><span class="pre">cutan.impacts.truth.</span></span><span class="sig-name descname"><span class="pre">TRUTH_SCHEMA_VERSION</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'1.0.0'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.impacts.truth.TRUTH_SCHEMA_VERSION" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.impacts.truth.TRUTH_SCHEMA_VERSION'">¶</a></dt>
-<dd><p>Bumped on any change a reader must know about; additive fields bump MINOR.</p>
+<span class="sig-prename descclassname"><span class="pre">cutan.impacts.truth.</span></span><span class="sig-name descname"><span class="pre">TRUTH_SCHEMA_VERSION</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'1.1.0'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.impacts.truth.TRUTH_SCHEMA_VERSION" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.impacts.truth.TRUTH_SCHEMA_VERSION'">¶</a></dt>
+<dd><p>Bumped on any change a reader must know about; additive fields bump MINOR.
+1.1.0: each event’s <code class="docutils literal notranslate"><span class="pre">rise</span></code> (cutan#27).</p>
 </dd></dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="cutan.impacts.truth.TruthMismatch">
@@ -312,7 +315,7 @@ points are what the frame shows; nothing else from the truth leaks in.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=6a9d8632"></script>
+<script src="../_static/documentation_options.js?v=26ffa1e9"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

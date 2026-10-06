@@ -76,6 +76,8 @@ prints one, and `python -m cutan.styles NAME --path` prints its file’s path
 | [`policy_of`](#cutan.styles.policy_of)(obj)                         | The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.                                                                                                               |
 | [`policy_problems`](#cutan.styles.policy_problems)(policy)                | What is wrong with a `policy` block, one sentence each (empty when it is sound).                                                                                                                            |
 | [`style_pack`](#cutan.styles.style_pack)(spec)                       | The StylePack a project saves for a style: its `live.style_pack` (a bare pack named after the style when the spec has none), its `policy`, and the spec it was copied from (name and digest) in `metadata`. |
+| [`style_voice`](#cutan.styles.style_voice)(spec, role)                | The partial voice document `spec` casts `role` as (<br/><br/>```<br/>``<br/>```<br/><br/>an.audio.takes.                                                                                                    |
+| [`check_style_copies`](#cutan.styles.check_style_copies)(ctx)                | `an validate`: the style pack the scene names, and every voice its lines speak with, warn when they were copied from an older version of the shipped spec they record (cutan#19).                           |
 
 ### Exceptions
 
@@ -116,6 +118,15 @@ it), and so also a `LookupError`.
 
 * **Return type:**
   [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+### cutan.styles.check_style_copies(ctx)
+
+`an validate`: the style pack the scene names, and every voice its lines
+speak with, warn when they were copied from an older version of the shipped
+spec they record (cutan#19). Once per validation.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.styles.layered_policy(, shot=None, style_pack=None)
 
@@ -252,7 +263,24 @@ The names of the style specs that ship with `cutan`, sorted.
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
+### cutan.styles.style_voice(spec, role)
+
+The partial voice document `spec` casts `role` as (`an.audio.takes.
+style_voice_role`: target names resolved to values), with the spec it came
+from recorded, so a later re-measure of the style is noticed. Merge it beside
+a `voice_id`: `{**style_voice("oversimplified", "eager"), "voice_id": ...}`.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+```pycon
+>>> doc = style_voice("oversimplified", "narrator")
+>>> doc["metadata"]["style_spec"]["name"], "targets" in doc["takes"]["cues"]["deadpan"]
+('oversimplified', True)
+```
+
 ### Modules
 
-| [`policy`](cutan.styles.policy.html.md#module-cutan.styles.policy)   | A style's policy: per-aspect method orders the compiler applies (ADR 0002 decision 4, cutan#9).   |
-|--------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| [`copies`](cutan.styles.copies.html.md#module-cutan.styles.copies)   | Copies of a style spec, and whether they are stale (cutan#19).                                  |
+|--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| [`policy`](cutan.styles.policy.html.md#module-cutan.styles.policy)   | A style's policy: per-aspect method orders the compiler applies (ADR 0002 decision 4, cutan#9). |

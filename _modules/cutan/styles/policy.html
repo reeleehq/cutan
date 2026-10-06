@@ -430,7 +430,7 @@
 </span><span id="line-231"><span class="sd">    """</span>
 </span><span id="line-232">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">StylePack</span>
 </span><span id="line-233">
-</span><span id="line-234">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">_is_style_name</span><span class="p">,</span> <span class="n">resolve_style_spec</span><span class="p">,</span> <span class="n">style_spec_digest</span>
+</span><span id="line-234">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_style_spec</span>
 </span><span id="line-235">
 </span><span id="line-236">    <span class="n">data</span> <span class="o">=</span> <span class="n">resolve_style_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 </span><span id="line-237">    <span class="n">live</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"live"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
@@ -440,86 +440,78 @@
 </span><span id="line-241">    <span class="k">if</span> <span class="n">block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="line-242">        <span class="n">check_policy</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="sa">f</span><span class="s2">"style spec </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'style'</span><span class="p">)</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-243">        <span class="n">pack</span><span class="p">[</span><span class="n">POLICY_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">block</span>
-</span><span id="line-244">    <span class="n">origin</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"style"</span><span class="p">)}</span>
-</span><span id="line-245">    <span class="k">if</span> <span class="n">_is_style_name</span><span class="p">(</span><span class="n">spec</span><span class="p">):</span>
-</span><span id="line-246">        <span class="n">origin</span><span class="p">[</span><span class="s2">"sha256"</span><span class="p">]</span> <span class="o">=</span> <span class="n">style_spec_digest</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
-</span><span id="line-247">    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
-</span><span id="line-248">        <span class="n">spec</span><span class="p">,</span> <span class="n">Mapping</span>
-</span><span id="line-249">    <span class="p">):</span>  <span class="c1"># a file: the same digest rule as the shipped specs</span>
-</span><span id="line-250">        <span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
-</span><span id="line-251">        <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-</span><span id="line-252">
-</span><span id="line-253">        <span class="n">raw</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">b</span><span class="s2">"</span><span class="se">\r\n</span><span class="s2">"</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-254">        <span class="n">origin</span><span class="p">[</span><span class="s2">"sha256"</span><span class="p">]</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-</span><span id="line-255">    <span class="n">pack</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="p">(</span><span class="n">pack</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"metadata"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}),</span> <span class="s2">"style_spec"</span><span class="p">:</span> <span class="n">origin</span><span class="p">}</span>
-</span><span id="line-256">    <span class="k">return</span> <span class="n">StylePack</span><span class="p">(</span><span class="o">**</span><span class="n">pack</span><span class="p">)</span></div>
+</span><span id="line-244">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles.copies</span><span class="w"> </span><span class="kn">import</span> <span class="n">SPEC_ORIGIN_KEY</span><span class="p">,</span> <span class="n">spec_origin</span>
+</span><span id="line-245">
+</span><span id="line-246">    <span class="n">origin</span> <span class="o">=</span> <span class="n">spec_origin</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+</span><span id="line-247">    <span class="n">pack</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="p">(</span><span class="n">pack</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"metadata"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}),</span> <span class="n">SPEC_ORIGIN_KEY</span><span class="p">:</span> <span class="n">origin</span><span class="p">}</span>
+</span><span id="line-248">    <span class="k">return</span> <span class="n">StylePack</span><span class="p">(</span><span class="o">**</span><span class="n">pack</span><span class="p">)</span></div>
 
-</span><span id="line-257">
-</span><span id="line-258">
-</span><span id="line-259"><span class="k">def</span><span class="w"> </span><span class="nf">_is_cutout</span><span class="p">(</span><span class="n">shot</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-260">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan</span><span class="w"> </span><span class="kn">import</span> <span class="n">RENDERER_NAME</span>
-</span><span id="line-261">
-</span><span id="line-262">    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="s2">"renderer"</span><span class="p">,</span> <span class="n">RENDERER_NAME</span><span class="p">)</span> <span class="o">==</span> <span class="n">RENDERER_NAME</span>
-</span><span id="line-263">
-</span><span id="line-264">
-</span><span id="line-265"><span class="k">def</span><span class="w"> </span><span class="nf">_scene_pack</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-</span><span id="line-266"><span class="w">    </span><span class="sd">"""The StylePack document the scene names (``meta.style_pack``), read from the</span>
-</span><span id="line-267"><span class="sd">    ``styles`` store ``an validate`` hands its checks (an#348); ``None`` when the</span>
-</span><span id="line-268"><span class="sd">    scene names none or the store is not supplied (or lacks it: the core's</span>
-</span><span id="line-269"><span class="sd">    own check says so)."""</span>
-</span><span id="line-270">    <span class="n">name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span> <span class="s2">"style_pack"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-271">    <span class="n">styles</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">stores</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"styles"</span><span class="p">)</span>
-</span><span id="line-272">    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">or</span> <span class="n">styles</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">styles</span><span class="p">:</span>
-</span><span id="line-273">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-274">    <span class="k">return</span> <span class="n">styles</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-</span><span id="line-275">
-</span><span id="line-276">
+</span><span id="line-249">
+</span><span id="line-250">
+</span><span id="line-251"><span class="k">def</span><span class="w"> </span><span class="nf">_is_cutout</span><span class="p">(</span><span class="n">shot</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-252">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan</span><span class="w"> </span><span class="kn">import</span> <span class="n">RENDERER_NAME</span>
+</span><span id="line-253">
+</span><span id="line-254">    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="s2">"renderer"</span><span class="p">,</span> <span class="n">RENDERER_NAME</span><span class="p">)</span> <span class="o">==</span> <span class="n">RENDERER_NAME</span>
+</span><span id="line-255">
+</span><span id="line-256">
+</span><span id="line-257"><span class="k">def</span><span class="w"> </span><span class="nf">_scene_pack</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+</span><span id="line-258"><span class="w">    </span><span class="sd">"""The StylePack document the scene names (``meta.style_pack``), read from the</span>
+</span><span id="line-259"><span class="sd">    ``styles`` store ``an validate`` hands its checks (an#348); ``None`` when the</span>
+</span><span id="line-260"><span class="sd">    scene names none or the store is not supplied (or lacks it: the core's</span>
+</span><span id="line-261"><span class="sd">    own check says so)."""</span>
+</span><span id="line-262">    <span class="n">name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span> <span class="s2">"style_pack"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-263">    <span class="n">styles</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">stores</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"styles"</span><span class="p">)</span>
+</span><span id="line-264">    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">or</span> <span class="n">styles</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">styles</span><span class="p">:</span>
+</span><span id="line-265">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-266">    <span class="k">return</span> <span class="n">styles</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+</span><span id="line-267">
+</span><span id="line-268">
 <div class="viewcode-block" id="policy_in_force">
 <a class="viewcode-back" href="../../../_autosummary/cutan.styles.policy.html#cutan.styles.policy_in_force">[docs]</a>
-</span><span id="line-277"><span class="k">def</span><span class="w"> </span><span class="nf">policy_in_force</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">shot</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-</span><span id="line-278"><span class="w">    </span><span class="sd">"""The policy the compiler will resolve a shot's aspects under: its</span>
-</span><span id="line-279"><span class="sd">    ``policy`` over the scene's style pack's (:func:`layered_policy`), once per</span>
-</span><span id="line-280"><span class="sd">    shot; ``None`` when neither has one or either is malformed</span>
-</span><span id="line-281"><span class="sd">    (:func:`check_shot_policy` reports that). The shot is the check's current</span>
-</span><span id="line-282"><span class="sd">    one unless ``shot`` and ``index`` name another (a scene-stage check)."""</span>
-</span><span id="line-283">    <span class="k">if</span> <span class="n">shot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-284">        <span class="n">shot</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">index</span>
-</span><span id="line-285">
-</span><span id="line-286">    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">():</span>
-</span><span id="line-287">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-288">            <span class="n">p</span> <span class="o">=</span> <span class="n">layered_policy</span><span class="p">(</span><span class="n">shot</span><span class="o">=</span><span class="n">shot</span><span class="p">,</span> <span class="n">style_pack</span><span class="o">=</span><span class="n">_scene_pack</span><span class="p">(</span><span class="n">ctx</span><span class="p">))</span>
-</span><span id="line-289">        <span class="k">except</span> <span class="n">PolicyError</span><span class="p">:</span>
-</span><span id="line-290">            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-291">        <span class="k">return</span> <span class="n">p</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">order</span> <span class="k">else</span> <span class="kc">None</span>
-</span><span id="line-292">
-</span><span id="line-293">    <span class="k">return</span> <span class="n">ctx</span><span class="o">.</span><span class="n">cached</span><span class="p">((</span><span class="s2">"cutan.policy"</span><span class="p">,</span> <span class="n">index</span><span class="p">),</span> <span class="n">compute</span><span class="p">)</span></div>
+</span><span id="line-269"><span class="k">def</span><span class="w"> </span><span class="nf">policy_in_force</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">shot</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+</span><span id="line-270"><span class="w">    </span><span class="sd">"""The policy the compiler will resolve a shot's aspects under: its</span>
+</span><span id="line-271"><span class="sd">    ``policy`` over the scene's style pack's (:func:`layered_policy`), once per</span>
+</span><span id="line-272"><span class="sd">    shot; ``None`` when neither has one or either is malformed</span>
+</span><span id="line-273"><span class="sd">    (:func:`check_shot_policy` reports that). The shot is the check's current</span>
+</span><span id="line-274"><span class="sd">    one unless ``shot`` and ``index`` name another (a scene-stage check)."""</span>
+</span><span id="line-275">    <span class="k">if</span> <span class="n">shot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-276">        <span class="n">shot</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">index</span>
+</span><span id="line-277">
+</span><span id="line-278">    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">():</span>
+</span><span id="line-279">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-280">            <span class="n">p</span> <span class="o">=</span> <span class="n">layered_policy</span><span class="p">(</span><span class="n">shot</span><span class="o">=</span><span class="n">shot</span><span class="p">,</span> <span class="n">style_pack</span><span class="o">=</span><span class="n">_scene_pack</span><span class="p">(</span><span class="n">ctx</span><span class="p">))</span>
+</span><span id="line-281">        <span class="k">except</span> <span class="n">PolicyError</span><span class="p">:</span>
+</span><span id="line-282">            <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-283">        <span class="k">return</span> <span class="n">p</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">order</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span id="line-284">
+</span><span id="line-285">    <span class="k">return</span> <span class="n">ctx</span><span class="o">.</span><span class="n">cached</span><span class="p">((</span><span class="s2">"cutan.policy"</span><span class="p">,</span> <span class="n">index</span><span class="p">),</span> <span class="n">compute</span><span class="p">)</span></div>
 
-</span><span id="line-294">
-</span><span id="line-295">
-</span><span id="line-296"><span class="k">def</span><span class="w"> </span><span class="nf">check_shot_policy</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-297"><span class="w">    </span><span class="sd">"""``an validate``'s side (cutan#9), per cut-out shot: its ``policy`` is well</span>
-</span><span id="line-298"><span class="sd">    formed, and so is the scene's style pack's (reported once, at the scene's</span>
-</span><span id="line-299"><span class="sd">    ``meta/style_pack``: the compiler refuses it on every cut-out shot)."""</span>
-</span><span id="line-300">    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_cutout</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">):</span>
-</span><span id="line-301">        <span class="k">return</span>
-</span><span id="line-302">    <span class="n">block</span> <span class="o">=</span> <span class="n">policy_of</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">)</span>
-</span><span id="line-303">    <span class="k">if</span> <span class="n">block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-304">        <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">policy_problems</span><span class="p">(</span><span class="n">block</span><span class="p">):</span>
-</span><span id="line-305">            <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"error"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ctx</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">/policy"</span><span class="p">,</span> <span class="n">problem</span><span class="p">)</span>
-</span><span id="line-306">    <span class="n">pack</span> <span class="o">=</span> <span class="n">_scene_pack</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
-</span><span id="line-307">
-</span><span id="line-308">    <span class="k">def</span><span class="w"> </span><span class="nf">report_pack</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-309">        <span class="n">block</span> <span class="o">=</span> <span class="n">policy_of</span><span class="p">(</span><span class="n">pack</span><span class="p">)</span>
-</span><span id="line-310">        <span class="k">if</span> <span class="n">block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-311">            <span class="n">name</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">style_pack</span>
-</span><span id="line-312">            <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">policy_problems</span><span class="p">(</span><span class="n">block</span><span class="p">):</span>
-</span><span id="line-313">                <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-</span><span id="line-314">                    <span class="s2">"error"</span><span class="p">,</span> <span class="s2">"meta/style_pack"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"style pack </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-315">                <span class="p">)</span>
-</span><span id="line-316">        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="line-317">
-</span><span id="line-318">    <span class="k">if</span> <span class="n">pack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-319">        <span class="n">ctx</span><span class="o">.</span><span class="n">cached</span><span class="p">((</span><span class="s2">"cutan.pack_policy"</span><span class="p">,),</span> <span class="n">report_pack</span><span class="p">)</span>
+</span><span id="line-286">
+</span><span id="line-287">
+</span><span id="line-288"><span class="k">def</span><span class="w"> </span><span class="nf">check_shot_policy</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-289"><span class="w">    </span><span class="sd">"""``an validate``'s side (cutan#9), per cut-out shot: its ``policy`` is well</span>
+</span><span id="line-290"><span class="sd">    formed, and so is the scene's style pack's (reported once, at the scene's</span>
+</span><span id="line-291"><span class="sd">    ``meta/style_pack``: the compiler refuses it on every cut-out shot)."""</span>
+</span><span id="line-292">    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_cutout</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">):</span>
+</span><span id="line-293">        <span class="k">return</span>
+</span><span id="line-294">    <span class="n">block</span> <span class="o">=</span> <span class="n">policy_of</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">)</span>
+</span><span id="line-295">    <span class="k">if</span> <span class="n">block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-296">        <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">policy_problems</span><span class="p">(</span><span class="n">block</span><span class="p">):</span>
+</span><span id="line-297">            <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"error"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ctx</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">/policy"</span><span class="p">,</span> <span class="n">problem</span><span class="p">)</span>
+</span><span id="line-298">    <span class="n">pack</span> <span class="o">=</span> <span class="n">_scene_pack</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
+</span><span id="line-299">
+</span><span id="line-300">    <span class="k">def</span><span class="w"> </span><span class="nf">report_pack</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-301">        <span class="n">block</span> <span class="o">=</span> <span class="n">policy_of</span><span class="p">(</span><span class="n">pack</span><span class="p">)</span>
+</span><span id="line-302">        <span class="k">if</span> <span class="n">block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-303">            <span class="n">name</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">style_pack</span>
+</span><span id="line-304">            <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">policy_problems</span><span class="p">(</span><span class="n">block</span><span class="p">):</span>
+</span><span id="line-305">                <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+</span><span id="line-306">                    <span class="s2">"error"</span><span class="p">,</span> <span class="s2">"meta/style_pack"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"style pack </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-307">                <span class="p">)</span>
+</span><span id="line-308">        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="line-309">
+</span><span id="line-310">    <span class="k">if</span> <span class="n">pack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-311">        <span class="n">ctx</span><span class="o">.</span><span class="n">cached</span><span class="p">((</span><span class="s2">"cutan.pack_policy"</span><span class="p">,),</span> <span class="n">report_pack</span><span class="p">)</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -533,7 +525,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=6a9d8632"></script>
+    <script src="../../../_static/documentation_options.js?v=26ffa1e9"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

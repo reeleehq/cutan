@@ -1,4 +1,4 @@
-> built 2026-10-06 13:09 UTC from 4a755a4 (main) · cutan 0.0.26. Details: build_info.json
+> built 2026-10-06 13:16 UTC from eebe7b2 (main) · cutan 0.0.28. Details: build_info.json
 
 # index.html.md
 
@@ -4769,7 +4769,7 @@ each chain ends in a method that requires nothing.
 * **Type:**
   The genre’s aspects
 
-### cutan.characters.methods.CUTOUT_METHODS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Method, ...]* *= (Method(id='loco.legged_cycle', kind='method', version='2', name='legs', title='legged walk cycle', description='a legged walk cycle: in profile the legs swing about the hip in opposition, facing the camera the stepping leg lifts; the arms swing against the legs', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'lift': {'type': 'number', 'default': 10.0}, 'arm_swing': {'type': 'number', 'default': 0.3}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'legs'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.profile_cycle', kind='method', version='2', name='profile', title='profile walk cycle', description="the four poses of a walk seen in profile (contact, down, passing, up): with a side or three-quarter view showing the legs swing about the hip in opposition and the body sinks after each contact and rises before the next; asked while another view shows, it walks as legs (Reiniger's silhouettes, any figure drawn side-on)", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.45}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.35}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'profile'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()), Requirement(capability='swap.view', key='side', at_least=None, any_of=())), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)', 'swap.view:side': 'give the character a side view: \`an character add-views <name>\` (a factory character), or carve its art in profile and declare \`rest_view: side\` in character.json'}), Method(id='loco.shuffle', kind='method', version='2', name='shuffle', title='shuffle', description='the feet barely leave the ground: short, quick steps with little bob and arms close to the body (the old, the tired, the cautious)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.3}, 'step_length': {'type': 'number', 'default': 40.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 3.0}, 'arm_swing': {'type': 'number', 'default': 0.1}, 'bob': {'type': 'number', 'default': 1.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'shuffle'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.hem_sway', kind='method', version='2', name='hem', title='hem sway', description="a robe figure's walk: the leg slots are the two halves of the hem, which tilt about the hip as mirror images (the hem opens and closes) while the body sways and bobs facing the camera; in profile they swing like legs", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hem_tilt': {'type': 'number', 'default': 0.24}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hem'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': "carve the robe's hem into two halves on slots leg_l/leg_r, pivoted at the hip, and declare \`gait: hem\` in character.json"}), Method(id='loco.waddle', kind='method', version='2', name='waddle', title='waddle', description='the body rocks from foot to foot and bobs on each step; legs, if any, lift in turn (a penguin, a toddler, a squat figure)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 5.0}, 'bob': {'type': 'number', 'default': 4.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'waddle'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.hop', kind='method', version='2', name='hop', title='hop', description='the whole figure jumps on every step while it travels (a bird, a kangaroo, a gleeful character, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hop_height': {'type': 'number', 'default': 18.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hop'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.bounce', kind='method', version='2', name='bounce', title='bounce', description='the body bobs on every step while it slides; legs, if any, only flick (the South Park walk)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 8.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lift': {'type': 'number', 'default': 4.0}, 'stride': {'type': 'number', 'default': 0.1}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'bounce'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.rock', kind='method', version='2', name='rock', title='rock and bob', description='no leg moves: the body rocks side to side and bobs once per step while it travels (a blob, a sack, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'rock'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.glide', kind='method', version='2', name='glide', title='glide', description='the figure slides, leaning into the move with a gentle bob; no limb moves (a robe figure, a ghost, a sack — the default for any figure without legs)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 1.5, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lean': {'type': 'number', 'default': 0.04}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'glide'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='speech.mouth_chart', kind='method', version='1', name='mouth_chart', title='mouth chart lip-sync', description="lip-sync on the character's mouth chart: the line's visemes swap the mouth drawings (the nine Rhubarb shapes, or the character's own set)", usage='', params={}, examples=(), requires=(Requirement(capability='face.mouth', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='speech', remedies={'face.mouth': "give the character an overlay mouth: a \`mouth\` slot with the viseme set's drawings (\`an character mouths <dir>\`) and face_overlay: true"}), Method(id='speech.pose_only', kind='method', version='1', name='pulse', title='speech pulse', description='no lip-sync: the head (or the body) pulses on each syllable, so a baked face or a mime still reads as speaking', usage='', params={'type': 'object', 'properties': {'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=('a character with face_overlay: false speaks',), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='speech', remedies={}), Method(id='expr.full_face', kind='method', version='1', name='full_face', title='full-face expression', description="the expression acts with the whole face: the brows rise, knit and tilt, the lids open and close, the pupils move and the mouth takes the preset's form", usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'},), requires=(Requirement(capability='face.brows', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='expression', remedies={'face.brows': "keep the brows clear: \`an character new\` seats a hat above them at most head scales — at this one it could not, so use a larger --head-scale, another --hat or --hat none; for drawn art, redraw what covers the brows and remove the descriptor's \`occluded\` entry, or give the face brow slots (left_brow/right_brow) with art"}), Method(id='expr.without_brows', kind='method', version='1', name='without_brows', title='expression without brows', description='the brows cannot be seen acting (covered, or not drawn): the lids, the gaze and the mouth form carry the expression', usage='', params={}, examples=('a character whose hat covers its brows takes [surprised]',), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='expression', remedies={}))*
+### cutan.characters.methods.CUTOUT_METHODS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Method, ...]* *= (Method(id='loco.legged_cycle', kind='method', version='2', name='legs', title='legged walk cycle', description='a legged walk cycle: in profile the legs swing about the hip in opposition, facing the camera the stepping leg lifts; the arms swing against the legs', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'lift': {'type': 'number', 'default': 10.0}, 'arm_swing': {'type': 'number', 'default': 0.3}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'legs'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.profile_cycle', kind='method', version='2', name='profile', title='profile walk cycle', description="the four poses of a walk seen in profile (contact, down, passing, up): with a side or three-quarter view showing the legs swing about the hip in opposition and the body sinks after each contact and rises before the next; asked while another view shows, it walks as legs (Reiniger's silhouettes, any figure drawn side-on)", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.45}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.35}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'profile'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()), Requirement(capability='swap.view', key='side', at_least=None, any_of=())), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)', 'swap.view:side': 'give the character a side view: \`an character add-views <name>\` (a factory character), or carve its art in profile and declare \`rest_view: side\` in character.json'}), Method(id='loco.shuffle', kind='method', version='2', name='shuffle', title='shuffle', description='the feet barely leave the ground: short, quick steps with little bob and arms close to the body (the old, the tired, the cautious)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.3}, 'step_length': {'type': 'number', 'default': 40.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 3.0}, 'arm_swing': {'type': 'number', 'default': 0.1}, 'bob': {'type': 'number', 'default': 1.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'shuffle'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.hem_sway', kind='method', version='2', name='hem', title='hem sway', description="a robe figure's walk: the leg slots are the two halves of the hem, which tilt about the hip as mirror images (the hem opens and closes) while the body sways and bobs facing the camera; in profile they swing like legs", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hem_tilt': {'type': 'number', 'default': 0.24}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hem'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': "carve the robe's hem into two halves on slots leg_l/leg_r, pivoted at the hip, and declare \`gait: hem\` in character.json"}), Method(id='loco.waddle', kind='method', version='2', name='waddle', title='waddle', description='the body rocks from foot to foot and bobs on each step; legs, if any, lift in turn (a penguin, a toddler, a squat figure)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 5.0}, 'bob': {'type': 'number', 'default': 4.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'waddle'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.hop', kind='method', version='2', name='hop', title='hop', description='the whole figure jumps on every step while it travels (a bird, a kangaroo, a gleeful character, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hop_height': {'type': 'number', 'default': 18.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hop'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.bounce', kind='method', version='2', name='bounce', title='bounce', description='the body bobs on every step while it slides; legs, if any, only flick (the South Park walk)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 8.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lift': {'type': 'number', 'default': 4.0}, 'stride': {'type': 'number', 'default': 0.1}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'bounce'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.rock', kind='method', version='2', name='rock', title='rock and bob', description='no leg moves: the body rocks side to side and bobs once per step while it travels (a blob, a sack, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'rock'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.glide', kind='method', version='2', name='glide', title='glide', description='the figure slides, leaning into the move with a gentle bob; no limb moves (a robe figure, a ghost, a sack — the default for any figure without legs)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 1.5, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lean': {'type': 'number', 'default': 0.04}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'glide'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='speech.mouth_chart', kind='method', version='1', name='mouth_chart', title='mouth chart lip-sync', description="lip-sync on the character's mouth chart: the line's visemes swap the mouth drawings (the nine Rhubarb shapes, or the character's own set)", usage='', params={}, examples=(), requires=(Requirement(capability='face.mouth', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='speech', remedies={'face.mouth': "give the character an overlay mouth: a \`mouth\` slot with the viseme set's drawings (\`an character mouths <dir>\`) and face_overlay: true"}), Method(id='speech.pose_only', kind='method', version='1', name='pulse', title='speech pulse', description='no lip-sync: the head (or the body) pulses on each syllable, so a baked face or a mime still reads as speaking', usage='', params={'type': 'object', 'properties': {'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=('a character with face_overlay: false speaks',), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='speech', remedies={}), Method(id='expr.full_face', kind='method', version='1', name='full_face', title='full-face expression', description="the expression acts with the whole face: the brows rise, knit and tilt, the lids open and close, the pupils move and the mouth takes the preset's form", usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'},), requires=(Requirement(capability='face.brows', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='expression', remedies={'face.brows': "keep the brows clear: \`an character new\` seats a hat above them at most head scales — at this one it could not, so use a larger --head-scale, another --hat or --hat none; for drawn art, redraw what covers the brows and remove the descriptor's \`occluded\` entry, or give the face brow slots (left_brow/right_brow) with art"}), Method(id='expr.without_brows', kind='method', version='1', name='without_brows', title='expression without brows', description='the brows cannot be seen acting (covered, or not drawn): the lids, the gaze and the mouth form carry the expression', usage='', params={}, examples=('a character whose hat covers its brows takes [surprised]',), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='expression', remedies={}))*
 
 The genre’s methods, as vocabulary entries (kind `method`).
 
@@ -6981,7 +6981,7 @@ registers nothing.
 | [`EXPRESSION_PRESET_VERSIONS`](_autosummary/cutan.characters.vocabulary.html.md#cutan.characters.vocabulary.EXPRESSION_PRESET_VERSIONS) | Each expression preset's vocabulary version (ADR 0003).                                                                                                                             |
 | [`CUTOUT_VOCABULARY`](_autosummary/cutan.characters.vocabulary.html.md#cutan.characters.vocabulary.CUTOUT_VOCABULARY)          | Everything this genre contributes to the vocabulary except its methods ([`cutan.characters.methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)). |
 
-### cutan.characters.vocabulary.CUTOUT_VOCABULARY *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Entry, ...]* *= (Entry(id='field.shot.actions.swap_set', kind='field', version='1', name='shot.actions.swap_set', title='', description='a set action that swaps a drawing (replacement animation)', usage="A set/tween property may also be the name of a swap set the target character's descriptor declares in asset_sets (e.g. 'viseme', 'eyelid', 'hands'), used with a 'set' action whose 'value' is one of that set's declared KEYS (replacement animation). The compiler refuses any other name with the declared sets listed. Never invent a set or a key.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='field.shot.actions.play', kind='field', version='1', name='shot.actions.play', title='', description='play a named animation of the target character, or a motion preset', usage="A 'play' action ({kind: play, target: <entity>, animation: <name>, [duration], [speed], [loop], [args]}) plays one of the target character's descriptor animations ('idle_breath', 'blink', or any it declares) or, for a name the descriptor does not declare, a motion preset (listed below) with 'args' as its parameters (e.g. {'height': 30}); a name in neither fails validation — never invent one. 'point' targets the arm node. A 'walk' picks its gait from the character's structure (its locomotion method, below) unless 'gait' is given.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('locomotion',)), Entry(id='field.shot.actions.expression', kind='field', version='1', name='shot.actions.expression', title='', description='hold a facial expression on a character', usage="An 'expression' action ({kind: expression, target: <entity>, preset: <name>, [axes: {axis: value}], [intensity], [duration], [blend]}) holds a facial expression on a character: brows, eyelids, and the mouth's set for any dialogue under it. 'preset' is an expression preset (listed below) — an unknown preset fails validation. Axes are offsets within their ranges: brow_height_l [-1, 1], brow_height_r [-1, 1], brow_angle_l [-1, 1], brow_angle_r [-1, 1], lid_open_l [-1, 0.5], lid_open_r [-1, 0.5], gaze_x [-1, 1], gaze_y [-1, 1]. 'duration' omitted = to the shot end. A character whose descriptor says face_overlay: false cannot take one.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='field.shot.dialogue.emotion', kind='field', version='1', name='shot.dialogue.emotion', title='', description='the mood a line is said in', usage="A dialogue line's 'emotion' is an expression preset name ([happy] on a scene.md line): it sets the face for the line and the voice's mood. When a line's wording changes, update its emotion if the mood changed too.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('speech',)), Entry(id='motion.pop_in', kind='motion_preset', version='1', name='pop_in', title='pop in', description='Grow from nothing to full size, overshooting and settling (an entrance).', usage='', params={'type': 'object', 'properties': {'duration': {'type': 'number', 'default': 0.45}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'pop_in'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.hop', kind='motion_preset', version='1', name='hop', title='hop', description='Jump up by \`height\` scene pixels and land back where it started.', usage='', params={'type': 'object', 'properties': {'height': {'type': 'number', 'default': 40.0}, 'duration': {'type': 'number', 'default': 0.5}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'hop'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.shake', kind='motion_preset', version='1', name='shake', title='shake', description='Tremble side to side \`cycles\` times and come back to rest (on \`x\`).', usage='', params={'type': 'object', 'properties': {'amplitude': {'type': 'number', 'default': 8.0}, 'duration': {'type': 'number', 'default': 0.4}, 'cycles': {'type': 'integer', 'default': 3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'shake'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.slide_in', kind='motion_preset', version='1', name='slide_in', title='slide in', description='Whip in from \`distance\` pixels off to one side, overshoot, and settle.', usage='', params={'type': 'object', 'properties': {'from_side': {'type': 'string', 'default': 'left'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_in'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.slide_out', kind='motion_preset', version='1', name='slide_out', title='slide out', description='Exit \`distance\` pixels off to one side, accelerating (an exit).', usage='', params={'type': 'object', 'properties': {'to_side': {'type': 'string', 'default': 'right'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'type': 'string', 'default': 'ease_in'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_out'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.squash_stretch', kind='motion_preset', version='1', name='squash_stretch', title='squash stretch', description='Squash (wide and short), stretch (narrow and tall), then settle.', usage='', params={'type': 'object', 'properties': {'amount': {'type': 'number', 'default': 0.2}, 'duration': {'type': 'number', 'default': 0.36}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'squash_stretch'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.crawl', kind='motion_preset', version='1', name='crawl', title='crawl', description='An opening crawl: lay \`target\` on a plane tilted away, and slide it up and away.', usage='', params={'type': 'object', 'properties': {'distance': {'type': 'number', 'default': 2400.0}, 'duration': {'type': 'number', 'default': 30.0}, 'start': {'type': 'number', 'default': None}, 'tilt': {'type': 'number', 'default': 0.96}, 'perspective': {'type': 'number', 'default': 1.0}, 'fade': {'type': 'array', 'default': [700.0, 1500.0]}, 'y': {'type': 'number', 'default': None}, 'easing': {'type': 'string', 'default': 'linear'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'crawl'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.nod', kind='motion_preset', version='1', name='nod', title='nod', description='Dip the head \`count\` times (a rotation of \`<target>/<part>\`).', usage='', params={'type': 'object', 'properties': {'part': {'type': 'string', 'default': 'head'}, 'angle': {'type': 'number', 'default': 0.18}, 'duration': {'type': 'number', 'default': 0.5}, 'count': {'type': 'integer', 'default': 2}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'nod'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.point', kind='motion_preset', version='1', name='point', title='point', description='Swing an arm out to point, hold it, and lower it again.', usage='', params={'type': 'object', 'properties': {'angle': {'type': 'number', 'default': -1.3}, 'raise_duration': {'type': 'number', 'default': 0.25}, 'hold': {'type': 'number', 'default': 0.6}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'point'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.waddle', kind='motion_preset', version='1', name='waddle', title='waddle', description='A walk cycle for a rig with no legs to animate: rock and bob per step.', usage='', params={'type': 'object', 'properties': {'steps': {'type': 'integer', 'default': 4}, 'step_duration': {'type': 'number', 'default': 0.3}, 'angle': {'type': 'number', 'default': 0.1}, 'lift': {'type': 'number', 'default': 6.0}, 'travel': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'waddle'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.turn', kind='motion_preset', version='2', name='turn', title='turn', description='Turn a character to the view \`to\` — the classic cut-out turn.', usage='', params={'type': 'object', 'properties': {'to': {'type': 'string', 'default': 'back'}, 'direction': {'type': 'string', 'default': 'right'}, 'from_direction': {'type': 'string', 'default': None}, 'duration': {'type': 'number', 'default': 0.3}, 'view_set': {'type': 'string', 'default': 'view'}, 'step_hz': {'type': 'number', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'turn'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.walk', kind='motion_preset', version='4', name='walk', title='walk', description='Walk: the body travels on \`x\` while the gait moves it — legs that alternate, a hop, a bounce, a glide (an#214, an#224).', usage='', params={'type': 'object', 'properties': {'to_x': {'type': 'number', 'default': None}, 'distance': {'type': 'number', 'default': None}, 'direction': {'type': 'string', 'default': None}, 'steps': {'type': 'integer', 'default': None}, 'step_s': {'default': None}, 'step_length': {'type': 'number', 'default': None}, 'stride': {'type': 'number', 'default': None}, 'lift': {'type': 'number', 'default': None}, 'bob': {'type': 'number', 'default': None}, 'arm_swing': {'type': 'number', 'default': None}, 'rock': {'type': 'number', 'default': None}, 'hem_tilt': {'type': 'number', 'default': None}, 'hop_height': {'type': 'number', 'default': None}, 'lean': {'type': 'number', 'default': None}, 'view': {'type': 'string', 'default': None}, 'gait': {'type': 'string', 'default': None}, 'legs': {'type': 'array', 'default': None}, 'arms': {'type': 'array', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('locomotion',)), Entry(id='motion.speech_pulse', kind='motion_preset', version='1', name='speech_pulse', title='speech pulse', description='Pulse a part on each syllable: speech carried without a mouth.', usage='', params={'type': 'object', 'properties': {'beats': {'type': 'array', 'default': [0.0]}, 'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'speech_pulse'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('speech',)), Entry(id='expression.neutral', kind='expression_preset', version='1', name='neutral', title='', description='the rest face: every axis at its neutral value', usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'neutral'}, '[neutral] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.happy', kind='expression_preset', version='1', name='happy', title='', description="expression-sheet preset: brow_angle_l +0.1, brow_angle_r +0.1, brow_height_l +0.2, brow_height_r +0.2, lid_open_l -0.2, lid_open_r -0.2; mouth form 'happy'", usage='FACS cross-reference 6+12', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'happy'}, '[happy] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.sad', kind='expression_preset', version='1', name='sad', title='', description="expression-sheet preset: brow_angle_l +0.6, brow_angle_r +0.6, brow_height_l +0.3, brow_height_r +0.3, lid_open_l -0.3, lid_open_r -0.3; mouth form 'sad'", usage='FACS cross-reference 1+4+15', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'sad'}, '[sad] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.angry', kind='expression_preset', version='1', name='angry', title='', description="expression-sheet preset: brow_angle_l -0.8, brow_angle_r -0.8, brow_height_l -0.6, brow_height_r -0.6, lid_open_l +0.1, lid_open_r +0.1; mouth form 'angry'", usage='FACS cross-reference 4+5+7+23', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'angry'}, '[angry] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.surprised', kind='expression_preset', version='1', name='surprised', title='', description="expression-sheet preset: brow_angle_l +0, brow_angle_r +0, brow_height_l +1, brow_height_r +1, lid_open_l +0.4, lid_open_r +0.4; mouth form 'surprised'", usage='FACS cross-reference 1+2+5+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'}, '[surprised] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.afraid', kind='expression_preset', version='1', name='afraid', title='', description="expression-sheet preset: brow_angle_l +0.5, brow_angle_r +0.5, brow_height_l +0.7, brow_height_r +0.7, lid_open_l +0.5, lid_open_r +0.5; mouth form 'afraid'", usage='FACS cross-reference 1+2+4+5+7+20+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'afraid'}, '[afraid] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.disgusted', kind='expression_preset', version='1', name='disgusted', title='', description="expression-sheet preset: brow_angle_l -0.3, brow_angle_r -0.3, brow_height_l -0.3, brow_height_r -0.3, lid_open_l -0.4, lid_open_r -0.4; mouth form 'disgusted'", usage='FACS cross-reference 9+15+17', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'disgusted'}, '[disgusted] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.thinking', kind='expression_preset', version='1', name='thinking', title='', description='expression-sheet preset: brow_angle_l +0.3, brow_angle_r -0.1, brow_height_l +0.5, brow_height_r -0.2, lid_open_l -0.1, lid_open_r -0.1', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'thinking'}, '[thinking] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.skeptical', kind='expression_preset', version='1', name='skeptical', title='', description='expression-sheet preset: brow_angle_l +0, brow_angle_r -0.2, brow_height_l +0.6, brow_height_r -0.3, lid_open_l +0, lid_open_r -0.2', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'skeptical'}, '[skeptical] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.amused', kind='expression_preset', version='1', name='amused', title='', description="expression-sheet preset: brow_angle_l +0.05, brow_angle_r +0.05, brow_height_l +0.1, brow_height_r +0.1, lid_open_l -0.1, lid_open_r -0.1; mouth form 'happy'", usage='FACS cross-reference happy at ~0.6', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'amused'}, '[amused] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()))*
+### cutan.characters.vocabulary.CUTOUT_VOCABULARY *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Entry, ...]* *= (Entry(id='field.shot.actions.swap_set', kind='field', version='1', name='shot.actions.swap_set', title='', description='a set action that swaps a drawing (replacement animation)', usage="A set/tween property may also be the name of a swap set the target character's descriptor declares in asset_sets (e.g. 'viseme', 'eyelid', 'hands'), used with a 'set' action whose 'value' is one of that set's declared KEYS (replacement animation). The compiler refuses any other name with the declared sets listed. Never invent a set or a key.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='field.shot.actions.play', kind='field', version='1', name='shot.actions.play', title='', description='play a named animation of the target character, or a motion preset', usage="A 'play' action ({kind: play, target: <entity>, animation: <name>, [duration], [speed], [loop], [args]}) plays one of the target character's descriptor animations ('idle_breath', 'blink', or any it declares) or, for a name the descriptor does not declare, a motion preset (listed below) with 'args' as its parameters (e.g. {'height': 30}); a name in neither fails validation — never invent one. 'point' targets the arm node. A 'walk' picks its gait from the character's structure (its locomotion method, below) unless 'gait' is given.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('locomotion',)), Entry(id='field.shot.actions.expression', kind='field', version='1', name='shot.actions.expression', title='', description='hold a facial expression on a character', usage="An 'expression' action ({kind: expression, target: <entity>, preset: <name>, [axes: {axis: value}], [intensity], [duration], [blend]}) holds a facial expression on a character: brows, eyelids, and the mouth's set for any dialogue under it. 'preset' is an expression preset (listed below) — an unknown preset fails validation. Axes are offsets within their ranges: brow_height_l [-1, 1], brow_height_r [-1, 1], brow_angle_l [-1, 1], brow_angle_r [-1, 1], lid_open_l [-1, 0.5], lid_open_r [-1, 0.5], gaze_x [-1, 1], gaze_y [-1, 1]. 'duration' omitted = to the shot end. A character whose descriptor says face_overlay: false cannot take one.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='field.shot.dialogue.emotion', kind='field', version='1', name='shot.dialogue.emotion', title='', description='the mood a line is said in', usage="A dialogue line's 'emotion' is an expression preset name ([happy] on a scene.md line): it sets the face for the line and the voice's mood. When a line's wording changes, update its emotion if the mood changed too.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('speech',)), Entry(id='motion.pop_in', kind='motion_preset', version='1', name='pop_in', title='pop in', description='Grow from nothing to full size, overshooting and settling (an entrance).', usage='', params={'type': 'object', 'properties': {'duration': {'type': 'number', 'default': 0.45}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'pop_in'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.hop', kind='motion_preset', version='1', name='hop', title='hop', description='Jump up by \`height\` scene pixels and land back where it started.', usage='', params={'type': 'object', 'properties': {'height': {'type': 'number', 'default': 40.0}, 'duration': {'type': 'number', 'default': 0.5}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'hop'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.shake', kind='motion_preset', version='1', name='shake', title='shake', description='Tremble side to side \`cycles\` times and come back to rest (on \`x\`).', usage='', params={'type': 'object', 'properties': {'amplitude': {'type': 'number', 'default': 8.0}, 'duration': {'type': 'number', 'default': 0.4}, 'cycles': {'type': 'integer', 'default': 3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'shake'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.slide_in', kind='motion_preset', version='1', name='slide_in', title='slide in', description='Whip in from \`distance\` pixels off to one side, overshoot, and settle.', usage='', params={'type': 'object', 'properties': {'from_side': {'type': 'string', 'default': 'left'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_in'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.slide_out', kind='motion_preset', version='1', name='slide_out', title='slide out', description='Exit \`distance\` pixels off to one side, accelerating (an exit).', usage='', params={'type': 'object', 'properties': {'to_side': {'type': 'string', 'default': 'right'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'type': 'string', 'default': 'ease_in'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_out'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.squash_stretch', kind='motion_preset', version='1', name='squash_stretch', title='squash stretch', description='Squash (wide and short), stretch (narrow and tall), then settle.', usage='', params={'type': 'object', 'properties': {'amount': {'type': 'number', 'default': 0.2}, 'duration': {'type': 'number', 'default': 0.36}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'squash_stretch'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.crawl', kind='motion_preset', version='1', name='crawl', title='crawl', description='An opening crawl: lay \`target\` on a plane tilted away, and slide it up and away.', usage='', params={'type': 'object', 'properties': {'distance': {'type': 'number', 'default': 2400.0}, 'duration': {'type': 'number', 'default': 30.0}, 'start': {'type': 'number', 'default': None}, 'tilt': {'type': 'number', 'default': 0.96}, 'perspective': {'type': 'number', 'default': 1.0}, 'fade': {'type': 'array', 'default': [700.0, 1500.0]}, 'y': {'type': 'number', 'default': None}, 'easing': {'type': 'string', 'default': 'linear'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'crawl'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.nod', kind='motion_preset', version='1', name='nod', title='nod', description='Dip the head \`count\` times (a rotation of \`<target>/<part>\`).', usage='', params={'type': 'object', 'properties': {'part': {'type': 'string', 'default': 'head'}, 'angle': {'type': 'number', 'default': 0.18}, 'duration': {'type': 'number', 'default': 0.5}, 'count': {'type': 'integer', 'default': 2}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'nod'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.point', kind='motion_preset', version='1', name='point', title='point', description='Swing an arm out to point, hold it, and lower it again.', usage='', params={'type': 'object', 'properties': {'angle': {'type': 'number', 'default': -1.3}, 'raise_duration': {'type': 'number', 'default': 0.25}, 'hold': {'type': 'number', 'default': 0.6}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'point'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.waddle', kind='motion_preset', version='1', name='waddle', title='waddle', description='A walk cycle for a rig with no legs to animate: rock and bob per step.', usage='', params={'type': 'object', 'properties': {'steps': {'type': 'integer', 'default': 4}, 'step_duration': {'type': 'number', 'default': 0.3}, 'angle': {'type': 'number', 'default': 0.1}, 'lift': {'type': 'number', 'default': 6.0}, 'travel': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'waddle'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.turn', kind='motion_preset', version='2', name='turn', title='turn', description='Turn a character to the view \`to\` — the classic cut-out turn.', usage='', params={'type': 'object', 'properties': {'to': {'type': 'string', 'default': 'back'}, 'direction': {'type': 'string', 'default': 'right'}, 'from_direction': {'type': 'string', 'default': None}, 'duration': {'type': 'number', 'default': 0.3}, 'view_set': {'type': 'string', 'default': 'view'}, 'step_hz': {'type': 'number', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'turn'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.walk', kind='motion_preset', version='4', name='walk', title='walk', description='Walk: the body travels on \`x\` while the gait moves it — legs that alternate, a hop, a bounce, a glide (an#214, an#224).', usage='', params={'type': 'object', 'properties': {'to_x': {'type': 'number', 'default': None}, 'distance': {'type': 'number', 'default': None}, 'direction': {'type': 'string', 'default': None}, 'steps': {'type': 'integer', 'default': None}, 'step_s': {'default': None}, 'step_length': {'type': 'number', 'default': None}, 'stride': {'type': 'number', 'default': None}, 'lift': {'type': 'number', 'default': None}, 'bob': {'type': 'number', 'default': None}, 'arm_swing': {'type': 'number', 'default': None}, 'rock': {'type': 'number', 'default': None}, 'hem_tilt': {'type': 'number', 'default': None}, 'hop_height': {'type': 'number', 'default': None}, 'lean': {'type': 'number', 'default': None}, 'view': {'type': 'string', 'default': None}, 'gait': {'type': 'string', 'default': None}, 'legs': {'type': 'array', 'default': None}, 'arms': {'type': 'array', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('locomotion',)), Entry(id='motion.speech_pulse', kind='motion_preset', version='1', name='speech_pulse', title='speech pulse', description='Pulse a part on each syllable: speech carried without a mouth.', usage='', params={'type': 'object', 'properties': {'beats': {'type': 'array', 'default': [0.0]}, 'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'speech_pulse'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('speech',)), Entry(id='expression.neutral', kind='expression_preset', version='1', name='neutral', title='', description='the rest face: every axis at its neutral value', usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'neutral'}, '[neutral] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.happy', kind='expression_preset', version='1', name='happy', title='', description="expression-sheet preset: brow_angle_l +0.1, brow_angle_r +0.1, brow_height_l +0.2, brow_height_r +0.2, lid_open_l -0.2, lid_open_r -0.2; mouth form 'happy'", usage='FACS cross-reference 6+12', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'happy'}, '[happy] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.sad', kind='expression_preset', version='1', name='sad', title='', description="expression-sheet preset: brow_angle_l +0.6, brow_angle_r +0.6, brow_height_l +0.3, brow_height_r +0.3, lid_open_l -0.3, lid_open_r -0.3; mouth form 'sad'", usage='FACS cross-reference 1+4+15', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'sad'}, '[sad] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.angry', kind='expression_preset', version='1', name='angry', title='', description="expression-sheet preset: brow_angle_l -0.8, brow_angle_r -0.8, brow_height_l -0.6, brow_height_r -0.6, lid_open_l +0.1, lid_open_r +0.1; mouth form 'angry'", usage='FACS cross-reference 4+5+7+23', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'angry'}, '[angry] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.surprised', kind='expression_preset', version='1', name='surprised', title='', description="expression-sheet preset: brow_angle_l +0, brow_angle_r +0, brow_height_l +1, brow_height_r +1, lid_open_l +0.4, lid_open_r +0.4; mouth form 'surprised'", usage='FACS cross-reference 1+2+5+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'}, '[surprised] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.afraid', kind='expression_preset', version='1', name='afraid', title='', description="expression-sheet preset: brow_angle_l +0.5, brow_angle_r +0.5, brow_height_l +0.7, brow_height_r +0.7, lid_open_l +0.5, lid_open_r +0.5; mouth form 'afraid'", usage='FACS cross-reference 1+2+4+5+7+20+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'afraid'}, '[afraid] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.disgusted', kind='expression_preset', version='1', name='disgusted', title='', description="expression-sheet preset: brow_angle_l -0.3, brow_angle_r -0.3, brow_height_l -0.3, brow_height_r -0.3, lid_open_l -0.4, lid_open_r -0.4; mouth form 'disgusted'", usage='FACS cross-reference 9+15+17', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'disgusted'}, '[disgusted] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.thinking', kind='expression_preset', version='1', name='thinking', title='', description='expression-sheet preset: brow_angle_l +0.3, brow_angle_r -0.1, brow_height_l +0.5, brow_height_r -0.2, lid_open_l -0.1, lid_open_r -0.1', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'thinking'}, '[thinking] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.skeptical', kind='expression_preset', version='1', name='skeptical', title='', description='expression-sheet preset: brow_angle_l +0, brow_angle_r -0.2, brow_height_l +0.6, brow_height_r -0.3, lid_open_l +0, lid_open_r -0.2', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'skeptical'}, '[skeptical] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.amused', kind='expression_preset', version='1', name='amused', title='', description="expression-sheet preset: brow_angle_l +0.05, brow_angle_r +0.05, brow_height_l +0.1, brow_height_r +0.1, lid_open_l -0.1, lid_open_r -0.1; mouth form 'happy'", usage='FACS cross-reference happy at ~0.6', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'amused'}, '[amused] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()))*
 
 Everything this genre contributes to the vocabulary except its methods
 ([`cutan.characters.methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)).
@@ -8980,7 +8980,7 @@ that take real types, and these only parse the list-valued flags.
 |-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
 | [`clip_set`](_autosummary/cutan.impacts.cli.html.md#cutan.impacts.cli.clip_set)(out_dir[, objects, kinds, fps, ...])      | Write a benchmark set (the product of the given axes) plus index.json. |
 
-### cutan.impacts.cli.clip(out_dir, object='stick', kind='surface', tempo='100', beats=16, subdivision=1, pattern='1', lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, fps=30.0, exposure=0.0, exposure_samples=0, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, seed=0, render=True)
+### cutan.impacts.cli.clip(out_dir, object='stick', kind='surface', tempo='100', beats=16, subdivision=1, pattern='1', lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=0.0, fps=30.0, exposure=0.0, exposure_samples=0, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, seed=0, render=True)
 
 Write one impact clip (video + ground truth) under OUT_DIR.
 
@@ -8996,6 +8996,10 @@ tail: seconds after the last beat
 jitter_sd: humanisation, seconds (standard deviation of the timing offset; 0 = metronome)
 jitter_rho: correlation of consecutive offsets (0 = independent)
 jitter_bias: constant lead (negative) or lag (positive), seconds
+rise_sd: spread of each stroke’s rise, seconds (drawn per stroke; 0 = constant)
+fall_sd: spread of each stroke’s fall, seconds (drawn per stroke; 0 = constant)
+brake_sd: spread of each air stroke’s brake, seconds (drawn per stroke; 0 = constant)
+arc_radius: the ball swings on a circle of this radius (px) about a pivot above its contact (0 = a straight fall)
 fps: frame rate (need not be an integer)
 exposure: fraction of the frame period the shutter is open (0.5 = 180 degrees)
 exposure_samples: instants averaged per open exposure (0 = automatic)
@@ -9082,7 +9086,7 @@ the video (optional — the truth and keypoints need no browser), and writes:
 | [`ImpactSpecError`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactSpecError)   | A clip spec that cannot describe a clip.   |
 |--------------------------------------------------------------------|--------------------------------------------|
 
-### cutan.impacts.clip.BENCHMARK_SPEC *= ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)*
+### cutan.impacts.clip.BENCHMARK_SPEC *= ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=None, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)*
 
 an accelerando with accents and
 human, slightly drifting timing. What [`impact_set_specs()`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.impact_set_specs) varies the
@@ -9103,7 +9107,7 @@ Seconds after the last grid beat before the clip ends.
 
 Samples per second of the dense trajectory in `trajectory.csv`.
 
-### *class* cutan.impacts.clip.ImpactClipSpec(object='stick', kind='surface', tempo=100.0, beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)
+### *class* cutan.impacts.clip.ImpactClipSpec(object='stick', kind='surface', tempo=100.0, beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=None, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -9120,7 +9124,14 @@ case a sub-frame estimator cannot be scored on. Set it to 0 for a metronome.
 
 Motion: `object` (`"stick"` or `"ball"`), `kind` (`"surface"` or
 `"air"`), the stroke timings `rise` / `fall` / `brake`, and
-`show_surface` (`None`: drawn for surface impacts only).
+`show_surface` (`None`: drawn for surface impacts only). Stroke-shape
+variability (cutan#27): `rise_sd` / `fall_sd` / `brake_sd` (seconds)
+draw each stroke’s own timings around those means from the seed’s stroke
+stream, never below `MIN_TIMING_FRACTION` of the mean; `truth.json`
+records each event’s actual `rise`, `fall` and `brake`. `arc_radius`
+(scene px, the ball only) swings the ball on a circle about a pivot that
+far above its contact point, instead of a straight fall: the contact is the
+arc’s lowest point and `impact_xy` is where it lands, as before.
 
 Camera ([`an.frame_clock.FrameClock`](_autosummary/cutan.impacts.html.md#cutan.impacts.FrameClock)): `fps`, `exposure`,
 `exposure_samples`, `timestamp_jitter_sd` (when frames are really
@@ -9162,7 +9173,7 @@ Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueEr
 
 A clip spec that cannot describe a clip.
 
-### cutan.impacts.clip.impact_set_specs(, base=ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0), objects=('stick', 'ball'), kinds=('surface', 'air'), fps=(24, 30, 60), exposures=(0.0, 0.5), timestamp_jitter_sds=(0.0,), seeds=(0,))
+### cutan.impacts.clip.impact_set_specs(, base=ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=None, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0), objects=('stick', 'ball'), kinds=('surface', 'air'), fps=(24, 30, 60), exposures=(0.0, 0.5), timestamp_jitter_sds=(0.0,), seeds=(0,))
 
 The cartesian product of the given axes over `base`.
 
@@ -9245,18 +9256,18 @@ Or from the shell: `an impacts clip OUT_DIR` / `an impacts clip-set OUT_DIR`.
 
 ### Functions
 
-| [`ball`](_autosummary/cutan.impacts.html.md#cutan.impacts.ball)(\*[, radius, x, floor_y, drop, color, ...])   | A ball moving vertically onto a floor whose top is at `floor_y`.                                                              |
-|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| [`build_stroke`](_autosummary/cutan.impacts.html.md#cutan.impacts.build_stroke)(events, \*[, kind, rise, fall, ...])  | Chain rise / hold / fall segments through every executed impact.                                                              |
-| [`gaussian_humanizer`](_autosummary/cutan.impacts.html.md#cutan.impacts.gaussian_humanizer)([sd, rho, bias])                | Offsets from an AR(1) Gaussian process: `o[k] = bias + rho*(o[k-1]-bias) + e`.                                                |
-| [`impact_object`](_autosummary/cutan.impacts.html.md#cutan.impacts.impact_object)(name, \*\*kwargs)                    | Build a registered object by name.                                                                                            |
-| [`impact_set_specs`](_autosummary/cutan.impacts.html.md#cutan.impacts.impact_set_specs)(\*[, base, objects, kinds, ...])  | The cartesian product of the given axes over `base`.                                                                          |
-| [`perform`](_autosummary/cutan.impacts.html.md#cutan.impacts.perform)([tempo, beats, subdivision, ...])          | The impacts of `beats` beats of `pattern`, on `tempo`'s grid.                                                                 |
-| [`plan_impact_clip`](_autosummary/cutan.impacts.html.md#cutan.impacts.plan_impact_clip)(spec)                             | Resolve `spec` into events, a stroke, frames and a Scene IR.                                                                  |
-| [`stick`](_autosummary/cutan.impacts.html.md#cutan.impacts.stick)(\*[, length, thickness, pivot, ...])         | A drumstick rotating about `pivot` (its butt — the hand).                                                                     |
-| [`tempo_map`](_autosummary/cutan.impacts.html.md#cutan.impacts.tempo_map)(tempo)                                   | Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](_autosummary/cutan.impacts.html.md#cutan.impacts.TempoMap).                    |
-| [`write_impact_clip`](_autosummary/cutan.impacts.html.md#cutan.impacts.write_impact_clip)(spec, out_dir, \*[, ...])        | Write one clip into `out_dir / (clip_dir or spec.clip_id)`; return that dir.                                                  |
-| [`write_impact_set`](_autosummary/cutan.impacts.html.md#cutan.impacts.write_impact_set)(out_dir[, specs, render, ...])    | Write every clip in `specs` (default: [`impact_set_specs()`](_autosummary/cutan.impacts.html.md#cutan.impacts.impact_set_specs)) plus `index.json`. |
+| [`ball`](_autosummary/cutan.impacts.html.md#cutan.impacts.ball)(\*[, radius, x, floor_y, drop, ...])         | A ball moving onto a floor whose top is at `floor_y`.                                                                         |
+|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| [`build_stroke`](_autosummary/cutan.impacts.html.md#cutan.impacts.build_stroke)(events, \*[, kind, rise, fall, ...]) | Chain rise / hold / fall segments through every executed impact.                                                              |
+| [`gaussian_humanizer`](_autosummary/cutan.impacts.html.md#cutan.impacts.gaussian_humanizer)([sd, rho, bias])               | Offsets from an AR(1) Gaussian process: `o[k] = bias + rho*(o[k-1]-bias) + e`.                                                |
+| [`impact_object`](_autosummary/cutan.impacts.html.md#cutan.impacts.impact_object)(name, \*\*kwargs)                   | Build a registered object by name.                                                                                            |
+| [`impact_set_specs`](_autosummary/cutan.impacts.html.md#cutan.impacts.impact_set_specs)(\*[, base, objects, kinds, ...]) | The cartesian product of the given axes over `base`.                                                                          |
+| [`perform`](_autosummary/cutan.impacts.html.md#cutan.impacts.perform)([tempo, beats, subdivision, ...])         | The impacts of `beats` beats of `pattern`, on `tempo`'s grid.                                                                 |
+| [`plan_impact_clip`](_autosummary/cutan.impacts.html.md#cutan.impacts.plan_impact_clip)(spec)                            | Resolve `spec` into events, a stroke, frames and a Scene IR.                                                                  |
+| [`stick`](_autosummary/cutan.impacts.html.md#cutan.impacts.stick)(\*[, length, thickness, pivot, ...])        | A drumstick rotating about `pivot` (its butt — the hand).                                                                     |
+| [`tempo_map`](_autosummary/cutan.impacts.html.md#cutan.impacts.tempo_map)(tempo)                                  | Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](_autosummary/cutan.impacts.html.md#cutan.impacts.TempoMap).                    |
+| [`write_impact_clip`](_autosummary/cutan.impacts.html.md#cutan.impacts.write_impact_clip)(spec, out_dir, \*[, ...])       | Write one clip into `out_dir / (clip_dir or spec.clip_id)`; return that dir.                                                  |
+| [`write_impact_set`](_autosummary/cutan.impacts.html.md#cutan.impacts.write_impact_set)(out_dir[, specs, render, ...])   | Write every clip in `specs` (default: [`impact_set_specs()`](_autosummary/cutan.impacts.html.md#cutan.impacts.impact_set_specs)) plus `index.json`. |
 
 ### Classes
 
@@ -9359,7 +9370,7 @@ Per frame, the scene instants to render and average — the render seam.
 * **Type:**
   The resolved sample count
 
-### *class* cutan.impacts.ImpactClipSpec(object='stick', kind='surface', tempo=100.0, beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)
+### *class* cutan.impacts.ImpactClipSpec(object='stick', kind='surface', tempo=100.0, beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, tail=0.5, jitter_sd=0.008, jitter_rho=0.0, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=None, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -9376,7 +9387,14 @@ case a sub-frame estimator cannot be scored on. Set it to 0 for a metronome.
 
 Motion: `object` (`"stick"` or `"ball"`), `kind` (`"surface"` or
 `"air"`), the stroke timings `rise` / `fall` / `brake`, and
-`show_surface` (`None`: drawn for surface impacts only).
+`show_surface` (`None`: drawn for surface impacts only). Stroke-shape
+variability (cutan#27): `rise_sd` / `fall_sd` / `brake_sd` (seconds)
+draw each stroke’s own timings around those means from the seed’s stroke
+stream, never below `MIN_TIMING_FRACTION` of the mean; `truth.json`
+records each event’s actual `rise`, `fall` and `brake`. `arc_radius`
+(scene px, the ball only) swings the ball on a circle about a pivot that
+far above its contact point, instead of a straight fall: the contact is the
+arc’s lowest point and `impact_xy` is where it lands, as before.
 
 Camera ([`an.frame_clock.FrameClock`](_autosummary/cutan.impacts.html.md#cutan.impacts.FrameClock)): `fps`, `exposure`,
 `exposure_samples`, `timestamp_jitter_sd` (when frames are really
@@ -9514,24 +9532,39 @@ Bases: [`RuntimeError`](https://docs.python.org/3/builtins/exceptions.html#Runti
 
 The ground truth and the thing it describes disagree.
 
-### cutan.impacts.ball(, radius=18.0, x=0.0, floor_y=90.0, drop=170.0, color='#111827', surface_color='#9ca3af', surface_size=(160.0, 24.0))
+### cutan.impacts.ball(, radius=18.0, x=0.0, floor_y=90.0, drop=170.0, arc_radius=None, color='#111827', surface_color='#9ca3af', surface_size=(160.0, 24.0))
 
-A ball moving vertically onto a floor whose top is at `floor_y`.
+A ball moving onto a floor whose top is at `floor_y`.
 
 A full stroke lifts it `drop` pixels. Keypoints: `center` and
 `bottom` (its contact point).
 
+Straight by default. With `arc_radius` (cutan#27, a wide stick arc: a
+hard hit) it hangs on a circle of that radius about a pivot straight above
+its contact point, and the stroke ROTATES the pivot: the ball swings up to
+one side and falls back along the arc, its contact the arc’s lowest point.
+The angle that lifts it `drop` pixels is `acos(1 - drop / arc_radius)`;
+rotation is the one channel, affine in `h`, so the curve stays exact.
+
 * **Return type:**
   [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
 
-### cutan.impacts.build_stroke(events, , kind='surface', duration, rise=0.18, fall=0.18, brake=0.03, rest_height=1.0)
+```pycon
+>>> b = ball(arc_radius=300.0)
+>>> round(b.params["arc_sweep"], 4), b.at == (0.0, b.params["pivot_y"])
+(1.1226, True)
+```
+
+### cutan.impacts.build_stroke(events, , kind='surface', duration, rise=0.18, fall=0.18, brake=0.03, rest_height=1.0, timings=None)
 
 Chain rise / hold / fall segments through every executed impact.
 
 The object starts and ends at `rest_height`; before impact `k` it is
 raised to `events[k].amplitude` (a bigger preparation, a harder hit).
 Segments tile `[0, duration]` exactly, and every impact is a segment
-boundary at precisely `t_impact`.
+boundary at precisely `t_impact`. `timings` gives each impact its own
+rise, fall and brake (one per event, cutan#27); without it every stroke
+takes `rise`, `fall` and `brake`.
 
 * **Return type:**
   [`Stroke`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.Stroke)
@@ -9575,7 +9608,7 @@ Traceback (most recent call last):
 KeyError: "no impact object 'hammer'; known: ['ball', 'stick']"
 ```
 
-### cutan.impacts.impact_set_specs(, base=ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0), objects=('stick', 'ball'), kinds=('surface', 'air'), fps=(24, 30, 60), exposures=(0.0, 0.5), timestamp_jitter_sds=(0.0,), seeds=(0,))
+### cutan.impacts.impact_set_specs(, base=ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=None, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0), objects=('stick', 'ball'), kinds=('surface', 'air'), fps=(24, 30, 60), exposures=(0.0, 0.5), timestamp_jitter_sds=(0.0,), seeds=(0,))
 
 The cartesian product of the given axes over `base`.
 
@@ -9717,10 +9750,10 @@ True
 
 ### Functions
 
-| [`ball`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ball)(\*[, radius, x, floor_y, drop, color, ...])   | A ball moving vertically onto a floor whose top is at `floor_y`.   |
-|-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
-| [`impact_object`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.impact_object)(name, \*\*kwargs)                    | Build a registered object by name.                                 |
-| [`stick`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.stick)(\*[, length, thickness, pivot, ...])         | A drumstick rotating about `pivot` (its butt — the hand).          |
+| [`ball`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ball)(\*[, radius, x, floor_y, drop, ...])   | A ball moving onto a floor whose top is at `floor_y`.     |
+|----------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| [`impact_object`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.impact_object)(name, \*\*kwargs)             | Build a registered object by name.                        |
+| [`stick`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.stick)(\*[, length, thickness, pivot, ...])  | A drumstick rotating about `pivot` (its butt — the hand). |
 
 ### Classes
 
@@ -9780,15 +9813,28 @@ One animated property, AFFINE in stroke height `h`.
 (radians, or pixels). Affine is the whole contract — it is what makes an
 eased tween of the property exactly the same easing of `h`.
 
-### cutan.impacts.objects.ball(, radius=18.0, x=0.0, floor_y=90.0, drop=170.0, color='#111827', surface_color='#9ca3af', surface_size=(160.0, 24.0))
+### cutan.impacts.objects.ball(, radius=18.0, x=0.0, floor_y=90.0, drop=170.0, arc_radius=None, color='#111827', surface_color='#9ca3af', surface_size=(160.0, 24.0))
 
-A ball moving vertically onto a floor whose top is at `floor_y`.
+A ball moving onto a floor whose top is at `floor_y`.
 
 A full stroke lifts it `drop` pixels. Keypoints: `center` and
 `bottom` (its contact point).
 
+Straight by default. With `arc_radius` (cutan#27, a wide stick arc: a
+hard hit) it hangs on a circle of that radius about a pivot straight above
+its contact point, and the stroke ROTATES the pivot: the ball swings up to
+one side and falls back along the arc, its contact the arc’s lowest point.
+The angle that lifts it `drop` pixels is `acos(1 - drop / arc_radius)`;
+rotation is the one channel, affine in `h`, so the curve stays exact.
+
 * **Return type:**
   [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
+
+```pycon
+>>> b = ball(arc_radius=300.0)
+>>> round(b.params["arc_sweep"], 4), b.at == (0.0, b.params["pivot_y"])
+(1.1226, True)
+```
 
 ### cutan.impacts.objects.impact_object(name, \*\*kwargs)
 
@@ -10061,10 +10107,11 @@ In both kinds the speed at the peak is `2 * apex / fall`.
 
 ### Classes
 
-| [`Stroke`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.Stroke)(kind, duration, segments, kinematics)   | The whole curve, plus the kinematics of every impact on it.   |
-|-------------------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| [`StrokeKinematics`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.StrokeKinematics)(index, kind, t_impact, ...)   | How the object moved into one impact.                         |
-| [`StrokeSegment`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.StrokeSegment)(t0, t1, h0, h1, easing)          | `h` goes from `h0` to `h1` over `[t0, t1]` under `easing`.    |
+| [`Stroke`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.Stroke)(kind, duration, segments, kinematics)   | The whole curve, plus the kinematics of every impact on it.                                                                                                         |
+|-------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`StrokeKinematics`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.StrokeKinematics)(index, kind, t_impact, ...)   | How the object moved into one impact.                                                                                                                               |
+| [`StrokeSegment`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.StrokeSegment)(t0, t1, h0, h1, easing)          | `h` goes from `h0` to `h1` over `[t0, t1]` under `easing`.                                                                                                          |
+| [`StrokeTiming`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.StrokeTiming)(rise, fall, brake)                | One impact's own timings (seconds): the `fall` into it, the air `brake` before it, and the `rise` out of it (cutan#27: stroke-shape variability, drawn per stroke). |
 
 ### Exceptions
 
@@ -10107,7 +10154,7 @@ Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueEr
 
 A stroke that cannot be built from these events.
 
-### *class* cutan.impacts.stroke.StrokeKinematics(index, kind, t_impact, t_peak_speed, peak_speed, apex, fall, brake)
+### *class* cutan.impacts.stroke.StrokeKinematics(index, kind, t_impact, t_peak_speed, peak_speed, apex, fall, brake, rise=0.0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -10117,20 +10164,35 @@ How the object moved into one impact.
 `brake` for an air impact; `peak_speed` is in stroke heights per second
 (multiply by the object’s stroke extent for pixels or radians).
 
+#### rise *: [float](https://docs.python.org/3/builtins/functions.html#float)*
+
+The rise out of this impact as executed (the next stroke’s preparation).
+
 ### *class* cutan.impacts.stroke.StrokeSegment(t0, t1, h0, h1, easing)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 `h` goes from `h0` to `h1` over `[t0, t1]` under `easing`.
 
-### cutan.impacts.stroke.build_stroke(events, , kind='surface', duration, rise=0.18, fall=0.18, brake=0.03, rest_height=1.0)
+### *class* cutan.impacts.stroke.StrokeTiming(rise, fall, brake)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One impact’s own timings (seconds): the `fall` into it, the air
+`brake` before it, and the `rise` out of it (cutan#27: stroke-shape
+variability, drawn per stroke). Each is the longest it may take: a fast
+tempo still shortens it to fit.
+
+### cutan.impacts.stroke.build_stroke(events, , kind='surface', duration, rise=0.18, fall=0.18, brake=0.03, rest_height=1.0, timings=None)
 
 Chain rise / hold / fall segments through every executed impact.
 
 The object starts and ends at `rest_height`; before impact `k` it is
 raised to `events[k].amplitude` (a bigger preparation, a harder hit).
 Segments tile `[0, duration]` exactly, and every impact is a segment
-boundary at precisely `t_impact`.
+boundary at precisely `t_impact`. `timings` gives each impact its own
+rise, fall and brake (one per event, cutan#27); without it every stroke
+takes `rise`, `fall` and `brake`.
 
 * **Return type:**
   [`Stroke`](_autosummary/cutan.impacts.stroke.html.md#cutan.impacts.stroke.Stroke)
@@ -10192,7 +10254,9 @@ clip with two can be described without changing any reader):
     `air` (turning point; velocity is zero at `t_impact`);
   - `t_peak_speed` (`= t_impact` for surface, `t_impact - brake` for
     air), `peak_speed` (stroke heights/s), `peak_speed_px` (the impact
-    keypoint’s px/s), `fall`, `brake` (seconds);
+    keypoint’s px/s), `fall`, `brake` and `rise` (the stroke into this
+    impact and the one out of it, as executed, seconds; drawn per stroke when
+    the spec spreads them, cutan#27);
   - `impact_xy` — the impact keypoint at `t_impact`;
   - `frames` — what the frames show: `before` (last frame whose exposure
     closed at or before the impact), `after` (first to open at or after it),
@@ -10239,9 +10303,10 @@ The analytic and compiled keypoints must agree to this many pixels. Both are
 double-precision evaluations of the same easing, so any real disagreement is
 orders of magnitude larger.
 
-### cutan.impacts.truth.TRUTH_SCHEMA_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '1.0.0'*
+### cutan.impacts.truth.TRUTH_SCHEMA_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '1.1.0'*
 
 Bumped on any change a reader must know about; additive fields bump MINOR.
+1.1.0: each event’s `rise` (cutan#27).
 
 ### *exception* cutan.impacts.truth.TruthMismatch
 
@@ -10773,6 +10838,86 @@ then `walk`.
 JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).
 
 
+# _autosummary/cutan.styles.copies.html.md
+
+# cutan.styles.copies
+
+Copies of a style spec, and whether they are stale (cutan#19).
+
+A spec changes between cutan releases (targets re-measured, roles re-cast), and
+what a production copies out of it is a snapshot: the StylePack
+([`cutan.styles.style_pack()`](_autosummary/cutan.styles.html.md#cutan.styles.style_pack)), a voice cast to one of the spec’s roles
+([`style_voice()`](_autosummary/cutan.styles.copies.html.md#cutan.styles.copies.style_voice)), a kit’s members built from them. Each copy records where
+it came from in `metadata.style_spec = {name, sha256}` ([`spec_origin()`](_autosummary/cutan.styles.copies.html.md#cutan.styles.copies.spec_origin)),
+and `an validate` compares that digest with the installed spec’s
+([`check_style_copies()`](_autosummary/cutan.styles.copies.html.md#cutan.styles.copies.check_style_copies)): a copy of an older spec is said, with what to
+re-derive. A copy from a spec file, or one that records no digest, is never
+compared (only a shipped spec has an installed version to compare with).
+
+```pycon
+>>> spec_origin("south_park")["name"]
+'south_park'
+```
+
+### Module Attributes
+
+| [`SPEC_ORIGIN_KEY`](_autosummary/cutan.styles.copies.html.md#cutan.styles.copies.SPEC_ORIGIN_KEY)   | Where a copy records the spec it came from, inside its `metadata`.   |
+|--------------------------------------------------------------------|----------------------------------------------------------------------|
+
+### Functions
+
+| [`check_style_copies`](_autosummary/cutan.styles.copies.html.md#cutan.styles.copies.check_style_copies)(ctx)           | `an validate`: the style pack the scene names, and every voice its lines speak with, warn when they were copied from an older version of the shipped spec they record (cutan#19).   |
+|------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`spec_origin`](_autosummary/cutan.styles.copies.html.md#cutan.styles.copies.spec_origin)(spec)                 | `{name, sha256}` of the spec `spec` names (a shipped style's name, a file), as a copy records it; no `sha256` for an in-memory mapping.                                             |
+| [`stale_copy_problem`](_autosummary/cutan.styles.copies.html.md#cutan.styles.copies.stale_copy_problem)(doc, \*, what) | Why `doc` (a copy that recorded its spec) is stale, or `None`: the shipped spec it names has changed since the copy was made.                                                       |
+| [`style_voice`](_autosummary/cutan.styles.copies.html.md#cutan.styles.copies.style_voice)(spec, role)           | The partial voice document `spec` casts `role` as (<br/><br/>```<br/>``<br/>```<br/><br/>an.audio.takes.                                                                            |
+
+### cutan.styles.copies.SPEC_ORIGIN_KEY *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'style_spec'*
+
+Where a copy records the spec it came from, inside its `metadata`.
+
+### cutan.styles.copies.check_style_copies(ctx)
+
+`an validate`: the style pack the scene names, and every voice its lines
+speak with, warn when they were copied from an older version of the shipped
+spec they record (cutan#19). Once per validation.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.styles.copies.spec_origin(spec)
+
+`{name, sha256}` of the spec `spec` names (a shipped style’s name, a
+file), as a copy records it; no `sha256` for an in-memory mapping.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### cutan.styles.copies.stale_copy_problem(doc, , what)
+
+Why `doc` (a copy that recorded its spec) is stale, or `None`: the
+shipped spec it names has changed since the copy was made.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.styles.copies.style_voice(spec, role)
+
+The partial voice document `spec` casts `role` as (`an.audio.takes.
+style_voice_role`: target names resolved to values), with the spec it came
+from recorded, so a later re-measure of the style is noticed. Merge it beside
+a `voice_id`: `{**style_voice("oversimplified", "eager"), "voice_id": ...}`.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+```pycon
+>>> doc = style_voice("oversimplified", "narrator")
+>>> doc["metadata"]["style_spec"]["name"], "targets" in doc["takes"]["cues"]["deadpan"]
+('oversimplified', True)
+```
+
+
 # _autosummary/cutan.styles.html.md
 
 # cutan.styles
@@ -10853,6 +10998,8 @@ prints one, and `python -m cutan.styles NAME --path` prints its file’s path
 | [`policy_of`](_autosummary/cutan.styles.html.md#cutan.styles.policy_of)(obj)                         | The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.                                                                                                               |
 | [`policy_problems`](_autosummary/cutan.styles.html.md#cutan.styles.policy_problems)(policy)                | What is wrong with a `policy` block, one sentence each (empty when it is sound).                                                                                                                            |
 | [`style_pack`](_autosummary/cutan.styles.html.md#cutan.styles.style_pack)(spec)                       | The StylePack a project saves for a style: its `live.style_pack` (a bare pack named after the style when the spec has none), its `policy`, and the spec it was copied from (name and digest) in `metadata`. |
+| [`style_voice`](_autosummary/cutan.styles.html.md#cutan.styles.style_voice)(spec, role)                | The partial voice document `spec` casts `role` as (<br/><br/>```<br/>``<br/>```<br/><br/>an.audio.takes.                                                                                                    |
+| [`check_style_copies`](_autosummary/cutan.styles.html.md#cutan.styles.check_style_copies)(ctx)                | `an validate`: the style pack the scene names, and every voice its lines speak with, warn when they were copied from an older version of the shipped spec they record (cutan#19).                           |
 
 ### Exceptions
 
@@ -10893,6 +11040,15 @@ it), and so also a `LookupError`.
 
 * **Return type:**
   [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+### cutan.styles.check_style_copies(ctx)
+
+`an validate`: the style pack the scene names, and every voice its lines
+speak with, warn when they were copied from an older version of the shipped
+spec they record (cutan#19). Once per validation.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.styles.layered_policy(, shot=None, style_pack=None)
 
@@ -11029,10 +11185,27 @@ The names of the style specs that ship with `cutan`, sorted.
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
+### cutan.styles.style_voice(spec, role)
+
+The partial voice document `spec` casts `role` as (`an.audio.takes.
+style_voice_role`: target names resolved to values), with the spec it came
+from recorded, so a later re-measure of the style is noticed. Merge it beside
+a `voice_id`: `{**style_voice("oversimplified", "eager"), "voice_id": ...}`.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+```pycon
+>>> doc = style_voice("oversimplified", "narrator")
+>>> doc["metadata"]["style_spec"]["name"], "targets" in doc["takes"]["cues"]["deadpan"]
+('oversimplified', True)
+```
+
 ### Modules
 
-| [`policy`](_autosummary/cutan.styles.policy.html.md#module-cutan.styles.policy)   | A style's policy: per-aspect method orders the compiler applies (ADR 0002 decision 4, cutan#9).   |
-|--------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| [`copies`](_autosummary/cutan.styles.copies.html.md#module-cutan.styles.copies)   | Copies of a style spec, and whether they are stale (cutan#19).                                  |
+|--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| [`policy`](_autosummary/cutan.styles.policy.html.md#module-cutan.styles.policy)   | A style's policy: per-aspect method orders the compiler applies (ADR 0002 decision 4, cutan#9). |
 
 
 # _autosummary/cutan.styles.policy.html.md
@@ -11530,20 +11703,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-06 13:09 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/4a755a42ddea831eb4e88dde104aca5325558622"><code>4a755a4</code></a> on branch <code>main</code>, for **cutan 0.0.26** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-06 13:16 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/eebe7b24ddd48c792a676ff04d947aecd8da2df6"><code>eebe7b2</code></a> on branch <code>main</code>, for **cutan 0.0.28** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.26) is behind the latest release on PyPI (0.0.27): `pip install cutan` gives newer code than these docs describe.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/4a755a42ddea831eb4e88dde104aca5325558622"><code>4a755a42ddea831eb4e88dde104aca5325558622</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/eebe7b24ddd48c792a676ff04d947aecd8da2df6"><code>eebe7b24ddd48c792a676ff04d947aecd8da2df6</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
-| Tags at this commit | none                                                                                                                                                    |
+| Tags at this commit | <code>0.0.28</code>                                                                                                                                     |
 | Working tree        | clean                                                                                                                                                   |
 | Remote              | <code>https://github.com/thorwhalen/cutan</code>                                                                                                        |
 
@@ -11552,9 +11723,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37468145948">37468145948</a>     |
+| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37468953926">37468953926</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>4a755a42ddea831eb4e88dde104aca5325558622</code> (in the history of the built commit) |
+| Event commit | <code>acfd354a8e28568abf5d7e05083ad9c5af3e3ee8</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -11579,13 +11750,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.27/">0.0.27</a>, newer than the documented version (0.0.26).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.28/">0.0.28</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout 4a755a42ddea831eb4e88dde104aca5325558622
+git checkout eebe7b24ddd48c792a676ff04d947aecd8da2df6
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

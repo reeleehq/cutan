@@ -34,7 +34,7 @@
 <link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="cutan.styles.policy.html" rel="next" title="cutan.styles.policy"/>
+<link href="cutan.styles.copies.html" rel="next" title="cutan.styles.copies"/>
 <link href="cutan.runtime.html" rel="prev" title="cutan.runtime"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
@@ -220,6 +220,12 @@ prints one, and <code class="docutils literal notranslate"><span class="pre">pyt
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.styles.style_pack" title="cutan.styles.style_pack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">style_pack</span></code></a>(spec)</p></td>
 <td><p>The StylePack a project saves for a style: its <code class="docutils literal notranslate"><span class="pre">live.style_pack</span></code> (a bare pack named after the style when the spec has none), its <code class="docutils literal notranslate"><span class="pre">policy</span></code>, and the spec it was copied from (name and digest) in <code class="docutils literal notranslate"><span class="pre">metadata</span></code>.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.styles.style_voice" title="cutan.styles.style_voice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">style_voice</span></code></a>(spec, role)</p></td>
+<td><p>The partial voice document <code class="docutils literal notranslate"><span class="pre">spec</span></code> casts <code class="docutils literal notranslate"><span class="pre">role</span></code> as (<a href="#id1"><span class="problematic" id="id2">``</span></a>an.audio.takes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.styles.check_style_copies" title="cutan.styles.check_style_copies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_style_copies</span></code></a>(ctx)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code>: the style pack the scene names, and every voice its lines speak with, warn when they were copied from an older version of the shipped spec they record (cutan#19).</p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Exceptions</p>
@@ -270,6 +276,18 @@ it), and so also a <code class="docutils literal notranslate"><span class="pre">
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.styles.check_style_copies">
+<span class="sig-prename descclassname"><span class="pre">cutan.styles.</span></span><span class="sig-name descname"><span class="pre">check_style_copies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/styles/copies.html#check_style_copies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.styles.check_style_copies" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.styles.check_style_copies'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code>: the style pack the scene names, and every voice its lines
+speak with, warn when they were copied from an older version of the shipped
+spec they record (cutan#19). Once per validation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -428,10 +446,31 @@ is a new version too.</p>
 </dd>
 </dl>
 </dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.styles.style_voice">
+<span class="sig-prename descclassname"><span class="pre">cutan.styles.</span></span><span class="sig-name descname"><span class="pre">style_voice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/styles/copies.html#style_voice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.styles.style_voice" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.styles.style_voice'">¶</a></dt>
+<dd><p>The partial voice document <code class="docutils literal notranslate"><span class="pre">spec</span></code> casts <code class="docutils literal notranslate"><span class="pre">role</span></code> as (<code class="docutils literal notranslate"><span class="pre">an.audio.takes.</span>
+<span class="pre">style_voice_role</span></code>: target names resolved to values), with the spec it came
+from recorded, so a later re-measure of the style is noticed. Merge it beside
+a <code class="docutils literal notranslate"><span class="pre">voice_id</span></code>: <code class="docutils literal notranslate"><span class="pre">{**style_voice("oversimplified",</span> <span class="pre">"eager"),</span> <span class="pre">"voice_id":</span> <span class="pre">...}</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">doc</span> <span class="o">=</span> <span class="n">style_voice</span><span class="p">(</span><span class="s2">"oversimplified"</span><span class="p">,</span> <span class="s2">"narrator"</span><span class="p">)</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">doc</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">][</span><span class="s2">"style_spec"</span><span class="p">][</span><span class="s2">"name"</span><span class="p">],</span> <span class="s2">"targets"</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">[</span><span class="s2">"takes"</span><span class="p">][</span><span class="s2">"cues"</span><span class="p">][</span><span class="s2">"deadpan"</span><span class="p">]</span>
+</span><span id="line-3"><span class="go">('oversimplified', True)</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
 <p class="rubric">Modules</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.styles.policy.html#module-cutan.styles.policy" title="cutan.styles.policy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">policy</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.styles.copies.html#module-cutan.styles.copies" title="cutan.styles.copies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copies</span></code></a></p></td>
+<td><p>Copies of a style spec, and whether they are stale (cutan#19).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.styles.policy.html#module-cutan.styles.policy" title="cutan.styles.policy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">policy</span></code></a></p></td>
 <td><p>A style's policy: per-aspect method orders the compiler applies (ADR 0002 decision 4, cutan#9).</p></td>
 </tr>
 </tbody>
@@ -445,6 +484,7 @@ is a new version too.</p>
 <li><a :data-current="activeSection === '#cutan.styles.STYLE_SPEC_SUFFIX'" class="reference internal" href="#cutan.styles.STYLE_SPEC_SUFFIX"><code class="docutils literal notranslate"><span class="pre">STYLE_SPEC_SUFFIX</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.UnknownStyleError'" class="reference internal" href="#cutan.styles.UnknownStyleError"><code class="docutils literal notranslate"><span class="pre">UnknownStyleError</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.check_policy'" class="reference internal" href="#cutan.styles.check_policy"><code class="docutils literal notranslate"><span class="pre">check_policy()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.styles.check_style_copies'" class="reference internal" href="#cutan.styles.check_style_copies"><code class="docutils literal notranslate"><span class="pre">check_style_copies()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.layered_policy'" class="reference internal" href="#cutan.styles.layered_policy"><code class="docutils literal notranslate"><span class="pre">layered_policy()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.policy_of'" class="reference internal" href="#cutan.styles.policy_of"><code class="docutils literal notranslate"><span class="pre">policy_of()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.policy_problems'" class="reference internal" href="#cutan.styles.policy_problems"><code class="docutils literal notranslate"><span class="pre">policy_problems()</span></code></a></li>
@@ -455,6 +495,7 @@ is a new version too.</p>
 <li><a :data-current="activeSection === '#cutan.styles.style_spec_path'" class="reference internal" href="#cutan.styles.style_spec_path"><code class="docutils literal notranslate"><span class="pre">style_spec_path()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.style_spec_text'" class="reference internal" href="#cutan.styles.style_spec_text"><code class="docutils literal notranslate"><span class="pre">style_spec_text()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.style_specs'" class="reference internal" href="#cutan.styles.style_specs"><code class="docutils literal notranslate"><span class="pre">style_specs()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.styles.style_voice'" class="reference internal" href="#cutan.styles.style_voice"><code class="docutils literal notranslate"><span class="pre">style_voice()</span></code></a></li>
 </ul>
 </div>
 </aside>
@@ -468,7 +509,7 @@ is a new version too.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=6a9d8632"></script>
+<script src="../_static/documentation_options.js?v=26ffa1e9"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

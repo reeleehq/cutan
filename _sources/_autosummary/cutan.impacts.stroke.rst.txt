@@ -24,6 +24,7 @@ cutan.impacts.stroke
       Stroke
       StrokeKinematics
       StrokeSegment
+      StrokeTiming
    
    .. rubric:: Exceptions
 
