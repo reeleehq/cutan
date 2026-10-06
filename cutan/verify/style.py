@@ -663,18 +663,50 @@ def check_targets(
         if lo <= value <= hi:
             continue
         low = value < lo
+        description = (
+            f"{name} = {value} is {'below' if low else 'above'} the "
+            f"style's range [{lo}, {hi}] ({METRICS[name]})"
+        )
+        if _one_authored_shot(metrics) and name in _CUT_RATE_METRICS:
+            # One shot is the guidance's answer for continuous action on one set,
+            # whatever the cut-rate target says (cutan#64): never tell the author
+            # to split it.
+            findings.append(
+                Finding(
+                    severity="info",
+                    ir_path=f"<style>/{name}",
+                    description=description + "; the film is one shot",
+                    suggested_fix=ONE_SHOT_FIX,
+                )
+            )
+            continue
         findings.append(
             Finding(
                 severity=miss_severity,
                 ir_path=f"<style>/{name}",
-                description=(
-                    f"{name} = {value} is {'below' if low else 'above'} the "
-                    f"style's range [{lo}, {hi}] ({METRICS[name]})"
-                ),
+                description=description,
                 suggested_fix=_fix_for(name, low, live),
             )
         )
     return findings
+
+
+#: The targets that measure a film's cutting: on a one-shot film they say only
+#: that it is one shot.
+_CUT_RATE_METRICS: frozenset[str] = frozenset({"cuts_per_min", "mean_shot_s"})
+
+#: What the lint says instead of "split long shots" on a one-shot film.
+ONE_SHOT_FIX: str = (
+    "none if the shot is continuous action on one set: the style's guidance keeps "
+    "that one shot whatever the cut-rate target says; cut only where the time or "
+    "place changes"
+)
+
+
+def _one_authored_shot(metrics: StyleMetrics) -> bool:
+    """The authored shot list says one shot (pixels cannot: they miss a cut
+    between two shots on one backdrop)."""
+    return metrics.cut_source == "shots" and metrics.cuts == 0
 
 
 # -----------------------------------------------------------------------------
