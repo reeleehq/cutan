@@ -75,6 +75,10 @@ class OfflineLipSync:
 
     name: str = "offline"
     convention: str = "rhubarb"
+    #: A pure function of the transcript, and nothing is billed: ``an cache gc``
+    #: may re-make a missing track in memory (an#311, cutan#29).
+    repeatable: bool = True
+    billed: bool = False
 
     def __init__(self, *, char_to_viseme: dict[str, str] | None = None) -> None:
         self._mapping = (

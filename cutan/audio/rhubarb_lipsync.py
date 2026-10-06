@@ -34,6 +34,16 @@ from an.audio.tts import AudioClip
 
 
 _DEFAULT_TIMEOUT_S: float = 60.0
+
+#: Where to get the binary, said by every error that cannot find it.
+_INSTALL_HINT: str = (
+    "Install with: brew install rhubarb-lipsync (macOS) or grab a release from "
+    "https://github.com/DanielSWolf/rhubarb-lip-sync/releases."
+)
+
+
+class RhubarbNotFoundError(RuntimeError):
+    """The rhubarb binary is not on this machine (with how to install it)."""
 #: Rhubarb's own default and its English recognizer — the one that reads the
 #: dialog file.
 _ENGLISH_RECOGNIZER: str = "pocketSphinx"
@@ -71,6 +81,12 @@ class RhubarbLipSync:
     """
 
     convention: str = "rhubarb"
+    #: The same audio, transcript and recognizer give the same track on one
+    #: machine (one binary), and nothing is billed: ``an cache gc`` may re-make
+    #: a missing track in memory (an#311, cutan#29). A machine without the
+    #: binary says so in :meth:`check_available`.
+    repeatable: bool = True
+    billed: bool = False
 
     def __init__(
         self,
@@ -101,13 +117,15 @@ class RhubarbLipSync:
         """Whether the chosen recognizer reads a transcript at all."""
         return self.recognizer == _ENGLISH_RECOGNIZER
 
-    def align(self, audio: AudioClip, transcript: str) -> VisemeTrack:
+    def check_available(self) -> None:
+        """Raise :class:`RhubarbNotFoundError` when this machine has no binary."""
         if not self.binary_path:
-            raise RuntimeError(
-                "rhubarb binary not found on PATH. Install with: "
-                "brew install rhubarb-lipsync (macOS) or grab a release from "
-                "https://github.com/DanielSWolf/rhubarb-lip-sync/releases."
+            raise RhubarbNotFoundError(
+                f"rhubarb binary not found on PATH. {_INSTALL_HINT}"
             )
+
+    def align(self, audio: AudioClip, transcript: str) -> VisemeTrack:
+        self.check_available()
         with tempfile.TemporaryDirectory() as d:
             d = Path(d)
             audio_path = audio.path
