@@ -2,6 +2,7 @@
 
 ## 2026-10-06
 
+- **A declared `occluded` is reported under `overrides`** (an#381): the character analyser declares `overrides=character_overrides` (the core hook from thorwhalen/an#388), so `an character capabilities` lists `occluded` among the overrides when a declared cover keeps `face.brows` from a face with brows. Reporting only; the analyser version is unchanged.
 - **A character has a specimen** (cutan#40, an#347): the `character` kind declares `specimen=character_specimen`, a short cut-out shot casting the character alone, at rest and facing the camera, so `an library sheet` draws the character instead of a grey placeholder.
 - **Impacts: per-stroke variability and an arc fall** (cutan#27, for thoremin's air-drum benchmarks):
   - `ImpactClipSpec.rise_sd/fall_sd/brake_sd` (and `an impacts clip --rise-sd/--fall-sd/--brake-sd`) draw each stroke's timings from the seed's own stroke stream, never below a quarter of the mean. Performance and camera are unchanged by it.

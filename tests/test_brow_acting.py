@@ -565,3 +565,21 @@ def test_validate_sees_brow_art_that_is_missing(tmp_path):
     store = CharactersStore(tmp_path)
     (hit,) = _brow_warnings(_scene_with("big", expression("c", "surprised")), store)
     assert "its brow slots have no art" in hit.description
+
+
+def test_a_declared_cover_is_reported_under_overrides(tmp_path):
+    """an#381: `occluded` is the illustrator's override since an#284, and an
+    override that removes a capability shows under `describe_asset`'s
+    `overrides`, not only under `declared`."""
+    from an.capabilities import art_in_dir
+    from an.genres import load
+    from an.semantic.describe import describe_asset
+
+    load()
+    char = _make(tmp_path, hat="none")
+    doc = json.loads((char / "character.json").read_text(encoding="utf-8"))
+    art = art_in_dir(char, exclude=("character.json",))
+    assert "occluded" not in describe_asset(doc, art)["overrides"]
+    doc["occluded"] = {"brows": "a drawn helmet"}
+    d = describe_asset(doc, art)
+    assert "occluded" in d["overrides"] and "face.brows" not in d["affordances"]
