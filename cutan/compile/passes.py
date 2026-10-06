@@ -41,6 +41,7 @@ from cutan.characters.play import (
     play_source,
     GAIT_ARG,
     PARTS_ARG,
+    POLICY_ARG,
     SCALE_ARG,
     VIEW_ARG,
     facing_at,
@@ -395,11 +396,67 @@ def _blink_windows(entity_id: str, duration: float) -> list[tuple[float, float]]
     return out
 
 
+#: Where the policy pass leaves the layered shot/style policy for later passes.
+POLICY_PRODUCT: str = "cutan.policy"
+
+
+def _scene_policy(state: CompileState):
+    """The shot's policy over the style pack's (cutan#9), checked; ``None`` when neither has one."""
+    from cutan.styles.policy import PolicyError, layered_policy, policy_of
+
+    if policy_of(state.shot) is None and policy_of(state.style_pack) is None:
+        return None
+    try:
+        return layered_policy(shot=state.shot, style_pack=state.style_pack)
+    except PolicyError as e:
+        raise CutoutCompileError(f"shot {state.shot.id!r}: {e}") from e
+
+
+def _with_walk_policy(action: Any, policy: Mapping[str, Any]) -> Any:
+    """``action`` with ``policy`` on each walk's internal args (compositions walked through)."""
+    if isinstance(action, PlayAction):
+        if action.animation != "walk":
+            return action
+        args = {**(action.args or {}), POLICY_ARG: policy}
+        return action.model_copy(update={"args": args})
+    children = getattr(action, "children", None)
+    if isinstance(children, list):
+        return action.model_copy(
+            update={"children": [_with_walk_policy(c, policy) for c in children]}
+        )
+    child = getattr(action, "child", None)
+    if child is not None:
+        return action.model_copy(update={"child": _with_walk_policy(child, policy)})
+    return action
+
+
+def _policy_pass(state: CompileState) -> None:
+    """Cut-out: the style's policy (cutan#9, ADR 0002 decision 4). The shot's
+    ``policy`` over the style pack's is resolved once, kept for the speech pass,
+    and written onto every ``walk``'s internal args (the lowering, which sees
+    no compile state, reads it there), so the locomotion method the walk
+    resolves follows it; the author's ``gait`` (or the character's declared
+    one) still comes first. A scene with no policy is untouched (its document
+    is byte-identical)."""
+    policy = _scene_policy(state)
+    if policy is None or not policy.order:
+        return
+    state.products[POLICY_PRODUCT] = policy
+    order = policy.to_json()
+    actions = [_with_walk_policy(a, order) for a in state.shot.actions or ()]
+    state.shot = state.shot.model_copy(update={"actions": actions})
+
+
 def _speech_pass(state: CompileState) -> None:
     """Cut-out: the speech aspect, resolved once per speaker (an#248) -- the
     pulses it adds for a speaker that does not lip-sync (compiled with the
     authored actions), and those speakers, whose lip-sync the viseme pass skips."""
-    speech = _speech_plan(state.shot, state.vocab, state.resolutions)
+    speech = _speech_plan(
+        state.shot,
+        state.vocab,
+        state.resolutions,
+        policy=state.products.get(POLICY_PRODUCT),
+    )
     state.extra_actions.extend(speech.actions)
     state.no_lip_sync = speech.no_lip_sync
 
@@ -751,6 +808,8 @@ def _speech_plan(
     shot: Shot,
     vocab: _SwapVocabulary,
     resolutions: list[AssetResolutionJSON] | None,
+    *,
+    policy: Any = None,
 ):
     """The speech aspect's plan for the shot (an#248): the pulses a speaker that
     does not lip-sync gets, and who those speakers are. A shot whose speakers
@@ -766,6 +825,10 @@ def _speech_plan(
             descriptor_of=lambda e: vocab.descriptors.get(e),
             has_part=lambda path: path in vocab.node_transforms,
             record=lambda sub: _record_substitution(sub, resolutions),
+            policy=policy,
+            record_skip=lambda e, m, chosen, missing: _record_policy_skip(
+                e, "speech", m, chosen, missing, resolutions
+            ),
         )
     except VocabularyError as e:
         raise CutoutCompileError(
@@ -2231,7 +2294,7 @@ def _expand_preset_plays(
             desc,
             action.animation,
             art_exists=vocab.art_exists.get(entity_id) if vocab is not None else None,
-            args=action.args,
+            args={k: v for k, v in (action.args or {}).items() if k != POLICY_ARG},
             duration=action.duration,
             speed=action.speed,
             loop=action.loop,
@@ -2357,6 +2420,38 @@ def _character_profile(entity: str, vocab: _SwapVocabulary) -> dict[str, dict]:
     )
 
 
+#: The ``asset_resolution`` kind of a policy entry passed over (cutan#9): not a
+#: ``method`` substitution (nothing asked for it), so a tool can tell them apart.
+POLICY_SKIP_KIND: str = "policy_skip"
+
+
+def _record_policy_skip(
+    entity: str,
+    aspect: str,
+    method: str,
+    chosen: str,
+    missing: tuple[str, ...],
+    resolutions: list[AssetResolutionJSON] | None,
+) -> None:
+    """A policy entry that did not apply, recorded (non-fatal) beside the stand-ins:
+    a skip is never silent (ADR 0002 decision 6, cutan#9)."""
+    if resolutions is not None:
+        resolutions.append(
+            AssetResolutionJSON(
+                id=entity,
+                kind=POLICY_SKIP_KIND,
+                store=aspect,
+                ref=method,
+                resolved=chosen,
+                fallback=False,
+                detail=(
+                    f"{entity}: {aspect}: the policy's {method!r} does not apply "
+                    f"(missing {', '.join(missing)}); skipped"
+                ),
+            )
+        )
+
+
 def _record_substitution(sub, resolutions: list[AssetResolutionJSON] | None) -> None:
     """A method substitution, recorded beside the stand-in assets (ADR 0002 decision 6)."""
     from cutan.characters.methods import substitution_record
@@ -2378,20 +2473,32 @@ def _locomotion_args(
     (an#248: :func:`cutan.characters.methods.locomotion_args`, the one
     resolution the extent reads too), the substitution recorded. ``view`` is
     the view in force at the play's start (a ``profile`` needs its side view
-    showing, cutan#17). A gait parameter the resolved gait never reads is a
+    showing, cutan#17). The scene's policy rides on the walk's internal
+    ``_policy`` arg (cutan#9, :func:`_policy_pass`); its skipped entries are
+    recorded beside the substitution. A gait parameter the resolved gait never reads is a
     warning here (an explicit gait's is `play_problems`' error, cutan#21)."""
     from cutan.characters.methods import locomotion_args, walk_arg_problems
+    from cutan.styles.policy import PolicyError
 
     explicit = args.get(GAIT_ARG) is not None
-    resolved, resolution = locomotion_args(
-        entity,
-        args,
-        descriptor=desc,
-        profile=_character_profile(entity, vocab),
-        view=view,
-    )
+    skipped: list[tuple[str, tuple[str, ...]]] = []
+    try:
+        resolved, resolution = locomotion_args(
+            entity,
+            args,
+            descriptor=desc,
+            profile=_character_profile(entity, vocab),
+            view=view,
+            on_skip=lambda m, t: skipped.append((m, t)),
+        )
+    except PolicyError as e:
+        raise CutoutCompileError(f"walk on {entity!r}: {e}") from e
     if resolution.substitution is not None:
         _record_substitution(resolution.substitution, resolutions)
+    for method, missing in skipped:
+        _record_policy_skip(
+            entity, "locomotion", method, resolution.method.id, missing, resolutions
+        )
     if not explicit:
         for problem in walk_arg_problems(resolved[GAIT_ARG], resolved):
             warnings.warn(f"walk on {entity!r}: {problem}", stacklevel=3)

@@ -527,8 +527,12 @@ def resolve_walk_gait(
     profile: Mapping[str, Mapping[str, Any]],
     policy: Any = None,
     view: Any = UNKNOWN_VIEW,
+    on_skip: Callable[[str, tuple[str, ...]], None] | None = None,
 ):
     """``(gait, resolution)`` of a walk on ``entity``: the locomotion method's spelling.
+
+    ``policy`` (the shot's over the style's) orders the methods when nothing
+    is requested; its entries that do not apply are reported to ``on_skip``.
 
     The request is the walk's ``gait`` arg, else the descriptor's declared
     ``gait`` (an override of the derivation, and reported as one). An explicit
@@ -576,6 +580,12 @@ def resolve_walk_gait(
         views = dict(profile["swap.view"])
         views["keys"] = [k for k in views["keys"] if k != "side"]
         profile["swap.view"] = views
+    if policy is not None and requested is None:  # a request is not ordered by a policy
+        from cutan.styles.policy import applicable_policy
+
+        # against the profile as it stands in this view: a profile cycle the
+        # view does not show is skipped (cutan#17), not chosen
+        policy = applicable_policy(policy, LOCOMOTION, profile, on_skip=on_skip)
     r = resolve(LOCOMOTION, profile, requested=requested, policy=policy, entity=entity)
     sub = r.substitution
     if side_not_showing and sub is not None and "swap.view:side" in sub.missing:
@@ -677,6 +687,7 @@ def locomotion_args(
     profile: Mapping[str, Mapping[str, Any]],
     policy: Any = None,
     view: Any = UNKNOWN_VIEW,
+    on_skip: Callable[[str, tuple[str, ...]], None] | None = None,
 ) -> tuple[dict[str, Any], Any]:
     """``(args with its gait resolved, resolution)`` of a walk on ``entity``:
     the locomotion method the registry resolves (an#248) — the author's
@@ -687,10 +698,26 @@ def locomotion_args(
     ``sequence`` waits for, :func:`walk_preset_context`), so the two cannot
     disagree about which gait runs (cutan#12).
 
+    The scene's policy (cutan#9: the shot's over the style's) arrives as the
+    internal ``_policy`` arg the compiler's policy pass writes, or as
+    ``policy``; it orders the methods when nothing is requested (its entries
+    that do not apply go to ``on_skip``), and the chosen entry's OWN args join
+    the walk's under them (never the method's defaults, which the gait scales
+    to the figure). A malformed policy raises
+    :class:`~cutan.styles.policy.PolicyError`.
+
     >>> args, r = locomotion_args("blob", {"gait": "hem", "distance": 80}, descriptor=None, profile={})
     >>> args["gait"], r.substitution.reason
     ('glide', 'missing')
     """
+    from cutan.characters.play import POLICY_ARG
+
+    args = dict(args)
+    block = args.pop(POLICY_ARG, None)
+    if policy is None and block:
+        from cutan.styles.policy import check_policy
+
+        policy = check_policy(block, where="the scene's policy")
     args = normalise_gait_args(args)
     gait, resolution = resolve_walk_gait(
         entity,
@@ -699,7 +726,20 @@ def locomotion_args(
         profile=profile,
         policy=policy,
         view=view,
+        on_skip=on_skip,
     )
+    if resolution.source == "policy":
+        from an.semantic import Policy
+
+        own = next(
+            (
+                c.args
+                for c in Policy.of(policy).choices(LOCOMOTION)
+                if c.method == resolution.method.id
+            ),
+            {},
+        )
+        return {**own, **args, "gait": gait}, resolution
     return {**args, "gait": gait}, resolution
 
 
@@ -746,6 +786,8 @@ def walk_preset_context(
         return out  # a bad gait is `cutout.play`'s to report; no extent
     if "gait" in resolved:
         out["gait"] = resolved["gait"]
+    # a policy entry's own args (a step_s) change the walk's length too
+    out.update({k: v for k, v in resolved.items() if k not in args and k not in out})
     return out
 
 
@@ -1173,6 +1215,14 @@ def _authored_pulse_speakers(shot) -> set[str]:
     return out
 
 
+def _applicable(policy: Any, aspect: str, profile, on_skip=None) -> Any:
+    if policy is None:
+        return None
+    from cutan.styles.policy import applicable_policy
+
+    return applicable_policy(policy, aspect, profile, on_skip=on_skip)
+
+
 def speech_plan(
     shot,
     *,
@@ -1182,6 +1232,7 @@ def speech_plan(
     has_part: Callable[[str], bool],
     record: Callable[[Any], None] | None = None,
     policy: Any = None,
+    record_skip: Callable[[str, str, str, tuple[str, ...]], None] | None = None,
 ) -> SpeechPlan:
     """Resolve the speech aspect ONCE per speaking character, and say what it adds.
 
@@ -1224,16 +1275,27 @@ def speech_plan(
             continue
         if speaker not in resolved:
             requested = getattr(descriptor_of(speaker), "speech", None)
+            profile = profile_of(speaker)
+            skipped: list[tuple[str, tuple[str, ...]]] = []
             r = resolve(
                 SPEECH,
-                profile_of(speaker),
+                profile,
                 requested=requested,
-                policy=policy,
+                policy=(
+                    None
+                    if requested is not None
+                    else _applicable(
+                        policy, SPEECH, profile, lambda m, t: skipped.append((m, t))
+                    )
+                ),
                 entity=speaker,
             )
             resolved[speaker] = r
             if r.substitution is not None and record is not None:
                 record(r.substitution)
+            if record_skip is not None:
+                for method, missing in skipped:
+                    record_skip(speaker, method, r.method.id, missing)
         r = resolved[speaker]
         if (
             r.method.id != SPEECH_PULSE.id

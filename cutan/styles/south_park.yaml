@@ -1,7 +1,8 @@
 # South Park-style cut-out (a digital emulation of construction-paper cut-out).
 # Read with the cutan-style skill. `live` keys map onto shipped `an` features and are
 # checked against the code by tests/test_style_specs.py; `targets` are what
-# `cutan.verify.style` measures; `guidance` is NOT wired to anything in `an` today.
+# `cutan.verify.style` measures; `policy` orders the methods the compiler picks (cutan#9);
+# `guidance` is NOT wired to anything in `an` today.
 # Numbers: misc/docs/cutout_styles_research.md (one 30 s dialogue scene, measured).
 style: south_park
 schema_version: "0.1.0"
@@ -48,6 +49,8 @@ live:
   voice:
     effects: {pitch_semitones: 4}   # the `effects` of every kid's voice document in assets/voices/ (an#163); about 4 semitones is an estimate
 
+policy:                      # cutan#9 (ADR 0002 decision 4): method orders the compiler applies; the author's request, then a shot's policy, win over it
+  locomotion: [loco.bounce]  # the show bounces its figures along even when they have legs (a legged character records a `policy` choice, not a warning)
 targets:
   identical_frame_share: [0.54, 0.69]   # measured 0.63 (0.64 before the local-change rule, an#255)
   cuts_per_min: [10, 14]                # measured 12.4
@@ -56,7 +59,7 @@ targets:
 guidance:                    # not in `an` yet: apply by hand where you can, otherwise tell the user it was omitted
   construction: head, torso and limbs are single rigid pieces; no elbow or knee bends (the squat build is live; the near-circular head with eyes touching is not)
   eyes: two white ovals with pupil dots; brows appear when worried or angry; a half-lid per shot
-  views: the show turns a figure by a hard swap between front and three-quarter heads; a `turn` play with a `duration` near one frame is the closest, and the factory's three-quarter body is a stand-in for the show's head-only swap
+  views: the show turns a figure by a hard swap between front and three-quarter heads; that is a plain `set` of the character's `view` (no `turn` play; on twos a near-one-frame turn squashes for two frames and vanishes for one, an#273), and the factory's three-quarter body is a stand-in for the show's head-only swap
   coverage: [two_shot, single_close, over_shoulder]
   motion_vocabulary_unmapped: [whole_piece_rotate]   # no preset: a short rotation tween on the entity
   voice: pitch raised; see `live.voice`. The amount is an estimate, and a stock-ffmpeg shift (asetrate + atempo) is a cruder shifter than a studio one

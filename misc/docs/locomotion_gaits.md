@@ -65,21 +65,20 @@ Every gait reads the parameters its method declares (the genre vocabulary lists 
 - `profile` also needs its side view **in force** when the walk starts (a turn to `side` before it, or art drawn in profile; the walk's own `view` arg poses the legs without swapping the art, so it does not count): a character that affords a side view but is showing its front walks `legs` instead, recorded and warned with that remedy — otherwise its legs would swing in the front view and scissor. `an character capabilities` lists `profile` as applying whenever the rig affords a side view; whether that view is showing is the timeline's to say, so the walk and `an validate` decide it per play.
 - When the asked gait does not apply, the walk uses the chain's choice and the substitution is **recorded** (`asset_resolution`, a warning, fatal under `--strict-assets`); `an validate` says it before any render (`cutout.walk_gait`), naming the missing capability and its remedy; `an character capabilities <name>` lists every gait that applies and why each other one does not.
 - A walk is played on the character, never on one of its parts (refused by `an validate` and the compiler). A prop can walk too, with a legless gait: a legged gait asked of it glides, recorded and warned. A gait parameter the chosen gait never reads is refused when the gait is explicit (`args: {gait: hop, bob: 20}`, a pinned choice's args included) and warned about when the gait is the descriptor's or the chain's.
-- A style that always walks one way (South Park bounces even when its characters have legs) is ADR 0002's **policy**; the matcher takes one (`resolve(..., policy=)`), but no style document is read by the compiler yet, so today a style is applied through each character's declared `gait`.
+- A style that always walks one way (South Park bounces even when its characters have legs) is ADR 0002's **policy**. The compiler reads it (cutan#9): the style spec's `policy:` block, carried into the project by the StylePack `cutan.styles.style_pack(<style>)` builds, under a shot's own `policy`, under the author's request (a walk's `gait`, a character's declared one). A policy choice is recorded as information, not a warning.
 
 ## 5. Per style, as the Alice & Bob comparison renders them
 
 | Style | Characters | Gait |
 |---|---|---|
-| South Park | carved legs | `bounce` (the show's slide-and-bob), declared per character (`"gait": "bounce"`) until the style's `policy:` is read by the compiler (cutan#9). The shipped spec and the `cutan-style` skill still walk with the older `waddle` *preset* (`play: waddle`, see the `waddle` row): the two coexist until the policy lands. |
-| OverSimplified | robe figures | `glide` (the default without legs; `hem` once the hem is carved in two) |
-| Reiniger | jointed silhouettes in profile | `profile` |
+| South Park | carved legs | `bounce` (the show's slide-and-bob): the spec's policy since cutan#9. The spec's `motion_presets` and the `cutan-style` skill also name the older `waddle` *preset* (`play: waddle`, see the `waddle` row), a different move. |
+| OverSimplified | robe figures | `glide` (the default without legs; `hem` once the hem is carved in two, declared on the character); no policy: `hem_sway` requires only a leg pair, so as a policy it would sway every legged figure |
+| Reiniger | jointed silhouettes in profile | `profile` while the side view shows, `legs` otherwise (the spec's policy; the profile cycle needs its side view in force, #17) |
 
 ## Open
 
 - Measure footage of each style (step period, bob height in figure heights, stride angle) and tune `GAIT_DEFAULTS` from it.
 - Knees and foot swaps: a `limbs.knees` capability and replacement feet would let `legs`/`profile` bend at the knee and roll the foot, as Harmony and Moho rigs do [4, 5].
-- The style `policy:` block read by the compiler (ADR 0002 decision 4).
 - Runs, sneaks and struts [1, 2]: further gaits with the same shape.
 
 ## References

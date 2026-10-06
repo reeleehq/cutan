@@ -40,6 +40,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 from an.genres import CompilePass, Genre, RuntimeScript, SemanticCheck
+from cutan.styles.policy import check_shot_policy
 
 from cutan import GENRE_NAME, LIBRARY_NAME, require_an
 from cutan.characters import checks as _checks
@@ -69,6 +70,12 @@ CUTOUT_GENRE_NAME: str = GENRE_NAME
 #: builder of a ``character``'s subtree inside the scene pass. Named by
 #: ``"module:function"`` so this declaration imports no engine.
 CUTOUT_COMPILE_PASSES: tuple[CompilePass, ...] = (
+    CompilePass(
+        "style_policy",
+        "cutan.compile.passes:_policy_pass",
+        order=140,
+        description="the style's and the shot's policy, onto each walk (cutan#9)",
+    ),
     CompilePass(
         "speech",
         "cutan.compile.passes:_speech_pass",
@@ -183,6 +190,15 @@ CUTOUT = Genre(
             description=(
                 "a `walk`'s requested gait applies to its character (else it says "
                 "which gait is used and what structure would enable the asked one)"
+            ),
+        ),
+        SemanticCheck(
+            "cutout.shot_policy",
+            check_shot_policy,
+            order=41.7,
+            description=(
+                "a shot's `policy` names aspects the compiler applies and their "
+                "method ids (cutan#9)"
             ),
         ),
         SemanticCheck(

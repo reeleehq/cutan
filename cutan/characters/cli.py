@@ -340,18 +340,23 @@ def validate(name: str, out_dir: str = "") -> str:
     return _format_report(report, name=name)
 
 
-def capabilities(name: str, out_dir: str = "", as_json: bool = False) -> str:
+def capabilities(
+    name: str, out_dir: str = "", as_json: bool = False, style: str = ""
+) -> str:
     """What a character affords, and per aspect which methods apply and what the rest lack.
 
     The affordances are derived from ``character.json`` and the art files
     present (ADR 0002 decision 2), with the declared overrides it used; per
     aspect (``locomotion``, ``speech``, …) the method the default chain picks,
     the methods that apply, and for each other method the missing capabilities
-    with the remedy that would add them.
+    with the remedy that would add them. With ``style``, each aspect also says
+    what it resolves to under that style's policy (cutan#9, an#273): a South
+    Park character with legs bounces, a Reiniger silhouette mimes.
 
     name: character id
     out_dir: parent directory; defaults to ./assets/characters
     as_json: print the answer as JSON (what the MCP surface returns)
+    style: a style spec's name (``python -m cutan.styles`` lists them) or path
     """
     from an.capabilities import art_in_dir
     from an.genres import load
@@ -366,10 +371,60 @@ def capabilities(name: str, out_dir: str = "", as_json: bool = False) -> str:
             f"{name!r} (default ./assets/characters)"
         )
     doc = json.loads(descriptor.read_text(encoding="utf-8"))
-    described = describe_asset(doc, art_in_dir(target, exclude=(descriptor.name,)))
+    art = art_in_dir(target, exclude=(descriptor.name,))
+    described = describe_asset(doc, art)
+    if style:
+        _under_style(described, doc, art, style)
     if as_json:
         return json.dumps(described, indent=2, sort_keys=True)
-    return format_description(described, name=name)
+    text = format_description(described, name=name)
+    if style:
+        lines = [
+            f"{aspect}: under {info['under_style']['style']}: "
+            f"{info['under_style']['method']} ({info['under_style']['source']})"
+            + (
+                f", only while {', '.join(info['under_style']['while'])} is showing"
+                if info["under_style"].get("while")
+                else ""
+            )
+            for aspect, info in described["aspects"].items()
+            if "under_style" in info
+        ]
+        text += "\n\n" + "\n".join(lines)
+    return text
+
+
+def _under_style(described: dict, doc: dict, art, style: str) -> None:
+    """Add, per aspect, what it resolves to under ``style``'s policy (in place)."""
+    from an.capabilities import affordances
+    from an.semantic import aspect as aspect_of
+    from an.semantic import resolve
+
+    from cutan.styles import check_policy, resolve_style_spec
+
+    spec = resolve_style_spec(style)
+    label = spec.get("style") or style
+    policy = check_policy(spec.get("policy"), where=f"style {label!r}")
+    profile = affordances(doc, art, kind=described["kind"])
+    declared = described.get("declared") or {}
+    for name, info in described["aspects"].items():
+        asp = aspect_of(name)
+        request = declared.get(asp.declared_by) if asp.declared_by else None
+        r = resolve(
+            name,
+            profile,
+            requested=request,
+            policy=policy,
+            entity_kind=described["kind"],
+        )
+        info["under_style"] = {
+            "style": label,
+            "method": r.method.id,
+            "source": r.source,
+        }
+        views = [str(t) for t in r.method.requires if str(t).startswith("swap.view")]
+        if views:  # resolved without a view: it runs only while that view shows
+            info["under_style"]["while"] = views
 
 
 def silhouette(
