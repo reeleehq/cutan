@@ -20,6 +20,8 @@ cutan.characters.factory
       HAIR_LENGTHS
       MAX_HEAD_SCALE
       BUILDS
+      RECIPE_KEY
+      RECIPE_VERSION
       FACTORY_AUTHOR
       EYE_CANVAS
       GAZE_PARTS
@@ -27,6 +29,7 @@ cutan.characters.factory
       SIDE_EYE_SHIFT
       SIDE_LEG_OFFSET
       THREE_QUARTER_FACE_SHIFT
+      MAX_RECIPE_STEPS
    
    .. rubric:: Functions
 
@@ -42,6 +45,7 @@ cutan.characters.factory
       gaze_travel_for
       new_character
       recording_drawn
+      redraw_digests
       scale_part_files
       stage_extent
       stamp_factory_descriptor

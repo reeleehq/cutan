@@ -33,6 +33,8 @@ problem routes the way every other verifier’s does (an#78).
 | [`HAIR_LENGTHS`](#cutan.characters.factory.HAIR_LENGTHS)             | `short` (nothing below the crown — the default), `medium` (falling beside the face to the jaw) and `long` (past the chin, in locks that keep clear of the neck and the collar).                                                                                                                                                                             |
 | [`MAX_HEAD_SCALE`](#cutan.characters.factory.MAX_HEAD_SCALE)           | The largest head scale accepted — past it the head no longer fits the 1024-unit view box above a regular body.                                                                                                                                                                                                                                              |
 | [`BUILDS`](#cutan.characters.factory.BUILDS)                   | Named builds.                                                                                                                                                                                                                                                                                                                                               |
+| [`RECIPE_KEY`](#cutan.characters.factory.RECIPE_KEY)               | every drawing call that made the character, in order, with its parameters — so the factory's bytes can be re-derived anywhere ([`redraw_digests()`](#cutan.characters.factory.redraw_digests)).                                                                                                                                                          |
+| [`RECIPE_VERSION`](#cutan.characters.factory.RECIPE_VERSION)           | The version of the recipe's format.                                                                                                                                                                                                                                                                                                                         |
 | [`FACTORY_AUTHOR`](#cutan.characters.factory.FACTORY_AUTHOR)           | The provider of every per-part source the factory stamps on what it draws.                                                                                                                                                                                                                                                                                  |
 | [`EYE_CANVAS`](#cutan.characters.factory.EYE_CANVAS)               | The eye's geometry in its 64x32 canvas, shared by the four synthesizers so the sclera, the pupil and the lid outline agree (an#99).                                                                                                                                                                                                                         |
 | [`GAZE_PARTS`](#cutan.characters.factory.GAZE_PARTS)               | The parts a rig gains with `an character add-gaze`.                                                                                                                                                                                                                                                                                                         |
@@ -40,6 +42,7 @@ problem routes the way every other verifier’s does (an#78).
 | [`SIDE_EYE_SHIFT`](#cutan.characters.factory.SIDE_EYE_SHIFT)           | how far the near eye, its stack and brow slide toward the face's edge, and the mouth with them (view_box units at head_scale 1); the mouth is narrowed, seen edge-on.                                                                                                                                                                                       |
 | [`SIDE_LEG_OFFSET`](#cutan.characters.factory.SIDE_LEG_OFFSET)          | both hang from under the body, the near leg (`leg_r`, drawn over the far one) a little forward and the far leg a little back, overlapping at the hip — each hip sits `SIDE_LEG_OFFSET` leg widths off the centre line — and splayed so the FEET part: the shoe centres land `SIDE_FOOT_SPREAD` leg widths apart, on every build (a stubby leg splays more). |
 | [`THREE_QUARTER_FACE_SHIFT`](#cutan.characters.factory.THREE_QUARTER_FACE_SHIFT) | the whole face slides toward the facing side, the far eye narrows, the far arm tucks in toward the body and the legs in.                                                                                                                                                                                                                                    |
+| [`MAX_RECIPE_STEPS`](#cutan.characters.factory.MAX_RECIPE_STEPS)         | The most drawing steps a recipe may replay, and the most bytes of JSON its parameters may take: the replay runs on whoever reads the descriptor, so its cost is bounded here, not by the recipe's author (review-292 R3).                                                                                                                                   |
 
 ### Functions
 
@@ -54,6 +57,7 @@ problem routes the way every other verifier’s does (an#78).
 | [`gaze_travel_for`](#cutan.characters.factory.gaze_travel_for)([rx, ry, pupil_r])               | The pupil's travel per axis, in view-box units: the sclera's clearance minus the pupil's radius — the semi-axes of the inner ellipse the gaze axes' unit circle maps onto.                                                                                                                                                                                                                            |
 | [`new_character`](#cutan.characters.factory.new_character)(out_dir, \*, name[, seed, ...])    | Build a complete character on disk.                                                                                                                                                                                                                                                                                                                                                                   |
 | [`recording_drawn`](#cutan.characters.factory.recording_drawn)(char_dir)                        | Log what the body writes, then record the factory-stamped bytes it wrote at `char_dir`.                                                                                                                                                                                                                                                                                                               |
+| [`redraw_digests`](#cutan.characters.factory.redraw_digests)(descriptor)                       | `{path: sha256}` of every file the factory draws from `descriptor`'s recipe (an#292).                                                                                                                                                                                                                                                                                                                 |
 | [`scale_part_files`](#cutan.characters.factory.scale_part_files)(paths, scale)                   | Rewrite each part SVG's root size by `scale` (its drawing untouched): the compiler draws a part at its own raster size, so that IS its size on screen.                                                                                                                                                                                                                                                |
 | [`stage_extent`](#cutan.characters.factory.stage_extent)(desc)                               | How far a character's art reaches above and below its stage point, in scene pixels at `stage.scale: 1`: `{"top", "feet", "height"}`.                                                                                                                                                                                                                                                                  |
 | [`stamp_factory_descriptor`](#cutan.characters.factory.stamp_factory_descriptor)(char_dir)               | Record the factory as the source of the character it just drew at `char_dir`.                                                                                                                                                                                                                                                                                                                         |
@@ -172,6 +176,12 @@ The roles a head’s own art carries. On a head the factory did not draw
 The largest head scale accepted — past it the head no longer fits the
 1024-unit view box above a regular body.
 
+### cutan.characters.factory.MAX_RECIPE_STEPS *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 8*
+
+The most drawing steps a recipe may replay, and the most bytes of JSON its
+parameters may take: the replay runs on whoever reads the descriptor, so
+its cost is bounded here, not by the recipe’s author (review-292 R3).
+
 ### cutan.characters.factory.OUTLINE_COLOUR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '#222222'*
 
 it is the
@@ -190,6 +200,19 @@ role so the pack can reach what the palette drew.
 ### cutan.characters.factory.PUPIL_COLOUR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '#1a1a1a'*
 
 The pupil, in its own part (or the pre-gaze open eye). Role `pupil`.
+
+### cutan.characters.factory.RECIPE_KEY *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'factory'*
+
+every
+drawing call that made the character, in order, with its parameters — so
+the factory’s bytes can be re-derived anywhere ([`redraw_digests()`](#cutan.characters.factory.redraw_digests)).
+
+* **Type:**
+  The descriptor `metadata` key holding the factory’s recipe (an#292)
+
+### cutan.characters.factory.RECIPE_VERSION *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 1*
+
+The version of the recipe’s format.
 
 ### cutan.characters.factory.SHOE_COLOUR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '#1a1a1a'*
 
@@ -436,6 +459,21 @@ Log what the body writes, then record the factory-stamped bytes it wrote at `cha
 For a drawing path outside this module (`an character mouths`): only
 bytes written through [`cutan.characters.drawn`](cutan.characters.drawn.md#module-cutan.characters.drawn) inside the block, and
 stamped by the factory, are recorded.
+
+### cutan.characters.factory.redraw_digests(descriptor)
+
+`{path: sha256}` of every file the factory draws from `descriptor`’s recipe (an#292).
+
+The factory is deterministic: replaying the recorded drawing calls, with
+their recorded parameters, into a scratch folder re-derives the very
+bytes — anywhere, on any machine. Whatever bytes it draws are the
+factory’s own work, so a recipe can only ever confirm the factory’s
+output: carved or hand-drawn bytes are never what it draws. `{}` when the
+descriptor records no replayable recipe (none, an older format, a DiceBear
+head, a parameter JSON could not hold). Memoised per recipe.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.factory.scale_part_files(paths, scale)
 
