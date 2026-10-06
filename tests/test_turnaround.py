@@ -165,7 +165,10 @@ def test_views_are_additive_to_the_character_that_existed(tmp_path):
     for part, roles in a["colour_roles"].items():
         assert b["colour_roles"][part] == roles
     assert {k: v for k, v in b["asset_sets"].items() if k != VIEW_CHANNEL} == a["asset_sets"]
-    assert {k: v for k, v in b["metadata"].items() if k != "views"} == a["metadata"]
+    # The recipe (an#292) records the parameters each was drawn with, which differ.
+    assert {k: v for k, v in b["metadata"].items() if k not in ("views", "factory")} == {
+        k: v for k, v in a["metadata"].items() if k != "factory"
+    }
 
 
 def test_add_views_is_idempotent_and_brings_an_old_character_level(tmp_path):

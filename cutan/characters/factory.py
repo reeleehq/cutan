@@ -806,7 +806,26 @@ def _record_step(desc_path: Path, func, args, kwargs) -> None:
     )
     if params is None or recipe.get("replayable") is False:
         recipe["replayable"] = False
-    recipe["steps"] = [*recipe.get("steps", []), {"call": func.__name__, "params": params}]
+    step = {"call": func.__name__, "params": params}
+    steps = list(recipe.get("steps", []))
+    if steps and steps[-1] == step:
+        return  # the same call again changes nothing it drew: idempotent
+    first = steps[0] if len(steps) == 1 else None
+    drawn_with = (
+        (first.get("params") or {}).get("views")
+        if first is not None and first.get("call") == "new_character"
+        else None
+    )
+    if func.__name__ == "add_views" and drawn_with is True:
+        return  # drawn with its turnaround: adding it again draws nothing new
+    if func.__name__ == "add_views" and drawn_with is False:
+        # The turnaround added later is the character drawn with it, byte for
+        # byte (tests/test_turnaround.py holds that): one recipe for both.
+        steps = [{**first, "params": {**first["params"], "views": True}}]
+    else:
+        steps = [*steps, step]
+    recipe["steps"] = steps
+    meta.pop(RECIPE_KEY, None)  # always last: one descriptor, however it was reached
     meta[RECIPE_KEY] = recipe
     Path(desc_path).write_text(descriptor.model_dump_json(indent=2), encoding="utf-8")
 

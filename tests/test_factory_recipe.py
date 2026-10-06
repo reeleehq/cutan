@@ -42,7 +42,9 @@ def test_the_recipe_replays_to_the_very_bytes_drawn(tmp_path):
                          head_scale=1.2).parent
     add_views(char)
     recipe = _desc(char)["metadata"][RECIPE_KEY]
-    assert [s["call"] for s in recipe["steps"]] == ["new_character", "add_views"]
+    # A turnaround added right after the drawing is the drawing with views on.
+    assert [s["call"] for s in recipe["steps"]] == ["new_character"]
+    assert recipe["steps"][0]["params"]["views"] is True
     assert "out_dir" not in recipe["steps"][0]["params"]
     assert redraw_digests(_desc(char)) == _files(char)
 
