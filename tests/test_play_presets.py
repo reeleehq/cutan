@@ -444,3 +444,36 @@ def test_validate_warns_when_the_scene_default_meets_explicit_ease_in_out():
     assert any(f.ir_path == "meta/default_easing" and f.severity == "warning" for f in report.findings)
     quiet = validate_semantic(_scene(_shot([tween("charlie", "x", to=1.0, duration=1.0)]), default_easing="linear"))
     assert not any(f.ir_path == "meta/default_easing" for f in quiet.findings)
+
+
+def test_a_preset_played_mid_way_through_a_from_less_tween_starts_where_the_tween_is():
+    """The lowering resolves a from-less tween's start INSIDE its own time-ordered
+    history (an#212), because a preset expanded later in that pass poses itself
+    from that history. The stage's own resolution (an#365) runs only after the
+    lowerings, so it cannot stand in for this: without the lowering's arm a
+    `shake` half-way through `x: 100 -> 200` centres on 100, not 150, and snaps
+    back there (cutan#59, measured)."""
+    text = {"kind": "TextDescriptor", "name": "t", "text": "hi", "unit": "line"}
+    from an.ir.schema import StagePlacement
+
+    shot = Shot(
+        id="s",
+        renderer="stage",
+        duration=3.0,
+        entities=[
+            AssetRef(
+                kind="prop", id="label", store="props", ref="t",
+                stage=StagePlacement(at=(100.0, 0.0)),
+            )
+        ],
+        actions=[
+            tween("label", "x", 200.0, 2.0, easing="linear"),
+            sequence(delay(1.0), play("label", "shake", duration=0.5)),
+        ],
+    )  # fmt: skip
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        doc = compile_shot(shot, {"props": {"t": text}}, width=320, height=240)
+    tl = timeline_from_scene(doc)
+    assert evaluate_timeline(tl, 1.0)[("label", "x")] == pytest.approx(150.0)
+    assert evaluate_timeline(tl, 1.5)[("label", "x")] == pytest.approx(150.0)

@@ -2416,6 +2416,11 @@ def _expand_preset_plays(
             and action.from_value is None
             and action.property in _PROPERTY_REST_VALUES
         ):
+            # NOT redundant with the stage's own resolution (an#365), which runs
+            # after this pass: a preset expanded later in THIS loop poses itself
+            # from `history`, so a from-less tween must be resolved here first
+            # (a `shake` mid-way through `x: 100 -> 200` must centre on 150;
+            # test_a_preset_played_mid_way_through_a_from_less_tween_..., cutan#59).
             base = _built_value(action.target, action.property, vocab=vocab)
             start_value = value_at(action.target, action.property, flat.start, base)
             leaves = [
