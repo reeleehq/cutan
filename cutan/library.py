@@ -29,7 +29,8 @@ capability             afforded when                                         ``k
 ``face.mouth``         an overlay face (``face_overlay``) whose ``viseme``   the chart (``rhubarb9``
                        set has drawings                                      or ``custom``)
 ``face.brows``         an overlay face whose two brow slots have art, with   —
-                       nothing recorded over them (``occluded``, an#252)
+                       nothing over them: a factory hat measured over their
+                       range (an#284), or a declared ``occluded`` override
 =====================  ====================================================  ==========================
 """
 
@@ -50,8 +51,9 @@ __all__ = [
 ]
 
 #: Bump when the derivation can answer differently for the same input.
-#: 0.2.0: ``face.brows`` (an#252).
-CHARACTER_ANALYSER_VERSION: str = "0.2.0"
+#: 0.2.0: ``face.brows`` (an#252). 0.3.0: a factory head's brow cover is
+#: derived from its knobs and recorded seat, ``occluded`` only an override (an#284).
+CHARACTER_ANALYSER_VERSION: str = "0.3.0"
 #: The chart name of the nine Rhubarb mouth shapes (A–H, X) — ``an``'s default.
 MOUTH_CHART_RHUBARB: str = "rhubarb9"
 #: The chart name of any other viseme set.

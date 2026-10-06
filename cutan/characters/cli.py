@@ -149,7 +149,16 @@ def new(
         f"; stands {ext['height']:g} px tall at stage.scale 1 — its top "
         f"{ext['top']:g} px above its stage point, its feet {ext['feet']:g} px below"
     )
-    for feature, cover in (doc.get("occluded") or {}).items():
+    from cutan.characters.brows import BROWS_FEATURE, brow_cover
+
+    # derived from the knobs and the recorded seat (an#284), plus any override
+    covers = dict(doc.get("occluded") or {})
+    derived = brow_cover(
+        CharacterDescriptor.model_validate(migrate(doc, kind="CharacterDescriptor"))
+    )
+    if derived:
+        covers.setdefault(BROWS_FEATURE, derived)
+    for feature, cover in covers.items():
         note += (
             f"; {cover} covers the {feature}, so expressions cannot act with them "
             "(see `an character capabilities`)"

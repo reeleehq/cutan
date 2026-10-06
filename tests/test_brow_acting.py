@@ -127,14 +127,18 @@ def test_a_hat_that_cannot_clear_a_tiny_heads_brows_is_recorded(tmp_path):
     out = cli_new("tiny", out_dir=str(tmp_path), offline=True, hat="cap", head_scale=0.3)
     assert "covers the brows" in out
     doc = json.loads((tmp_path / "tiny" / "character.json").read_text(encoding="utf-8"))
-    assert doc["occluded"] == {BROWS_FEATURE: "the cap hat at head_scale 0.3"}
+    # derived from the knobs and the recorded seat, never stored (an#284)
+    assert not doc.get("occluded")
+    from cutan.characters.brows import brow_cover
+
+    assert brow_cover(CharacterDescriptor.model_validate(doc)) == "the cap hat at head_scale 0.3"
     described = describe_asset(doc, art_in_dir(tmp_path / "tiny", exclude=("character.json",)))
     assert "face.brows" not in described["affordances"]
     expression = described["aspects"]["expression"]
     assert expression["default"] == "expr.without_brows"
     assert expression["substitution"]["missing"] == ["face.brows"]
     text = capabilities("tiny", out_dir=str(tmp_path))
-    assert "occluded=" in text and "to add face.brows:" in text
+    assert "to add face.brows:" in text
 
 
 def test_a_character_with_clear_brows_affords_them_and_acts_with_the_full_face(tmp_path):
@@ -342,18 +346,83 @@ def test_the_hat_seat_is_recorded_and_redraws_read_it(tmp_path, monkeypatch):
     assert meta["hat_seat"] in side
 
 
-def test_validate_warns_about_a_hat_drawn_before_seating(tmp_path):
-    from cutan.characters.validate import validate_character
+def _pre_seat_cap(tmp_path, *, stamp: str) -> Path:
+    """A cap at head scale 1.7 as made before hats were seated (an#252): its head
+    drawn unseated, no seat recorded, and its head attachments stamped with the
+    digest of ``stamp`` ("legacy": the unseated drawing; "seated": the seated
+    one, the an#252-#278 window; "none": made before stamps, an#236)."""
+    import hashlib
 
-    char = _make(tmp_path, hat="bowler", head_scale=1.7)
-    hit = lambda: [f for f in validate_character(char, name="c").findings if "seated above" in f.description]
-    assert not hit()
+    char = _make(tmp_path, hat="cap", head_scale=1.7, views=False)
     path = char / "character.json"
     doc = json.loads(path.read_text(encoding="utf-8"))
-    del doc["metadata"]["hat_seat"]  # as a character made before an#252 reads
+    meta = doc["metadata"]
+    height = REFERENCE_HEAD_HEIGHT * 1.7
+    drawn = {
+        "legacy": _head_part_text(_resolve_looks(meta["seed"], {}, hat="cap", hat_seat=None).head_svg, height=height),
+        "seated": _head_part_text(_resolve_looks(meta["seed"], {}, hat="cap", hat_seat=meta["hat_seat"]).head_svg, height=height),
+    }
+    (char / "parts" / "head.svg").write_text(drawn["seated" if stamp == "seated" else "legacy"], encoding="utf-8")
+    del meta["hat_seat"]
+    doc.pop("occluded", None)
+    for att in doc["skins"]["default"]["slots"]["head"].values():
+        if stamp == "none":
+            att["source"] = None
+        else:
+            att["source"]["sha256"] = hashlib.sha256(drawn[stamp].encode("utf-8")).hexdigest()
     path.write_text(json.dumps(doc), encoding="utf-8")
-    (finding,) = hit()
+    return char
+
+
+@pytest.mark.parametrize("stamp", ["legacy", "none"])
+def test_a_cap_drawn_before_seating_reports_its_brows_covered(tmp_path, stamp):
+    """an#284's acceptance: derived from the knobs, not stored. A pre-an#252 cap
+    at head scale 1.7 does not afford `face.brows`, names the hat, and the
+    validate warning that stood in for the derivation is gone."""
+    from an.capabilities import art_in_dir
+    from an.genres import load
+    from an.semantic.describe import describe_asset
+    from cutan.characters.validate import validate_character
+
+    load()
+    char = _pre_seat_cap(tmp_path, stamp=stamp)
+    doc = json.loads((char / "character.json").read_text(encoding="utf-8"))
+    d = describe_asset(doc, art_in_dir(char, exclude=("character.json",)))
+    assert "face.brows" not in d["affordances"]
+    assert d["aspects"]["expression"]["default"] == "expr.without_brows"
+    from cutan.characters.brows import brow_cover
+
+    cover = brow_cover(CharacterDescriptor.model_validate(doc))
+    assert cover.startswith("the cap hat at head_scale 1.7") and "before hats were seated" in cover
+    assert not [f for f in validate_character(char, name="c").findings if "hat" in f.ir_path]
+
+
+def test_a_seated_cap_whose_seat_was_not_recorded_is_clear(tmp_path):
+    """The an#252-#278 window: seated, no seat recorded; its stamp says which drawing it is."""
+    from cutan.characters.brows import brow_cover
+
+    char = _pre_seat_cap(tmp_path, stamp="seated")
+    doc = json.loads((char / "character.json").read_text(encoding="utf-8"))
+    assert brow_cover(CharacterDescriptor.model_validate(doc)) is None
+
+
+def test_an_edited_factory_head_is_said_and_assumed_clear(tmp_path):
+    from cutan.characters.brows import brow_cover
+    from cutan.characters.validate import validate_character
+
+    char = _pre_seat_cap(tmp_path, stamp="legacy")
+    doc = json.loads((char / "character.json").read_text(encoding="utf-8"))
+    for att in doc["skins"]["default"]["slots"]["head"].values():
+        att["source"]["sha256"] = "0" * 64  # neither drawing: edited by hand
+    (char / "character.json").write_text(json.dumps(doc), encoding="utf-8")
+    assert brow_cover(CharacterDescriptor.model_validate(doc)) is None
+    (finding,) = [f for f in validate_character(char, name="c").findings if "hat" in f.ir_path]
     assert finding.severity == "warning" and "occluded" in finding.suggested_fix
+    # a declared `occluded` is the override, and silences it
+    doc["occluded"] = {"brows": "a drawn brim"}
+    (char / "character.json").write_text(json.dumps(doc), encoding="utf-8")
+    assert brow_cover(CharacterDescriptor.model_validate(doc)) == "a drawn brim"
+    assert not [f for f in validate_character(char, name="c").findings if "hat" in f.ir_path]
 
 
 def test_covers_means_ink_overlap_not_the_clearance_margin():
