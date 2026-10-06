@@ -55,7 +55,8 @@ LIBRARY_NAME: str = "cutan"
 #: pose (an#339): ``register_rest_pose_migration`` and ``rig_rest_problems``. Level 5
 #: is nested chains (an#340): ``build_rig_subtree(skip_slots=)``, ``slot_parent_chain``,
 #: ``slot_node_paths``, ``rig_affordances``, ``RigError``.
-REQUIRED_AN_API_LEVEL: int = 5
+#: Level 6: ``rest_pose_protection`` (an#407), which ``validate_character`` says aloud.
+REQUIRED_AN_API_LEVEL: int = 6
 
 
 def require_an() -> None:
