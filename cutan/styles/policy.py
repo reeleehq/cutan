@@ -17,9 +17,16 @@ shot, then the style, then the aspect's default chain. Where each lives:
   carried into the project by the StylePack :func:`style_pack` builds (its
   ``policy`` field), the document a scene names in ``meta.style_pack``. A
   snapshot, like every copy of a spec: the pack records the spec's digest;
-- **the shot**: a ``policy`` field on the shot. ``an``'s ``scene.md`` reader
-  keeps only the shot keys it knows, so today it is read from ``ir/scene.json``
-  or set in Python, not from a ``yaml shot`` block (thorwhalen/an#348).
+- **the shot**: its ``policy`` field (``Shot.policy``, declared by ``an``
+  since thorwhalen/an#348), written in its ``yaml shot`` block, in
+  ``ir/scene.json`` or in Python.
+
+Where a character's DECLARED ``gait``/``speech`` sits is the core matcher's one
+rule (``an.semantic.matcher.DECLARED_OUTRANKS_POLICY``, cutan#36): today it is
+the request. The compiler hands the policy to the ``play`` lowering through its
+products (:data:`cutan.compile.passes.POLICY_PRODUCT`); ``an validate`` layers
+the same two documents (:func:`policy_in_force`, the pack read from the
+``styles`` store), so the two resolve every walk alike.
 
 A policy choice is information, not a warning: a character that could walk on
 legs but bounces under South Park records a ``policy`` resolution beside its
@@ -37,6 +44,7 @@ __all__ = [
     "PolicyError",
     "check_policy",
     "layered_policy",
+    "policy_in_force",
     "policy_of",
     "policy_problems",
     "style_pack",
@@ -254,11 +262,58 @@ def _is_cutout(shot: Any) -> bool:
     return getattr(shot, "renderer", RENDERER_NAME) == RENDERER_NAME
 
 
+def _scene_pack(ctx) -> Any:
+    """The StylePack document the scene names (``meta.style_pack``), read from the
+    ``styles`` store ``an validate`` hands its checks (an#348); ``None`` when the
+    scene names none or the store is not supplied (or lacks it: the core's
+    own check says so)."""
+    name = getattr(ctx.scene.meta, "style_pack", None)
+    styles = (ctx.stores or {}).get("styles")
+    if not name or styles is None or name not in styles:
+        return None
+    return styles[name]
+
+
+def policy_in_force(ctx, *, shot: Any = None, index: int | None = None) -> Any:
+    """The policy the compiler will resolve a shot's aspects under: its
+    ``policy`` over the scene's style pack's (:func:`layered_policy`), once per
+    shot; ``None`` when neither has one or either is malformed
+    (:func:`check_shot_policy` reports that). The shot is the check's current
+    one unless ``shot`` and ``index`` name another (a scene-stage check)."""
+    if shot is None:
+        shot, index = ctx.shot, ctx.index
+
+    def compute():
+        try:
+            p = layered_policy(shot=shot, style_pack=_scene_pack(ctx))
+        except PolicyError:
+            return None
+        return p if p.order else None
+
+    return ctx.cached(("cutan.policy", index), compute)
+
+
 def check_shot_policy(ctx) -> None:
-    """``an validate``'s side (cutan#9), per cut-out shot: its ``policy`` is well formed."""
+    """``an validate``'s side (cutan#9), per cut-out shot: its ``policy`` is well
+    formed, and so is the scene's style pack's (reported once, at the scene's
+    ``meta/style_pack``: the compiler refuses it on every cut-out shot)."""
     if not _is_cutout(ctx.shot):
         return
     block = policy_of(ctx.shot)
     if block is not None:
         for problem in policy_problems(block):
             ctx.report.add("error", f"{ctx.path}/policy", problem)
+    pack = _scene_pack(ctx)
+
+    def report_pack() -> bool:
+        block = policy_of(pack)
+        if block is not None:
+            name = ctx.scene.meta.style_pack
+            for problem in policy_problems(block):
+                ctx.report.add(
+                    "error", "meta/style_pack", f"style pack {name!r}: {problem}"
+                )
+        return True
+
+    if pack is not None:
+        ctx.cached(("cutan.pack_policy",), report_pack)

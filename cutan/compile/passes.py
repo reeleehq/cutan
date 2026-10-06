@@ -41,7 +41,6 @@ from cutan.characters.play import (
     play_source,
     GAIT_ARG,
     PARTS_ARG,
-    POLICY_ARG,
     SCALE_ARG,
     VIEW_ARG,
     facing_at,
@@ -414,39 +413,17 @@ def _scene_policy(state: CompileState):
         raise CutoutCompileError(f"shot {state.shot.id!r}: {e}") from e
 
 
-def _with_walk_policy(action: Any, policy: Mapping[str, Any]) -> Any:
-    """``action`` with ``policy`` on each walk's internal args (compositions walked through)."""
-    if isinstance(action, PlayAction):
-        if action.animation != "walk":
-            return action
-        args = {**(action.args or {}), POLICY_ARG: policy}
-        return action.model_copy(update={"args": args})
-    children = getattr(action, "children", None)
-    if isinstance(children, list):
-        return action.model_copy(
-            update={"children": [_with_walk_policy(c, policy) for c in children]}
-        )
-    child = getattr(action, "child", None)
-    if child is not None:
-        return action.model_copy(update={"child": _with_walk_policy(child, policy)})
-    return action
-
-
 def _policy_pass(state: CompileState) -> None:
     """Cut-out: the style's policy (cutan#9, ADR 0002 decision 4). The shot's
-    ``policy`` over the style pack's is resolved once, kept for the speech pass,
-    and written onto every ``walk``'s internal args (the lowering, which sees
-    no compile state, reads it there), so the locomotion method the walk
-    resolves follows it; the author's ``gait`` (or the character's declared
-    one) still comes first. A scene with no policy is untouched (its document
-    is byte-identical)."""
+    ``policy`` over the style pack's is resolved once and left in the compile
+    products (:data:`POLICY_PRODUCT`), where the speech pass and the ``play``
+    lowering (its walks' extent and expansion, an#348) read it; the author's
+    ``gait`` (or the character's declared one) still comes first. A scene with
+    no policy is untouched (its document is byte-identical)."""
     policy = _scene_policy(state)
     if policy is None or not policy.order:
         return
     state.products[POLICY_PRODUCT] = policy
-    order = policy.to_json()
-    actions = [_with_walk_policy(a, order) for a in state.shot.actions or ()]
-    state.shot = state.shot.model_copy(update={"actions": actions})
 
 
 def _speech_pass(state: CompileState) -> None:
@@ -2238,9 +2215,12 @@ def _expand_preset_plays(
     step_hz: float | None = None,
     default_easing: Any = None,
     resolutions: list[AssetResolutionJSON] | None = None,
+    policy: Any = None,
 ) -> list[FlatAction]:
     """Replace each ``play`` of a motion preset with the flat tweens and sets
     it expands to (an#166), and give every from-less tween its start (an#212);
+    a walk's gait follows ``policy`` (the scene's, from the compile products:
+    cutan#9, an#348) when nothing is requested;
     descriptor plays pass through to :func:`_resolve_play`.
 
     Every ``play`` — both sources — is checked here by
@@ -2296,7 +2276,7 @@ def _expand_preset_plays(
             desc,
             action.animation,
             art_exists=vocab.art_exists.get(entity_id) if vocab is not None else None,
-            args={k: v for k, v in (action.args or {}).items() if k != POLICY_ARG},
+            args=action.args or {},
             duration=action.duration,
             speed=action.speed,
             loop=action.loop,
@@ -2348,6 +2328,7 @@ def _expand_preset_plays(
                     history=history,
                     vocab=vocab,
                     resolutions=resolutions,
+                    policy=policy,
                 )
 
                 def parts_of(entity: str) -> list[str]:
@@ -2470,14 +2451,14 @@ def _locomotion_args(
     resolutions: list[AssetResolutionJSON] | None,
     *,
     view: str | None = None,
+    policy: Any = None,
 ) -> dict[str, Any]:
     """The walk's args with its gait the locomotion method the registry resolves
     (an#248: :func:`cutan.characters.methods.locomotion_args`, the one
     resolution the extent reads too), the substitution recorded. ``view`` is
     the view in force at the play's start (a ``profile`` needs its side view
-    showing, cutan#17). The scene's policy rides on the walk's internal
-    ``_policy`` arg (cutan#9, :func:`_policy_pass`); its skipped entries are
-    recorded beside the substitution. A gait parameter the resolved gait never reads is a
+    showing, cutan#17). ``policy`` is the scene's (cutan#9, :func:`_policy_pass`);
+    its skipped entries are recorded beside the substitution. A gait parameter the resolved gait never reads is a
     warning here (an explicit gait's is `play_problems`' error, cutan#21)."""
     from cutan.characters.methods import locomotion_args, walk_arg_problems
     from cutan.styles.policy import PolicyError
@@ -2490,6 +2471,7 @@ def _locomotion_args(
             args,
             descriptor=desc,
             profile=_character_profile(entity, vocab),
+            policy=policy,
             view=view,
             on_skip=lambda m, t: skipped.append((m, t)),
         )
@@ -2545,12 +2527,12 @@ def _drawn_scale(entity: str, vocab: _SwapVocabulary | None) -> float | None:
     return abs(float(transform.scale_y))
 
 
-def preset_context_of(vocab: _SwapVocabulary | None):
+def preset_context_of(vocab: _SwapVocabulary | None, *, policy: Any = None):
     """``(entity_id, play) -> PresetContext`` for the extent resolver
     (:func:`cutan.characters.play.play_extent_for`): exactly the ``gait`` and
     ``scale`` :func:`_with_view_and_posed_parts` will fill in before the
-    expansion, read off the same vocabulary, so a ``sequence`` waits for what
-    the walk runs (cutan#12)."""
+    expansion, read off the same vocabulary under the same ``policy``, so a
+    ``sequence`` waits for what the walk runs (cutan#12)."""
     from cutan.characters.methods import walk_preset_context
 
     def context(entity: str, action: Any) -> dict[str, Any] | None:
@@ -2570,6 +2552,7 @@ def preset_context_of(vocab: _SwapVocabulary | None):
             profile=_character_profile(target, vocab) if on_registry else None,
             scale=scale,
             parts=None if on_registry else _built_parts(vocab, target),
+            policy=policy,
         )
 
     return context
@@ -2583,6 +2566,7 @@ def _with_view_and_posed_parts(
     history: Mapping[tuple[str, str], list[tuple[tuple[int, int], FlatAction]]],
     vocab: _SwapVocabulary,
     resolutions: list[AssetResolutionJSON] | None = None,
+    policy: Any = None,
 ) -> tuple[PlayAction, Callable[[str], dict[str, float] | None]]:
     """For a preset that moves an entity's parts (``walk``, an#214): fill its
     ``view`` from the timeline when the author did not (else from the
@@ -2634,7 +2618,9 @@ def _with_view_and_posed_parts(
             action = action.model_copy(update={"args": args})
     if preset_takes(action.animation, GAIT_ARG):
         resolved = (
-            _locomotion_args(entity, args, desc, vocab, resolutions, view=in_force)
+            _locomotion_args(
+                entity, args, desc, vocab, resolutions, view=in_force, policy=policy
+            )
             if _on_registry(entity, vocab)
             else _off_registry_walk_args(
                 entity, args, resolutions, parts=_built_parts(vocab, entity)

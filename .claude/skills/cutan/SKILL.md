@@ -40,7 +40,7 @@ An `an character new --offline` character carries a **turnaround** (an#197): a `
 
 ## Walking: gaits (an#224)
 
-`{kind: play, target: ned, animation: walk, args: {distance: 320, gait: bounce}}`. A walk's **gait** is a locomotion method chosen by what the character affords; with none asked, it is `legs` when the rig has a leg pair (`leg_l`/`leg_r` with art) and `glide` otherwise. Ask for one with `args: {gait: …}`, or declare `"gait": "…"` in `character.json` for every walk of that character. A style can prefer another (its `policy:`, carried by the StylePack the scene names: South Park walks its legged figures with `bounce`), and so can a shot's `policy` field (set in Python or `ir/scene.json`; a ` ```yaml shot ` block does not keep it yet, an#348); your `gait`, or one the character declares, always wins (the `cutan-style` skill, step 3).
+`{kind: play, target: ned, animation: walk, args: {distance: 320, gait: bounce}}`. A walk's **gait** is a locomotion method chosen by what the character affords; with none asked, it is `legs` when the rig has a leg pair (`leg_l`/`leg_r` with art) and `glide` otherwise. Ask for one with `args: {gait: …}`, or declare `"gait": "…"` in `character.json` for every walk of that character. A style can prefer another (its `policy:`, carried by the StylePack the scene names: South Park walks its legged figures with `bounce`), and so can a shot's `policy` field (in its ` ```yaml shot ` block, `policy: {locomotion: [loco.glide]}`); your `gait`, or one the character declares, always wins (the `cutan-style` skill, step 3).
 
 | gait | needs | reads as |
 |---|---|---|

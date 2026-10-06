@@ -39,7 +39,8 @@ def test_a_style_pack_carries_its_spec_policy_and_where_it_came_from():
     # saved and read back the way a project store does: the policy survives
     again = StylePack.model_validate(json.loads(json.dumps(pack.model_dump(mode="json"))))
     assert again.policy == pack.policy
-    assert not hasattr(style_pack("kurzgesagt"), "policy")  # no block, no field
+    assert style_pack("kurzgesagt").policy is None  # no block: the declared field unset (an#348)
+    assert "policy" not in style_pack("kurzgesagt").model_dump(mode="json")
 
 
 def test_no_policy_leaves_the_walk_as_the_chain_resolves_it(store):
@@ -108,11 +109,13 @@ def test_capabilities_says_what_each_aspect_resolves_to_under_a_style(tmp_path):
 
     new_character(tmp_path, name="ned", seed="ned", use_dicebear=False, overwrite=True)
     out = json.loads(capabilities("ned", out_dir=str(tmp_path), as_json=True, style="reiniger"))
-    assert out["aspects"]["speech"]["under_style"] == {
-        "style": "reiniger", "method": "speech.pose_only", "source": "policy"}
+    # the core's answer (an#348: describe_asset(policy=)), labelled with the style
+    assert out["style"] == "reiniger"
+    under = out["aspects"]["speech"]["under_policy"]
+    assert (under["method"], under["source"]) == ("speech.pose_only", "policy")
     assert out["aspects"]["locomotion"]["default"] == "loco.legged_cycle"  # the chain, unchanged
     text = capabilities("ned", out_dir=str(tmp_path), style="south_park")
-    assert "locomotion: under south_park: loco.bounce (policy)" in text
+    assert "under south_park: loco.bounce (policy)" in text
 
 
 # --- findings of the adversarial reviews (PR #32) -------------------------------
@@ -126,16 +129,9 @@ def _tweens(scene):
 
 
 def test_a_walk_in_a_sequence_keeps_its_length_under_a_policy(store):
-    """The internal policy arg never reaches the walk's extent: what follows it waits."""
-    from an.ir.compose import duration_of
-
-    from cutan.characters.play import POLICY_ARG, play_extent_for
-
+    """The walk's extent resolves under the policy the lowering reads from the
+    compile products (an#348): what follows a policy-chosen gait waits for it."""
     walk = PlayAction(target="w", animation="walk", args={"distance": 160})
-    tagged = PlayAction(target="w", animation="walk",
-                        args={"distance": 160, POLICY_ARG: {"locomotion": ["loco.bounce"]}})
-    extent = play_extent_for(lambda e: None)
-    assert duration_of(walk, play_extent=extent) == duration_of(tagged, play_extent=extent) > 0
     mall, pack = {"characters": store}, style_pack("south_park")
     alone = _compile(_walk_shot("legged"), mall, style_pack=pack)
     walk_end = max(end for _, end in _tweens(alone))
@@ -288,4 +284,78 @@ def test_capabilities_says_a_view_bound_method_needs_its_view(tmp_path):
 
     new_character(tmp_path, name="ned", seed="ned", use_dicebear=False, overwrite=True)
     text = capabilities("ned", out_dir=str(tmp_path), style="reiniger")
-    assert "loco.profile_cycle (policy), only while swap.view:side is showing" in text
+    assert "loco.profile_cycle (policy; needs limbs.legs, swap.view:side)" in text
+
+
+# --- on an's seams (an#348) ------------------------------------------------------
+
+
+def test_a_policy_in_a_yaml_shot_block_reaches_the_compile(store):
+    """`scene.md` keeps a shot's `policy` now that `an` declares it."""
+    from an.ir.schema import Meta, SceneIR
+    from an.ir.sync import ir_to_markdown, markdown_to_ir
+
+    shot = _walk_shot("legged").model_copy(update={"policy": {"locomotion": ["loco.glide"]}})
+    again = markdown_to_ir(ir_to_markdown(SceneIR(meta=Meta(), timeline=[shot]))).timeline[0]
+    assert again.policy == {"locomotion": ["loco.glide"]}
+    scene = _compile(again, {"characters": store})
+    assert _methods(scene) == [("locomotion", "loco.legged_cycle", "loco.glide")]
+
+
+def _validate(shot, store, pack=None):
+    from an.ir.schema import Meta, SceneIR
+    from an.ir.validate import validate_semantic
+
+    meta = Meta(style_pack=pack.name) if pack is not None else Meta()
+    styles = {pack.name: pack.model_dump(mode="json")} if pack is not None else None
+    return validate_semantic(
+        SceneIR(meta=meta, timeline=[shot, shot.model_copy(update={"id": "again"})]),
+        available_characters=store,
+        available_styles=styles,
+    )
+
+
+def test_validate_reports_a_bad_style_pack_policy_once(store):
+    """The pack's policy is checked before a render (the `styles` store, an#348),
+    once for the scene, not once per shot."""
+    pack = StylePack(name="broken", policy={"locomotion": ["bounce"]})
+    found = [f for f in _validate(_walk_shot("legged"), store, pack).findings
+             if f.ir_path == "meta/style_pack"]
+    assert len(found) == 1 and found[0].severity == "error"
+    assert "did you mean 'loco.bounce'" in found[0].description
+    assert not [f for f in _validate(_walk_shot("legged"), store).findings
+                if f.ir_path == "meta/style_pack"]
+
+
+def test_validate_resolves_a_walk_under_the_policy_the_compiler_uses(store):
+    """`stride` is read by a legged walk, not by a glide: with no policy the
+    walk is fine; under a pack that glides, validate says the arg goes unread,
+    naming the policy's gait, exactly as the compile does."""
+    shot = _walk_shot("legged", stride=0.4)
+    glide = StylePack(name="glides", policy={"locomotion": ["loco.glide"]})
+
+    def unread(report):
+        return [f.description for f in report.findings if "does not read 'stride'" in f.description]
+
+    assert unread(_validate(shot, store)) == []
+    (said, _again) = unread(_validate(shot, store, glide))
+    assert "gait 'glide'" in said and "the policy's" in said
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        compile_shot(shot, {"characters": store}, style_pack=glide)
+    assert any("does not read 'stride'" in str(w.message) for w in caught)
+
+
+def test_the_declared_gait_against_the_style_is_the_cores_one_switch(store, monkeypatch):
+    """cutan#36 is undecided: today a character's declared gait outranks the
+    style. Flipping `an.semantic.matcher.DECLARED_OUTRANKS_POLICY` alone makes
+    the style win, here as in the core's describe."""
+    from an.semantic import matcher
+
+    mall = {"characters": store}
+    declared = _walk_shot("gale_legs")
+    assert _methods(_compile(declared, mall, style_pack=style_pack("south_park"))) == []
+    monkeypatch.setattr(matcher, "DECLARED_OUTRANKS_POLICY", False)
+    assert _methods(_compile(declared, mall, style_pack=style_pack("south_park"))) == [
+        ("locomotion", "loco.legged_cycle", "loco.bounce")
+    ]
