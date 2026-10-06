@@ -8,6 +8,7 @@ Subcommands (used as ``an character <verb> ...``):
 
 - ``new``       — generate a fresh character from DiceBear or fallback art.
 - ``add-views`` — give an offline character its turnaround (an#197).
+- ``add-half-lid`` — a HALF eyelid drawing from the rig's own lid art (cutan#65).
 - ``mouths``    — regenerate the 9-shape default mouth set.
 - ``validate``  — completeness check.
 - ``capabilities`` — what it affords, and per aspect which methods apply (an#248).
@@ -260,6 +261,32 @@ def add_gaze(name: str, out_dir: str = "", overwrite_eyes: bool = False) -> str:
     except ValueError as e:
         return str(e)
     return f"added the eye stack to {desc.parent} (descriptor: {desc.name})"
+
+
+def add_half_lid(
+    name: str, out_dir: str = "", fraction: float = 0.5, overwrite: bool = False
+) -> str:
+    """Give ``name`` a HALF eyelid drawing (cutan#65), made from its own OPEN and
+    CLOSED lid art: the closed lid cut to its top ``fraction``, under the open
+    eye's outline. A partial lid (`lid_open` between -0.35 and -0.85: a squint,
+    suspicion, annoyance) then narrows the eyes instead of showing them open.
+
+    name: character id
+    out_dir: parent directory; defaults to ./assets/characters
+    fraction: how much of the eye the half lid covers, from the top
+    overwrite: replace a HALF lid someone drew (refused otherwise)
+    """
+    from cutan.characters.lids import HalfLidError
+    from cutan.characters.lids import add_half_lid as _add_half_lid
+
+    char_dir = _resolve_target(out_dir) / name
+    if not (char_dir / "character.json").is_file():
+        return f"no character at {char_dir}"
+    try:
+        _add_half_lid(char_dir, fraction=fraction, overwrite=overwrite)
+    except (HalfLidError, OSError) as e:
+        return str(e)
+    return f"added a HALF eyelid drawing to {char_dir}"
 
 
 def add_views(name: str, out_dir: str = "") -> str:
@@ -666,6 +693,7 @@ _dispatch_funcs = [
     new,
     mouths,
     add_gaze,
+    add_half_lid,
     add_views,
     validate,
     capabilities,
