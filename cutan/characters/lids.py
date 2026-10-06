@@ -98,11 +98,17 @@ def half_lid_svg(
 
 def _half_path(open_path: str) -> str:
     p = Path(open_path)
-    stem = p.stem.replace("open", HALF_ATTACHMENT) if "open" in p.stem else f"{p.stem}_half"
+    stem = (
+        p.stem.replace("open", HALF_ATTACHMENT)
+        if "open" in p.stem
+        else f"{p.stem}_half"
+    )
     return (p.parent / f"{stem}{p.suffix}").as_posix()
 
 
-def _derived_source(open_att: dict, closed_att: dict, digest: str, paths) -> dict | None:
+def _derived_source(
+    open_att: dict, closed_att: dict, digest: str, paths
+) -> dict | None:
     licences = {
         (att.get("source") or {}).get("license") for att in (open_att, closed_att)
     }
