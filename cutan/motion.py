@@ -81,7 +81,9 @@ DFLT_WALK_STRIDE: float = 0.35  # radians a leg swings either side (side view)
 DFLT_WALK_LIFT: float = 10.0  # scene px a stepping leg rises (front view)
 DFLT_WALK_BOB: float = 6.0  # scene px the body travels per step (its whole bob)
 DFLT_WALK_ARM_SWING: float = 0.3  # radians
-DFLT_WALK_ROCK: float = 0.06  # radians, the body's side-to-side sway (rock, waddle, hem)
+DFLT_WALK_ROCK: float = (
+    0.06  # radians, the body's side-to-side sway (rock, waddle, hem)
+)
 #: Radians each hem half tilts about its hip (the two as mirror images: the
 #: hem opens and closes) in a ``hem`` gait seen from the front (an#220) — what read on a carved robe figure, where lifting
 #: one half by ``lift`` px barely showed.
