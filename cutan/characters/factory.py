@@ -605,12 +605,14 @@ def stage_extent(desc: CharacterDescriptor) -> dict[str, float]:
     """How far a character's art reaches above and below its stage point, in
     scene pixels at ``stage.scale: 1``: ``{"top", "feet", "height"}``.
 
-    The stage point (``stage.at``) is not the feet: the compiler places a rig
+    The stage point (``stage.at``) is the rig's declared ``origin`` when it
+    has one (an#338); otherwise it is not the feet: the compiler places a rig
     by the middle of its bones' extent, between the neck and the feet, so
     where the feet land depends on the build and the head scale (a squat
     figure's feet sit about half as far below the point as a tall one's).
-    Read from the compiler's own placement rule and the head's art, so this is
-    what the compiled scene does, not a second guess at it. Multiply by
+    Read from the compiler's own placement rule (``an.stage.rig.rig_origin``)
+    and the head's art, so this is what the compiled scene does, not a second
+    guess at it. Multiply by
     ``stage.scale``. The head reaches its drawing's top edge (a hat stays
     inside it).
 
@@ -618,14 +620,10 @@ def stage_extent(desc: CharacterDescriptor) -> dict[str, float]:
     >>> round(e["top"]), round(e["feet"])
     (169, 94)
     """
-    from an.adapters.cutout.compile import (
-        SCENE_PX_PER_VIEW_BOX,
-        _bone_positions,
-        _rig_origin,
-    )
+    from an.stage.rig import SCENE_PX_PER_VIEW_BOX, bone_positions, rig_origin
 
-    bones = _bone_positions(desc)
-    origin_y = _rig_origin(bones)[1]
+    bones = bone_positions(desc)
+    origin_y = rig_origin(desc)[1]
     k = SCENE_PX_PER_VIEW_BOX / float(desc.view_box[3] or 1)
     head_scale = float(desc.metadata.get("head_scale") or 1.0)
     head = desc.skins["default"].slots["head"]

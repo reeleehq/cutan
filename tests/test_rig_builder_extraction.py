@@ -24,11 +24,11 @@ from pathlib import Path
 import pytest
 
 from cutan.characters.schema import CHARACTER_DOCUMENT_KIND, CharacterDescriptor
-from an.adapters.cutout.compile import (
+from an.stage.rig import (
     CHARACTER_ART_PREFIX,
-    _build_svg_character_subtree,
-    _part_probe,
-    _svg_asset_src,
+    art_src as _svg_asset_src,
+    build_rig_subtree as _build_svg_character_subtree,
+    part_probe as _part_probe,
 )
 from an.ir.schema import AssetRef
 from an.stores.characters import CharactersStore

@@ -54,10 +54,12 @@ from an.stage.rig import (  # noqa: F401  (re-exported: the rig model lives in t
     DEFAULT_VIEW_BOX,
     Attachment,
     Bone,
+    RigDocument,
     RigModel as _CharModel,
     Skin,
     Slot,
     attachment_box,
+    omit_unset_rig_fields,
 )
 
 
@@ -275,7 +277,7 @@ class IdleAnimation(_CharModel):
     tracks: list[AnimationTrack] = Field(default_factory=list)
 
 
-class CharacterDescriptor(_CharModel):
+class CharacterDescriptor(RigDocument):
     """The on-disk character schema. Saved as ``character.json``.
 
     The descriptor is the SSOT for a character's identity, body part inventory,
@@ -503,8 +505,10 @@ class CharacterDescriptor(_CharModel):
     def _omit_unset_view_facts(self, handler):
         """``rest_view``/``gait``/``speech`` unset and ``occluded`` empty are
         written out of existence, so every stored descriptor reads back
-        byte-identical (an#220)."""
-        data = handler(self)
+        byte-identical (an#220). So are the rig document's own unset fields
+        (``origin``, an#338): this serializer REPLACES the base's (pydantic
+        keeps one per model), so it must call the base's helper."""
+        data = omit_unset_rig_fields(handler(self))
         if isinstance(data, dict):
             for name in ("rest_view", "gait", "speech"):
                 if data.get(name) is None:
