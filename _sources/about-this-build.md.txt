@@ -5,17 +5,19 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-10-06 01:39 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/c73028af05a0b43ccdfe1ec246c541a4cb5c66ee"><code>c73028a</code></a> on branch <code>main</code>, for **cutan 0.0.13** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-06 11:16 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/24f3ed40ded0890b45d0aa98ace6158f1b6c653a"><code>24f3ed4</code></a> on branch <code>main</code>, for **cutan 0.0.14** (from <code>pyproject.toml</code>).
 
-:::{note}
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+:::{warning}
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.14) is behind the latest release on PyPI (0.0.15): `pip install cutan` gives newer code than these docs describe.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/thorwhalen/cutan/commit/c73028af05a0b43ccdfe1ec246c541a4cb5c66ee"><code>c73028af05a0b43ccdfe1ec246c541a4cb5c66ee</code></a> |
+| Commit | <a href="https://github.com/thorwhalen/cutan/commit/24f3ed40ded0890b45d0aa98ace6158f1b6c653a"><code>24f3ed40ded0890b45d0aa98ace6158f1b6c653a</code></a> |
 | Branch | <code>main</code> |
 | Tags at this commit | none |
 | Working tree | clean |
@@ -26,9 +28,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 | | |
 |---|---|
 | Repository | <code>thorwhalen/cutan</code> |
-| Run | <a href="https://github.com/thorwhalen/cutan/actions/runs/37399954792">37399954792</a> |
+| Run | <a href="https://github.com/thorwhalen/cutan/actions/runs/37454922544">37454922544</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>c73028af05a0b43ccdfe1ec246c541a4cb5c66ee</code> (in the history of the built commit) |
+| Event commit | <code>24f3ed40ded0890b45d0aa98ace6158f1b6c653a</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -53,13 +55,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.13/">0.0.13</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.15/">0.0.15</a>, newer than the documented version (0.0.14).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout c73028af05a0b43ccdfe1ec246c541a4cb5c66ee
+git checkout 24f3ed40ded0890b45d0aa98ace6158f1b6c653a
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
