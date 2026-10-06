@@ -37,13 +37,12 @@ stand-ins, so the choice is visible and never silent.
 
 ### Functions
 
-| [`applicable_policy`](#cutan.styles.policy.applicable_policy)(policy, aspect, profile, \*)   | `policy` with `aspect`'s order cut to the methods that apply to `profile`.                                                                                                                                  |
-|---------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`check_policy`](#cutan.styles.policy.check_policy)(policy, \*[, where])                | `policy` parsed into an `an.semantic.Policy`, or [`PolicyError`](#cutan.styles.policy.PolicyError) naming `where`.                                                                               |
-| [`layered_policy`](#cutan.styles.policy.layered_policy)(\*[, shot, style_pack])           | The policy in force: `shot` over `style_pack` (each checked).                                                                                                                                               |
-| [`policy_of`](#cutan.styles.policy.policy_of)(obj)                                   | The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.                                                                                                               |
-| [`policy_problems`](#cutan.styles.policy.policy_problems)(policy)                          | What is wrong with a `policy` block, one sentence each (empty when it is sound).                                                                                                                            |
-| [`style_pack`](#cutan.styles.policy.style_pack)(spec)                                 | The StylePack a project saves for a style: its `live.style_pack` (a bare pack named after the style when the spec has none), its `policy`, and the spec it was copied from (name and digest) in `metadata`. |
+| [`check_policy`](#cutan.styles.policy.check_policy)(policy, \*[, where])      | `policy` parsed into an `an.semantic.Policy`, or [`PolicyError`](#cutan.styles.policy.PolicyError) naming `where`.                                                                               |
+|-----------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`layered_policy`](#cutan.styles.policy.layered_policy)(\*[, shot, style_pack]) | The policy in force: `shot` over `style_pack` (each checked).                                                                                                                                               |
+| [`policy_of`](#cutan.styles.policy.policy_of)(obj)                         | The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.                                                                                                               |
+| [`policy_problems`](#cutan.styles.policy.policy_problems)(policy)                | What is wrong with a `policy` block, one sentence each (empty when it is sound).                                                                                                                            |
+| [`style_pack`](#cutan.styles.policy.style_pack)(spec)                       | The StylePack a project saves for a style: its `live.style_pack` (a bare pack named after the style when the spec has none), its `policy`, and the spec it was copied from (name and digest) in `metadata`. |
 
 ### Exceptions
 
@@ -68,24 +67,6 @@ in a style spec, on a StylePack, on a shot.
 Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
 
 A policy block names an aspect or a method that does not exist, or is malformed.
-
-### cutan.styles.policy.applicable_policy(policy, aspect, profile, , on_skip=None)
-
-`policy` with `aspect`’s order cut to the methods that apply to `profile`.
-
-A policy is an order: its first APPLICABLE entry wins (ADR 0002). The
-core matcher today treats the order’s head as a request (an#334), so a
-head that does not apply (a profile cycle on a figure with no side view)
-would be recorded as a fatal `missing` substitution. Handing it only the
-entries that apply gives the order’s own meaning: the first of them is a
-non-fatal `policy` choice, and none applying leaves the chain to decide.
-Each entry passed over before the first applicable one is reported to
-`on_skip(method id, missing terms)`, so a skip is recorded, never silent
-(ADR 0002 decision 6). Drop this once
-an#334 lands.
-
-* **Return type:**
-  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
 
 ### cutan.styles.policy.check_policy(policy, , where='policy')
 

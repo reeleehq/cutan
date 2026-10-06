@@ -168,22 +168,19 @@ stand-ins, so the choice is visible and never silent.</p>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.styles.policy.applicable_policy" title="cutan.styles.policy.applicable_policy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">applicable_policy</span></code></a>(policy, aspect, profile, *)</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">policy</span></code> with <code class="docutils literal notranslate"><span class="pre">aspect</span></code>'s order cut to the methods that apply to <code class="docutils literal notranslate"><span class="pre">profile</span></code>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.styles.policy.check_policy" title="cutan.styles.policy.check_policy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_policy</span></code></a>(policy, *[, where])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.styles.policy.check_policy" title="cutan.styles.policy.check_policy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_policy</span></code></a>(policy, *[, where])</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">policy</span></code> parsed into an <code class="xref py py-class docutils literal notranslate"><span class="pre">an.semantic.Policy</span></code>, or <a class="reference internal" href="#cutan.styles.policy.PolicyError" title="cutan.styles.policy.PolicyError"><code class="xref py py-class docutils literal notranslate"><span class="pre">PolicyError</span></code></a> naming <code class="docutils literal notranslate"><span class="pre">where</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.styles.policy.layered_policy" title="cutan.styles.policy.layered_policy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layered_policy</span></code></a>(*[, shot, style_pack])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.styles.policy.layered_policy" title="cutan.styles.policy.layered_policy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layered_policy</span></code></a>(*[, shot, style_pack])</p></td>
 <td><p>The policy in force: <code class="docutils literal notranslate"><span class="pre">shot</span></code> over <code class="docutils literal notranslate"><span class="pre">style_pack</span></code> (each checked).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.styles.policy.policy_of" title="cutan.styles.policy.policy_of"><code class="xref py py-obj docutils literal notranslate"><span class="pre">policy_of</span></code></a>(obj)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.styles.policy.policy_of" title="cutan.styles.policy.policy_of"><code class="xref py py-obj docutils literal notranslate"><span class="pre">policy_of</span></code></a>(obj)</p></td>
 <td><p>The policy block an object carries: a <code class="docutils literal notranslate"><span class="pre">policy</span></code> field (declared or extra) or key; else <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.styles.policy.policy_problems" title="cutan.styles.policy.policy_problems"><code class="xref py py-obj docutils literal notranslate"><span class="pre">policy_problems</span></code></a>(policy)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.styles.policy.policy_problems" title="cutan.styles.policy.policy_problems"><code class="xref py py-obj docutils literal notranslate"><span class="pre">policy_problems</span></code></a>(policy)</p></td>
 <td><p>What is wrong with a <code class="docutils literal notranslate"><span class="pre">policy</span></code> block, one sentence each (empty when it is sound).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.styles.policy.style_pack" title="cutan.styles.policy.style_pack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">style_pack</span></code></a>(spec)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.styles.policy.style_pack" title="cutan.styles.policy.style_pack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">style_pack</span></code></a>(spec)</p></td>
 <td><p>The StylePack a project saves for a style: its <code class="docutils literal notranslate"><span class="pre">live.style_pack</span></code> (a bare pack named after the style when the spec has none), its <code class="docutils literal notranslate"><span class="pre">policy</span></code>, and the spec it was copied from (name and digest) in <code class="docutils literal notranslate"><span class="pre">metadata</span></code>.</p></td>
 </tr>
 </tbody>
@@ -218,26 +215,6 @@ there would be accepted and do nothing, so it is refused).</p>
 <span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.styles.policy.</span></span><span class="sig-name descname"><span class="pre">PolicyError</span></span><a class="reference internal" href="../_modules/cutan/styles/policy.html#PolicyError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.styles.policy.PolicyError" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.styles.policy.PolicyError'">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
 <p>A policy block names an aspect or a method that does not exist, or is malformed.</p>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="cutan.styles.policy.applicable_policy">
-<span class="sig-prename descclassname"><span class="pre">cutan.styles.policy.</span></span><span class="sig-name descname"><span class="pre">applicable_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/styles/policy.html#applicable_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.styles.policy.applicable_policy" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.styles.policy.applicable_policy'">¶</a></dt>
-<dd><p><code class="docutils literal notranslate"><span class="pre">policy</span></code> with <code class="docutils literal notranslate"><span class="pre">aspect</span></code>’s order cut to the methods that apply to <code class="docutils literal notranslate"><span class="pre">profile</span></code>.</p>
-<p>A policy is an order: its first APPLICABLE entry wins (ADR 0002). The
-core matcher today treats the order’s head as a request (an#334), so a
-head that does not apply (a profile cycle on a figure with no side view)
-would be recorded as a fatal <code class="docutils literal notranslate"><span class="pre">missing</span></code> substitution. Handing it only the
-entries that apply gives the order’s own meaning: the first of them is a
-non-fatal <code class="docutils literal notranslate"><span class="pre">policy</span></code> choice, and none applying leaves the chain to decide.
-Each entry passed over before the first applicable one is reported to
-<code class="docutils literal notranslate"><span class="pre">on_skip(method</span> <span class="pre">id,</span> <span class="pre">missing</span> <span class="pre">terms)</span></code>, so a skip is recorded, never silent
-(ADR 0002 decision 6). Drop this once
-an#334 lands.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
-</dd>
-</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.styles.policy.check_policy">
@@ -325,7 +302,6 @@ style’s name, a path, a mapping). Save it as the skill’s step 3 says:
 <li><a :data-current="activeSection === '#cutan.styles.policy.APPLIED_ASPECTS'" class="reference internal" href="#cutan.styles.policy.APPLIED_ASPECTS"><code class="docutils literal notranslate"><span class="pre">APPLIED_ASPECTS</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.policy.POLICY_KEY'" class="reference internal" href="#cutan.styles.policy.POLICY_KEY"><code class="docutils literal notranslate"><span class="pre">POLICY_KEY</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.policy.PolicyError'" class="reference internal" href="#cutan.styles.policy.PolicyError"><code class="docutils literal notranslate"><span class="pre">PolicyError</span></code></a></li>
-<li><a :data-current="activeSection === '#cutan.styles.policy.applicable_policy'" class="reference internal" href="#cutan.styles.policy.applicable_policy"><code class="docutils literal notranslate"><span class="pre">applicable_policy()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.policy.check_policy'" class="reference internal" href="#cutan.styles.policy.check_policy"><code class="docutils literal notranslate"><span class="pre">check_policy()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.policy.layered_policy'" class="reference internal" href="#cutan.styles.policy.layered_policy"><code class="docutils literal notranslate"><span class="pre">layered_policy()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.styles.policy.policy_of'" class="reference internal" href="#cutan.styles.policy.policy_of"><code class="docutils literal notranslate"><span class="pre">policy_of()</span></code></a></li>
@@ -344,7 +320,7 @@ style’s name, a path, a mapping). Save it as the skill’s step 3 says:
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=c7cdf6fe"></script>
+<script src="../_static/documentation_options.js?v=63b572e7"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

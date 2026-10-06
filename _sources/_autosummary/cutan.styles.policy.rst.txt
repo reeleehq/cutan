@@ -15,7 +15,6 @@ cutan.styles.policy
 
    .. autosummary::
    
-      applicable_policy
       check_policy
       layered_policy
       policy_of

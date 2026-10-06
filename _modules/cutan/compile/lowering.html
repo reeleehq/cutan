@@ -220,99 +220,103 @@
 </span><span id="line-39">
 <div class="viewcode-block" id="PlayLowering.extent_resolver">
 <a class="viewcode-back" href="../../../_autosummary/cutan.compile.lowering.html#cutan.compile.lowering.PlayLowering.extent_resolver">[docs]</a>
-</span><span id="line-40">    <span class="k">def</span><span class="w"> </span><span class="nf">extent_resolver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
-</span><span id="line-41"><span class="w">        </span><span class="sd">"""``play -&gt; seconds`` for a play that names no duration, read off its</span>
-</span><span id="line-42"><span class="sd">        descriptor — and, for a walk, off the gait and scale the expansion will</span>
-</span><span id="line-43"><span class="sd">        fill in (:func:`cutan.compile.passes.preset_context_of`, cutan#12)."""</span>
-</span><span id="line-44">        <span class="k">return</span> <span class="n">play_extent_for</span><span class="p">(</span>
-</span><span id="line-45">            <span class="k">lambda</span> <span class="n">entity_id</span><span class="p">:</span> <span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">vocab</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-46">            <span class="n">context_of</span><span class="o">=</span><span class="n">preset_context_of</span><span class="p">(</span><span class="n">vocab</span><span class="p">),</span>
-</span><span id="line-47">        <span class="p">)</span></div>
+</span><span id="line-40">    <span class="k">def</span><span class="w"> </span><span class="nf">extent_resolver</span><span class="p">(</span>
+</span><span id="line-41">        <span class="bp">self</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-42">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
+</span><span id="line-43"><span class="w">        </span><span class="sd">"""``play -&gt; seconds`` for a play that names no duration, read off its</span>
+</span><span id="line-44"><span class="sd">        descriptor — and, for a walk, off the gait and scale the expansion will</span>
+</span><span id="line-45"><span class="sd">        fill in (:func:`cutan.compile.passes.preset_context_of`, cutan#12).</span>
+</span><span id="line-46"><span class="sd">        ``products`` is the shot's compile products (an#348), not read yet."""</span>
+</span><span id="line-47">        <span class="k">return</span> <span class="n">play_extent_for</span><span class="p">(</span>
+</span><span id="line-48">            <span class="k">lambda</span> <span class="n">entity_id</span><span class="p">:</span> <span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">vocab</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-49">            <span class="n">context_of</span><span class="o">=</span><span class="n">preset_context_of</span><span class="p">(</span><span class="n">vocab</span><span class="p">),</span>
+</span><span id="line-50">        <span class="p">)</span></div>
 
-</span><span id="line-48">
+</span><span id="line-51">
 <div class="viewcode-block" id="PlayLowering.expand">
 <a class="viewcode-back" href="../../../_autosummary/cutan.compile.lowering.html#cutan.compile.lowering.PlayLowering.expand">[docs]</a>
-</span><span id="line-49">    <span class="k">def</span><span class="w"> </span><span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-</span><span id="line-50"><span class="w">        </span><span class="sd">"""Replace each ``play`` of a motion preset by the tweens and sets it stands for."""</span>
-</span><span id="line-51">        <span class="k">return</span> <span class="n">_expand_preset_plays</span><span class="p">(</span><span class="n">flat_list</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
+</span><span id="line-52">    <span class="k">def</span><span class="w"> </span><span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+</span><span id="line-53"><span class="w">        </span><span class="sd">"""Replace each ``play`` of a motion preset by the tweens and sets it stands for.</span>
+</span><span id="line-54"><span class="sd">        ``products`` is the shot's compile products (an#348), not read yet."""</span>
+</span><span id="line-55">        <span class="k">return</span> <span class="n">_expand_preset_plays</span><span class="p">(</span><span class="n">flat_list</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
 
-</span><span id="line-52">
+</span><span id="line-56">
 <div class="viewcode-block" id="PlayLowering.view_of">
 <a class="viewcode-back" href="../../../_autosummary/cutan.compile.lowering.html#cutan.compile.lowering.PlayLowering.view_of">[docs]</a>
-</span><span id="line-53">    <span class="k">def</span><span class="w"> </span><span class="nf">view_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity_swaps</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-</span><span id="line-54"><span class="w">        </span><span class="sd">"""``flat -&gt; the view its entity is in then``, for characters with per-view face sets."""</span>
-</span><span id="line-55">        <span class="n">spans_by_entity</span> <span class="o">=</span> <span class="n">_view_spans</span><span class="p">(</span><span class="n">entity_swaps</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">)</span>
-</span><span id="line-56">        <span class="k">if</span> <span class="ow">not</span> <span class="n">spans_by_entity</span><span class="p">:</span>
-</span><span id="line-57">            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-58">
-</span><span id="line-59">        <span class="k">def</span><span class="w"> </span><span class="nf">view_of</span><span class="p">(</span><span class="n">flat</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-60">            <span class="n">entity</span> <span class="o">=</span> <span class="n">_track_root_of</span><span class="p">(</span><span class="n">flat</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
-</span><span id="line-61">            <span class="k">return</span> <span class="n">_view_at</span><span class="p">(</span><span class="n">spans_by_entity</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">),</span> <span class="n">flat</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+</span><span id="line-57">    <span class="k">def</span><span class="w"> </span><span class="nf">view_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity_swaps</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+</span><span id="line-58"><span class="w">        </span><span class="sd">"""``flat -&gt; the view its entity is in then``, for characters with per-view face sets."""</span>
+</span><span id="line-59">        <span class="n">spans_by_entity</span> <span class="o">=</span> <span class="n">_view_spans</span><span class="p">(</span><span class="n">entity_swaps</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">)</span>
+</span><span id="line-60">        <span class="k">if</span> <span class="ow">not</span> <span class="n">spans_by_entity</span><span class="p">:</span>
+</span><span id="line-61">            <span class="k">return</span> <span class="kc">None</span>
 </span><span id="line-62">
-</span><span id="line-63">        <span class="k">return</span> <span class="n">view_of</span></div>
-
-</span><span id="line-64">
-<div class="viewcode-block" id="PlayLowering.clip">
-<a class="viewcode-back" href="../../../_autosummary/cutan.compile.lowering.html#cutan.compile.lowering.PlayLowering.clip">[docs]</a>
-</span><span id="line-65">    <span class="k">def</span><span class="w"> </span><span class="nf">clip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
-</span><span id="line-66"><span class="w">        </span><span class="sd">"""The clip of one descriptor ``play`` (the presets were expanded already)."""</span>
-</span><span id="line-67">        <span class="k">return</span> <span class="n">_resolve_play</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
-</div>
+</span><span id="line-63">        <span class="k">def</span><span class="w"> </span><span class="nf">view_of</span><span class="p">(</span><span class="n">flat</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-64">            <span class="n">entity</span> <span class="o">=</span> <span class="n">_track_root_of</span><span class="p">(</span><span class="n">flat</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+</span><span id="line-65">            <span class="k">return</span> <span class="n">_view_at</span><span class="p">(</span><span class="n">spans_by_entity</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">),</span> <span class="n">flat</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+</span><span id="line-66">
+</span><span id="line-67">        <span class="k">return</span> <span class="n">view_of</span></div>
 
 </span><span id="line-68">
-</span><span id="line-69">
+<div class="viewcode-block" id="PlayLowering.clip">
+<a class="viewcode-back" href="../../../_autosummary/cutan.compile.lowering.html#cutan.compile.lowering.PlayLowering.clip">[docs]</a>
+</span><span id="line-69">    <span class="k">def</span><span class="w"> </span><span class="nf">clip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+</span><span id="line-70"><span class="w">        </span><span class="sd">"""The clip of one descriptor ``play`` (the presets were expanded already)."""</span>
+</span><span id="line-71">        <span class="k">return</span> <span class="n">_resolve_play</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
+</div>
+
+</span><span id="line-72">
+</span><span id="line-73">
 <div class="viewcode-block" id="ExpressionLowering">
 <a class="viewcode-back" href="../../../_autosummary/cutan.compile.lowering.html#cutan.compile.lowering.ExpressionLowering">[docs]</a>
-</span><span id="line-70"><span class="k">class</span><span class="w"> </span><span class="nc">ExpressionLowering</span><span class="p">:</span>
-</span><span id="line-71"><span class="w">    </span><span class="sd">"""The ``expression`` action kind: the face solver's input, so it makes no clip of its own."""</span>
-</span><span id="line-72">
-</span><span id="line-73">    <span class="k">def</span><span class="w"> </span><span class="nf">extent_resolver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-74">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-75">
+</span><span id="line-74"><span class="k">class</span><span class="w"> </span><span class="nc">ExpressionLowering</span><span class="p">:</span>
+</span><span id="line-75"><span class="w">    </span><span class="sd">"""The ``expression`` action kind: the face solver's input, so it makes no clip of its own."""</span>
+</span><span id="line-76">
+</span><span id="line-77">    <span class="k">def</span><span class="w"> </span><span class="nf">extent_resolver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-78">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-79">
 <div class="viewcode-block" id="ExpressionLowering.expand">
 <a class="viewcode-back" href="../../../_autosummary/cutan.compile.lowering.html#cutan.compile.lowering.ExpressionLowering.expand">[docs]</a>
-</span><span id="line-76">    <span class="k">def</span><span class="w"> </span><span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-</span><span id="line-77"><span class="w">        </span><span class="sd">"""Drop the ``expression`` leaves: ``_add_face_clips`` sums them per (node, property)."""</span>
-</span><span id="line-78">        <span class="k">return</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">flat_list</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s2">"expression"</span><span class="p">]</span></div>
+</span><span id="line-80">    <span class="k">def</span><span class="w"> </span><span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+</span><span id="line-81"><span class="w">        </span><span class="sd">"""Drop the ``expression`` leaves: ``_add_face_clips`` sums them per (node, property)."""</span>
+</span><span id="line-82">        <span class="k">return</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">flat_list</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s2">"expression"</span><span class="p">]</span></div>
 
-</span><span id="line-79">
-</span><span id="line-80">    <span class="k">def</span><span class="w"> </span><span class="nf">view_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity_swaps</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-81">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-82">
-</span><span id="line-83">    <span class="n">clip</span> <span class="o">=</span> <span class="kc">None</span></div>
+</span><span id="line-83">
+</span><span id="line-84">    <span class="k">def</span><span class="w"> </span><span class="nf">view_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity_swaps</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-85">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-86">
+</span><span id="line-87">    <span class="n">clip</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-</span><span id="line-84">
-</span><span id="line-85">
-</span><span id="line-86"><span class="n">PLAY_LOWERING</span> <span class="o">=</span> <span class="n">PlayLowering</span><span class="p">()</span>
-</span><span id="line-87"><span class="n">EXPRESSION_LOWERING</span> <span class="o">=</span> <span class="n">ExpressionLowering</span><span class="p">()</span>
 </span><span id="line-88">
 </span><span id="line-89">
+</span><span id="line-90"><span class="n">PLAY_LOWERING</span> <span class="o">=</span> <span class="n">PlayLowering</span><span class="p">()</span>
+</span><span id="line-91"><span class="n">EXPRESSION_LOWERING</span> <span class="o">=</span> <span class="n">ExpressionLowering</span><span class="p">()</span>
+</span><span id="line-92">
+</span><span id="line-93">
 <div class="viewcode-block" id="character_swap_declaration">
 <a class="viewcode-back" href="../../../_autosummary/cutan.compile.lowering.html#cutan.compile.lowering.character_swap_declaration">[docs]</a>
-</span><span id="line-90"><span class="k">def</span><span class="w"> </span><span class="nf">character_swap_declaration</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">mall</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SwapDeclaration</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-91"><span class="w">    </span><span class="sd">"""What a character's (migrated) descriptor declares, for the swap vocabulary.</span>
-</span><span id="line-92">
-</span><span id="line-93"><span class="sd">    ``None`` when the store has no descriptor for the entity (a procedural or</span>
-</span><span id="line-94"><span class="sd">    placeholder rig: its built nodes' sets ARE its declaration).</span>
-</span><span id="line-95"><span class="sd">    """</span>
-</span><span id="line-96">    <span class="n">store</span> <span class="o">=</span> <span class="n">mall</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CHARACTERS_STORE</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
-</span><span id="line-97">    <span class="k">if</span> <span class="n">entity</span><span class="o">.</span><span class="n">ref</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">store</span><span class="p">:</span>
-</span><span id="line-98">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-99">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-100">        <span class="n">data</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">entity</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span>
-</span><span id="line-101">    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+</span><span id="line-94"><span class="k">def</span><span class="w"> </span><span class="nf">character_swap_declaration</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">mall</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SwapDeclaration</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-95"><span class="w">    </span><span class="sd">"""What a character's (migrated) descriptor declares, for the swap vocabulary.</span>
+</span><span id="line-96">
+</span><span id="line-97"><span class="sd">    ``None`` when the store has no descriptor for the entity (a procedural or</span>
+</span><span id="line-98"><span class="sd">    placeholder rig: its built nodes' sets ARE its declaration).</span>
+</span><span id="line-99"><span class="sd">    """</span>
+</span><span id="line-100">    <span class="n">store</span> <span class="o">=</span> <span class="n">mall</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CHARACTERS_STORE</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+</span><span id="line-101">    <span class="k">if</span> <span class="n">entity</span><span class="o">.</span><span class="n">ref</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">store</span><span class="p">:</span>
 </span><span id="line-102">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-103">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">!=</span> <span class="n">CHARACTER_DOCUMENT_KIND</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
-</span><span id="line-104">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-105">    <span class="n">desc</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
-</span><span id="line-106">        <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="n">CHARACTER_DOCUMENT_KIND</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-</span><span id="line-107">    <span class="p">)</span>
-</span><span id="line-108">    <span class="k">return</span> <span class="n">SwapDeclaration</span><span class="p">(</span>
-</span><span id="line-109">        <span class="n">sets</span><span class="o">=</span><span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">,</span>
-</span><span id="line-110">        <span class="n">descriptor</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span>
-</span><span id="line-111">        <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists_for</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">entity</span><span class="o">.</span><span class="n">ref</span><span class="p">),</span>
-</span><span id="line-112">        <span class="n">scale</span><span class="o">=</span><span class="n">SCENE_PX_PER_VIEW_BOX</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">desc</span><span class="o">.</span><span class="n">view_box</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">or</span> <span class="mi">1</span><span class="p">),</span>
-</span><span id="line-113">    <span class="p">)</span></div>
+</span><span id="line-103">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-104">        <span class="n">data</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">entity</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span>
+</span><span id="line-105">    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+</span><span id="line-106">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-107">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">!=</span> <span class="n">CHARACTER_DOCUMENT_KIND</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+</span><span id="line-108">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-109">    <span class="n">desc</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
+</span><span id="line-110">        <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="n">CHARACTER_DOCUMENT_KIND</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-111">    <span class="p">)</span>
+</span><span id="line-112">    <span class="k">return</span> <span class="n">SwapDeclaration</span><span class="p">(</span>
+</span><span id="line-113">        <span class="n">sets</span><span class="o">=</span><span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">,</span>
+</span><span id="line-114">        <span class="n">descriptor</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span>
+</span><span id="line-115">        <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists_for</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">entity</span><span class="o">.</span><span class="n">ref</span><span class="p">),</span>
+</span><span id="line-116">        <span class="n">scale</span><span class="o">=</span><span class="n">SCENE_PX_PER_VIEW_BOX</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">desc</span><span class="o">.</span><span class="n">view_box</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">or</span> <span class="mi">1</span><span class="p">),</span>
+</span><span id="line-117">    <span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -327,7 +331,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=c7cdf6fe"></script>
+    <script src="../../../_static/documentation_options.js?v=63b572e7"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
