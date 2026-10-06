@@ -35,6 +35,7 @@ from cutan.characters.schema import (
     CharacterDescriptor,
 )
 from cutan.characters.svg_utils import SVG_NS, extract_pivots
+from cutan.motion import DFLT_LEGLESS_GAIT, WALK_LEG_NAMES
 from an.stage.raster import RASTER_SUFFIXES, has_alpha, image_size, is_raster
 from an.verify._base import Finding, VerificationReport
 
@@ -69,6 +70,14 @@ BLOCKING: str = "error"
 
 #: Severity for a problem worth fixing that still renders.
 ADVISORY: str = "warning"
+
+#: Severity for a fact about the art worth knowing, not a problem.
+NOTE: str = "info"
+
+#: The required parts a figure with no leg pair leaves out (cutan#35): nothing
+#: steps, so its walks glide (the locomotion chain's last link) and nothing
+#: reads them. Required again as soon as a skin draws a leg slot.
+LEG_PARTS: tuple[str, ...] = WALK_LEG_NAMES[0]
 
 
 def _localname(tag: str) -> str:
@@ -290,7 +299,19 @@ def validate_character(
             )
 
     parts_dir = directory / "parts"
+    legged = _declares_legs(descriptor)
+    if not legged:
+        report.add(
+            NOTE,
+            "character.json#skins",
+            f"{who} draws no leg slot, so it has no leg pair: its walks "
+            f"{DFLT_LEGLESS_GAIT}, and {', '.join(LEG_PARTS)} are not required",
+            f"To walk with legs, add {' and '.join(LEG_PARTS)} slots with art "
+            "(split at the hips, each with a hip pivot).",
+        )
     for part in REQUIRED_PARTS:
+        if part in LEG_PARTS and not legged:
+            continue
         if _part_file(parts_dir, part) is None:
             report.add(
                 BLOCKING,
@@ -333,6 +354,21 @@ def validate_character(
             "backwards through finished work.",
         )
     return report
+
+
+def _declares_legs(descriptor: CharacterDescriptor | None) -> bool:
+    """Whether any skin draws an attachment in a leg slot (either spelling of
+    the pair, :data:`cutan.motion.WALK_LEG_NAMES`). With no descriptor to read,
+    the contract's legs stay required."""
+    if descriptor is None:
+        return True
+    leg_slots = {name for pair in WALK_LEG_NAMES for name in pair}
+    return any(
+        attachments
+        for skin in descriptor.skins.values()
+        for slot, attachments in skin.slots.items()
+        if slot in leg_slots
+    )
 
 
 def _check_asset_sets(
@@ -854,6 +890,9 @@ def render_contract() -> str:
         "## Required parts",
         "",
         "    " + ", ".join(REQUIRED_PARTS),
+        "",
+        f"    ({', '.join(LEG_PARTS)} only for a figure with legs: one whose skins draw",
+        f"    no leg slot walks {DFLT_LEGLESS_GAIT}, cutan#35)",
         "",
         f"    mouth/: {', '.join('mouth_' + s for s in MOUTH_SHAPES)}",
         "",
