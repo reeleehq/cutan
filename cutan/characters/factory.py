@@ -891,6 +891,7 @@ def new_character(
     views: bool = True,
     hair_style: str = DFLT_HAIR_STYLE,
     hair_length: str = DFLT_HAIR_LENGTH,
+    feet_origin: bool = False,
 ) -> Path:
     """Build a complete character on disk.
 
@@ -923,6 +924,13 @@ def new_character(
       :func:`cutan.motion.turn` can turn the character around. Offline head only
       (a DiceBear face is baked into its art); ignored for a DiceBear head.
       Additive: a shot that never sets a view renders exactly as without it.
+
+    - ``feet_origin`` (an#285) — declare the rig's ``origin`` at its ROOT bone,
+      the ground contact, so ``stage.at`` is where the feet stand and every
+      build placed at one ``y`` stands on one line (``stage_extent``'s
+      ``feet`` is then 0). Off (the default), the stage point stays the
+      middle of the bones, as for every character made before it; whether
+      it becomes the default is an#285's open decision.
 
     Every colour the factory draws in a role is recorded in the descriptor's
     ``colour_roles`` so a style pack can recolour it later (palette swapping,
@@ -1119,6 +1127,11 @@ def new_character(
     ):
         if value != default:
             descriptor.metadata[key] = value
+    if feet_origin:
+        # The root bone is the ground contact (an#285); its parent-relative
+        # position is its world position, having no parent.
+        root = next(b for b in descriptor.bones if b.parent is None)
+        descriptor.origin = (root.x, root.y)
     desc_path = out / "character.json"
     desc_path.write_text(descriptor.model_dump_json(indent=2), encoding="utf-8")
     if gaze and descriptor.face_overlay:

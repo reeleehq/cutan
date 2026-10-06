@@ -61,6 +61,7 @@ def new(
     views: bool = True,
     hair_style: str = DFLT_HAIR_STYLE,
     hair_length: str = DFLT_HAIR_LENGTH,
+    feet_origin: bool = False,
 ) -> str:
     """Create a new character at ``out_dir``/``name``.
 
@@ -95,6 +96,9 @@ def new(
     views: draw the turnaround — back, side (a profile facing right) and
         three_quarter beside the front, as a `view` swap set (offline head
         only), so `play: turn` can turn the character (an#197)
+    feet_origin: put the stage point at the feet (the rig's root bone), so
+        `stage.at` is where the character stands and every build placed at one
+        y stands on one floor line (an#285)
     """
     target = _resolve_target(out_dir)
     target.mkdir(parents=True, exist_ok=True)
@@ -124,6 +128,7 @@ def new(
             views=views,
             hair_style=hair_style,
             hair_length=hair_length,
+            feet_origin=feet_origin,
         )
     except ValueError as e:
         # A licence refusal is a message for a human, not a traceback. The

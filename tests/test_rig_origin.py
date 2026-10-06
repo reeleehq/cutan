@@ -63,3 +63,19 @@ def test_a_characters_rest_pose_migration_protects_only_a_posed_legacy_rig():
     assert "rest_rotation" not in out
     doc["bones"][0]["rotation_deg"] = 12.0
     assert migrate(dict(doc), kind="CharacterDescriptor")["rest_rotation"] is False
+
+
+def test_feet_origin_puts_the_stage_point_at_the_feet_for_every_build():
+    """an#285's asset half: with `feet_origin`, two builds placed at one `y`
+    stand on one line, and `stage_extent` says the feet are AT the point."""
+    from cutan.characters.factory import new_character
+
+    feet = {}
+    with tempfile.TemporaryDirectory() as d:
+        for build in ("regular", "squat", "tall"):
+            path = new_character(d, name=build, use_dicebear=False, build=build, feet_origin=True, views=False)
+            desc = CharacterDescriptor.model_validate_json(path.read_text(encoding="utf-8"))
+            feet[build] = stage_extent(desc)["feet"]
+        plain = new_character(d, name="plain", use_dicebear=False, views=False)
+        assert "origin" not in json.loads(plain.read_text(encoding="utf-8")), "the default is unchanged"
+    assert set(feet.values()) == {0.0}
