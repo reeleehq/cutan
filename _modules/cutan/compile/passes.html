@@ -2598,426 +2598,431 @@
 </span><span id="line-2416">            <span class="ow">and</span> <span class="n">action</span><span class="o">.</span><span class="n">from_value</span> <span class="ow">is</span> <span class="kc">None</span>
 </span><span id="line-2417">            <span class="ow">and</span> <span class="n">action</span><span class="o">.</span><span class="n">property</span> <span class="ow">in</span> <span class="n">_PROPERTY_REST_VALUES</span>
 </span><span id="line-2418">        <span class="p">):</span>
-</span><span id="line-2419">            <span class="n">base</span> <span class="o">=</span> <span class="n">_built_value</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">property</span><span class="p">,</span> <span class="n">vocab</span><span class="o">=</span><span class="n">vocab</span><span class="p">)</span>
-</span><span id="line-2420">            <span class="n">start_value</span> <span class="o">=</span> <span class="n">value_at</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">property</span><span class="p">,</span> <span class="n">flat</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
-</span><span id="line-2421">            <span class="n">leaves</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-2422">                <span class="n">dataclasses</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-</span><span id="line-2423">                    <span class="n">flat</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"from_value"</span><span class="p">:</span> <span class="n">start_value</span><span class="p">})</span>
-</span><span id="line-2424">                <span class="p">)</span>
-</span><span id="line-2425">            <span class="p">]</span>
-</span><span id="line-2426">        <span class="k">else</span><span class="p">:</span>
-</span><span id="line-2427">            <span class="n">leaves</span> <span class="o">=</span> <span class="p">[</span><span class="n">flat</span><span class="p">]</span>
-</span><span id="line-2428">        <span class="n">placed</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">leaves</span>
-</span><span id="line-2429">        <span class="k">for</span> <span class="n">sub</span><span class="p">,</span> <span class="n">leaf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">leaves</span><span class="p">):</span>
-</span><span id="line-2430">            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">action</span><span class="p">,</span> <span class="p">(</span><span class="n">SetAction</span><span class="p">,</span> <span class="n">TweenAction</span><span class="p">)):</span>
-</span><span id="line-2431">                <span class="c1"># Keyed by what the property WRITES: `rotation_rad` is `rotation`.</span>
-</span><span id="line-2432">                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">write_group</span><span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">property</span><span class="p">))</span>
-</span><span id="line-2433">                <span class="n">history</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">i</span><span class="p">,</span> <span class="n">sub</span><span class="p">),</span> <span class="n">leaf</span><span class="p">))</span>
-</span><span id="line-2434">    <span class="k">return</span> <span class="p">[</span><span class="n">leaf</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flat_list</span><span class="p">))</span> <span class="k">for</span> <span class="n">leaf</span> <span class="ow">in</span> <span class="n">placed</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
-</span><span id="line-2435">
-</span><span id="line-2436">
-</span><span id="line-2437"><span class="k">def</span><span class="w"> </span><span class="nf">_built_parts</span><span class="p">(</span><span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span><span class="p">,</span> <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-2438"><span class="w">    </span><span class="sd">"""The part paths the builder built under ``entity``, relative to it."""</span>
-</span><span id="line-2439">    <span class="n">prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity</span><span class="si">}</span><span class="s2">/"</span>
-</span><span id="line-2440">    <span class="k">return</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">vocab</span><span class="o">.</span><span class="n">node_transforms</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)]</span>
+</span><span id="line-2419">            <span class="c1"># NOT redundant with the stage's own resolution (an#365), which runs</span>
+</span><span id="line-2420">            <span class="c1"># after this pass: a preset expanded later in THIS loop poses itself</span>
+</span><span id="line-2421">            <span class="c1"># from `history`, so a from-less tween must be resolved here first</span>
+</span><span id="line-2422">            <span class="c1"># (a `shake` mid-way through `x: 100 -&gt; 200` must centre on 150;</span>
+</span><span id="line-2423">            <span class="c1"># test_a_preset_played_mid_way_through_a_from_less_tween_..., cutan#59).</span>
+</span><span id="line-2424">            <span class="n">base</span> <span class="o">=</span> <span class="n">_built_value</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">property</span><span class="p">,</span> <span class="n">vocab</span><span class="o">=</span><span class="n">vocab</span><span class="p">)</span>
+</span><span id="line-2425">            <span class="n">start_value</span> <span class="o">=</span> <span class="n">value_at</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">property</span><span class="p">,</span> <span class="n">flat</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+</span><span id="line-2426">            <span class="n">leaves</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-2427">                <span class="n">dataclasses</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+</span><span id="line-2428">                    <span class="n">flat</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"from_value"</span><span class="p">:</span> <span class="n">start_value</span><span class="p">})</span>
+</span><span id="line-2429">                <span class="p">)</span>
+</span><span id="line-2430">            <span class="p">]</span>
+</span><span id="line-2431">        <span class="k">else</span><span class="p">:</span>
+</span><span id="line-2432">            <span class="n">leaves</span> <span class="o">=</span> <span class="p">[</span><span class="n">flat</span><span class="p">]</span>
+</span><span id="line-2433">        <span class="n">placed</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">leaves</span>
+</span><span id="line-2434">        <span class="k">for</span> <span class="n">sub</span><span class="p">,</span> <span class="n">leaf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">leaves</span><span class="p">):</span>
+</span><span id="line-2435">            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">action</span><span class="p">,</span> <span class="p">(</span><span class="n">SetAction</span><span class="p">,</span> <span class="n">TweenAction</span><span class="p">)):</span>
+</span><span id="line-2436">                <span class="c1"># Keyed by what the property WRITES: `rotation_rad` is `rotation`.</span>
+</span><span id="line-2437">                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">write_group</span><span class="p">(</span><span class="n">leaf</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">property</span><span class="p">))</span>
+</span><span id="line-2438">                <span class="n">history</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">i</span><span class="p">,</span> <span class="n">sub</span><span class="p">),</span> <span class="n">leaf</span><span class="p">))</span>
+</span><span id="line-2439">    <span class="k">return</span> <span class="p">[</span><span class="n">leaf</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flat_list</span><span class="p">))</span> <span class="k">for</span> <span class="n">leaf</span> <span class="ow">in</span> <span class="n">placed</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+</span><span id="line-2440">
 </span><span id="line-2441">
-</span><span id="line-2442">
-</span><span id="line-2443"><span class="k">def</span><span class="w"> </span><span class="nf">_on_registry</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-2444"><span class="w">    </span><span class="sd">"""Whether ``entity`` resolves its methods on the capability registry: a</span>
-</span><span id="line-2445"><span class="sd">    character (the one entity kind with an analyser, an#248)."""</span>
-</span><span id="line-2446">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">CHARACTER_KIND</span>
+</span><span id="line-2442"><span class="k">def</span><span class="w"> </span><span class="nf">_built_parts</span><span class="p">(</span><span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span><span class="p">,</span> <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-2443"><span class="w">    </span><span class="sd">"""The part paths the builder built under ``entity``, relative to it."""</span>
+</span><span id="line-2444">    <span class="n">prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity</span><span class="si">}</span><span class="s2">/"</span>
+</span><span id="line-2445">    <span class="k">return</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">vocab</span><span class="o">.</span><span class="n">node_transforms</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)]</span>
+</span><span id="line-2446">
 </span><span id="line-2447">
-</span><span id="line-2448">    <span class="k">return</span> <span class="n">vocab</span><span class="o">.</span><span class="n">entity_kinds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span> <span class="o">==</span> <span class="n">CHARACTER_KIND</span>
-</span><span id="line-2449">
-</span><span id="line-2450">
-</span><span id="line-2451"><span class="k">def</span><span class="w"> </span><span class="nf">_character_profile</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
-</span><span id="line-2452"><span class="w">    </span><span class="sd">"""What a character on stage affords: the character analyser, fed what compiled."""</span>
-</span><span id="line-2453">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">compile_profile</span>
+</span><span id="line-2448"><span class="k">def</span><span class="w"> </span><span class="nf">_on_registry</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-2449"><span class="w">    </span><span class="sd">"""Whether ``entity`` resolves its methods on the capability registry: a</span>
+</span><span id="line-2450"><span class="sd">    character (the one entity kind with an analyser, an#248)."""</span>
+</span><span id="line-2451">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">CHARACTER_KIND</span>
+</span><span id="line-2452">
+</span><span id="line-2453">    <span class="k">return</span> <span class="n">vocab</span><span class="o">.</span><span class="n">entity_kinds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span> <span class="o">==</span> <span class="n">CHARACTER_KIND</span>
 </span><span id="line-2454">
-</span><span id="line-2455">    <span class="k">return</span> <span class="n">compile_profile</span><span class="p">(</span>
-</span><span id="line-2456">        <span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">),</span>
-</span><span id="line-2457">        <span class="n">built_parts</span><span class="o">=</span><span class="n">_built_parts</span><span class="p">(</span><span class="n">vocab</span><span class="p">,</span> <span class="n">entity</span><span class="p">),</span>
-</span><span id="line-2458">        <span class="n">art_exists</span><span class="o">=</span><span class="n">vocab</span><span class="o">.</span><span class="n">art_exists</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">),</span>
-</span><span id="line-2459">    <span class="p">)</span>
-</span><span id="line-2460">
-</span><span id="line-2461">
-</span><span id="line-2462"><span class="c1">#: The ``asset_resolution`` kind of a policy entry passed over (cutan#9): not a</span>
-</span><span id="line-2463"><span class="c1">#: ``method`` substitution (nothing asked for it), so a tool can tell them apart.</span>
-</span><span id="line-2464"><span class="n">POLICY_SKIP_KIND</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"policy_skip"</span>
+</span><span id="line-2455">
+</span><span id="line-2456"><span class="k">def</span><span class="w"> </span><span class="nf">_character_profile</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+</span><span id="line-2457"><span class="w">    </span><span class="sd">"""What a character on stage affords: the character analyser, fed what compiled."""</span>
+</span><span id="line-2458">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">compile_profile</span>
+</span><span id="line-2459">
+</span><span id="line-2460">    <span class="k">return</span> <span class="n">compile_profile</span><span class="p">(</span>
+</span><span id="line-2461">        <span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">),</span>
+</span><span id="line-2462">        <span class="n">built_parts</span><span class="o">=</span><span class="n">_built_parts</span><span class="p">(</span><span class="n">vocab</span><span class="p">,</span> <span class="n">entity</span><span class="p">),</span>
+</span><span id="line-2463">        <span class="n">art_exists</span><span class="o">=</span><span class="n">vocab</span><span class="o">.</span><span class="n">art_exists</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">),</span>
+</span><span id="line-2464">    <span class="p">)</span>
 </span><span id="line-2465">
 </span><span id="line-2466">
-</span><span id="line-2467"><span class="k">def</span><span class="w"> </span><span class="nf">_record_policy_skip</span><span class="p">(</span>
-</span><span id="line-2468">    <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-2469">    <span class="n">aspect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-2470">    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-2471">    <span class="n">chosen</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-2472">    <span class="n">missing</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
-</span><span id="line-2473">    <span class="n">resolutions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AssetResolutionJSON</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-2474"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2475"><span class="w">    </span><span class="sd">"""A policy entry that did not apply, recorded (non-fatal) beside the stand-ins:</span>
-</span><span id="line-2476"><span class="sd">    a skip is never silent (ADR 0002 decision 6, cutan#9)."""</span>
-</span><span id="line-2477">    <span class="k">if</span> <span class="n">resolutions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2478">        <span class="n">resolutions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-2479">            <span class="n">AssetResolutionJSON</span><span class="p">(</span>
-</span><span id="line-2480">                <span class="nb">id</span><span class="o">=</span><span class="n">entity</span><span class="p">,</span>
-</span><span id="line-2481">                <span class="n">kind</span><span class="o">=</span><span class="n">POLICY_SKIP_KIND</span><span class="p">,</span>
-</span><span id="line-2482">                <span class="n">store</span><span class="o">=</span><span class="n">aspect</span><span class="p">,</span>
-</span><span id="line-2483">                <span class="n">ref</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
-</span><span id="line-2484">                <span class="n">resolved</span><span class="o">=</span><span class="n">chosen</span><span class="p">,</span>
-</span><span id="line-2485">                <span class="n">fallback</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="line-2486">                <span class="n">detail</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-2487">                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">aspect</span><span class="si">}</span><span class="s2">: the policy's </span><span class="si">{</span><span class="n">method</span><span class="si">!r}</span><span class="s2"> does not apply "</span>
-</span><span id="line-2488">                    <span class="sa">f</span><span class="s2">"(missing </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">); skipped"</span>
-</span><span id="line-2489">                <span class="p">),</span>
-</span><span id="line-2490">            <span class="p">)</span>
-</span><span id="line-2491">        <span class="p">)</span>
-</span><span id="line-2492">
-</span><span id="line-2493">
-</span><span id="line-2494"><span class="k">def</span><span class="w"> </span><span class="nf">_record_substitution</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">resolutions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AssetResolutionJSON</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2495"><span class="w">    </span><span class="sd">"""A method substitution, recorded beside the stand-in assets (ADR 0002 decision 6)."""</span>
-</span><span id="line-2496">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">substitution_record</span>
+</span><span id="line-2467"><span class="c1">#: The ``asset_resolution`` kind of a policy entry passed over (cutan#9): not a</span>
+</span><span id="line-2468"><span class="c1">#: ``method`` substitution (nothing asked for it), so a tool can tell them apart.</span>
+</span><span id="line-2469"><span class="n">POLICY_SKIP_KIND</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"policy_skip"</span>
+</span><span id="line-2470">
+</span><span id="line-2471">
+</span><span id="line-2472"><span class="k">def</span><span class="w"> </span><span class="nf">_record_policy_skip</span><span class="p">(</span>
+</span><span id="line-2473">    <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-2474">    <span class="n">aspect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-2475">    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-2476">    <span class="n">chosen</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-2477">    <span class="n">missing</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+</span><span id="line-2478">    <span class="n">resolutions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AssetResolutionJSON</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-2479"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2480"><span class="w">    </span><span class="sd">"""A policy entry that did not apply, recorded (non-fatal) beside the stand-ins:</span>
+</span><span id="line-2481"><span class="sd">    a skip is never silent (ADR 0002 decision 6, cutan#9)."""</span>
+</span><span id="line-2482">    <span class="k">if</span> <span class="n">resolutions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2483">        <span class="n">resolutions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-2484">            <span class="n">AssetResolutionJSON</span><span class="p">(</span>
+</span><span id="line-2485">                <span class="nb">id</span><span class="o">=</span><span class="n">entity</span><span class="p">,</span>
+</span><span id="line-2486">                <span class="n">kind</span><span class="o">=</span><span class="n">POLICY_SKIP_KIND</span><span class="p">,</span>
+</span><span id="line-2487">                <span class="n">store</span><span class="o">=</span><span class="n">aspect</span><span class="p">,</span>
+</span><span id="line-2488">                <span class="n">ref</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+</span><span id="line-2489">                <span class="n">resolved</span><span class="o">=</span><span class="n">chosen</span><span class="p">,</span>
+</span><span id="line-2490">                <span class="n">fallback</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="line-2491">                <span class="n">detail</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-2492">                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">aspect</span><span class="si">}</span><span class="s2">: the policy's </span><span class="si">{</span><span class="n">method</span><span class="si">!r}</span><span class="s2"> does not apply "</span>
+</span><span id="line-2493">                    <span class="sa">f</span><span class="s2">"(missing </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">); skipped"</span>
+</span><span id="line-2494">                <span class="p">),</span>
+</span><span id="line-2495">            <span class="p">)</span>
+</span><span id="line-2496">        <span class="p">)</span>
 </span><span id="line-2497">
-</span><span id="line-2498">    <span class="k">if</span> <span class="n">resolutions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2499">        <span class="n">resolutions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AssetResolutionJSON</span><span class="p">(</span><span class="o">**</span><span class="n">substitution_record</span><span class="p">(</span><span class="n">sub</span><span class="p">)))</span>
-</span><span id="line-2500">
-</span><span id="line-2501">
-</span><span id="line-2502"><span class="k">def</span><span class="w"> </span><span class="nf">_locomotion_args</span><span class="p">(</span>
-</span><span id="line-2503">    <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-2504">    <span class="n">args</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-</span><span id="line-2505">    <span class="n">desc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-</span><span id="line-2506">    <span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span><span class="p">,</span>
-</span><span id="line-2507">    <span class="n">resolutions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AssetResolutionJSON</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-2508">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-2509">    <span class="n">view</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-2510">    <span class="n">policy</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-2511"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="line-2512"><span class="w">    </span><span class="sd">"""The walk's args with its gait the locomotion method the registry resolves</span>
-</span><span id="line-2513"><span class="sd">    (an#248: :func:`cutan.characters.methods.locomotion_args`, the one</span>
-</span><span id="line-2514"><span class="sd">    resolution the extent reads too), the substitution recorded. ``view`` is</span>
-</span><span id="line-2515"><span class="sd">    the view in force at the play's start (a ``profile`` needs its side view</span>
-</span><span id="line-2516"><span class="sd">    showing, cutan#17). ``policy`` is the scene's (cutan#9, :func:`_policy_pass`);</span>
-</span><span id="line-2517"><span class="sd">    its skipped entries are recorded beside the substitution. A gait parameter the resolved gait never reads is a</span>
-</span><span id="line-2518"><span class="sd">    warning here (an explicit gait's is `play_problems`' error, cutan#21)."""</span>
-</span><span id="line-2519">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">locomotion_args</span><span class="p">,</span> <span class="n">walk_arg_problems</span>
-</span><span id="line-2520">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">PolicyError</span>
-</span><span id="line-2521">
-</span><span id="line-2522">    <span class="n">explicit</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">GAIT_ARG</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="line-2523">    <span class="n">skipped</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-2524">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-2525">        <span class="n">resolved</span><span class="p">,</span> <span class="n">resolution</span> <span class="o">=</span> <span class="n">locomotion_args</span><span class="p">(</span>
-</span><span id="line-2526">            <span class="n">entity</span><span class="p">,</span>
-</span><span id="line-2527">            <span class="n">args</span><span class="p">,</span>
-</span><span id="line-2528">            <span class="n">descriptor</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span>
-</span><span id="line-2529">            <span class="n">profile</span><span class="o">=</span><span class="n">_character_profile</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">vocab</span><span class="p">),</span>
-</span><span id="line-2530">            <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span>
-</span><span id="line-2531">            <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span>
-</span><span id="line-2532">            <span class="n">on_skip</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">skipped</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">)),</span>
-</span><span id="line-2533">        <span class="p">)</span>
-</span><span id="line-2534">    <span class="k">except</span> <span class="n">PolicyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-2535">        <span class="k">raise</span> <span class="n">CutoutCompileError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"walk on </span><span class="si">{</span><span class="n">entity</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
-</span><span id="line-2536">    <span class="k">if</span> <span class="n">resolution</span><span class="o">.</span><span class="n">substitution</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2537">        <span class="n">_record_substitution</span><span class="p">(</span><span class="n">resolution</span><span class="o">.</span><span class="n">substitution</span><span class="p">,</span> <span class="n">resolutions</span><span class="p">)</span>
-</span><span id="line-2538">    <span class="k">for</span> <span class="n">method</span><span class="p">,</span> <span class="n">missing</span> <span class="ow">in</span> <span class="n">skipped</span><span class="p">:</span>
-</span><span id="line-2539">        <span class="n">_record_policy_skip</span><span class="p">(</span>
-</span><span id="line-2540">            <span class="n">entity</span><span class="p">,</span> <span class="s2">"locomotion"</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">resolution</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">missing</span><span class="p">,</span> <span class="n">resolutions</span>
-</span><span id="line-2541">        <span class="p">)</span>
-</span><span id="line-2542">    <span class="k">if</span> <span class="ow">not</span> <span class="n">explicit</span><span class="p">:</span>
-</span><span id="line-2543">        <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">walk_arg_problems</span><span class="p">(</span><span class="n">resolved</span><span class="p">[</span><span class="n">GAIT_ARG</span><span class="p">],</span> <span class="n">resolved</span><span class="p">):</span>
-</span><span id="line-2544">            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">"walk on </span><span class="si">{</span><span class="n">entity</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-</span><span id="line-2545">    <span class="k">return</span> <span class="n">resolved</span>
-</span><span id="line-2546">
-</span><span id="line-2547">
-</span><span id="line-2548"><span class="k">def</span><span class="w"> </span><span class="nf">_off_registry_walk_args</span><span class="p">(</span>
-</span><span id="line-2549">    <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-2550">    <span class="n">args</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-</span><span id="line-2551">    <span class="n">resolutions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AssetResolutionJSON</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-2552">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-2553">    <span class="n">parts</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="line-2554"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="line-2555"><span class="w">    </span><span class="sd">"""A walk on an entity that does not resolve on the registry (a prop): a</span>
-</span><span id="line-2556"><span class="sd">    legged gait asked of it with no leg pair among its built ``parts`` walks</span>
-</span><span id="line-2557"><span class="sd">    the legless default, recorded (cutan#22)."""</span>
-</span><span id="line-2558">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-</span><span id="line-2559">        <span class="n">normalise_gait_args</span><span class="p">,</span>
-</span><span id="line-2560">        <span class="n">off_registry_substitution</span><span class="p">,</span>
-</span><span id="line-2561">    <span class="p">)</span>
-</span><span id="line-2562">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_LEGLESS_GAIT</span>
-</span><span id="line-2563">
-</span><span id="line-2564">    <span class="n">args</span> <span class="o">=</span> <span class="n">normalise_gait_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-</span><span id="line-2565">    <span class="n">sub</span> <span class="o">=</span> <span class="n">off_registry_substitution</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">parts</span><span class="p">)</span>
-</span><span id="line-2566">    <span class="k">if</span> <span class="n">sub</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2567">        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-</span><span id="line-2568">    <span class="n">_record_substitution</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">resolutions</span><span class="p">)</span>
-</span><span id="line-2569">    <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">args</span><span class="p">,</span> <span class="n">GAIT_ARG</span><span class="p">:</span> <span class="n">DFLT_LEGLESS_GAIT</span><span class="p">}</span>
-</span><span id="line-2570">
-</span><span id="line-2571">
-</span><span id="line-2572"><span class="k">def</span><span class="w"> </span><span class="nf">_drawn_scale</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2573"><span class="w">    </span><span class="sd">"""The figure's drawn scale: the ``scale_y`` of its BUILT root (the stage</span>
-</span><span id="line-2574"><span class="sd">    placement applied to the rig, before any authored move), ``None`` with no</span>
-</span><span id="line-2575"><span class="sd">    built node. What a walk's default lengths are stated against (cutan#13):</span>
-</span><span id="line-2576"><span class="sd">    the pose the timeline holds at a play's start is transient — a ``pop_in``</span>
-</span><span id="line-2577"><span class="sd">    running under the walk holds it at 0."""</span>
-</span><span id="line-2578">    <span class="k">if</span> <span class="n">vocab</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2579">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-2580">    <span class="n">transform</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">node_transforms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span>
-</span><span id="line-2581">    <span class="k">if</span> <span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2582">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-2583">    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">transform</span><span class="o">.</span><span class="n">scale_y</span><span class="p">))</span>
-</span><span id="line-2584">
-</span><span id="line-2585">
+</span><span id="line-2498">
+</span><span id="line-2499"><span class="k">def</span><span class="w"> </span><span class="nf">_record_substitution</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">resolutions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AssetResolutionJSON</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2500"><span class="w">    </span><span class="sd">"""A method substitution, recorded beside the stand-in assets (ADR 0002 decision 6)."""</span>
+</span><span id="line-2501">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">substitution_record</span>
+</span><span id="line-2502">
+</span><span id="line-2503">    <span class="k">if</span> <span class="n">resolutions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2504">        <span class="n">resolutions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AssetResolutionJSON</span><span class="p">(</span><span class="o">**</span><span class="n">substitution_record</span><span class="p">(</span><span class="n">sub</span><span class="p">)))</span>
+</span><span id="line-2505">
+</span><span id="line-2506">
+</span><span id="line-2507"><span class="k">def</span><span class="w"> </span><span class="nf">_locomotion_args</span><span class="p">(</span>
+</span><span id="line-2508">    <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-2509">    <span class="n">args</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+</span><span id="line-2510">    <span class="n">desc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="line-2511">    <span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span><span class="p">,</span>
+</span><span id="line-2512">    <span class="n">resolutions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AssetResolutionJSON</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-2513">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-2514">    <span class="n">view</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-2515">    <span class="n">policy</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-2516"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="line-2517"><span class="w">    </span><span class="sd">"""The walk's args with its gait the locomotion method the registry resolves</span>
+</span><span id="line-2518"><span class="sd">    (an#248: :func:`cutan.characters.methods.locomotion_args`, the one</span>
+</span><span id="line-2519"><span class="sd">    resolution the extent reads too), the substitution recorded. ``view`` is</span>
+</span><span id="line-2520"><span class="sd">    the view in force at the play's start (a ``profile`` needs its side view</span>
+</span><span id="line-2521"><span class="sd">    showing, cutan#17). ``policy`` is the scene's (cutan#9, :func:`_policy_pass`);</span>
+</span><span id="line-2522"><span class="sd">    its skipped entries are recorded beside the substitution. A gait parameter the resolved gait never reads is a</span>
+</span><span id="line-2523"><span class="sd">    warning here (an explicit gait's is `play_problems`' error, cutan#21)."""</span>
+</span><span id="line-2524">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">locomotion_args</span><span class="p">,</span> <span class="n">walk_arg_problems</span>
+</span><span id="line-2525">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">PolicyError</span>
+</span><span id="line-2526">
+</span><span id="line-2527">    <span class="n">explicit</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">GAIT_ARG</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="line-2528">    <span class="n">skipped</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-2529">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-2530">        <span class="n">resolved</span><span class="p">,</span> <span class="n">resolution</span> <span class="o">=</span> <span class="n">locomotion_args</span><span class="p">(</span>
+</span><span id="line-2531">            <span class="n">entity</span><span class="p">,</span>
+</span><span id="line-2532">            <span class="n">args</span><span class="p">,</span>
+</span><span id="line-2533">            <span class="n">descriptor</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span>
+</span><span id="line-2534">            <span class="n">profile</span><span class="o">=</span><span class="n">_character_profile</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">vocab</span><span class="p">),</span>
+</span><span id="line-2535">            <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span>
+</span><span id="line-2536">            <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span>
+</span><span id="line-2537">            <span class="n">on_skip</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">skipped</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">)),</span>
+</span><span id="line-2538">        <span class="p">)</span>
+</span><span id="line-2539">    <span class="k">except</span> <span class="n">PolicyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-2540">        <span class="k">raise</span> <span class="n">CutoutCompileError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"walk on </span><span class="si">{</span><span class="n">entity</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+</span><span id="line-2541">    <span class="k">if</span> <span class="n">resolution</span><span class="o">.</span><span class="n">substitution</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2542">        <span class="n">_record_substitution</span><span class="p">(</span><span class="n">resolution</span><span class="o">.</span><span class="n">substitution</span><span class="p">,</span> <span class="n">resolutions</span><span class="p">)</span>
+</span><span id="line-2543">    <span class="k">for</span> <span class="n">method</span><span class="p">,</span> <span class="n">missing</span> <span class="ow">in</span> <span class="n">skipped</span><span class="p">:</span>
+</span><span id="line-2544">        <span class="n">_record_policy_skip</span><span class="p">(</span>
+</span><span id="line-2545">            <span class="n">entity</span><span class="p">,</span> <span class="s2">"locomotion"</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">resolution</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">missing</span><span class="p">,</span> <span class="n">resolutions</span>
+</span><span id="line-2546">        <span class="p">)</span>
+</span><span id="line-2547">    <span class="k">if</span> <span class="ow">not</span> <span class="n">explicit</span><span class="p">:</span>
+</span><span id="line-2548">        <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">walk_arg_problems</span><span class="p">(</span><span class="n">resolved</span><span class="p">[</span><span class="n">GAIT_ARG</span><span class="p">],</span> <span class="n">resolved</span><span class="p">):</span>
+</span><span id="line-2549">            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">"walk on </span><span class="si">{</span><span class="n">entity</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span><span id="line-2550">    <span class="k">return</span> <span class="n">resolved</span>
+</span><span id="line-2551">
+</span><span id="line-2552">
+</span><span id="line-2553"><span class="k">def</span><span class="w"> </span><span class="nf">_off_registry_walk_args</span><span class="p">(</span>
+</span><span id="line-2554">    <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-2555">    <span class="n">args</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+</span><span id="line-2556">    <span class="n">resolutions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AssetResolutionJSON</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-2557">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-2558">    <span class="n">parts</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="line-2559"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="line-2560"><span class="w">    </span><span class="sd">"""A walk on an entity that does not resolve on the registry (a prop): a</span>
+</span><span id="line-2561"><span class="sd">    legged gait asked of it with no leg pair among its built ``parts`` walks</span>
+</span><span id="line-2562"><span class="sd">    the legless default, recorded (cutan#22)."""</span>
+</span><span id="line-2563">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-2564">        <span class="n">normalise_gait_args</span><span class="p">,</span>
+</span><span id="line-2565">        <span class="n">off_registry_substitution</span><span class="p">,</span>
+</span><span id="line-2566">    <span class="p">)</span>
+</span><span id="line-2567">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_LEGLESS_GAIT</span>
+</span><span id="line-2568">
+</span><span id="line-2569">    <span class="n">args</span> <span class="o">=</span> <span class="n">normalise_gait_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</span><span id="line-2570">    <span class="n">sub</span> <span class="o">=</span> <span class="n">off_registry_substitution</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">parts</span><span class="p">)</span>
+</span><span id="line-2571">    <span class="k">if</span> <span class="n">sub</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2572">        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</span><span id="line-2573">    <span class="n">_record_substitution</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">resolutions</span><span class="p">)</span>
+</span><span id="line-2574">    <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">args</span><span class="p">,</span> <span class="n">GAIT_ARG</span><span class="p">:</span> <span class="n">DFLT_LEGLESS_GAIT</span><span class="p">}</span>
+</span><span id="line-2575">
+</span><span id="line-2576">
+</span><span id="line-2577"><span class="k">def</span><span class="w"> </span><span class="nf">_drawn_scale</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2578"><span class="w">    </span><span class="sd">"""The figure's drawn scale: the ``scale_y`` of its BUILT root (the stage</span>
+</span><span id="line-2579"><span class="sd">    placement applied to the rig, before any authored move), ``None`` with no</span>
+</span><span id="line-2580"><span class="sd">    built node. What a walk's default lengths are stated against (cutan#13):</span>
+</span><span id="line-2581"><span class="sd">    the pose the timeline holds at a play's start is transient — a ``pop_in``</span>
+</span><span id="line-2582"><span class="sd">    running under the walk holds it at 0."""</span>
+</span><span id="line-2583">    <span class="k">if</span> <span class="n">vocab</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2584">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-2585">    <span class="n">transform</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">node_transforms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span>
+</span><span id="line-2586">    <span class="k">if</span> <span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2587">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-2588">    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">transform</span><span class="o">.</span><span class="n">scale_y</span><span class="p">))</span>
+</span><span id="line-2589">
+</span><span id="line-2590">
 <div class="viewcode-block" id="preset_context_of">
 <a class="viewcode-back" href="../../../_autosummary/cutan.compile.passes.html#cutan.compile.passes.preset_context_of">[docs]</a>
-</span><span id="line-2586"><span class="k">def</span><span class="w"> </span><span class="nf">preset_context_of</span><span class="p">(</span><span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">policy</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="line-2587"><span class="w">    </span><span class="sd">"""``(entity_id, play) -&gt; PresetContext`` for the extent resolver</span>
-</span><span id="line-2588"><span class="sd">    (:func:`cutan.characters.play.play_extent_for`): exactly the ``gait`` and</span>
-</span><span id="line-2589"><span class="sd">    ``scale`` :func:`_with_view_and_posed_parts` will fill in before the</span>
-</span><span id="line-2590"><span class="sd">    expansion, read off the same vocabulary under the same ``policy``, so a</span>
-</span><span id="line-2591"><span class="sd">    ``sequence`` waits for what the walk runs (cutan#12)."""</span>
-</span><span id="line-2592">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">walk_preset_context</span>
-</span><span id="line-2593">
-</span><span id="line-2594">    <span class="k">def</span><span class="w"> </span><span class="nf">context</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2595">        <span class="c1"># Keyed on the play's TARGET, as the expansion is: a walk played on a</span>
-</span><span id="line-2596">        <span class="c1"># part walks that part (its scale, its limbs).</span>
-</span><span id="line-2597">        <span class="n">target</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">target</span>
-</span><span id="line-2598">        <span class="k">if</span> <span class="n">vocab</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">preset_takes</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="p">,</span> <span class="n">GAIT_ARG</span><span class="p">):</span>
-</span><span id="line-2599">            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-2600">        <span class="n">scale</span> <span class="o">=</span> <span class="n">_drawn_scale</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
-</span><span id="line-2601">        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2602">            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-2603">        <span class="n">on_registry</span> <span class="o">=</span> <span class="n">_on_registry</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
-</span><span id="line-2604">        <span class="k">return</span> <span class="n">walk_preset_context</span><span class="p">(</span>
-</span><span id="line-2605">            <span class="n">target</span><span class="p">,</span>
-</span><span id="line-2606">            <span class="nb">dict</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">args</span> <span class="ow">or</span> <span class="p">{}),</span>
-</span><span id="line-2607">            <span class="n">descriptor</span><span class="o">=</span><span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">target</span><span class="p">),</span>
-</span><span id="line-2608">            <span class="n">profile</span><span class="o">=</span><span class="n">_character_profile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span> <span class="k">if</span> <span class="n">on_registry</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-2609">            <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
-</span><span id="line-2610">            <span class="n">parts</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">on_registry</span> <span class="k">else</span> <span class="n">_built_parts</span><span class="p">(</span><span class="n">vocab</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span>
-</span><span id="line-2611">            <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span>
-</span><span id="line-2612">        <span class="p">)</span>
-</span><span id="line-2613">
-</span><span id="line-2614">    <span class="k">return</span> <span class="n">context</span></div>
+</span><span id="line-2591"><span class="k">def</span><span class="w"> </span><span class="nf">preset_context_of</span><span class="p">(</span><span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">policy</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="line-2592"><span class="w">    </span><span class="sd">"""``(entity_id, play) -&gt; PresetContext`` for the extent resolver</span>
+</span><span id="line-2593"><span class="sd">    (:func:`cutan.characters.play.play_extent_for`): exactly the ``gait`` and</span>
+</span><span id="line-2594"><span class="sd">    ``scale`` :func:`_with_view_and_posed_parts` will fill in before the</span>
+</span><span id="line-2595"><span class="sd">    expansion, read off the same vocabulary under the same ``policy``, so a</span>
+</span><span id="line-2596"><span class="sd">    ``sequence`` waits for what the walk runs (cutan#12)."""</span>
+</span><span id="line-2597">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">walk_preset_context</span>
+</span><span id="line-2598">
+</span><span id="line-2599">    <span class="k">def</span><span class="w"> </span><span class="nf">context</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2600">        <span class="c1"># Keyed on the play's TARGET, as the expansion is: a walk played on a</span>
+</span><span id="line-2601">        <span class="c1"># part walks that part (its scale, its limbs).</span>
+</span><span id="line-2602">        <span class="n">target</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">target</span>
+</span><span id="line-2603">        <span class="k">if</span> <span class="n">vocab</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">preset_takes</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="p">,</span> <span class="n">GAIT_ARG</span><span class="p">):</span>
+</span><span id="line-2604">            <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-2605">        <span class="n">scale</span> <span class="o">=</span> <span class="n">_drawn_scale</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
+</span><span id="line-2606">        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2607">            <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-2608">        <span class="n">on_registry</span> <span class="o">=</span> <span class="n">_on_registry</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
+</span><span id="line-2609">        <span class="k">return</span> <span class="n">walk_preset_context</span><span class="p">(</span>
+</span><span id="line-2610">            <span class="n">target</span><span class="p">,</span>
+</span><span id="line-2611">            <span class="nb">dict</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">args</span> <span class="ow">or</span> <span class="p">{}),</span>
+</span><span id="line-2612">            <span class="n">descriptor</span><span class="o">=</span><span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">target</span><span class="p">),</span>
+</span><span id="line-2613">            <span class="n">profile</span><span class="o">=</span><span class="n">_character_profile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span> <span class="k">if</span> <span class="n">on_registry</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-2614">            <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
+</span><span id="line-2615">            <span class="n">parts</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">on_registry</span> <span class="k">else</span> <span class="n">_built_parts</span><span class="p">(</span><span class="n">vocab</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span>
+</span><span id="line-2616">            <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span>
+</span><span id="line-2617">        <span class="p">)</span>
+</span><span id="line-2618">
+</span><span id="line-2619">    <span class="k">return</span> <span class="n">context</span></div>
 
-</span><span id="line-2615">
-</span><span id="line-2616">
-</span><span id="line-2617"><span class="k">def</span><span class="w"> </span><span class="nf">_with_view_and_posed_parts</span><span class="p">(</span>
-</span><span id="line-2618">    <span class="n">action</span><span class="p">:</span> <span class="n">PlayAction</span><span class="p">,</span>
-</span><span id="line-2619">    <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="line-2620">    <span class="n">rest_of</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span>
-</span><span id="line-2621">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-2622">    <span class="n">history</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">FlatAction</span><span class="p">]]],</span>
-</span><span id="line-2623">    <span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span><span class="p">,</span>
-</span><span id="line-2624">    <span class="n">resolutions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AssetResolutionJSON</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-2625">    <span class="n">policy</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-2626"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">PlayAction</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]:</span>
-</span><span id="line-2627"><span class="w">    </span><span class="sd">"""For a preset that moves an entity's parts (``walk``, an#214): fill its</span>
-</span><span id="line-2628"><span class="sd">    ``view`` from the timeline when the author did not (else from the</span>
-</span><span id="line-2629"><span class="sd">    descriptor's ``rest_view``, an#220), its ``gait`` from the locomotion</span>
-</span><span id="line-2630"><span class="sd">    method the capability registry resolves (an#248: the author's ``gait``,</span>
-</span><span id="line-2631"><span class="sd">    else the descriptor's, else the default chain; a requested gait the rig</span>
-</span><span id="line-2632"><span class="sd">    cannot honour is a recorded substitution in ``resolutions``), its ``scale``</span>
-</span><span id="line-2633"><span class="sd">    from the figure's built root (its stage scale, cutan#13: never the pose at</span>
-</span><span id="line-2634"><span class="sd">    the play's start, which a ``pop_in`` holds at 0), and read a part the</span>
-</span><span id="line-2635"><span class="sd">    view POSES at its posed value — a side view splays the legs (an#203), so a</span>
-</span><span id="line-2636"><span class="sd">    walk swings them about the splay, not about the front-view rest, and ends</span>
-</span><span id="line-2637"><span class="sd">    where the view's pose takes them back.</span>
-</span><span id="line-2638">
-</span><span id="line-2639"><span class="sd">    The view is the last ``view`` swap set on the entity at or before ``t``</span>
-</span><span id="line-2640"><span class="sd">    (:func:`cutan.characters.play.facing_at`); none leaves ``view`` unset (the</span>
-</span><span id="line-2641"><span class="sd">    preset's default). A part the author has animated keeps its timeline pose.</span>
-</span><span id="line-2642"><span class="sd">    """</span>
-</span><span id="line-2643">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.timeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">SWAP_WRITE_GROUP</span><span class="p">,</span> <span class="n">write_group</span>
-</span><span id="line-2644">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_TURN_SET</span>
-</span><span id="line-2645">
-</span><span id="line-2646">    <span class="n">entity</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">target</span>
-</span><span id="line-2647">    <span class="n">args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">args</span> <span class="ow">or</span> <span class="p">{})</span>
-</span><span id="line-2648">    <span class="n">view_set</span> <span class="o">=</span> <span class="n">DFLT_TURN_SET</span>
-</span><span id="line-2649">    <span class="n">events</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-2650">        <span class="n">f</span>
-</span><span id="line-2651">        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
-</span><span id="line-2652">            <span class="n">history</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">entity</span><span class="p">,</span> <span class="n">SWAP_WRITE_GROUP</span><span class="p">),</span> <span class="p">[]),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="line-2653">        <span class="p">)</span>
-</span><span id="line-2654">    <span class="p">]</span>
-</span><span id="line-2655">    <span class="n">view</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">VIEW_ARG</span><span class="p">)</span>
-</span><span id="line-2656">    <span class="n">desc</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span>
-</span><span id="line-2657">    <span class="n">posed_view</span> <span class="o">=</span> <span class="n">view</span>
-</span><span id="line-2658">    <span class="c1"># The view the TIMELINE has in force (a turn before the play, else the view</span>
-</span><span id="line-2659">    <span class="c1"># the art is drawn in): what a `profile` needs showing (cutan#17). The</span>
-</span><span id="line-2660">    <span class="c1"># walk's own `view` arg poses the legs without swapping the art, so it</span>
-</span><span id="line-2661">    <span class="c1"># does not count there.</span>
-</span><span id="line-2662">    <span class="n">in_force</span> <span class="o">=</span> <span class="n">facing_at</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">entity</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">view_set</span><span class="o">=</span><span class="n">view_set</span><span class="p">)</span><span class="o">.</span><span class="n">view</span>
-</span><span id="line-2663">    <span class="k">if</span> <span class="n">in_force</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2664">        <span class="n">in_force</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">rest_view</span>
-</span><span id="line-2665">    <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">preset_takes</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="p">,</span> <span class="n">VIEW_ARG</span><span class="p">):</span>
-</span><span id="line-2666">        <span class="n">view</span> <span class="o">=</span> <span class="n">posed_view</span> <span class="o">=</span> <span class="n">facing_at</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">entity</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">view_set</span><span class="o">=</span><span class="n">view_set</span><span class="p">)</span><span class="o">.</span><span class="n">view</span>
-</span><span id="line-2667">        <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2668">            <span class="c1"># No turn before it: the view the art is DRAWN in (an#220) — a</span>
-</span><span id="line-2669">            <span class="c1"># character carved in profile walks as a profile, on its unposed</span>
-</span><span id="line-2670">            <span class="c1"># rest (no swap has posed it).</span>
-</span><span id="line-2671">            <span class="n">view</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">rest_view</span>
-</span><span id="line-2672">        <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2673">            <span class="n">args</span><span class="p">[</span><span class="n">VIEW_ARG</span><span class="p">]</span> <span class="o">=</span> <span class="n">view</span>
-</span><span id="line-2674">            <span class="n">action</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"args"</span><span class="p">:</span> <span class="n">args</span><span class="p">})</span>
-</span><span id="line-2675">    <span class="k">if</span> <span class="n">preset_takes</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="p">,</span> <span class="n">GAIT_ARG</span><span class="p">):</span>
-</span><span id="line-2676">        <span class="n">resolved</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-2677">            <span class="n">_locomotion_args</span><span class="p">(</span>
-</span><span id="line-2678">                <span class="n">entity</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">resolutions</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="n">in_force</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="n">policy</span>
-</span><span id="line-2679">            <span class="p">)</span>
-</span><span id="line-2680">            <span class="k">if</span> <span class="n">_on_registry</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
-</span><span id="line-2681">            <span class="k">else</span> <span class="n">_off_registry_walk_args</span><span class="p">(</span>
-</span><span id="line-2682">                <span class="n">entity</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">resolutions</span><span class="p">,</span> <span class="n">parts</span><span class="o">=</span><span class="n">_built_parts</span><span class="p">(</span><span class="n">vocab</span><span class="p">,</span> <span class="n">entity</span><span class="p">)</span>
-</span><span id="line-2683">            <span class="p">)</span>
-</span><span id="line-2684">        <span class="p">)</span>
-</span><span id="line-2685">        <span class="k">if</span> <span class="n">resolved</span> <span class="o">!=</span> <span class="n">args</span><span class="p">:</span>
-</span><span id="line-2686">            <span class="n">args</span> <span class="o">=</span> <span class="n">resolved</span>
-</span><span id="line-2687">            <span class="n">action</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"args"</span><span class="p">:</span> <span class="n">args</span><span class="p">})</span>
-</span><span id="line-2688">    <span class="k">if</span> <span class="n">preset_takes</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="p">,</span> <span class="n">SCALE_ARG</span><span class="p">)</span> <span class="ow">and</span> <span class="n">SCALE_ARG</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
-</span><span id="line-2689">        <span class="n">scale</span> <span class="o">=</span> <span class="n">_drawn_scale</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
-</span><span id="line-2690">        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2691">            <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">args</span><span class="p">,</span> <span class="n">SCALE_ARG</span><span class="p">:</span> <span class="n">scale</span><span class="p">}</span>
+</span><span id="line-2620">
+</span><span id="line-2621">
+</span><span id="line-2622"><span class="k">def</span><span class="w"> </span><span class="nf">_with_view_and_posed_parts</span><span class="p">(</span>
+</span><span id="line-2623">    <span class="n">action</span><span class="p">:</span> <span class="n">PlayAction</span><span class="p">,</span>
+</span><span id="line-2624">    <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="line-2625">    <span class="n">rest_of</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span>
+</span><span id="line-2626">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-2627">    <span class="n">history</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">FlatAction</span><span class="p">]]],</span>
+</span><span id="line-2628">    <span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span><span class="p">,</span>
+</span><span id="line-2629">    <span class="n">resolutions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AssetResolutionJSON</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-2630">    <span class="n">policy</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-2631"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">PlayAction</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]:</span>
+</span><span id="line-2632"><span class="w">    </span><span class="sd">"""For a preset that moves an entity's parts (``walk``, an#214): fill its</span>
+</span><span id="line-2633"><span class="sd">    ``view`` from the timeline when the author did not (else from the</span>
+</span><span id="line-2634"><span class="sd">    descriptor's ``rest_view``, an#220), its ``gait`` from the locomotion</span>
+</span><span id="line-2635"><span class="sd">    method the capability registry resolves (an#248: the author's ``gait``,</span>
+</span><span id="line-2636"><span class="sd">    else the descriptor's, else the default chain; a requested gait the rig</span>
+</span><span id="line-2637"><span class="sd">    cannot honour is a recorded substitution in ``resolutions``), its ``scale``</span>
+</span><span id="line-2638"><span class="sd">    from the figure's built root (its stage scale, cutan#13: never the pose at</span>
+</span><span id="line-2639"><span class="sd">    the play's start, which a ``pop_in`` holds at 0), and read a part the</span>
+</span><span id="line-2640"><span class="sd">    view POSES at its posed value — a side view splays the legs (an#203), so a</span>
+</span><span id="line-2641"><span class="sd">    walk swings them about the splay, not about the front-view rest, and ends</span>
+</span><span id="line-2642"><span class="sd">    where the view's pose takes them back.</span>
+</span><span id="line-2643">
+</span><span id="line-2644"><span class="sd">    The view is the last ``view`` swap set on the entity at or before ``t``</span>
+</span><span id="line-2645"><span class="sd">    (:func:`cutan.characters.play.facing_at`); none leaves ``view`` unset (the</span>
+</span><span id="line-2646"><span class="sd">    preset's default). A part the author has animated keeps its timeline pose.</span>
+</span><span id="line-2647"><span class="sd">    """</span>
+</span><span id="line-2648">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.timeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">SWAP_WRITE_GROUP</span><span class="p">,</span> <span class="n">write_group</span>
+</span><span id="line-2649">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_TURN_SET</span>
+</span><span id="line-2650">
+</span><span id="line-2651">    <span class="n">entity</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">target</span>
+</span><span id="line-2652">    <span class="n">args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">args</span> <span class="ow">or</span> <span class="p">{})</span>
+</span><span id="line-2653">    <span class="n">view_set</span> <span class="o">=</span> <span class="n">DFLT_TURN_SET</span>
+</span><span id="line-2654">    <span class="n">events</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-2655">        <span class="n">f</span>
+</span><span id="line-2656">        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+</span><span id="line-2657">            <span class="n">history</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">entity</span><span class="p">,</span> <span class="n">SWAP_WRITE_GROUP</span><span class="p">),</span> <span class="p">[]),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="line-2658">        <span class="p">)</span>
+</span><span id="line-2659">    <span class="p">]</span>
+</span><span id="line-2660">    <span class="n">view</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">VIEW_ARG</span><span class="p">)</span>
+</span><span id="line-2661">    <span class="n">desc</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span>
+</span><span id="line-2662">    <span class="n">posed_view</span> <span class="o">=</span> <span class="n">view</span>
+</span><span id="line-2663">    <span class="c1"># The view the TIMELINE has in force (a turn before the play, else the view</span>
+</span><span id="line-2664">    <span class="c1"># the art is drawn in): what a `profile` needs showing (cutan#17). The</span>
+</span><span id="line-2665">    <span class="c1"># walk's own `view` arg poses the legs without swapping the art, so it</span>
+</span><span id="line-2666">    <span class="c1"># does not count there.</span>
+</span><span id="line-2667">    <span class="n">in_force</span> <span class="o">=</span> <span class="n">facing_at</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">entity</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">view_set</span><span class="o">=</span><span class="n">view_set</span><span class="p">)</span><span class="o">.</span><span class="n">view</span>
+</span><span id="line-2668">    <span class="k">if</span> <span class="n">in_force</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2669">        <span class="n">in_force</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">rest_view</span>
+</span><span id="line-2670">    <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">preset_takes</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="p">,</span> <span class="n">VIEW_ARG</span><span class="p">):</span>
+</span><span id="line-2671">        <span class="n">view</span> <span class="o">=</span> <span class="n">posed_view</span> <span class="o">=</span> <span class="n">facing_at</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">entity</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">view_set</span><span class="o">=</span><span class="n">view_set</span><span class="p">)</span><span class="o">.</span><span class="n">view</span>
+</span><span id="line-2672">        <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2673">            <span class="c1"># No turn before it: the view the art is DRAWN in (an#220) — a</span>
+</span><span id="line-2674">            <span class="c1"># character carved in profile walks as a profile, on its unposed</span>
+</span><span id="line-2675">            <span class="c1"># rest (no swap has posed it).</span>
+</span><span id="line-2676">            <span class="n">view</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">rest_view</span>
+</span><span id="line-2677">        <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2678">            <span class="n">args</span><span class="p">[</span><span class="n">VIEW_ARG</span><span class="p">]</span> <span class="o">=</span> <span class="n">view</span>
+</span><span id="line-2679">            <span class="n">action</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"args"</span><span class="p">:</span> <span class="n">args</span><span class="p">})</span>
+</span><span id="line-2680">    <span class="k">if</span> <span class="n">preset_takes</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="p">,</span> <span class="n">GAIT_ARG</span><span class="p">):</span>
+</span><span id="line-2681">        <span class="n">resolved</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-2682">            <span class="n">_locomotion_args</span><span class="p">(</span>
+</span><span id="line-2683">                <span class="n">entity</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">resolutions</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="n">in_force</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="n">policy</span>
+</span><span id="line-2684">            <span class="p">)</span>
+</span><span id="line-2685">            <span class="k">if</span> <span class="n">_on_registry</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
+</span><span id="line-2686">            <span class="k">else</span> <span class="n">_off_registry_walk_args</span><span class="p">(</span>
+</span><span id="line-2687">                <span class="n">entity</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">resolutions</span><span class="p">,</span> <span class="n">parts</span><span class="o">=</span><span class="n">_built_parts</span><span class="p">(</span><span class="n">vocab</span><span class="p">,</span> <span class="n">entity</span><span class="p">)</span>
+</span><span id="line-2688">            <span class="p">)</span>
+</span><span id="line-2689">        <span class="p">)</span>
+</span><span id="line-2690">        <span class="k">if</span> <span class="n">resolved</span> <span class="o">!=</span> <span class="n">args</span><span class="p">:</span>
+</span><span id="line-2691">            <span class="n">args</span> <span class="o">=</span> <span class="n">resolved</span>
 </span><span id="line-2692">            <span class="n">action</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"args"</span><span class="p">:</span> <span class="n">args</span><span class="p">})</span>
-</span><span id="line-2693">    <span class="n">posed</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">_StepCurve</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span id="line-2694">    <span class="k">if</span> <span class="n">posed_view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="p">:</span>
-</span><span id="line-2695">        <span class="n">posed</span> <span class="o">=</span> <span class="n">_swap_pose_layer</span><span class="p">(</span>
-</span><span id="line-2696">            <span class="p">[</span><span class="n">_EntitySwap</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">view_set</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">posed_view</span><span class="p">))],</span> <span class="n">vocab</span>
-</span><span id="line-2697">        <span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="p">{})</span>
-</span><span id="line-2698">    <span class="k">if</span> <span class="ow">not</span> <span class="n">posed</span><span class="p">:</span>
-</span><span id="line-2699">        <span class="k">return</span> <span class="n">action</span><span class="p">,</span> <span class="n">rest_of</span>
-</span><span id="line-2700">
-</span><span id="line-2701">    <span class="k">def</span><span class="w"> </span><span class="nf">posed_rest_of</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2702">        <span class="n">pose</span> <span class="o">=</span> <span class="n">rest_of</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</span><span id="line-2703">        <span class="k">if</span> <span class="n">pose</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-2704">            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-2705">        <span class="k">return</span> <span class="p">{</span>
-</span><span id="line-2706">            <span class="n">prop</span><span class="p">:</span> <span class="p">(</span>
-</span><span id="line-2707">                <span class="n">posed</span><span class="p">[(</span><span class="n">path</span><span class="p">,</span> <span class="n">prop</span><span class="p">)][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-</span><span id="line-2708">                <span class="k">if</span> <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span> <span class="ow">in</span> <span class="n">posed</span> <span class="ow">and</span> <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">write_group</span><span class="p">(</span><span class="n">prop</span><span class="p">))</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">history</span>
-</span><span id="line-2709">                <span class="k">else</span> <span class="n">value</span>
-</span><span id="line-2710">            <span class="p">)</span>
-</span><span id="line-2711">            <span class="k">for</span> <span class="n">prop</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pose</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-</span><span id="line-2712">        <span class="p">}</span>
-</span><span id="line-2713">
-</span><span id="line-2714">    <span class="k">return</span> <span class="n">action</span><span class="p">,</span> <span class="n">posed_rest_of</span>
-</span><span id="line-2715">
-</span><span id="line-2716">
-</span><span id="line-2717"><span class="k">def</span><span class="w"> </span><span class="nf">_resolve_play</span><span class="p">(</span>
-</span><span id="line-2718">    <span class="n">action</span><span class="p">:</span> <span class="n">PlayAction</span><span class="p">,</span>
-</span><span id="line-2719">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-2720">    <span class="n">anim_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-2721">    <span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-2722">    <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-</span><span id="line-2723">    <span class="n">view</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-2724"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AnimationClipJSON</span><span class="p">:</span>
-</span><span id="line-2725"><span class="w">    </span><span class="sd">"""A ``play`` becomes a clip built from the descriptor animation's tracks</span>
-</span><span id="line-2726"><span class="sd">    (an#7). Resolution — which node, which set, which key, and every way it</span>
-</span><span id="line-2727"><span class="sd">    can fail — is :func:`cutan.characters.play.resolve_play`, shared with</span>
-</span><span id="line-2728"><span class="sd">    ``an validate`` so the two cannot disagree; this function only converts</span>
-</span><span id="line-2729"><span class="sd">    the resolved tracks into channel values.</span>
-</span><span id="line-2730">
-</span><span id="line-2731"><span class="sd">    Two conversions a naive copy gets wrong (the research reasoned them out,</span>
-</span><span id="line-2732"><span class="sd">    `tests/test_play.py` pins them):</span>
-</span><span id="line-2733">
-</span><span id="line-2734"><span class="sd">    - **Units and reference.** A ``bone:&lt;b&gt;.&lt;prop&gt;`` track is a DEVIATION in</span>
-</span><span id="line-2735"><span class="sd">      view-box units (rotation in degrees) around the bone's rest; a channel</span>
-</span><span id="line-2736"><span class="sd">      carries ABSOLUTE scene values (radians). So every value is</span>
-</span><span id="line-2737"><span class="sd">      ``rest + deviation * k`` (positions scale by the rig's view_box → pixel</span>
-</span><span id="line-2738"><span class="sd">      factor; rotation by pi/180), read off the built node's transform — a</span>
-</span><span id="line-2739"><span class="sd">      naive copy would put the torso at y≈±2 instead of bobbing around its</span>
-</span><span id="line-2740"><span class="sd">      rest, and `rotation_deg` is not a runtime property at all.</span>
-</span><span id="line-2741"><span class="sd">    - **Attachment swaps.** A ``slot:&lt;s&gt;.attachment`` track names</span>
-</span><span id="line-2742"><span class="sd">      ATTACHMENTS; a swap channel carries set KEYS. The whole track resolves</span>
-</span><span id="line-2743"><span class="sd">      to ONE set (never split per frame across two channels) and rides the</span>
-</span><span id="line-2744"><span class="sd">      same runtime swap path an authored ``set`` does.</span>
-</span><span id="line-2745">
-</span><span id="line-2746"><span class="sd">    Sine tracks are sampled at the frame rate with linear easing, always</span>
-</span><span id="line-2747"><span class="sd">    closing the cycle at the clip end; step and linear tracks map 1:1.</span>
-</span><span id="line-2748"><span class="sd">    ``loop`` is the action's override or, when the action says nothing, the</span>
-</span><span id="line-2749"><span class="sd">    animation's own.</span>
+</span><span id="line-2693">    <span class="k">if</span> <span class="n">preset_takes</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="p">,</span> <span class="n">SCALE_ARG</span><span class="p">)</span> <span class="ow">and</span> <span class="n">SCALE_ARG</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+</span><span id="line-2694">        <span class="n">scale</span> <span class="o">=</span> <span class="n">_drawn_scale</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
+</span><span id="line-2695">        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2696">            <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">args</span><span class="p">,</span> <span class="n">SCALE_ARG</span><span class="p">:</span> <span class="n">scale</span><span class="p">}</span>
+</span><span id="line-2697">            <span class="n">action</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"args"</span><span class="p">:</span> <span class="n">args</span><span class="p">})</span>
+</span><span id="line-2698">    <span class="n">posed</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">_StepCurve</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-2699">    <span class="k">if</span> <span class="n">posed_view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="p">:</span>
+</span><span id="line-2700">        <span class="n">posed</span> <span class="o">=</span> <span class="n">_swap_pose_layer</span><span class="p">(</span>
+</span><span id="line-2701">            <span class="p">[</span><span class="n">_EntitySwap</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">view_set</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">posed_view</span><span class="p">))],</span> <span class="n">vocab</span>
+</span><span id="line-2702">        <span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="p">{})</span>
+</span><span id="line-2703">    <span class="k">if</span> <span class="ow">not</span> <span class="n">posed</span><span class="p">:</span>
+</span><span id="line-2704">        <span class="k">return</span> <span class="n">action</span><span class="p">,</span> <span class="n">rest_of</span>
+</span><span id="line-2705">
+</span><span id="line-2706">    <span class="k">def</span><span class="w"> </span><span class="nf">posed_rest_of</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2707">        <span class="n">pose</span> <span class="o">=</span> <span class="n">rest_of</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span id="line-2708">        <span class="k">if</span> <span class="n">pose</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-2709">            <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-2710">        <span class="k">return</span> <span class="p">{</span>
+</span><span id="line-2711">            <span class="n">prop</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="line-2712">                <span class="n">posed</span><span class="p">[(</span><span class="n">path</span><span class="p">,</span> <span class="n">prop</span><span class="p">)][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="line-2713">                <span class="k">if</span> <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span> <span class="ow">in</span> <span class="n">posed</span> <span class="ow">and</span> <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">write_group</span><span class="p">(</span><span class="n">prop</span><span class="p">))</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">history</span>
+</span><span id="line-2714">                <span class="k">else</span> <span class="n">value</span>
+</span><span id="line-2715">            <span class="p">)</span>
+</span><span id="line-2716">            <span class="k">for</span> <span class="n">prop</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pose</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+</span><span id="line-2717">        <span class="p">}</span>
+</span><span id="line-2718">
+</span><span id="line-2719">    <span class="k">return</span> <span class="n">action</span><span class="p">,</span> <span class="n">posed_rest_of</span>
+</span><span id="line-2720">
+</span><span id="line-2721">
+</span><span id="line-2722"><span class="k">def</span><span class="w"> </span><span class="nf">_resolve_play</span><span class="p">(</span>
+</span><span id="line-2723">    <span class="n">action</span><span class="p">:</span> <span class="n">PlayAction</span><span class="p">,</span>
+</span><span id="line-2724">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-2725">    <span class="n">anim_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-2726">    <span class="n">vocab</span><span class="p">:</span> <span class="n">_SwapVocabulary</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-2727">    <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="line-2728">    <span class="n">view</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-2729"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AnimationClipJSON</span><span class="p">:</span>
+</span><span id="line-2730"><span class="w">    </span><span class="sd">"""A ``play`` becomes a clip built from the descriptor animation's tracks</span>
+</span><span id="line-2731"><span class="sd">    (an#7). Resolution — which node, which set, which key, and every way it</span>
+</span><span id="line-2732"><span class="sd">    can fail — is :func:`cutan.characters.play.resolve_play`, shared with</span>
+</span><span id="line-2733"><span class="sd">    ``an validate`` so the two cannot disagree; this function only converts</span>
+</span><span id="line-2734"><span class="sd">    the resolved tracks into channel values.</span>
+</span><span id="line-2735">
+</span><span id="line-2736"><span class="sd">    Two conversions a naive copy gets wrong (the research reasoned them out,</span>
+</span><span id="line-2737"><span class="sd">    `tests/test_play.py` pins them):</span>
+</span><span id="line-2738">
+</span><span id="line-2739"><span class="sd">    - **Units and reference.** A ``bone:&lt;b&gt;.&lt;prop&gt;`` track is a DEVIATION in</span>
+</span><span id="line-2740"><span class="sd">      view-box units (rotation in degrees) around the bone's rest; a channel</span>
+</span><span id="line-2741"><span class="sd">      carries ABSOLUTE scene values (radians). So every value is</span>
+</span><span id="line-2742"><span class="sd">      ``rest + deviation * k`` (positions scale by the rig's view_box → pixel</span>
+</span><span id="line-2743"><span class="sd">      factor; rotation by pi/180), read off the built node's transform — a</span>
+</span><span id="line-2744"><span class="sd">      naive copy would put the torso at y≈±2 instead of bobbing around its</span>
+</span><span id="line-2745"><span class="sd">      rest, and `rotation_deg` is not a runtime property at all.</span>
+</span><span id="line-2746"><span class="sd">    - **Attachment swaps.** A ``slot:&lt;s&gt;.attachment`` track names</span>
+</span><span id="line-2747"><span class="sd">      ATTACHMENTS; a swap channel carries set KEYS. The whole track resolves</span>
+</span><span id="line-2748"><span class="sd">      to ONE set (never split per frame across two channels) and rides the</span>
+</span><span id="line-2749"><span class="sd">      same runtime swap path an authored ``set`` does.</span>
 </span><span id="line-2750">
-</span><span id="line-2751"><span class="sd">    ``view`` is the view the entity is in when the play starts (an#220): a</span>
-</span><span id="line-2752"><span class="sd">    swap track rides the set's per-view variant (``eyelid@side``) when the</span>
-</span><span id="line-2753"><span class="sd">    node carries it and it has every key the track uses — a blink played in</span>
-</span><span id="line-2754"><span class="sd">    profile closes the profile's eye, not the front one.</span>
-</span><span id="line-2755"><span class="sd">    """</span>
-</span><span id="line-2756">    <span class="n">entity_id</span> <span class="o">=</span> <span class="n">_track_root_of</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
-</span><span id="line-2757">    <span class="k">if</span> <span class="n">vocab</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">entity_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="p">:</span>
-</span><span id="line-2758">        <span class="k">raise</span> <span class="n">CutoutCompileError</span><span class="p">(</span>
-</span><span id="line-2759">            <span class="sa">f</span><span class="s2">"play of </span><span class="si">{</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="si">!r}</span><span class="s2"> on </span><span class="si">{</span><span class="n">entity_id</span><span class="si">!r}</span><span class="s2">: named animations "</span>
-</span><span id="line-2760">            <span class="s2">"live in a character descriptor's `animations`, and this entity "</span>
-</span><span id="line-2761">            <span class="s2">"has no descriptor (a procedural rig has none). Use tween / set."</span>
-</span><span id="line-2762">        <span class="p">)</span>
-</span><span id="line-2763">    <span class="n">desc</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="p">[</span><span class="n">entity_id</span><span class="p">]</span>
-</span><span id="line-2764">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-2765">        <span class="n">resolved</span> <span class="o">=</span> <span class="n">resolve_play</span><span class="p">(</span>
-</span><span id="line-2766">            <span class="n">desc</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="p">,</span> <span class="n">art_exists</span><span class="o">=</span><span class="n">vocab</span><span class="o">.</span><span class="n">art_exists</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity_id</span><span class="p">)</span>
+</span><span id="line-2751"><span class="sd">    Sine tracks are sampled at the frame rate with linear easing, always</span>
+</span><span id="line-2752"><span class="sd">    closing the cycle at the clip end; step and linear tracks map 1:1.</span>
+</span><span id="line-2753"><span class="sd">    ``loop`` is the action's override or, when the action says nothing, the</span>
+</span><span id="line-2754"><span class="sd">    animation's own.</span>
+</span><span id="line-2755">
+</span><span id="line-2756"><span class="sd">    ``view`` is the view the entity is in when the play starts (an#220): a</span>
+</span><span id="line-2757"><span class="sd">    swap track rides the set's per-view variant (``eyelid@side``) when the</span>
+</span><span id="line-2758"><span class="sd">    node carries it and it has every key the track uses — a blink played in</span>
+</span><span id="line-2759"><span class="sd">    profile closes the profile's eye, not the front one.</span>
+</span><span id="line-2760"><span class="sd">    """</span>
+</span><span id="line-2761">    <span class="n">entity_id</span> <span class="o">=</span> <span class="n">_track_root_of</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+</span><span id="line-2762">    <span class="k">if</span> <span class="n">vocab</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">entity_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="p">:</span>
+</span><span id="line-2763">        <span class="k">raise</span> <span class="n">CutoutCompileError</span><span class="p">(</span>
+</span><span id="line-2764">            <span class="sa">f</span><span class="s2">"play of </span><span class="si">{</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="si">!r}</span><span class="s2"> on </span><span class="si">{</span><span class="n">entity_id</span><span class="si">!r}</span><span class="s2">: named animations "</span>
+</span><span id="line-2765">            <span class="s2">"live in a character descriptor's `animations`, and this entity "</span>
+</span><span id="line-2766">            <span class="s2">"has no descriptor (a procedural rig has none). Use tween / set."</span>
 </span><span id="line-2767">        <span class="p">)</span>
-</span><span id="line-2768">    <span class="k">except</span> <span class="n">PlayResolutionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-2769">        <span class="k">raise</span> <span class="n">CutoutCompileError</span><span class="p">(</span>
-</span><span id="line-2770">            <span class="sa">f</span><span class="s2">"play of </span><span class="si">{</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="si">!r}</span><span class="s2"> on </span><span class="si">{</span><span class="n">entity_id</span><span class="si">!r}</span><span class="s2">: "</span> <span class="o">+</span> <span class="s2">"; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">problems</span><span class="p">)</span>
-</span><span id="line-2771">        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
-</span><span id="line-2772">    <span class="n">anim</span> <span class="o">=</span> <span class="n">resolved</span><span class="o">.</span><span class="n">animation</span>
-</span><span id="line-2773">    <span class="n">k</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">entity_scale</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity_id</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-</span><span id="line-2774">    <span class="n">duration</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">anim</span><span class="o">.</span><span class="n">duration</span><span class="p">))</span>
-</span><span id="line-2775">    <span class="n">channels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ChannelJSON</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-2776">    <span class="k">for</span> <span class="n">rt</span> <span class="ow">in</span> <span class="n">resolved</span><span class="o">.</span><span class="n">tracks</span><span class="p">:</span>
-</span><span id="line-2777">        <span class="n">path</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-2778">            <span class="n">entity_id</span>
-</span><span id="line-2779">            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rt</span><span class="p">,</span> <span class="n">BoneTrack</span><span class="p">)</span> <span class="ow">and</span> <span class="n">rt</span><span class="o">.</span><span class="n">slot</span> <span class="ow">is</span> <span class="kc">None</span>
-</span><span id="line-2780">            <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity_id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">slot_node_path</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span><span class="w"> </span><span class="n">rt</span><span class="o">.</span><span class="n">slot</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-2781">        <span class="p">)</span>
-</span><span id="line-2782">        <span class="k">if</span> <span class="n">path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vocab</span><span class="o">.</span><span class="n">paths</span><span class="p">:</span>
-</span><span id="line-2783">            <span class="c1"># Resolution mirrors the rig builder, so this is a bug in one of</span>
-</span><span id="line-2784">            <span class="c1"># the two rather than an authoring error — say which node.</span>
-</span><span id="line-2785">            <span class="k">raise</span> <span class="n">CutoutCompileError</span><span class="p">(</span>
-</span><span id="line-2786">                <span class="sa">f</span><span class="s2">"play of </span><span class="si">{</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="si">!r}</span><span class="s2">: track </span><span class="si">{</span><span class="n">rt</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">target</span><span class="si">!r}</span><span class="s2"> "</span>
-</span><span id="line-2787">                <span class="sa">f</span><span class="s2">"resolved to node </span><span class="si">{</span><span class="n">path</span><span class="si">!r}</span><span class="s2">, which the built scene does not "</span>
-</span><span id="line-2788">                <span class="sa">f</span><span class="s2">"carry (built: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">vocab</span><span class="o">.</span><span class="n">paths</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">p</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">entity_id</span><span class="p">))</span><span class="si">}</span><span class="s2">)."</span>
-</span><span id="line-2789">            <span class="p">)</span>
-</span><span id="line-2790">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rt</span><span class="p">,</span> <span class="n">BoneTrack</span><span class="p">):</span>
-</span><span id="line-2791">            <span class="n">rest_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">vocab</span><span class="o">.</span><span class="n">node_transforms</span><span class="p">[</span><span class="n">path</span><span class="p">],</span> <span class="n">rt</span><span class="o">.</span><span class="n">property</span><span class="p">))</span>
-</span><span id="line-2792">            <span class="n">scale</span> <span class="o">=</span> <span class="n">rt</span><span class="o">.</span><span class="n">unit</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="k">if</span> <span class="n">rt</span><span class="o">.</span><span class="n">rig_scaled</span> <span class="k">else</span> <span class="mf">1.0</span><span class="p">)</span>
-</span><span id="line-2793">            <span class="k">if</span> <span class="n">rt</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">"sine"</span><span class="p">:</span>
-</span><span id="line-2794">                <span class="n">kfs</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-2795">                    <span class="n">KeyframeJSON</span><span class="p">(</span>
-</span><span id="line-2796">                        <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">rest_value</span> <span class="o">+</span> <span class="n">dev</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="n">easing</span><span class="o">=</span><span class="s2">"linear"</span>
-</span><span id="line-2797">                    <span class="p">)</span>
-</span><span id="line-2798">                    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">dev</span> <span class="ow">in</span> <span class="n">sampled_deviations</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">track</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">fps</span><span class="p">)</span>
-</span><span id="line-2799">                <span class="p">]</span>
-</span><span id="line-2800">            <span class="k">else</span><span class="p">:</span>
-</span><span id="line-2801">                <span class="n">easing</span> <span class="o">=</span> <span class="s2">"step"</span> <span class="k">if</span> <span class="n">rt</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">"step"</span> <span class="k">else</span> <span class="s2">"linear"</span>
-</span><span id="line-2802">                <span class="n">kfs</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-2803">                    <span class="n">KeyframeJSON</span><span class="p">(</span>
-</span><span id="line-2804">                        <span class="n">time</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">ft</span><span class="p">),</span>
-</span><span id="line-2805">                        <span class="n">value</span><span class="o">=</span><span class="n">rest_value</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">fv</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span>
-</span><span id="line-2806">                        <span class="n">easing</span><span class="o">=</span><span class="n">easing</span><span class="p">,</span>
-</span><span id="line-2807">                    <span class="p">)</span>
-</span><span id="line-2808">                    <span class="k">for</span> <span class="n">ft</span><span class="p">,</span> <span class="n">fv</span> <span class="ow">in</span> <span class="n">rt</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">frames</span>
-</span><span id="line-2809">                <span class="p">]</span>
-</span><span id="line-2810">            <span class="n">channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-2811">                <span class="n">ChannelJSON</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="nb">property</span><span class="o">=</span><span class="n">rt</span><span class="o">.</span><span class="n">property</span><span class="p">,</span> <span class="n">keyframes</span><span class="o">=</span><span class="n">kfs</span><span class="p">)</span>
-</span><span id="line-2812">            <span class="p">)</span>
-</span><span id="line-2813">        <span class="k">else</span><span class="p">:</span>
-</span><span id="line-2814">            <span class="n">set_name</span> <span class="o">=</span> <span class="n">_face_set_for</span><span class="p">(</span><span class="n">vocab</span><span class="p">,</span> <span class="n">entity_id</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">rt</span><span class="o">.</span><span class="n">set_name</span><span class="p">,</span> <span class="n">view</span><span class="p">)</span>
-</span><span id="line-2815">            <span class="k">if</span> <span class="ow">not</span> <span class="p">{</span><span class="n">key</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">rt</span><span class="o">.</span><span class="n">frames</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span>
-</span><span id="line-2816">                <span class="n">vocab</span><span class="o">.</span><span class="n">node_sets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">set_name</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
-</span><span id="line-2817">            <span class="p">):</span>
-</span><span id="line-2818">                <span class="n">set_name</span> <span class="o">=</span> <span class="n">rt</span><span class="o">.</span><span class="n">set_name</span>  <span class="c1"># the variant lacks a key: the base set</span>
-</span><span id="line-2819">            <span class="n">channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-2820">                <span class="n">ChannelJSON</span><span class="p">(</span>
-</span><span id="line-2821">                    <span class="n">target</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-</span><span id="line-2822">                    <span class="nb">property</span><span class="o">=</span><span class="n">set_name</span><span class="p">,</span>
-</span><span id="line-2823">                    <span class="n">keyframes</span><span class="o">=</span><span class="p">[</span>
-</span><span id="line-2824">                        <span class="n">KeyframeJSON</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">easing</span><span class="o">=</span><span class="s2">"step"</span><span class="p">)</span>
-</span><span id="line-2825">                        <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">rt</span><span class="o">.</span><span class="n">frames</span>
-</span><span id="line-2826">                    <span class="p">],</span>
-</span><span id="line-2827">                <span class="p">)</span>
-</span><span id="line-2828">            <span class="p">)</span>
-</span><span id="line-2829">    <span class="n">loop</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">loop</span> <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">loop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">bool</span><span class="p">(</span><span class="n">anim</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
-</span><span id="line-2830">    <span class="k">return</span> <span class="n">AnimationClipJSON</span><span class="p">(</span>
-</span><span id="line-2831">        <span class="n">name</span><span class="o">=</span><span class="n">anim_id</span><span class="p">,</span>
-</span><span id="line-2832">        <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
-</span><span id="line-2833">        <span class="n">loop_mode</span><span class="o">=</span><span class="s2">"loop"</span> <span class="k">if</span> <span class="n">loop</span> <span class="k">else</span> <span class="s2">"once"</span><span class="p">,</span>
-</span><span id="line-2834">        <span class="n">channels</span><span class="o">=</span><span class="n">channels</span><span class="p">,</span>
-</span><span id="line-2835">    <span class="p">)</span>
+</span><span id="line-2768">    <span class="n">desc</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">descriptors</span><span class="p">[</span><span class="n">entity_id</span><span class="p">]</span>
+</span><span id="line-2769">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-2770">        <span class="n">resolved</span> <span class="o">=</span> <span class="n">resolve_play</span><span class="p">(</span>
+</span><span id="line-2771">            <span class="n">desc</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="p">,</span> <span class="n">art_exists</span><span class="o">=</span><span class="n">vocab</span><span class="o">.</span><span class="n">art_exists</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity_id</span><span class="p">)</span>
+</span><span id="line-2772">        <span class="p">)</span>
+</span><span id="line-2773">    <span class="k">except</span> <span class="n">PlayResolutionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-2774">        <span class="k">raise</span> <span class="n">CutoutCompileError</span><span class="p">(</span>
+</span><span id="line-2775">            <span class="sa">f</span><span class="s2">"play of </span><span class="si">{</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="si">!r}</span><span class="s2"> on </span><span class="si">{</span><span class="n">entity_id</span><span class="si">!r}</span><span class="s2">: "</span> <span class="o">+</span> <span class="s2">"; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">problems</span><span class="p">)</span>
+</span><span id="line-2776">        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+</span><span id="line-2777">    <span class="n">anim</span> <span class="o">=</span> <span class="n">resolved</span><span class="o">.</span><span class="n">animation</span>
+</span><span id="line-2778">    <span class="n">k</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">entity_scale</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity_id</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</span><span id="line-2779">    <span class="n">duration</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">anim</span><span class="o">.</span><span class="n">duration</span><span class="p">))</span>
+</span><span id="line-2780">    <span class="n">channels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ChannelJSON</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-2781">    <span class="k">for</span> <span class="n">rt</span> <span class="ow">in</span> <span class="n">resolved</span><span class="o">.</span><span class="n">tracks</span><span class="p">:</span>
+</span><span id="line-2782">        <span class="n">path</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-2783">            <span class="n">entity_id</span>
+</span><span id="line-2784">            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rt</span><span class="p">,</span> <span class="n">BoneTrack</span><span class="p">)</span> <span class="ow">and</span> <span class="n">rt</span><span class="o">.</span><span class="n">slot</span> <span class="ow">is</span> <span class="kc">None</span>
+</span><span id="line-2785">            <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity_id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">slot_node_path</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span><span class="w"> </span><span class="n">rt</span><span class="o">.</span><span class="n">slot</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-2786">        <span class="p">)</span>
+</span><span id="line-2787">        <span class="k">if</span> <span class="n">path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vocab</span><span class="o">.</span><span class="n">paths</span><span class="p">:</span>
+</span><span id="line-2788">            <span class="c1"># Resolution mirrors the rig builder, so this is a bug in one of</span>
+</span><span id="line-2789">            <span class="c1"># the two rather than an authoring error — say which node.</span>
+</span><span id="line-2790">            <span class="k">raise</span> <span class="n">CutoutCompileError</span><span class="p">(</span>
+</span><span id="line-2791">                <span class="sa">f</span><span class="s2">"play of </span><span class="si">{</span><span class="n">action</span><span class="o">.</span><span class="n">animation</span><span class="si">!r}</span><span class="s2">: track </span><span class="si">{</span><span class="n">rt</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">target</span><span class="si">!r}</span><span class="s2"> "</span>
+</span><span id="line-2792">                <span class="sa">f</span><span class="s2">"resolved to node </span><span class="si">{</span><span class="n">path</span><span class="si">!r}</span><span class="s2">, which the built scene does not "</span>
+</span><span id="line-2793">                <span class="sa">f</span><span class="s2">"carry (built: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">vocab</span><span class="o">.</span><span class="n">paths</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">p</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">entity_id</span><span class="p">))</span><span class="si">}</span><span class="s2">)."</span>
+</span><span id="line-2794">            <span class="p">)</span>
+</span><span id="line-2795">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rt</span><span class="p">,</span> <span class="n">BoneTrack</span><span class="p">):</span>
+</span><span id="line-2796">            <span class="n">rest_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">vocab</span><span class="o">.</span><span class="n">node_transforms</span><span class="p">[</span><span class="n">path</span><span class="p">],</span> <span class="n">rt</span><span class="o">.</span><span class="n">property</span><span class="p">))</span>
+</span><span id="line-2797">            <span class="n">scale</span> <span class="o">=</span> <span class="n">rt</span><span class="o">.</span><span class="n">unit</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="k">if</span> <span class="n">rt</span><span class="o">.</span><span class="n">rig_scaled</span> <span class="k">else</span> <span class="mf">1.0</span><span class="p">)</span>
+</span><span id="line-2798">            <span class="k">if</span> <span class="n">rt</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">"sine"</span><span class="p">:</span>
+</span><span id="line-2799">                <span class="n">kfs</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-2800">                    <span class="n">KeyframeJSON</span><span class="p">(</span>
+</span><span id="line-2801">                        <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">rest_value</span> <span class="o">+</span> <span class="n">dev</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="n">easing</span><span class="o">=</span><span class="s2">"linear"</span>
+</span><span id="line-2802">                    <span class="p">)</span>
+</span><span id="line-2803">                    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">dev</span> <span class="ow">in</span> <span class="n">sampled_deviations</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">track</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">fps</span><span class="p">)</span>
+</span><span id="line-2804">                <span class="p">]</span>
+</span><span id="line-2805">            <span class="k">else</span><span class="p">:</span>
+</span><span id="line-2806">                <span class="n">easing</span> <span class="o">=</span> <span class="s2">"step"</span> <span class="k">if</span> <span class="n">rt</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">"step"</span> <span class="k">else</span> <span class="s2">"linear"</span>
+</span><span id="line-2807">                <span class="n">kfs</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-2808">                    <span class="n">KeyframeJSON</span><span class="p">(</span>
+</span><span id="line-2809">                        <span class="n">time</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">ft</span><span class="p">),</span>
+</span><span id="line-2810">                        <span class="n">value</span><span class="o">=</span><span class="n">rest_value</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">fv</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span>
+</span><span id="line-2811">                        <span class="n">easing</span><span class="o">=</span><span class="n">easing</span><span class="p">,</span>
+</span><span id="line-2812">                    <span class="p">)</span>
+</span><span id="line-2813">                    <span class="k">for</span> <span class="n">ft</span><span class="p">,</span> <span class="n">fv</span> <span class="ow">in</span> <span class="n">rt</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">frames</span>
+</span><span id="line-2814">                <span class="p">]</span>
+</span><span id="line-2815">            <span class="n">channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-2816">                <span class="n">ChannelJSON</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="nb">property</span><span class="o">=</span><span class="n">rt</span><span class="o">.</span><span class="n">property</span><span class="p">,</span> <span class="n">keyframes</span><span class="o">=</span><span class="n">kfs</span><span class="p">)</span>
+</span><span id="line-2817">            <span class="p">)</span>
+</span><span id="line-2818">        <span class="k">else</span><span class="p">:</span>
+</span><span id="line-2819">            <span class="n">set_name</span> <span class="o">=</span> <span class="n">_face_set_for</span><span class="p">(</span><span class="n">vocab</span><span class="p">,</span> <span class="n">entity_id</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">rt</span><span class="o">.</span><span class="n">set_name</span><span class="p">,</span> <span class="n">view</span><span class="p">)</span>
+</span><span id="line-2820">            <span class="k">if</span> <span class="ow">not</span> <span class="p">{</span><span class="n">key</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">rt</span><span class="o">.</span><span class="n">frames</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span>
+</span><span id="line-2821">                <span class="n">vocab</span><span class="o">.</span><span class="n">node_sets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">set_name</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+</span><span id="line-2822">            <span class="p">):</span>
+</span><span id="line-2823">                <span class="n">set_name</span> <span class="o">=</span> <span class="n">rt</span><span class="o">.</span><span class="n">set_name</span>  <span class="c1"># the variant lacks a key: the base set</span>
+</span><span id="line-2824">            <span class="n">channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-2825">                <span class="n">ChannelJSON</span><span class="p">(</span>
+</span><span id="line-2826">                    <span class="n">target</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+</span><span id="line-2827">                    <span class="nb">property</span><span class="o">=</span><span class="n">set_name</span><span class="p">,</span>
+</span><span id="line-2828">                    <span class="n">keyframes</span><span class="o">=</span><span class="p">[</span>
+</span><span id="line-2829">                        <span class="n">KeyframeJSON</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">easing</span><span class="o">=</span><span class="s2">"step"</span><span class="p">)</span>
+</span><span id="line-2830">                        <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">rt</span><span class="o">.</span><span class="n">frames</span>
+</span><span id="line-2831">                    <span class="p">],</span>
+</span><span id="line-2832">                <span class="p">)</span>
+</span><span id="line-2833">            <span class="p">)</span>
+</span><span id="line-2834">    <span class="n">loop</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">loop</span> <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">loop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">bool</span><span class="p">(</span><span class="n">anim</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
+</span><span id="line-2835">    <span class="k">return</span> <span class="n">AnimationClipJSON</span><span class="p">(</span>
+</span><span id="line-2836">        <span class="n">name</span><span class="o">=</span><span class="n">anim_id</span><span class="p">,</span>
+</span><span id="line-2837">        <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+</span><span id="line-2838">        <span class="n">loop_mode</span><span class="o">=</span><span class="s2">"loop"</span> <span class="k">if</span> <span class="n">loop</span> <span class="k">else</span> <span class="s2">"once"</span><span class="p">,</span>
+</span><span id="line-2839">        <span class="n">channels</span><span class="o">=</span><span class="n">channels</span><span class="p">,</span>
+</span><span id="line-2840">    <span class="p">)</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -3031,7 +3036,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=c5dbc6bb"></script>
+    <script src="../../../_static/documentation_options.js?v=f2234cd1"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
