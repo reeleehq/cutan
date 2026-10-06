@@ -38,6 +38,14 @@ Default lip-sync provider: deterministic char-to-viseme mapping.
 
 Implements the `LipSyncProvider` protocol.
 
+#### repeatable *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+`an cache gc`
+may re-make a missing track in memory (an#311, cutan#29).
+
+* **Type:**
+  A pure function of the transcript, and nothing is billed
+
 ### *class* cutan.audio.RhubarbLipSync(, binary_path=None, language='en', recognizer=None, timeout_s=60.0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -52,6 +60,20 @@ Wrap the rhubarb CLI. Implements the `LipSyncProvider` protocol.
 >>> RhubarbLipSync(binary_path="/bin/rhubarb", language="de").name
 'rhubarb:phonetic'
 ```
+
+#### check_available()
+
+Raise `RhubarbNotFoundError` when this machine has no binary.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+#### repeatable *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+The same audio, transcript and recognizer give the same track on one
+machine (one binary), and nothing is billed: `an cache gc` may re-make
+a missing track in memory (an#311, cutan#29). A machine without the
+binary says so in [`check_available()`](#cutan.audio.RhubarbLipSync.check_available).
 
 #### *property* uses_dialog_file *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 

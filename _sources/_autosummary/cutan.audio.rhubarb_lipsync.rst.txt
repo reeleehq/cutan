@@ -22,3 +22,9 @@ cutan.audio.rhubarb\_lipsync
    
       RhubarbLipSync
    
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      RhubarbNotFoundError
+   

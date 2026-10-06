@@ -216,127 +216,153 @@
 </span><span id="line-34">
 </span><span id="line-35">
 </span><span id="line-36"><span class="n">_DEFAULT_TIMEOUT_S</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span>
-</span><span id="line-37"><span class="c1">#: Rhubarb's own default and its English recognizer — the one that reads the</span>
-</span><span id="line-38"><span class="c1">#: dialog file.</span>
-</span><span id="line-39"><span class="n">_ENGLISH_RECOGNIZER</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"pocketSphinx"</span>
-</span><span id="line-40"><span class="c1">#: Language-independent; ignores the dialog file at source.</span>
-</span><span id="line-41"><span class="n">_PHONETIC_RECOGNIZER</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"phonetic"</span>
-</span><span id="line-42"><span class="c1">#: The languages `pocketSphinx` (CMU Sphinx US English acoustic model) covers.</span>
-</span><span id="line-43"><span class="n">ENGLISH_LANGUAGES</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"en"</span><span class="p">})</span>
-</span><span id="line-44"><span class="n">RECOGNIZERS</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="n">_ENGLISH_RECOGNIZER</span><span class="p">,</span> <span class="n">_PHONETIC_RECOGNIZER</span><span class="p">})</span>
-</span><span id="line-45">
-</span><span id="line-46">
+</span><span id="line-37">
+</span><span id="line-38"><span class="c1">#: Where to get the binary, said by every error that cannot find it.</span>
+</span><span id="line-39"><span class="n">_INSTALL_HINT</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-40">    <span class="s2">"Install with: brew install rhubarb-lipsync (macOS) or grab a release from "</span>
+</span><span id="line-41">    <span class="s2">"https://github.com/DanielSWolf/rhubarb-lip-sync/releases."</span>
+</span><span id="line-42"><span class="p">)</span>
+</span><span id="line-43">
+</span><span id="line-44">
+<div class="viewcode-block" id="RhubarbNotFoundError">
+<a class="viewcode-back" href="../../../_autosummary/cutan.audio.rhubarb_lipsync.html#cutan.audio.RhubarbNotFoundError">[docs]</a>
+</span><span id="line-45"><span class="k">class</span><span class="w"> </span><span class="nc">RhubarbNotFoundError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+</span><span id="line-46"><span class="w">    </span><span class="sd">"""The rhubarb binary is not on this machine (with how to install it)."""</span></div>
+
+</span><span id="line-47">
+</span><span id="line-48">
+</span><span id="line-49"><span class="c1">#: Rhubarb's own default and its English recognizer — the one that reads the</span>
+</span><span id="line-50"><span class="c1">#: dialog file.</span>
+</span><span id="line-51"><span class="n">_ENGLISH_RECOGNIZER</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"pocketSphinx"</span>
+</span><span id="line-52"><span class="c1">#: Language-independent; ignores the dialog file at source.</span>
+</span><span id="line-53"><span class="n">_PHONETIC_RECOGNIZER</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"phonetic"</span>
+</span><span id="line-54"><span class="c1">#: The languages `pocketSphinx` (CMU Sphinx US English acoustic model) covers.</span>
+</span><span id="line-55"><span class="n">ENGLISH_LANGUAGES</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"en"</span><span class="p">})</span>
+</span><span id="line-56"><span class="n">RECOGNIZERS</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="n">_ENGLISH_RECOGNIZER</span><span class="p">,</span> <span class="n">_PHONETIC_RECOGNIZER</span><span class="p">})</span>
+</span><span id="line-57">
+</span><span id="line-58">
 <div class="viewcode-block" id="recognizer_for">
 <a class="viewcode-back" href="../../../_autosummary/cutan.audio.rhubarb_lipsync.html#cutan.audio.recognizer_for">[docs]</a>
-</span><span id="line-47"><span class="k">def</span><span class="w"> </span><span class="nf">recognizer_for</span><span class="p">(</span><span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-48"><span class="w">    </span><span class="sd">"""The Rhubarb recognizer for a BCP-47 language tag (primary subtag only).</span>
-</span><span id="line-49">
-</span><span id="line-50"><span class="sd">    Accepts the POSIX locale spelling too (``en_US``); an empty tag is refused</span>
-</span><span id="line-51"><span class="sd">    rather than read as "non-English" (an#96 review).</span>
-</span><span id="line-52">
-</span><span id="line-53"><span class="sd">    &gt;&gt;&gt; recognizer_for("en"), recognizer_for("en-GB"), recognizer_for("en_US"), recognizer_for("fr")</span>
-</span><span id="line-54"><span class="sd">    ('pocketSphinx', 'pocketSphinx', 'pocketSphinx', 'phonetic')</span>
-</span><span id="line-55"><span class="sd">    """</span>
-</span><span id="line-56">    <span class="n">primary</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"_"</span><span class="p">,</span> <span class="s2">"-"</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"-"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-</span><span id="line-57">    <span class="k">if</span> <span class="ow">not</span> <span class="n">primary</span><span class="p">:</span>
-</span><span id="line-58">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"language must be a BCP-47 tag such as 'en' or 'fr'; got ''"</span><span class="p">)</span>
-</span><span id="line-59">    <span class="k">return</span> <span class="n">_ENGLISH_RECOGNIZER</span> <span class="k">if</span> <span class="n">primary</span> <span class="ow">in</span> <span class="n">ENGLISH_LANGUAGES</span> <span class="k">else</span> <span class="n">_PHONETIC_RECOGNIZER</span></div>
-
-</span><span id="line-60">
+</span><span id="line-59"><span class="k">def</span><span class="w"> </span><span class="nf">recognizer_for</span><span class="p">(</span><span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-60"><span class="w">    </span><span class="sd">"""The Rhubarb recognizer for a BCP-47 language tag (primary subtag only).</span>
 </span><span id="line-61">
+</span><span id="line-62"><span class="sd">    Accepts the POSIX locale spelling too (``en_US``); an empty tag is refused</span>
+</span><span id="line-63"><span class="sd">    rather than read as "non-English" (an#96 review).</span>
+</span><span id="line-64">
+</span><span id="line-65"><span class="sd">    &gt;&gt;&gt; recognizer_for("en"), recognizer_for("en-GB"), recognizer_for("en_US"), recognizer_for("fr")</span>
+</span><span id="line-66"><span class="sd">    ('pocketSphinx', 'pocketSphinx', 'pocketSphinx', 'phonetic')</span>
+</span><span id="line-67"><span class="sd">    """</span>
+</span><span id="line-68">    <span class="n">primary</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"_"</span><span class="p">,</span> <span class="s2">"-"</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"-"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="line-69">    <span class="k">if</span> <span class="ow">not</span> <span class="n">primary</span><span class="p">:</span>
+</span><span id="line-70">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"language must be a BCP-47 tag such as 'en' or 'fr'; got ''"</span><span class="p">)</span>
+</span><span id="line-71">    <span class="k">return</span> <span class="n">_ENGLISH_RECOGNIZER</span> <span class="k">if</span> <span class="n">primary</span> <span class="ow">in</span> <span class="n">ENGLISH_LANGUAGES</span> <span class="k">else</span> <span class="n">_PHONETIC_RECOGNIZER</span></div>
+
+</span><span id="line-72">
+</span><span id="line-73">
 <div class="viewcode-block" id="RhubarbLipSync">
 <a class="viewcode-back" href="../../../_autosummary/cutan.audio.rhubarb_lipsync.html#cutan.audio.RhubarbLipSync">[docs]</a>
-</span><span id="line-62"><span class="k">class</span><span class="w"> </span><span class="nc">RhubarbLipSync</span><span class="p">:</span>
-</span><span id="line-63"><span class="w">    </span><span class="sd">"""Wrap the rhubarb CLI. Implements the ``LipSyncProvider`` protocol.</span>
-</span><span id="line-64">
-</span><span id="line-65"><span class="sd">    &gt;&gt;&gt; RhubarbLipSync(binary_path="/bin/rhubarb").recognizer</span>
-</span><span id="line-66"><span class="sd">    'pocketSphinx'</span>
-</span><span id="line-67"><span class="sd">    &gt;&gt;&gt; RhubarbLipSync(binary_path="/bin/rhubarb", language="de").recognizer</span>
-</span><span id="line-68"><span class="sd">    'phonetic'</span>
-</span><span id="line-69"><span class="sd">    &gt;&gt;&gt; RhubarbLipSync(binary_path="/bin/rhubarb", language="de").name</span>
-</span><span id="line-70"><span class="sd">    'rhubarb:phonetic'</span>
-</span><span id="line-71"><span class="sd">    """</span>
-</span><span id="line-72">
-</span><span id="line-73">    <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span>
-</span><span id="line-74">
-</span><span id="line-75">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-</span><span id="line-76">        <span class="bp">self</span><span class="p">,</span>
-</span><span id="line-77">        <span class="o">*</span><span class="p">,</span>
-</span><span id="line-78">        <span class="n">binary_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-79">        <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"en"</span><span class="p">,</span>
-</span><span id="line-80">        <span class="n">recognizer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-81">        <span class="n">timeout_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_TIMEOUT_S</span><span class="p">,</span>
-</span><span id="line-82">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-83">        <span class="bp">self</span><span class="o">.</span><span class="n">binary_path</span> <span class="o">=</span> <span class="n">binary_path</span> <span class="ow">or</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">"rhubarb"</span><span class="p">)</span>
-</span><span id="line-84">        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">language</span>
-</span><span id="line-85">        <span class="n">chosen</span> <span class="o">=</span> <span class="n">recognizer</span> <span class="k">if</span> <span class="n">recognizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">recognizer_for</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
-</span><span id="line-86">        <span class="k">if</span> <span class="n">chosen</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">RECOGNIZERS</span><span class="p">:</span>
-</span><span id="line-87">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="line-88">                <span class="sa">f</span><span class="s2">"unknown rhubarb recognizer </span><span class="si">{</span><span class="n">chosen</span><span class="si">!r}</span><span class="s2">; known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">RECOGNIZERS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-89">            <span class="p">)</span>
-</span><span id="line-90">        <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="o">=</span> <span class="n">chosen</span>
-</span><span id="line-91">        <span class="bp">self</span><span class="o">.</span><span class="n">timeout_s</span> <span class="o">=</span> <span class="n">timeout_s</span>
+</span><span id="line-74"><span class="k">class</span><span class="w"> </span><span class="nc">RhubarbLipSync</span><span class="p">:</span>
+</span><span id="line-75"><span class="w">    </span><span class="sd">"""Wrap the rhubarb CLI. Implements the ``LipSyncProvider`` protocol.</span>
+</span><span id="line-76">
+</span><span id="line-77"><span class="sd">    &gt;&gt;&gt; RhubarbLipSync(binary_path="/bin/rhubarb").recognizer</span>
+</span><span id="line-78"><span class="sd">    'pocketSphinx'</span>
+</span><span id="line-79"><span class="sd">    &gt;&gt;&gt; RhubarbLipSync(binary_path="/bin/rhubarb", language="de").recognizer</span>
+</span><span id="line-80"><span class="sd">    'phonetic'</span>
+</span><span id="line-81"><span class="sd">    &gt;&gt;&gt; RhubarbLipSync(binary_path="/bin/rhubarb", language="de").name</span>
+</span><span id="line-82"><span class="sd">    'rhubarb:phonetic'</span>
+</span><span id="line-83"><span class="sd">    """</span>
+</span><span id="line-84">
+</span><span id="line-85">    <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span>
+</span><span id="line-86">    <span class="c1">#: The same audio, transcript and recognizer give the same track on one</span>
+</span><span id="line-87">    <span class="c1">#: machine (one binary), and nothing is billed: ``an cache gc`` may re-make</span>
+</span><span id="line-88">    <span class="c1">#: a missing track in memory (an#311, cutan#29). A machine without the</span>
+</span><span id="line-89">    <span class="c1">#: binary says so in :meth:`check_available`.</span>
+</span><span id="line-90">    <span class="n">repeatable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="line-91">    <span class="n">billed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 </span><span id="line-92">
-</span><span id="line-93">    <span class="nd">@property</span>
-</span><span id="line-94">    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-95">        <span class="c1"># The recognizer is part of the identity: it changes the track, so it</span>
-</span><span id="line-96">        <span class="c1"># must change the viseme cache key (the pipeline hashes `name`).</span>
-</span><span id="line-97">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"rhubarb:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-98">
-</span><span id="line-99">    <span class="nd">@property</span>
-</span><span id="line-100">    <span class="k">def</span><span class="w"> </span><span class="nf">uses_dialog_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-101"><span class="w">        </span><span class="sd">"""Whether the chosen recognizer reads a transcript at all."""</span>
-</span><span id="line-102">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="o">==</span> <span class="n">_ENGLISH_RECOGNIZER</span>
-</span><span id="line-103">
-</span><span id="line-104">    <span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="n">transcript</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VisemeTrack</span><span class="p">:</span>
-</span><span id="line-105">        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_path</span><span class="p">:</span>
-</span><span id="line-106">            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-</span><span id="line-107">                <span class="s2">"rhubarb binary not found on PATH. Install with: "</span>
-</span><span id="line-108">                <span class="s2">"brew install rhubarb-lipsync (macOS) or grab a release from "</span>
-</span><span id="line-109">                <span class="s2">"https://github.com/DanielSWolf/rhubarb-lip-sync/releases."</span>
-</span><span id="line-110">            <span class="p">)</span>
-</span><span id="line-111">        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-</span><span id="line-112">            <span class="n">d</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-</span><span id="line-113">            <span class="n">audio_path</span> <span class="o">=</span> <span class="n">audio</span><span class="o">.</span><span class="n">path</span>
-</span><span id="line-114">            <span class="k">if</span> <span class="n">audio_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-115">                <span class="k">if</span> <span class="n">audio</span><span class="o">.</span><span class="n">bytes_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-116">                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"AudioClip needs either .path or .bytes_"</span><span class="p">)</span>
-</span><span id="line-117">                <span class="n">audio_path</span> <span class="o">=</span> <span class="n">d</span> <span class="o">/</span> <span class="s2">"audio.wav"</span>
-</span><span id="line-118">                <span class="n">audio_path</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">audio</span><span class="o">.</span><span class="n">bytes_</span><span class="p">)</span>
-</span><span id="line-119">
-</span><span id="line-120">            <span class="n">out_json</span> <span class="o">=</span> <span class="n">d</span> <span class="o">/</span> <span class="s2">"out.json"</span>
-</span><span id="line-121">            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">binary_path</span><span class="p">,</span> <span class="s2">"-f"</span><span class="p">,</span> <span class="s2">"json"</span><span class="p">,</span> <span class="s2">"-r"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="p">]</span>
-</span><span id="line-122">            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uses_dialog_file</span><span class="p">:</span>
-</span><span id="line-123">                <span class="n">dialog_path</span> <span class="o">=</span> <span class="n">d</span> <span class="o">/</span> <span class="s2">"transcript.txt"</span>
-</span><span id="line-124">                <span class="n">dialog_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">transcript</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
-</span><span id="line-125">                <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"--dialogFile"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">dialog_path</span><span class="p">)]</span>
-</span><span id="line-126">            <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"-o"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">out_json</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">audio_path</span><span class="p">)]</span>
-</span><span id="line-127">            <span class="k">try</span><span class="p">:</span>
-</span><span id="line-128">                <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span id="line-129">                    <span class="n">cmd</span><span class="p">,</span>
-</span><span id="line-130">                    <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="line-131">                    <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="line-132">                    <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout_s</span><span class="p">,</span>
-</span><span id="line-133">                    <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="line-134">                <span class="p">)</span>
-</span><span id="line-135">            <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-136">                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-</span><span id="line-137">                    <span class="sa">f</span><span class="s2">"rhubarb failed (rc=</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-138">                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
-</span><span id="line-139">            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">out_json</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
-</span><span id="line-140">
-</span><span id="line-141">        <span class="n">cues</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"mouthCues"</span><span class="p">,</span> <span class="p">[])</span>
-</span><span id="line-142">        <span class="n">visemes</span> <span class="o">=</span> <span class="p">[</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">"start"</span><span class="p">]),</span> <span class="n">code</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cues</span><span class="p">]</span>
-</span><span id="line-143">        <span class="k">if</span> <span class="n">cues</span><span class="p">:</span>
-</span><span id="line-144">            <span class="c1"># Append a final rest at the last cue's "end" so the track matches duration.</span>
-</span><span id="line-145">            <span class="n">last_end</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cues</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">"end"</span><span class="p">])</span>
-</span><span id="line-146">            <span class="k">if</span> <span class="ow">not</span> <span class="n">visemes</span> <span class="ow">or</span> <span class="n">visemes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">code</span> <span class="o">!=</span> <span class="s2">"X"</span><span class="p">:</span>
-</span><span id="line-147">                <span class="n">visemes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">last_end</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="s2">"X"</span><span class="p">))</span>
-</span><span id="line-148">        <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
-</span><span id="line-149">            <span class="n">visemes</span><span class="o">=</span><span class="n">visemes</span><span class="p">,</span>
-</span><span id="line-150">            <span class="n">convention</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convention</span><span class="p">,</span>
-</span><span id="line-151">            <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
-</span><span id="line-152">        <span class="p">)</span></div>
+</span><span id="line-93">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="line-94">        <span class="bp">self</span><span class="p">,</span>
+</span><span id="line-95">        <span class="o">*</span><span class="p">,</span>
+</span><span id="line-96">        <span class="n">binary_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-97">        <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"en"</span><span class="p">,</span>
+</span><span id="line-98">        <span class="n">recognizer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-99">        <span class="n">timeout_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_DEFAULT_TIMEOUT_S</span><span class="p">,</span>
+</span><span id="line-100">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-101">        <span class="bp">self</span><span class="o">.</span><span class="n">binary_path</span> <span class="o">=</span> <span class="n">binary_path</span> <span class="ow">or</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">"rhubarb"</span><span class="p">)</span>
+</span><span id="line-102">        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">language</span>
+</span><span id="line-103">        <span class="n">chosen</span> <span class="o">=</span> <span class="n">recognizer</span> <span class="k">if</span> <span class="n">recognizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">recognizer_for</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+</span><span id="line-104">        <span class="k">if</span> <span class="n">chosen</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">RECOGNIZERS</span><span class="p">:</span>
+</span><span id="line-105">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="line-106">                <span class="sa">f</span><span class="s2">"unknown rhubarb recognizer </span><span class="si">{</span><span class="n">chosen</span><span class="si">!r}</span><span class="s2">; known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">RECOGNIZERS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-107">            <span class="p">)</span>
+</span><span id="line-108">        <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="o">=</span> <span class="n">chosen</span>
+</span><span id="line-109">        <span class="bp">self</span><span class="o">.</span><span class="n">timeout_s</span> <span class="o">=</span> <span class="n">timeout_s</span>
+</span><span id="line-110">
+</span><span id="line-111">    <span class="nd">@property</span>
+</span><span id="line-112">    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-113">        <span class="c1"># The recognizer is part of the identity: it changes the track, so it</span>
+</span><span id="line-114">        <span class="c1"># must change the viseme cache key (the pipeline hashes `name`).</span>
+</span><span id="line-115">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"rhubarb:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-116">
+</span><span id="line-117">    <span class="nd">@property</span>
+</span><span id="line-118">    <span class="k">def</span><span class="w"> </span><span class="nf">uses_dialog_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-119"><span class="w">        </span><span class="sd">"""Whether the chosen recognizer reads a transcript at all."""</span>
+</span><span id="line-120">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="o">==</span> <span class="n">_ENGLISH_RECOGNIZER</span>
+</span><span id="line-121">
+<div class="viewcode-block" id="RhubarbLipSync.check_available">
+<a class="viewcode-back" href="../../../_autosummary/cutan.audio.rhubarb_lipsync.html#cutan.audio.RhubarbLipSync.check_available">[docs]</a>
+</span><span id="line-122">    <span class="k">def</span><span class="w"> </span><span class="nf">check_available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-123"><span class="w">        </span><span class="sd">"""Raise :class:`RhubarbNotFoundError` when this machine has no binary."""</span>
+</span><span id="line-124">        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_path</span><span class="p">:</span>
+</span><span id="line-125">            <span class="k">raise</span> <span class="n">RhubarbNotFoundError</span><span class="p">(</span>
+</span><span id="line-126">                <span class="sa">f</span><span class="s2">"rhubarb binary not found on PATH. </span><span class="si">{</span><span class="n">_INSTALL_HINT</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-127">            <span class="p">)</span></div>
+
+</span><span id="line-128">
+</span><span id="line-129">    <span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="n">transcript</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VisemeTrack</span><span class="p">:</span>
+</span><span id="line-130">        <span class="bp">self</span><span class="o">.</span><span class="n">check_available</span><span class="p">()</span>
+</span><span id="line-131">        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
+</span><span id="line-132">            <span class="n">d</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+</span><span id="line-133">            <span class="n">audio_path</span> <span class="o">=</span> <span class="n">audio</span><span class="o">.</span><span class="n">path</span>
+</span><span id="line-134">            <span class="k">if</span> <span class="n">audio_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-135">                <span class="k">if</span> <span class="n">audio</span><span class="o">.</span><span class="n">bytes_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-136">                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"AudioClip needs either .path or .bytes_"</span><span class="p">)</span>
+</span><span id="line-137">                <span class="n">audio_path</span> <span class="o">=</span> <span class="n">d</span> <span class="o">/</span> <span class="s2">"audio.wav"</span>
+</span><span id="line-138">                <span class="n">audio_path</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">audio</span><span class="o">.</span><span class="n">bytes_</span><span class="p">)</span>
+</span><span id="line-139">
+</span><span id="line-140">            <span class="n">out_json</span> <span class="o">=</span> <span class="n">d</span> <span class="o">/</span> <span class="s2">"out.json"</span>
+</span><span id="line-141">            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">binary_path</span><span class="p">,</span> <span class="s2">"-f"</span><span class="p">,</span> <span class="s2">"json"</span><span class="p">,</span> <span class="s2">"-r"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="p">]</span>
+</span><span id="line-142">            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uses_dialog_file</span><span class="p">:</span>
+</span><span id="line-143">                <span class="n">dialog_path</span> <span class="o">=</span> <span class="n">d</span> <span class="o">/</span> <span class="s2">"transcript.txt"</span>
+</span><span id="line-144">                <span class="n">dialog_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">transcript</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span><span id="line-145">                <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"--dialogFile"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">dialog_path</span><span class="p">)]</span>
+</span><span id="line-146">            <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"-o"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">out_json</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">audio_path</span><span class="p">)]</span>
+</span><span id="line-147">            <span class="k">try</span><span class="p">:</span>
+</span><span id="line-148">                <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="line-149">                    <span class="n">cmd</span><span class="p">,</span>
+</span><span id="line-150">                    <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="line-151">                    <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="line-152">                    <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout_s</span><span class="p">,</span>
+</span><span id="line-153">                    <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="line-154">                <span class="p">)</span>
+</span><span id="line-155">            <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-156">                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+</span><span id="line-157">                    <span class="sa">f</span><span class="s2">"rhubarb failed (rc=</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-158">                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+</span><span id="line-159">            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">out_json</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-160">
+</span><span id="line-161">        <span class="n">cues</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"mouthCues"</span><span class="p">,</span> <span class="p">[])</span>
+</span><span id="line-162">        <span class="n">visemes</span> <span class="o">=</span> <span class="p">[</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">"start"</span><span class="p">]),</span> <span class="n">code</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cues</span><span class="p">]</span>
+</span><span id="line-163">        <span class="k">if</span> <span class="n">cues</span><span class="p">:</span>
+</span><span id="line-164">            <span class="c1"># Append a final rest at the last cue's "end" so the track matches duration.</span>
+</span><span id="line-165">            <span class="n">last_end</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cues</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">"end"</span><span class="p">])</span>
+</span><span id="line-166">            <span class="k">if</span> <span class="ow">not</span> <span class="n">visemes</span> <span class="ow">or</span> <span class="n">visemes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">code</span> <span class="o">!=</span> <span class="s2">"X"</span><span class="p">:</span>
+</span><span id="line-167">                <span class="n">visemes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">last_end</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="s2">"X"</span><span class="p">))</span>
+</span><span id="line-168">        <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
+</span><span id="line-169">            <span class="n">visemes</span><span class="o">=</span><span class="n">visemes</span><span class="p">,</span>
+</span><span id="line-170">            <span class="n">convention</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convention</span><span class="p">,</span>
+</span><span id="line-171">            <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+</span><span id="line-172">        <span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -351,7 +377,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=544df88d"></script>
+    <script src="../../../_static/documentation_options.js?v=f0357c94"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

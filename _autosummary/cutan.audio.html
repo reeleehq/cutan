@@ -181,6 +181,17 @@ draws mouths. The genre registers these by name as <code class="docutils literal
 <p>Implements the <code class="docutils literal notranslate"><span class="pre">LipSyncProvider</span></code> protocol.</p>
 <dl class="field-list simple">
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cutan.audio.OfflineLipSync.repeatable">
+<span class="sig-name descname"><span class="pre">repeatable</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">bool</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.audio.OfflineLipSync.repeatable" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.audio.OfflineLipSync.repeatable'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">cache</span> <span class="pre">gc</span></code>
+may re-make a missing track in memory (an#311, cutan#29).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pure function of the transcript, and nothing is billed</p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="cutan.audio.RhubarbLipSync">
@@ -197,6 +208,24 @@ draws mouths. The genre registers these by name as <code class="docutils literal
 </div>
 <dl class="field-list simple">
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cutan.audio.RhubarbLipSync.check_available">
+<span class="sig-name descname"><span class="pre">check_available</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/audio/rhubarb_lipsync.html#RhubarbLipSync.check_available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.audio.RhubarbLipSync.check_available" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.audio.RhubarbLipSync.check_available'">¶</a></dt>
+<dd><p>Raise <code class="xref py py-class docutils literal notranslate"><span class="pre">RhubarbNotFoundError</span></code> when this machine has no binary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cutan.audio.RhubarbLipSync.repeatable">
+<span class="sig-name descname"><span class="pre">repeatable</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">bool</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.audio.RhubarbLipSync.repeatable" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.audio.RhubarbLipSync.repeatable'">¶</a></dt>
+<dd><p>The same audio, transcript and recognizer give the same track on one
+machine (one binary), and nothing is billed: <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">cache</span> <span class="pre">gc</span></code> may re-make
+a missing track in memory (an#311, cutan#29). A machine without the
+binary says so in <a class="reference internal" href="#cutan.audio.RhubarbLipSync.check_available" title="cutan.audio.RhubarbLipSync.check_available"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_available()</span></code></a>.</p>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="cutan.audio.RhubarbLipSync.uses_dialog_file">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">uses_dialog_file</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.14)"><span class="pre">bool</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.audio.RhubarbLipSync.uses_dialog_file" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.audio.RhubarbLipSync.uses_dialog_file'">¶</a></dt>
@@ -309,8 +338,13 @@ we insert a rest keyframe. Defaults to <code class="docutils literal notranslate
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
-<li><a :data-current="activeSection === '#cutan.audio.OfflineLipSync'" class="reference internal" href="#cutan.audio.OfflineLipSync"><code class="docutils literal notranslate"><span class="pre">OfflineLipSync</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.audio.OfflineLipSync'" class="reference internal" href="#cutan.audio.OfflineLipSync"><code class="docutils literal notranslate"><span class="pre">OfflineLipSync</span></code></a><ul>
+<li><a :data-current="activeSection === '#cutan.audio.OfflineLipSync.repeatable'" class="reference internal" href="#cutan.audio.OfflineLipSync.repeatable"><code class="docutils literal notranslate"><span class="pre">OfflineLipSync.repeatable</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#cutan.audio.RhubarbLipSync'" class="reference internal" href="#cutan.audio.RhubarbLipSync"><code class="docutils literal notranslate"><span class="pre">RhubarbLipSync</span></code></a><ul>
+<li><a :data-current="activeSection === '#cutan.audio.RhubarbLipSync.check_available'" class="reference internal" href="#cutan.audio.RhubarbLipSync.check_available"><code class="docutils literal notranslate"><span class="pre">RhubarbLipSync.check_available()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.audio.RhubarbLipSync.repeatable'" class="reference internal" href="#cutan.audio.RhubarbLipSync.repeatable"><code class="docutils literal notranslate"><span class="pre">RhubarbLipSync.repeatable</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.audio.RhubarbLipSync.uses_dialog_file'" class="reference internal" href="#cutan.audio.RhubarbLipSync.uses_dialog_file"><code class="docutils literal notranslate"><span class="pre">RhubarbLipSync.uses_dialog_file</span></code></a></li>
 </ul>
 </li>
@@ -339,7 +373,7 @@ we insert a rest keyframe. Defaults to <code class="docutils literal notranslate
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=544df88d"></script>
+<script src="../_static/documentation_options.js?v=f0357c94"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

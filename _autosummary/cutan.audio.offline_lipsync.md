@@ -34,3 +34,11 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 Default lip-sync provider: deterministic char-to-viseme mapping.
 
 Implements the `LipSyncProvider` protocol.
+
+#### repeatable *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+`an cache gc`
+may re-make a missing track in memory (an#311, cutan#29).
+
+* **Type:**
+  A pure function of the transcript, and nothing is billed

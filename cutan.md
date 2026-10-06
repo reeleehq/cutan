@@ -1,4 +1,4 @@
-> built 2026-10-06 11:16 UTC from 24f3ed4 (main) · cutan 0.0.14. Details: build_info.json
+> built 2026-10-06 11:44 UTC from 7128e31 (main) · cutan 0.0.15. Details: build_info.json
 
 # index.html.md
 
@@ -103,6 +103,14 @@ Default lip-sync provider: deterministic char-to-viseme mapping.
 
 Implements the `LipSyncProvider` protocol.
 
+#### repeatable *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+`an cache gc`
+may re-make a missing track in memory (an#311, cutan#29).
+
+* **Type:**
+  A pure function of the transcript, and nothing is billed
+
 ### *class* cutan.audio.RhubarbLipSync(, binary_path=None, language='en', recognizer=None, timeout_s=60.0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -117,6 +125,20 @@ Wrap the rhubarb CLI. Implements the `LipSyncProvider` protocol.
 >>> RhubarbLipSync(binary_path="/bin/rhubarb", language="de").name
 'rhubarb:phonetic'
 ```
+
+#### check_available()
+
+Raise `RhubarbNotFoundError` when this machine has no binary.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+#### repeatable *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+The same audio, transcript and recognizer give the same track on one
+machine (one binary), and nothing is billed: `an cache gc` may re-make
+a missing track in memory (an#311, cutan#29). A machine without the
+binary says so in [`check_available()`](_autosummary/cutan.audio.html.md#cutan.audio.RhubarbLipSync.check_available).
 
 #### *property* uses_dialog_file *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
@@ -313,6 +335,14 @@ Default lip-sync provider: deterministic char-to-viseme mapping.
 
 Implements the `LipSyncProvider` protocol.
 
+#### repeatable *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+`an cache gc`
+may re-make a missing track in memory (an#311, cutan#29).
+
+* **Type:**
+  A pure function of the transcript, and nothing is billed
+
 
 # _autosummary/cutan.audio.rhubarb_lipsync.html.md
 
@@ -355,6 +385,11 @@ stale `phonetic` track replays.
 | [`RhubarbLipSync`](_autosummary/cutan.audio.rhubarb_lipsync.html.md#cutan.audio.rhubarb_lipsync.RhubarbLipSync)(\*[, binary_path, language, ...])   | Wrap the rhubarb CLI.   |
 |-----------------------------------------------------------------------------------------------------|-------------------------|
 
+### Exceptions
+
+| [`RhubarbNotFoundError`](_autosummary/cutan.audio.rhubarb_lipsync.html.md#cutan.audio.rhubarb_lipsync.RhubarbNotFoundError)   | The rhubarb binary is not on this machine (with how to install it).   |
+|-------------------------------------------------------------------------|-----------------------------------------------------------------------|
+
 ### cutan.audio.rhubarb_lipsync.ENGLISH_LANGUAGES *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'en'})*
 
 The languages `pocketSphinx` (CMU Sphinx US English acoustic model) covers.
@@ -374,9 +409,29 @@ Wrap the rhubarb CLI. Implements the `LipSyncProvider` protocol.
 'rhubarb:phonetic'
 ```
 
+#### check_available()
+
+Raise [`RhubarbNotFoundError`](_autosummary/cutan.audio.rhubarb_lipsync.html.md#cutan.audio.rhubarb_lipsync.RhubarbNotFoundError) when this machine has no binary.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+#### repeatable *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+The same audio, transcript and recognizer give the same track on one
+machine (one binary), and nothing is billed: `an cache gc` may re-make
+a missing track in memory (an#311, cutan#29). A machine without the
+binary says so in [`check_available()`](_autosummary/cutan.audio.rhubarb_lipsync.html.md#cutan.audio.rhubarb_lipsync.RhubarbLipSync.check_available).
+
 #### *property* uses_dialog_file *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
 Whether the chosen recognizer reads a transcript at all.
+
+### *exception* cutan.audio.rhubarb_lipsync.RhubarbNotFoundError
+
+Bases: [`RuntimeError`](https://docs.python.org/3/builtins/exceptions.html#RuntimeError)
+
+The rhubarb binary is not on this machine (with how to install it).
 
 ### cutan.audio.rhubarb_lipsync.recognizer_for(language)
 
@@ -465,7 +520,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'eye', 'rect', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'rect', 'eye', 'mouth', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -11201,18 +11256,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-06 11:16 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/24f3ed40ded0890b45d0aa98ace6158f1b6c653a"><code>24f3ed4</code></a> on branch <code>main</code>, for **cutan 0.0.14** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-06 11:44 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/7128e3110f6a9dfc8326bcea2e4add68b03518ce"><code>7128e31</code></a> on branch <code>main</code>, for **cutan 0.0.15** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.14) is behind the latest release on PyPI (0.0.15): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.15) is behind the latest release on PyPI (0.0.16): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/24f3ed40ded0890b45d0aa98ace6158f1b6c653a"><code>24f3ed40ded0890b45d0aa98ace6158f1b6c653a</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/7128e3110f6a9dfc8326bcea2e4add68b03518ce"><code>7128e3110f6a9dfc8326bcea2e4add68b03518ce</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -11223,9 +11278,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37454922544">37454922544</a>     |
+| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37458143760">37458143760</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>24f3ed40ded0890b45d0aa98ace6158f1b6c653a</code> (in the history of the built commit) |
+| Event commit | <code>7128e3110f6a9dfc8326bcea2e4add68b03518ce</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -11250,13 +11305,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.15/">0.0.15</a>, newer than the documented version (0.0.14).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.16/">0.0.16</a>, newer than the documented version (0.0.15).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout 24f3ed40ded0890b45d0aa98ace6158f1b6c653a
+git checkout 7128e3110f6a9dfc8326bcea2e4add68b03518ce
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

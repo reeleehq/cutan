@@ -37,6 +37,11 @@ stale `phonetic` track replays.
 | [`RhubarbLipSync`](#cutan.audio.rhubarb_lipsync.RhubarbLipSync)(\*[, binary_path, language, ...])   | Wrap the rhubarb CLI.   |
 |-----------------------------------------------------------------------------------------------------|-------------------------|
 
+### Exceptions
+
+| [`RhubarbNotFoundError`](#cutan.audio.rhubarb_lipsync.RhubarbNotFoundError)   | The rhubarb binary is not on this machine (with how to install it).   |
+|-------------------------------------------------------------------------|-----------------------------------------------------------------------|
+
 ### cutan.audio.rhubarb_lipsync.ENGLISH_LANGUAGES *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'en'})*
 
 The languages `pocketSphinx` (CMU Sphinx US English acoustic model) covers.
@@ -56,9 +61,29 @@ Wrap the rhubarb CLI. Implements the `LipSyncProvider` protocol.
 'rhubarb:phonetic'
 ```
 
+#### check_available()
+
+Raise [`RhubarbNotFoundError`](#cutan.audio.rhubarb_lipsync.RhubarbNotFoundError) when this machine has no binary.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+#### repeatable *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
+
+The same audio, transcript and recognizer give the same track on one
+machine (one binary), and nothing is billed: `an cache gc` may re-make
+a missing track in memory (an#311, cutan#29). A machine without the
+binary says so in [`check_available()`](#cutan.audio.rhubarb_lipsync.RhubarbLipSync.check_available).
+
 #### *property* uses_dialog_file *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
 Whether the chosen recognizer reads a transcript at all.
+
+### *exception* cutan.audio.rhubarb_lipsync.RhubarbNotFoundError
+
+Bases: [`RuntimeError`](https://docs.python.org/3/builtins/exceptions.html#RuntimeError)
+
+The rhubarb binary is not on this machine (with how to install it).
 
 ### cutan.audio.rhubarb_lipsync.recognizer_for(language)
 

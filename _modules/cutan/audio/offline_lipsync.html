@@ -259,55 +259,59 @@
 </span><span id="line-75">
 </span><span id="line-76">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"offline"</span>
 </span><span id="line-77">    <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span>
-</span><span id="line-78">
-</span><span id="line-79">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">char_to_viseme</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-80">        <span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-81">            <span class="nb">dict</span><span class="p">(</span><span class="n">char_to_viseme</span><span class="p">)</span> <span class="k">if</span> <span class="n">char_to_viseme</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_CHAR_TO_VISEME</span><span class="p">)</span>
-</span><span id="line-82">        <span class="p">)</span>
-</span><span id="line-83">
-</span><span id="line-84">    <span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="n">transcript</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VisemeTrack</span><span class="p">:</span>
-</span><span id="line-85">        <span class="n">codes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_codes_for</span><span class="p">(</span><span class="n">transcript</span><span class="p">))</span>
-</span><span id="line-86">        <span class="k">if</span> <span class="ow">not</span> <span class="n">codes</span><span class="p">:</span>
-</span><span id="line-87">            <span class="c1"># Empty transcript → just rest at start, rest at end.</span>
-</span><span id="line-88">            <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
-</span><span id="line-89">                <span class="n">visemes</span><span class="o">=</span><span class="p">[</span>
-</span><span id="line-90">                    <span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">_REST_VISEME</span><span class="p">),</span>
-</span><span id="line-91">                    <span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">),</span> <span class="n">code</span><span class="o">=</span><span class="n">_REST_VISEME</span><span class="p">),</span>
-</span><span id="line-92">                <span class="p">],</span>
-</span><span id="line-93">                <span class="n">convention</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convention</span><span class="p">,</span>
-</span><span id="line-94">                <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
-</span><span id="line-95">            <span class="p">)</span>
-</span><span id="line-96">        <span class="c1"># Distribute one keyframe per code over [0, duration].</span>
-</span><span id="line-97">        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">)</span>
-</span><span id="line-98">        <span class="n">duration</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">)</span>
-</span><span id="line-99">        <span class="n">visemes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Viseme</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-100">        <span class="c1"># Always lead with rest at t=0</span>
-</span><span id="line-101">        <span class="n">visemes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">_REST_VISEME</span><span class="p">))</span>
-</span><span id="line-102">        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">code</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">codes</span><span class="p">):</span>
-</span><span id="line-103">            <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">duration</span>
-</span><span id="line-104">            <span class="n">visemes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">code</span><span class="p">))</span>
-</span><span id="line-105">        <span class="c1"># Trailing rest</span>
-</span><span id="line-106">        <span class="n">visemes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">_REST_VISEME</span><span class="p">))</span>
-</span><span id="line-107">        <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
-</span><span id="line-108">            <span class="n">visemes</span><span class="o">=</span><span class="n">visemes</span><span class="p">,</span> <span class="n">convention</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convention</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span>
-</span><span id="line-109">        <span class="p">)</span>
-</span><span id="line-110">
-</span><span id="line-111">    <span class="k">def</span><span class="w"> </span><span class="nf">_codes_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transcript</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-112"><span class="w">        </span><span class="sd">"""Per-character viseme codes; collapses adjacent duplicates."""</span>
-</span><span id="line-113">        <span class="n">previous</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-114">        <span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">transcript</span><span class="p">:</span>
-</span><span id="line-115">            <span class="n">ch</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-</span><span id="line-116">            <span class="k">if</span> <span class="ow">not</span> <span class="n">ch</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
-</span><span id="line-117">                <span class="c1"># Spaces, punctuation → mouth rest. Insert if not redundant.</span>
-</span><span id="line-118">                <span class="k">if</span> <span class="n">previous</span> <span class="o">!=</span> <span class="n">_REST_VISEME</span><span class="p">:</span>
-</span><span id="line-119">                    <span class="n">previous</span> <span class="o">=</span> <span class="n">_REST_VISEME</span>
-</span><span id="line-120">                    <span class="k">yield</span> <span class="n">_REST_VISEME</span>
-</span><span id="line-121">                <span class="k">continue</span>
-</span><span id="line-122">            <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="s2">"C"</span><span class="p">)</span>
-</span><span id="line-123">            <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="n">previous</span><span class="p">:</span>
-</span><span id="line-124">                <span class="k">continue</span>
-</span><span id="line-125">            <span class="n">previous</span> <span class="o">=</span> <span class="n">code</span>
-</span><span id="line-126">            <span class="k">yield</span> <span class="n">code</span></div>
+</span><span id="line-78">    <span class="c1">#: A pure function of the transcript, and nothing is billed: ``an cache gc``</span>
+</span><span id="line-79">    <span class="c1">#: may re-make a missing track in memory (an#311, cutan#29).</span>
+</span><span id="line-80">    <span class="n">repeatable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="line-81">    <span class="n">billed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="line-82">
+</span><span id="line-83">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">char_to_viseme</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-84">        <span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-85">            <span class="nb">dict</span><span class="p">(</span><span class="n">char_to_viseme</span><span class="p">)</span> <span class="k">if</span> <span class="n">char_to_viseme</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_CHAR_TO_VISEME</span><span class="p">)</span>
+</span><span id="line-86">        <span class="p">)</span>
+</span><span id="line-87">
+</span><span id="line-88">    <span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="n">transcript</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VisemeTrack</span><span class="p">:</span>
+</span><span id="line-89">        <span class="n">codes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_codes_for</span><span class="p">(</span><span class="n">transcript</span><span class="p">))</span>
+</span><span id="line-90">        <span class="k">if</span> <span class="ow">not</span> <span class="n">codes</span><span class="p">:</span>
+</span><span id="line-91">            <span class="c1"># Empty transcript → just rest at start, rest at end.</span>
+</span><span id="line-92">            <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
+</span><span id="line-93">                <span class="n">visemes</span><span class="o">=</span><span class="p">[</span>
+</span><span id="line-94">                    <span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">_REST_VISEME</span><span class="p">),</span>
+</span><span id="line-95">                    <span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">),</span> <span class="n">code</span><span class="o">=</span><span class="n">_REST_VISEME</span><span class="p">),</span>
+</span><span id="line-96">                <span class="p">],</span>
+</span><span id="line-97">                <span class="n">convention</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convention</span><span class="p">,</span>
+</span><span id="line-98">                <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+</span><span id="line-99">            <span class="p">)</span>
+</span><span id="line-100">        <span class="c1"># Distribute one keyframe per code over [0, duration].</span>
+</span><span id="line-101">        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">)</span>
+</span><span id="line-102">        <span class="n">duration</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">)</span>
+</span><span id="line-103">        <span class="n">visemes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Viseme</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-104">        <span class="c1"># Always lead with rest at t=0</span>
+</span><span id="line-105">        <span class="n">visemes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">_REST_VISEME</span><span class="p">))</span>
+</span><span id="line-106">        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">code</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">codes</span><span class="p">):</span>
+</span><span id="line-107">            <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">duration</span>
+</span><span id="line-108">            <span class="n">visemes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">code</span><span class="p">))</span>
+</span><span id="line-109">        <span class="c1"># Trailing rest</span>
+</span><span id="line-110">        <span class="n">visemes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">_REST_VISEME</span><span class="p">))</span>
+</span><span id="line-111">        <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
+</span><span id="line-112">            <span class="n">visemes</span><span class="o">=</span><span class="n">visemes</span><span class="p">,</span> <span class="n">convention</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convention</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span>
+</span><span id="line-113">        <span class="p">)</span>
+</span><span id="line-114">
+</span><span id="line-115">    <span class="k">def</span><span class="w"> </span><span class="nf">_codes_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transcript</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-116"><span class="w">        </span><span class="sd">"""Per-character viseme codes; collapses adjacent duplicates."""</span>
+</span><span id="line-117">        <span class="n">previous</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-118">        <span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">transcript</span><span class="p">:</span>
+</span><span id="line-119">            <span class="n">ch</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="line-120">            <span class="k">if</span> <span class="ow">not</span> <span class="n">ch</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
+</span><span id="line-121">                <span class="c1"># Spaces, punctuation → mouth rest. Insert if not redundant.</span>
+</span><span id="line-122">                <span class="k">if</span> <span class="n">previous</span> <span class="o">!=</span> <span class="n">_REST_VISEME</span><span class="p">:</span>
+</span><span id="line-123">                    <span class="n">previous</span> <span class="o">=</span> <span class="n">_REST_VISEME</span>
+</span><span id="line-124">                    <span class="k">yield</span> <span class="n">_REST_VISEME</span>
+</span><span id="line-125">                <span class="k">continue</span>
+</span><span id="line-126">            <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="s2">"C"</span><span class="p">)</span>
+</span><span id="line-127">            <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="n">previous</span><span class="p">:</span>
+</span><span id="line-128">                <span class="k">continue</span>
+</span><span id="line-129">            <span class="n">previous</span> <span class="o">=</span> <span class="n">code</span>
+</span><span id="line-130">            <span class="k">yield</span> <span class="n">code</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -322,7 +326,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=544df88d"></script>
+    <script src="../../../_static/documentation_options.js?v=f0357c94"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
