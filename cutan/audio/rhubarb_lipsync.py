@@ -44,6 +44,8 @@ _INSTALL_HINT: str = (
 
 class RhubarbNotFoundError(RuntimeError):
     """The rhubarb binary is not on this machine (with how to install it)."""
+
+
 #: Rhubarb's own default and its English recognizer — the one that reads the
 #: dialog file.
 _ENGLISH_RECOGNIZER: str = "pocketSphinx"
