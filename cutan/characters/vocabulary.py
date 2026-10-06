@@ -52,7 +52,9 @@ PRESET_ASPECTS: dict[str, tuple[str, ...]] = {
 
 #: Each expression preset's vocabulary version (ADR 0003). Bump one in the same
 #: change that moves its axes or its mouth form.
-EXPRESSION_PRESET_VERSIONS: dict[str, str] = {}
+EXPRESSION_PRESET_VERSIONS: dict[str, str] = {
+    "angry": "2",  # cutan#61: lids lowered to a glare (-0.45; was +0.1)
+}
 
 
 def _first_sentence(doc: str | None) -> str:

@@ -27,7 +27,14 @@ pytestmark = pytest.mark.genre("cutout_animation")
 
 @pytest.fixture
 def amy(tmp_path):
-    return new_character(tmp_path, name="amy", use_dicebear=False).parent
+    """A factory rig with no HALF lid: one made before cutan#61 drew it."""
+    char = new_character(tmp_path, name="amy", use_dicebear=False).parent
+    raw = json.loads((char / "character.json").read_text(encoding="utf-8"))
+    raw["asset_sets"]["eyelid"].pop("HALF")
+    for slot in raw["skins"]["default"]["slots"].values():
+        slot.pop(HALF_ATTACHMENT, None)
+    (char / "character.json").write_text(json.dumps(raw), encoding="utf-8")
+    return char
 
 
 def _desc(char):

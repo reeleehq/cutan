@@ -92,7 +92,7 @@ PRESETS: dict[str, Preset] = {
             "angry",
             height=(-0.6, -0.6),
             angle=(-0.8, -0.8),
-            lid=(0.1, 0.1),
+            lid=(-0.45, -0.45),  # a glare: the HALF lid at full intensity (cutan#61)
             form="angry",
             anchor="4+5+7+23",
         ),

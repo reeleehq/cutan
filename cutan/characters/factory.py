@@ -64,6 +64,8 @@ from cutan.characters.mouth_set import (
     write_default_mouths,
 )
 from cutan.characters.brows import (
+    BROW_DROP,
+    BROW_SLOTS,
     BROW_CANVAS,
     BROW_STROKE,
     BROWS_FEATURE,
@@ -72,6 +74,7 @@ from cutan.characters.brows import (
     seat_above_brows,
 )
 from cutan.characters.colour_roles import distinct_literal, normalise_hex
+from cutan.characters.lids import add_half_lid as _add_half_lid
 from cutan.characters.schema import (
     Bone,
     CharacterDescriptor,
@@ -1107,6 +1110,10 @@ def new_character(
             else {"bones": _bones_for(body, head_scale=head_scale)}
         ),
     )
+    if head_is_ours:  # the factory's brows rest below its own hairline (cutan#61)
+        for slot_name in BROW_SLOTS:
+            for att in descriptor.skins["default"].slots.get(slot_name, {}).values():
+                att.y = round(att.y + BROW_DROP, 1)
     # A hat that still covers the brows, worn as high and as flat as it goes,
     # is NOT stored (an#284): the analyser derives it from the recorded knobs
     # and seat (`derived_brow_cover`), so the answer never goes stale.
@@ -1136,6 +1143,7 @@ def new_character(
     desc_path.write_text(descriptor.model_dump_json(indent=2), encoding="utf-8")
     if gaze and descriptor.face_overlay:
         add_gaze(out)  # the lid's fill is read off the head art it just wrote
+        _factory_half_lid(out)  # a glare reads (cutan#61)
     if head_scale != 1.0:
         _scale_face(out, head_scale)
     if views and head_is_ours:
@@ -1747,6 +1755,26 @@ def add_gaze(
             for side in ("l", "r")
             for stem in ("eye_{}_open", "eye_{}_closed", "sclera_{}", "pupil_{}")
         },
+    )
+
+
+def _factory_half_lid(char_dir: Path) -> None:
+    """The factory's ``HALF`` lid (cutan#61): :func:`cutan.characters.lids.add_half_lid`
+    on the eyes it just drew, kept as the factory's own drawing — written through
+    the drawing log and left unsourced, so the factory's stamp pins it and a
+    recipe replay re-derives it like every other part (an#269, an#292)."""
+    from cutan.characters.lids import HALF_ATTACHMENT
+
+    desc_path = _add_half_lid(char_dir)
+    raw = json.loads(desc_path.read_text(encoding="utf-8"))
+    for slot in ((raw.get("skins") or {}).get("default") or {}).get("slots", {}).values():
+        half = slot.get(HALF_ATTACHMENT)
+        if isinstance(half, dict):
+            path = char_dir / half["path"]
+            _drawn.write_text(path, path.read_text(encoding="utf-8"), encoding="utf-8")
+            half.pop("source", None)
+    desc_path.write_text(
+        CharacterDescriptor.model_validate(raw).model_dump_json(indent=2), encoding="utf-8"
     )
 
 

@@ -22,9 +22,10 @@ expression falls to the lids, the gaze and the mouth (an#252). So:
   slots with art on an overlay face, and nothing recorded over them. The cut-out genre's ``expression`` aspect
   requires it for its full-face method (:mod:`cutan.characters.methods`).
 
-Hair is not measured here: the brows' outer ends meet the hairline by design
-(the default hair has always run under them), so a hair style is held to the
-default hairline instead (tests), never to the brows' range.
+Hair is not measured here: since cutan#61 the brows rest below the default
+hairline (:data:`BROW_DROP`; before, their outer ends
+ran into the fringe and read as hair), so a hair style is held to the default
+hairline instead (tests), never to the brows' range.
 
 Units: the offline head is drawn in an :data:`HEAD_ART_SIZE` square; the rig
 draws it :data:`~cutan.characters.schema.REFERENCE_HEAD_HEIGHT` × ``head_scale``
@@ -38,11 +39,11 @@ A surprised brow reaches about three head units above its rest, less on a
 bigger head; a band drawn across the forehead is lifted clear of it:
 
 >>> round(BROW_REST_TOP, 1)
-22.8
+25.1
 >>> [round(min(brow_range(head_scale=s)["front"].values()), 1) for s in (1.0, 1.7)]
-[19.5, 20.3]
+[21.8, 22.6]
 >>> seat_above_brows({"front": '<rect x="20" y="20" width="40" height="4"/>'}, head_scale=1.0)
-Seat(transform='translate(0 -5.47)', covers=False)
+Seat(transform='translate(0 -3.18)', covers=False)
 """
 
 from __future__ import annotations
@@ -58,6 +59,8 @@ from cutan.characters.schema import FACE_OFFSETS, HEAD_ANCHOR, REFERENCE_HEAD_HE
 
 __all__ = [
     "BROW_CANVAS",
+    "BROW_DROP",
+    "BROW_SLOTS",
     "BROW_STROKE",
     "BROWS_FEATURE",
     "HAT_BROW_CLEARANCE",
@@ -85,7 +88,7 @@ HEAD_ART_SIZE: float = 80.0
 #: The factory's brow drawing: its canvas (view-box units at head scale 1),
 #: the stroke, and how far each end tilts from the level.
 BROW_CANVAS: tuple[int, int] = (80, 24)
-BROW_STROKE: float = 6.0
+BROW_STROKE: float = 7.5
 BROW_TILT: float = 4.0
 
 #: The face features a drawing can be recorded as covering (``occluded`` keys).
@@ -131,8 +134,20 @@ _NECK: tuple[float, float] = (
 )
 
 
+#: The factory's brow slots, and how far below the default face layout
+#: (:data:`~cutan.characters.schema.FACE_OFFSETS`) the factory hangs them on
+#: its own head, in view_box units (cutan#61): about 2.5 of the head drawing's
+#: 80 units, so their outer ends clear the hairline — the fringe ran into them,
+#: and a brow in the hair's colour over the hair is a brow nobody sees — and
+#: they keep their gap above the eyes. Only new factory heads take it (a
+#: descriptor stores its offsets); a promoted or DiceBear head keeps the layout.
+BROW_SLOTS: tuple[str, ...] = ("left_brow", "right_brow")
+BROW_DROP: float = 8.9
+
+
 def _brow_centre(slot: str) -> tuple[float, float]:
     x, y = FACE_OFFSETS[slot]
+    y += BROW_DROP
     return _NECK[0] + x / _UNIT, _NECK[1] + y / _UNIT
 
 

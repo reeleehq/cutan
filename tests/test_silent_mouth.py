@@ -47,7 +47,7 @@ def test_the_neutral_mouth_is_drawn_as_it_always_was():
 def _scene(tmp_path, *actions, dialogue=()):
     from an.stores.characters import CharactersStore
 
-    new_character(tmp_path, name="ned", use_dicebear=False, overwrite=True)  # variants: happy, sad
+    new_character(tmp_path, name="ned", use_dicebear=False, overwrite=True)  # variants: happy, sad, angry
     shot = Shot(
         id="s",
         duration=2.0,
@@ -90,15 +90,15 @@ def test_a_silent_happy_holds_the_variants_rest_mouth(tmp_path):
 
 
 def test_a_form_the_character_has_no_set_for_is_said_with_the_fix(tmp_path):
-    scene, store = _scene(tmp_path, expression("c", "angry"), expression("c", "angry"))
+    scene, store = _scene(tmp_path, expression("c", "disgusted"), expression("c", "disgusted"))
     (finding, _second) = _validate(scene, store)
     assert finding.severity == "warning"
-    assert "'viseme@angry'" in finding.description
-    assert "an character mouths ned --variants angry" in finding.description
+    assert "'viseme@disgusted'" in finding.description
+    assert "an character mouths ned --variants disgusted" in finding.description
     _, said = _compile_warnings(scene, store)
-    assert len(said) == 1 and "an character mouths ned --variants angry" in said[0]
+    assert len(said) == 1 and "an character mouths ned --variants disgusted" in said[0]
     # the dialogue sugar is the same expression: validate says it too
-    line = Dialogue(speaker="c", text="No.", emotion="angry", start=0.2, duration=0.5)
+    line = Dialogue(speaker="c", text="No.", emotion="disgusted", start=0.2, duration=0.5)
     scene, store = _scene(tmp_path, dialogue=[line])
     (finding,) = _validate(scene, store)
     assert finding.ir_path.endswith("/dialogue/0/emotion")
