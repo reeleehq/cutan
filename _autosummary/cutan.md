@@ -79,7 +79,7 @@ The package whose data root holds the genre’s asset library and projects
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
-### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 5*
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 6*
 
 The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
 it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
@@ -90,6 +90,7 @@ Level 3 is the public rig builder (an#338): `an.stage.rig.build_rig_subtree`,
 pose (an#339): `register_rest_pose_migration` and `rig_rest_problems`. Level 5
 is nested chains (an#340): `build_rig_subtree(skip_slots=)`, `slot_parent_chain`,
 `slot_node_paths`, `rig_affordances`, `RigError`.
+Level 6: `rest_pose_protection` (an#407), which `validate_character` says aloud.
 
 ### cutan.require_an()
 

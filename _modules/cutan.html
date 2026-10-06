@@ -231,42 +231,43 @@
 </span><span id="line-55"><span class="c1">#: pose (an#339): ``register_rest_pose_migration`` and ``rig_rest_problems``. Level 5</span>
 </span><span id="line-56"><span class="c1">#: is nested chains (an#340): ``build_rig_subtree(skip_slots=)``, ``slot_parent_chain``,</span>
 </span><span id="line-57"><span class="c1">#: ``slot_node_paths``, ``rig_affordances``, ``RigError``.</span>
-</span><span id="line-58"><span class="n">REQUIRED_AN_API_LEVEL</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
-</span><span id="line-59">
+</span><span id="line-58"><span class="c1">#: Level 6: ``rest_pose_protection`` (an#407), which ``validate_character`` says aloud.</span>
+</span><span id="line-59"><span class="n">REQUIRED_AN_API_LEVEL</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span>
 </span><span id="line-60">
+</span><span id="line-61">
 <div class="viewcode-block" id="require_an">
 <a class="viewcode-back" href="../_autosummary/cutan.html#cutan.require_an">[docs]</a>
-</span><span id="line-61"><span class="k">def</span><span class="w"> </span><span class="nf">require_an</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-62"><span class="w">    </span><span class="sd">"""Refuse, with an upgrade hint, to load against an ``an`` older than this ``cutan`` needs.</span>
-</span><span id="line-63">
-</span><span id="line-64"><span class="sd">    &gt;&gt;&gt; require_an()</span>
-</span><span id="line-65"><span class="sd">    """</span>
-</span><span id="line-66">    <span class="kn">import</span><span class="w"> </span><span class="nn">an.genres</span>
-</span><span id="line-67">
-</span><span id="line-68">    <span class="n">level</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">an</span><span class="o">.</span><span class="n">genres</span><span class="p">,</span> <span class="s2">"API_LEVEL"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-</span><span id="line-69">    <span class="k">if</span> <span class="n">level</span> <span class="o">&lt;</span> <span class="n">REQUIRED_AN_API_LEVEL</span><span class="p">:</span>
-</span><span id="line-70">        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-</span><span id="line-71">            <span class="sa">f</span><span class="s2">"cutan needs an.genres API level </span><span class="si">{</span><span class="n">REQUIRED_AN_API_LEVEL</span><span class="si">}</span><span class="s2"> or higher; this an "</span>
-</span><span id="line-72">            <span class="sa">f</span><span class="s2">"provides </span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">. Upgrade an: pip install -U an"</span>
-</span><span id="line-73">        <span class="p">)</span></div>
+</span><span id="line-62"><span class="k">def</span><span class="w"> </span><span class="nf">require_an</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-63"><span class="w">    </span><span class="sd">"""Refuse, with an upgrade hint, to load against an ``an`` older than this ``cutan`` needs.</span>
+</span><span id="line-64">
+</span><span id="line-65"><span class="sd">    &gt;&gt;&gt; require_an()</span>
+</span><span id="line-66"><span class="sd">    """</span>
+</span><span id="line-67">    <span class="kn">import</span><span class="w"> </span><span class="nn">an.genres</span>
+</span><span id="line-68">
+</span><span id="line-69">    <span class="n">level</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">an</span><span class="o">.</span><span class="n">genres</span><span class="p">,</span> <span class="s2">"API_LEVEL"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span id="line-70">    <span class="k">if</span> <span class="n">level</span> <span class="o">&lt;</span> <span class="n">REQUIRED_AN_API_LEVEL</span><span class="p">:</span>
+</span><span id="line-71">        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+</span><span id="line-72">            <span class="sa">f</span><span class="s2">"cutan needs an.genres API level </span><span class="si">{</span><span class="n">REQUIRED_AN_API_LEVEL</span><span class="si">}</span><span class="s2"> or higher; this an "</span>
+</span><span id="line-73">            <span class="sa">f</span><span class="s2">"provides </span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">. Upgrade an: pip install -U an"</span>
+</span><span id="line-74">        <span class="p">)</span></div>
 
-</span><span id="line-74">
 </span><span id="line-75">
-</span><span id="line-76"><span class="c1"># The named style specs (package data, cutan#4): ``cutan.style_spec("south_park")``.</span>
-</span><span id="line-77"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">style_spec</span><span class="p">,</span> <span class="n">style_specs</span>  <span class="c1"># noqa: E402</span>
-</span><span id="line-78">
-</span><span id="line-79"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-80">    <span class="s2">"ENTRY_POINT_GROUP"</span><span class="p">,</span>
-</span><span id="line-81">    <span class="s2">"ENTRY_POINT_NAME"</span><span class="p">,</span>
-</span><span id="line-82">    <span class="s2">"ENTRY_POINT_VALUE"</span><span class="p">,</span>
-</span><span id="line-83">    <span class="s2">"GENRE_NAME"</span><span class="p">,</span>
-</span><span id="line-84">    <span class="s2">"LIBRARY_NAME"</span><span class="p">,</span>
-</span><span id="line-85">    <span class="s2">"REQUIRED_AN_API_LEVEL"</span><span class="p">,</span>
-</span><span id="line-86">    <span class="s2">"RENDERER_NAME"</span><span class="p">,</span>
-</span><span id="line-87">    <span class="s2">"require_an"</span><span class="p">,</span>
-</span><span id="line-88">    <span class="s2">"style_spec"</span><span class="p">,</span>
-</span><span id="line-89">    <span class="s2">"style_specs"</span><span class="p">,</span>
-</span><span id="line-90"><span class="p">]</span>
+</span><span id="line-76">
+</span><span id="line-77"><span class="c1"># The named style specs (package data, cutan#4): ``cutan.style_spec("south_park")``.</span>
+</span><span id="line-78"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">style_spec</span><span class="p">,</span> <span class="n">style_specs</span>  <span class="c1"># noqa: E402</span>
+</span><span id="line-79">
+</span><span id="line-80"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-81">    <span class="s2">"ENTRY_POINT_GROUP"</span><span class="p">,</span>
+</span><span id="line-82">    <span class="s2">"ENTRY_POINT_NAME"</span><span class="p">,</span>
+</span><span id="line-83">    <span class="s2">"ENTRY_POINT_VALUE"</span><span class="p">,</span>
+</span><span id="line-84">    <span class="s2">"GENRE_NAME"</span><span class="p">,</span>
+</span><span id="line-85">    <span class="s2">"LIBRARY_NAME"</span><span class="p">,</span>
+</span><span id="line-86">    <span class="s2">"REQUIRED_AN_API_LEVEL"</span><span class="p">,</span>
+</span><span id="line-87">    <span class="s2">"RENDERER_NAME"</span><span class="p">,</span>
+</span><span id="line-88">    <span class="s2">"require_an"</span><span class="p">,</span>
+</span><span id="line-89">    <span class="s2">"style_spec"</span><span class="p">,</span>
+</span><span id="line-90">    <span class="s2">"style_specs"</span><span class="p">,</span>
+</span><span id="line-91"><span class="p">]</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -280,7 +281,7 @@
 </footer>
     </div>
     
-    <script src="../_static/documentation_options.js?v=dcb4eb81"></script>
+    <script src="../_static/documentation_options.js?v=eb4c61eb"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
