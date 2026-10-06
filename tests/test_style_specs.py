@@ -405,6 +405,7 @@ STALE_ABSENCE_CLAIMS = {
     r"\bno (plane|parallax|multiplane) (layer|support)": "plane environments ship (an#110)",
     r"\bno (sound|audio) (layer|support|track)": "shot and meta `sounds` ship (an#176)",
     r"\bno transitions?\b": "shot transitions ship (an#176)",
+    r"\bwipes? (are|is) not built|\bno wipes?\b": "wipes ship (an#390): `Transition(kind='wipe', direction=...)`",
     r"\b(use|needs?) side-view art|\bno (profile|side[- ]view|turnaround)": "views ship (an#197): `live.characters.view`, `play: turn`",
 }
 
