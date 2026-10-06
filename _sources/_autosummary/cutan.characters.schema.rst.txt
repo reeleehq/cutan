@@ -8,6 +8,7 @@ cutan.characters.schema
 
    .. autosummary::
    
+      CHARACTER_SCHEMA_VERSION
       CHARACTER_DOCUMENT_KIND
       MOUTH_SHAPES
       DEFAULT_VISEME_MAP

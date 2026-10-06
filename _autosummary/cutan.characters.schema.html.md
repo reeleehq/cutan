@@ -49,23 +49,24 @@ several slots.
 
 ### Module Attributes
 
-| [`CHARACTER_DOCUMENT_KIND`](#cutan.characters.schema.CHARACTER_DOCUMENT_KIND)   | The descriptor is a schema-versioned document in its own right, with its own version field.                                                                                                                                                           |
-|----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`MOUTH_SHAPES`](#cutan.characters.schema.MOUTH_SHAPES)              | Rhubarb mouth shapes.                                                                                                                                                                                                                                 |
-| [`DEFAULT_VISEME_MAP`](#cutan.characters.schema.DEFAULT_VISEME_MAP)        | Default Rhubarb-letter → mouth-attachment-name mapping.                                                                                                                                                                                               |
-| [`VISEME_CHANNEL`](#cutan.characters.schema.VISEME_CHANNEL)            | The swap channel lip-sync drives.                                                                                                                                                                                                                     |
-| [`EYELID_CHANNEL`](#cutan.characters.schema.EYELID_CHANNEL)            | The swap channel blinks drive.                                                                                                                                                                                                                        |
-| [`DEFAULT_EYELID_MAP`](#cutan.characters.schema.DEFAULT_EYELID_MAP)        | Default eyelid-state → attachment-name mapping, shared by both eye slots.                                                                                                                                                                             |
-| [`VIEW_CHANNEL`](#cutan.characters.schema.VIEW_CHANNEL)              | one KEY per drawn view, projected onto the slots whose art changes with the view (the factory draws the head and the torso), each slot carrying attachments NAMED after the keys.                                                                     |
-| [`VIEWS`](#cutan.characters.schema.VIEWS)                     | The views the factory draws, in turnaround order.                                                                                                                                                                                                     |
-| [`DFLT_VIEW`](#cutan.characters.schema.DFLT_VIEW)                 | its default attachments ARE this view.                                                                                                                                                                                                                |
-| [`VIEW_VARIANT_SEP`](#cutan.characters.schema.VIEW_VARIANT_SEP)          | What joins a swap set's name to the view a variant of it serves: `eyelid@side` is the `eyelid` set drawn for the `side` view (an#220), the same separator the expression variants (`viseme@happy`, an#98) use.                                        |
-| [`REQUIRED_PARTS`](#cutan.characters.schema.REQUIRED_PARTS)            | Required body parts.                                                                                                                                                                                                                                  |
-| [`SLOT_POSE_OFFSETS`](#cutan.characters.schema.SLOT_POSE_OFFSETS)         | The transform properties a [`SlotPose`](#cutan.characters.schema.SlotPose) sets, and whether each is an OFFSET added to the rest (in view_box units, so scaled by the rig), an ANGLE added to it (radians, never scaled) or a FACTOR on it. |
-| [`LEG_LENGTH`](#cutan.characters.schema.LEG_LENGTH)                | Hip to ground in the default rig, in view_box units.                                                                                                                                                                                                  |
-| [`HEAD_ANCHOR`](#cutan.characters.schema.HEAD_ANCHOR)               | the head hangs above the neck, its lower ~fifth overlapping the collar.                                                                                                                                                                               |
-| [`REFERENCE_HEAD_HEIGHT`](#cutan.characters.schema.REFERENCE_HEAD_HEIGHT)     | The head height the default face layout is drawn for, in view_box units — the pre-Wave-4 compiler's 96 px head at k = 345/1024.                                                                                                                       |
-| [`FACE_OFFSETS`](#cutan.characters.schema.FACE_OFFSETS)              | Where each face part sits relative to the `head` bone, in view_box units.                                                                                                                                                                             |
+| [`CHARACTER_SCHEMA_VERSION`](#cutan.characters.schema.CHARACTER_SCHEMA_VERSION)   | the bones' rest pose (`rotation_deg`, `scale_*`) poses the built parts; the migration protects a 0.3.0 rig that carried one.                                                                                                                          |
+|-----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`CHARACTER_DOCUMENT_KIND`](#cutan.characters.schema.CHARACTER_DOCUMENT_KIND)    | The descriptor is a schema-versioned document in its own right, with its own version field.                                                                                                                                                           |
+| [`MOUTH_SHAPES`](#cutan.characters.schema.MOUTH_SHAPES)               | Rhubarb mouth shapes.                                                                                                                                                                                                                                 |
+| [`DEFAULT_VISEME_MAP`](#cutan.characters.schema.DEFAULT_VISEME_MAP)         | Default Rhubarb-letter → mouth-attachment-name mapping.                                                                                                                                                                                               |
+| [`VISEME_CHANNEL`](#cutan.characters.schema.VISEME_CHANNEL)             | The swap channel lip-sync drives.                                                                                                                                                                                                                     |
+| [`EYELID_CHANNEL`](#cutan.characters.schema.EYELID_CHANNEL)             | The swap channel blinks drive.                                                                                                                                                                                                                        |
+| [`DEFAULT_EYELID_MAP`](#cutan.characters.schema.DEFAULT_EYELID_MAP)         | Default eyelid-state → attachment-name mapping, shared by both eye slots.                                                                                                                                                                             |
+| [`VIEW_CHANNEL`](#cutan.characters.schema.VIEW_CHANNEL)               | one KEY per drawn view, projected onto the slots whose art changes with the view (the factory draws the head and the torso), each slot carrying attachments NAMED after the keys.                                                                     |
+| [`VIEWS`](#cutan.characters.schema.VIEWS)                      | The views the factory draws, in turnaround order.                                                                                                                                                                                                     |
+| [`DFLT_VIEW`](#cutan.characters.schema.DFLT_VIEW)                  | its default attachments ARE this view.                                                                                                                                                                                                                |
+| [`VIEW_VARIANT_SEP`](#cutan.characters.schema.VIEW_VARIANT_SEP)           | What joins a swap set's name to the view a variant of it serves: `eyelid@side` is the `eyelid` set drawn for the `side` view (an#220), the same separator the expression variants (`viseme@happy`, an#98) use.                                        |
+| [`REQUIRED_PARTS`](#cutan.characters.schema.REQUIRED_PARTS)             | Required body parts.                                                                                                                                                                                                                                  |
+| [`SLOT_POSE_OFFSETS`](#cutan.characters.schema.SLOT_POSE_OFFSETS)          | The transform properties a [`SlotPose`](#cutan.characters.schema.SlotPose) sets, and whether each is an OFFSET added to the rest (in view_box units, so scaled by the rig), an ANGLE added to it (radians, never scaled) or a FACTOR on it. |
+| [`LEG_LENGTH`](#cutan.characters.schema.LEG_LENGTH)                 | Hip to ground in the default rig, in view_box units.                                                                                                                                                                                                  |
+| [`HEAD_ANCHOR`](#cutan.characters.schema.HEAD_ANCHOR)                | the head hangs above the neck, its lower ~fifth overlapping the collar.                                                                                                                                                                               |
+| [`REFERENCE_HEAD_HEIGHT`](#cutan.characters.schema.REFERENCE_HEAD_HEIGHT)      | The head height the default face layout is drawn for, in view_box units — the pre-Wave-4 compiler's 96 px head at k = 345/1024.                                                                                                                       |
+| [`FACE_OFFSETS`](#cutan.characters.schema.FACE_OFFSETS)               | Where each face part sits relative to the `head` bone, in view_box units.                                                                                                                                                                             |
 
 ### Functions
 
@@ -109,13 +110,21 @@ list of `[time_s, value]` pairs evaluated in order.
 
 Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
 
-### cutan.characters.schema.CHARACTER_DOCUMENT_KIND *: DocumentKind* *= DocumentKind(name='CharacterDescriptor', version_field='schema_version', current_version='0.3.0')*
+### cutan.characters.schema.CHARACTER_DOCUMENT_KIND *: DocumentKind* *= DocumentKind(name='CharacterDescriptor', version_field='schema_version', current_version='0.4.0')*
 
 The descriptor is a schema-versioned document in its own right, with its own
 version field. Registered here rather than in `an.ir.migrate` because
 this module already imports from `an.ir.assets` — registering from the
 other direction would close an import cycle, and because the package that
 owns a schema is the one that knows its version field.
+
+### cutan.characters.schema.CHARACTER_SCHEMA_VERSION *= '0.4.0'*
+
+the bones’ rest pose (`rotation_deg`, `scale_*`) poses the
+built parts; the migration protects a 0.3.0 rig that carried one.
+
+* **Type:**
+  0.4.0 (an#339)
 
 ### *class* cutan.characters.schema.CharacterDescriptor(\*\*data)
 

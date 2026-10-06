@@ -17,7 +17,7 @@ promising a side view whose drawing is missing does not afford one.
 It is genre code (cut-out characters). It lives here until the genre package
 exists (plan P8) and imports the cut-out modules lazily so `import an.library`
 stays free of them. **Importing it registers nothing** (P7): the cut-out genre
-declares [`CHARACTER_CAPABILITIES`](#cutan.library.CHARACTER_CAPABILITIES) and [`CHARACTER_ANALYSER`](#cutan.library.CHARACTER_ANALYSER) in its
+declares [`CHARACTER_CAPABILITIES`](#cutan.library.CHARACTER_CAPABILITIES) and `CHARACTER_ANALYSER` in its
 `capabilities` and `analysers` fields (`cutan.genre.CUTOUT`), so
 they register with the genre, owned by it, and come out with it.
 
@@ -35,17 +35,13 @@ they register with the genre, owned by it, and come out with it.
 |-------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
 | [`MOUTH_CHART_RHUBARB`](#cutan.library.MOUTH_CHART_RHUBARB)          | The chart name of the nine Rhubarb mouth shapes (A–H, X) — `an`'s default.       |
 | [`CHARACTER_CAPABILITIES`](#cutan.library.CHARACTER_CAPABILITIES)       | The capabilities the character analyser derives (declared by the cut-out genre). |
-| [`CHARACTER_ANALYSER`](#cutan.library.CHARACTER_ANALYSER)           | The character analyser (declared by the cut-out genre, registered with it).      |
 
 ### Functions
 
-| [`character_affordances`](#cutan.library.character_affordances)(doc, art)   | The capabilities a character descriptor and its art afford.                      |
-|------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| [`renders_as_placeholder`](#cutan.library.renders_as_placeholder)(doc)       | Whether the compiler would draw this character only as its placeholder stand-in. |
-
-### cutan.library.CHARACTER_ANALYSER *: Analyser* *= Analyser(kind='character', version='0.3.0', subject='asset', declares=('rest_view', 'face_overlay', 'gait', 'speech', 'occluded'))*
-
-The character analyser (declared by the cut-out genre, registered with it).
+| [`character_affordances`](#cutan.library.character_affordances)(doc, art)   | The capabilities a character descriptor and its art afford.                                                                                                         |
+|------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`character_overrides`](#cutan.library.character_overrides)(doc, art)     | The declared fields that REMOVED a capability (an#381): `occluded` when a declared cover is what keeps `face.brows` from an overlay face whose binding moves brows. |
+| [`renders_as_placeholder`](#cutan.library.renders_as_placeholder)(doc)       | Whether the compiler would draw this character only as its placeholder stand-in.                                                                                    |
 
 ### cutan.library.CHARACTER_ANALYSER_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '0.3.0'*
 
@@ -80,6 +76,24 @@ matcher’s answer (`applicable("locomotion", asset)`, ADR 0002), derived from
 >>> doc = CharacterDescriptor(name="blob").model_dump(mode="json")
 >>> sorted(character_affordances(doc, art={}))   # a descriptor with no art
 ['swap.view']
+```
+
+### cutan.library.character_overrides(doc, art)
+
+The declared fields that REMOVED a capability (an#381): `occluded`
+when a declared cover is what keeps `face.brows` from an overlay face
+whose binding moves brows. (Overrides that show on an afforded capability
+are in its `overrides` param already.)
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> character_overrides({"kind": "CharacterDescriptor", "name": "c",
+...                      "occluded": {"brows": "a helmet"}}, {})
+['occluded']
+>>> character_overrides({"kind": "CharacterDescriptor", "name": "c"}, {})
+[]
 ```
 
 ### cutan.library.renders_as_placeholder(doc)

@@ -174,52 +174,55 @@ several slots.</p>
 <p class="rubric">Module Attributes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.CHARACTER_DOCUMENT_KIND" title="cutan.characters.schema.CHARACTER_DOCUMENT_KIND"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CHARACTER_DOCUMENT_KIND</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.CHARACTER_SCHEMA_VERSION" title="cutan.characters.schema.CHARACTER_SCHEMA_VERSION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CHARACTER_SCHEMA_VERSION</span></code></a></p></td>
+<td><p>the bones' rest pose (<code class="docutils literal notranslate"><span class="pre">rotation_deg</span></code>, <code class="docutils literal notranslate"><span class="pre">scale_*</span></code>) poses the built parts; the migration protects a 0.3.0 rig that carried one.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.CHARACTER_DOCUMENT_KIND" title="cutan.characters.schema.CHARACTER_DOCUMENT_KIND"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CHARACTER_DOCUMENT_KIND</span></code></a></p></td>
 <td><p>The descriptor is a schema-versioned document in its own right, with its own version field.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.MOUTH_SHAPES" title="cutan.characters.schema.MOUTH_SHAPES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MOUTH_SHAPES</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.MOUTH_SHAPES" title="cutan.characters.schema.MOUTH_SHAPES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MOUTH_SHAPES</span></code></a></p></td>
 <td><p>Rhubarb mouth shapes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.DEFAULT_VISEME_MAP" title="cutan.characters.schema.DEFAULT_VISEME_MAP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_VISEME_MAP</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.DEFAULT_VISEME_MAP" title="cutan.characters.schema.DEFAULT_VISEME_MAP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_VISEME_MAP</span></code></a></p></td>
 <td><p>Default Rhubarb-letter → mouth-attachment-name mapping.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.VISEME_CHANNEL" title="cutan.characters.schema.VISEME_CHANNEL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VISEME_CHANNEL</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.VISEME_CHANNEL" title="cutan.characters.schema.VISEME_CHANNEL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VISEME_CHANNEL</span></code></a></p></td>
 <td><p>The swap channel lip-sync drives.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.EYELID_CHANNEL" title="cutan.characters.schema.EYELID_CHANNEL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EYELID_CHANNEL</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.EYELID_CHANNEL" title="cutan.characters.schema.EYELID_CHANNEL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EYELID_CHANNEL</span></code></a></p></td>
 <td><p>The swap channel blinks drive.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.DEFAULT_EYELID_MAP" title="cutan.characters.schema.DEFAULT_EYELID_MAP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_EYELID_MAP</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.DEFAULT_EYELID_MAP" title="cutan.characters.schema.DEFAULT_EYELID_MAP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_EYELID_MAP</span></code></a></p></td>
 <td><p>Default eyelid-state → attachment-name mapping, shared by both eye slots.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.VIEW_CHANNEL" title="cutan.characters.schema.VIEW_CHANNEL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VIEW_CHANNEL</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.VIEW_CHANNEL" title="cutan.characters.schema.VIEW_CHANNEL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VIEW_CHANNEL</span></code></a></p></td>
 <td><p>one KEY per drawn view, projected onto the slots whose art changes with the view (the factory draws the head and the torso), each slot carrying attachments NAMED after the keys.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.VIEWS" title="cutan.characters.schema.VIEWS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VIEWS</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.VIEWS" title="cutan.characters.schema.VIEWS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VIEWS</span></code></a></p></td>
 <td><p>The views the factory draws, in turnaround order.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.DFLT_VIEW" title="cutan.characters.schema.DFLT_VIEW"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_VIEW</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.DFLT_VIEW" title="cutan.characters.schema.DFLT_VIEW"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_VIEW</span></code></a></p></td>
 <td><p>its default attachments ARE this view.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.VIEW_VARIANT_SEP" title="cutan.characters.schema.VIEW_VARIANT_SEP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VIEW_VARIANT_SEP</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.VIEW_VARIANT_SEP" title="cutan.characters.schema.VIEW_VARIANT_SEP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VIEW_VARIANT_SEP</span></code></a></p></td>
 <td><p>What joins a swap set's name to the view a variant of it serves: <code class="docutils literal notranslate"><span class="pre">eyelid@side</span></code> is the <code class="docutils literal notranslate"><span class="pre">eyelid</span></code> set drawn for the <code class="docutils literal notranslate"><span class="pre">side</span></code> view (an#220), the same separator the expression variants (<code class="docutils literal notranslate"><span class="pre">viseme@happy</span></code>, an#98) use.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.REQUIRED_PARTS" title="cutan.characters.schema.REQUIRED_PARTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REQUIRED_PARTS</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.REQUIRED_PARTS" title="cutan.characters.schema.REQUIRED_PARTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REQUIRED_PARTS</span></code></a></p></td>
 <td><p>Required body parts.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.SLOT_POSE_OFFSETS" title="cutan.characters.schema.SLOT_POSE_OFFSETS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SLOT_POSE_OFFSETS</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.SLOT_POSE_OFFSETS" title="cutan.characters.schema.SLOT_POSE_OFFSETS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SLOT_POSE_OFFSETS</span></code></a></p></td>
 <td><p>The transform properties a <a class="reference internal" href="#cutan.characters.schema.SlotPose" title="cutan.characters.schema.SlotPose"><code class="xref py py-class docutils literal notranslate"><span class="pre">SlotPose</span></code></a> sets, and whether each is an OFFSET added to the rest (in view_box units, so scaled by the rig), an ANGLE added to it (radians, never scaled) or a FACTOR on it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.LEG_LENGTH" title="cutan.characters.schema.LEG_LENGTH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LEG_LENGTH</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.LEG_LENGTH" title="cutan.characters.schema.LEG_LENGTH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LEG_LENGTH</span></code></a></p></td>
 <td><p>Hip to ground in the default rig, in view_box units.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.HEAD_ANCHOR" title="cutan.characters.schema.HEAD_ANCHOR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HEAD_ANCHOR</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.HEAD_ANCHOR" title="cutan.characters.schema.HEAD_ANCHOR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HEAD_ANCHOR</span></code></a></p></td>
 <td><p>the head hangs above the neck, its lower ~fifth overlapping the collar.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.REFERENCE_HEAD_HEIGHT" title="cutan.characters.schema.REFERENCE_HEAD_HEIGHT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REFERENCE_HEAD_HEIGHT</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.REFERENCE_HEAD_HEIGHT" title="cutan.characters.schema.REFERENCE_HEAD_HEIGHT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REFERENCE_HEAD_HEIGHT</span></code></a></p></td>
 <td><p>The head height the default face layout is drawn for, in view_box units — the pre-Wave-4 compiler's 96 px head at k = 345/1024.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.FACE_OFFSETS" title="cutan.characters.schema.FACE_OFFSETS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FACE_OFFSETS</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.FACE_OFFSETS" title="cutan.characters.schema.FACE_OFFSETS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FACE_OFFSETS</span></code></a></p></td>
 <td><p>Where each face part sits relative to the <code class="docutils literal notranslate"><span class="pre">head</span></code> bone, in view_box units.</p></td>
 </tr>
 </tbody>
@@ -287,12 +290,23 @@ list of <code class="docutils literal notranslate"><span class="pre">[time_s,</s
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="cutan.characters.schema.CHARACTER_DOCUMENT_KIND">
-<span class="sig-prename descclassname"><span class="pre">cutan.characters.schema.</span></span><span class="sig-name descname"><span class="pre">CHARACTER_DOCUMENT_KIND</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DocumentKind</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DocumentKind(name='CharacterDescriptor',</span> <span class="pre">version_field='schema_version',</span> <span class="pre">current_version='0.3.0')</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.schema.CHARACTER_DOCUMENT_KIND" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.schema.CHARACTER_DOCUMENT_KIND'">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.schema.</span></span><span class="sig-name descname"><span class="pre">CHARACTER_DOCUMENT_KIND</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DocumentKind</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DocumentKind(name='CharacterDescriptor',</span> <span class="pre">version_field='schema_version',</span> <span class="pre">current_version='0.4.0')</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.schema.CHARACTER_DOCUMENT_KIND" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.schema.CHARACTER_DOCUMENT_KIND'">¶</a></dt>
 <dd><p>The descriptor is a schema-versioned document in its own right, with its own
 version field. Registered here rather than in <code class="xref py py-mod docutils literal notranslate"><span class="pre">an.ir.migrate</span></code> because
 this module already imports from <code class="xref py py-mod docutils literal notranslate"><span class="pre">an.ir.assets</span></code> — registering from the
 other direction would close an import cycle, and because the package that
 owns a schema is the one that knows its version field.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.characters.schema.CHARACTER_SCHEMA_VERSION">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.schema.</span></span><span class="sig-name descname"><span class="pre">CHARACTER_SCHEMA_VERSION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.4.0'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.schema.CHARACTER_SCHEMA_VERSION" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.schema.CHARACTER_SCHEMA_VERSION'">¶</a></dt>
+<dd><p>the bones’ rest pose (<code class="docutils literal notranslate"><span class="pre">rotation_deg</span></code>, <code class="docutils literal notranslate"><span class="pre">scale_*</span></code>) poses the
+built parts; the migration protects a 0.3.0 rig that carried one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>0.4.0 (an#339)</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="cutan.characters.schema.CharacterDescriptor">
@@ -760,6 +774,7 @@ so the expression variants (an#98) and the view variants never collide.</p>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#cutan.characters.schema.CHARACTER_DOCUMENT_KIND'" class="reference internal" href="#cutan.characters.schema.CHARACTER_DOCUMENT_KIND"><code class="docutils literal notranslate"><span class="pre">CHARACTER_DOCUMENT_KIND</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.schema.CHARACTER_SCHEMA_VERSION'" class="reference internal" href="#cutan.characters.schema.CHARACTER_SCHEMA_VERSION"><code class="docutils literal notranslate"><span class="pre">CHARACTER_SCHEMA_VERSION</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.schema.CharacterDescriptor'" class="reference internal" href="#cutan.characters.schema.CharacterDescriptor"><code class="docutils literal notranslate"><span class="pre">CharacterDescriptor</span></code></a><ul>
 <li><a :data-current="activeSection === '#cutan.characters.schema.CharacterDescriptor.asset_sets'" class="reference internal" href="#cutan.characters.schema.CharacterDescriptor.asset_sets"><code class="docutils literal notranslate"><span class="pre">CharacterDescriptor.asset_sets</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.schema.CharacterDescriptor.colour_roles'" class="reference internal" href="#cutan.characters.schema.CharacterDescriptor.colour_roles"><code class="docutils literal notranslate"><span class="pre">CharacterDescriptor.colour_roles</span></code></a></li>
@@ -819,7 +834,7 @@ so the expression variants (an#98) and the view variants never collide.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=828725f0"></script>
+<script src="../_static/documentation_options.js?v=61a342a2"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
