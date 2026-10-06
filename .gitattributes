@@ -1,2 +1,5 @@
 *.ipynb linguist-documentation
 *.yaml text eol=lf
+
+# Two PRs each adding a line under the same date must rebase without a conflict: keep both lines.
+misc/CHANGELOG.md merge=union
