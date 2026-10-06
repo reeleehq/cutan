@@ -382,6 +382,11 @@ def capabilities(
         lines = [
             f"{aspect}: under {info['under_style']['style']}: "
             f"{info['under_style']['method']} ({info['under_style']['source']})"
+            + (
+                f", only while {', '.join(info['under_style']['while'])} is showing"
+                if info["under_style"].get("while")
+                else ""
+            )
             for aspect, info in described["aspects"].items()
             if "under_style" in info
         ]
@@ -417,6 +422,9 @@ def _under_style(described: dict, doc: dict, art, style: str) -> None:
             "method": r.method.id,
             "source": r.source,
         }
+        views = [str(t) for t in r.method.requires if str(t).startswith("swap.view")]
+        if views:  # resolved without a view: it runs only while that view shows
+            info["under_style"]["while"] = views
 
 
 def silhouette(

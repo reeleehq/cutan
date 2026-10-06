@@ -127,7 +127,44 @@ def policy_problems(policy: Any) -> list[str]:
                 out.append(
                     f"policy {aspect_name}: {choice.method!r} is not a {aspect_name} method id{hint}"
                 )
+        if aspect_name == "locomotion":
+            out.extend(_view_dependent_length_args(items, methods, S))
     return out
+
+
+#: The walk args that set its LENGTH (what a ``sequence`` waits for).
+_LENGTH_ARGS: frozenset[str] = frozenset(
+    {"step_s", "step_length", "steps", "distance", "to_x"}
+)
+
+
+def _view_dependent_length_args(items, methods, S) -> list[str]:
+    """A locomotion order whose entries need a view (``swap.view:side``) decides
+    its winner by the view in force at the walk; a walk's extent is measured
+    before the timeline places it, so it cannot know that view. An entry's own
+    length args would then make a ``sequence`` wait for the wrong walk: refused.
+    """
+    choices = []
+    for c in items:
+        try:
+            choices.append(S.Choice.of(c))
+        except S.VocabularyError:
+            return []
+    needs_view = [
+        c.method
+        for c in choices
+        if c.method in methods
+        and any(str(r).startswith("swap.view") for r in methods[c.method].requires)
+    ]
+    if not needs_view:
+        return []
+    return [
+        f"policy locomotion: {c.method!r} sets {', '.join(sorted(set(c.args) & _LENGTH_ARGS))}, "
+        f"but which entry wins depends on the view in force ({', '.join(needs_view)} needs "
+        "one), which a walk's length is measured without: put length args on the walk"
+        for c in choices
+        if set(c.args) & _LENGTH_ARGS
+    ]
 
 
 def check_policy(policy: Any, *, where: str = "policy") -> Any:

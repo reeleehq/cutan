@@ -270,3 +270,22 @@ def test_reiniger_walks_in_profile_only_while_the_side_view_shows(tmp_path):
     side = compile_shot(shot(set_("w", "view", "side", at=0.0)), mall, style_pack=pack,
                         strict_assets=True)
     assert _methods(side) == [("locomotion", "loco.legged_cycle", "loco.profile_cycle")]
+
+
+
+def test_length_args_on_a_view_dependent_order_are_refused():
+    """Which entry of [profile_cycle, legged_cycle] wins depends on the view at the
+    walk; the extent cannot see it, so an entry's step_s would mistime a sequence."""
+    (problem,) = policy_problems({"locomotion": [
+        {"method": "loco.profile_cycle", "args": {"step_s": 0.2}}, "loco.legged_cycle"]})
+    assert "step_s" in problem and "view" in problem
+    assert policy_problems({"locomotion": [{"method": "loco.bounce", "args": {"step_s": 0.2}}]}) == []
+
+
+def test_capabilities_says_a_view_bound_method_needs_its_view(tmp_path):
+    from cutan.characters import new_character
+    from cutan.characters.cli import capabilities
+
+    new_character(tmp_path, name="ned", seed="ned", use_dicebear=False, overwrite=True)
+    text = capabilities("ned", out_dir=str(tmp_path), style="reiniger")
+    assert "loco.profile_cycle (policy), only while swap.view:side is showing" in text
