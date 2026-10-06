@@ -481,7 +481,7 @@
 </span><span id="line-276">
 </span><span id="line-277"><span class="sd">    &gt;&gt;&gt; d = CharacterDescriptor(name="bob", asset_sets={"eyelid": {"OPEN": "o", "CLOSED": "c"}})</span>
 </span><span id="line-278"><span class="sd">    &gt;&gt;&gt; lid_rung_problems(d, None, axes={"lid_open_l": -0.45})</span>
-</span><span id="line-279"><span class="sd">    ["bob's eyelids have no 'HALF' drawing, so lid_open_l -0.45 shows 'OPEN' (its eyelid set: CLOSED, OPEN): add a HALF eyelid drawing to the set, or use -0.85 or lower to close the lid"]</span>
+</span><span id="line-279"><span class="sd">    ["bob's eyelids have no 'HALF' drawing, so lid_open_l -0.45 shows 'OPEN' (its eyelid set: CLOSED, OPEN): add a HALF eyelid drawing to the set (`an character add-half-lid bob` makes one from the rig's own lids), or use -0.85 or lower to close the lid"]</span>
 </span><span id="line-280"><span class="sd">    &gt;&gt;&gt; lid_rung_problems(d, None, axes={"lid_open_l": -0.9})</span>
 </span><span id="line-281"><span class="sd">    []</span>
 </span><span id="line-282"><span class="sd">    """</span>
@@ -504,146 +504,147 @@
 </span><span id="line-299">        <span class="n">shown</span> <span class="o">=</span> <span class="n">lid_key</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">available</span><span class="o">=</span><span class="n">keys</span><span class="p">)</span>
 </span><span id="line-300">        <span class="k">if</span> <span class="n">wanted</span> <span class="o">!=</span> <span class="n">shown</span><span class="p">:</span>
 </span><span id="line-301">            <span class="n">fix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"add a </span><span class="si">{</span><span class="n">wanted</span><span class="si">}</span><span class="s2"> eyelid drawing to the set"</span> <span class="o">+</span> <span class="p">(</span>
-</span><span id="line-302">                <span class="sa">f</span><span class="s2">", or use </span><span class="si">{</span><span class="n">LID_CLOSED_BELOW</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> or lower to close the lid"</span>
-</span><span id="line-303">                <span class="k">if</span> <span class="n">wanted</span> <span class="o">==</span> <span class="n">LID_KEY_HALF</span>
-</span><span id="line-304">                <span class="k">else</span> <span class="s2">""</span>
-</span><span id="line-305">            <span class="p">)</span>
-</span><span id="line-306">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-307">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2">'s eyelids have no </span><span class="si">{</span><span class="n">wanted</span><span class="si">!r}</span><span class="s2"> drawing, so </span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">+.2f</span><span class="si">}</span><span class="s2"> "</span>
-</span><span id="line-308">                <span class="sa">f</span><span class="s2">"shows </span><span class="si">{</span><span class="n">shown</span><span class="si">!r}</span><span class="s2"> (its eyelid set: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">))</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">fix</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-309">            <span class="p">)</span>
-</span><span id="line-310">    <span class="k">return</span> <span class="n">out</span></div>
+</span><span id="line-302">                <span class="sa">f</span><span class="s2">" (`an character add-half-lid </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">` makes one from the "</span>
+</span><span id="line-303">                <span class="sa">f</span><span class="s2">"rig's own lids), or use </span><span class="si">{</span><span class="n">LID_CLOSED_BELOW</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> or lower to close the lid"</span>
+</span><span id="line-304">                <span class="k">if</span> <span class="n">wanted</span> <span class="o">==</span> <span class="n">LID_KEY_HALF</span>
+</span><span id="line-305">                <span class="k">else</span> <span class="s2">""</span>
+</span><span id="line-306">            <span class="p">)</span>
+</span><span id="line-307">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-308">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2">'s eyelids have no </span><span class="si">{</span><span class="n">wanted</span><span class="si">!r}</span><span class="s2"> drawing, so </span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">+.2f</span><span class="si">}</span><span class="s2"> "</span>
+</span><span id="line-309">                <span class="sa">f</span><span class="s2">"shows </span><span class="si">{</span><span class="n">shown</span><span class="si">!r}</span><span class="s2"> (its eyelid set: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">))</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">fix</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-310">            <span class="p">)</span>
+</span><span id="line-311">    <span class="k">return</span> <span class="n">out</span></div>
 
-</span><span id="line-311">
 </span><span id="line-312">
+</span><span id="line-313">
 <div class="viewcode-block" id="resolve_mouth_set">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.resolve_mouth_set">[docs]</a>
-</span><span id="line-313"><span class="k">def</span><span class="w"> </span><span class="nf">resolve_mouth_set</span><span class="p">(</span>
-</span><span id="line-314">    <span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span><span class="p">,</span>
-</span><span id="line-315">    <span class="n">preset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-316">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-317">    <span class="n">keys_used</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="line-318">    <span class="n">who</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-319"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-320"><span class="w">    </span><span class="sd">"""Which mouth set a line under ``preset`` uses — the one chain, shared.</span>
-</span><span id="line-321">
-</span><span id="line-322"><span class="sd">    ``viseme@&lt;form&gt;`` if the preset prefers a form the descriptor declares and</span>
-</span><span id="line-323"><span class="sd">    that set covers ``keys_used``; else ``viseme`` with a warning naming what</span>
-</span><span id="line-324"><span class="sd">    was missing; else :class:`ExpressionResolutionError`. A descriptor with no</span>
-</span><span id="line-325"><span class="sd">    ``viseme`` set and no covering variant cannot speak at all — that is the</span>
-</span><span id="line-326"><span class="sd">    error, not a fallback.</span>
-</span><span id="line-327"><span class="sd">    """</span>
-</span><span id="line-328">    <span class="n">who</span> <span class="o">=</span> <span class="n">who</span> <span class="ow">or</span> <span class="n">desc</span><span class="o">.</span><span class="n">name</span>
-</span><span id="line-329">    <span class="n">form</span> <span class="o">=</span> <span class="n">mouth_form_of</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
-</span><span id="line-330">    <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys_used</span><span class="p">}</span>
-</span><span id="line-331">    <span class="k">if</span> <span class="n">form</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-332">        <span class="n">variant</span> <span class="o">=</span> <span class="n">variant_set_name</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
-</span><span id="line-333">        <span class="n">declared</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">variant</span><span class="p">)</span>
-</span><span id="line-334">        <span class="k">if</span> <span class="n">declared</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-335">            <span class="n">reason</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"declares no </span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> set"</span>
-</span><span id="line-336">        <span class="k">else</span><span class="p">:</span>
-</span><span id="line-337">            <span class="n">missing</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span> <span class="o">-</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">declared</span><span class="p">})</span>
-</span><span id="line-338">            <span class="k">if</span> <span class="ow">not</span> <span class="n">missing</span><span class="p">:</span>
-</span><span id="line-339">                <span class="k">return</span> <span class="n">variant</span>
-</span><span id="line-340">            <span class="n">reason</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> lacks the keys </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> this line uses"</span>
-</span><span id="line-341">        <span class="k">if</span> <span class="n">VISEME_CHANNEL</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">:</span>
-</span><span id="line-342">            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-</span><span id="line-343">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">; the neutral </span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">!r}</span><span class="s2"> set is used under "</span>
-</span><span id="line-344">                <span class="sa">f</span><span class="s2">"the </span><span class="si">{</span><span class="n">preset</span><span class="si">!r}</span><span class="s2"> expression instead (give the character a "</span>
-</span><span id="line-345">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> mouth set to change that: `an character mouths "</span>
-</span><span id="line-346">                <span class="sa">f</span><span class="s2">"--variants </span><span class="si">{</span><span class="n">form</span><span class="si">}</span><span class="s2">`)"</span><span class="p">,</span>
-</span><span id="line-347">                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-</span><span id="line-348">            <span class="p">)</span>
-</span><span id="line-349">            <span class="k">return</span> <span class="n">VISEME_CHANNEL</span>
-</span><span id="line-350">        <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
-</span><span id="line-351">            <span class="n">who</span><span class="p">,</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">, and there is no </span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">!r}</span><span class="s2"> set to fall back on"</span><span class="p">]</span>
-</span><span id="line-352">        <span class="p">)</span>
-</span><span id="line-353">    <span class="k">if</span> <span class="n">VISEME_CHANNEL</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">:</span>
-</span><span id="line-354">        <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
-</span><span id="line-355">            <span class="n">who</span><span class="p">,</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"declares no </span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">!r}</span><span class="s2"> mouth set, so it cannot speak"</span><span class="p">]</span>
-</span><span id="line-356">        <span class="p">)</span>
-</span><span id="line-357">    <span class="k">return</span> <span class="n">VISEME_CHANNEL</span></div>
+</span><span id="line-314"><span class="k">def</span><span class="w"> </span><span class="nf">resolve_mouth_set</span><span class="p">(</span>
+</span><span id="line-315">    <span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span><span class="p">,</span>
+</span><span id="line-316">    <span class="n">preset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-317">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-318">    <span class="n">keys_used</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="line-319">    <span class="n">who</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-320"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-321"><span class="w">    </span><span class="sd">"""Which mouth set a line under ``preset`` uses — the one chain, shared.</span>
+</span><span id="line-322">
+</span><span id="line-323"><span class="sd">    ``viseme@&lt;form&gt;`` if the preset prefers a form the descriptor declares and</span>
+</span><span id="line-324"><span class="sd">    that set covers ``keys_used``; else ``viseme`` with a warning naming what</span>
+</span><span id="line-325"><span class="sd">    was missing; else :class:`ExpressionResolutionError`. A descriptor with no</span>
+</span><span id="line-326"><span class="sd">    ``viseme`` set and no covering variant cannot speak at all — that is the</span>
+</span><span id="line-327"><span class="sd">    error, not a fallback.</span>
+</span><span id="line-328"><span class="sd">    """</span>
+</span><span id="line-329">    <span class="n">who</span> <span class="o">=</span> <span class="n">who</span> <span class="ow">or</span> <span class="n">desc</span><span class="o">.</span><span class="n">name</span>
+</span><span id="line-330">    <span class="n">form</span> <span class="o">=</span> <span class="n">mouth_form_of</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
+</span><span id="line-331">    <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys_used</span><span class="p">}</span>
+</span><span id="line-332">    <span class="k">if</span> <span class="n">form</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-333">        <span class="n">variant</span> <span class="o">=</span> <span class="n">variant_set_name</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+</span><span id="line-334">        <span class="n">declared</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">variant</span><span class="p">)</span>
+</span><span id="line-335">        <span class="k">if</span> <span class="n">declared</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-336">            <span class="n">reason</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"declares no </span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> set"</span>
+</span><span id="line-337">        <span class="k">else</span><span class="p">:</span>
+</span><span id="line-338">            <span class="n">missing</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span> <span class="o">-</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">declared</span><span class="p">})</span>
+</span><span id="line-339">            <span class="k">if</span> <span class="ow">not</span> <span class="n">missing</span><span class="p">:</span>
+</span><span id="line-340">                <span class="k">return</span> <span class="n">variant</span>
+</span><span id="line-341">            <span class="n">reason</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> lacks the keys </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> this line uses"</span>
+</span><span id="line-342">        <span class="k">if</span> <span class="n">VISEME_CHANNEL</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">:</span>
+</span><span id="line-343">            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+</span><span id="line-344">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">; the neutral </span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">!r}</span><span class="s2"> set is used under "</span>
+</span><span id="line-345">                <span class="sa">f</span><span class="s2">"the </span><span class="si">{</span><span class="n">preset</span><span class="si">!r}</span><span class="s2"> expression instead (give the character a "</span>
+</span><span id="line-346">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variant</span><span class="si">!r}</span><span class="s2"> mouth set to change that: `an character mouths "</span>
+</span><span id="line-347">                <span class="sa">f</span><span class="s2">"--variants </span><span class="si">{</span><span class="n">form</span><span class="si">}</span><span class="s2">`)"</span><span class="p">,</span>
+</span><span id="line-348">                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+</span><span id="line-349">            <span class="p">)</span>
+</span><span id="line-350">            <span class="k">return</span> <span class="n">VISEME_CHANNEL</span>
+</span><span id="line-351">        <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
+</span><span id="line-352">            <span class="n">who</span><span class="p">,</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">, and there is no </span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">!r}</span><span class="s2"> set to fall back on"</span><span class="p">]</span>
+</span><span id="line-353">        <span class="p">)</span>
+</span><span id="line-354">    <span class="k">if</span> <span class="n">VISEME_CHANNEL</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">:</span>
+</span><span id="line-355">        <span class="k">raise</span> <span class="n">ExpressionResolutionError</span><span class="p">(</span>
+</span><span id="line-356">            <span class="n">who</span><span class="p">,</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"declares no </span><span class="si">{</span><span class="n">VISEME_CHANNEL</span><span class="si">!r}</span><span class="s2"> mouth set, so it cannot speak"</span><span class="p">]</span>
+</span><span id="line-357">        <span class="p">)</span>
+</span><span id="line-358">    <span class="k">return</span> <span class="n">VISEME_CHANNEL</span></div>
 
-</span><span id="line-358">
 </span><span id="line-359">
+</span><span id="line-360">
 <div class="viewcode-block" id="expression_problems">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.expression_problems">[docs]</a>
-</span><span id="line-360"><span class="k">def</span><span class="w"> </span><span class="nf">expression_problems</span><span class="p">(</span>
-</span><span id="line-361">    <span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-362">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-363">    <span class="n">preset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-364">    <span class="n">axes</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-</span><span id="line-365">    <span class="n">who</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-366"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-367"><span class="w">    </span><span class="sd">"""Every reason an expression cannot resolve on ``desc`` — empty means it can.</span>
-</span><span id="line-368">
-</span><span id="line-369"><span class="sd">    Shared by ``an validate`` (each becomes an error Finding) and the compiler</span>
-</span><span id="line-370"><span class="sd">    (which raises :class:`ExpressionResolutionError` with the same list).</span>
-</span><span id="line-371">
-</span><span id="line-372"><span class="sd">    &gt;&gt;&gt; expression_problems(CharacterDescriptor(name="m"), preset="joyful", who="m")</span>
-</span><span id="line-373"><span class="sd">    ["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]</span>
-</span><span id="line-374"><span class="sd">    &gt;&gt;&gt; expression_problems(CharacterDescriptor(name="m", face_overlay=False), preset="happy", who="m")[0].startswith("'m' has its face baked")</span>
-</span><span id="line-375"><span class="sd">    True</span>
-</span><span id="line-376"><span class="sd">    """</span>
-</span><span id="line-377">    <span class="n">problems</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-378">    <span class="k">if</span> <span class="n">preset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">preset</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PRESETS</span><span class="p">:</span>
-</span><span id="line-379">        <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-380">            <span class="sa">f</span><span class="s2">"unknown expression preset </span><span class="si">{</span><span class="n">preset</span><span class="si">!r}</span><span class="s2"> (known: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">known_presets</span><span class="p">())</span><span class="si">}</span><span class="s2">)"</span>
-</span><span id="line-381">        <span class="p">)</span>
-</span><span id="line-382">    <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
-</span><span id="line-383">        <span class="k">if</span> <span class="n">axis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AXES</span><span class="p">:</span>
-</span><span id="line-384">            <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-385">                <span class="sa">f</span><span class="s2">"unknown expression axis </span><span class="si">{</span><span class="n">axis</span><span class="si">!r}</span><span class="s2"> (known: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">AXES</span><span class="p">))</span><span class="si">}</span><span class="s2">)"</span>
-</span><span id="line-386">            <span class="p">)</span>
-</span><span id="line-387">    <span class="k">if</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-388">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-389">            <span class="n">binding_for</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
-</span><span id="line-390">        <span class="k">except</span> <span class="n">ExpressionResolutionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-391">            <span class="n">problems</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">problems</span><span class="p">)</span>
-</span><span id="line-392">    <span class="k">if</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">desc</span><span class="o">.</span><span class="n">face_overlay</span><span class="p">:</span>
-</span><span id="line-393">        <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-394">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">!r}</span><span class="s2"> has its face baked into the head art (face_overlay: false), so "</span>
-</span><span id="line-395">            <span class="s2">"there is no brow, lid or pupil node for an expression to move. Two "</span>
-</span><span id="line-396">            <span class="s2">"exits: `an character promote` a hand-drawn rig with overlay face parts "</span>
-</span><span id="line-397">            <span class="s2">"(or `an character new --offline`, whose synthesized face is overlay "</span>
-</span><span id="line-398">            <span class="s2">"art), then `an character add-gaze` for the pupils."</span>
-</span><span id="line-399">        <span class="p">)</span>
-</span><span id="line-400">    <span class="k">return</span> <span class="n">problems</span></div>
+</span><span id="line-361"><span class="k">def</span><span class="w"> </span><span class="nf">expression_problems</span><span class="p">(</span>
+</span><span id="line-362">    <span class="n">desc</span><span class="p">:</span> <span class="n">CharacterDescriptor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-363">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-364">    <span class="n">preset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-365">    <span class="n">axes</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+</span><span id="line-366">    <span class="n">who</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-367"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-368"><span class="w">    </span><span class="sd">"""Every reason an expression cannot resolve on ``desc`` — empty means it can.</span>
+</span><span id="line-369">
+</span><span id="line-370"><span class="sd">    Shared by ``an validate`` (each becomes an error Finding) and the compiler</span>
+</span><span id="line-371"><span class="sd">    (which raises :class:`ExpressionResolutionError` with the same list).</span>
+</span><span id="line-372">
+</span><span id="line-373"><span class="sd">    &gt;&gt;&gt; expression_problems(CharacterDescriptor(name="m"), preset="joyful", who="m")</span>
+</span><span id="line-374"><span class="sd">    ["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]</span>
+</span><span id="line-375"><span class="sd">    &gt;&gt;&gt; expression_problems(CharacterDescriptor(name="m", face_overlay=False), preset="happy", who="m")[0].startswith("'m' has its face baked")</span>
+</span><span id="line-376"><span class="sd">    True</span>
+</span><span id="line-377"><span class="sd">    """</span>
+</span><span id="line-378">    <span class="n">problems</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-379">    <span class="k">if</span> <span class="n">preset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">preset</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PRESETS</span><span class="p">:</span>
+</span><span id="line-380">        <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-381">            <span class="sa">f</span><span class="s2">"unknown expression preset </span><span class="si">{</span><span class="n">preset</span><span class="si">!r}</span><span class="s2"> (known: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">known_presets</span><span class="p">())</span><span class="si">}</span><span class="s2">)"</span>
+</span><span id="line-382">        <span class="p">)</span>
+</span><span id="line-383">    <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
+</span><span id="line-384">        <span class="k">if</span> <span class="n">axis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AXES</span><span class="p">:</span>
+</span><span id="line-385">            <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-386">                <span class="sa">f</span><span class="s2">"unknown expression axis </span><span class="si">{</span><span class="n">axis</span><span class="si">!r}</span><span class="s2"> (known: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">AXES</span><span class="p">))</span><span class="si">}</span><span class="s2">)"</span>
+</span><span id="line-387">            <span class="p">)</span>
+</span><span id="line-388">    <span class="k">if</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-389">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-390">            <span class="n">binding_for</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+</span><span id="line-391">        <span class="k">except</span> <span class="n">ExpressionResolutionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-392">            <span class="n">problems</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">problems</span><span class="p">)</span>
+</span><span id="line-393">    <span class="k">if</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">desc</span><span class="o">.</span><span class="n">face_overlay</span><span class="p">:</span>
+</span><span id="line-394">        <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-395">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="si">!r}</span><span class="s2"> has its face baked into the head art (face_overlay: false), so "</span>
+</span><span id="line-396">            <span class="s2">"there is no brow, lid or pupil node for an expression to move. Two "</span>
+</span><span id="line-397">            <span class="s2">"exits: `an character promote` a hand-drawn rig with overlay face parts "</span>
+</span><span id="line-398">            <span class="s2">"(or `an character new --offline`, whose synthesized face is overlay "</span>
+</span><span id="line-399">            <span class="s2">"art), then `an character add-gaze` for the pupils."</span>
+</span><span id="line-400">        <span class="p">)</span>
+</span><span id="line-401">    <span class="k">return</span> <span class="n">problems</span></div>
 
-</span><span id="line-401">
 </span><span id="line-402">
+</span><span id="line-403">
 <div class="viewcode-block" id="touches_gaze">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.binding.html#cutan.expression.touches_gaze">[docs]</a>
-</span><span id="line-403"><span class="k">def</span><span class="w"> </span><span class="nf">touches_gaze</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-404"><span class="w">    </span><span class="sd">"""Whether any of ``axes`` is a gaze axis (a no-op on a rig without pupils).</span>
-</span><span id="line-405">
-</span><span id="line-406"><span class="sd">    &gt;&gt;&gt; touches_gaze(["gaze_x"]), touches_gaze(["brow_angle_l"])</span>
-</span><span id="line-407"><span class="sd">    (True, False)</span>
-</span><span id="line-408"><span class="sd">    """</span>
-</span><span id="line-409">    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">a</span> <span class="ow">in</span> <span class="n">GAZE_AXES</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">)</span></div>
+</span><span id="line-404"><span class="k">def</span><span class="w"> </span><span class="nf">touches_gaze</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-405"><span class="w">    </span><span class="sd">"""Whether any of ``axes`` is a gaze axis (a no-op on a rig without pupils).</span>
+</span><span id="line-406">
+</span><span id="line-407"><span class="sd">    &gt;&gt;&gt; touches_gaze(["gaze_x"]), touches_gaze(["brow_angle_l"])</span>
+</span><span id="line-408"><span class="sd">    (True, False)</span>
+</span><span id="line-409"><span class="sd">    """</span>
+</span><span id="line-410">    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">a</span> <span class="ow">in</span> <span class="n">GAZE_AXES</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">)</span></div>
 
-</span><span id="line-410">
 </span><span id="line-411">
-</span><span id="line-412"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-413">    <span class="s2">"BROW_ANGLE_TRAVEL"</span><span class="p">,</span>
-</span><span id="line-414">    <span class="s2">"BROW_HEIGHT_TRAVEL"</span><span class="p">,</span>
-</span><span id="line-415">    <span class="s2">"Binding"</span><span class="p">,</span>
-</span><span id="line-416">    <span class="s2">"ChannelBinding"</span><span class="p">,</span>
-</span><span id="line-417">    <span class="s2">"ExpressionResolutionError"</span><span class="p">,</span>
-</span><span id="line-418">    <span class="s2">"GAZE_TRAVEL"</span><span class="p">,</span>
-</span><span id="line-419">    <span class="s2">"LID_SQUASH_GAIN"</span><span class="p">,</span>
-</span><span id="line-420">    <span class="s2">"SetBinding"</span><span class="p">,</span>
-</span><span id="line-421">    <span class="s2">"binding_for"</span><span class="p">,</span>
-</span><span id="line-422">    <span class="s2">"declared_mouth_variants"</span><span class="p">,</span>
-</span><span id="line-423">    <span class="s2">"default_binding"</span><span class="p">,</span>
-</span><span id="line-424">    <span class="s2">"expression_problems"</span><span class="p">,</span>
-</span><span id="line-425">    <span class="s2">"preset_axes"</span><span class="p">,</span>
-</span><span id="line-426">    <span class="s2">"missing_mouth_form"</span><span class="p">,</span>
-</span><span id="line-427">    <span class="s2">"lid_rung_problems"</span><span class="p">,</span>
-</span><span id="line-428">    <span class="s2">"resolve_mouth_set"</span><span class="p">,</span>
-</span><span id="line-429">    <span class="s2">"touches_gaze"</span><span class="p">,</span>
-</span><span id="line-430">    <span class="s2">"variant_set_name"</span><span class="p">,</span>
-</span><span id="line-431"><span class="p">]</span>
+</span><span id="line-412">
+</span><span id="line-413"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-414">    <span class="s2">"BROW_ANGLE_TRAVEL"</span><span class="p">,</span>
+</span><span id="line-415">    <span class="s2">"BROW_HEIGHT_TRAVEL"</span><span class="p">,</span>
+</span><span id="line-416">    <span class="s2">"Binding"</span><span class="p">,</span>
+</span><span id="line-417">    <span class="s2">"ChannelBinding"</span><span class="p">,</span>
+</span><span id="line-418">    <span class="s2">"ExpressionResolutionError"</span><span class="p">,</span>
+</span><span id="line-419">    <span class="s2">"GAZE_TRAVEL"</span><span class="p">,</span>
+</span><span id="line-420">    <span class="s2">"LID_SQUASH_GAIN"</span><span class="p">,</span>
+</span><span id="line-421">    <span class="s2">"SetBinding"</span><span class="p">,</span>
+</span><span id="line-422">    <span class="s2">"binding_for"</span><span class="p">,</span>
+</span><span id="line-423">    <span class="s2">"declared_mouth_variants"</span><span class="p">,</span>
+</span><span id="line-424">    <span class="s2">"default_binding"</span><span class="p">,</span>
+</span><span id="line-425">    <span class="s2">"expression_problems"</span><span class="p">,</span>
+</span><span id="line-426">    <span class="s2">"preset_axes"</span><span class="p">,</span>
+</span><span id="line-427">    <span class="s2">"missing_mouth_form"</span><span class="p">,</span>
+</span><span id="line-428">    <span class="s2">"lid_rung_problems"</span><span class="p">,</span>
+</span><span id="line-429">    <span class="s2">"resolve_mouth_set"</span><span class="p">,</span>
+</span><span id="line-430">    <span class="s2">"touches_gaze"</span><span class="p">,</span>
+</span><span id="line-431">    <span class="s2">"variant_set_name"</span><span class="p">,</span>
+</span><span id="line-432"><span class="p">]</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -657,7 +658,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=0e525676"></script>
+    <script src="../../../_static/documentation_options.js?v=aa2ad26f"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

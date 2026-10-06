@@ -1,0 +1,21 @@
+cutan.characters.lids
+=====================
+
+.. automodule:: cutan.characters.lids
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DFLT_HALF_LID_FRACTION
+      HALF_ATTACHMENT
+      HALF_LID_PROVIDER
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      add_half_lid
+      half_lid_svg
+   

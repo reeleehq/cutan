@@ -178,7 +178,7 @@ a baked face.
 ```pycon
 >>> d = CharacterDescriptor(name="bob", asset_sets={"eyelid": {"OPEN": "o", "CLOSED": "c"}})
 >>> lid_rung_problems(d, None, axes={"lid_open_l": -0.45})
-["bob's eyelids have no 'HALF' drawing, so lid_open_l -0.45 shows 'OPEN' (its eyelid set: CLOSED, OPEN): add a HALF eyelid drawing to the set, or use -0.85 or lower to close the lid"]
+["bob's eyelids have no 'HALF' drawing, so lid_open_l -0.45 shows 'OPEN' (its eyelid set: CLOSED, OPEN): add a HALF eyelid drawing to the set (`an character add-half-lid bob` makes one from the rig's own lids), or use -0.85 or lower to close the lid"]
 >>> lid_rung_problems(d, None, axes={"lid_open_l": -0.9})
 []
 ```

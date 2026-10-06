@@ -15,6 +15,7 @@ cutan.characters.cli
    .. autosummary::
    
       add_gaze
+      add_half_lid
       add_views
       capabilities
       contract

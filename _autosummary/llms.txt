@@ -30,6 +30,7 @@
 - [cutan.characters.factory](cutan.characters.factory.html.md): High-level entry points: build and inspect a character.
 - [cutan.characters.idle](cutan.characters.idle.html.md): Idle animation factories: breath, blink, weight-shift.
 - [cutan.characters.licenses](cutan.characters.licenses.html.md): DiceBear per-style licences, as data.
+- [cutan.characters.lids](cutan.characters.lids.html.md): A HALF eyelid drawing, made from a character’s own OPEN and CLOSED lid art (cutan#65).
 - [cutan.characters.methods](cutan.characters.methods.html.md): The cut-out genre’s methods and aspects, and their compile-time resolution (ADR 0002).
 - [cutan.characters.mouth_set](cutan.characters.mouth_set.html.md): Generate the 9-shape default mouth set as parametric SVGs.
 - [cutan.characters.play](cutan.characters.play.html.md): Resolve a &#96;play&#96; against a character descriptor — the renderer-free half (an#7).

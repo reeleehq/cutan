@@ -10,6 +10,7 @@ Subcommands (used as `an character <verb> ...`):
 
 - `new`       — generate a fresh character from DiceBear or fallback art.
 - `add-views` — give an offline character its turnaround (an#197).
+- `add-half-lid` — a HALF eyelid drawing from the rig’s own lid art (cutan#65).
 - `mouths`    — regenerate the 9-shape default mouth set.
 - `validate`  — completeness check.
 - `capabilities` — what it affords, and per aspect which methods apply (an#248).
@@ -25,6 +26,7 @@ Subcommands (used as `an character <verb> ...`):
 
 | [`add_gaze`](#cutan.characters.cli.add_gaze)(name[, out_dir, overwrite_eyes])         | Give `name` the eye stack (an#99): sclera and pupil slots under each lid, a filled closed lid, and the `gaze_travel` clamp — so `gaze_x` / `gaze_y` and the ambient saccades move its pupils.   |
 |----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`add_half_lid`](#cutan.characters.cli.add_half_lid)(name[, out_dir, fraction, ...])      | Give `name` a HALF eyelid drawing (cutan#65), made from its own OPEN and CLOSED lid art: the closed lid cut to its top `fraction`, under the open eye's outline.                                |
 | [`add_views`](#cutan.characters.cli.add_views)(name[, out_dir])                        | Give `name` its turnaround (an#197): back, side and three-quarter head and torso art, a `view` swap set, and a pose per view — so `play: turn` and `set <name> view <key>` turn it.             |
 | [`capabilities`](#cutan.characters.cli.capabilities)(name[, out_dir, as_json, style])     | What a character affords, and per aspect which methods apply and what the rest lack.                                                                                                            |
 | [`contract`](#cutan.characters.cli.contract)()                                        | Print the art-package contract an illustrator must satisfy.                                                                                                                                     |
@@ -53,6 +55,21 @@ overwrite_eyes: replace hand-drawn eye parts with the synthesized outline
 
 > and filled lid (refused otherwise — a promoted rig’s eyes are not the
 > factory’s to redraw)
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.add_half_lid(name, out_dir='', fraction=0.5, overwrite=False)
+
+Give `name` a HALF eyelid drawing (cutan#65), made from its own OPEN and
+CLOSED lid art: the closed lid cut to its top `fraction`, under the open
+eye’s outline. A partial lid (`lid_open` between -0.35 and -0.85: a squint,
+suspicion, annoyance) then narrows the eyes instead of showing them open.
+
+name: character id
+out_dir: parent directory; defaults to ./assets/characters
+fraction: how much of the eye the half lid covers, from the top
+overwrite: replace a HALF lid someone drew (refused otherwise)
+
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 

@@ -137,6 +137,7 @@ and returns a string for terminal display.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">new</span></code>       — generate a fresh character from DiceBear or fallback art.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">add-views</span></code> — give an offline character its turnaround (an#197).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">add-half-lid</span></code> — a HALF eyelid drawing from the rig’s own lid art (cutan#65).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mouths</span></code>    — regenerate the 9-shape default mouth set.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">validate</span></code>  — completeness check.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">capabilities</span></code> — what it affords, and per aspect which methods apply (an#248).</p></li>
@@ -157,31 +158,34 @@ and returns a string for terminal display.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.add_gaze" title="cutan.characters.cli.add_gaze"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_gaze</span></code></a>(name[, out_dir, overwrite_eyes])</p></td>
 <td><p>Give <code class="docutils literal notranslate"><span class="pre">name</span></code> the eye stack (an#99): sclera and pupil slots under each lid, a filled closed lid, and the <code class="docutils literal notranslate"><span class="pre">gaze_travel</span></code> clamp — so <code class="code docutils literal notranslate"><span class="pre">gaze_x</span></code> / <code class="code docutils literal notranslate"><span class="pre">gaze_y</span></code> and the ambient saccades move its pupils.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.add_views" title="cutan.characters.cli.add_views"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_views</span></code></a>(name[, out_dir])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.add_half_lid" title="cutan.characters.cli.add_half_lid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_half_lid</span></code></a>(name[, out_dir, fraction, ...])</p></td>
+<td><p>Give <code class="docutils literal notranslate"><span class="pre">name</span></code> a HALF eyelid drawing (cutan#65), made from its own OPEN and CLOSED lid art: the closed lid cut to its top <code class="docutils literal notranslate"><span class="pre">fraction</span></code>, under the open eye's outline.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.add_views" title="cutan.characters.cli.add_views"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_views</span></code></a>(name[, out_dir])</p></td>
 <td><p>Give <code class="docutils literal notranslate"><span class="pre">name</span></code> its turnaround (an#197): back, side and three-quarter head and torso art, a <code class="code docutils literal notranslate"><span class="pre">view</span></code> swap set, and a pose per view — so <code class="code docutils literal notranslate"><span class="pre">play:</span> <span class="pre">turn</span></code> and <code class="code docutils literal notranslate"><span class="pre">set</span> <span class="pre">&lt;name&gt;</span> <span class="pre">view</span> <span class="pre">&lt;key&gt;</span></code> turn it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.capabilities" title="cutan.characters.cli.capabilities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capabilities</span></code></a>(name[, out_dir, as_json, style])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.capabilities" title="cutan.characters.cli.capabilities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capabilities</span></code></a>(name[, out_dir, as_json, style])</p></td>
 <td><p>What a character affords, and per aspect which methods apply and what the rest lack.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.contract" title="cutan.characters.cli.contract"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contract</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.contract" title="cutan.characters.cli.contract"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contract</span></code></a>()</p></td>
 <td><p>Print the art-package contract an illustrator must satisfy.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.mouths" title="cutan.characters.cli.mouths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouths</span></code></a>(name[, out_dir, palette, variants])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.mouths" title="cutan.characters.cli.mouths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouths</span></code></a>(name[, out_dir, palette, variants])</p></td>
 <td><p>Regenerate the default 9-shape mouth set for <code class="docutils literal notranslate"><span class="pre">name</span></code>, plus its <code class="code docutils literal notranslate"><span class="pre">viseme@&lt;form&gt;</span></code> variants, and declare them in the descriptor.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.new" title="cutan.characters.cli.new"><code class="xref py py-obj docutils literal notranslate"><span class="pre">new</span></code></a>(name[, out_dir, seed, style, voice_ref, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.new" title="cutan.characters.cli.new"><code class="xref py py-obj docutils literal notranslate"><span class="pre">new</span></code></a>(name[, out_dir, seed, style, voice_ref, ...])</p></td>
 <td><p>Create a new character at <code class="docutils literal notranslate"><span class="pre">out_dir</span></code>/<code class="docutils literal notranslate"><span class="pre">name</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.preview" title="cutan.characters.cli.preview"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preview</span></code></a>(name[, out_dir, open_browser])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.preview" title="cutan.characters.cli.preview"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preview</span></code></a>(name[, out_dir, open_browser])</p></td>
 <td><p>Render a small HTML viewer that previews all visemes + idle animation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.record" title="cutan.characters.cli.record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record</span></code></a>(name[, out_dir, output, duration, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.record" title="cutan.characters.cli.record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record</span></code></a>(name[, out_dir, output, duration, ...])</p></td>
 <td><p>Record a character's preview HTML to mp4.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.silhouette" title="cutan.characters.cli.silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">silhouette</span></code></a>(name[, other, out_dir, output, size])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.silhouette" title="cutan.characters.cli.silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">silhouette</span></code></a>(name[, other, out_dir, output, size])</p></td>
 <td><p>Render a black silhouette for <code class="docutils literal notranslate"><span class="pre">name</span></code> (and optionally compare to <code class="docutils literal notranslate"><span class="pre">other</span></code>).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.validate" title="cutan.characters.cli.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(name[, out_dir])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.validate" title="cutan.characters.cli.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(name[, out_dir])</p></td>
 <td><p>Validate a character's directory structure and descriptor.</p></td>
 </tr>
 </tbody>
@@ -206,6 +210,23 @@ overwrite_eyes: replace hand-drawn eye parts with the synthesized outline</p>
 <div><p>and filled lid (refused otherwise — a promoted rig’s eyes are not the
 factory’s to redraw)</p>
 </div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.cli.add_half_lid">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.cli.</span></span><span class="sig-name descname"><span class="pre">add_half_lid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/cli.html#add_half_lid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.cli.add_half_lid" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.cli.add_half_lid'">¶</a></dt>
+<dd><p>Give <code class="docutils literal notranslate"><span class="pre">name</span></code> a HALF eyelid drawing (cutan#65), made from its own OPEN and
+CLOSED lid art: the closed lid cut to its top <code class="docutils literal notranslate"><span class="pre">fraction</span></code>, under the open
+eye’s outline. A partial lid (<code class="code docutils literal notranslate"><span class="pre">lid_open</span></code> between -0.35 and -0.85: a squint,
+suspicion, annoyance) then narrows the eyes instead of showing them open.</p>
+<p>name: character id
+out_dir: parent directory; defaults to ./assets/characters
+fraction: how much of the eye the half lid covers, from the top
+overwrite: replace a HALF lid someone drew (refused otherwise)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
@@ -409,6 +430,7 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 <ul>
 <li><a :data-current="activeSection === '#cutan.characters.cli.SILHOUETTE_ARTIFACTS'" class="reference internal" href="#cutan.characters.cli.SILHOUETTE_ARTIFACTS"><code class="docutils literal notranslate"><span class="pre">SILHOUETTE_ARTIFACTS</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.add_gaze'" class="reference internal" href="#cutan.characters.cli.add_gaze"><code class="docutils literal notranslate"><span class="pre">add_gaze()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.cli.add_half_lid'" class="reference internal" href="#cutan.characters.cli.add_half_lid"><code class="docutils literal notranslate"><span class="pre">add_half_lid()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.add_views'" class="reference internal" href="#cutan.characters.cli.add_views"><code class="docutils literal notranslate"><span class="pre">add_views()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.capabilities'" class="reference internal" href="#cutan.characters.cli.capabilities"><code class="docutils literal notranslate"><span class="pre">capabilities()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.contract'" class="reference internal" href="#cutan.characters.cli.contract"><code class="docutils literal notranslate"><span class="pre">contract()</span></code></a></li>
@@ -431,7 +453,7 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=0e525676"></script>
+<script src="../_static/documentation_options.js?v=aa2ad26f"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

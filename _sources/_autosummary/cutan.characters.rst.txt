@@ -53,6 +53,7 @@ cutan.characters
    factory
    idle
    licenses
+   lids
    methods
    mouth_set
    play

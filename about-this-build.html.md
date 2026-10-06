@@ -2,18 +2,20 @@
 
 # About this build
 
-This documentation was built on **2026-10-06 14:17 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/4b295e3938ba9e57a9685dcd24a930f252a96e49"><code>4b295e3</code></a> on branch <code>main</code>, for **cutan 0.0.36** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-06 14:22 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/07bb1594e6ff08745c99b7cd9997b8e28d4698cc"><code>07bb159</code></a> on branch <code>main</code>, for **cutan 0.0.37** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.37) is behind the latest release on PyPI (0.0.38): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/4b295e3938ba9e57a9685dcd24a930f252a96e49"><code>4b295e3938ba9e57a9685dcd24a930f252a96e49</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/07bb1594e6ff08745c99b7cd9997b8e28d4698cc"><code>07bb1594e6ff08745c99b7cd9997b8e28d4698cc</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
-| Tags at this commit | <code>0.0.36</code>                                                                                                                                     |
+| Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
 | Remote              | <code>https://github.com/thorwhalen/cutan</code>                                                                                                        |
 
@@ -22,9 +24,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37476707879">37476707879</a>     |
+| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37477952355">37477952355</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>001252bcab506754c13ed15691ab81036e5acfd7</code> (in the history of the built commit) |
+| Event commit | <code>07bb1594e6ff08745c99b7cd9997b8e28d4698cc</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -49,13 +51,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.36/">0.0.36</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.38/">0.0.38</a>, newer than the documented version (0.0.37).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout 4b295e3938ba9e57a9685dcd24a930f252a96e49
+git checkout 07bb1594e6ff08745c99b7cd9997b8e28d4698cc
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

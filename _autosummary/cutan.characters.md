@@ -755,6 +755,7 @@ namespace as the default, so the output is a valid standalone SVG.
 | [`factory`](cutan.characters.factory.md#module-cutan.characters.factory)           | High-level entry points: build and inspect a character.                                               |
 | [`idle`](cutan.characters.idle.md#module-cutan.characters.idle)                 | Idle animation factories: breath, blink, weight-shift.                                                |
 | [`licenses`](cutan.characters.licenses.md#module-cutan.characters.licenses)         | DiceBear per-style licences, as data.                                                                 |
+| [`lids`](cutan.characters.lids.md#module-cutan.characters.lids)                 | A HALF eyelid drawing, made from a character's own OPEN and CLOSED lid art (cutan#65).                |
 | [`methods`](cutan.characters.methods.md#module-cutan.characters.methods)           | The cut-out genre's methods and aspects, and their compile-time resolution (ADR 0002).                |
 | [`mouth_set`](cutan.characters.mouth_set.md#module-cutan.characters.mouth_set)       | Generate the 9-shape default mouth set as parametric SVGs.                                            |
 | [`play`](cutan.characters.play.md#module-cutan.characters.play)                 | Resolve a `play` against a character descriptor — the renderer-free half (an#7).                      |

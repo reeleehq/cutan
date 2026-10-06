@@ -365,7 +365,7 @@ a baked face.</p>
 </dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"bob"</span><span class="p">,</span> <span class="n">asset_sets</span><span class="o">=</span><span class="p">{</span><span class="s2">"eyelid"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"OPEN"</span><span class="p">:</span> <span class="s2">"o"</span><span class="p">,</span> <span class="s2">"CLOSED"</span><span class="p">:</span> <span class="s2">"c"</span><span class="p">}})</span>
 </span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">lid_rung_problems</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">{</span><span class="s2">"lid_open_l"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.45</span><span class="p">})</span>
-</span><span id="line-3"><span class="go">["bob's eyelids have no 'HALF' drawing, so lid_open_l -0.45 shows 'OPEN' (its eyelid set: CLOSED, OPEN): add a HALF eyelid drawing to the set, or use -0.85 or lower to close the lid"]</span>
+</span><span id="line-3"><span class="go">["bob's eyelids have no 'HALF' drawing, so lid_open_l -0.45 shows 'OPEN' (its eyelid set: CLOSED, OPEN): add a HALF eyelid drawing to the set (`an character add-half-lid bob` makes one from the rig's own lids), or use -0.85 or lower to close the lid"]</span>
 </span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">lid_rung_problems</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">{</span><span class="s2">"lid_open_l"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.9</span><span class="p">})</span>
 </span><span id="line-5"><span class="go">[]</span>
 </span></code></pre></div>
@@ -488,7 +488,7 @@ error, not a fallback.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=0e525676"></script>
+<script src="../_static/documentation_options.js?v=aa2ad26f"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
