@@ -182,7 +182,7 @@ substitutes the method, plus each missing capability’s remedy.
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### cutan.characters.methods.locomotion_args(entity, args, \*, descriptor, profile, policy=None, view=<object object>)
+### cutan.characters.methods.locomotion_args(entity, args, \*, descriptor, profile, policy=None, view=<object object>, on_skip=None)
 
 `(args with its gait resolved, resolution)` of a walk on `entity`:
 the locomotion method the registry resolves (an#248) — the author’s
@@ -192,6 +192,14 @@ its args joining the walk’s), else the descriptor’s, else the chain.
 ONE function for the compiler’s expansion and for the walk’s EXTENT (what a
 `sequence` waits for, [`walk_preset_context()`](#cutan.characters.methods.walk_preset_context)), so the two cannot
 disagree about which gait runs (cutan#12).
+
+The scene’s policy (cutan#9: the shot’s over the style’s) arrives as the
+internal `_policy` arg the compiler’s policy pass writes, or as
+`policy`; it orders the methods when nothing is requested (its entries
+that do not apply go to `on_skip`), and the chosen entry’s OWN args join
+the walk’s under them (never the method’s defaults, which the gait scales
+to the figure). A malformed policy raises
+[`PolicyError`](cutan.styles.policy.md#cutan.styles.policy.PolicyError).
 
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)], [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
@@ -239,9 +247,12 @@ True
 True
 ```
 
-### cutan.characters.methods.resolve_walk_gait(entity, \*, args, descriptor, profile, policy=None, view=<object object>)
+### cutan.characters.methods.resolve_walk_gait(entity, \*, args, descriptor, profile, policy=None, view=<object object>, on_skip=None)
 
 `(gait, resolution)` of a walk on `entity`: the locomotion method’s spelling.
+
+`policy` (the shot’s over the style’s) orders the methods when nothing
+is requested; its entries that do not apply are reported to `on_skip`.
 
 The request is the walk’s `gait` arg, else the descriptor’s declared
 `gait` (an override of the derivation, and reported as one). An explicit
@@ -269,7 +280,7 @@ record names [`SIDE_VIEW_IN_FORCE`](#cutan.characters.methods.SIDE_VIEW_IN_FORCE
 'profile'
 ```
 
-### cutan.characters.methods.speech_plan(shot, \*, is_character, profile_of, descriptor_of=<function <lambda>>, has_part, record=None, policy=None)
+### cutan.characters.methods.speech_plan(shot, \*, is_character, profile_of, descriptor_of=<function <lambda>>, has_part, record=None, policy=None, record_skip=None)
 
 Resolve the speech aspect ONCE per speaking character, and say what it adds.
 

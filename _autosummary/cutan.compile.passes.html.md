@@ -19,6 +19,8 @@ as `"cutan.compile.passes:<name>"`) and the character rig builder.
 | [`EYE_NODE_NAMES`](#cutan.compile.passes.EYE_NODE_NAMES)         | the default rig's eye slots ARE its node names, on both the procedural and the descriptor path.                                                                                                                                                                                                              |
 | [`PUPIL_NODE_NAMES`](#cutan.compile.passes.PUPIL_NODE_NAMES)       | The pupil nodes of the gaze stack (an#99); a rig without them takes gaze as a no-op.                                                                                                                                                                                                                         |
 | [`GAZE_ELLIPSE_MARGIN`](#cutan.compile.passes.GAZE_ELLIPSE_MARGIN)    | The summed gaze (x, y), in axis units, is clamped to a circle of this radius — the declared travel maps the unit circle onto the sclera's inner ellipse, and 0.95 keeps the whole pupil disc inside it at every angle (measured on the synthesized eye: 1.0 pokes out by 2% of the ellipse at the diagonal). |
+| [`POLICY_PRODUCT`](#cutan.compile.passes.POLICY_PRODUCT)         | Where the policy pass leaves the layered shot/style policy for later passes.                                                                                                                                                                                                                                 |
+| [`POLICY_SKIP_KIND`](#cutan.compile.passes.POLICY_SKIP_KIND)       | not a `method` substitution (nothing asked for it), so a tool can tell them apart.                                                                                                                                                                                                                           |
 
 ### Functions
 
@@ -67,6 +69,18 @@ the synthesized eye: 1.0 pokes out by 2% of the ellipse at the diagonal).
 
 The parts the built-in placeholder rig draws when a character ref has no
 descriptor and no `parts`: arms, no legs (so a walk on it glides).
+
+### cutan.compile.passes.POLICY_PRODUCT *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'cutan.policy'*
+
+Where the policy pass leaves the layered shot/style policy for later passes.
+
+### cutan.compile.passes.POLICY_SKIP_KIND *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'policy_skip'*
+
+not a
+`method` substitution (nothing asked for it), so a tool can tell them apart.
+
+* **Type:**
+  The `asset_resolution` kind of a policy entry passed over (cutan#9)
 
 ### cutan.compile.passes.PROCEDURAL_MOUTH_KEYS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E', 'F': 'F', 'G': 'G', 'H': 'H', 'X': 'X'}*
 

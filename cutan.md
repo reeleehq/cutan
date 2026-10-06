@@ -1,4 +1,4 @@
-> built 2026-10-06 01:13 UTC from d0cd718 (main) · cutan 0.0.12. Details: build_info.json
+> built 2026-10-06 01:39 UTC from c73028a (main) · cutan 0.0.13. Details: build_info.json
 
 # index.html.md
 
@@ -465,7 +465,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'rect', 'eye', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'eye', 'ellipse', 'rect', 'mouth'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -2480,7 +2480,7 @@ Subcommands (used as `an character <verb> ...`):
 | [`add_gaze`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.add_gaze)(name[, out_dir, overwrite_eyes])         | Give `name` the eye stack (an#99): sclera and pupil slots under each lid, a filled closed lid, and the `gaze_travel` clamp — so `gaze_x` / `gaze_y` and the ambient saccades move its pupils.   |
 |----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`add_views`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.add_views)(name[, out_dir])                        | Give `name` its turnaround (an#197): back, side and three-quarter head and torso art, a `view` swap set, and a pose per view — so `play: turn` and `set <name> view <key>` turn it.             |
-| [`capabilities`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.capabilities)(name[, out_dir, as_json])            | What a character affords, and per aspect which methods apply and what the rest lack.                                                                                                            |
+| [`capabilities`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.capabilities)(name[, out_dir, as_json, style])     | What a character affords, and per aspect which methods apply and what the rest lack.                                                                                                            |
 | [`contract`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.contract)()                                        | Print the art-package contract an illustrator must satisfy.                                                                                                                                     |
 | [`mouths`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.mouths)(name[, out_dir, palette, variants])        | Regenerate the default 9-shape mouth set for `name`, plus its `viseme@<form>` variants, and declare them in the descriptor.                                                                     |
 | [`new`](_autosummary/cutan.characters.cli.html.md#cutan.characters.cli.new)(name[, out_dir, seed, style, voice_ref, ...]) | Create a new character at `out_dir`/`name`.                                                                                                                                                     |
@@ -2519,7 +2519,7 @@ out_dir: parent directory; defaults to ./assets/characters
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
-### cutan.characters.cli.capabilities(name, out_dir='', as_json=False)
+### cutan.characters.cli.capabilities(name, out_dir='', as_json=False, style='')
 
 What a character affords, and per aspect which methods apply and what the rest lack.
 
@@ -2527,11 +2527,14 @@ The affordances are derived from `character.json` and the art files
 present (ADR 0002 decision 2), with the declared overrides it used; per
 aspect (`locomotion`, `speech`, …) the method the default chain picks,
 the methods that apply, and for each other method the missing capabilities
-with the remedy that would add them.
+with the remedy that would add them. With `style`, each aspect also says
+what it resolves to under that style’s policy (cutan#9, an#273): a South
+Park character with legs bounces, a Reiniger silhouette mimes.
 
 name: character id
 out_dir: parent directory; defaults to ./assets/characters
 as_json: print the answer as JSON (what the MCP surface returns)
+style: a style spec’s name (`python -m cutan.styles` lists them) or path
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
@@ -4712,7 +4715,7 @@ substitutes the method, plus each missing capability’s remedy.
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### cutan.characters.methods.locomotion_args(entity, args, \*, descriptor, profile, policy=None, view=<object object>)
+### cutan.characters.methods.locomotion_args(entity, args, \*, descriptor, profile, policy=None, view=<object object>, on_skip=None)
 
 `(args with its gait resolved, resolution)` of a walk on `entity`:
 the locomotion method the registry resolves (an#248) — the author’s
@@ -4722,6 +4725,14 @@ its args joining the walk’s), else the descriptor’s, else the chain.
 ONE function for the compiler’s expansion and for the walk’s EXTENT (what a
 `sequence` waits for, [`walk_preset_context()`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.walk_preset_context)), so the two cannot
 disagree about which gait runs (cutan#12).
+
+The scene’s policy (cutan#9: the shot’s over the style’s) arrives as the
+internal `_policy` arg the compiler’s policy pass writes, or as
+`policy`; it orders the methods when nothing is requested (its entries
+that do not apply go to `on_skip`), and the chosen entry’s OWN args join
+the walk’s under them (never the method’s defaults, which the gait scales
+to the figure). A malformed policy raises
+[`PolicyError`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.PolicyError).
 
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)], [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
@@ -4769,9 +4780,12 @@ True
 True
 ```
 
-### cutan.characters.methods.resolve_walk_gait(entity, \*, args, descriptor, profile, policy=None, view=<object object>)
+### cutan.characters.methods.resolve_walk_gait(entity, \*, args, descriptor, profile, policy=None, view=<object object>, on_skip=None)
 
 `(gait, resolution)` of a walk on `entity`: the locomotion method’s spelling.
+
+`policy` (the shot’s over the style’s) orders the methods when nothing
+is requested; its entries that do not apply are reported to `on_skip`.
 
 The request is the walk’s `gait` arg, else the descriptor’s declared
 `gait` (an override of the derivation, and reported as one). An explicit
@@ -4799,7 +4813,7 @@ record names [`SIDE_VIEW_IN_FORCE`](_autosummary/cutan.characters.methods.html.m
 'profile'
 ```
 
-### cutan.characters.methods.speech_plan(shot, \*, is_character, profile_of, descriptor_of=<function <lambda>>, has_part, record=None, policy=None)
+### cutan.characters.methods.speech_plan(shot, \*, is_character, profile_of, descriptor_of=<function <lambda>>, has_part, record=None, policy=None, record_skip=None)
 
 Resolve the speech aspect ONCE per speaking character, and say what it adds.
 
@@ -7287,6 +7301,8 @@ as `"cutan.compile.passes:<name>"`) and the character rig builder.
 | [`EYE_NODE_NAMES`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.EYE_NODE_NAMES)         | the default rig's eye slots ARE its node names, on both the procedural and the descriptor path.                                                                                                                                                                                                              |
 | [`PUPIL_NODE_NAMES`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.PUPIL_NODE_NAMES)       | The pupil nodes of the gaze stack (an#99); a rig without them takes gaze as a no-op.                                                                                                                                                                                                                         |
 | [`GAZE_ELLIPSE_MARGIN`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.GAZE_ELLIPSE_MARGIN)    | The summed gaze (x, y), in axis units, is clamped to a circle of this radius — the declared travel maps the unit circle onto the sclera's inner ellipse, and 0.95 keeps the whole pupil disc inside it at every angle (measured on the synthesized eye: 1.0 pokes out by 2% of the ellipse at the diagonal). |
+| [`POLICY_PRODUCT`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.POLICY_PRODUCT)         | Where the policy pass leaves the layered shot/style policy for later passes.                                                                                                                                                                                                                                 |
+| [`POLICY_SKIP_KIND`](_autosummary/cutan.compile.passes.html.md#cutan.compile.passes.POLICY_SKIP_KIND)       | not a `method` substitution (nothing asked for it), so a tool can tell them apart.                                                                                                                                                                                                                           |
 
 ### Functions
 
@@ -7335,6 +7351,18 @@ the synthesized eye: 1.0 pokes out by 2% of the ellipse at the diagonal).
 
 The parts the built-in placeholder rig draws when a character ref has no
 descriptor and no `parts`: arms, no legs (so a walk on it glides).
+
+### cutan.compile.passes.POLICY_PRODUCT *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'cutan.policy'*
+
+Where the policy pass leaves the layered shot/style policy for later passes.
+
+### cutan.compile.passes.POLICY_SKIP_KIND *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'policy_skip'*
+
+not a
+`method` substitution (nothing asked for it), so a tool can tell them apart.
+
+* **Type:**
+  The `asset_resolution` kind of a policy entry passed over (cutan#9)
 
 ### cutan.compile.passes.PROCEDURAL_MOUTH_KEYS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E', 'F': 'F', 'G': 'G', 'H': 'H', 'X': 'X'}*
 
@@ -10484,18 +10512,30 @@ prints one, and `python -m cutan.styles NAME --path` prints its file’s path
 
 ### Functions
 
-| [`resolve_style_spec`](_autosummary/cutan.styles.html.md#cutan.styles.resolve_style_spec)(ref)   | A style spec as a dict, from whatever refers to one.                          |
-|----------------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| [`style_spec`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec)(name)          | The style spec `name`, parsed: a new dict on every call.                      |
-| [`style_spec_digest`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec_digest)(name)   | The sha256 of the style spec `name`'s file: the version a copy was made from. |
-| [`style_spec_path`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec_path)(name)     | The file of the style spec `name` (for a tool that reads a path).             |
-| [`style_spec_text`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec_text)(name)     | The YAML text of the style spec `name`, comments included.                    |
-| [`style_specs`](_autosummary/cutan.styles.html.md#cutan.styles.style_specs)()             | The names of the style specs that ship with `cutan`, sorted.                  |
+| [`resolve_style_spec`](_autosummary/cutan.styles.html.md#cutan.styles.resolve_style_spec)(ref)                | A style spec as a dict, from whatever refers to one.                                                                                                                                                        |
+|-----------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`style_spec`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec)(name)                       | The style spec `name`, parsed: a new dict on every call.                                                                                                                                                    |
+| [`style_spec_digest`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec_digest)(name)                | The sha256 of the style spec `name`'s file: the version a copy was made from.                                                                                                                               |
+| [`style_spec_path`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec_path)(name)                  | The file of the style spec `name` (for a tool that reads a path).                                                                                                                                           |
+| [`style_spec_text`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec_text)(name)                  | The YAML text of the style spec `name`, comments included.                                                                                                                                                  |
+| [`style_specs`](_autosummary/cutan.styles.html.md#cutan.styles.style_specs)()                          | The names of the style specs that ship with `cutan`, sorted.                                                                                                                                                |
+| [`check_policy`](_autosummary/cutan.styles.html.md#cutan.styles.check_policy)(policy, \*[, where])      | `policy` parsed into an `an.semantic.Policy`, or [`PolicyError`](_autosummary/cutan.styles.html.md#cutan.styles.PolicyError) naming `where`.                                                                               |
+| [`layered_policy`](_autosummary/cutan.styles.html.md#cutan.styles.layered_policy)(\*[, shot, style_pack]) | The policy in force: `shot` over `style_pack` (each checked).                                                                                                                                               |
+| [`policy_of`](_autosummary/cutan.styles.html.md#cutan.styles.policy_of)(obj)                         | The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.                                                                                                               |
+| [`policy_problems`](_autosummary/cutan.styles.html.md#cutan.styles.policy_problems)(policy)                | What is wrong with a `policy` block, one sentence each (empty when it is sound).                                                                                                                            |
+| [`style_pack`](_autosummary/cutan.styles.html.md#cutan.styles.style_pack)(spec)                       | The StylePack a project saves for a style: its `live.style_pack` (a bare pack named after the style when the spec has none), its `policy`, and the spec it was copied from (name and digest) in `metadata`. |
 
 ### Exceptions
 
-| [`UnknownStyleError`](_autosummary/cutan.styles.html.md#cutan.styles.UnknownStyleError)   | No style spec of that name ships with `cutan`.   |
-|----------------------------------------------------------------------|--------------------------------------------------|
+| [`UnknownStyleError`](_autosummary/cutan.styles.html.md#cutan.styles.UnknownStyleError)   | No style spec of that name ships with `cutan`.                                   |
+|----------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| [`PolicyError`](_autosummary/cutan.styles.html.md#cutan.styles.PolicyError)         | A policy block names an aspect or a method that does not exist, or is malformed. |
+
+### *exception* cutan.styles.PolicyError
+
+Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+A policy block names an aspect or a method that does not exist, or is malformed.
 
 ### cutan.styles.STYLE_SPEC_SCHEMA_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '0.1.0'*
 
@@ -10517,6 +10557,57 @@ No style spec of that name ships with `cutan`.
 
 A `KeyError` (so a mapping or a `ChainMap` of spec sources falls through
 it), and so also a `LookupError`.
+
+### cutan.styles.check_policy(policy, , where='policy')
+
+`policy` parsed into an `an.semantic.Policy`, or [`PolicyError`](_autosummary/cutan.styles.html.md#cutan.styles.PolicyError) naming `where`.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+### cutan.styles.layered_policy(, shot=None, style_pack=None)
+
+The policy in force: `shot` over `style_pack` (each checked).
+
+Each argument is anything [`policy_of()`](_autosummary/cutan.styles.html.md#cutan.styles.policy_of) reads (or `None`). The
+author’s explicit request is not here: the matcher puts it first
+(`resolve(..., requested=)`).
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+### cutan.styles.policy_of(obj)
+
+The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+```pycon
+>>> policy_of({"policy": {"locomotion": ["loco.glide"]}})
+{'locomotion': ['loco.glide']}
+>>> policy_of(None) is None
+True
+```
+
+### cutan.styles.policy_problems(policy)
+
+What is wrong with a `policy` block, one sentence each (empty when it is sound).
+
+Every aspect must be registered, every choice a method OF that aspect (by
+id: `loco.bounce`, not `bounce`), and every choice well formed (an id or
+`{method, args, version}`).
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> policy_problems({"locomotion": ["loco.bounce", "loco.glide"]})
+[]
+>>> for p in policy_problems({"locomotion": ["bounce"], "dance": ["x"]}): print(p)
+policy locomotion: 'bounce' is not a locomotion method id; did you mean 'loco.bounce'?
+policy aspect 'dance' is not registered (aspects: expression, locomotion, speech)
+```
 
 ### cutan.styles.resolve_style_spec(ref)
 
@@ -10547,6 +10638,25 @@ FileNotFoundError: no style spec file 'oversimplified.yaml' ...
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### cutan.styles.style_pack(spec)
+
+The StylePack a project saves for a style: its `live.style_pack` (a bare
+pack named after the style when the spec has none), its `policy`, and the
+spec it was copied from (name and digest) in `metadata`.
+
+`spec` is anything [`cutan.styles.resolve_style_spec()`](_autosummary/cutan.styles.html.md#cutan.styles.resolve_style_spec) takes (a
+style’s name, a path, a mapping). Save it as the skill’s step 3 says:
+`mall["styles"][pack.name] = pack.model_dump(mode="json")`.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+```pycon
+>>> pack = style_pack("south_park")
+>>> pack.name, pack.policy, pack.metadata["style_spec"]["name"]
+('south_park', {'locomotion': ['loco.bounce']}, 'south_park')
+```
 
 ### cutan.styles.style_spec(name)
 
@@ -10589,6 +10699,173 @@ The names of the style specs that ship with `cutan`, sorted.
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### Modules
+
+| [`policy`](_autosummary/cutan.styles.policy.html.md#module-cutan.styles.policy)   | A style's policy: per-aspect method orders the compiler applies (ADR 0002 decision 4, cutan#9).   |
+|--------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+
+
+# _autosummary/cutan.styles.policy.html.md
+
+# cutan.styles.policy
+
+A style’s policy: per-aspect method orders the compiler applies (ADR 0002 decision 4, cutan#9).
+
+A first-applicable chain cannot say “this show bounces even when its
+characters have legs” (South Park), “these figures glide” (OverSimplified) or
+“silhouettes mime” (Reiniger); a policy can. It is a `policy:` block, one
+method order per aspect, naming methods by id:
+
+```default
+policy:
+  locomotion: [loco.bounce]
+  speech: [speech.pose_only]
+```
+
+**Precedence**, as ADR 0002 decision 4 states it: the author’s explicit request
+(a walk’s `gait`, a character’s declared `gait` or `speech`), then the
+shot, then the style, then the aspect’s default chain. Where each lives:
+
+- **the style**: the spec’s `policy:` block ([`cutan.styles.style_spec()`](_autosummary/cutan.styles.html.md#cutan.styles.style_spec)),
+  carried into the project by the StylePack [`style_pack()`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.style_pack) builds (its
+  `policy` field), the document a scene names in `meta.style_pack`. A
+  snapshot, like every copy of a spec: the pack records the spec’s digest;
+- **the shot**: a `policy` field on the shot. `an`’s `scene.md` reader
+  keeps only the shot keys it knows, so today it is read from `ir/scene.json`
+  or set in Python, not from a `yaml shot` block (thorwhalen/an#348).
+
+A policy choice is information, not a warning: a character that could walk on
+legs but bounces under South Park records a `policy` resolution beside its
+stand-ins, so the choice is visible and never silent.
+
+### Module Attributes
+
+| [`POLICY_KEY`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.POLICY_KEY)      | in a style spec, on a StylePack, on a shot.                                                                                                                                                                     |
+|------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`APPLIED_ASPECTS`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.APPLIED_ASPECTS) | The aspects whose method the cut-out compiler resolves, so a policy on them takes effect (`expression` is resolved only for warnings today: a policy there would be accepted and do nothing, so it is refused). |
+
+### Functions
+
+| [`applicable_policy`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.applicable_policy)(policy, aspect, profile, \*)   | `policy` with `aspect`'s order cut to the methods that apply to `profile`.                                                                                                                                  |
+|---------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`check_policy`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.check_policy)(policy, \*[, where])                | `policy` parsed into an `an.semantic.Policy`, or [`PolicyError`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.PolicyError) naming `where`.                                                                               |
+| [`layered_policy`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.layered_policy)(\*[, shot, style_pack])           | The policy in force: `shot` over `style_pack` (each checked).                                                                                                                                               |
+| [`policy_of`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.policy_of)(obj)                                   | The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.                                                                                                               |
+| [`policy_problems`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.policy_problems)(policy)                          | What is wrong with a `policy` block, one sentence each (empty when it is sound).                                                                                                                            |
+| [`style_pack`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.style_pack)(spec)                                 | The StylePack a project saves for a style: its `live.style_pack` (a bare pack named after the style when the spec has none), its `policy`, and the spec it was copied from (name and digest) in `metadata`. |
+
+### Exceptions
+
+| [`PolicyError`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.PolicyError)   | A policy block names an aspect or a method that does not exist, or is malformed.   |
+|----------------------------------------------------------------|------------------------------------------------------------------------------------|
+
+### cutan.styles.policy.APPLIED_ASPECTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('locomotion', 'speech')*
+
+The aspects whose method the cut-out compiler resolves, so a policy on them
+takes effect (`expression` is resolved only for warnings today: a policy
+there would be accepted and do nothing, so it is refused).
+
+### cutan.styles.policy.POLICY_KEY *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'policy'*
+
+in a style spec, on a StylePack, on a shot.
+
+* **Type:**
+  The key of a policy block
+
+### *exception* cutan.styles.policy.PolicyError
+
+Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+A policy block names an aspect or a method that does not exist, or is malformed.
+
+### cutan.styles.policy.applicable_policy(policy, aspect, profile, , on_skip=None)
+
+`policy` with `aspect`’s order cut to the methods that apply to `profile`.
+
+A policy is an order: its first APPLICABLE entry wins (ADR 0002). The
+core matcher today treats the order’s head as a request (an#334), so a
+head that does not apply (a profile cycle on a figure with no side view)
+would be recorded as a fatal `missing` substitution. Handing it only the
+entries that apply gives the order’s own meaning: the first of them is a
+non-fatal `policy` choice, and none applying leaves the chain to decide.
+Each entry passed over before the first applicable one is reported to
+`on_skip(method id, missing terms)`, so a skip is recorded, never silent
+(ADR 0002 decision 6). Drop this once
+an#334 lands.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+### cutan.styles.policy.check_policy(policy, , where='policy')
+
+`policy` parsed into an `an.semantic.Policy`, or [`PolicyError`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.PolicyError) naming `where`.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+### cutan.styles.policy.layered_policy(, shot=None, style_pack=None)
+
+The policy in force: `shot` over `style_pack` (each checked).
+
+Each argument is anything [`policy_of()`](_autosummary/cutan.styles.policy.html.md#cutan.styles.policy.policy_of) reads (or `None`). The
+author’s explicit request is not here: the matcher puts it first
+(`resolve(..., requested=)`).
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+### cutan.styles.policy.policy_of(obj)
+
+The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+```pycon
+>>> policy_of({"policy": {"locomotion": ["loco.glide"]}})
+{'locomotion': ['loco.glide']}
+>>> policy_of(None) is None
+True
+```
+
+### cutan.styles.policy.policy_problems(policy)
+
+What is wrong with a `policy` block, one sentence each (empty when it is sound).
+
+Every aspect must be registered, every choice a method OF that aspect (by
+id: `loco.bounce`, not `bounce`), and every choice well formed (an id or
+`{method, args, version}`).
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> policy_problems({"locomotion": ["loco.bounce", "loco.glide"]})
+[]
+>>> for p in policy_problems({"locomotion": ["bounce"], "dance": ["x"]}): print(p)
+policy locomotion: 'bounce' is not a locomotion method id; did you mean 'loco.bounce'?
+policy aspect 'dance' is not registered (aspects: expression, locomotion, speech)
+```
+
+### cutan.styles.policy.style_pack(spec)
+
+The StylePack a project saves for a style: its `live.style_pack` (a bare
+pack named after the style when the spec has none), its `policy`, and the
+spec it was copied from (name and digest) in `metadata`.
+
+`spec` is anything [`cutan.styles.resolve_style_spec()`](_autosummary/cutan.styles.html.md#cutan.styles.resolve_style_spec) takes (a
+style’s name, a path, a mapping). Save it as the skill’s step 3 says:
+`mall["styles"][pack.name] = pack.model_dump(mode="json")`.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+```pycon
+>>> pack = style_pack("south_park")
+>>> pack.name, pack.policy, pack.metadata["style_spec"]["name"]
+('south_park', {'locomotion': ['loco.bounce']}, 'south_park')
+```
 
 
 # _autosummary/cutan.verify.html.md
@@ -10924,7 +11201,7 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-06 01:13 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/d0cd7180e6f354a99553eacdf993133fa9bfba43"><code>d0cd718</code></a> on branch <code>main</code>, for **cutan 0.0.12** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-06 01:39 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/c73028af05a0b43ccdfe1ec246c541a4cb5c66ee"><code>c73028a</code></a> on branch <code>main</code>, for **cutan 0.0.13** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -10933,7 +11210,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/d0cd7180e6f354a99553eacdf993133fa9bfba43"><code>d0cd7180e6f354a99553eacdf993133fa9bfba43</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/c73028af05a0b43ccdfe1ec246c541a4cb5c66ee"><code>c73028af05a0b43ccdfe1ec246c541a4cb5c66ee</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -10944,9 +11221,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37397823710">37397823710</a>     |
+| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37399954792">37399954792</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>d0cd7180e6f354a99553eacdf993133fa9bfba43</code> (in the history of the built commit) |
+| Event commit | <code>c73028af05a0b43ccdfe1ec246c541a4cb5c66ee</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -10971,13 +11248,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.12/">0.0.12</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.13/">0.0.13</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout d0cd7180e6f354a99553eacdf993133fa9bfba43
+git checkout c73028af05a0b43ccdfe1ec246c541a4cb5c66ee
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

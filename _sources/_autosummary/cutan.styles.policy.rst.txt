@@ -1,0 +1,30 @@
+cutan.styles.policy
+===================
+
+.. automodule:: cutan.styles.policy
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      POLICY_KEY
+      APPLIED_ASPECTS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      applicable_policy
+      check_policy
+      layered_policy
+      policy_of
+      policy_problems
+      style_pack
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      PolicyError
+   

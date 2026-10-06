@@ -16,6 +16,8 @@ cutan.compile.passes
       EYE_NODE_NAMES
       PUPIL_NODE_NAMES
       GAZE_ELLIPSE_MARGIN
+      POLICY_PRODUCT
+      POLICY_SKIP_KIND
    
    .. rubric:: Functions
 

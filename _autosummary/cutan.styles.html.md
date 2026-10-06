@@ -64,18 +64,30 @@ prints one, and `python -m cutan.styles NAME --path` prints its file’s path
 
 ### Functions
 
-| [`resolve_style_spec`](#cutan.styles.resolve_style_spec)(ref)   | A style spec as a dict, from whatever refers to one.                          |
-|----------------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| [`style_spec`](#cutan.styles.style_spec)(name)          | The style spec `name`, parsed: a new dict on every call.                      |
-| [`style_spec_digest`](#cutan.styles.style_spec_digest)(name)   | The sha256 of the style spec `name`'s file: the version a copy was made from. |
-| [`style_spec_path`](#cutan.styles.style_spec_path)(name)     | The file of the style spec `name` (for a tool that reads a path).             |
-| [`style_spec_text`](#cutan.styles.style_spec_text)(name)     | The YAML text of the style spec `name`, comments included.                    |
-| [`style_specs`](#cutan.styles.style_specs)()             | The names of the style specs that ship with `cutan`, sorted.                  |
+| [`resolve_style_spec`](#cutan.styles.resolve_style_spec)(ref)                | A style spec as a dict, from whatever refers to one.                                                                                                                                                        |
+|-----------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`style_spec`](#cutan.styles.style_spec)(name)                       | The style spec `name`, parsed: a new dict on every call.                                                                                                                                                    |
+| [`style_spec_digest`](#cutan.styles.style_spec_digest)(name)                | The sha256 of the style spec `name`'s file: the version a copy was made from.                                                                                                                               |
+| [`style_spec_path`](#cutan.styles.style_spec_path)(name)                  | The file of the style spec `name` (for a tool that reads a path).                                                                                                                                           |
+| [`style_spec_text`](#cutan.styles.style_spec_text)(name)                  | The YAML text of the style spec `name`, comments included.                                                                                                                                                  |
+| [`style_specs`](#cutan.styles.style_specs)()                          | The names of the style specs that ship with `cutan`, sorted.                                                                                                                                                |
+| [`check_policy`](#cutan.styles.check_policy)(policy, \*[, where])      | `policy` parsed into an `an.semantic.Policy`, or [`PolicyError`](#cutan.styles.PolicyError) naming `where`.                                                                               |
+| [`layered_policy`](#cutan.styles.layered_policy)(\*[, shot, style_pack]) | The policy in force: `shot` over `style_pack` (each checked).                                                                                                                                               |
+| [`policy_of`](#cutan.styles.policy_of)(obj)                         | The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.                                                                                                               |
+| [`policy_problems`](#cutan.styles.policy_problems)(policy)                | What is wrong with a `policy` block, one sentence each (empty when it is sound).                                                                                                                            |
+| [`style_pack`](#cutan.styles.style_pack)(spec)                       | The StylePack a project saves for a style: its `live.style_pack` (a bare pack named after the style when the spec has none), its `policy`, and the spec it was copied from (name and digest) in `metadata`. |
 
 ### Exceptions
 
-| [`UnknownStyleError`](#cutan.styles.UnknownStyleError)   | No style spec of that name ships with `cutan`.   |
-|----------------------------------------------------------------------|--------------------------------------------------|
+| [`UnknownStyleError`](#cutan.styles.UnknownStyleError)   | No style spec of that name ships with `cutan`.                                   |
+|----------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| [`PolicyError`](#cutan.styles.PolicyError)         | A policy block names an aspect or a method that does not exist, or is malformed. |
+
+### *exception* cutan.styles.PolicyError
+
+Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+A policy block names an aspect or a method that does not exist, or is malformed.
 
 ### cutan.styles.STYLE_SPEC_SCHEMA_VERSION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '0.1.0'*
 
@@ -97,6 +109,57 @@ No style spec of that name ships with `cutan`.
 
 A `KeyError` (so a mapping or a `ChainMap` of spec sources falls through
 it), and so also a `LookupError`.
+
+### cutan.styles.check_policy(policy, , where='policy')
+
+`policy` parsed into an `an.semantic.Policy`, or [`PolicyError`](#cutan.styles.PolicyError) naming `where`.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+### cutan.styles.layered_policy(, shot=None, style_pack=None)
+
+The policy in force: `shot` over `style_pack` (each checked).
+
+Each argument is anything [`policy_of()`](#cutan.styles.policy_of) reads (or `None`). The
+author’s explicit request is not here: the matcher puts it first
+(`resolve(..., requested=)`).
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+### cutan.styles.policy_of(obj)
+
+The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+```pycon
+>>> policy_of({"policy": {"locomotion": ["loco.glide"]}})
+{'locomotion': ['loco.glide']}
+>>> policy_of(None) is None
+True
+```
+
+### cutan.styles.policy_problems(policy)
+
+What is wrong with a `policy` block, one sentence each (empty when it is sound).
+
+Every aspect must be registered, every choice a method OF that aspect (by
+id: `loco.bounce`, not `bounce`), and every choice well formed (an id or
+`{method, args, version}`).
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+```pycon
+>>> policy_problems({"locomotion": ["loco.bounce", "loco.glide"]})
+[]
+>>> for p in policy_problems({"locomotion": ["bounce"], "dance": ["x"]}): print(p)
+policy locomotion: 'bounce' is not a locomotion method id; did you mean 'loco.bounce'?
+policy aspect 'dance' is not registered (aspects: expression, locomotion, speech)
+```
 
 ### cutan.styles.resolve_style_spec(ref)
 
@@ -127,6 +190,25 @@ FileNotFoundError: no style spec file 'oversimplified.yaml' ...
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### cutan.styles.style_pack(spec)
+
+The StylePack a project saves for a style: its `live.style_pack` (a bare
+pack named after the style when the spec has none), its `policy`, and the
+spec it was copied from (name and digest) in `metadata`.
+
+`spec` is anything [`cutan.styles.resolve_style_spec()`](#cutan.styles.resolve_style_spec) takes (a
+style’s name, a path, a mapping). Save it as the skill’s step 3 says:
+`mall["styles"][pack.name] = pack.model_dump(mode="json")`.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+```pycon
+>>> pack = style_pack("south_park")
+>>> pack.name, pack.policy, pack.metadata["style_spec"]["name"]
+('south_park', {'locomotion': ['loco.bounce']}, 'south_park')
+```
 
 ### cutan.styles.style_spec(name)
 
@@ -169,3 +251,8 @@ The names of the style specs that ship with `cutan`, sorted.
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### Modules
+
+| [`policy`](cutan.styles.policy.html.md#module-cutan.styles.policy)   | A style's policy: per-aspect method orders the compiler applies (ADR 0002 decision 4, cutan#9).   |
+|--------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|

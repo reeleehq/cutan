@@ -21,7 +21,7 @@ Subcommands (used as `an character <verb> ...`):
 | [`add_gaze`](#cutan.characters.cli.add_gaze)(name[, out_dir, overwrite_eyes])         | Give `name` the eye stack (an#99): sclera and pupil slots under each lid, a filled closed lid, and the `gaze_travel` clamp — so `gaze_x` / `gaze_y` and the ambient saccades move its pupils.   |
 |----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`add_views`](#cutan.characters.cli.add_views)(name[, out_dir])                        | Give `name` its turnaround (an#197): back, side and three-quarter head and torso art, a `view` swap set, and a pose per view — so `play: turn` and `set <name> view <key>` turn it.             |
-| [`capabilities`](#cutan.characters.cli.capabilities)(name[, out_dir, as_json])            | What a character affords, and per aspect which methods apply and what the rest lack.                                                                                                            |
+| [`capabilities`](#cutan.characters.cli.capabilities)(name[, out_dir, as_json, style])     | What a character affords, and per aspect which methods apply and what the rest lack.                                                                                                            |
 | [`contract`](#cutan.characters.cli.contract)()                                        | Print the art-package contract an illustrator must satisfy.                                                                                                                                     |
 | [`mouths`](#cutan.characters.cli.mouths)(name[, out_dir, palette, variants])        | Regenerate the default 9-shape mouth set for `name`, plus its `viseme@<form>` variants, and declare them in the descriptor.                                                                     |
 | [`new`](#cutan.characters.cli.new)(name[, out_dir, seed, style, voice_ref, ...]) | Create a new character at `out_dir`/`name`.                                                                                                                                                     |
@@ -60,7 +60,7 @@ out_dir: parent directory; defaults to ./assets/characters
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
-### cutan.characters.cli.capabilities(name, out_dir='', as_json=False)
+### cutan.characters.cli.capabilities(name, out_dir='', as_json=False, style='')
 
 What a character affords, and per aspect which methods apply and what the rest lack.
 
@@ -68,11 +68,14 @@ The affordances are derived from `character.json` and the art files
 present (ADR 0002 decision 2), with the declared overrides it used; per
 aspect (`locomotion`, `speech`, …) the method the default chain picks,
 the methods that apply, and for each other method the missing capabilities
-with the remedy that would add them.
+with the remedy that would add them. With `style`, each aspect also says
+what it resolves to under that style’s policy (cutan#9, an#273): a South
+Park character with legs bounces, a Reiniger silhouette mimes.
 
 name: character id
 out_dir: parent directory; defaults to ./assets/characters
 as_json: print the answer as JSON (what the MCP surface returns)
+style: a style spec’s name (`python -m cutan.styles` lists them) or path
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

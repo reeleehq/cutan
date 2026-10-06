@@ -65,6 +65,7 @@
 - [cutan.motion](cutan.motion.html.md): The cut-out genre’s motion presets: moves that name a rig’s parts or swap its views.
 - [cutan.runtime](cutan.runtime.html.md): JavaScript the cut-out genre adds to the stage runtime (&#96;visuals.js&#96;: the mouth and eye).
 - [cutan.styles](cutan.styles.html.md): The named cut-out style specs, shipped as package data (cutan#4).
+- [cutan.styles.policy](cutan.styles.policy.html.md): A style’s policy: per-aspect method orders the compiler applies (ADR 0002 decision 4, cutan#9).
 - [cutan.verify](cutan.verify.html.md): The cut-out style lint: measures a render against a named style spec.
 - [cutan.verify.style](cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 

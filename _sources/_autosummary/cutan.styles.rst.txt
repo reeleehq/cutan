@@ -21,10 +21,23 @@ cutan.styles
       style_spec_path
       style_spec_text
       style_specs
+      check_policy
+      layered_policy
+      policy_of
+      policy_problems
+      style_pack
    
    .. rubric:: Exceptions
 
    .. autosummary::
    
       UnknownStyleError
+      PolicyError
    
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   policy

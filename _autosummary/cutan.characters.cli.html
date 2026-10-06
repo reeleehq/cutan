@@ -152,7 +152,7 @@ and returns a string for terminal display.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.add_views" title="cutan.characters.cli.add_views"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_views</span></code></a>(name[, out_dir])</p></td>
 <td><p>Give <code class="docutils literal notranslate"><span class="pre">name</span></code> its turnaround (an#197): back, side and three-quarter head and torso art, a <code class="code docutils literal notranslate"><span class="pre">view</span></code> swap set, and a pose per view — so <code class="code docutils literal notranslate"><span class="pre">play:</span> <span class="pre">turn</span></code> and <code class="code docutils literal notranslate"><span class="pre">set</span> <span class="pre">&lt;name&gt;</span> <span class="pre">view</span> <span class="pre">&lt;key&gt;</span></code> turn it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.capabilities" title="cutan.characters.cli.capabilities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capabilities</span></code></a>(name[, out_dir, as_json])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.capabilities" title="cutan.characters.cli.capabilities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capabilities</span></code></a>(name[, out_dir, as_json, style])</p></td>
 <td><p>What a character affords, and per aspect which methods apply and what the rest lack.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.contract" title="cutan.characters.cli.contract"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contract</span></code></a>()</p></td>
@@ -216,16 +216,19 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.characters.cli.capabilities">
-<span class="sig-prename descclassname"><span class="pre">cutan.characters.cli.</span></span><span class="sig-name descname"><span class="pre">capabilities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_json</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/cli.html#capabilities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.cli.capabilities" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.cli.capabilities'">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.cli.</span></span><span class="sig-name descname"><span class="pre">capabilities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_json</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/cli.html#capabilities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.cli.capabilities" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.cli.capabilities'">¶</a></dt>
 <dd><p>What a character affords, and per aspect which methods apply and what the rest lack.</p>
 <p>The affordances are derived from <code class="docutils literal notranslate"><span class="pre">character.json</span></code> and the art files
 present (ADR 0002 decision 2), with the declared overrides it used; per
 aspect (<code class="docutils literal notranslate"><span class="pre">locomotion</span></code>, <code class="docutils literal notranslate"><span class="pre">speech</span></code>, …) the method the default chain picks,
 the methods that apply, and for each other method the missing capabilities
-with the remedy that would add them.</p>
+with the remedy that would add them. With <code class="docutils literal notranslate"><span class="pre">style</span></code>, each aspect also says
+what it resolves to under that style’s policy (cutan#9, an#273): a South
+Park character with legs bounces, a Reiniger silhouette mimes.</p>
 <p>name: character id
 out_dir: parent directory; defaults to ./assets/characters
-as_json: print the answer as JSON (what the MCP surface returns)</p>
+as_json: print the answer as JSON (what the MCP surface returns)
+style: a style spec’s name (<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">cutan.styles</span></code> lists them) or path</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
@@ -407,7 +410,7 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=3bbcec59"></script>
+<script src="../_static/documentation_options.js?v=9fc46840"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
