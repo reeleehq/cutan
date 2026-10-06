@@ -50,7 +50,9 @@ LIBRARY_NAME: str = "cutan"
 #: it supports", ADR 0001 decision 8, said without a version pin: ``an``'s version is
 #: assigned by CI at merge). Level 2 is the move itself: ``Genre.services``,
 #: ``ActionKind.lowering``, ``EntityKind.swap_declaration`` and ``an.stage.rig``.
-REQUIRED_AN_API_LEVEL: int = 2
+#: Level 3 is the public rig builder (an#338): ``an.stage.rig.build_rig_subtree``,
+#: ``rig_origin``, ``RigDocument`` and ``omit_unset_rig_fields``.
+REQUIRED_AN_API_LEVEL: int = 3
 
 
 def require_an() -> None:

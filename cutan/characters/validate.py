@@ -37,6 +37,7 @@ from cutan.characters.schema import (
 from cutan.characters.svg_utils import SVG_NS, extract_pivots
 from cutan.motion import DFLT_LEGLESS_GAIT, WALK_LEG_NAMES
 from an.stage.raster import RASTER_SUFFIXES, has_alpha, image_size, is_raster
+from an.stage.rig import rig_origin_problems
 from an.verify._base import Finding, VerificationReport
 
 #: Elements an art package may not contain.
@@ -340,6 +341,7 @@ def validate_character(
     _check_mouth_variants(descriptor, report, who=who)
     _check_gaze_stack(descriptor, report, who=who)
     _check_face_overlay_declaration(descriptor, report, who=who)
+    _check_rig_origin(descriptor, report, who=who)
     _check_declared_speech(descriptor, report, who=who)
     _check_unseated_hat(descriptor, report, who=who)
     _check_joint_names(directory, descriptor, report)
@@ -794,6 +796,27 @@ def _check_face_overlay_declaration(
             "Set face_overlay: false if the face is baked in (the compiler "
             "reads only that field now), or leave it if the avatar really "
             "has separate face parts.",
+        )
+
+
+def _check_rig_origin(
+    descriptor: CharacterDescriptor | None, report: VerificationReport, *, who: str
+) -> None:
+    """A declared ``origin`` is finite and inside the view_box (an#338).
+
+    Advisory: the stage's own rule (``an.stage.rig.rig_origin_problems``), the
+    one ``an validate`` applies to every rig entity, so the two agree.
+    """
+    if descriptor is None:
+        return
+    for problem in rig_origin_problems(descriptor):
+        report.add(
+            ADVISORY,
+            "character.json#origin",
+            f"{who}: {problem}",
+            "The origin is the point of the art that lands at `stage.at`, in "
+            "view_box units (the bones' units); unset, the rig is placed by the "
+            "middle of its bones.",
         )
 
 

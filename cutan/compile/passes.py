@@ -105,15 +105,17 @@ from an.stage.compile import (  # noqa: E402
     _StepCurve,
     _SwapVocabulary,
     _apply_stage_placement,
-    _build_svg_character_subtree,
     _built_value,
-    _note_raster_rig,
-    _part_probe,
-    _raster_digest,
-    _svg_asset_src,
     _track_root_of,
     _value_at,
     _warn_surface,
+    note_raster_rig,
+)
+from an.stage.rig import (  # noqa: E402  (the public rig builder, an#338)
+    art_src,
+    build_rig_subtree,
+    part_probe,
+    raster_digest,
 )
 
 
@@ -254,7 +256,7 @@ def _recoloured_texture_srcs(
         )
         if not swaps:
             continue
-        src = _svg_asset_src(entity.ref or entity.id, rel_path, art_prefix=art_prefix)
+        src = art_src(entity.ref or entity.id, rel_path, art_prefix=art_prefix)
         path = Path(root) / src[len(art_prefix) :]
         if not path.is_file():
             continue  # a missing part is `_record_missing_parts`' business
@@ -604,7 +606,7 @@ def _build_character_subtree(
 
     if char_meta.get("kind") == "CharacterDescriptor":
         _record("descriptor")
-        _note_raster_rig(entity, char_meta, style_pack, raster)
+        note_raster_rig(entity, char_meta, style_pack, raster)
         # An SVG rig's colours live inside its drawings. A pack reaches the
         # ones the descriptor TAGS (`colour_roles`); an untagged rig is
         # recorded so the compiler can say which it could not reach, by name.
@@ -618,14 +620,14 @@ def _build_character_subtree(
             untagged = _core_roles_left_untagged(entity, char_meta, style_pack)
             if untagged and skipped is not None:
                 skipped.add(f"{entity.id} ({', '.join(untagged)})")
-        return _build_svg_character_subtree(
+        return build_rig_subtree(
             entity,
             char_meta,
             textures=textures if textures is not None else {},
-            probe=_part_probe(characters_store),
+            probe=part_probe(characters_store),
             resolutions=resolutions,
             texture_srcs=srcs or None,
-            digest=_raster_digest(characters_store),
+            digest=raster_digest(characters_store),
             descriptor_model=CharacterDescriptor,
             document_kind=CHARACTER_DOCUMENT_KIND,
         )
@@ -841,7 +843,7 @@ def _baked_face_speakers(shot: Shot, mall: Mapping[str, Mapping] | None) -> set[
 
     Used to suppress viseme channels for characters that don't have an
     overlay mouth node (DiceBear / external avatars). See
-    ``_build_svg_character_subtree`` for the matching scene-tree branch.
+    ``an.stage.rig.build_rig_subtree`` for the matching scene-tree branch.
 
     Reads the **migrated, validated** descriptor's declared ``face_overlay``
     fact — the predecessor read the RAW store dict's ``art_provenance`` with
