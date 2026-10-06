@@ -42,6 +42,14 @@ _DEFAULT_PALETTE: dict[str, str] = {
 }
 
 
+#: How far a variant's ``smile`` lifts the mouth's corners, as a fraction of the
+#: shape's half width per unit of smile (an#253). The corners move against the
+#: middle, so the line curves: a ``viseme@happy`` rest mouth is a closed smile,
+#: ``viseme@sad`` a frown. At ``DEFAULT_MOUTH_VARIANTS``' 0.35 the corners of
+#: the idle line rise about a sixth of its half width.
+SMILE_CURVE_GAIN: float = 0.5
+
+
 # Per-shape geometry parameters. Each entry describes a quad-arc lens
 # mouth, optionally with teeth and/or tongue overlays. Field meanings:
 #   width:  full mouth width as a fraction of the canvas width
@@ -90,9 +98,13 @@ def _shape_svg(
 ) -> str:
     """Render one mouth shape as an SVG document string.
 
-    ``smile`` is added to the shape's own corner upturn (positive = smile,
-    negative = frown) — the one knob behind a ``viseme@<form>`` variant set
-    (an#98): every shape keeps its opening, only the corners move.
+    ``smile`` curves the shape (positive = smile, negative = frown) — the one
+    knob behind a ``viseme@<form>`` variant set (an#98): every shape keeps its
+    opening, only the corners move, against the middle, by ``smile`` ×
+    :data:`SMILE_CURVE_GAIN` × the half width. (Until an#253 the variant's
+    smile shifted the whole mouth down with its corners, so a happy mouth was
+    the neutral one moved by two pixels.) ``smile=0`` draws the shape exactly
+    as the neutral set always has.
     """
     cw, ch = canvas
     cx, cy = cw / 2.0, ch / 2.0
@@ -100,7 +112,9 @@ def _shape_svg(
 
     half_w = (cw * float(s["width"])) / 2.0
     half_h = (ch * float(s["height"])) / 2.0
-    smile_y = max(-1.0, min(1.0, float(s["smile"]) + float(smile))) * half_h * 1.5
+    smile_y = max(-1.0, min(1.0, float(s["smile"]))) * half_h * 1.5
+    # y points down: a smile lifts the corners (a smaller y)
+    corner_y = cy + smile_y - float(smile) * SMILE_CURVE_GAIN * half_w
     open_amt = float(s["open"])
 
     # Top lip: lifted slightly with smile offset; its control point is above.
@@ -117,9 +131,9 @@ def _shape_svg(
     tongue = palette.get("tongue", _DEFAULT_PALETTE["tongue"])
 
     body = (
-        f'<path d="M {left_x:.2f} {cy + smile_y:.2f} '
-        f"Q {cx:.2f} {top_ctrl_y:.2f} {right_x:.2f} {cy + smile_y:.2f} "
-        f'Q {cx:.2f} {bot_ctrl_y:.2f} {left_x:.2f} {cy + smile_y:.2f} Z" '
+        f'<path d="M {left_x:.2f} {corner_y:.2f} '
+        f"Q {cx:.2f} {top_ctrl_y:.2f} {right_x:.2f} {corner_y:.2f} "
+        f'Q {cx:.2f} {bot_ctrl_y:.2f} {left_x:.2f} {corner_y:.2f} Z" '
         f'fill="{fill}" stroke="{lip}" stroke-width="2" stroke-linejoin="round"/>'
     )
 

@@ -31,6 +31,7 @@ from cutan.expression.binding import (
 )
 from cutan.compile.gaze import gaze_seed, saccade_track
 from cutan.expression.presets import mouth_form_of
+from cutan.expression.binding import missing_mouth_form
 from cutan.expression.provider import DefaultExpressionProvider, ExpressionProvider
 from cutan.characters.play import (
     PRESET_SOURCE,
@@ -1980,10 +1981,21 @@ def _solve_face(
                     holes=view_holes.get(target, []),
                     exact=bool(view_holes.get(target)),
                 )
+    warned: set[str] = set()
     for idx, sp in enumerate(spans):
         if sp.mouth_form is None or sp.source != "action":
             continue
         set_name = f"{VISEME_CHANNEL}@{sp.mouth_form}"
+        # A form the character has no set for leaves the silent mouth neutral:
+        # said, once per preset (an#253), as a line under it already is.
+        problem = missing_mouth_form(
+            vocab.descriptors.get(entity_id), sp.preset, who=repr(entity_id)
+        )
+        if problem is not None and sp.preset not in warned:
+            warned.add(sp.preset)
+            warnings.warn(
+                f"shot {shot.id!r}: {problem}", CutoutCompileWarning, stacklevel=2
+            )
         for target in vocab.swap_capable_paths(entity_id, set_name):
             rest = _mouth_rest_key(vocab, target, set_name)
             if rest is None:

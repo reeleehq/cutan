@@ -31,7 +31,7 @@ from cutan.characters.play import (
     swap_slots,
 )
 from cutan.characters.schema import DFLT_VIEW, VIEW_CHANNEL, CharacterDescriptor
-from cutan.expression.binding import expression_problems
+from cutan.expression.binding import expression_problems, missing_mouth_form
 from an.ir.compose import flatten
 from an.ir.migrate import migrate
 from an.ir.schema import SceneIR
@@ -341,6 +341,10 @@ def _check_expression_actions(
                     f"`expression` on {entity_id!r} cannot resolve: {problem} — "
                     "compiling this shot raises.",
                 )
+            if (
+                missing := missing_mouth_form(desc, leaf.preset, who=repr(entity_id))
+            ) is not None:
+                report.add("warning", f"{path}/actions/{k}", missing)
     for j, line in enumerate(shot.dialogue):
         emotion = (line.emotion or "").strip().lower()
         if not emotion:
@@ -348,6 +352,10 @@ def _check_expression_actions(
         desc = _descriptor_for(refs_by_entity.get(line.speaker), available_characters)
         for problem in expression_problems(None, preset=emotion, who=line.speaker):
             report.add("error", f"{path}/dialogue/{j}/emotion", problem)
+        if (
+            missing := missing_mouth_form(desc, emotion, who=repr(line.speaker))
+        ) is not None:
+            report.add("warning", f"{path}/dialogue/{j}/emotion", missing)
         if desc is not None and not desc.face_overlay:
             report.add(
                 "warning",
