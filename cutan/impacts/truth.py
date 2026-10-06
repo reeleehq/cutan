@@ -51,7 +51,9 @@ clip with two can be described without changing any reader):
     ``air`` (turning point; velocity is zero at ``t_impact``);
   - ``t_peak_speed`` (``= t_impact`` for surface, ``t_impact - brake`` for
     air), ``peak_speed`` (stroke heights/s), ``peak_speed_px`` (the impact
-    keypoint's px/s), ``fall``, ``brake`` (seconds);
+    keypoint's px/s), ``fall``, ``brake`` and ``rise`` (the stroke into this
+    impact and the one out of it, as executed, seconds; drawn per stroke when
+    the spec spreads them, cutan#27);
   - ``impact_xy`` — the impact keypoint at ``t_impact``;
   - ``frames`` — what the frames show: ``before`` (last frame whose exposure
     closed at or before the impact), ``after`` (first to open at or after it),
@@ -106,7 +108,8 @@ __all__ = [
 
 TRUTH_SCHEMA: str = "cutan.impacts/truth"
 #: Bumped on any change a reader must know about; additive fields bump MINOR.
-TRUTH_SCHEMA_VERSION: str = "1.0.0"
+#: 1.1.0: each event's ``rise`` (cutan#27).
+TRUTH_SCHEMA_VERSION: str = "1.1.0"
 
 #: The analytic and compiled keypoints must agree to this many pixels. Both are
 #: double-precision evaluations of the same easing, so any real disagreement is
@@ -273,6 +276,7 @@ def ground_truth(
                 "peak_speed_px": speed_px,
                 "fall": kk.fall,
                 "brake": kk.brake,
+                "rise": kk.rise,
                 "impact_xy": list(projector.analytic(e.t_impact)[obj.impact_keypoint]),
                 "frames": _frame_evidence(
                     e, frames, stroke, (bounds[k], bounds[k + 1])

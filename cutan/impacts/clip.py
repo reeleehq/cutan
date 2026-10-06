@@ -56,6 +56,7 @@ from cutan.impacts.stroke import (
     DEFAULT_RISE,
     Stroke,
     build_stroke,
+    StrokeTiming,
 )
 from cutan.impacts.truth import (
     TruthMismatch,
@@ -105,6 +106,9 @@ _FLOAT_FIELDS = (
     "rise",
     "fall",
     "brake",
+    "rise_sd",
+    "fall_sd",
+    "brake_sd",
     "fps",
     "exposure",
     "timestamp_jitter_sd",
@@ -121,7 +125,20 @@ class ImpactSpecError(ValueError):
 
 _SHOT_ID = "impacts"
 _SURFACE_ID = "surface"
-_SEED_STREAMS = {"performance": 0, "clock": 1}
+_SEED_STREAMS = {"performance": 0, "clock": 1, "stroke": 2}
+
+#: The shortest a drawn stroke timing may be, as a fraction of its mean: a
+#: wide spread never makes a stroke instantaneous (or negative).
+MIN_TIMING_FRACTION: float = 0.25
+#: Fields added after clips were first named: omitted from the spec's JSON (so
+#: from its ``clip_id``) while at their default, so every existing clip keeps
+#: its directory name and digest.
+_LATE_DEFAULTS: dict[str, Any] = {
+    "rise_sd": 0.0,
+    "fall_sd": 0.0,
+    "brake_sd": 0.0,
+    "arc_radius": None,
+}
 
 
 @dataclass(frozen=True)
@@ -139,7 +156,14 @@ class ImpactClipSpec:
 
     Motion: ``object`` (``"stick"`` or ``"ball"``), ``kind`` (``"surface"`` or
     ``"air"``), the stroke timings ``rise`` / ``fall`` / ``brake``, and
-    ``show_surface`` (``None``: drawn for surface impacts only).
+    ``show_surface`` (``None``: drawn for surface impacts only). Stroke-shape
+    variability (cutan#27): ``rise_sd`` / ``fall_sd`` / ``brake_sd`` (seconds)
+    draw each stroke's own timings around those means from the seed's stroke
+    stream, never below :data:`MIN_TIMING_FRACTION` of the mean; ``truth.json``
+    records each event's actual ``rise``, ``fall`` and ``brake``. ``arc_radius``
+    (scene px, the ball only) swings the ball on a circle about a pivot that
+    far above its contact point, instead of a straight fall: the contact is the
+    arc's lowest point and ``impact_xy`` is where it lands, as before.
 
     Camera (:class:`an.frame_clock.FrameClock`): ``fps``, ``exposure``,
     ``exposure_samples``, ``timestamp_jitter_sd`` (when frames are really
@@ -165,6 +189,10 @@ class ImpactClipSpec:
     rise: float = DEFAULT_RISE
     fall: float = DEFAULT_FALL
     brake: float = DEFAULT_BRAKE
+    rise_sd: float = 0.0
+    fall_sd: float = 0.0
+    brake_sd: float = 0.0
+    arc_radius: float | None = None
     show_surface: bool | None = None
     fps: float = 30.0
     exposure: float = 0.0
@@ -194,6 +222,18 @@ class ImpactClipSpec:
         else:
             object.__setattr__(self, "tempo", tempo_map(self.tempo).points)
         object.__setattr__(self, "pattern", tuple(float(a) for a in self.pattern))
+        for name in ("rise_sd", "fall_sd", "brake_sd"):
+            if getattr(self, name) < 0:
+                raise ImpactSpecError(
+                    f"{name} must be >= 0; got {getattr(self, name)!r}"
+                )
+        if self.arc_radius is not None:
+            object.__setattr__(self, "arc_radius", float(self.arc_radius))
+            if self.object != "ball":
+                raise ImpactSpecError(
+                    f"arc_radius swings the ball; the {self.object!r} already swings "
+                    "in an arc about its grip"
+                )
         if not self.trajectory_hz > 0:
             raise ImpactSpecError(
                 f"trajectory_hz must be > 0; got {self.trajectory_hz!r}"
@@ -212,6 +252,9 @@ class ImpactClipSpec:
         if isinstance(self.tempo, tuple):
             d["tempo"] = [list(p) for p in self.tempo]
         d["pattern"] = list(self.pattern)
+        for name, default in _LATE_DEFAULTS.items():
+            if d.get(name) == default:
+                del d[name]
         return d
 
     @classmethod
@@ -306,17 +349,42 @@ def plan_impact_clip(spec: ImpactClipSpec) -> ImpactPlan:
         events,
         kind=spec.kind,  # type: ignore[arg-type]
         duration=duration,
-        rise=spec.rise,
-        fall=spec.fall,
-        brake=spec.brake,
+        timings=_stroke_timings(spec, len(events)),
     )
-    obj = impact_object(spec.object)
+    obj = impact_object(
+        spec.object,
+        **({"arc_radius": spec.arc_radius} if spec.arc_radius is not None else {}),
+    )
     frames = spec.clock().frames(duration)
     show_surface = (
         spec.kind == "surface" if spec.show_surface is None else spec.show_surface
     )
     scene = _scene(spec, obj, stroke, show_surface=show_surface)
     return ImpactPlan(spec, events, obj, stroke, frames, scene)
+
+
+def _stroke_timings(spec: ImpactClipSpec, n: int) -> list[StrokeTiming]:
+    """Each stroke's rise, fall and brake: the spec's means, spread by their
+    ``*_sd`` from the seed's own stroke stream (so the performance and the
+    camera are unchanged by it), never below :data:`MIN_TIMING_FRACTION` of the
+    mean. With every ``*_sd`` 0, the means exactly (no draw)."""
+    import random
+
+    if not (spec.rise_sd or spec.fall_sd or spec.brake_sd):
+        return [StrokeTiming(spec.rise, spec.fall, spec.brake)] * n
+    rng = random.Random(_seed(spec.seed, "stroke"))
+
+    def draw(mean: float, sd: float) -> float:
+        return max(mean * MIN_TIMING_FRACTION, rng.gauss(mean, sd)) if sd else mean
+
+    return [
+        StrokeTiming(
+            rise=draw(spec.rise, spec.rise_sd),
+            fall=draw(spec.fall, spec.fall_sd),
+            brake=draw(spec.brake, spec.brake_sd),
+        )
+        for _ in range(n)
+    ]
 
 
 def _scene(

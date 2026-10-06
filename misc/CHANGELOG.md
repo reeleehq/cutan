@@ -3,6 +3,11 @@
 ## 2026-10-06
 
 - **A character has a specimen** (cutan#40, an#347): the `character` kind declares `specimen=character_specimen`, a short cut-out shot casting the character alone, at rest and facing the camera, so `an library sheet` draws the character instead of a grey placeholder.
+- **Impacts: per-stroke variability and an arc fall** (cutan#27, for thoremin's air-drum benchmarks):
+  - `ImpactClipSpec.rise_sd/fall_sd/brake_sd` (and `an impacts clip --rise-sd/--fall-sd/--brake-sd`) draw each stroke's timings from the seed's own stroke stream, never below a quarter of the mean. Performance and camera are unchanged by it.
+  - `truth.json` records each event's actual `rise` (schema 1.1.0) beside `fall` and `brake`.
+  - `arc_radius` (`--arc-radius`) swings the ball on a circle about a pivot straight above its contact. The stroke rotates the pivot, so the curve stays exact, and the contact stays the lowest point.
+  - The new fields are omitted from a spec's JSON at their defaults, so no existing clip id changes.
 - **Silhouette styles keep their faces readable, and a short turn on twos never vanishes** (an#273):
   - The Reiniger spec declares cut-out eyes (`live.characters.part_tints`: white scleras, since a part's tint replaces the root's). `tests/test_style_specs.py` checks each part against the nodes an offline character is built with.
   - A `turn` played by name gets the shot's `step_hz`; one whose halves are shorter than a step is a hard swap at its midpoint, not a squash a stepped frame catches edge-on (`turn` version 2).

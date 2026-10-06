@@ -57,6 +57,10 @@ def clip(
     jitter_sd: float = DEFAULT_JITTER_SD,
     jitter_rho: float = 0.0,
     jitter_bias: float = 0.0,
+    rise_sd: float = 0.0,
+    fall_sd: float = 0.0,
+    brake_sd: float = 0.0,
+    arc_radius: float = 0.0,
     fps: float = 30.0,
     exposure: float = 0.0,
     exposure_samples: int = 0,
@@ -83,6 +87,10 @@ def clip(
     jitter_sd: humanisation, seconds (standard deviation of the timing offset; 0 = metronome)
     jitter_rho: correlation of consecutive offsets (0 = independent)
     jitter_bias: constant lead (negative) or lag (positive), seconds
+    rise_sd: spread of each stroke's rise, seconds (drawn per stroke; 0 = constant)
+    fall_sd: spread of each stroke's fall, seconds (drawn per stroke; 0 = constant)
+    brake_sd: spread of each air stroke's brake, seconds (drawn per stroke; 0 = constant)
+    arc_radius: the ball swings on a circle of this radius (px) about a pivot above its contact (0 = a straight fall)
     fps: frame rate (need not be an integer)
     exposure: fraction of the frame period the shutter is open (0.5 = 180 degrees)
     exposure_samples: instants averaged per open exposure (0 = automatic)
@@ -107,6 +115,10 @@ def clip(
         jitter_sd=jitter_sd,
         jitter_rho=jitter_rho,
         jitter_bias=jitter_bias,
+        rise_sd=rise_sd,
+        fall_sd=fall_sd,
+        brake_sd=brake_sd,
+        arc_radius=arc_radius or None,
         fps=fps,
         exposure=exposure,
         exposure_samples=exposure_samples or None,

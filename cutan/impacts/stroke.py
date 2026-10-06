@@ -41,7 +41,7 @@ from __future__ import annotations
 
 import bisect
 from collections.abc import Sequence
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from typing import Literal
 
 from an.stage.easing import apply_easing
@@ -57,6 +57,7 @@ __all__ = [
     "StrokeError",
     "StrokeKinematics",
     "StrokeSegment",
+    "StrokeTiming",
     "build_stroke",
 ]
 
@@ -83,6 +84,18 @@ _EASING_SLOPES = {
 
 class StrokeError(ValueError):
     """A stroke that cannot be built from these events."""
+
+
+@dataclass(frozen=True, slots=True)
+class StrokeTiming:
+    """One impact's own timings (seconds): the ``fall`` into it, the air
+    ``brake`` before it, and the ``rise`` out of it (cutan#27: stroke-shape
+    variability, drawn per stroke). Each is the longest it may take: a fast
+    tempo still shortens it to fit."""
+
+    rise: float
+    fall: float
+    brake: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -125,6 +138,8 @@ class StrokeKinematics:
     apex: float
     fall: float
     brake: float
+    #: The rise out of this impact as executed (the next stroke's preparation).
+    rise: float = 0.0
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -164,22 +179,32 @@ def build_stroke(
     fall: float = DEFAULT_FALL,
     brake: float = DEFAULT_BRAKE,
     rest_height: float = 1.0,
+    timings: Sequence[StrokeTiming] | None = None,
 ) -> Stroke:
     """Chain rise / hold / fall segments through every executed impact.
 
     The object starts and ends at ``rest_height``; before impact ``k`` it is
     raised to ``events[k].amplitude`` (a bigger preparation, a harder hit).
     Segments tile ``[0, duration]`` exactly, and every impact is a segment
-    boundary at precisely ``t_impact``.
+    boundary at precisely ``t_impact``. ``timings`` gives each impact its own
+    rise, fall and brake (one per event, cutan#27); without it every stroke
+    takes ``rise``, ``fall`` and ``brake``.
     """
     if kind not in IMPACT_KINDS:
         raise StrokeError(f"kind must be one of {IMPACT_KINDS}; got {kind!r}")
     if not events:
         raise StrokeError("a stroke needs at least one impact")
-    if min(rise, fall) <= 0 or brake <= 0:
+    if timings is None:
+        timings = [StrokeTiming(rise, fall, brake)] * len(events)
+    if len(timings) != len(events):
         raise StrokeError(
-            f"rise, fall and brake must be > 0; got {rise}, {fall}, {brake}"
+            f"one timing per impact: {len(timings)} timings for {len(events)} impacts"
         )
+    for tm in timings:
+        if min(tm.rise, tm.fall) <= 0 or tm.brake <= 0:
+            raise StrokeError(
+                f"rise, fall and brake must be > 0; got {tm.rise}, {tm.fall}, {tm.brake}"
+            )
     times = [e.t_impact for e in events]
     if any(b <= a for a, b in zip(times, times[1:])):
         raise StrokeError("impact times must strictly increase")
@@ -196,15 +221,17 @@ def build_stroke(
         if t1 > t0:
             segments.append(StrokeSegment(t0, t1, h0, h1, easing))
 
-    def fall_into(event: ImpactEvent, *, from_t: float, apex: float) -> None:
+    def fall_into(
+        event: ImpactEvent, *, from_t: float, apex: float, tm: StrokeTiming
+    ) -> None:
         T = event.t_impact
-        D = min(fall, T - from_t)
+        D = min(tm.fall, T - from_t)
         add(from_t, T - D, apex, apex, "linear")  # hold at the apex
         if kind == "surface":
             add(T - D, T, apex, 0.0, "ease_in")
             b, t_peak = 0.0, T
         else:
-            b = min(brake, D / 2.0)
+            b = min(tm.brake, D / 2.0)
             d = apex * b / D
             add(T - D, T - b, apex, d, "ease_in")
             add(T - b, T, d, 0.0, "ease_out")
@@ -213,12 +240,15 @@ def build_stroke(
             StrokeKinematics(event.index, kind, T, t_peak, 2.0 * apex / D, apex, D, b)
         )
 
-    def rise_from(t: float, *, longest: float, to: float) -> float:
-        top = t + min(rise, longest)
+    rises: list[float] = []
+
+    def rise_from(t: float, *, longest: float, to: float, tm: StrokeTiming) -> float:
+        top = t + min(tm.rise, longest)
+        rises.append(top - t)
         add(t, top, 0.0, to, "ease_out" if kind == "surface" else "ease_in_out")
         return top
 
-    fall_into(events[0], from_t=0.0, apex=events[0].amplitude)
+    fall_into(events[0], from_t=0.0, apex=events[0].amplitude, tm=timings[0])
     # With room for a hold before the first fall, the clip opens at rest height
     # and eases to the first apex during it; without room, it opens at the apex.
     if rest_height != events[0].amplitude and segments[0].easing == "linear":
@@ -230,14 +260,20 @@ def build_stroke(
         if k + 1 < len(events):
             nxt = events[k + 1]
             half = (nxt.t_impact - event.t_impact) / 2.0
-            top = rise_from(event.t_impact, longest=half, to=nxt.amplitude)
-            fall_into(nxt, from_t=top, apex=nxt.amplitude)
+            top = rise_from(
+                event.t_impact, longest=half, to=nxt.amplitude, tm=timings[k]
+            )
+            fall_into(nxt, from_t=top, apex=nxt.amplitude, tm=timings[k + 1])
         else:
             top = rise_from(
-                event.t_impact, longest=duration - event.t_impact, to=rest_height
+                event.t_impact,
+                longest=duration - event.t_impact,
+                to=rest_height,
+                tm=timings[k],
             )
             add(top, duration, rest_height, rest_height, "linear")
     _check_tiling(segments, duration)
+    kinematics = [replace(kk, rise=r) for kk, r in zip(kinematics, rises)]
     return Stroke(kind, duration, tuple(segments), tuple(kinematics))
 
 

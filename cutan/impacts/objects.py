@@ -208,31 +208,80 @@ def ball(
     x: float = 0.0,
     floor_y: float = 90.0,
     drop: float = 170.0,
+    arc_radius: float | None = None,
     color: str = DEFAULT_OBJECT_COLOR,
     surface_color: str = DEFAULT_SURFACE_COLOR,
     surface_size: tuple[float, float] = (160.0, 24.0),
 ) -> ImpactObject:
-    """A ball moving vertically onto a floor whose top is at ``floor_y``.
+    """A ball moving onto a floor whose top is at ``floor_y``.
 
     A full stroke lifts it ``drop`` pixels. Keypoints: ``center`` and
     ``bottom`` (its contact point).
+
+    Straight by default. With ``arc_radius`` (cutan#27, a wide stick arc: a
+    hard hit) it hangs on a circle of that radius about a pivot straight above
+    its contact point, and the stroke ROTATES the pivot: the ball swings up to
+    one side and falls back along the arc, its contact the arc's lowest point.
+    The angle that lifts it ``drop`` pixels is ``acos(1 - drop / arc_radius)``;
+    rotation is the one channel, affine in ``h``, so the curve stays exact.
+
+    >>> b = ball(arc_radius=300.0)
+    >>> round(b.params["arc_sweep"], 4), b.at == (0.0, b.params["pivot_y"])
+    (1.1226, True)
     """
     d = 2.0 * radius
-    svg = _svg(
-        d, d, f'<circle cx="{radius:g}" cy="{radius:g}" r="{radius:g}" fill="{color}"/>'
-    )
-    art = _prop_art("impact-ball", svg, anchor=(0.5, 0.5))
     contact_y = floor_y - radius
-    return ImpactObject(
-        name="ball",
-        art=art,
-        at=(x, contact_y),
-        channels=(StrokeChannel("ball", "y", contact_y, drop),),
-        keypoints={"center": (0.0, 0.0), "bottom": (0.0, radius)},
+    common = dict(
         impact_keypoint="bottom",
         surface_art=_slab(*surface_size, surface_color),
         surface_at=(x, floor_y),
-        params={"radius": radius},
+    )
+    if arc_radius is None:
+        svg = _svg(
+            d,
+            d,
+            f'<circle cx="{radius:g}" cy="{radius:g}" r="{radius:g}" fill="{color}"/>',
+        )
+        art = _prop_art("impact-ball", svg, anchor=(0.5, 0.5))
+        return ImpactObject(
+            name="ball",
+            art=art,
+            at=(x, contact_y),
+            channels=(StrokeChannel("ball", "y", contact_y, drop),),
+            keypoints={"center": (0.0, 0.0), "bottom": (0.0, radius)},
+            params={"radius": radius},
+            **common,
+        )
+    if not drop <= 2.0 * arc_radius:
+        raise ValueError(
+            f"an arc of radius {arc_radius:g} px cannot lift the ball {drop:g} px "
+            f"(at most twice the radius); give a radius of at least {drop / 2:g}"
+        )
+    sweep = math.acos(1.0 - drop / arc_radius)
+    # The drawing hangs from its top centre (the pivot): the ball's centre is
+    # `arc_radius` below it, so rotating the entity swings the ball on the arc.
+    height = arc_radius + radius
+    svg = _svg(
+        d,
+        height,
+        f'<circle cx="{radius:g}" cy="{arc_radius:g}" r="{radius:g}" fill="{color}"/>',
+    )
+    art = _prop_art("impact-ball-arc", svg, anchor=(0.5, 0.0))
+    pivot_y = contact_y - arc_radius
+    return ImpactObject(
+        name="ball",
+        art=art,
+        at=(x, pivot_y),
+        channels=(StrokeChannel("ball", "rotation", 0.0, sweep),),
+        keypoints={"center": (0.0, arc_radius), "bottom": (0.0, arc_radius + radius)},
+        params={
+            "radius": radius,
+            "arc_radius": arc_radius,
+            "arc_sweep": sweep,
+            "pivot_x": x,
+            "pivot_y": pivot_y,
+        },
+        **common,
     )
 
 
