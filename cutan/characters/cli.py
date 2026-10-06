@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import tempfile
 import textwrap
 from pathlib import Path
@@ -401,35 +402,39 @@ def silhouette(
 ) -> str:
     """Render a black silhouette for ``name`` (and optionally compare to ``other``).
 
-    When two names are given, prints both silhouettes' paths and an IoU
-    score (0..1; lower means more visually distinct).
+    The silhouette is the figure as the stage draws it (build, head scale, hat:
+    an#272), tinted black on white. When two names are given, prints both
+    silhouettes' paths and an IoU score (0..1; lower means more visually
+    distinct). Nothing is written into a character's folder, so a later
+    ``an library publish`` never ships a silhouette.
 
     name: character id
     other: optional second character to compare against
     out_dir: parent directory; defaults to ./assets/characters
-    output: output PNG path; defaults to <character_dir>/silhouette.png
+    output: output PNG path (one name only); defaults to the project's
+        artifacts/silhouettes/<name>.png
     size: square output size in pixels (default 512)
     """
     from cutan.characters.silhouette import (
-        render_silhouette,
         compare_silhouettes,
+        render_character_silhouettes,
     )
 
     base = _resolve_target(out_dir)
-
-    def _render(char_name: str) -> Path:
-        cdir = base / char_name
-        svg = cdir / f"{char_name}.svg"
-        if not svg.exists():
-            raise FileNotFoundError(svg)
-        out_path = Path(output) if output and not other else cdir / "silhouette.png"
-        return render_silhouette(svg, out_path, size=(size, size))
-
-    a_path = _render(name)
+    names = [name, other] if other else [name]
+    for n in names:
+        if not (base / n / "character.json").is_file():
+            raise FileNotFoundError(base / n / "character.json")
+    target = _silhouette_dir(base)
+    paths = render_character_silhouettes(
+        {n: base / n for n in names}, target, size=size
+    )
+    if output and not other:
+        Path(output).parent.mkdir(parents=True, exist_ok=True)
+        paths[name] = Path(shutil.move(str(paths[name]), output))
     if not other:
-        return f"silhouette: {a_path}"
-    b_path = _render(other)
-    score = compare_silhouettes(a_path, b_path, size=(size, size))
+        return f"silhouette: {paths[name]}"
+    score = compare_silhouettes(paths[name], paths[other], size=(size, size))
     verdict = (
         "very similar (consider redesigning)"
         if score >= 0.75
@@ -439,10 +444,23 @@ def silhouette(
     )
     return (
         f"silhouettes:\n"
-        f"  {name}: {a_path}\n"
-        f"  {other}: {b_path}\n"
+        f"  {name}: {paths[name]}\n"
+        f"  {other}: {paths[other]}\n"
         f"  IoU: {score:.3f} — {verdict}"
     )
+
+
+#: Where silhouettes go, under the project the characters belong to (never a
+#: character's own folder: that folder is the published asset, an#272).
+SILHOUETTE_ARTIFACTS: tuple[str, ...] = ("artifacts", "silhouettes")
+
+
+def _silhouette_dir(characters_dir: Path) -> Path:
+    """``<project>/artifacts/silhouettes`` for a project's ``assets/characters``;
+    else a folder in the system temp dir."""
+    if characters_dir.name == "characters" and characters_dir.parent.name == "assets":
+        return characters_dir.parent.parent.joinpath(*SILHOUETTE_ARTIFACTS)
+    return Path(tempfile.gettempdir()).joinpath("an", *SILHOUETTE_ARTIFACTS)
 
 
 def preview(

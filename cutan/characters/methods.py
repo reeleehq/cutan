@@ -1184,11 +1184,24 @@ def substitution_record(sub, *, entity_ref: str | None = None) -> dict[str, Any]
 def syllable_beats(line, *, min_gap_s: float = DFLT_MIN_BEAT_GAP_S) -> list[float]:
     """Syllable onsets of a dialogue line, in seconds from its start.
 
-    From the line's viseme track (a syllable starts where the mouth opens out
-    of a closed shape), else its word timings (one beat per word), else one
-    beat at its start. Beats closer than ``min_gap_s`` merge.
+    The line's word timings, when its provider has them, are the authority:
+    they are measured on the audio, so a beat never falls in a leading breath
+    or a pause (an#272: a pulse dipped 0.35 s before "Hi" was heard). Each
+    word starts a beat, and the viseme track's syllables (where the mouth
+    opens out of a closed shape) add beats INSIDE a word's window, never
+    outside every word. With no word timings: the viseme track's syllables,
+    else one beat at the line's start. Beats closer than ``min_gap_s`` merge.
+
+    >>> from types import SimpleNamespace as NS
+    >>> track = NS(keyframes=[NS(time=0.0, viseme="B"), NS(time=0.4, viseme="X"),
+    ...                       NS(time=0.7, viseme="C")])
+    >>> syllable_beats(NS(viseme_track=track, word_timings=None, duration=1.2))
+    [0.0, 0.7]
+    >>> words = [NS(start=0.35, end=1.0)]  # a breath before the word
+    >>> syllable_beats(NS(viseme_track=track, word_timings=words, duration=1.2))
+    [0.35, 0.7]
     """
-    times: list[float] = []
+    syllables: list[float] = []
     track = getattr(line, "viseme_track", None)
     if track is not None and track.keyframes:
         closed = True
@@ -1197,12 +1210,16 @@ def syllable_beats(line, *, min_gap_s: float = DFLT_MIN_BEAT_GAP_S) -> list[floa
             if shape in CLOSED_VISEMES:
                 closed = True
             elif closed:
-                times.append(float(kf.time))
+                syllables.append(float(kf.time))
                 closed = False
-    elif getattr(line, "word_timings", None):
-        times = [float(w.start) for w in line.word_timings]
+    words = getattr(line, "word_timings", None) or []
+    if words:
+        windows = [(float(w.start), float(w.end)) for w in words]
+        times = [a for a, _ in windows] + [
+            t for t in syllables if any(a < t < b for a, b in windows)
+        ]
     else:
-        times = [0.0]
+        times = syllables or [0.0]
     end = float(line.duration) if line.duration is not None else float("inf")
     out: list[float] = []
     for t in sorted(times):

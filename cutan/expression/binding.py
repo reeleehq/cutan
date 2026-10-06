@@ -35,12 +35,22 @@ True
 from __future__ import annotations
 
 import warnings
-from collections.abc import Collection, Iterable
+from collections.abc import Collection, Iterable, Mapping
 from dataclasses import dataclass
 from typing import Union
 
 from cutan.characters.schema import EYELID_CHANNEL, VISEME_CHANNEL, CharacterDescriptor
-from cutan.expression.axes import AXES, GAZE_AXES
+from cutan.expression.axes import (
+    AXES,
+    GAZE_AXES,
+    LID_AXES,
+    LID_CLOSED_BELOW,
+    LID_KEY_CLOSED,
+    LID_KEY_HALF,
+    LID_KEY_OPEN,
+    LID_KEY_WIDE,
+    lid_key,
+)
 from cutan.expression.presets import PRESETS, known_presets, mouth_form_of, preset_axes
 
 #: Brow travel per unit of `brow_height_*`, in the rig's view-box units
@@ -244,6 +254,62 @@ def missing_mouth_form(
     )
 
 
+#: Every rung of the eyelid ladder a lid state can ask for.
+_LID_RUNGS: tuple[str, ...] = (LID_KEY_WIDE, LID_KEY_OPEN, LID_KEY_HALF, LID_KEY_CLOSED)
+
+
+def lid_rung_problems(
+    desc: CharacterDescriptor | None,
+    preset: str | None,
+    *,
+    axes: Mapping[str, float] | None = None,
+    intensity: float = 1.0,
+    who: str | None = None,
+) -> list[str]:
+    """What an expression's lids ask for that ``desc``'s eyelid art cannot show
+    (an#272): a rig whose ``eyelid`` set draws ``OPEN`` and ``CLOSED`` picks a
+    DRAWING per lid state (the ladder: wide, open, half, closed), so a partial
+    lid on a rig with no ``HALF`` drawing shows ``OPEN``, the same picture as no
+    expression at all. One sentence per lid axis that falls short; empty for a
+    preset with no lid, a rig whose lids squash (no closed art: continuous), or
+    a baked face.
+
+    >>> d = CharacterDescriptor(name="bob", asset_sets={"eyelid": {"OPEN": "o", "CLOSED": "c"}})
+    >>> lid_rung_problems(d, None, axes={"lid_open_l": -0.45})
+    ["bob's eyelids have no 'HALF' drawing, so lid_open_l -0.45 shows 'OPEN' (its eyelid set: CLOSED, OPEN): add a HALF eyelid drawing to the set, or use -0.85 or lower to close the lid"]
+    >>> lid_rung_problems(d, None, axes={"lid_open_l": -0.9})
+    []
+    """
+    if desc is None or not desc.face_overlay:
+        return []
+    keys = {str(k).upper() for k in desc.asset_sets.get(EYELID_CHANNEL) or {}}
+    if LID_KEY_OPEN not in keys or LID_KEY_CLOSED not in keys:
+        return []  # no ladder: the lid squashes, which shows any value
+    try:
+        values = preset_axes(preset, axes=axes, intensity=intensity)
+    except ValueError:
+        return []  # an unknown preset or axis is `expression_problems`' error
+    who = who or desc.name
+    out = []
+    for axis in LID_AXES:
+        value = values.get(axis)
+        if not value:
+            continue
+        wanted = lid_key(value, available=_LID_RUNGS)
+        shown = lid_key(value, available=keys)
+        if wanted != shown:
+            fix = f"add a {wanted} eyelid drawing to the set" + (
+                f", or use {LID_CLOSED_BELOW:g} or lower to close the lid"
+                if wanted == LID_KEY_HALF
+                else ""
+            )
+            out.append(
+                f"{who}'s eyelids have no {wanted!r} drawing, so {axis} {value:+.2f} "
+                f"shows {shown!r} (its eyelid set: {', '.join(sorted(keys))}): {fix}"
+            )
+    return out
+
+
 def resolve_mouth_set(
     desc: CharacterDescriptor,
     preset: str | None,
@@ -358,6 +424,7 @@ __all__ = [
     "expression_problems",
     "preset_axes",
     "missing_mouth_form",
+    "lid_rung_problems",
     "resolve_mouth_set",
     "touches_gaze",
     "variant_set_name",
