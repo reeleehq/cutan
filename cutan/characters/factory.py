@@ -790,7 +790,11 @@ def stand_on_feet(char_dir: str | Path, *, undo: bool = False) -> dict[str, Any]
         )
     )
     path.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
-    return {"before": before, "after": after, "shift": round(before["feet"] - after["feet"], 1)}
+    return {
+        "before": before,
+        "after": after,
+        "shift": round(before["feet"] - after["feet"], 1),
+    }
 
 
 def _check_style_is_usable(style: str, *, acknowledge_attribution: bool) -> None:
