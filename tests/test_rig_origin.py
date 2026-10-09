@@ -96,3 +96,42 @@ def test_validate_character_says_the_migration_kept_a_pose_unapplied():
         Path(d, "character.json").write_text(json.dumps(doc), encoding="utf-8")
         report = validate_character(d, name="c")
     assert any("rest_rotation: true" in f.description for f in report.findings)
+
+
+def test_an_character_new_stands_a_new_character_on_its_feet_by_default():
+    """The maintainer's decision (an#423, 2026-10-09): `an character new` uses
+    the feet origin by default; `--no-feet-origin` keeps the bones' middle."""
+    from cutan.characters.cli import new
+
+    with tempfile.TemporaryDirectory() as d:
+        new("amy", out_dir=d, offline=True, views=False)
+        new("bob", out_dir=d, offline=True, views=False, feet_origin=False)
+        amy = json.loads(Path(d, "amy", "character.json").read_text(encoding="utf-8"))
+        bob = json.loads(Path(d, "bob", "character.json").read_text(encoding="utf-8"))
+    assert stage_extent(amy)["feet"] == 0.0
+    assert "origin" not in bob and stage_extent(bob)["feet"] > 0.0
+
+
+def test_an_existing_character_is_converted_only_when_asked_and_says_by_how_much():
+    """No migration: an existing character keeps its placement until
+    `an character feet-origin` converts it, and the command says how far to
+    move its `stage.at` to keep it where it stood. `--undo` goes back."""
+    from cutan.characters.cli import feet_origin
+    from cutan.characters.factory import new_character
+
+    with tempfile.TemporaryDirectory() as d:
+        path = new_character(d, name="old", use_dicebear=False, build="squat", views=False)
+        before = json.loads(path.read_text(encoding="utf-8"))
+        feet = stage_extent(before)["feet"]
+        assert feet > 0.0 and "origin" not in before
+        said = feet_origin("old", out_dir=d)
+        after = json.loads(path.read_text(encoding="utf-8"))
+        assert stage_extent(after)["feet"] == 0.0
+        assert f"add {feet:g} x its stage.scale" in said
+        # Only `origin` changed.
+        assert {k: v for k, v in after.items() if k != "origin"} == before
+        assert "already stood there" in feet_origin("old", out_dir=d)
+        said = feet_origin("old", out_dir=d, undo=True)
+        assert json.loads(path.read_text(encoding="utf-8")) == before
+        assert f"add {-feet:g} x" in said
+        assert feet_origin("nobody", out_dir=d).startswith("no character at")

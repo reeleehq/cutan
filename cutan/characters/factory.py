@@ -749,6 +749,50 @@ def stage_extent(desc: "CharacterDescriptor | Mapping[str, Any]") -> dict[str, f
     }
 
 
+def stand_on_feet(char_dir: str | Path, *, undo: bool = False) -> dict[str, Any]:
+    """Convert an existing character to stand on its feet (an#285), or back.
+
+    Declares the rig's ``origin`` at its ROOT bone, the ground contact, the
+    way ``an character new`` does for a new character: ``stage.at`` is then
+    where its feet stand. Existing characters are never converted implicitly
+    (that would move them in every scene already made), so this is the opt-in,
+    one character at a time. ``undo`` removes the declared origin, back to the
+    middle of the bones.
+
+    Only ``character.json``'s ``origin`` changes; every other key is kept as
+    written. Returns ``{"before", "after"}`` (:func:`stage_extent` of each)
+    and ``shift``: how many scene pixels (at ``stage.scale: 1``) to ADD to the
+    character's ``stage.at`` y in a scene made before, to keep it where it
+    stood (negative after ``undo``).
+    """
+    from an.ir.migrate import migrate
+
+    path = Path(char_dir) / "character.json"
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    desc = CharacterDescriptor.model_validate(
+        migrate(dict(raw), kind=CHARACTER_DOCUMENT_KIND.name)
+    )
+    before = stage_extent(desc)
+    if undo:
+        raw.pop("origin", None)
+    else:
+        root = next((b for b in desc.bones if b.parent is None), None)
+        if root is None:
+            raise ValueError(
+                f"{path} declares no root bone: nothing says where its feet are"
+            )
+        # The root bone is the ground contact; with no parent, its position is
+        # its world position.
+        raw["origin"] = [root.x, root.y]
+    after = stage_extent(
+        CharacterDescriptor.model_validate(
+            migrate(dict(raw), kind=CHARACTER_DOCUMENT_KIND.name)
+        )
+    )
+    path.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
+    return {"before": before, "after": after, "shift": round(before["feet"] - after["feet"], 1)}
+
+
 def _check_style_is_usable(style: str, *, acknowledge_attribution: bool) -> None:
     """Refuse a style whose licence puts a duty on the user, unless acknowledged.
 
@@ -939,9 +983,11 @@ def new_character(
     - ``feet_origin`` (an#285) — declare the rig's ``origin`` at its ROOT bone,
       the ground contact, so ``stage.at`` is where the feet stand and every
       build placed at one ``y`` stands on one line (``stage_extent``'s
-      ``feet`` is then 0). Off (the default), the stage point stays the
-      middle of the bones, as for every character made before it; whether
-      it becomes the default is an#285's open decision.
+      ``feet`` is then 0). ``an character new`` turns it on by default (the
+      maintainer's decision on an#423, 2026-10-09); here it stays off by
+      default, so code that rebuilds a character (goldens, a recipe's replay,
+      the demos) draws exactly what it drew. :func:`stand_on_feet` converts an
+      existing character, one at a time.
 
     Every colour the factory draws in a role is recorded in the descriptor's
     ``colour_roles`` so a style pack can recolour it later (palette swapping,
