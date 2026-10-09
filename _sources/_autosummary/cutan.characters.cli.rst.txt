@@ -19,6 +19,7 @@ cutan.characters.cli
       add_views
       capabilities
       contract
+      feet_origin
       mouths
       new
       preview

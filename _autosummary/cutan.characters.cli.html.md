@@ -30,6 +30,7 @@ Subcommands (used as `an character <verb> ...`):
 | [`add_views`](#cutan.characters.cli.add_views)(name[, out_dir])                        | Give `name` its turnaround (an#197): back, side and three-quarter head and torso art, a `view` swap set, and a pose per view — so `play: turn` and `set <name> view <key>` turn it.             |
 | [`capabilities`](#cutan.characters.cli.capabilities)(name[, out_dir, as_json, style])     | What a character affords, and per aspect which methods apply and what the rest lack.                                                                                                            |
 | [`contract`](#cutan.characters.cli.contract)()                                        | Print the art-package contract an illustrator must satisfy.                                                                                                                                     |
+| [`feet_origin`](#cutan.characters.cli.feet_origin)(name[, out_dir, undo])                | Make an existing character stand on its feet (an#285): its stage point (`stage.at`) becomes where its feet are, as for a character `an character new` makes now.                                |
 | [`mouths`](#cutan.characters.cli.mouths)(name[, out_dir, palette, variants])        | Regenerate the default 9-shape mouth set for `name`, plus its `viseme@<form>` variants, and declare them in the descriptor.                                                                     |
 | [`new`](#cutan.characters.cli.new)(name[, out_dir, seed, style, voice_ref, ...]) | Create a new character at `out_dir`/`name`.                                                                                                                                                     |
 | [`preview`](#cutan.characters.cli.preview)(name[, out_dir, open_browser])            | Render a small HTML viewer that previews all visemes + idle animation.                                                                                                                          |
@@ -119,6 +120,20 @@ gets a human paid for work that cannot land.
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
+### cutan.characters.cli.feet_origin(name, out_dir='', undo=False)
+
+Make an existing character stand on its feet (an#285): its stage point
+(`stage.at`) becomes where its feet are, as for a character `an character
+new` makes now. Existing characters are never converted implicitly; this
+moves the character in scenes made before, and prints by how much.
+
+name: character id
+out_dir: parent directory; defaults to ./assets/characters
+undo: go back to placing it by the middle of its bones
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
 ### cutan.characters.cli.mouths(name, out_dir='', palette='', variants='happy,sad')
 
 Regenerate the default 9-shape mouth set for `name`, plus its
@@ -136,7 +151,7 @@ variants: comma-separated mouth forms (see `an character new`); “” = none
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
-### cutan.characters.cli.new(name, out_dir='', seed='', style='lorelei', voice_ref='', offline=False, acknowledge_attribution=False, overwrite=False, mouth_variants='happy,sad', palette='', build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False)
+### cutan.characters.cli.new(name, out_dir='', seed='', style='lorelei', voice_ref='', offline=False, acknowledge_attribution=False, overwrite=False, mouth_variants='happy,sad', palette='', build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=True)
 
 Create a new character at `out_dir`/`name`.
 
@@ -185,7 +200,9 @@ views: draw the turnaround — back, side (a profile facing right) and
 
 feet_origin: put the stage point at the feet (the rig’s root bone), so
 : `stage.at` is where the character stands and every build placed at one
-  y stands on one floor line (an#285)
+  y stands on one floor line (an#285). On by default; –no-feet-origin
+  places it by the middle of its bones, as characters made before were
+  (convert one of those with `an character feet-origin`)
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

@@ -52,6 +52,7 @@ cutan.characters.factory
       stamp_factory_descriptor
       stamp_factory_parts
       stamp_generated_head
+      stand_on_feet
       view_poses
    
    .. rubric:: Classes

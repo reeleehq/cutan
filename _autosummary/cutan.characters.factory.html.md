@@ -64,6 +64,7 @@ problem routes the way every other verifier’s does (an#78).
 | [`stamp_factory_descriptor`](#cutan.characters.factory.stamp_factory_descriptor)(char_dir)               | Record the factory as the source of the character it just drew at `char_dir`.                                                                                                                                                                                                                                                                                                                         |
 | [`stamp_factory_parts`](#cutan.characters.factory.stamp_factory_parts)(char_dir, paths, \*[, skip]) | Give each part the factory drew a `cc0` per-part source pinned to its digest.                                                                                                                                                                                                                                                                                                                         |
 | [`stamp_generated_head`](#cutan.characters.factory.stamp_generated_head)(char_dir, source)           | Pin a generator's `source` (DiceBear's) to the bytes it produced at `char_dir`.                                                                                                                                                                                                                                                                                                                       |
+| [`stand_on_feet`](#cutan.characters.factory.stand_on_feet)(char_dir, \*[, undo])              | Convert an existing character to stand on its feet (an#285), or back.                                                                                                                                                                                                                                                                                                                                 |
 | [`view_poses`](#cutan.characters.factory.view_poses)([body, head_scale, slots])            | `{view: {slot: SlotPose}}` for the factory's rig built as `body` — what a view does besides swapping art: the back hides the face, the side hides the far eye and arm and slides the near eye and mouth to the profile edge.                                                                                                                                                                          |
 
 ### Classes
@@ -427,9 +428,11 @@ byte, which a golden test holds):
 - `feet_origin` (an#285) — declare the rig’s `origin` at its ROOT bone,
   the ground contact, so `stage.at` is where the feet stand and every
   build placed at one `y` stands on one line (`stage_extent`’s
-  `feet` is then 0). Off (the default), the stage point stays the
-  middle of the bones, as for every character made before it; whether
-  it becomes the default is an#285’s open decision.
+  `feet` is then 0). `an character new` turns it on by default (the
+  maintainer’s decision on an#423, 2026-10-09); here it stays off by
+  default, so code that rebuilds a character (goldens, a recipe’s replay,
+  the demos) draws exactly what it drew. [`stand_on_feet()`](#cutan.characters.factory.stand_on_feet) converts an
+  existing character, one at a time.
 
 Every colour the factory draws in a role is recorded in the descriptor’s
 `colour_roles` so a style pack can recolour it later (palette swapping,
@@ -571,6 +574,26 @@ credits` and `unknown` in the asset library. Called by
 
 * **Return type:**
   [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.factory.stand_on_feet(char_dir, , undo=False)
+
+Convert an existing character to stand on its feet (an#285), or back.
+
+Declares the rig’s `origin` at its ROOT bone, the ground contact, the
+way `an character new` does for a new character: `stage.at` is then
+where its feet stand. Existing characters are never converted implicitly
+(that would move them in every scene already made), so this is the opt-in,
+one character at a time. `undo` removes the declared origin, back to the
+middle of the bones.
+
+Only `character.json`’s `origin` changes; every other key is kept as
+written. Returns `{"before", "after"}` ([`stage_extent()`](#cutan.characters.factory.stage_extent) of each)
+and `shift`: how many scene pixels (at `stage.scale: 1`) to ADD to the
+character’s `stage.at` y in a scene made before, to keep it where it
+stood (negative after `undo`).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 ### cutan.characters.factory.view_poses(body=BodyBuild(torso_size=(256, 256), torso_radius=40, torso_inset_bottom=20, arm_width=36, arm_length=256, hand_radius=20, limb_stroke=4, leg_width=40, leg_length=300.0, shoe_size=(32, 18), shoulder=(90, 240), hip_x=50, neck_height=260), , head_scale=1.0, slots=None)
 

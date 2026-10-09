@@ -268,7 +268,10 @@ problem routes the way every other verifier’s does (an#78).</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.factory.stamp_generated_head" title="cutan.characters.factory.stamp_generated_head"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stamp_generated_head</span></code></a>(char_dir, source)</p></td>
 <td><p>Pin a generator's <code class="docutils literal notranslate"><span class="pre">source</span></code> (DiceBear's) to the bytes it produced at <code class="docutils literal notranslate"><span class="pre">char_dir</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.factory.view_poses" title="cutan.characters.factory.view_poses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">view_poses</span></code></a>([body, head_scale, slots])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.factory.stand_on_feet" title="cutan.characters.factory.stand_on_feet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stand_on_feet</span></code></a>(char_dir, *[, undo])</p></td>
+<td><p>Convert an existing character to stand on its feet (an#285), or back.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.factory.view_poses" title="cutan.characters.factory.view_poses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">view_poses</span></code></a>([body, head_scale, slots])</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{view:</span> <span class="pre">{slot:</span> <span class="pre">SlotPose}}</span></code> for the factory's rig built as <code class="docutils literal notranslate"><span class="pre">body</span></code> — what a view does besides swapping art: the back hides the face, the side hides the far eye and arm and slides the near eye and mouth to the profile edge.</p></td>
 </tr>
 </tbody>
@@ -701,9 +704,11 @@ facing the viewer’s right) and <code class="docutils literal notranslate"><spa
 <li><p><code class="docutils literal notranslate"><span class="pre">feet_origin</span></code> (an#285) — declare the rig’s <code class="docutils literal notranslate"><span class="pre">origin</span></code> at its ROOT bone,
 the ground contact, so <code class="docutils literal notranslate"><span class="pre">stage.at</span></code> is where the feet stand and every
 build placed at one <code class="docutils literal notranslate"><span class="pre">y</span></code> stands on one line (<code class="docutils literal notranslate"><span class="pre">stage_extent</span></code>’s
-<code class="docutils literal notranslate"><span class="pre">feet</span></code> is then 0). Off (the default), the stage point stays the
-middle of the bones, as for every character made before it; whether
-it becomes the default is an#285’s open decision.</p></li>
+<code class="docutils literal notranslate"><span class="pre">feet</span></code> is then 0). <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span> <span class="pre">new</span></code> turns it on by default (the
+maintainer’s decision on an#423, 2026-10-09); here it stays off by
+default, so code that rebuilds a character (goldens, a recipe’s replay,
+the demos) draws exactly what it drew. <a class="reference internal" href="#cutan.characters.factory.stand_on_feet" title="cutan.characters.factory.stand_on_feet"><code class="xref py py-func docutils literal notranslate"><span class="pre">stand_on_feet()</span></code></a> converts an
+existing character, one at a time.</p></li>
 </ul>
 <p>Every colour the factory draws in a role is recorded in the descriptor’s
 <code class="docutils literal notranslate"><span class="pre">colour_roles</span></code> so a style pack can recolour it later (palette swapping,
@@ -860,6 +865,27 @@ bytes: a part re-carved since, or a file added, is UNVERIFIED in <code class="do
 </dl>
 </dd></dl>
 <dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.factory.stand_on_feet">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.factory.</span></span><span class="sig-name descname"><span class="pre">stand_on_feet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_dir</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">undo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/factory.html#stand_on_feet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.factory.stand_on_feet" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.factory.stand_on_feet'">¶</a></dt>
+<dd><p>Convert an existing character to stand on its feet (an#285), or back.</p>
+<p>Declares the rig’s <code class="docutils literal notranslate"><span class="pre">origin</span></code> at its ROOT bone, the ground contact, the
+way <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span> <span class="pre">new</span></code> does for a new character: <code class="docutils literal notranslate"><span class="pre">stage.at</span></code> is then
+where its feet stand. Existing characters are never converted implicitly
+(that would move them in every scene already made), so this is the opt-in,
+one character at a time. <code class="docutils literal notranslate"><span class="pre">undo</span></code> removes the declared origin, back to the
+middle of the bones.</p>
+<p>Only <code class="docutils literal notranslate"><span class="pre">character.json</span></code>’s <code class="docutils literal notranslate"><span class="pre">origin</span></code> changes; every other key is kept as
+written. Returns <code class="docutils literal notranslate"><span class="pre">{"before",</span> <span class="pre">"after"}</span></code> (<a class="reference internal" href="#cutan.characters.factory.stage_extent" title="cutan.characters.factory.stage_extent"><code class="xref py py-func docutils literal notranslate"><span class="pre">stage_extent()</span></code></a> of each)
+and <code class="docutils literal notranslate"><span class="pre">shift</span></code>: how many scene pixels (at <code class="docutils literal notranslate"><span class="pre">stage.scale:</span> <span class="pre">1</span></code>) to ADD to the
+character’s <code class="docutils literal notranslate"><span class="pre">stage.at</span></code> y in a scene made before, to keep it where it
+stood (negative after <code class="docutils literal notranslate"><span class="pre">undo</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
 <dt class="sig sig-object py" id="cutan.characters.factory.view_poses">
 <span class="sig-prename descclassname"><span class="pre">cutan.characters.factory.</span></span><span class="sig-name descname"><span class="pre">view_poses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">BodyBuild(torso_size=(256,</span> <span class="pre">256),</span> <span class="pre">torso_radius=40,</span> <span class="pre">torso_inset_bottom=20,</span> <span class="pre">arm_width=36,</span> <span class="pre">arm_length=256,</span> <span class="pre">hand_radius=20,</span> <span class="pre">limb_stroke=4,</span> <span class="pre">leg_width=40,</span> <span class="pre">leg_length=300.0,</span> <span class="pre">shoe_size=(32,</span> <span class="pre">18),</span> <span class="pre">shoulder=(90,</span> <span class="pre">240),</span> <span class="pre">hip_x=50,</span> <span class="pre">neck_height=260)</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">head_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/factory.html#view_poses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.factory.view_poses" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.factory.view_poses'">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">{view:</span> <span class="pre">{slot:</span> <span class="pre">SlotPose}}</span></code> for the factory’s rig built as <code class="docutils literal notranslate"><span class="pre">body</span></code> — what
@@ -933,6 +959,7 @@ slots a rig has (a rig without the eye stack has no pupils to pose).</p>
 <li><a :data-current="activeSection === '#cutan.characters.factory.stamp_factory_descriptor'" class="reference internal" href="#cutan.characters.factory.stamp_factory_descriptor"><code class="docutils literal notranslate"><span class="pre">stamp_factory_descriptor()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.factory.stamp_factory_parts'" class="reference internal" href="#cutan.characters.factory.stamp_factory_parts"><code class="docutils literal notranslate"><span class="pre">stamp_factory_parts()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.factory.stamp_generated_head'" class="reference internal" href="#cutan.characters.factory.stamp_generated_head"><code class="docutils literal notranslate"><span class="pre">stamp_generated_head()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.factory.stand_on_feet'" class="reference internal" href="#cutan.characters.factory.stand_on_feet"><code class="docutils literal notranslate"><span class="pre">stand_on_feet()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.factory.view_poses'" class="reference internal" href="#cutan.characters.factory.view_poses"><code class="docutils literal notranslate"><span class="pre">view_poses()</span></code></a></li>
 </ul>
 </div>
@@ -947,7 +974,7 @@ slots a rig has (a rig without the eye stack has no pupils to pose).</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=e072a57b"></script>
+<script src="../_static/documentation_options.js?v=440a2162"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
