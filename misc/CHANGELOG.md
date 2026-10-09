@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-10-09
+- **New characters stand on their feet** (an#285, the maintainer's decision on an#423): `an character new` declares the rig's `origin` at its root bone by default (`--no-feet-origin` opts out; the Python factory's default stays off so rebuilt characters are unchanged). Existing characters are not migrated; `an character feet-origin <name> [--undo]` (`stand_on_feet`) converts one and prints how far to move its `stage.at`.
+
 ## 2026-10-06
 
 - **Nested characters and the library's package, in the cutan skill** (an#450, an#455): the generated rig-paths table has a `nesting: bones` row (its paths follow the chain: `c/torso/arm_r`, `c/torso/head/mouth`); the addressing prose says when the rigs are flat; a verified recipe adds an elbow to a factory character (the arm split by viewBox crops, a `fore_r` bone with a rest bend); and the skill says `an library find` reads the `an` library unless `--package cutan`.

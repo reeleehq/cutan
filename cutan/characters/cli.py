@@ -62,7 +62,7 @@ def new(
     views: bool = True,
     hair_style: str = DFLT_HAIR_STYLE,
     hair_length: str = DFLT_HAIR_LENGTH,
-    feet_origin: bool = False,
+    feet_origin: bool = True,
 ) -> str:
     """Create a new character at ``out_dir``/``name``.
 
@@ -99,7 +99,9 @@ def new(
         only), so `play: turn` can turn the character (an#197)
     feet_origin: put the stage point at the feet (the rig's root bone), so
         `stage.at` is where the character stands and every build placed at one
-        y stands on one floor line (an#285)
+        y stands on one floor line (an#285). On by default; --no-feet-origin
+        places it by the middle of its bones, as characters made before were
+        (convert one of those with `an character feet-origin`)
     """
     target = _resolve_target(out_dir)
     target.mkdir(parents=True, exist_ok=True)
@@ -314,6 +316,37 @@ def add_views(name: str, out_dir: str = "") -> str:
     except ValueError as e:
         return str(e)
     return f"added the views to {desc.parent} (descriptor: {desc.name})"
+
+
+def feet_origin(name: str, out_dir: str = "", undo: bool = False) -> str:
+    """Make an existing character stand on its feet (an#285): its stage point
+    (`stage.at`) becomes where its feet are, as for a character `an character
+    new` makes now. Existing characters are never converted implicitly; this
+    moves the character in scenes made before, and prints by how much.
+
+    name: character id
+    out_dir: parent directory; defaults to ./assets/characters
+    undo: go back to placing it by the middle of its bones
+    """
+    from cutan.characters.factory import stand_on_feet
+
+    char_dir = _resolve_target(out_dir) / name
+    if not (char_dir / "character.json").is_file():
+        return f"no character at {char_dir}"
+    try:
+        moved = stand_on_feet(char_dir, undo=undo)
+    except ValueError as e:
+        return str(e)
+    feet = moved["after"]["feet"]
+    where = "its feet" if not feet else f"{feet:g} px above its feet"
+    shift = moved["shift"]
+    keep = (
+        "nothing moved (it already stood there)"
+        if not shift
+        else f"to keep it where it stood in a scene made before, add {shift:g} x "
+        "its stage.scale to its stage.at y"
+    )
+    return f"{name}: its stage point is now {where}; {keep}"
 
 
 def _parse_palette(spec: str) -> dict[str, str]:
@@ -699,6 +732,7 @@ _dispatch_funcs = [
     add_gaze,
     add_half_lid,
     add_views,
+    feet_origin,
     validate,
     capabilities,
     contract,
