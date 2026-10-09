@@ -21,6 +21,7 @@ def test_the_character_command_set_is_pinned_by_literal():
         "add-gaze",
         "add-half-lid",
         "add-views",
+        "feet-origin",
         "validate",
         "capabilities",
         "contract",
