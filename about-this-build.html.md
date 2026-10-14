@@ -2,37 +2,37 @@
 
 # About this build
 
-This documentation was built on **2026-10-09 10:09 UTC** from commit <a href="https://github.com/thorwhalen/cutan/commit/65a44afc3e36c8990c997ea43d4edfbf66645a98"><code>65a44af</code></a> on branch <code>main</code>, for **cutan 0.0.51** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-14 04:58 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/7a152084a9a2a094e1b47a527d1a25e2c7477262"><code>7a15208</code></a> on branch <code>main</code>, for **cutan 0.0.52** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.51) is behind the latest release on PyPI (0.0.52): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.52) is behind the latest release on PyPI (0.0.53): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
-|                     |                                                                                                                                                         |
-|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/cutan/commit/65a44afc3e36c8990c997ea43d4edfbf66645a98"><code>65a44afc3e36c8990c997ea43d4edfbf66645a98</code></a> |
-| Branch              | <code>main</code>                                                                                                                                       |
-| Tags at this commit | none                                                                                                                                                    |
-| Working tree        | clean                                                                                                                                                   |
-| Remote              | <code>https://github.com/thorwhalen/cutan</code>                                                                                                        |
+|                     |                                                                                                                                                       |
+|---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/7a152084a9a2a094e1b47a527d1a25e2c7477262"><code>7a152084a9a2a094e1b47a527d1a25e2c7477262</code></a> |
+| Branch              | <code>main</code>                                                                                                                                     |
+| Tags at this commit | none                                                                                                                                                  |
+| Working tree        | clean                                                                                                                                                 |
+| Remote              | <code>https://github.com/reeleehq/cutan</code>                                                                                                        |
 
 ## Continuous integration
 
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
-| Repository   | <code>thorwhalen/cutan</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/cutan/actions/runs/37915490480">37915490480</a>     |
+| Repository   | <code>reeleehq/cutan</code>                                                                |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/38513794596">38513794596</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>65a44afc3e36c8990c997ea43d4edfbf66645a98</code> (in the history of the built commit) |
+| Event commit | <code>7a152084a9a2a094e1b47a527d1a25e2c7477262</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.12  |
+| epythet  | 0.2.17  |
 | Sphinx   | 9.1.0   |
 | docutils | 0.22.4  |
 | Python   | 3.12.15 |
@@ -51,14 +51,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.52/">0.0.52</a>, newer than the documented version (0.0.51).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.53/">0.0.53</a>, newer than the documented version (0.0.52).
 
 ## Reproduce
 
 ```bash
-git clone https://github.com/thorwhalen/cutan && cd cutan
-git checkout 65a44afc3e36c8990c997ea43d4edfbf66645a98
-pip install "epythet==0.2.12"
+git clone https://github.com/reeleehq/cutan && cd cutan
+git checkout 7a152084a9a2a094e1b47a527d1a25e2c7477262
+pip install "epythet==0.2.17"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 
