@@ -1,0 +1,10 @@
+{
+  "kind": "TextDescriptor",
+  "name": "title",
+  "text": "The Umbrella",
+  "layer": "overlay",
+  "unit": "word",
+  "size": 0.11,
+  "color": "#f4efe6",
+  "anchor": "center"
+}

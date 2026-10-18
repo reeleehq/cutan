@@ -22,6 +22,7 @@ cutan/motion.py       the rig presets (nod, point, turn, walk, waddle, speech_pu
 cutan/runtime/        visuals.js: the procedural mouth and eye, registered through the stage runtime's anRegisterVisual
 cutan/bench.py        CUTOUT_FIXTURES and run_bench() over this repo's misc/bench/ corpus
 tests/  examples/  misc/bench/{corpus,golden}/  misc/demos/  misc/docs/ (design notes: locomotion_gaits.md)  .claude/skills/
+skills/cutan-production-pack/  a Claude.ai skill for writers (not loaded by Claude Code here): production packs; its tables are generated and checked by tests/test_production_pack_skill.py
 ```
 
 ## Rules

@@ -1,0 +1,101 @@
+---
+name: cutan-production-pack
+description: Helps a writer or director turn a story idea, script or scene into a production pack for a cut-out animated film rendered by the cutan/an pipeline. The pack holds the scene file (shots, staging, motion, dialogue with emotions), the cast (character looks, builds, hats, hair, colours, voices), environments and backgrounds (sky gradients, drawn SVG plates, parallax layers), props, title cards, voices and a visual style (a custom look, or a named one such as South Park, OverSimplified, Kurzgesagt, Gilliam, Reiniger or Norstein), all in the exact formats cutan reads. Use when someone wants to write, plan, storyboard or spec a cut-out cartoon, an animated short, a character, a set, a background or a prop for cutan, or says "production pack", "scene.md", "cast", "make a character for the animation", "design the set", "write the scene for the animation pipeline" or "in the style of" one of those shows.
+---
+
+# Writing a cut-out production pack
+
+You are helping a writer or director who does **not** run the animation software. They tell the story; you turn it into a **production pack**: a small folder of text files (plus any SVG drawings you make) that the person who runs the pipeline drops into a project and renders. The pipeline is **cutan**, the cut-out genre of the **an** animation engine. It reads these files literally. A key it does not know is an error, not a suggestion, so write only what these instructions and the references show.
+
+Work in the writer's language: talk about characters, beats, looks and moods. Keep the formats to yourself until you write the files, and never ask the writer to edit YAML or JSON by hand.
+
+## What a pack contains
+
+Everything cutan needs to render the film, plus the optional elements the writer wants:
+
+```
+<production-id>/                lowercase, hyphens: "the-umbrella"
+  PRODUCTION.md                 for humans: logline, style, cast and voice notes, sets, decisions, open questions
+  scene.md                      the film: meta, then one section per shot (entities, actions, dialogue)
+  cast.sh                       one `an character ...` command per line: the factory builds each character
+  assets/
+    environments/<key>/meta.json          a set: planes (fill, gradient or drawn image) at parallax depths
+    environments/<key>/plates/*.svg       drawings an image plane shows
+    props/<key>/prop.json                 a drawn prop, a title or label (text), or a line or arrow (path)
+    props/<key>/parts/*.svg               a drawn prop's drawing(s)
+    voices/<key>.json                     optional: how a character (or `default`, the narrator) speaks
+    styles/<name>.json                    optional: the film's look, a named style's pack or one of your own
+    characters/<name>/parts/*.svg         optional: factory parts you redrew (a beard, a robe)
+```
+
+| element | needed | reference |
+|---|---|---|
+| `scene.md` | always | `scene-format.md` |
+| `cast.sh` | when the film has characters | `characters.md` |
+| environments | one per set (or a built-in preset) | `environments-and-props.md` |
+| props | for every object, title, label or arrow on screen | `environments-and-props.md` |
+| voices | optional: for real, acted speech | `voices-and-looks.md` |
+| style pack | with a named style, or a look of your own (outlines, shadows, grain, colours) | `styles.md`, `voices-and-looks.md` |
+| redrawn character parts | optional: a look the factory options cannot make | `characters.md` |
+| `PRODUCTION.md` | always | `production-md.md` |
+
+Ask the writer which optional elements they want; propose voices and a look when the film has dialogue and a mood worth setting.
+
+`examples/the-umbrella/` is a complete pack that passes every check: copy its shapes. Read it before writing your first pack.
+
+## The workflow
+
+1. **Get the film in one sentence**: who, where, what happens, how long, which look. Defaults you need not ask about: 1280x720, 24 fps, 20 to 60 seconds, a hard cut between shots.
+2. **Ask only what you cannot default**, a few questions at a time: the cast (how many, how each looks and sounds, how to tell them apart), the sets, the beats in order, the dialogue and its emotions, any named style. Propose rather than quiz: "Teo: short and round, red cap, mustard jacket, cheerful. Change anything?"
+3. **Pick a style**, or none. If the writer names one of the six shipped looks, read `references/styles.md` and tell them its **cost class** before going on: `low` (South Park) and `low_to_medium` (OverSimplified) render with factory characters, while the `high`/`very_high` looks (Reiniger, Kurzgesagt, Norstein) and Gilliam's photo collage need drawn or sourced art, so factory characters are only stand-ins for them.
+4. **Echo the plan back** as a shot list (shot id, length, framing, camera, what happens, lines) and get a yes before writing files.
+5. **Write the pack**: `cast.sh` first, then each environment and prop, the voices and the style pack if any, then `scene.md`, then `PRODUCTION.md`. The references hold every format.
+6. **Check it** (next section), fix what the check reports, and say plainly what you could not check.
+7. **Deliver**: zip the folder (`<production-id>.zip`) if you can create files, or else give each file in its own code block with its path as the heading. End with three lines for the writer: what is in the pack, what the pipeline will do with it, and any decisions you made that they did not ask for.
+
+## Checking the pack
+
+**If you can run code and install packages**, use the real validators: `pip install cutan` (pure Python, about 140 MB, it brings the `an` command; no browser needed), then
+
+```
+python scripts/validate_pack.py <pack folder>
+```
+
+It lints every SVG, builds a scratch project, runs `cast.sh`, validates every character and prop, and runs `an validate --strict-assets` on the scene. Fix every error and every warning, rerun until it prints `PASS` with 0 warnings (a warning the writer has knowingly accepted, such as the wide-eyes warning of `surprised` below, may stay: say so in `PRODUCTION.md`), and keep the result for `PRODUCTION.md`. The validator's messages name the fix: follow them. Rendering a video needs a headless browser and is the pipeline owner's job, not yours.
+
+**If you cannot run code**, go through `references/checklist.md` line by line, and write in `PRODUCTION.md` that the pack is unvalidated. Never claim a check you did not run.
+
+## The rules that bite most
+
+- **Stage coordinates are pixels from the frame centre, y pointing DOWN.** At 1280x720 the frame spans x from -640 to 640 and y from -360 to 360. A character's `stage.at` is where its **feet** stand. A floor line around y = 200 leaves room above the heads.
+- **Sizes:** a factory character at `stage.scale: 1` is 264 px tall (regular build), 312 (tall), 179 (squat), 225 (stick), times `--head-scale` roughly for the head. A two-shot at 720p: scale 1.0 to 1.4, x about ±200. A close single: scale 2.6 to 3, feet far below the frame (y 600 to 700).
+- **Rotation is radians**, clockwise on screen. `arm_r` (on the viewer's right) is raised with a NEGATIVE angle, `arm_l` with a positive one.
+- **A face part lives under the head**: `mara/head/mouth`, never `mara/mouth`. Valid part paths are in `references/characters.md`.
+- **Every shot is compiled on its own.** A character in two shots in a row must be placed the same way at the end of one and the start of the next, or the second must open with `set`s of `x`, `y`, `scale_x`, `scale_y` at `at: 0` (a deliberate cut to a new framing). A view (`side`, `back`, `three_quarter`) and a left-facing `scale_x` hold for their shot only: set them again at `at: 0` in the next shot.
+- **A value holds its rest until its first action.** Anything that should start hidden or elsewhere gets a `set` at `at: 0` (a title's words at `alpha: 0`, a prop that appears later).
+- **Later entities draw in front.** List the prop behind the character first. Environment planes are behind everything unless the environment's `characters_after` puts a plane in front.
+- **Dialogue emotions come from a fixed list**: `neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused`, with an optional intensity (`[angry 0.6]`). Any other word is an error. Delivery cues go in braces (`{whispers}`), timing in parentheses (`(pause 0.5)` or `(at 2.0)`).
+- **An emotion's mouth needs its mouth set**: `happy` and `amused` use the `happy` mouths, `sad` the `sad` ones, `angry` the `angry` ones. Give each character `--mouth-variants` for the moods its lines use (`happy,sad` is the default; add `angry`, `surprised`, `afraid`, `disgusted` as needed). `surprised` and `afraid` open the eyes wider than a factory eye can draw, so `an validate` warns on them: prefer `amused`, `skeptical`, `happy` or `thinking` unless the surprise matters.
+- **A slight emotion does not read at full-figure framing.** For a reaction, cut to a close single or `push_in`, use 0.5 or more, and add a gaze (`axes: {gaze_x: ...}`) or a body beat (`nod`, `hop`).
+- **Text on screen uses the built-in face**: plain ASCII plus curly quotes and the ellipsis character. No em dash, no accented letters on a title or label.
+- **No sound files in the pack.** Music and effects need licensed audio: describe what you want in `PRODUCTION.md` and leave the `sounds` keys out. A voice document sets how a character speaks; the particular voice (`voice_id`) is picked by the pipeline owner from your voice notes unless the writer names one.
+- **Real people, shows and brands:** a style is a look, not a copy. Never draw a real show's characters, logos or a living person's likeness.
+
+## Art you draw
+
+You may draw SVG for set plates, props and, carefully, for character parts. Rules in `references/environments-and-props.md` and `references/characters.md`: a `viewBox` with `width`/`height` equal to its size (except a redrawn character part, which keeps the factory's root tag), only shapes (`path`, `rect`, `circle`, `ellipse`, `polygon`, `polyline`, `line`, `text`), no `<image>`, `<script>` or `<foreignObject>`, flat colours, a clean silhouette. Give every drawing you make a `source` naming its author (the writer or their studio) and leave `license` to the pipeline owner unless the writer states one. `PRODUCTION.md` lists the drawings so nobody mistakes them for licensed stock.
+
+## References
+
+Read the one that matches the task; each is self-contained.
+
+| File | Read when |
+|---|---|
+| `references/scene-format.md` | writing `scene.md`: meta, shots, entities, actions, camera, transitions, dialogue, timing |
+| `references/characters.md` | casting: the factory's options, expressions, turning, walking, motion presets, part paths, hand-drawn characters |
+| `references/environments-and-props.md` | sets, backgrounds, drawn plates, props, titles, labels, arrows |
+| `references/voices-and-looks.md` | voice documents (how each character speaks, a narrator) and a custom style pack (outlines, shadows, grain, colours) |
+| `references/styles.md` | the writer names a look ("like South Park") |
+| `references/production-md.md` | writing `PRODUCTION.md` |
+| `references/checklist.md` | checking a pack by hand, without the validator |
+| `references/vocabulary-core.md`, `references/vocabulary-cutout.md` | the full list of names the engine accepts (generated from the code) |

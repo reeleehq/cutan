@@ -1,0 +1,7 @@
+{
+  "kind": "EnvironmentDescriptor",
+  "name": "title_card",
+  "planes": [
+    {"name": "bg", "art": {"kind": "fill", "color": "#101418"}, "depth": 0.0}
+  ]
+}
