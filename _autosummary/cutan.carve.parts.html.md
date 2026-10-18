@@ -51,7 +51,7 @@ One lifted part: its RGBA image, its pivot in that image, where it sits in the c
 
 The pivot as an attachment anchor (0..1 of the image).
 
-### *class* cutan.carve.parts.PartSet(carving, base, parts=<factory>)
+### *class* cutan.carve.parts.PartSet(carving, base, parts=list())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 

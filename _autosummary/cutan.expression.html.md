@@ -97,7 +97,7 @@ Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueEr
 
 An expression that cannot resolve on a character; `problems` says why.
 
-### *class* cutan.expression.ExpressionSpan(start, end, preset, axes=<factory>, intensity=1.0, blend=0.0, source='action')
+### *class* cutan.expression.ExpressionSpan(start, end, preset, axes=dict(), intensity=1.0, blend=0.0, source='action')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -121,7 +121,7 @@ The ramped intensity at `t`: 0 outside, ramping over `blend` at each end.
 * **Return type:**
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
-### *class* cutan.expression.Preset(name, axes=<factory>, mouth_form=None, anchor='')
+### *class* cutan.expression.Preset(name, axes=dict(), mouth_form=None, anchor='')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -150,14 +150,11 @@ A declared binding is a list of dicts in the two dataclasses’ shapes
 `{"axis", "slot", "set_family"}`). An unknown axis in it is an error.
 
 * **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Union`[[`ChannelBinding`](cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`ChannelBinding`](cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
 
 ### cutan.expression.clamp_axes(values)
 
 Clamp every numeric axis to its range; an unknown axis is an error.
-
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 ```pycon
 >>> clamp_axes({"brow_height_l": 2.0, "lid_open_r": -3.0})
@@ -168,17 +165,20 @@ Traceback (most recent call last):
 ValueError: unknown expression axis 'eyebrow' (known: brow_angle_l, ...)
 ```
 
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
 ### cutan.expression.declared_mouth_variants(desc)
 
 `{form: set name}` for every `viseme@<form>` set the descriptor declares.
-
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ```pycon
 >>> declared_mouth_variants(CharacterDescriptor(name="m"))
 {}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.expression.default_binding(desc)
 
@@ -190,7 +190,7 @@ end while on the RIGHT brow it lifts it — the axis says “+ = inner end
 up”, hence `-travel` on the left and `+travel` on the right.
 
 * **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Union`[[`ChannelBinding`](cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`ChannelBinding`](cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
 
 ### cutan.expression.expression_problems(desc, , preset, axes=(), who)
 
@@ -199,15 +199,15 @@ Every reason an expression cannot resolve on `desc` — empty means it can.
 Shared by `an validate` (each becomes an error Finding) and the compiler
 (which raises [`ExpressionResolutionError`](#cutan.expression.ExpressionResolutionError) with the same list).
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> expression_problems(CharacterDescriptor(name="m"), preset="joyful", who="m")
 ["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]
 >>> expression_problems(CharacterDescriptor(name="m", face_overlay=False), preset="happy", who="m")[0].startswith("'m' has its face baked")
 True
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.expression.expression_spans(shot, entity_id)
 
@@ -231,13 +231,13 @@ Unknown names raise — a misspelt coefficient must not vanish quietly.
 
 The preset names, in declaration order.
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
-
 ```pycon
 >>> known_presets()[:3]
 ('neutral', 'happy', 'sad')
 ```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
 
 ### cutan.expression.lid_key(value, , available)
 
@@ -254,13 +254,13 @@ a rig without `half` stays open until the lower threshold and one without
 
 The `viseme@<form>` a preset prefers, or `None` for the neutral set.
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
-
 ```pycon
 >>> mouth_form_of("amused"), mouth_form_of("thinking"), mouth_form_of(None)
 ('happy', None, None)
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.expression.preset_axes(preset, , axes=None, intensity=1.0)
 
@@ -291,13 +291,13 @@ error, not a fallback.
 
 The swap-set name for a mouth form (`@` is a legal set-name character).
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> variant_set_name("happy")
 'viseme@happy'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### Modules
 

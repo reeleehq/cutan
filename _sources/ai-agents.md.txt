@@ -11,6 +11,16 @@ machine-readable copies of this documentation.
 
 Skills are folders holding a `SKILL.md` (the [Agent Skills](https://agentskills.io) format): a description that tells an agent when to use it and a body with the procedure. Install one into your agent with `gh skill` (any host: `--agent claude-code`, `copilot`, `cursor`, `codex`, `gemini`), or use the copy bundled in the wheel.
 
+### `cutan-production-pack`
+
+Helps a writer or director turn a story idea, script or scene into a production pack for a cut-out animated film rendered by the cutan/an pipeline. The pack holds the scene file (shots, staging, motion, dialogue with emotions), the cast (character looks, builds, hats, hair, colours, voices), environments and backgrounds (sky gradients, drawn SVG plates, parallax layers), props, title cards, voices and a visual style (a custom look, or a named one such as South Park, OverSimplified, Kurzgesagt, Gilliam, Reiniger or Norstein), all in the exact formats cutan reads. Use when someone wants to write, plan, storyboard or spec a cut-out cartoon, an animated short, a character, a set, a background or a prop for cutan, or says "production pack", "scene.md", "cast", "make a character for the animation", "design the set", "write the scene for the animation pipeline" or "in the style of" one of those shows.
+
+```bash
+gh skill install thorwhalen/cutan cutan-production-pack --agent claude-code
+```
+
+Source: [`skills/cutan-production-pack`](https://github.com/thorwhalen/cutan/tree/HEAD/skills/cutan-production-pack).
+
 ### `cutan`
 
 Use when making a cut-out animated character video with `an`: rigged characters, faces and expressions, lip-sync, turning and facing, motion, impacts, and named cut-out styles (South Park, OverSimplified, Kurzgesagt, Gilliam, Reiniger, Norstein). Triggers on "make a character", "an character new", "lip-sync", "expression", "turn around", "walk", "cutout", "in the style of", or any scene with a `character` entity.

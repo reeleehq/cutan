@@ -78,13 +78,13 @@ several slots.
 
 ### Classes
 
-| [`AnimationTrack`](#cutan.characters.schema.AnimationTrack)(\*\*data)      | A single channel inside an idle animation.                              |
-|--------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| [`CharacterDescriptor`](#cutan.characters.schema.CharacterDescriptor)(\*\*data) | The on-disk character schema.                                           |
-| [`IdleAnimation`](#cutan.characters.schema.IdleAnimation)(\*\*data)       | A named idle loop (e.g., breath, blink).                                |
-| [`SlotPose`](#cutan.characters.schema.SlotPose)(\*\*data)            | How one slot is posed while a swap key is shown (`swap_poses`, an#197). |
+| [`AnimationTrack`](#cutan.characters.schema.AnimationTrack)(\*, target[, type, amplitude, ...])   | A single channel inside an idle animation.                              |
+|-------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`CharacterDescriptor`](#cutan.characters.schema.CharacterDescriptor)(\*[, origin, ...])               | The on-disk character schema.                                           |
+| [`IdleAnimation`](#cutan.characters.schema.IdleAnimation)(\*, name[, duration, loop, tracks])    | A named idle loop (e.g., breath, blink).                                |
+| [`SlotPose`](#cutan.characters.schema.SlotPose)(\*[, x, y, scale_x, scale_y, alpha, ...])   | How one slot is posed while a swap key is shown (`swap_poses`, an#197). |
 
-### *class* cutan.characters.schema.AnimationTrack(\*\*data)
+### *class* cutan.characters.schema.AnimationTrack(\*, target, type='sine', amplitude=0.0, phase=0.0, frames=<factory>, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -126,7 +126,7 @@ built parts; the migration protects a 0.3.0 rig that carried one.
 * **Type:**
   0.4.0 (an#339)
 
-### *class* cutan.characters.schema.CharacterDescriptor(\*\*data)
+### *class* cutan.characters.schema.CharacterDescriptor(\*, origin=None, rest_rotation=None, nesting=None, schema_version='0.4.0', kind='CharacterDescriptor', name, display_name=None, view_box=(0, 0, 1024, 1024), voice_ref=None, source_svg=None, bones=<factory>, slots=<factory>, skins=<factory>, asset_sets=<factory>, animations=<factory>, source=None, face_overlay=True, expression_binding=None, gaze_travel=None, colour_roles=<factory>, metadata=<factory>, swap_poses=<factory>, rest_view=None, gait=None, speech=None, occluded=<factory>, \*\*extra_data)
 
 Bases: `RigDocument`
 
@@ -178,7 +178,7 @@ Additive: no schema bump, and a descriptor without it reads back as
 untagged. Keys are normalised to lowercase `#rrggbb`; a role must be
 one a pack can set (`an.styles.REACHABLE_ROLES`).
 
-#### expression_binding *: [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### expression_binding *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[list](https://docs.python.org/3/builtins/stdtypes.html#list)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]]]*
 
 How expression axes reach this rig (an#98), as a list of binding dicts —
 `{"axis", "slot", "property", "gain"[, "rig_scaled"]}` for a transform
@@ -201,7 +201,7 @@ from; this says what the art IS. The 0.2.0 → 0.3.0 migration derives it
 from the provenance string once, and `art_provenance` reverts to pure
 provenance/licensing metadata.
 
-#### gait *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### gait *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 This character’s default walk `gait` (one of `GAITS`, an#220);
 an author’s `gait` arg overrides it. `None` = the locomotion chain:
@@ -210,7 +210,7 @@ figure whose leg slots are hem halves declares `"hem"` once, here,
 rather than on every walk.
 Omitted from the stored document when unset.
 
-#### gaze_travel *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### gaze_travel *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]]*
 
 How far a pupil may travel from its rest, in view-box units per axis
 (an#99): the sclera’s clearance minus the pupil’s radius, written by
@@ -255,7 +255,7 @@ by `an character capabilities`. Keys are
 `OCCLUDABLE_FEATURES`. Omitted from the
 stored document when empty.
 
-#### rest_view *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### rest_view *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 The view the DEFAULT art is drawn in (an#220) — a declared fact about
 the art, like `face_overlay`. `None` means [`DFLT_VIEW`](#cutan.characters.schema.DFLT_VIEW)
@@ -278,12 +278,12 @@ Field names match `illustration.ImageResult` exactly, so an adapter is a
 dict copy rather than a rename table — and a rename table is where a field
 quietly stops being carried. Pinned by test.
 
-#### source_svg *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### source_svg *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 Optional source SVG (relative path) that the parts/ folder was
 extracted from. Useful for re-slicing.
 
-#### speech *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### speech *: [Union](https://docs.python.org/3/library/typing.html#typing.Union)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)], [None](https://docs.python.org/3/builtins/constants.html#None)]*
 
 a
 method’s spelling (`mouth_chart`, `pulse`), its id
@@ -322,7 +322,7 @@ schema bump, and a descriptor without it reads back unposed.
 * **Type:**
   {key
 
-#### voice_ref *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### voice_ref *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 Voice-store id or path used by the audio pipeline. Optional; the scene
 can override per shot.
@@ -372,7 +372,7 @@ the head hangs above the neck, its lower
 * **Type:**
   The head’s anchor on the neck bone
 
-### *class* cutan.characters.schema.IdleAnimation(\*\*data)
+### *class* cutan.characters.schema.IdleAnimation(\*, name, duration=1.0, loop=True, tracks=<factory>, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -417,7 +417,7 @@ The transform properties a [`SlotPose`](#cutan.characters.schema.SlotPose) sets,
 OFFSET added to the rest (in view_box units, so scaled by the rig), an
 ANGLE added to it (radians, never scaled) or a FACTOR on it.
 
-### *class* cutan.characters.schema.SlotPose(\*\*data)
+### *class* cutan.characters.schema.SlotPose(, x=0.0, y=0.0, scale_x=1.0, scale_y=1.0, alpha=1.0, rotation=0.0, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -488,9 +488,6 @@ Positions are stored parent-relative, so an absolute joint is converted
 against its parent’s resolved absolute position — and parents are resolved
 first, which is why this walks in declaration order rather than by index.
 
-* **Return type:**
-  list[Bone]
-
 ```pycon
 >>> bones = bones_from_pivots({"neck": (500.0, 300.0), "root": (500.0, 900.0)})
 >>> head = next(b for b in bones if b.name == "head")
@@ -501,6 +498,9 @@ first, which is why this walks in declaration order rather than by index.
 >>> round(head.y + torso.y + root.y)          # absolute, back to the neck
 300
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Bone`](cutan.characters.html.md#cutan.characters.Bone)]
 
 ### cutan.characters.schema.default_asset_sets()
 
@@ -513,13 +513,13 @@ first, which is why this walks in declaration order rather than by index.
 
 The name of `set_name`’s variant for `view` (an#220).
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> view_variant_set("eyelid", "side")
 'eyelid@side'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.schema.view_variant_sets(desc, , view_set='view')
 
@@ -529,9 +529,6 @@ is a declared set and `<view>` a key of its `view` set (or its
 `rest_view`). `viseme@happy` is NOT one — `happy` is not a view —
 so the expression variants (an#98) and the view variants never collide.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
-
 ```pycon
 >>> d = CharacterDescriptor(name="v")
 >>> d.asset_sets["view"] = {"front": "front", "side": "side"}
@@ -540,3 +537,6 @@ so the expression variants (an#98) and the view variants never collide.
 >>> view_variant_sets(d)
 {'eyelid': {'side': 'eyelid@side'}}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]

@@ -54,9 +54,6 @@ Logged only if `source` is exactly what this drawing itself wrote there:
 a file swapped in between the factory’s write and its re-read (a rescale)
 is rewritten, but not as the factory’s drawing (review-288 round 2).
 
-* **Return type:**
-  [`None`](https://docs.python.org/3/builtins/constants.html#None)
-
 ```pycon
 >>> import tempfile, pathlib
 >>> with tempfile.TemporaryDirectory() as d, drawing() as log:
@@ -68,6 +65,9 @@ is rewritten, but not as the factory’s drawing (review-288 round 2).
 18
 False
 ```
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.characters.drawn.write_text(path, text, , encoding='utf-8')
 

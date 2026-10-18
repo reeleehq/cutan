@@ -84,9 +84,6 @@ For sine: `amplitude * sin(2π * (t/duration + phase))`.
 For step: returns the value of the latest frame whose time ≤ `t`.
 For linear: linear interpolation between bracketing frames.
 
-* **Return type:**
-  [`object`](https://docs.python.org/3/builtins/functions.html#object)
-
 ```pycon
 >>> tr = AnimationTrack(target='bone:torso.y', type='sine', amplitude=2.0)
 >>> round(evaluate_track(tr, 0.0, 4.0), 6)
@@ -94,6 +91,9 @@ For linear: linear interpolation between bracketing frames.
 >>> round(evaluate_track(tr, 1.0, 4.0), 6)
 2.0
 ```
+
+* **Return type:**
+  [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 ### cutan.characters.idle.random_blink_schedule(duration_s, , min_gap_s=3.0, max_gap_s=8.0, seed=None)
 
@@ -103,9 +103,6 @@ A seeded schedule with uniform gaps in `[min_gap_s, max_gap_s]`. NOT
 what the renderer uses today (see the module docstring); kept as the
 candidate for descriptor-driven scheduling.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> times = random_blink_schedule(20.0, seed=0)
 >>> all(0 <= t < 20 for t in times)
@@ -113,3 +110,6 @@ True
 >>> times == sorted(times)
 True
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]

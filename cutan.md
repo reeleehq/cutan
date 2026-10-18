@@ -1,4 +1,4 @@
-> built 2026-10-14 04:58 UTC from 7a15208 (main) · cutan 0.0.52. Details: build_info.json
+> built 2026-10-18 13:09 UTC from 7b90c13 (main) · cutan 0.0.53. Details: build_info.json
 
 # index.html.md
 
@@ -45,6 +45,20 @@ head = carve_head(frame, face=(830, 170, 930, 305), matte="rembg")  # neck cut, 
 The matte is a strategy: `flat_colour` (the default), `chroma`, `grabcut`, `polygon`, `focus`, `rembg`, or any `(rgb, hint) -> alpha` callable. Two combine with `&` and `|`: `Polygon(outline) & FlatColour()` is a hand outline cleaned by a colour key. `split_parts` lifts moving parts off a carving, each with a pivot (clock hands off the face), and `write_prop` gives each part its own bone. Publishing the folder (`an library publish <folder> prop.<name> --package cutan --origin carved`) records the rights from the descriptor’s own `source`; `write_prop` refuses a carving with no provenance (unless the pixels are yours: `ours=True`) and a `source=` that would loosen its licence without `relicense=`. Every coordinate is in the source’s pixels, and a carving’s `recipe` is its arguments by name, so `carve(frame, **part.recipe)` replays it: a batch of carves is a list of recipes.
 
 The cut-out bench corpus (`misc/bench/`), `examples/` and the demo gallery (`misc/demos/`) live here too; `cutan.bench.run_bench()` runs the corpus through `an`’s bench runner.
+
+## Production packs from writers
+
+`skills/cutan-production-pack/` is an agent skill for people who write and direct but do not run cutan: uploaded to Claude.ai (zip the folder, or package it with the `skill-creator` skill), it has their Claude write a **production pack**: `scene.md`, a `cast.sh` of `an character new` commands, environments, props and their SVG drawings, and a `PRODUCTION.md` brief, in the formats this package reads. Its example pack (`examples/the-umbrella/`) is validated by `tests/test_production_pack_skill.py`, which also regenerates the skill’s vocabulary, preset, rig-path and style tables from the code.
+
+Receiving a pack:
+
+```bash
+python skills/cutan-production-pack/scripts/validate_pack.py <pack>   # cutan's own checks on a scratch project
+an init <id> --id --genre cutout_animation                            # then copy the pack in, run cast.sh's lines
+an validate <project> --strict-assets && an render <project>          # from the project root, and render
+```
+
+`validate_pack.py` runs only `an character ...` lines from `cast.sh` (no shell). Set the licence of the pack’s own drawings (their `source`) before publishing a render.
 
 ## Names that never change
 
@@ -440,13 +454,13 @@ The Rhubarb recognizer for a BCP-47 language tag (primary subtag only).
 Accepts the POSIX locale spelling too (`en_US`); an empty tag is refused
 rather than read as “non-English” (an#96 review).
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> recognizer_for("en"), recognizer_for("en-GB"), recognizer_for("en_US"), recognizer_for("fr")
 ('pocketSphinx', 'pocketSphinx', 'pocketSphinx', 'phonetic')
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 
 # _autosummary/cutan.audio.whisper_lipsync.html.md
@@ -520,7 +534,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'mouth', 'rect', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'eye', 'rect', 'mouth', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -641,7 +655,7 @@ The signals that look wrong, in words.
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
-### *class* cutan.carve.core.Carving(image, anchor, offset, scale, quality, recipe, source=None, meta=<factory>, mode='part')
+### *class* cutan.carve.core.Carving(image, anchor, offset, scale, quality, recipe, source=None, meta=dict(), mode='part')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -685,9 +699,6 @@ subject encloses, detach nothing, no choke, a 0.6 px feather, de-spill 1 px.
 
 Cut a part out of `image`; every coordinate is in the source image’s pixels.
 
-* **Return type:**
-  [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)
-
 image: a path, a PIL image or an RGB(A) array (`grab_frame` for video)
 matte: the strategy ([`cutan.carve.mattes`](_autosummary/cutan.carve.mattes.html.md#module-cutan.carve.mattes)): a name, a recipe mapping,
 
@@ -730,12 +741,12 @@ source: provenance ([`frame_source()`](_autosummary/cutan.carve.provenance.html.
 True
 ```
 
+* **Return type:**
+  [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)
+
 ### cutan.carve.core.carve_head(image, , face=None, locate=None, pick='largest', matte='flat_colour', cut='auto', neck=None, neck_soft=0.05, pad_x=1.05, pad_top=1.25, pad_bottom=1.0, upscale=3, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, canvas=512, face_h=270.0, centre=(256.0, 300.0), margin=6, view=None, source=None)
 
 A head cut out at the neck and normalised onto a `canvas`-px square.
-
-* **Return type:**
-  [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)
 
 face: the face, a [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face) (box and, when known, a
 : jaw contour and landmarks), a box `(x0, y0, x1, y1)` or a mapping
@@ -770,6 +781,9 @@ the crop per image, the matte and the finish shared). The part’s anchor is `ce
 `meta` holds what a rig needs to hang it: the face box, the chin and the
 neck point, the head’s bounding box, the landmarks, all on the canvas.
 
+* **Return type:**
+  [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)
+
 ### cutan.carve.core.grab_frame(video, t, , ffmpeg='ffmpeg')
 
 The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).
@@ -781,13 +795,13 @@ The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).
 
 An `HxWx3` `uint8` RGB array from a path, a PIL image or an array.
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> load_rgb(np.zeros((4, 5, 4), np.uint8)).shape
 (4, 5, 3)
 ```
+
+* **Return type:**
+  `ndarray`
 
 
 # _autosummary/cutan.carve.head.html.md
@@ -862,13 +876,13 @@ The lowest point of the jaw, else the box’s bottom.
 
 A face from a `Face`, a box `(x0, y0, x1, y1)`, or a mapping (`box`, `jaw`, …).
 
-* **Return type:**
-  [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)
-
 ```pycon
 >>> Face.of({"box": [0, 0, 10, 12], "jaw": [[0, 6], [5, 12], [10, 6]]}).chin_y
 12.0
 ```
+
+* **Return type:**
+  [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)
 
 ### cutan.carve.head.HEAD_CANVAS *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 512*
 
@@ -905,26 +919,26 @@ and `"none"` keeps everything. `neck` is the depth below the jaw (or
 the chin) in face-box heights. `offset`/`scale` map the face (given in
 source pixels) into the mask’s pixels.
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> m = neck_cut((100, 50), Face((10, 10, 40, 60)), cut="flat", neck=0.1)
 >>> float(m[50, 25]), float(m[90, 25])
 (1.0, 0.0)
 ```
 
+* **Return type:**
+  `ndarray`
+
 ### cutan.carve.head.pick_face(faces, pick='largest')
 
 One face of several: `largest`, `leftmost`, `rightmost` or `best` (score).
-
-* **Return type:**
-  [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)
 
 ```pycon
 >>> pick_face([Face((0, 0, 10, 10)), Face((50, 0, 70, 20))]).box
 (50.0, 0.0, 70.0, 20.0)
 ```
+
+* **Return type:**
+  [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)
 
 
 # _autosummary/cutan.carve.html.md
@@ -1040,7 +1054,7 @@ The signals that look wrong, in words.
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
-### *class* cutan.carve.Carving(image, anchor, offset, scale, quality, recipe, source=None, meta=<factory>, mode='part')
+### *class* cutan.carve.Carving(image, anchor, offset, scale, quality, recipe, source=None, meta=dict(), mode='part')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -1126,13 +1140,13 @@ The lowest point of the jaw, else the box’s bottom.
 
 A face from a `Face`, a box `(x0, y0, x1, y1)`, or a mapping (`box`, `jaw`, …).
 
-* **Return type:**
-  [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)
-
 ```pycon
 >>> Face.of({"box": [0, 0, 10, 12], "jaw": [[0, 6], [5, 12], [10, 6]]}).chin_y
 12.0
 ```
+
+* **Return type:**
+  [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)
 
 ### *class* cutan.carve.FlatColour(colours=None, tolerance=24.0, softness=16.0, edge=2.0, connected=True, seeds=None)
 
@@ -1239,7 +1253,7 @@ One lifted part: its RGBA image, its pivot in that image, where it sits in the c
 
 The pivot as an attachment anchor (0..1 of the image).
 
-### *class* cutan.carve.PartSet(carving, base, parts=<factory>)
+### *class* cutan.carve.PartSet(carving, base, parts=list())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -1286,9 +1300,6 @@ A [`Matte`](_autosummary/cutan.carve.html.md#cutan.carve.Matte) from a strategy�
 A recipe (`Matte.recipe()`, as a carve records it) builds the same matte
 back, so a strategy with its settings is plain data (a batch spec, a CLI):
 
-* **Return type:**
-  [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
-
 ```pycon
 >>> as_matte("chroma").name
 'chroma'
@@ -1302,6 +1313,9 @@ Traceback (most recent call last):
 ValueError: no matte strategy 'rainbow'; the strategies are: chroma, flat_colour, ...
 ```
 
+* **Return type:**
+  [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
 ### cutan.carve.border_colours(rgb, , max_colours=3, min_share=0.08, bits=4)
 
 The dominant colours of the image’s border: the backdrop of a flat frame.
@@ -1310,21 +1324,18 @@ Border pixels are binned at `bits` per channel; every bin holding at least
 `min_share` of the border (up to `max_colours`, most frequent first)
 gives one colour, the median of its pixels.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int)]]
-
 ```pycon
 >>> img = np.zeros((20, 20, 3), np.uint8); img[:] = (250, 240, 230)
 >>> border_colours(img)
 [(250, 240, 230)]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int)]]
+
 ### cutan.carve.carve(image, , matte='flat_colour', crop=None, box=None, point=None, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, upscale=1, pad=4, source=None)
 
 Cut a part out of `image`; every coordinate is in the source image’s pixels.
-
-* **Return type:**
-  [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)
 
 image: a path, a PIL image or an RGB(A) array (`grab_frame` for video)
 matte: the strategy ([`cutan.carve.mattes`](_autosummary/cutan.carve.mattes.html.md#module-cutan.carve.mattes)): a name, a recipe mapping,
@@ -1368,12 +1379,12 @@ source: provenance ([`frame_source()`](_autosummary/cutan.carve.provenance.html.
 True
 ```
 
+* **Return type:**
+  [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)
+
 ### cutan.carve.carve_head(image, , face=None, locate=None, pick='largest', matte='flat_colour', cut='auto', neck=None, neck_soft=0.05, pad_x=1.05, pad_top=1.25, pad_bottom=1.0, upscale=3, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, canvas=512, face_h=270.0, centre=(256.0, 300.0), margin=6, view=None, source=None)
 
 A head cut out at the neck and normalised onto a `canvas`-px square.
-
-* **Return type:**
-  [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)
 
 face: the face, a [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face) (box and, when known, a
 : jaw contour and landmarks), a box `(x0, y0, x1, y1)` or a mapping
@@ -1408,17 +1419,20 @@ the crop per image, the matte and the finish shared). The part’s anchor is `ce
 `meta` holds what a rig needs to hang it: the face box, the chin and the
 neck point, the head’s bounding box, the landmarks, all on the canvas.
 
+* **Return type:**
+  [`Carving`](_autosummary/cutan.carve.core.html.md#cutan.carve.core.Carving)
+
 ### cutan.carve.check_requirements(, verbose=True)
 
 Which optional dependencies of carving are installed (printing how to get the rest).
-
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
 
 ```pycon
 >>> sorted(check_requirements(verbose=False))
 ['cv2', 'insightface', 'rembg']
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
 
 ### cutan.carve.frame_source(url, , license, t=None, author=None, author_url=None, title=None, provider=None, attribution=None, note=None, cacheable=True, \*\*extra)
 
@@ -1435,9 +1449,6 @@ query: signed-URL tokens are credentials). A local file (a path, a
 in `extra.file`, no path anywhere; a `data:` URI is refused. `t`,
 `title` and `note` go into `extra` beside any other keyword.
 
-* **Return type:**
-  `AssetSource`
-
 ```pycon
 >>> s = frame_source("https://www.youtube.com/watch?v=AAGIi62-sAU&si=track",
 ...                  t=34.6, license="all-rights-reserved", author="OverSimplified")
@@ -1452,6 +1463,9 @@ in `extra.file`, no path anywhere; a `data:` URI is refused. `t`,
 ('local', None, 'clip.mp4', False)
 ```
 
+* **Return type:**
+  `AssetSource`
+
 ### cutan.carve.grab_frame(video, t, , ffmpeg='ffmpeg')
 
 The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).
@@ -1463,13 +1477,13 @@ The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).
 
 An `HxWx3` `uint8` RGB array from a path, a PIL image or an array.
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> load_rgb(np.zeros((4, 5, 4), np.uint8)).shape
 (4, 5, 3)
 ```
+
+* **Return type:**
+  `ndarray`
 
 ### cutan.carve.neck_cut(shape, face, , cut='auto', neck=None, soft=0.05, offset=(0.0, 0.0), scale=1.0)
 
@@ -1482,26 +1496,26 @@ and `"none"` keeps everything. `neck` is the depth below the jaw (or
 the chin) in face-box heights. `offset`/`scale` map the face (given in
 source pixels) into the mask’s pixels.
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> m = neck_cut((100, 50), Face((10, 10, 40, 60)), cut="flat", neck=0.1)
 >>> float(m[50, 25]), float(m[90, 25])
 (1.0, 0.0)
 ```
 
+* **Return type:**
+  `ndarray`
+
 ### cutan.carve.pick_face(faces, pick='largest')
 
 One face of several: `largest`, `leftmost`, `rightmost` or `best` (score).
-
-* **Return type:**
-  [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)
 
 ```pycon
 >>> pick_face([Face((0, 0, 10, 10)), Face((50, 0, 70, 20))]).box
 (50.0, 0.0, 70.0, 20.0)
 ```
+
+* **Return type:**
+  [`Face`](_autosummary/cutan.carve.head.html.md#cutan.carve.head.Face)
 
 ### cutan.carve.register_matte(cls, , name=None)
 
@@ -1533,9 +1547,6 @@ part moves. A part’s `origin` and `pivot` are in the carving’s pixels
 
 Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.
 
-* **Return type:**
-  `PropDescriptor`
-
 name: the prop’s name (default: the folder’s name)
 unit: view_box units per carved pixel (default 1); or `max_side`: the
 
@@ -1560,12 +1571,12 @@ part, at its pivot, parented to the root, and one slot per part above the
 base, in the order the parts were listed. Nothing is written unless the
 whole descriptor is valid.
 
+* **Return type:**
+  `PropDescriptor`
+
 ### cutan.carve.youtube_id(url)
 
 The video id of a YouTube URL, else `None`.
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ```pycon
 >>> youtube_id("https://www.youtube.com/watch?v=AAGIi62-sAU&t=34")
@@ -1575,6 +1586,9 @@ The video id of a YouTube URL, else `None`.
 >>> youtube_id("https://notyoutube.com/watch?v=x"), youtube_id("https://WWW.YOUTUBE.COM:443/shorts/abc")
 (None, 'abc')
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Modules
 
@@ -1778,9 +1792,6 @@ A [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte) fr
 A recipe (`Matte.recipe()`, as a carve records it) builds the same matte
 back, so a strategy with its settings is plain data (a batch spec, a CLI):
 
-* **Return type:**
-  [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
-
 ```pycon
 >>> as_matte("chroma").name
 'chroma'
@@ -1794,6 +1805,9 @@ Traceback (most recent call last):
 ValueError: no matte strategy 'rainbow'; the strategies are: chroma, flat_colour, ...
 ```
 
+* **Return type:**
+  [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
 ### cutan.carve.mattes.border_colours(rgb, , max_colours=3, min_share=0.08, bits=4)
 
 The dominant colours of the image’s border: the backdrop of a flat frame.
@@ -1802,14 +1816,14 @@ Border pixels are binned at `bits` per channel; every bin holding at least
 `min_share` of the border (up to `max_colours`, most frequent first)
 gives one colour, the median of its pixels.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int)]]
-
 ```pycon
 >>> img = np.zeros((20, 20, 3), np.uint8); img[:] = (250, 240, 230)
 >>> border_colours(img)
 [(250, 240, 230)]
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int)]]
 
 ### cutan.carve.mattes.register_matte(cls, , name=None)
 
@@ -1877,7 +1891,7 @@ One lifted part: its RGBA image, its pivot in that image, where it sits in the c
 
 The pivot as an attachment anchor (0..1 of the image).
 
-### *class* cutan.carve.parts.PartSet(carving, base, parts=<factory>)
+### *class* cutan.carve.parts.PartSet(carving, base, parts=list())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -1967,9 +1981,6 @@ The bone every carved prop hangs from, at the carving’s anchor.
 
 Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.
 
-* **Return type:**
-  `PropDescriptor`
-
 name: the prop’s name (default: the folder’s name)
 unit: view_box units per carved pixel (default 1); or `max_side`: the
 
@@ -1993,6 +2004,9 @@ The root bone sits at the carving’s anchor. A split prop gets one bone per
 part, at its pivot, parented to the root, and one slot per part above the
 base, in the order the parts were listed. Nothing is written unless the
 whole descriptor is valid.
+
+* **Return type:**
+  `PropDescriptor`
 
 
 # _autosummary/cutan.carve.provenance.html.md
@@ -2032,9 +2046,6 @@ query: signed-URL tokens are credentials). A local file (a path, a
 in `extra.file`, no path anywhere; a `data:` URI is refused. `t`,
 `title` and `note` go into `extra` beside any other keyword.
 
-* **Return type:**
-  `AssetSource`
-
 ```pycon
 >>> s = frame_source("https://www.youtube.com/watch?v=AAGIi62-sAU&si=track",
 ...                  t=34.6, license="all-rights-reserved", author="OverSimplified")
@@ -2049,12 +2060,12 @@ in `extra.file`, no path anywhere; a `data:` URI is refused. `t`,
 ('local', None, 'clip.mp4', False)
 ```
 
+* **Return type:**
+  `AssetSource`
+
 ### cutan.carve.provenance.youtube_id(url)
 
 The video id of a YouTube URL, else `None`.
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ```pycon
 >>> youtube_id("https://www.youtube.com/watch?v=AAGIi62-sAU&t=34")
@@ -2064,6 +2075,9 @@ The video id of a YouTube URL, else `None`.
 >>> youtube_id("https://notyoutube.com/watch?v=x"), youtube_id("https://WWW.YOUTUBE.COM:443/shorts/abc")
 (None, 'abc')
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 
 # _autosummary/cutan.carve.refine.html.md
@@ -2107,14 +2121,14 @@ The alpha above which a pixel counts as the subject’s.
 
 Pull the matte’s edge in by `px` pixels (a smooth, distance-based erosion).
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> a = np.zeros((9, 9), np.float32); a[1:8, 1:8] = 1
 >>> float(choke(a, 2)[1, 4]), float(choke(a, 2)[4, 4])
 (0.0, 1.0)
 ```
+
+* **Return type:**
+  `ndarray`
 
 ### cutan.carve.refine.despill(rgb, alpha, rim, , solid=None)
 
@@ -2132,9 +2146,6 @@ outline stays an outline: it is solid, so its inner part is trusted. The
 share is of the subject’s pixels, the quality signal for a de-spill that
 repainted real content.
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[`ndarray`, [`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> rgb = np.zeros((7, 7, 3), np.uint8); rgb[:] = (0, 0, 255)  # a blue backdrop
 >>> rgb[1:6, 1:6] = (200, 0, 0); rgb[1, 1:6] = (100, 0, 160)   # a red subject, a spilt top row
@@ -2143,6 +2154,9 @@ repainted real content.
 >>> tuple(int(c) for c in out[1, 3]), round(share, 2)
 ((200, 0, 0), 0.64)
 ```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[`ndarray`, [`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 ### cutan.carve.refine.detach_bridges(mask, radius, , point=None)
 
@@ -2154,9 +2168,6 @@ largest), grows it back by `radius + 1` inside the original mask. Returns
 parts of what was removed, at least `radius²` px: a caption glyph, and also
 a thin part thinner than `2 * radius` px, which erosion cannot tell apart).
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[`ndarray`, [`int`](https://docs.python.org/3/builtins/functions.html#int)]
-
 ```pycon
 >>> m = np.zeros((20, 40), bool); m[2:18, 2:18] = True   # a body
 >>> m[9:11, 18:24] = True; m[6:14, 24:32] = True          # a glyph on a 2-px neck
@@ -2164,6 +2175,9 @@ a thin part thinner than `2 * radius` px, which erosion cannot tell apart).
 >>> pieces, bool(out[10, 28]), bool(out[10, 10])
 (1, False, True)
 ```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[`ndarray`, [`int`](https://docs.python.org/3/builtins/functions.html#int)]
 
 ### cutan.carve.refine.feather(alpha, sigma)
 
@@ -2176,14 +2190,14 @@ Soften the edge with a Gaussian of `sigma` px (0 leaves it as it is).
 
 `mask` with every enclosed hole filled.
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> m = np.ones((5, 5), bool); m[2, 2] = False
 >>> bool(fill_holes(m)[2, 2])
 True
 ```
+
+* **Return type:**
+  `ndarray`
 
 ### cutan.carve.refine.keep_components(mask, , point=None, keep='point', min_share=0.02, gap=6)
 
@@ -2195,9 +2209,6 @@ the point is off the subject or not given) and the pieces lying within
 hat a matte separated by a sliver); `"largest"` keeps the largest only;
 `"all"` keeps everything.
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> m = np.zeros((10, 30), bool); m[1:9, 1:9] = True; m[4:6, 25:27] = True
 >>> int(keep_components(m, keep="largest").sum()), int(keep_components(m, keep="all").sum())
@@ -2208,6 +2219,9 @@ hat a matte separated by a sliver); `"largest"` keeps the largest only;
 >>> int(keep_components(m, point=(4, 4), min_share=0.05).sum())
 68
 ```
+
+* **Return type:**
+  `ndarray`
 
 
 # _autosummary/cutan.characters.brows.html.md
@@ -2350,9 +2364,6 @@ or a factory hat measured over them, an#284).
 The slots are the solver’s own binding’s, so the capability and the solver
 cannot disagree about which slots act.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
-
 ```pycon
 >>> from cutan.characters.schema import CharacterDescriptor
 >>> d = CharacterDescriptor(name="c")
@@ -2362,6 +2373,9 @@ cannot disagree about which slots act.
 >>> brow_affordance(d, {"left_brow": {"brow_l"}, "right_brow": {"brow_r"}}) is None
 True
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.characters.brows.brow_cover(desc)
 
@@ -2380,13 +2394,13 @@ compiler’s record and `an validate`.
 
 The path of the factory’s brow on `side` (`l` or `r`) in its canvas.
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> brow_path_d("l")
 'M 8 16 Q 40 4 72 8'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.brows.brow_range(, head_scale=1.0, views=('front', 'three_quarter', 'side'), presets=None)
 
@@ -2413,26 +2427,26 @@ brows live on slots of its own naming is read as having brows, and one
 whose declared binding moves no brow is read as having none. A binding
 that does not resolve moves nothing (`an validate` reports it).
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> from cutan.characters.schema import CharacterDescriptor
 >>> brow_slots(CharacterDescriptor(name="c"))
 ['left_brow', 'right_brow']
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
 ### cutan.characters.brows.ink_columns(discs)
 
 `{column: (top, bottom)}` of ink, per head-unit column (`round(x)`).
-
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
 
 ```pycon
 >>> ink_columns([(10.2, 5.0, 0.0), (10.4, 7.0, 0.0)])
 {10: (5.0, 7.0)}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
 
 ### cutan.characters.brows.seat_above_brows(fragments, , head_scale=1.0, clearance=1.0, crown_min_y=0.5, min_flatten=0.6)
 
@@ -2456,13 +2470,13 @@ dips into the brows’ acting range: positive means it covers them (an#284).
 The inverse of [`seat_above_brows()`](_autosummary/cutan.characters.brows.html.md#cutan.characters.brows.seat_above_brows) on its own transforms, so a
 character’s recorded seat is measured, not re-chosen.
 
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
-
 ```pycon
 >>> seat_overlap({"front": ""}, None)
 -inf
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 
 # _autosummary/cutan.characters.checks.html.md
@@ -2896,9 +2910,6 @@ Two roles drawn in one literal cannot be told apart by a swap, and neither
 can a role and an untagged detail (a shoe, an outline) that happens to share
 it. One step in one channel is invisible and makes the key exact.
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> distinct_literal("#222222", {"#222222"})
 '#222223'
@@ -2908,12 +2919,12 @@ it. One step in one channel is invisible and makes the key exact.
 '#123456'
 ```
 
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
 ### cutan.characters.colour_roles.normalise_hex(colour)
 
 `'#ABC'` -> `'#aabbcc'`: the one spelling a literal is keyed by.
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ```pycon
 >>> normalise_hex("#A83249"), normalise_hex("#fa0")
@@ -2923,6 +2934,9 @@ Traceback (most recent call last):
 ...
 ValueError: 'red' is not a #rgb or #rrggbb colour
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.colour_roles.recolour_svg(svg, swaps)
 
@@ -2934,9 +2948,6 @@ fragment references — stays byte-for-byte. Literals match case- and
 length-insensitively (`#FA0` is `#ffaa00`). Deterministic, and cached by
 content: the same text and swaps are rewritten once per process.
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> recolour_svg('<g style="fill:#fa0;stroke:#000"><use href="#fa0"/></g>',
 ...              {"#ffaa00": "#010203"})
@@ -2944,6 +2955,9 @@ content: the same text and swaps are rewritten once per process.
 >>> recolour_svg('<rect data-fill="#aaa" fill="#aaa"/>', {"#aaaaaa": "#bbbbbb"})
 '<rect data-fill="#aaa" fill="#bbbbbb"/>'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.colour_roles.role_recolouring(roles, colour_for)
 
@@ -2953,14 +2967,14 @@ content: the same text and swaps are rewritten once per process.
 unset keeps its literal, and a role set to the colour it already has is not
 a swap — so a pack that changes nothing produces nothing to rewrite.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> role_recolouring({"#a83249": "clothing", "#3b2a1a": "hair"},
 ...                  {"clothing": "#202028"}.get)
 {'#a83249': '#202028'}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 
 # _autosummary/cutan.characters.dicebear.html.md
@@ -3122,9 +3136,6 @@ Logged only if `source` is exactly what this drawing itself wrote there:
 a file swapped in between the factory’s write and its re-read (a rescale)
 is rewritten, but not as the factory’s drawing (review-288 round 2).
 
-* **Return type:**
-  [`None`](https://docs.python.org/3/builtins/constants.html#None)
-
 ```pycon
 >>> import tempfile, pathlib
 >>> with tempfile.TemporaryDirectory() as d, drawing() as log:
@@ -3136,6 +3147,9 @@ is rewritten, but not as the factory’s drawing (review-288 round 2).
 18
 False
 ```
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.characters.drawn.write_text(path, text, , encoding='utf-8')
 
@@ -3503,26 +3517,26 @@ asset library and `an credits` read every file of the character that no
 stamp pins (a part re-carved later, a file added by hand) as UNVERIFIED,
 never as the factory’s (`an.credits._part_credits()`).
 
-* **Return type:**
-  `AssetSource`
-
 ```pycon
 >>> s = factory_descriptor_source(b"<svg/>")
 >>> (s.provider, s.license, len(s.sha256))
 ('an character factory', 'cc0-1.0', 64)
 ```
 
+* **Return type:**
+  `AssetSource`
+
 ### cutan.characters.factory.factory_source(data)
 
 The per-part source of a part this factory drew, pinned to its bytes.
-
-* **Return type:**
-  `AssetSource`
 
 ```pycon
 >>> factory_source(b"<svg/>").license, len(factory_source(b"<svg/>").sha256)
 ('cc0-1.0', 64)
 ```
+
+* **Return type:**
+  `AssetSource`
 
 ### cutan.characters.factory.gaze_travel_for(rx=14, ry=10, pupil_r=5)
 
@@ -3532,13 +3546,13 @@ axes’ unit circle maps onto. The compiler clamps the summed gaze to 0.95
 of that circle (`GAZE_ELLIPSE_MARGIN`), which is what keeps the pupil disc
 inside the white at every angle without a runtime mask.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> gaze_travel_for()
 {'x': 9.0, 'y': 5.0}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 ### cutan.characters.factory.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False)
 
@@ -3667,14 +3681,14 @@ guess at it. Multiply by
 `stage.scale`. The head reaches its drawing’s top edge (a hat stays
 inside it).
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> e = stage_extent(CharacterDescriptor(name="c"))
 >>> round(e["top"]), round(e["feet"])
 (169, 94)
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 ### cutan.characters.factory.stamp_factory_descriptor(char_dir)
 
@@ -3701,14 +3715,14 @@ would make every other character’s shared parts private. The stamp pins the
 digest, so a part later re-drawn or re-carved no longer matches it and stops
 being itemised as the factory’s — the stamp cannot launder new bytes.
 
-* **Return type:**
-  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
-
 paths: the relative paths this call has just DRAWN — required (an#249
 : R4-N1): a stamp says “the factory made these bytes”, so only the code
   that made them may write it. Stamping every part by default would label
   a part re-carved since as the factory’s `cc0`. A part carrying some
   other provider’s source is never re-stamped.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
 
 ### cutan.characters.factory.stamp_generated_head(char_dir, source)
 
@@ -3754,9 +3768,6 @@ Face offsets scale with `head_scale` (the face was drawn at it), limb
 offsets come from the build’s own joints. `slots` limits the poses to the
 slots a rig has (a rig without the eye stack has no pupils to pose).
 
-* **Return type:**
-  dict[str, dict[str, ‘SlotPose’]]
-
 ```pycon
 >>> poses = view_poses()
 >>> sorted(poses)
@@ -3764,6 +3775,9 @@ slots a rig has (a rig without the eye stack has no pupils to pose).
 >>> poses["front"], poses["back"]["mouth"].alpha, poses["side"]["arm_r"].x
 ({}, 0.0, -90.0)
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), SlotPose]]
 
 
 # _autosummary/cutan.characters.html.md
@@ -3823,16 +3837,16 @@ Conventions (locked in):
 
 ### Classes
 
-| [`CharacterDescriptor`](_autosummary/cutan.characters.html.md#cutan.characters.CharacterDescriptor)(\*\*data)   | The on-disk character schema.                                           |
-|----------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| [`Bone`](_autosummary/cutan.characters.html.md#cutan.characters.Bone)(\*\*data)                  | A skeleton joint with a local transform relative to its parent.         |
-| [`Slot`](_autosummary/cutan.characters.html.md#cutan.characters.Slot)(\*\*data)                  | A draw-order slot bound to a bone, displaying one attachment at a time. |
-| [`Attachment`](_autosummary/cutan.characters.html.md#cutan.characters.Attachment)(\*\*data)            | A drawable: an SVG path + anchor point (in 0..1 per-axis units).        |
-| [`Skin`](_autosummary/cutan.characters.html.md#cutan.characters.Skin)(\*\*data)                  | A named outfit/variant: maps slot → {attachment_name → Attachment}.     |
-| [`IdleAnimation`](_autosummary/cutan.characters.html.md#cutan.characters.IdleAnimation)(\*\*data)         | A named idle loop (e.g., breath, blink).                                |
-| [`AnimationTrack`](_autosummary/cutan.characters.html.md#cutan.characters.AnimationTrack)(\*\*data)        | A single channel inside an idle animation.                              |
+| [`CharacterDescriptor`](_autosummary/cutan.characters.html.md#cutan.characters.CharacterDescriptor)(\*[, origin, ...])             | The on-disk character schema.                                           |
+|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`Bone`](_autosummary/cutan.characters.html.md#cutan.characters.Bone)(\*, name[, parent, x, y, rotation_deg, ...])  | A skeleton joint with a local transform relative to its parent.         |
+| [`Slot`](_autosummary/cutan.characters.html.md#cutan.characters.Slot)(\*, name, bone[, draw_order, attachment])     | A draw-order slot bound to a bone, displaying one attachment at a time. |
+| [`Attachment`](_autosummary/cutan.characters.html.md#cutan.characters.Attachment)(\*, path[, anchor, x, y, width, ...])   | A drawable: an SVG path + anchor point (in 0..1 per-axis units).        |
+| [`Skin`](_autosummary/cutan.characters.html.md#cutan.characters.Skin)(\*[, name, slots])                            | A named outfit/variant: maps slot → {attachment_name → Attachment}.     |
+| [`IdleAnimation`](_autosummary/cutan.characters.html.md#cutan.characters.IdleAnimation)(\*, name[, duration, loop, tracks])  | A named idle loop (e.g., breath, blink).                                |
+| [`AnimationTrack`](_autosummary/cutan.characters.html.md#cutan.characters.AnimationTrack)(\*, target[, type, amplitude, ...]) | A single channel inside an idle animation.                              |
 
-### *class* cutan.characters.AnimationTrack(\*\*data)
+### *class* cutan.characters.AnimationTrack(\*, target, type='sine', amplitude=0.0, phase=0.0, frames=<factory>, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -3858,7 +3872,7 @@ list of `[time_s, value]` pairs evaluated in order.
 
 Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
 
-### *class* cutan.characters.Attachment(\*\*data)
+### *class* cutan.characters.Attachment(, path, anchor=(0.5, 0.5), x=0.0, y=0.0, width=None, height=None, source=None, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -3887,7 +3901,7 @@ on a CC0 body, credits each (an#220). `None` = the descriptor’s
 reserved part makes the render NOT PUBLISHABLE like any other.
 Omitted from the stored document when unset.
 
-#### width *: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### width *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[float](https://docs.python.org/3/builtins/functions.html#float)]*
 
 The size the part draws at, in **view_box units** — the rig’s units,
 the ones `x`/`y` and the bones use (an#220). \*\*A declared size
@@ -3914,7 +3928,7 @@ parts share one `head` bone and still land in different places — before
 this field they all stacked on the bone, because the descriptor had no
 way to say otherwise and the compiler used hardcoded literals instead.
 
-### *class* cutan.characters.Bone(\*\*data)
+### *class* cutan.characters.Bone(, name, parent=None, x=0.0, y=0.0, rotation_deg=0.0, scale_x=1.0, scale_y=1.0, pivot=None, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -3930,11 +3944,11 @@ A skeleton joint with a local transform relative to its parent.
 
 Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
 
-#### pivot *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### pivot *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 Optional pivot name — must match a circle in the SVG `skeleton` group.
 
-### *class* cutan.characters.CharacterDescriptor(\*\*data)
+### *class* cutan.characters.CharacterDescriptor(\*, origin=None, rest_rotation=None, nesting=None, schema_version='0.4.0', kind='CharacterDescriptor', name, display_name=None, view_box=(0, 0, 1024, 1024), voice_ref=None, source_svg=None, bones=<factory>, slots=<factory>, skins=<factory>, asset_sets=<factory>, animations=<factory>, source=None, face_overlay=True, expression_binding=None, gaze_travel=None, colour_roles=<factory>, metadata=<factory>, swap_poses=<factory>, rest_view=None, gait=None, speech=None, occluded=<factory>, \*\*extra_data)
 
 Bases: `RigDocument`
 
@@ -3986,7 +4000,7 @@ Additive: no schema bump, and a descriptor without it reads back as
 untagged. Keys are normalised to lowercase `#rrggbb`; a role must be
 one a pack can set (`an.styles.REACHABLE_ROLES`).
 
-#### expression_binding *: [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### expression_binding *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[list](https://docs.python.org/3/builtins/stdtypes.html#list)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]]]*
 
 How expression axes reach this rig (an#98), as a list of binding dicts —
 `{"axis", "slot", "property", "gain"[, "rig_scaled"]}` for a transform
@@ -4009,7 +4023,7 @@ from; this says what the art IS. The 0.2.0 → 0.3.0 migration derives it
 from the provenance string once, and `art_provenance` reverts to pure
 provenance/licensing metadata.
 
-#### gait *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### gait *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 This character’s default walk `gait` (one of `GAITS`, an#220);
 an author’s `gait` arg overrides it. `None` = the locomotion chain:
@@ -4018,7 +4032,7 @@ figure whose leg slots are hem halves declares `"hem"` once, here,
 rather than on every walk.
 Omitted from the stored document when unset.
 
-#### gaze_travel *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### gaze_travel *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]]*
 
 How far a pupil may travel from its rest, in view-box units per axis
 (an#99): the sclera’s clearance minus the pupil’s radius, written by
@@ -4063,7 +4077,7 @@ by `an character capabilities`. Keys are
 `OCCLUDABLE_FEATURES`. Omitted from the
 stored document when empty.
 
-#### rest_view *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### rest_view *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 The view the DEFAULT art is drawn in (an#220) — a declared fact about
 the art, like `face_overlay`. `None` means `DFLT_VIEW`
@@ -4086,12 +4100,12 @@ Field names match `illustration.ImageResult` exactly, so an adapter is a
 dict copy rather than a rename table — and a rename table is where a field
 quietly stops being carried. Pinned by test.
 
-#### source_svg *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### source_svg *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 Optional source SVG (relative path) that the parts/ folder was
 extracted from. Useful for re-slicing.
 
-#### speech *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### speech *: [Union](https://docs.python.org/3/library/typing.html#typing.Union)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)], [None](https://docs.python.org/3/builtins/constants.html#None)]*
 
 a
 method’s spelling (`mouth_chart`, `pulse`), its id
@@ -4130,12 +4144,12 @@ schema bump, and a descriptor without it reads back unposed.
 * **Type:**
   {key
 
-#### voice_ref *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### voice_ref *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 Voice-store id or path used by the audio pipeline. Optional; the scene
 can override per shot.
 
-### *class* cutan.characters.IdleAnimation(\*\*data)
+### *class* cutan.characters.IdleAnimation(\*, name, duration=1.0, loop=True, tracks=<factory>, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -4151,7 +4165,7 @@ True
 
 Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
 
-### *class* cutan.characters.Skin(\*\*data)
+### *class* cutan.characters.Skin(\*, name='default', slots=<factory>, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -4167,7 +4181,7 @@ A named outfit/variant: maps slot → {attachment_name → Attachment}.
 
 Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
 
-### *class* cutan.characters.Slot(\*\*data)
+### *class* cutan.characters.Slot(, name, bone, draw_order=0, attachment=None, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -4179,7 +4193,7 @@ A draw-order slot bound to a bone, displaying one attachment at a time.
 'mouth_x'
 ```
 
-#### attachment *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### attachment *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 Default attachment name; the active attachment can change at runtime
 via animation tracks targeting `slot:<name>.attachment`.
@@ -4225,13 +4239,13 @@ Both images are resized to `size`, converted to grayscale, thresholded
 at the midpoint, and the intersection-over-union of the foreground (dark)
 pixels is computed.
 
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
-
 ```pycon
 >>> # Two identical silhouettes → IoU = 1.0; two empty → 0.0 (no overlap).
 >>> # Tested via test suite, not doctest, since it requires Playwright.
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.characters.extract_part(source, part_id, , crop_viewbox=True, padding=8.0)
 
@@ -4294,9 +4308,6 @@ Pass `extra_params` to forward style-specific options (e.g.
 
 Return `{"mouth_<letter>[_<form>]": <svg-string>, ...}` for every shape.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> svgs = generate_default_mouths()
 >>> 'mouth_x' in svgs and 'viewBox' in svgs['mouth_x']
@@ -4304,6 +4315,9 @@ True
 >>> sorted(generate_default_mouths(shapes=["a"], smile=0.35, form="happy"))
 ['mouth_a_happy']
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False)
 
@@ -4486,9 +4500,6 @@ unparseable descriptor, absent required parts or mouth shapes, a part that
 draws nothing, a prohibited construct, a letterboxed part, a joint name
 colliding with a part id, and an unpopulated `AssetSource`.
 
-* **Return type:**
-  `VerificationReport`
-
 ```pycon
 >>> import tempfile, pathlib
 >>> with tempfile.TemporaryDirectory() as d:
@@ -4498,6 +4509,9 @@ False
 >>> any("character.json" in f.description for f in report.findings)
 True
 ```
+
+* **Return type:**
+  `VerificationReport`
 
 ### cutan.characters.write_default_mouths(out_dir, , canvas=(256, 128), palette=None, shapes=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x'), variants=None)
 
@@ -4634,9 +4648,6 @@ For sine: `amplitude * sin(2π * (t/duration + phase))`.
 For step: returns the value of the latest frame whose time ≤ `t`.
 For linear: linear interpolation between bracketing frames.
 
-* **Return type:**
-  [`object`](https://docs.python.org/3/builtins/functions.html#object)
-
 ```pycon
 >>> tr = AnimationTrack(target='bone:torso.y', type='sine', amplitude=2.0)
 >>> round(evaluate_track(tr, 0.0, 4.0), 6)
@@ -4644,6 +4655,9 @@ For linear: linear interpolation between bracketing frames.
 >>> round(evaluate_track(tr, 1.0, 4.0), 6)
 2.0
 ```
+
+* **Return type:**
+  [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 ### cutan.characters.idle.random_blink_schedule(duration_s, , min_gap_s=3.0, max_gap_s=8.0, seed=None)
 
@@ -4653,9 +4667,6 @@ A seeded schedule with uniform gaps in `[min_gap_s, max_gap_s]`. NOT
 what the renderer uses today (see the module docstring); kept as the
 candidate for descriptor-driven scheduling.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> times = random_blink_schedule(20.0, seed=0)
 >>> all(0 <= t < 20 for t in times)
@@ -4663,6 +4674,9 @@ True
 >>> times == sorted(times)
 True
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 
 # _autosummary/cutan.characters.licenses.html.md
@@ -4982,7 +4996,7 @@ each chain ends in a method that requires nothing.
 * **Type:**
   The genre’s aspects
 
-### cutan.characters.methods.CUTOUT_METHODS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Method, ...]* *= (Method(id='loco.legged_cycle', kind='method', version='2', name='legs', title='legged walk cycle', description='a legged walk cycle: in profile the legs swing about the hip in opposition, facing the camera the stepping leg lifts; the arms swing against the legs', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'lift': {'type': 'number', 'default': 10.0}, 'arm_swing': {'type': 'number', 'default': 0.3}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'legs'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.profile_cycle', kind='method', version='2', name='profile', title='profile walk cycle', description="the four poses of a walk seen in profile (contact, down, passing, up): with a side or three-quarter view showing the legs swing about the hip in opposition and the body sinks after each contact and rises before the next; asked while another view shows, it walks as legs (Reiniger's silhouettes, any figure drawn side-on)", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.45}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.35}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'profile'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()), Requirement(capability='swap.view', key='side', at_least=None, any_of=())), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)', 'swap.view:side': 'give the character a side view: \`an character add-views <name>\` (a factory character), or carve its art in profile and declare \`rest_view: side\` in character.json'}), Method(id='loco.shuffle', kind='method', version='2', name='shuffle', title='shuffle', description='the feet barely leave the ground: short, quick steps with little bob and arms close to the body (the old, the tired, the cautious)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.3}, 'step_length': {'type': 'number', 'default': 40.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 3.0}, 'arm_swing': {'type': 'number', 'default': 0.1}, 'bob': {'type': 'number', 'default': 1.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'shuffle'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.hem_sway', kind='method', version='2', name='hem', title='hem sway', description="a robe figure's walk: the leg slots are the two halves of the hem, which tilt about the hip as mirror images (the hem opens and closes) while the body sways and bobs facing the camera; in profile they swing like legs", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hem_tilt': {'type': 'number', 'default': 0.24}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hem'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': "carve the robe's hem into two halves on slots leg_l/leg_r, pivoted at the hip, and declare \`gait: hem\` in character.json"}), Method(id='loco.waddle', kind='method', version='2', name='waddle', title='waddle', description='the body rocks from foot to foot and bobs on each step; legs, if any, lift in turn (a penguin, a toddler, a squat figure)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 5.0}, 'bob': {'type': 'number', 'default': 4.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'waddle'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.hop', kind='method', version='2', name='hop', title='hop', description='the whole figure jumps on every step while it travels (a bird, a kangaroo, a gleeful character, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hop_height': {'type': 'number', 'default': 18.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hop'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.bounce', kind='method', version='2', name='bounce', title='bounce', description='the body bobs on every step while it slides; legs, if any, only flick (the South Park walk)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 8.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lift': {'type': 'number', 'default': 4.0}, 'stride': {'type': 'number', 'default': 0.1}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'bounce'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.rock', kind='method', version='2', name='rock', title='rock and bob', description='no leg moves: the body rocks side to side and bobs once per step while it travels (a blob, a sack, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'rock'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.glide', kind='method', version='2', name='glide', title='glide', description='the figure slides, leaning into the move with a gentle bob; no limb moves (a robe figure, a ghost, a sack — the default for any figure without legs)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 1.5, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lean': {'type': 'number', 'default': 0.04}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'glide'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='speech.mouth_chart', kind='method', version='1', name='mouth_chart', title='mouth chart lip-sync', description="lip-sync on the character's mouth chart: the line's visemes swap the mouth drawings (the nine Rhubarb shapes, or the character's own set)", usage='', params={}, examples=(), requires=(Requirement(capability='face.mouth', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='speech', remedies={'face.mouth': "give the character an overlay mouth: a \`mouth\` slot with the viseme set's drawings (\`an character mouths <dir>\`) and face_overlay: true"}), Method(id='speech.pose_only', kind='method', version='1', name='pulse', title='speech pulse', description='no lip-sync: the head (or the body) pulses on each syllable, so a baked face or a mime still reads as speaking', usage='', params={'type': 'object', 'properties': {'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=('a character with face_overlay: false speaks',), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='speech', remedies={}), Method(id='expr.full_face', kind='method', version='1', name='full_face', title='full-face expression', description="the expression acts with the whole face: the brows rise, knit and tilt, the lids open and close, the pupils move and the mouth takes the preset's form", usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'},), requires=(Requirement(capability='face.brows', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='expression', remedies={'face.brows': "keep the brows clear: \`an character new\` seats a hat above them at most head scales — at this one it could not, so use a larger --head-scale, another --hat or --hat none; for drawn art, redraw what covers the brows and remove the descriptor's \`occluded\` entry, or give the face brow slots (left_brow/right_brow) with art"}), Method(id='expr.without_brows', kind='method', version='1', name='without_brows', title='expression without brows', description='the brows cannot be seen acting (covered, or not drawn): the lids, the gaze and the mouth form carry the expression', usage='', params={}, examples=('a character whose hat covers its brows takes [surprised]',), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='expression', remedies={}))*
+### cutan.characters.methods.CUTOUT_METHODS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Method, ...]* *= (Method(id='loco.legged_cycle', kind='method', version='2', name='legs', title='legged walk cycle', description='a legged walk cycle: in profile the legs swing about the hip in opposition, facing the camera the stepping leg lifts; the arms swing against the legs', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'lift': {'type': 'number', 'default': 10.0}, 'arm_swing': {'type': 'number', 'default': 0.3}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'legs'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.profile_cycle', kind='method', version='2', name='profile', title='profile walk cycle', description="the four poses of a walk seen in profile (contact, down, passing, up): with a side or three-quarter view showing the legs swing about the hip in opposition and the body sinks after each contact and rises before the next; asked while another view shows, it walks as legs (Reiniger's silhouettes, any figure drawn side-on)", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.45}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.35}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'profile'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()), Requirement(capability='swap.view', key='side', at_least=None, any_of=())), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)', 'swap.view:side': 'give the character a side view: \`an character add-views <name>\` (a factory character), or carve its art in profile and declare \`rest_view: side\` in character.json'}), Method(id='loco.shuffle', kind='method', version='2', name='shuffle', title='shuffle', description='the feet barely leave the ground: short, quick steps with little bob and arms close to the body (the old, the tired, the cautious)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.3}, 'step_length': {'type': 'number', 'default': 40.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 3.0}, 'arm_swing': {'type': 'number', 'default': 0.1}, 'bob': {'type': 'number', 'default': 1.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'shuffle'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.hem_sway', kind='method', version='2', name='hem', title='hem sway', description="a robe figure's walk: the leg slots are the two halves of the hem, which tilt about the hip as mirror images (the hem opens and closes) while the body sways and bobs facing the camera; in profile they swing like legs", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hem_tilt': {'type': 'number', 'default': 0.24}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hem'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': "carve the robe's hem into two halves on slots leg_l/leg_r, pivoted at the hip, and declare \`gait: hem\` in character.json"}), Method(id='loco.waddle', kind='method', version='2', name='waddle', title='waddle', description='the body rocks from foot to foot and bobs on each step; legs, if any, lift in turn (a penguin, a toddler, a squat figure)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 5.0}, 'bob': {'type': 'number', 'default': 4.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'waddle'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.hop', kind='method', version='2', name='hop', title='hop', description='the whole figure jumps on every step while it travels (a bird, a kangaroo, a gleeful character, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hop_height': {'type': 'number', 'default': 18.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hop'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.bounce', kind='method', version='2', name='bounce', title='bounce', description='the body bobs on every step while it slides; legs, if any, only flick (the South Park walk)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 8.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lift': {'type': 'number', 'default': 4.0}, 'stride': {'type': 'number', 'default': 0.1}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'bounce'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.rock', kind='method', version='2', name='rock', title='rock and bob', description='no leg moves: the body rocks side to side and bobs once per step while it travels (a blob, a sack, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'rock'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.glide', kind='method', version='2', name='glide', title='glide', description='the figure slides, leaning into the move with a gentle bob; no limb moves (a robe figure, a ghost, a sack — the default for any figure without legs)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 1.5, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lean': {'type': 'number', 'default': 0.04}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'glide'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='speech.mouth_chart', kind='method', version='1', name='mouth_chart', title='mouth chart lip-sync', description="lip-sync on the character's mouth chart: the line's visemes swap the mouth drawings (the nine Rhubarb shapes, or the character's own set)", usage='', params={}, examples=(), requires=(Requirement(capability='face.mouth', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='speech', remedies={'face.mouth': "give the character an overlay mouth: a \`mouth\` slot with the viseme set's drawings (\`an character mouths <dir>\`) and face_overlay: true"}), Method(id='speech.pose_only', kind='method', version='1', name='pulse', title='speech pulse', description='no lip-sync: the head (or the body) pulses on each syllable, so a baked face or a mime still reads as speaking', usage='', params={'type': 'object', 'properties': {'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=('a character with face_overlay: false speaks',), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='speech', remedies={}), Method(id='expr.full_face', kind='method', version='1', name='full_face', title='full-face expression', description="the expression acts with the whole face: the brows rise, knit and tilt, the lids open and close, the pupils move and the mouth takes the preset's form", usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'},), requires=(Requirement(capability='face.brows', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='expression', remedies={'face.brows': "keep the brows clear: \`an character new\` seats a hat above them at most head scales — at this one it could not, so use a larger --head-scale, another --hat or --hat none; for drawn art, redraw what covers the brows and remove the descriptor's \`occluded\` entry, or give the face brow slots (left_brow/right_brow) with art"}), Method(id='expr.without_brows', kind='method', version='1', name='without_brows', title='expression without brows', description='the brows cannot be seen acting (covered, or not drawn): the lids, the gaze and the mouth form carry the expression', usage='', params={}, examples=('a character whose hat covers its brows takes [surprised]',), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='expression', remedies={}))*
 
 The genre’s methods, as vocabulary entries (kind `method`).
 
@@ -5112,14 +5126,14 @@ methods when nothing is requested (its entries that do not apply go to
 `on_skip`), and the chosen entry’s OWN args join the walk’s under them
 (never the method’s defaults, which the gait scales to the figure).
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)], [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
-
 ```pycon
 >>> args, r = locomotion_args("blob", {"gait": "hem", "distance": 80}, descriptor=None, profile={})
 >>> args["gait"], r.substitution.reason
 ('glide', 'missing')
 ```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)], [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 ### cutan.characters.methods.normalise_gait_args(args)
 
@@ -5131,15 +5145,15 @@ method’s version (ADR 0003 decision 2). The choice’s `args` join the
 walk’s (an explicit arg wins); a pin that no longer holds, or a method of
 another aspect, raises `VocabularyError`.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
-
 ```pycon
 >>> normalise_gait_args({"gait": {"method": "loco.legged_cycle", "args": {"stride": 0.5}, "version": "2"}})
 {'stride': 0.5, 'gait': 'legs'}
 >>> normalise_gait_args({"gait": "hem", "distance": 80})
 {'gait': 'hem', 'distance': 80}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 ### cutan.characters.methods.off_registry_substitution(entity, args, parts=None)
 
@@ -5224,15 +5238,15 @@ Why a character’s declared `speech` cannot be honoured (empty: it can).
 An unknown method, a method of another aspect, or a pin to a version the
 registry no longer has; the message names the speech methods.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> speech_problems("pulse"), speech_problems(None)
 ([], [])
 >>> speech_problems("flap")[0].startswith("speech 'flap'")
 True
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.methods.substitution_problem(sub)
 
@@ -5268,9 +5282,6 @@ opens out of a closed shape) add beats INSIDE a word’s window, never
 outside every word. With no word timings: the viseme track’s syllables,
 else one beat at the line’s start. Beats closer than `min_gap_s` merge.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> from types import SimpleNamespace as NS
 >>> track = NS(keyframes=[NS(time=0.0, viseme="B"), NS(time=0.4, viseme="X"),
@@ -5282,6 +5293,9 @@ else one beat at the line’s start. Beats closer than `min_gap_s` merge.
 [0.35, 0.7]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
 ### cutan.characters.methods.walk_arg_problems(gait, args)
 
 The gait parameters in `args` that `gait` never reads (cutan#21):
@@ -5290,15 +5304,15 @@ each is a silent no-op otherwise. `gait` is a spelling (one of
 ([`walk_own_args()`](_autosummary/cutan.characters.methods.html.md#cutan.characters.methods.walk_own_args)) are never a problem. An unknown spelling is the
 walk’s own to refuse.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> walk_arg_problems("hop", {"bob": 20, "distance": 80, "arm_swing": 0.2})
 ["gait 'hop' does not read 'bob' (it reads: arm_swing, hop_height, step_length, step_s)"]
 >>> walk_arg_problems("glide", {"bob": 2}), walk_arg_problems("noop", {"bob": 2})
 ([], [])
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.methods.walk_own_args()
 
@@ -5307,13 +5321,13 @@ The walk’s own arguments — where to, how many steps, the limbs, the view
 parameter (`cutan.motion.WALK_PARAM_DEFAULTS`), which only the gaits
 that declare it read (cutan#21).
 
-* **Return type:**
-  [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> sorted(walk_own_args())
 ['arms', 'direction', 'distance', 'gait', 'legs', 'steps', 'to_x', 'view']
 ```
+
+* **Return type:**
+  [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.methods.walk_preset_context(entity, args, , descriptor, profile, scale, parts=None, policy=None)
 
@@ -5329,9 +5343,6 @@ view in force (cutan#17): a `profile` it resolves may walk as `legs`,
 which is why those two share `step_s` and `step_length`
 (`tests/test_gaits.py` pins that).
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
-
 ```pycon
 >>> walk_preset_context("b", {"gait": "shuffle"}, descriptor=None, profile={}, scale=2.0)
 {'scale': 2.0, 'gait': 'glide'}
@@ -5340,6 +5351,9 @@ which is why those two share `step_s` and `step_length`
 >>> walk_preset_context("b", {}, descriptor=None, profile=None, scale=1.0, parts=["head"])
 {'scale': 1.0, 'parts': {'head': {}}}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 ### cutan.characters.methods.walk_problems(doc, \*, entity, args, art_exists=None, view=<object object>, policy=None)
 
@@ -5432,9 +5446,6 @@ the idle line rise about a sixth of its half width.
 
 Return `{"mouth_<letter>[_<form>]": <svg-string>, ...}` for every shape.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> svgs = generate_default_mouths()
 >>> 'mouth_x' in svgs and 'viewBox' in svgs['mouth_x']
@@ -5443,17 +5454,20 @@ True
 ['mouth_a_happy']
 ```
 
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
 ### cutan.characters.mouth_set.mouth_attachment_name(shape, form=None)
 
 The attachment (and file stem) of one mouth drawing.
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ```pycon
 >>> mouth_attachment_name("a"), mouth_attachment_name("a", "happy")
 ('mouth_a', 'mouth_a_happy')
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.mouth_set.write_default_mouths(out_dir, , canvas=(256, 128), palette=None, shapes=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x'), variants=None)
 
@@ -5750,9 +5764,6 @@ A preset that moves several nodes of the entity (it takes `parts`,
 `PARTS_ARG` — `walk`) gets `parts_of(entity)`’s paths with their
 `rest_of` poses, and every node its expansion moves is checked.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
-
 ```pycon
 >>> from cutan.characters.registration import PlayAction
 >>> flats = expand_preset_play(
@@ -5764,6 +5775,9 @@ A preset that moves several nodes of the entity (it takes `parts`,
 -5.0
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
+
 ### cutan.characters.play.facing_at(events, entity, t, , view_set='view')
 
 What `entity` shows at time `t`: the latest `view_set` swap set
@@ -5771,9 +5785,6 @@ on the entity and the sign of the latest `scale_x` it was given, at or
 before `t` (a tween counts from its END, when its value has landed; at
 one instant the one LATER in `events` wins — so pass them in authoring
 order, as [`resolve_turns()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.resolve_turns) does).
-
-* **Return type:**
-  [`Facing`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.Facing)
 
 ```pycon
 >>> from an.ir.compose import flatten, sequence
@@ -5783,14 +5794,14 @@ order, as [`resolve_turns()`](_autosummary/cutan.characters.play.html.md#cutan.c
 (Facing(view=None, direction=None), Facing(view='side', direction='left'))
 ```
 
+* **Return type:**
+  [`Facing`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.Facing)
+
 ### cutan.characters.play.play_problems(desc, animation, , art_exists=None, args=None, duration=None, speed=1.0, loop=None)
 
 Every reason `play(<entity>, animation, ...)` cannot resolve — empty
 when it can. THE verdict `an validate` reports and the compiler raises
 on, for both sources (an#7, an#166).
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ```pycon
 >>> play_problems(None, "hop", args={"heigth": 3})
@@ -5798,6 +5809,9 @@ on, for both sources (an#7, an#166).
 >>> play_problems(None, "hop", loop=True)
 ["motion preset 'hop' is a one-shot: `loop: true` ...
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.play.play_source(desc, animation)
 
@@ -5818,13 +5832,13 @@ The ONE node path a preset play moves — `<target>/head` for a `nod`,
 the target itself for the rest. Read off the expansion rather than
 restated per preset, so a preset added later needs no entry here.
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> preset_moved_node("charlie", "nod"), preset_moved_node("charlie", "hop")
 ('charlie/head', 'charlie')
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.play.preset_moved_nodes(action_target, animation, args=None, , parts=None)
 
@@ -5832,15 +5846,15 @@ Every node path a preset play moves. `parts` (the entity’s built part
 paths, relative to it) is what a multi-node preset chooses its limbs from;
 `None` lets it assume the rig contract’s names.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> preset_moved_nodes("bob", "walk", {"distance": 80}, parts=["torso", "left_leg", "right_leg"])
 ['bob', 'bob/left_leg', 'bob/right_leg']
 >>> preset_moved_nodes("charlie", "nod")
 ['charlie/head']
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.play.preset_play_span(action, context=None)
 
@@ -5850,9 +5864,6 @@ else the preset’s natural length divided by `speed`. What a
 source. `context` is what the compiler adds to the args before expanding
 ([`PresetContext`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.PresetContext)): a walk’s length depends on its resolved gait and
 the figure’s scale, so the extent must see them too (cutan#12).
-
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ```pycon
 >>> from cutan.characters.registration import PlayAction
@@ -5864,6 +5875,9 @@ the figure’s scale, so the extent must see them too (cutan#12).
 >>> round(preset_play_span(walk), 6), round(preset_play_span(walk, {"scale": 2.0}), 6)
 (0.8, 0.4)
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.characters.play.preset_problems(animation, , args=None, duration=None, speed=1.0, loop=None)
 
@@ -5881,13 +5895,13 @@ building it (at the identity pose), so a value the preset itself refuses —
 Whether the motion preset `animation` has the keyword `name`
 (`False` for a name that is no preset: a descriptor animation takes nothing).
 
-* **Return type:**
-  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
-
 ```pycon
 >>> preset_takes("walk", "parts"), preset_takes("hop", "parts"), preset_takes("blink", "parts")
 (True, False, False)
 ```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 ### cutan.characters.play.preset_target_problems(animation, target)
 
@@ -5897,15 +5911,15 @@ entity’s PARTS (`walk`) is played on the entity, not on one of its parts
 resolution keys the whole character (cutan#22). Checked by the compiler
 and by `an validate` alike.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> preset_target_problems("walk", "w/torso")
 ["motion preset 'walk' moves a whole character: play it on 'w', not on its part 'w/torso'"]
 >>> preset_target_problems("walk", "w"), preset_target_problems("point", "w/arm_r")
 ([], [])
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.play.primary_slot_per_bone(desc)
 
@@ -5919,14 +5933,14 @@ slot itself, which puts eyes and mouth under `head` and leaves every limb
 a direct child of the entity. `nesting: bones` (an#340) follows the bone
 hierarchy to the nearest ancestor’s primary slot instead.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> from types import SimpleNamespace as NS
 >>> primary_slot_per_bone(NS(slots=[NS(name="head", bone="head"), NS(name="mouth", bone="head")]))["head"]
 'head'
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.play.resolve_part_arg(animation, args=None, , parts=None)
 
@@ -5938,15 +5952,15 @@ under its torso (`torso/head`). A part that is built as named, or whose
 name matches no single built path’s last segment, is left as given (and
 reported unbuilt as before).
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
-
 ```pycon
 >>> resolve_part_arg("nod", {}, parts=["torso", "torso/head"])["part"]
 'torso/head'
 >>> resolve_part_arg("nod", {}, parts=["head", "torso"])  # built as named: as given
 {}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### cutan.characters.play.resolve_play(desc, animation, , art_exists=None)
 
@@ -5975,9 +5989,6 @@ An explicit `from_direction` is kept — `turns` records it with the
 inferred state so `an validate` can say when the two disagree. A play
 that cannot resolve is left for [`play_problems()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.play_problems) to report.
 
-* **Return type:**
-  [`TurnResolution`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.TurnResolution)
-
 ```pycon
 >>> from an.ir.compose import flatten, sequence
 >>> from cutan.characters.registration import PlayAction
@@ -5989,6 +6000,9 @@ that cannot resolve is left for [`play_problems()`](_autosummary/cutan.character
 >>> res.flats[1].action.args["from_direction"], res.turns[1].before
 ('left', Facing(view='side', direction='left'))
 ```
+
+* **Return type:**
+  [`TurnResolution`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.TurnResolution)
 
 ### cutan.characters.play.sampled_deviations(track, duration, fps)
 
@@ -6008,9 +6022,6 @@ got samples up to 0.1667 s and then held that value to the clip end, so
 the cycle-closing sample (equal to the first) was never emitted and the
 clip wrapped with a jump (an#7 review).
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> sine_sample_times(0.19, 24)[-2:]
 [0.16666666666666666, 0.19]
@@ -6018,13 +6029,13 @@ clip wrapped with a jump (an#7 review).
 145
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
 ### cutan.characters.play.slot_node_path(desc, slot_name)
 
 The node path of a slot RELATIVE to its entity (`head/left_eye`,
 `torso`) — the rig builder’s nesting rule, stated once.
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ```pycon
 >>> slot_node_path(CharacterDescriptor(name="m"), "left_eye")
@@ -6032,6 +6043,9 @@ The node path of a slot RELATIVE to its entity (`head/left_eye`,
 >>> slot_node_path(CharacterDescriptor(name="m"), "torso")
 'torso'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.play.slot_parent(desc, slot)
 
@@ -6050,15 +6064,15 @@ slot (the head itself) — keyed on the bone, not on a slot named “head”.
 The compile pass hands them to `an.stage.rig.build_rig_subtree` as
 `skip_slots`.
 
-* **Return type:**
-  [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> sorted(suppressed_slots(CharacterDescriptor(name="m", face_overlay=False)))
 ['left_brow', 'left_eye', 'mouth', 'right_brow', 'right_eye']
 >>> suppressed_slots(CharacterDescriptor(name="m"))
 frozenset()
 ```
+
+* **Return type:**
+  [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 
 # _autosummary/cutan.characters.record.html.md
@@ -6162,10 +6176,10 @@ Plain declarations: importing this module registers nothing.
 
 ### Classes
 
-| [`PlayAction`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.PlayAction)(\*\*data)   | Play a named animation of the target entity's descriptor (an#7).   |
-|-------------------------------------------------------------------------|--------------------------------------------------------------------|
+| [`PlayAction`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.PlayAction)(\*[, name, kind, duration, speed, ...])   | Play a named animation of the target entity's descriptor (an#7).   |
+|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
 
-### *class* cutan.characters.registration.PlayAction(\*\*data)
+### *class* cutan.characters.registration.PlayAction(, name=None, kind='play', target, animation, duration=None, speed=1.0, loop=None, args=None, \*\*extra_data)
 
 Bases: `ExtensionAction`
 
@@ -6213,15 +6227,15 @@ The shot that shows one character on its own (an#347’s
 the stage centre. `an library sheet` draws its first frame on a canvas
 sized from the descriptor’s `view_box` and trims it to what it shows.
 
-* **Return type:**
-  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
-
 ```pycon
 >>> from an.ir.schema import AssetRef
 >>> shot = character_specimen(AssetRef(kind="character", id="ned", store="characters", ref="ned"))
 >>> shot.renderer, [e.id for e in shot.entities], shot.actions
 ('cutout', ['ned'], [])
 ```
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
 
 ### cutan.characters.registration.default_play_extent(action)
 
@@ -6231,15 +6245,15 @@ preset’s natural length over `speed`, else `0.0`.
 The one resolver is `cutan.characters.play.play_extent()`; this is it with
 `desc=None`.
 
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
-
 ```pycon
 >>> default_play_extent(PlayAction(target="a", animation="hop"))
 0.5
 >>> default_play_extent(PlayAction(target="a", animation="not_a_preset"))
 0.0
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.characters.registration.play(target, animation, , duration=None, speed=1.0, loop=None, args=None)
 
@@ -6251,9 +6265,6 @@ occupies its **natural** length (a motion preset’s own length divided by
 `speed`; a non-looping descriptor animation’s likewise), so the sibling
 after it starts when it ends; a looping one runs to the shot end and
 occupies **zero**:
-
-* **Return type:**
-  [`PlayAction`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.PlayAction)
 
 ```pycon
 >>> [f.start for f in flatten(sequence(play("a", "idle_breath"), delay(1.0), play("a", "blink")))]
@@ -6279,6 +6290,9 @@ A name the descriptor does not declare falls back to a motion preset of
 {'height': 30}
 ```
 
+* **Return type:**
+  [`PlayAction`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.PlayAction)
+
 ### cutan.characters.registration.play_duration(action, extent)
 
 The span a `play` occupies: its `duration`, else its natural extent.
@@ -6287,15 +6301,15 @@ The span a `play` occupies: its `duration`, else its natural extent.
 one bound to the entity’s descriptor); without one, a motion preset’s own
 length ([`default_play_extent()`](_autosummary/cutan.characters.registration.html.md#cutan.characters.registration.default_play_extent)).
 
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
-
 ```pycon
 >>> play_duration(PlayAction(target="a", animation="hop", duration=2.0), None)
 2.0
 >>> play_duration(PlayAction(target="a", animation="hop"), None)
 0.5
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.characters.registration.read_play_md(item, , index)
 
@@ -6402,13 +6416,13 @@ several slots.
 
 ### Classes
 
-| [`AnimationTrack`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.AnimationTrack)(\*\*data)      | A single channel inside an idle animation.                              |
-|--------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| [`CharacterDescriptor`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.CharacterDescriptor)(\*\*data) | The on-disk character schema.                                           |
-| [`IdleAnimation`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.IdleAnimation)(\*\*data)       | A named idle loop (e.g., breath, blink).                                |
-| [`SlotPose`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.SlotPose)(\*\*data)            | How one slot is posed while a swap key is shown (`swap_poses`, an#197). |
+| [`AnimationTrack`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.AnimationTrack)(\*, target[, type, amplitude, ...])   | A single channel inside an idle animation.                              |
+|-------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`CharacterDescriptor`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.CharacterDescriptor)(\*[, origin, ...])               | The on-disk character schema.                                           |
+| [`IdleAnimation`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.IdleAnimation)(\*, name[, duration, loop, tracks])    | A named idle loop (e.g., breath, blink).                                |
+| [`SlotPose`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.SlotPose)(\*[, x, y, scale_x, scale_y, alpha, ...])   | How one slot is posed while a swap key is shown (`swap_poses`, an#197). |
 
-### *class* cutan.characters.schema.AnimationTrack(\*\*data)
+### *class* cutan.characters.schema.AnimationTrack(\*, target, type='sine', amplitude=0.0, phase=0.0, frames=<factory>, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -6450,7 +6464,7 @@ built parts; the migration protects a 0.3.0 rig that carried one.
 * **Type:**
   0.4.0 (an#339)
 
-### *class* cutan.characters.schema.CharacterDescriptor(\*\*data)
+### *class* cutan.characters.schema.CharacterDescriptor(\*, origin=None, rest_rotation=None, nesting=None, schema_version='0.4.0', kind='CharacterDescriptor', name, display_name=None, view_box=(0, 0, 1024, 1024), voice_ref=None, source_svg=None, bones=<factory>, slots=<factory>, skins=<factory>, asset_sets=<factory>, animations=<factory>, source=None, face_overlay=True, expression_binding=None, gaze_travel=None, colour_roles=<factory>, metadata=<factory>, swap_poses=<factory>, rest_view=None, gait=None, speech=None, occluded=<factory>, \*\*extra_data)
 
 Bases: `RigDocument`
 
@@ -6502,7 +6516,7 @@ Additive: no schema bump, and a descriptor without it reads back as
 untagged. Keys are normalised to lowercase `#rrggbb`; a role must be
 one a pack can set (`an.styles.REACHABLE_ROLES`).
 
-#### expression_binding *: [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### expression_binding *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[list](https://docs.python.org/3/builtins/stdtypes.html#list)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]]]*
 
 How expression axes reach this rig (an#98), as a list of binding dicts —
 `{"axis", "slot", "property", "gain"[, "rig_scaled"]}` for a transform
@@ -6525,7 +6539,7 @@ from; this says what the art IS. The 0.2.0 → 0.3.0 migration derives it
 from the provenance string once, and `art_provenance` reverts to pure
 provenance/licensing metadata.
 
-#### gait *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### gait *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 This character’s default walk `gait` (one of `GAITS`, an#220);
 an author’s `gait` arg overrides it. `None` = the locomotion chain:
@@ -6534,7 +6548,7 @@ figure whose leg slots are hem halves declares `"hem"` once, here,
 rather than on every walk.
 Omitted from the stored document when unset.
 
-#### gaze_travel *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### gaze_travel *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]]*
 
 How far a pupil may travel from its rest, in view-box units per axis
 (an#99): the sclera’s clearance minus the pupil’s radius, written by
@@ -6579,7 +6593,7 @@ by `an character capabilities`. Keys are
 `OCCLUDABLE_FEATURES`. Omitted from the
 stored document when empty.
 
-#### rest_view *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### rest_view *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 The view the DEFAULT art is drawn in (an#220) — a declared fact about
 the art, like `face_overlay`. `None` means [`DFLT_VIEW`](_autosummary/cutan.characters.schema.html.md#cutan.characters.schema.DFLT_VIEW)
@@ -6602,12 +6616,12 @@ Field names match `illustration.ImageResult` exactly, so an adapter is a
 dict copy rather than a rename table — and a rename table is where a field
 quietly stops being carried. Pinned by test.
 
-#### source_svg *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### source_svg *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 Optional source SVG (relative path) that the parts/ folder was
 extracted from. Useful for re-slicing.
 
-#### speech *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### speech *: [Union](https://docs.python.org/3/library/typing.html#typing.Union)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)], [None](https://docs.python.org/3/builtins/constants.html#None)]*
 
 a
 method’s spelling (`mouth_chart`, `pulse`), its id
@@ -6646,7 +6660,7 @@ schema bump, and a descriptor without it reads back unposed.
 * **Type:**
   {key
 
-#### voice_ref *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### voice_ref *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 Voice-store id or path used by the audio pipeline. Optional; the scene
 can override per shot.
@@ -6696,7 +6710,7 @@ the head hangs above the neck, its lower
 * **Type:**
   The head’s anchor on the neck bone
 
-### *class* cutan.characters.schema.IdleAnimation(\*\*data)
+### *class* cutan.characters.schema.IdleAnimation(\*, name, duration=1.0, loop=True, tracks=<factory>, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -6741,7 +6755,7 @@ The transform properties a [`SlotPose`](_autosummary/cutan.characters.schema.htm
 OFFSET added to the rest (in view_box units, so scaled by the rig), an
 ANGLE added to it (radians, never scaled) or a FACTOR on it.
 
-### *class* cutan.characters.schema.SlotPose(\*\*data)
+### *class* cutan.characters.schema.SlotPose(, x=0.0, y=0.0, scale_x=1.0, scale_y=1.0, alpha=1.0, rotation=0.0, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -6812,9 +6826,6 @@ Positions are stored parent-relative, so an absolute joint is converted
 against its parent’s resolved absolute position — and parents are resolved
 first, which is why this walks in declaration order rather than by index.
 
-* **Return type:**
-  list[Bone]
-
 ```pycon
 >>> bones = bones_from_pivots({"neck": (500.0, 300.0), "root": (500.0, 900.0)})
 >>> head = next(b for b in bones if b.name == "head")
@@ -6825,6 +6836,9 @@ first, which is why this walks in declaration order rather than by index.
 >>> round(head.y + torso.y + root.y)          # absolute, back to the neck
 300
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Bone`](_autosummary/cutan.characters.html.md#cutan.characters.Bone)]
 
 ### cutan.characters.schema.default_asset_sets()
 
@@ -6837,13 +6851,13 @@ first, which is why this walks in declaration order rather than by index.
 
 The name of `set_name`’s variant for `view` (an#220).
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> view_variant_set("eyelid", "side")
 'eyelid@side'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.schema.view_variant_sets(desc, , view_set='view')
 
@@ -6853,9 +6867,6 @@ is a declared set and `<view>` a key of its `view` set (or its
 `rest_view`). `viseme@happy` is NOT one — `happy` is not a view —
 so the expression variants (an#98) and the view variants never collide.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
-
 ```pycon
 >>> d = CharacterDescriptor(name="v")
 >>> d.asset_sets["view"] = {"front": "front", "side": "side"}
@@ -6864,6 +6875,9 @@ so the expression variants (an#98) and the view variants never collide.
 >>> view_variant_sets(d)
 {'eyelid': {'side': 'eyelid@side'}}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
 
 
 # _autosummary/cutan.characters.silhouette.html.md
@@ -6918,13 +6932,13 @@ Both images are resized to `size`, converted to grayscale, thresholded
 at the midpoint, and the intersection-over-union of the foreground (dark)
 pixels is computed.
 
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
-
 ```pycon
 >>> # Two identical silhouettes → IoU = 1.0; two empty → 0.0 (no overlap).
 >>> # Tested via test suite, not doctest, since it requires Playwright.
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.characters.silhouette.render_character_silhouettes(char_dirs, out_dir, , size=512)
 
@@ -7196,9 +7210,6 @@ unparseable descriptor, absent required parts or mouth shapes, a part that
 draws nothing, a prohibited construct, a letterboxed part, a joint name
 colliding with a part id, and an unpopulated `AssetSource`.
 
-* **Return type:**
-  `VerificationReport`
-
 ```pycon
 >>> import tempfile, pathlib
 >>> with tempfile.TemporaryDirectory() as d:
@@ -7208,6 +7219,9 @@ False
 >>> any("character.json" in f.description for f in report.findings)
 True
 ```
+
+* **Return type:**
+  `VerificationReport`
 
 
 # _autosummary/cutan.characters.vocabulary.html.md
@@ -7238,7 +7252,7 @@ registers nothing.
 | [`EXPRESSION_PRESET_VERSIONS`](_autosummary/cutan.characters.vocabulary.html.md#cutan.characters.vocabulary.EXPRESSION_PRESET_VERSIONS) | Each expression preset's vocabulary version (ADR 0003).                                                                                                                             |
 | [`CUTOUT_VOCABULARY`](_autosummary/cutan.characters.vocabulary.html.md#cutan.characters.vocabulary.CUTOUT_VOCABULARY)          | Everything this genre contributes to the vocabulary except its methods ([`cutan.characters.methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)). |
 
-### cutan.characters.vocabulary.CUTOUT_VOCABULARY *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Entry, ...]* *= (Entry(id='field.shot.actions.swap_set', kind='field', version='1', name='shot.actions.swap_set', title='', description='a set action that swaps a drawing (replacement animation)', usage="A set/tween property may also be the name of a swap set the target character's descriptor declares in asset_sets (e.g. 'viseme', 'eyelid', 'hands'), used with a 'set' action whose 'value' is one of that set's declared KEYS (replacement animation). The compiler refuses any other name with the declared sets listed. Never invent a set or a key.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='field.shot.actions.play', kind='field', version='1', name='shot.actions.play', title='', description='play a named animation of the target character, or a motion preset', usage="A 'play' action ({kind: play, target: <entity>, animation: <name>, [duration], [speed], [loop], [args]}) plays one of the target character's descriptor animations ('idle_breath', 'blink', or any it declares) or, for a name the descriptor does not declare, a motion preset (listed below) with 'args' as its parameters (e.g. {'height': 30}); a name in neither fails validation — never invent one. 'point' targets the arm node. A 'walk' picks its gait from the character's structure (its locomotion method, below) unless 'gait' is given.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('locomotion',)), Entry(id='field.shot.actions.expression', kind='field', version='1', name='shot.actions.expression', title='', description='hold a facial expression on a character', usage="An 'expression' action ({kind: expression, target: <entity>, preset: <name>, [axes: {axis: value}], [intensity], [duration], [blend]}) holds a facial expression on a character: brows, eyelids, and the mouth's set for any dialogue under it. 'preset' is an expression preset (listed below) — an unknown preset fails validation. Axes are offsets within their ranges: brow_height_l [-1, 1], brow_height_r [-1, 1], brow_angle_l [-1, 1], brow_angle_r [-1, 1], lid_open_l [-1, 0.5], lid_open_r [-1, 0.5], gaze_x [-1, 1], gaze_y [-1, 1]. 'duration' omitted = to the shot end. A character whose descriptor says face_overlay: false cannot take one.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='field.shot.dialogue.emotion', kind='field', version='1', name='shot.dialogue.emotion', title='', description='the mood a line is said in', usage="A dialogue line's 'emotion' is an expression preset name ([happy] on a scene.md line): it sets the face for the line and the voice's mood. When a line's wording changes, update its emotion if the mood changed too.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('speech',)), Entry(id='motion.pop_in', kind='motion_preset', version='1', name='pop_in', title='pop in', description='Grow from nothing to full size, overshooting and settling (an entrance).', usage='', params={'type': 'object', 'properties': {'duration': {'type': 'number', 'default': 0.45}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'pop_in'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.hop', kind='motion_preset', version='1', name='hop', title='hop', description='Jump up by \`height\` scene pixels and land back where it started.', usage='', params={'type': 'object', 'properties': {'height': {'type': 'number', 'default': 40.0}, 'duration': {'type': 'number', 'default': 0.5}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'hop'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.shake', kind='motion_preset', version='1', name='shake', title='shake', description='Tremble side to side \`cycles\` times and come back to rest (on \`x\`).', usage='', params={'type': 'object', 'properties': {'amplitude': {'type': 'number', 'default': 8.0}, 'duration': {'type': 'number', 'default': 0.4}, 'cycles': {'type': 'integer', 'default': 3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'shake'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.slide_in', kind='motion_preset', version='1', name='slide_in', title='slide in', description='Whip in from \`distance\` pixels off to one side, overshoot, and settle.', usage='', params={'type': 'object', 'properties': {'from_side': {'type': 'string', 'default': 'left'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_in'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.slide_out', kind='motion_preset', version='1', name='slide_out', title='slide out', description='Exit \`distance\` pixels off to one side, accelerating (an exit).', usage='', params={'type': 'object', 'properties': {'to_side': {'type': 'string', 'default': 'right'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'type': 'string', 'default': 'ease_in'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_out'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.squash_stretch', kind='motion_preset', version='1', name='squash_stretch', title='squash stretch', description='Squash (wide and short), stretch (narrow and tall), then settle.', usage='', params={'type': 'object', 'properties': {'amount': {'type': 'number', 'default': 0.2}, 'duration': {'type': 'number', 'default': 0.36}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'squash_stretch'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.crawl', kind='motion_preset', version='1', name='crawl', title='crawl', description='An opening crawl: lay \`target\` on a plane tilted away, and slide it up and away.', usage='', params={'type': 'object', 'properties': {'distance': {'type': 'number', 'default': 2400.0}, 'duration': {'type': 'number', 'default': 30.0}, 'start': {'type': 'number', 'default': None}, 'tilt': {'type': 'number', 'default': 0.96}, 'perspective': {'type': 'number', 'default': 1.0}, 'fade': {'type': 'array', 'default': [700.0, 1500.0]}, 'y': {'type': 'number', 'default': None}, 'easing': {'type': 'string', 'default': 'linear'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'crawl'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.nod', kind='motion_preset', version='1', name='nod', title='nod', description='Dip the head \`count\` times (a rotation of \`<target>/<part>\`).', usage='', params={'type': 'object', 'properties': {'part': {'type': 'string', 'default': 'head'}, 'angle': {'type': 'number', 'default': 0.18}, 'duration': {'type': 'number', 'default': 0.5}, 'count': {'type': 'integer', 'default': 2}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'nod'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.point', kind='motion_preset', version='1', name='point', title='point', description='Swing an arm out to point, hold it, and lower it again.', usage='', params={'type': 'object', 'properties': {'angle': {'type': 'number', 'default': -1.3}, 'raise_duration': {'type': 'number', 'default': 0.25}, 'hold': {'type': 'number', 'default': 0.6}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'point'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.waddle', kind='motion_preset', version='1', name='waddle', title='waddle', description='A walk cycle for a rig with no legs to animate: rock and bob per step.', usage='', params={'type': 'object', 'properties': {'steps': {'type': 'integer', 'default': 4}, 'step_duration': {'type': 'number', 'default': 0.3}, 'angle': {'type': 'number', 'default': 0.1}, 'lift': {'type': 'number', 'default': 6.0}, 'travel': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'waddle'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.turn', kind='motion_preset', version='2', name='turn', title='turn', description='Turn a character to the view \`to\` — the classic cut-out turn.', usage='', params={'type': 'object', 'properties': {'to': {'type': 'string', 'default': 'back'}, 'direction': {'type': 'string', 'default': 'right'}, 'from_direction': {'type': 'string', 'default': None}, 'duration': {'type': 'number', 'default': 0.3}, 'view_set': {'type': 'string', 'default': 'view'}, 'step_hz': {'type': 'number', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'turn'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.walk', kind='motion_preset', version='4', name='walk', title='walk', description='Walk: the body travels on \`x\` while the gait moves it — legs that alternate, a hop, a bounce, a glide (an#214, an#224).', usage='', params={'type': 'object', 'properties': {'to_x': {'type': 'number', 'default': None}, 'distance': {'type': 'number', 'default': None}, 'direction': {'type': 'string', 'default': None}, 'steps': {'type': 'integer', 'default': None}, 'step_s': {'default': None}, 'step_length': {'type': 'number', 'default': None}, 'stride': {'type': 'number', 'default': None}, 'lift': {'type': 'number', 'default': None}, 'bob': {'type': 'number', 'default': None}, 'arm_swing': {'type': 'number', 'default': None}, 'rock': {'type': 'number', 'default': None}, 'hem_tilt': {'type': 'number', 'default': None}, 'hop_height': {'type': 'number', 'default': None}, 'lean': {'type': 'number', 'default': None}, 'view': {'type': 'string', 'default': None}, 'gait': {'type': 'string', 'default': None}, 'legs': {'type': 'array', 'default': None}, 'arms': {'type': 'array', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('locomotion',)), Entry(id='motion.speech_pulse', kind='motion_preset', version='1', name='speech_pulse', title='speech pulse', description='Pulse a part on each syllable: speech carried without a mouth.', usage='', params={'type': 'object', 'properties': {'beats': {'type': 'array', 'default': [0.0]}, 'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'speech_pulse'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('speech',)), Entry(id='expression.neutral', kind='expression_preset', version='1', name='neutral', title='', description='the rest face: every axis at its neutral value', usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'neutral'}, '[neutral] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.happy', kind='expression_preset', version='1', name='happy', title='', description="expression-sheet preset: brow_angle_l +0.1, brow_angle_r +0.1, brow_height_l +0.2, brow_height_r +0.2, lid_open_l -0.2, lid_open_r -0.2; mouth form 'happy'", usage='FACS cross-reference 6+12', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'happy'}, '[happy] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.sad', kind='expression_preset', version='1', name='sad', title='', description="expression-sheet preset: brow_angle_l +0.6, brow_angle_r +0.6, brow_height_l +0.3, brow_height_r +0.3, lid_open_l -0.3, lid_open_r -0.3; mouth form 'sad'", usage='FACS cross-reference 1+4+15', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'sad'}, '[sad] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.angry', kind='expression_preset', version='2', name='angry', title='', description="expression-sheet preset: brow_angle_l -0.8, brow_angle_r -0.8, brow_height_l -0.6, brow_height_r -0.6, lid_open_l -0.45, lid_open_r -0.45; mouth form 'angry'", usage='FACS cross-reference 4+5+7+23', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'angry'}, '[angry] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.surprised', kind='expression_preset', version='1', name='surprised', title='', description="expression-sheet preset: brow_angle_l +0, brow_angle_r +0, brow_height_l +1, brow_height_r +1, lid_open_l +0.4, lid_open_r +0.4; mouth form 'surprised'", usage='FACS cross-reference 1+2+5+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'}, '[surprised] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.afraid', kind='expression_preset', version='1', name='afraid', title='', description="expression-sheet preset: brow_angle_l +0.5, brow_angle_r +0.5, brow_height_l +0.7, brow_height_r +0.7, lid_open_l +0.5, lid_open_r +0.5; mouth form 'afraid'", usage='FACS cross-reference 1+2+4+5+7+20+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'afraid'}, '[afraid] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.disgusted', kind='expression_preset', version='1', name='disgusted', title='', description="expression-sheet preset: brow_angle_l -0.3, brow_angle_r -0.3, brow_height_l -0.3, brow_height_r -0.3, lid_open_l -0.4, lid_open_r -0.4; mouth form 'disgusted'", usage='FACS cross-reference 9+15+17', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'disgusted'}, '[disgusted] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.thinking', kind='expression_preset', version='1', name='thinking', title='', description='expression-sheet preset: brow_angle_l +0.3, brow_angle_r -0.1, brow_height_l +0.5, brow_height_r -0.2, lid_open_l -0.1, lid_open_r -0.1', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'thinking'}, '[thinking] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.skeptical', kind='expression_preset', version='1', name='skeptical', title='', description='expression-sheet preset: brow_angle_l +0, brow_angle_r -0.2, brow_height_l +0.6, brow_height_r -0.3, lid_open_l +0, lid_open_r -0.2', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'skeptical'}, '[skeptical] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.amused', kind='expression_preset', version='1', name='amused', title='', description="expression-sheet preset: brow_angle_l +0.05, brow_angle_r +0.05, brow_height_l +0.1, brow_height_r +0.1, lid_open_l -0.1, lid_open_r -0.1; mouth form 'happy'", usage='FACS cross-reference happy at ~0.6', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'amused'}, '[amused] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()))*
+### cutan.characters.vocabulary.CUTOUT_VOCABULARY *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Entry, ...]* *= (Entry(id='field.shot.actions.swap_set', kind='field', version='1', name='shot.actions.swap_set', title='', description='a set action that swaps a drawing (replacement animation)', usage="A set/tween property may also be the name of a swap set the target character's descriptor declares in asset_sets (e.g. 'viseme', 'eyelid', 'hands'), used with a 'set' action whose 'value' is one of that set's declared KEYS (replacement animation). The compiler refuses any other name with the declared sets listed. Never invent a set or a key.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='field.shot.actions.play', kind='field', version='1', name='shot.actions.play', title='', description='play a named animation of the target character, or a motion preset', usage="A 'play' action ({kind: play, target: <entity>, animation: <name>, [duration], [speed], [loop], [args]}) plays one of the target character's descriptor animations ('idle_breath', 'blink', or any it declares) or, for a name the descriptor does not declare, a motion preset (listed below) with 'args' as its parameters (e.g. {'height': 30}); a name in neither fails validation — never invent one. 'point' targets the arm node. A 'walk' picks its gait from the character's structure (its locomotion method, below) unless 'gait' is given.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('locomotion',)), Entry(id='field.shot.actions.expression', kind='field', version='1', name='shot.actions.expression', title='', description='hold a facial expression on a character', usage="An 'expression' action ({kind: expression, target: <entity>, preset: <name>, [axes: {axis: value}], [intensity], [duration], [blend]}) holds a facial expression on a character: brows, eyelids, and the mouth's set for any dialogue under it. 'preset' is an expression preset (listed below) — an unknown preset fails validation. Axes are offsets within their ranges: brow_height_l [-1, 1], brow_height_r [-1, 1], brow_angle_l [-1, 1], brow_angle_r [-1, 1], lid_open_l [-1, 0.5], lid_open_r [-1, 0.5], gaze_x [-1, 1], gaze_y [-1, 1]. 'duration' omitted = to the shot end. A character whose descriptor says face_overlay: false cannot take one.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='field.shot.dialogue.emotion', kind='field', version='1', name='shot.dialogue.emotion', title='', description='the mood a line is said in', usage="A dialogue line's 'emotion' is an expression preset name ([happy] on a scene.md line): it sets the face for the line and the voice's mood. When a line's wording changes, update its emotion if the mood changed too.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('speech',)), Entry(id='motion.pop_in', kind='motion_preset', version='1', name='pop_in', title='pop in', description='Grow from nothing to full size, overshooting and settling (an entrance).', usage='', params={'type': 'object', 'properties': {'duration': {'type': 'number', 'default': 0.45}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'pop_in'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.hop', kind='motion_preset', version='1', name='hop', title='hop', description='Jump up by \`height\` scene pixels and land back where it started.', usage='', params={'type': 'object', 'properties': {'height': {'type': 'number', 'default': 40.0}, 'duration': {'type': 'number', 'default': 0.5}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'hop'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.shake', kind='motion_preset', version='1', name='shake', title='shake', description='Tremble side to side \`cycles\` times and come back to rest (on \`x\`).', usage='', params={'type': 'object', 'properties': {'amplitude': {'type': 'number', 'default': 8.0}, 'duration': {'type': 'number', 'default': 0.4}, 'cycles': {'type': 'integer', 'default': 3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'shake'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.slide_in', kind='motion_preset', version='1', name='slide_in', title='slide in', description='Whip in from \`distance\` pixels off to one side, overshoot, and settle.', usage='', params={'type': 'object', 'properties': {'from_side': {'type': 'string', 'default': 'left'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_in'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.slide_out', kind='motion_preset', version='1', name='slide_out', title='slide out', description='Exit \`distance\` pixels off to one side, accelerating (an exit).', usage='', params={'type': 'object', 'properties': {'to_side': {'type': 'string', 'default': 'right'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'type': 'string', 'default': 'ease_in'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_out'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.squash_stretch', kind='motion_preset', version='1', name='squash_stretch', title='squash stretch', description='Squash (wide and short), stretch (narrow and tall), then settle.', usage='', params={'type': 'object', 'properties': {'amount': {'type': 'number', 'default': 0.2}, 'duration': {'type': 'number', 'default': 0.36}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'squash_stretch'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.crawl', kind='motion_preset', version='1', name='crawl', title='crawl', description='An opening crawl: lay \`target\` on a plane tilted away, and slide it up and away.', usage='', params={'type': 'object', 'properties': {'distance': {'type': 'number', 'default': 2400.0}, 'duration': {'type': 'number', 'default': 30.0}, 'start': {'type': 'number', 'default': None}, 'tilt': {'type': 'number', 'default': 0.96}, 'perspective': {'type': 'number', 'default': 1.0}, 'fade': {'type': 'array', 'default': [700.0, 1500.0]}, 'y': {'type': 'number', 'default': None}, 'easing': {'type': 'string', 'default': 'linear'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'crawl'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.nod', kind='motion_preset', version='1', name='nod', title='nod', description='Dip the head \`count\` times (a rotation of \`<target>/<part>\`).', usage='', params={'type': 'object', 'properties': {'part': {'type': 'string', 'default': 'head'}, 'angle': {'type': 'number', 'default': 0.18}, 'duration': {'type': 'number', 'default': 0.5}, 'count': {'type': 'integer', 'default': 2}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'nod'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.point', kind='motion_preset', version='1', name='point', title='point', description='Swing an arm out to point, hold it, and lower it again.', usage='', params={'type': 'object', 'properties': {'angle': {'type': 'number', 'default': -1.3}, 'raise_duration': {'type': 'number', 'default': 0.25}, 'hold': {'type': 'number', 'default': 0.6}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'point'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.waddle', kind='motion_preset', version='1', name='waddle', title='waddle', description='A walk cycle for a rig with no legs to animate: rock and bob per step.', usage='', params={'type': 'object', 'properties': {'steps': {'type': 'integer', 'default': 4}, 'step_duration': {'type': 'number', 'default': 0.3}, 'angle': {'type': 'number', 'default': 0.1}, 'lift': {'type': 'number', 'default': 6.0}, 'travel': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'waddle'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.turn', kind='motion_preset', version='2', name='turn', title='turn', description='Turn a character to the view \`to\` — the classic cut-out turn.', usage='', params={'type': 'object', 'properties': {'to': {'type': 'string', 'default': 'back'}, 'direction': {'type': 'string', 'default': 'right'}, 'from_direction': {'type': 'string', 'default': None}, 'duration': {'type': 'number', 'default': 0.3}, 'view_set': {'type': 'string', 'default': 'view'}, 'step_hz': {'type': 'number', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'turn'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.walk', kind='motion_preset', version='4', name='walk', title='walk', description='Walk: the body travels on \`x\` while the gait moves it — legs that alternate, a hop, a bounce, a glide (an#214, an#224).', usage='', params={'type': 'object', 'properties': {'to_x': {'type': 'number', 'default': None}, 'distance': {'type': 'number', 'default': None}, 'direction': {'type': 'string', 'default': None}, 'steps': {'type': 'integer', 'default': None}, 'step_s': {'default': None}, 'step_length': {'type': 'number', 'default': None}, 'stride': {'type': 'number', 'default': None}, 'lift': {'type': 'number', 'default': None}, 'bob': {'type': 'number', 'default': None}, 'arm_swing': {'type': 'number', 'default': None}, 'rock': {'type': 'number', 'default': None}, 'hem_tilt': {'type': 'number', 'default': None}, 'hop_height': {'type': 'number', 'default': None}, 'lean': {'type': 'number', 'default': None}, 'view': {'type': 'string', 'default': None}, 'gait': {'type': 'string', 'default': None}, 'legs': {'type': 'array', 'default': None}, 'arms': {'type': 'array', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('locomotion',)), Entry(id='motion.speech_pulse', kind='motion_preset', version='1', name='speech_pulse', title='speech pulse', description='Pulse a part on each syllable: speech carried without a mouth.', usage='', params={'type': 'object', 'properties': {'beats': {'type': 'array', 'default': [0.0]}, 'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'speech_pulse'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('speech',)), Entry(id='expression.neutral', kind='expression_preset', version='1', name='neutral', title='', description='the rest face: every axis at its neutral value', usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'neutral'}, '[neutral] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.happy', kind='expression_preset', version='1', name='happy', title='', description="expression-sheet preset: brow_angle_l +0.1, brow_angle_r +0.1, brow_height_l +0.2, brow_height_r +0.2, lid_open_l -0.2, lid_open_r -0.2; mouth form 'happy'", usage='FACS cross-reference 6+12', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'happy'}, '[happy] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.sad', kind='expression_preset', version='1', name='sad', title='', description="expression-sheet preset: brow_angle_l +0.6, brow_angle_r +0.6, brow_height_l +0.3, brow_height_r +0.3, lid_open_l -0.3, lid_open_r -0.3; mouth form 'sad'", usage='FACS cross-reference 1+4+15', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'sad'}, '[sad] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.angry', kind='expression_preset', version='2', name='angry', title='', description="expression-sheet preset: brow_angle_l -0.8, brow_angle_r -0.8, brow_height_l -0.6, brow_height_r -0.6, lid_open_l -0.45, lid_open_r -0.45; mouth form 'angry'", usage='FACS cross-reference 4+5+7+23', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'angry'}, '[angry] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.surprised', kind='expression_preset', version='1', name='surprised', title='', description="expression-sheet preset: brow_angle_l +0, brow_angle_r +0, brow_height_l +1, brow_height_r +1, lid_open_l +0.4, lid_open_r +0.4; mouth form 'surprised'", usage='FACS cross-reference 1+2+5+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'}, '[surprised] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.afraid', kind='expression_preset', version='1', name='afraid', title='', description="expression-sheet preset: brow_angle_l +0.5, brow_angle_r +0.5, brow_height_l +0.7, brow_height_r +0.7, lid_open_l +0.5, lid_open_r +0.5; mouth form 'afraid'", usage='FACS cross-reference 1+2+4+5+7+20+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'afraid'}, '[afraid] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.disgusted', kind='expression_preset', version='1', name='disgusted', title='', description="expression-sheet preset: brow_angle_l -0.3, brow_angle_r -0.3, brow_height_l -0.3, brow_height_r -0.3, lid_open_l -0.4, lid_open_r -0.4; mouth form 'disgusted'", usage='FACS cross-reference 9+15+17', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'disgusted'}, '[disgusted] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.thinking', kind='expression_preset', version='1', name='thinking', title='', description='expression-sheet preset: brow_angle_l +0.3, brow_angle_r -0.1, brow_height_l +0.5, brow_height_r -0.2, lid_open_l -0.1, lid_open_r -0.1', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'thinking'}, '[thinking] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.skeptical', kind='expression_preset', version='1', name='skeptical', title='', description='expression-sheet preset: brow_angle_l +0, brow_angle_r -0.2, brow_height_l +0.6, brow_height_r -0.3, lid_open_l +0, lid_open_r -0.2', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'skeptical'}, '[skeptical] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.amused', kind='expression_preset', version='1', name='amused', title='', description="expression-sheet preset: brow_angle_l +0.05, brow_angle_r +0.05, brow_height_l +0.1, brow_height_r +0.1, lid_open_l -0.1, lid_open_r -0.1; mouth form 'happy'", usage='FACS cross-reference happy at ~0.6', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'amused'}, '[amused] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()))*
 
 Everything this genre contributes to the vocabulary except its methods
 ([`cutan.characters.methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)).
@@ -7391,9 +7405,6 @@ in another convention closes with its own).
 
 The evidence, “Bye.” timed 0.0–0.5 s in a 1.84 s clip:
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
-
 ```pycon
 >>> raw = [(0, "X"), (0, "A"), (0.167, "B"), (0.333, "C"), (1.838, "X")]
 >>> [(c.time, c.code) for c in close_after_speech(raw, speech_end=0.5)]
@@ -7410,15 +7421,15 @@ A 25 ms last word whose second shape starts after it ends:
 [(1.025, 'B'), (1.025000001, 'X'), (2.0, 'X')]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
+
 ### cutan.compile.coarticulate.coarticulate(keys, , fps, end=None, min_hold_s=0.14, lead_s=0.08333333333333333, decay_s=0.12, rest='X', speech_end=None)
 
 All the passes, in the order the module docstring gives.
 
 `speech_end` (where the last word ends, when the line knows its words)
 closes the mouth there instead of at `end` (an#213):
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
 
 ```pycon
 >>> bye = [(0, "X"), (0, "A"), (0.167, "B"), (0.333, "C"), (1.838, "X")]
@@ -7457,6 +7468,9 @@ Traceback (most recent call last):
 ValueError: min_hold_s must be > 0, got 0
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
+
 ### cutan.compile.coarticulate.condense(keys, , min_hold_s, end=None)
 
 Enforce a minimum hold by voting, never by dropping.
@@ -7473,9 +7487,6 @@ the hold doing its job. Ties go to the later arrival.
 The defect the epic names, verbatim semantics of the old compiler loop —
 ‘A’ (the closure) and ‘D’ (the open vowel) are gone and a 40 ms ‘B’ holds
 for 500 ms:
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
 
 ```pycon
 >>> raw = [(0.0, "X"), (0.30, "B"), (0.34, "A"), (0.38, "D"), (0.80, "X")]
@@ -7529,14 +7540,14 @@ A winner equal to the shape already showing is merged:
 [(0.0, 'X')]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
+
 ### cutan.compile.coarticulate.decay(keys, , decay_s, rest='X', end=None)
 
 Give a shape `decay_s` to close: a rest arriving sooner than that after
 the shape before it is pushed out to `decay_s`, never past the next cue
 and never past `end` (a rest pushed to `end` is where the line closes).
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
 
 ```pycon
 >>> [(round(c.time, 3), c.code) for c in decay([(0.0, "X"), (0.2, "D"), (0.25, "X"), (0.6, "B")], decay_s=0.12)]
@@ -7544,6 +7555,9 @@ and never past `end` (a rest pushed to `end` is where the line closes).
 >>> [(round(c.time, 3), c.code) for c in decay([(0.0, "X"), (0.2, "D"), (0.25, "X"), (0.30, "B")], decay_s=0.12)]
 [(0.0, 'X'), (0.2, 'D'), (0.3, 'B')]
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
 
 ### cutan.compile.coarticulate.lead(keys, , lead_s)
 
@@ -7555,32 +7569,29 @@ lead (`[(0, X), (0.02, A), (0.05, D), (0.07, X)]`) therefore never opens
 the mouth; the hold would have refused a 70 ms word anyway, and the old
 condenser did.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
-
 ```pycon
 >>> [(round(c.time, 3), c.code) for c in lead([(0.0, "X"), (0.05, "D"), (0.5, "B")], lead_s=0.08)]
 [(0.0, 'D'), (0.42, 'B')]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
+
 ### cutan.compile.coarticulate.merge_duplicates(keys)
 
 Drop a cue whose shape is the one already showing.
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
 
 ```pycon
 >>> [(c.time, c.code) for c in merge_duplicates([(0, "X"), (0.1, "B"), (0.2, "B"), (0.3, "C")])]
 [(0.0, 'X'), (0.1, 'B'), (0.3, 'C')]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
+
 ### cutan.compile.coarticulate.suppress_weak(keys, , max_weak_s, end=None)
 
 Drop a weak (low-dominance) cue that would show for less than `max_weak_s`.
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
 
 ```pycon
 >>> raw = [(0.0, "X"), (0.20, "D"), (0.40, "B"), (0.43, "D"), (0.80, "X")]
@@ -7594,6 +7605,9 @@ A weak cue that lasts is kept — this is not the minimum-hold pass:
 >>> [(c.time, c.code) for c in suppress_weak([(0.0, "X"), (0.2, "B"), (0.5, "D")], max_weak_s=0.04)]
 [(0.0, 'X'), (0.2, 'B'), (0.5, 'D')]
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](_autosummary/cutan.compile.coarticulate.html.md#cutan.compile.coarticulate.Cue)]
 
 
 # _autosummary/cutan.compile.gaze.html.md
@@ -7664,13 +7678,13 @@ The pupils rest at `(x, y)` (axis units) from `time` on.
 
 The generator’s seed for an entity — a pure function of its name.
 
-* **Return type:**
-  [`int`](https://docs.python.org/3/builtins/functions.html#int)
-
 ```pycon
 >>> gaze_seed("gale") == gaze_seed("gale") and gaze_seed("gale") != gaze_seed("nora")
 True
 ```
+
+* **Return type:**
+  [`int`](https://docs.python.org/3/builtins/functions.html#int)
 
 ### cutan.compile.gaze.saccade_track(entity_id, , duration, fps, blink_windows=None, amplitude=1.0)
 
@@ -7896,13 +7910,13 @@ The pupil nodes of the gaze stack (an#99); a rig without them takes gaze as a no
 
 The entity’s blink phase in [0, 1): the runtime’s rule, ported exactly.
 
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
-
 ```pycon
 >>> blink_phase("charlie")
 0.762
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.compile.passes.preset_context_of(vocab, , policy=None)
 
@@ -8011,9 +8025,6 @@ which `viseme@<form>` set the mouth’s key indexes.
 
 Clamp every numeric axis to its range; an unknown axis is an error.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> clamp_axes({"brow_height_l": 2.0, "lid_open_r": -3.0})
 {'brow_height_l': 1.0, 'lid_open_r': -1.0}
@@ -8022,6 +8033,9 @@ Traceback (most recent call last):
 ...
 ValueError: unknown expression axis 'eyebrow' (known: brow_angle_l, ...)
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 ### cutan.expression.axes.lid_key(value, , available)
 
@@ -8158,19 +8172,19 @@ A declared binding is a list of dicts in the two dataclasses’ shapes
 `{"axis", "slot", "set_family"}`). An unknown axis in it is an error.
 
 * **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Union`[[`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
 
 ### cutan.expression.binding.declared_mouth_variants(desc)
 
 `{form: set name}` for every `viseme@<form>` set the descriptor declares.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> declared_mouth_variants(CharacterDescriptor(name="m"))
 {}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.expression.binding.default_binding(desc)
 
@@ -8182,7 +8196,7 @@ end while on the RIGHT brow it lifts it — the axis says “+ = inner end
 up”, hence `-travel` on the left and `+travel` on the right.
 
 * **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Union`[[`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
 
 ### cutan.expression.binding.expression_problems(desc, , preset, axes=(), who)
 
@@ -8191,15 +8205,15 @@ Every reason an expression cannot resolve on `desc` — empty means it can.
 Shared by `an validate` (each becomes an error Finding) and the compiler
 (which raises [`ExpressionResolutionError`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ExpressionResolutionError) with the same list).
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> expression_problems(CharacterDescriptor(name="m"), preset="joyful", who="m")
 ["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]
 >>> expression_problems(CharacterDescriptor(name="m", face_overlay=False), preset="happy", who="m")[0].startswith("'m' has its face baked")
 True
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.expression.binding.lid_rung_problems(desc, preset, , axes=None, intensity=1.0, who=None)
 
@@ -8211,9 +8225,6 @@ expression at all. One sentence per lid axis that falls short; empty for a
 preset with no lid, a rig whose lids squash (no closed art: continuous), or
 a baked face.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> d = CharacterDescriptor(name="bob", asset_sets={"eyelid": {"OPEN": "o", "CLOSED": "c"}})
 >>> lid_rung_problems(d, None, axes={"lid_open_l": -0.45})
@@ -8221,6 +8232,9 @@ a baked face.
 >>> lid_rung_problems(d, None, axes={"lid_open_l": -0.9})
 []
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.expression.binding.missing_mouth_form(desc, preset, , who=None)
 
@@ -8233,9 +8247,6 @@ change (a baked face, a rig with no `viseme` set).
 One sentence for `an validate` (an `expression` and a dialogue
 `[emotion]`) and the compiler’s silent-mouth hold.
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
-
 ```pycon
 >>> d = CharacterDescriptor(name="ned", asset_sets={"viseme": {"X": "mouth_x"}})
 >>> missing_mouth_form(d, "angry")
@@ -8243,6 +8254,9 @@ One sentence for `an validate` (an `expression` and a dialogue
 >>> missing_mouth_form(d, "thinking") is None
 True
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.expression.binding.preset_axes(preset, , axes=None, intensity=1.0)
 
@@ -8273,25 +8287,25 @@ error, not a fallback.
 
 Whether any of `axes` is a gaze axis (a no-op on a rig without pupils).
 
-* **Return type:**
-  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
-
 ```pycon
 >>> touches_gaze(["gaze_x"]), touches_gaze(["brow_angle_l"])
 (True, False)
 ```
 
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
 ### cutan.expression.binding.variant_set_name(form)
 
 The swap-set name for a mouth form (`@` is a legal set-name character).
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ```pycon
 >>> variant_set_name("happy")
 'viseme@happy'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 
 # _autosummary/cutan.expression.blendshapes.html.md
@@ -8436,7 +8450,7 @@ Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueEr
 
 An expression that cannot resolve on a character; `problems` says why.
 
-### *class* cutan.expression.ExpressionSpan(start, end, preset, axes=<factory>, intensity=1.0, blend=0.0, source='action')
+### *class* cutan.expression.ExpressionSpan(start, end, preset, axes=dict(), intensity=1.0, blend=0.0, source='action')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -8460,7 +8474,7 @@ The ramped intensity at `t`: 0 outside, ramping over `blend` at each end.
 * **Return type:**
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
-### *class* cutan.expression.Preset(name, axes=<factory>, mouth_form=None, anchor='')
+### *class* cutan.expression.Preset(name, axes=dict(), mouth_form=None, anchor='')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -8489,14 +8503,11 @@ A declared binding is a list of dicts in the two dataclasses’ shapes
 `{"axis", "slot", "set_family"}`). An unknown axis in it is an error.
 
 * **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Union`[[`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
 
 ### cutan.expression.clamp_axes(values)
 
 Clamp every numeric axis to its range; an unknown axis is an error.
-
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 ```pycon
 >>> clamp_axes({"brow_height_l": 2.0, "lid_open_r": -3.0})
@@ -8507,17 +8518,20 @@ Traceback (most recent call last):
 ValueError: unknown expression axis 'eyebrow' (known: brow_angle_l, ...)
 ```
 
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
 ### cutan.expression.declared_mouth_variants(desc)
 
 `{form: set name}` for every `viseme@<form>` set the descriptor declares.
-
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ```pycon
 >>> declared_mouth_variants(CharacterDescriptor(name="m"))
 {}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.expression.default_binding(desc)
 
@@ -8529,7 +8543,7 @@ end while on the RIGHT brow it lifts it — the axis says “+ = inner end
 up”, hence `-travel` on the left and `+travel` on the right.
 
 * **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Union`[[`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`ChannelBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.ChannelBinding), [`SetBinding`](_autosummary/cutan.expression.binding.html.md#cutan.expression.binding.SetBinding)]]
 
 ### cutan.expression.expression_problems(desc, , preset, axes=(), who)
 
@@ -8538,15 +8552,15 @@ Every reason an expression cannot resolve on `desc` — empty means it can.
 Shared by `an validate` (each becomes an error Finding) and the compiler
 (which raises [`ExpressionResolutionError`](_autosummary/cutan.expression.html.md#cutan.expression.ExpressionResolutionError) with the same list).
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> expression_problems(CharacterDescriptor(name="m"), preset="joyful", who="m")
 ["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]
 >>> expression_problems(CharacterDescriptor(name="m", face_overlay=False), preset="happy", who="m")[0].startswith("'m' has its face baked")
 True
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.expression.expression_spans(shot, entity_id)
 
@@ -8570,13 +8584,13 @@ Unknown names raise — a misspelt coefficient must not vanish quietly.
 
 The preset names, in declaration order.
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
-
 ```pycon
 >>> known_presets()[:3]
 ('neutral', 'happy', 'sad')
 ```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
 
 ### cutan.expression.lid_key(value, , available)
 
@@ -8593,13 +8607,13 @@ a rig without `half` stays open until the lower threshold and one without
 
 The `viseme@<form>` a preset prefers, or `None` for the neutral set.
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
-
 ```pycon
 >>> mouth_form_of("amused"), mouth_form_of("thinking"), mouth_form_of(None)
 ('happy', None, None)
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.expression.preset_axes(preset, , axes=None, intensity=1.0)
 
@@ -8630,13 +8644,13 @@ error, not a fallback.
 
 The swap-set name for a mouth form (`@` is a legal set-name character).
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> variant_set_name("happy")
 'viseme@happy'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### Modules
 
@@ -8692,7 +8706,7 @@ True
 | [`Preset`](_autosummary/cutan.expression.presets.html.md#cutan.expression.presets.Preset)(name[, axes, mouth_form, anchor])   | A named expression: axis offsets, the mouth form it prefers, its anchor.   |
 |---------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
 
-### *class* cutan.expression.presets.Preset(name, axes=<factory>, mouth_form=None, anchor='')
+### *class* cutan.expression.presets.Preset(name, axes=dict(), mouth_form=None, anchor='')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -8710,25 +8724,25 @@ The `viseme@<form>` set this preset’s mouth prefers; `None` = `viseme`.
 
 The preset names, in declaration order.
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
-
 ```pycon
 >>> known_presets()[:3]
 ('neutral', 'happy', 'sad')
 ```
 
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
 ### cutan.expression.presets.mouth_form_of(preset)
 
 The `viseme@<form>` a preset prefers, or `None` for the neutral set.
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ```pycon
 >>> mouth_form_of("amused"), mouth_form_of("thinking"), mouth_form_of(None)
 ('happy', None, None)
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.expression.presets.preset_axes(preset, , axes=None, intensity=1.0)
 
@@ -8832,7 +8846,7 @@ Bases: [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protoco
 
 The seam: whatever produces per-axis curves for one entity of one shot.
 
-### *class* cutan.expression.provider.ExpressionSpan(start, end, preset, axes=<factory>, intensity=1.0, blend=0.0, source='action')
+### *class* cutan.expression.provider.ExpressionSpan(start, end, preset, axes=dict(), intensity=1.0, blend=0.0, source='action')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -8911,8 +8925,8 @@ Plain declarations: importing this module registers nothing.
 
 ### Classes
 
-| [`ExpressionAction`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.ExpressionAction)(\*\*data)   | Hold a facial expression on an entity (an#98, epic #9 Wave 6).   |
-|-------------------------------------------------------------------------------|------------------------------------------------------------------|
+| [`ExpressionAction`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.ExpressionAction)(\*[, name, kind, preset, ...])   | Hold a facial expression on an entity (an#98, epic #9 Wave 6).   |
+|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
 
 ### cutan.expression.registration.DFLT_EXPRESSION_BLEND_S *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.15*
 
@@ -8930,7 +8944,7 @@ a preset name (`happy`, `wry-smile`).
 * **Type:**
   What an emotion name may be
 
-### *class* cutan.expression.registration.ExpressionAction(\*\*data)
+### *class* cutan.expression.registration.ExpressionAction(\*, name=None, kind='expression', target, preset=None, axes=<factory>, intensity=1.0, duration=None, blend=0.15, \*\*extra_data)
 
 Bases: `ExtensionAction`
 
@@ -8964,9 +8978,6 @@ Hold a facial expression on an entity (an#98).
 `duration=None` runs to the shot end and counts as **zero** in a
 `sequence`, as a looping `play` does:
 
-* **Return type:**
-  [`ExpressionAction`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.ExpressionAction)
-
 ```pycon
 >>> [f.start for f in flatten(sequence(expression("a", "happy"), delay(1.0), expression("a", "sad")))]
 [0.0, 1.0]
@@ -8974,12 +8985,12 @@ Hold a facial expression on an entity (an#98).
 2.0
 ```
 
+* **Return type:**
+  [`ExpressionAction`](_autosummary/cutan.expression.registration.html.md#cutan.expression.registration.ExpressionAction)
+
 ### cutan.expression.registration.expression_duration(action, extent)
 
 An expression’s span: its `duration`, else zero (it runs to the shot end).
-
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ```pycon
 >>> expression_duration(ExpressionAction(target="a", duration=2.0), None)
@@ -8987,6 +8998,9 @@ An expression’s span: its `duration`, else zero (it runs to the shot end).
 >>> expression_duration(ExpressionAction(target="a"), None)
 0.0
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.expression.registration.format_emotion(line)
 
@@ -9002,13 +9016,13 @@ The `[…]` content for `line` (`angry 0.4` with an intensity), or
 0.4]`’s to the emotion and its intensity (0..1, an#253); refuse anything
 else.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
-
 ```pycon
 >>> parse_emotion("Happy"), parse_emotion(" angry 0.4 ")
 ({'emotion': 'happy'}, {'emotion': 'angry', 'emotion_intensity': 0.4})
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 ### cutan.expression.registration.read_expression_md(item, , index)
 
@@ -9182,12 +9196,12 @@ Level 6: `rest_pose_protection` (an#407), which `validate_character` says aloud.
 
 Refuse, with an upgrade hint, to load against an `an` older than this `cutan` needs.
 
-* **Return type:**
-  [`None`](https://docs.python.org/3/builtins/constants.html#None)
-
 ```pycon
 >>> require_an()
 ```
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.style_spec(name)
 
@@ -9438,15 +9452,15 @@ A clip spec that cannot describe a clip.
 
 The cartesian product of the given axes over `base`.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ImpactClipSpec`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec)]
-
 ```pycon
 >>> len(impact_set_specs())
 24
 >>> {s.seed for s in impact_set_specs(seeds=(0, 1), fps=(30,))}
 {0, 1}
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ImpactClipSpec`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec)]
 
 ### cutan.impacts.clip.plan_impact_clip(spec)
 
@@ -9698,7 +9712,7 @@ the humanisation actually applied (post-clamp).
 * **Type:**
   `t_impact - t_grid`
 
-### *class* cutan.impacts.ImpactObject(name, art, at, channels, keypoints, impact_keypoint, keypoint_nodes=<factory>, surface_art=None, surface_at=None, params=<factory>)
+### *class* cutan.impacts.ImpactObject(name, art, at, channels, keypoints, impact_keypoint, keypoint_nodes=dict(), surface_art=None, surface_at=None, params=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -9807,14 +9821,14 @@ one side and falls back along the arc, its contact the arc’s lowest point.
 The angle that lifts it `drop` pixels is `acos(1 - drop / arc_radius)`;
 rotation is the one channel, affine in `h`, so the curve stays exact.
 
-* **Return type:**
-  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
-
 ```pycon
 >>> b = ball(arc_radius=300.0)
 >>> round(b.params["arc_sweep"], 4), b.at == (0.0, b.params["pivot_y"])
 (1.1226, True)
 ```
+
+* **Return type:**
+  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
 
 ### cutan.impacts.build_stroke(events, , kind='surface', duration, rise=0.18, fall=0.18, brake=0.03, rest_height=1.0, timings=None)
 
@@ -9840,9 +9854,6 @@ the timing wanders, not how far. `rho = 0` is independent jitter;
 `rho` near 1 is a player who drifts ahead or behind for several beats.
 `bias` is a constant lead (negative) or lag (positive).
 
-* **Return type:**
-  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)], [`object`](https://docs.python.org/3/builtins/functions.html#object)], [`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]
-
 ```pycon
 >>> import numpy as np
 >>> h = gaussian_humanizer(0.01, rho=0.5)
@@ -9853,12 +9864,12 @@ the timing wanders, not how far. `rho = 0` is independent jitter;
 [0.0, 0.0]
 ```
 
+* **Return type:**
+  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)], [`object`](https://docs.python.org/3/builtins/functions.html#object)], [`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
 ### cutan.impacts.impact_object(name, \*\*kwargs)
 
 Build a registered object by name.
-
-* **Return type:**
-  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
 
 ```pycon
 >>> impact_object("ball").name
@@ -9869,12 +9880,12 @@ Traceback (most recent call last):
 KeyError: "no impact object 'hammer'; known: ['ball', 'stick']"
 ```
 
+* **Return type:**
+  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
+
 ### cutan.impacts.impact_set_specs(, base=ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=None, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0), objects=('stick', 'ball'), kinds=('surface', 'air'), fps=(24, 30, 60), exposures=(0.0, 0.5), timestamp_jitter_sds=(0.0,), seeds=(0,))
 
 The cartesian product of the given axes over `base`.
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ImpactClipSpec`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec)]
 
 ```pycon
 >>> len(impact_set_specs())
@@ -9882,6 +9893,9 @@ The cartesian product of the given axes over `base`.
 >>> {s.seed for s in impact_set_specs(seeds=(0, 1), fps=(30,))}
 {0, 1}
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ImpactClipSpec`](_autosummary/cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec)]
 
 ### cutan.impacts.perform(tempo=100.0, , beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, humanizer=None, seed=0)
 
@@ -9895,15 +9909,15 @@ into offsets (default: none); each offset is then clamped to
 `MAX_OFFSET_FRACTION` of the gap to either neighbour, and the clamped
 value is what the event records — the ground truth is what was executed.
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImpactEvent`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.ImpactEvent), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
-
 ```pycon
 >>> [e.beat for e in perform(120, beats=2, subdivision=2, pattern=(1, 0))]
 [0.0, 1.0]
 >>> [e.amplitude for e in perform(120, beats=1, subdivision=4, pattern=(1, .5))]
 [1.0, 0.5, 1.0, 0.5]
 ```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImpactEvent`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.ImpactEvent), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
 
 ### cutan.impacts.plan_impact_clip(spec)
 
@@ -9928,15 +9942,15 @@ rounded end.
 
 Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](_autosummary/cutan.impacts.html.md#cutan.impacts.TempoMap).
 
-* **Return type:**
-  [`TempoMap`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap)
-
 ```pycon
 >>> tempo_map(90).points
 ((0.0, 90.0),)
 >>> tempo_map([(0, 90), (16, 120)]).points
 ((0.0, 90.0), (16.0, 120.0))
 ```
+
+* **Return type:**
+  [`TempoMap`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap)
 
 ### cutan.impacts.write_impact_clip(spec, out_dir, , render=True, clip_dir=None)
 
@@ -10023,11 +10037,11 @@ True
 | [`PropArt`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.PropArt)(ref, descriptor, parts)                     | A prop's descriptor and its SVG parts — what goes into a props store. |
 | [`StrokeChannel`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.StrokeChannel)(target, property, ...)                | One animated property, AFFINE in stroke height `h`.                   |
 
-### cutan.impacts.objects.IMPACT_OBJECTS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[...], [ImpactObject](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)]]* *= {'ball': <function ball>, 'stick': <function stick>}*
+### cutan.impacts.objects.IMPACT_OBJECTS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[..., [ImpactObject](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)]]* *= {'ball': <function ball>, 'stick': <function stick>}*
 
 Name -> factory. The registry the clip spec and the CLI resolve names through.
 
-### *class* cutan.impacts.objects.ImpactObject(name, art, at, channels, keypoints, impact_keypoint, keypoint_nodes=<factory>, surface_art=None, surface_at=None, params=<factory>)
+### *class* cutan.impacts.objects.ImpactObject(name, art, at, channels, keypoints, impact_keypoint, keypoint_nodes=dict(), surface_art=None, surface_at=None, params=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -10088,21 +10102,18 @@ one side and falls back along the arc, its contact the arc’s lowest point.
 The angle that lifts it `drop` pixels is `acos(1 - drop / arc_radius)`;
 rotation is the one channel, affine in `h`, so the curve stays exact.
 
-* **Return type:**
-  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
-
 ```pycon
 >>> b = ball(arc_radius=300.0)
 >>> round(b.params["arc_sweep"], 4), b.at == (0.0, b.params["pivot_y"])
 (1.1226, True)
 ```
 
+* **Return type:**
+  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
+
 ### cutan.impacts.objects.impact_object(name, \*\*kwargs)
 
 Build a registered object by name.
-
-* **Return type:**
-  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
 
 ```pycon
 >>> impact_object("ball").name
@@ -10112,6 +10123,9 @@ Traceback (most recent call last):
   ...
 KeyError: "no impact object 'hammer'; known: ['ball', 'stick']"
 ```
+
+* **Return type:**
+  [`ImpactObject`](_autosummary/cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
 
 ### cutan.impacts.objects.stick(, length=200.0, thickness=12.0, pivot=(-120.0, -30.0), contact_angle=0.35, swing=0.95, color='#111827', surface_color='#9ca3af', surface_size=(140.0, 24.0))
 
@@ -10261,9 +10275,6 @@ the timing wanders, not how far. `rho = 0` is independent jitter;
 `rho` near 1 is a player who drifts ahead or behind for several beats.
 `bias` is a constant lead (negative) or lag (positive).
 
-* **Return type:**
-  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)], [`object`](https://docs.python.org/3/builtins/functions.html#object)], [`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]
-
 ```pycon
 >>> import numpy as np
 >>> h = gaussian_humanizer(0.01, rho=0.5)
@@ -10273,6 +10284,9 @@ the timing wanders, not how far. `rho = 0` is independent jitter;
 >>> gaussian_humanizer()([0.0, 1.0], None)
 [0.0, 0.0]
 ```
+
+* **Return type:**
+  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)], [`object`](https://docs.python.org/3/builtins/functions.html#object)], [`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]
 
 ### cutan.impacts.performance.perform(tempo=100.0, , beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, humanizer=None, seed=0)
 
@@ -10286,9 +10300,6 @@ into offsets (default: none); each offset is then clamped to
 [`MAX_OFFSET_FRACTION`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.MAX_OFFSET_FRACTION) of the gap to either neighbour, and the clamped
 value is what the event records — the ground truth is what was executed.
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImpactEvent`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.ImpactEvent), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
-
 ```pycon
 >>> [e.beat for e in perform(120, beats=2, subdivision=2, pattern=(1, 0))]
 [0.0, 1.0]
@@ -10296,12 +10307,12 @@ value is what the event records — the ground truth is what was executed.
 [1.0, 0.5, 1.0, 0.5]
 ```
 
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImpactEvent`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.ImpactEvent), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
 ### cutan.impacts.performance.tempo_map(tempo)
 
 Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap).
-
-* **Return type:**
-  [`TempoMap`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap)
 
 ```pycon
 >>> tempo_map(90).points
@@ -10309,6 +10320,9 @@ Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](_autosummary/cutan.
 >>> tempo_map([(0, 90), (16, 120)]).points
 ((0.0, 90.0), (16.0, 120.0))
 ```
+
+* **Return type:**
+  [`TempoMap`](_autosummary/cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap)
 
 
 # _autosummary/cutan.impacts.stroke.html.md
@@ -10676,9 +10690,6 @@ Gait is deliberately not here: which walk methods apply is the capability
 matcher’s answer (`applicable("locomotion", asset)`, ADR 0002), derived from
 `limbs.legs`, not a second fact about the asset.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
-
 ```pycon
 >>> from cutan.characters.schema import CharacterDescriptor
 >>> doc = CharacterDescriptor(name="blob").model_dump(mode="json")
@@ -10686,15 +10697,15 @@ matcher’s answer (`applicable("locomotion", asset)`, ADR 0002), derived from
 ['swap.view']
 ```
 
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
+
 ### cutan.library.character_overrides(doc, art)
 
 The declared fields that REMOVED a capability (an#381): `occluded`
 when a declared cover is what keeps `face.brows` from an overlay face
 whose binding moves brows. (Overrides that show on an afforded capability
 are in its `overrides` param already.)
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ```pycon
 >>> character_overrides({"kind": "CharacterDescriptor", "name": "c",
@@ -10704,17 +10715,20 @@ are in its `overrides` param already.)
 []
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
 ### cutan.library.renders_as_placeholder(doc)
 
 Whether the compiler would draw this character only as its placeholder stand-in.
-
-* **Return type:**
-  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 ```pycon
 >>> renders_as_placeholder({"name": "alice"}), renders_as_placeholder({"parts": ["head"]})
 (True, False)
 ```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 
 # _autosummary/cutan.motion.html.md
@@ -10807,7 +10821,7 @@ the pre-an#224 gaits and keep the shared defaults exactly (no pixel moves).
 
 The gaits that move a leg pair — and need one (the `limbs.legs` capability).
 
-### cutan.motion.PRESETS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[...], [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[[Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[SetAction, Tag(tag=[set](https://docs.python.org/3/builtins/stdtypes.html#set))] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[TweenAction, Tag(tag=tween)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[SequenceAction, Tag(tag=sequence)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[ParallelAction, Tag(tag=parallel)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[DelayAction, Tag(tag=delay)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[LoopAction, Tag(tag=loop)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[ExtensionAction, SerializeAsAny(), Tag(tag=extension)], Discriminator(discriminator=\_action_tag, custom_error_type=[None](https://docs.python.org/3/builtins/constants.html#None), custom_error_message=[None](https://docs.python.org/3/builtins/constants.html#None), custom_error_context=[None](https://docs.python.org/3/builtins/constants.html#None))]]]* *= {'crawl': <function crawl>, 'hop': <function hop>, 'nod': <function nod>, 'point': <function point>, 'pop_in': <function pop_in>, 'shake': <function shake>, 'slide_in': <function slide_in>, 'slide_out': <function slide_out>, 'speech_pulse': <function speech_pulse>, 'squash_stretch': <function squash_stretch>, 'turn': <function turn>, 'waddle': <function waddle>, 'walk': <function walk>}*
+### cutan.motion.PRESETS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[..., [Union](https://docs.python.org/3/library/typing.html#typing.Union)[SetAction, TweenAction, SequenceAction, ParallelAction, DelayAction, LoopAction, ExtensionAction]]]* *= {'crawl': <function crawl>, 'hop': <function hop>, 'nod': <function nod>, 'point': <function point>, 'pop_in': <function pop_in>, 'shake': <function shake>, 'slide_in': <function slide_in>, 'slide_out': <function slide_out>, 'speech_pulse': <function speech_pulse>, 'squash_stretch': <function squash_stretch>, 'turn': <function turn>, 'waddle': <function waddle>, 'walk': <function walk>}*
 
 Every preset a `play` can name — the core’s and the genre’s — the one table
 the skill, the demos, the vocabulary and the `play` fallback
@@ -10818,7 +10832,7 @@ name the core also has.
 
 [`PRESETS`](_autosummary/cutan.motion.html.md#cutan.motion.PRESETS)’ vocabulary versions.
 
-### cutan.motion.RIG_PRESETS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[...], [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[[Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[SetAction, Tag(tag=[set](https://docs.python.org/3/builtins/stdtypes.html#set))] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[TweenAction, Tag(tag=tween)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[SequenceAction, Tag(tag=sequence)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[ParallelAction, Tag(tag=parallel)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[DelayAction, Tag(tag=delay)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[LoopAction, Tag(tag=loop)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[ExtensionAction, SerializeAsAny(), Tag(tag=extension)], Discriminator(discriminator=\_action_tag, custom_error_type=[None](https://docs.python.org/3/builtins/constants.html#None), custom_error_message=[None](https://docs.python.org/3/builtins/constants.html#None), custom_error_context=[None](https://docs.python.org/3/builtins/constants.html#None))]]]* *= {'nod': <function nod>, 'point': <function point>, 'speech_pulse': <function speech_pulse>, 'turn': <function turn>, 'waddle': <function waddle>, 'walk': <function walk>}*
+### cutan.motion.RIG_PRESETS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[..., [Union](https://docs.python.org/3/library/typing.html#typing.Union)[SetAction, TweenAction, SequenceAction, ParallelAction, DelayAction, LoopAction, ExtensionAction]]]* *= {'nod': <function nod>, 'point': <function point>, 'speech_pulse': <function speech_pulse>, 'turn': <function turn>, 'waddle': <function waddle>, 'walk': <function walk>}*
 
 The genre’s presets, by name.
 
@@ -10848,9 +10862,6 @@ layout put them.
 
 (These examples build character entities, the cut-out genre’s; they are not run here.)
 
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
-
 ```pycon
 >>> from an.ir.schema import AssetRef
 >>> two = Shot(id="s", entities=[
@@ -10858,6 +10869,9 @@ layout put them.
 >>> [f.action.to_value for f in _tweens(face_toward(two, "b", "a"))]
 [0.0, -1.0]
 ```
+
+* **Return type:**
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 ### cutan.motion.gait_params(gait, , scale=1.0, \*\*given)
 
@@ -10869,15 +10883,15 @@ hop) is stated for a figure at drawn scale 1 and multiplied by `scale`
 scene px as given. Angles and a leg’s `lift` (in the figure’s own frame,
 already scaled with it) never scale.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> gait_params("legs")["step_length"], gait_params("legs", scale=2.0)["step_length"]
 (80.0, 160.0)
 >>> gait_params("shuffle", scale=2.0, step_length=50.0)["step_length"]
 50.0
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 ### cutan.motion.nod(target, , part='head', angle=0.18, duration=0.5, count=2, rest=None)
 
@@ -10886,13 +10900,13 @@ Dip the head `count` times (a rotation of `<target>/<part>`).
 In a front-facing 2D cut-out a nod reads as a small head rotation about
 its pivot; `rest` is the HEAD’s rest, not the entity’s.
 
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
-
 ```pycon
 >>> [(f.action.target, round(f.action.to_value, 2)) for f in _tweens(nod("charlie", count=1))]
 [('charlie/head', 0.18), ('charlie/head', 0.0)]
 ```
+
+* **Return type:**
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 ### cutan.motion.point(target, , angle=-1.3, raise_duration=0.25, hold=0.6, easing=(0.34, 1.56, 0.64, 1.0), rest=None)
 
@@ -10902,13 +10916,13 @@ Swing an arm out to point, hold it, and lower it again.
 rig, `"maya/arm_r"` on a descriptor rig (and there, since that arm hangs
 on the viewer’s left, pass a positive `angle` to point outward).
 
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
-
 ```pycon
 >>> [(f.start, f.action.to_value) for f in _tweens(point("charlie/right_arm", hold=0.5))]
 [(0.0, -1.3), (0.75, 0.0)]
 ```
+
+* **Return type:**
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 ### cutan.motion.speech_pulse(target, , beats=(0.0,), strength=0.06, part='head', attack=0.06, release=0.1, rest=None)
 
@@ -10925,13 +10939,13 @@ settles is skipped, so the pulse never stacks. `strength=0` is a mime.
 tween rather than a settling `set`, so played once per syllable (as the
 speech aspect does) each pulse rides whatever the head is doing.
 
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
-
 ```pycon
 >>> [(round(f.start, 2), f.action.to_value) for f in _tweens(speech_pulse("al", beats=(0.0, 0.3)))]
 [(0.0, 1.06), (0.06, 1.0), (0.3, 1.06), (0.36, 1.0), (0.46, 1.0)]
 ```
+
+* **Return type:**
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 ### cutan.motion.turn(target, , to='back', direction='right', from_direction=None, duration=0.3, view_set='view', rest=None, step_hz=None)
 
@@ -10962,9 +10976,6 @@ so the character vanishes for a frame (an#273, South Park on twos). Such a
 turn is the style’s HARD SWAP instead: at its midpoint the view changes and
 `scale_x` takes the new facing, with no squash.
 
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
-
 ```pycon
 >>> def lands(a):  # a tween's end value, a set's value
 ...     return a.to_value if a.kind == "tween" else a.value
@@ -10976,6 +10987,9 @@ turn is the style’s HARD SWAP instead: at its midpoint the view changes and
 [(0.02, 'view', 'side'), (0.02, 'scale_x', 1.0)]
 ```
 
+* **Return type:**
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
+
 ### cutan.motion.waddle(target, , steps=4, step_duration=0.3, angle=0.1, lift=6.0, travel=0.0, rest=None)
 
 A walk cycle for a rig with no legs to animate: rock and bob per step.
@@ -10985,9 +10999,6 @@ Each step rocks the body to alternate sides by `angle` and bobs it up by
 carries the body sideways over the whole walk — the one `x` move here,
 so it is the one that needs `rest` in a multi-character shot.
 
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
-
 ```pycon
 >>> w = _tweens(waddle("charlie", steps=2, travel=100))
 >>> sorted({f.action.property for f in w})
@@ -10995,6 +11006,9 @@ so it is the one that needs `rest` in a multi-character shot.
 >>> max(f.end for f in w)
 0.6
 ```
+
+* **Return type:**
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 ### cutan.motion.walk(target, , to_x=None, distance=None, direction=None, steps=None, step_s=None, step_length=None, stride=None, lift=None, bob=None, arm_swing=None, rock=None, hem_tilt=None, hop_height=None, lean=None, view=None, gait=None, legs=None, arms=None, parts=None, rest=None, scale=None)
 
@@ -11103,7 +11117,7 @@ then `walk`.
 ```
 
 * **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 
 # _autosummary/cutan.runtime.html.md
@@ -11183,14 +11197,14 @@ style_voice_role`: target names resolved to values), with the spec it came
 from recorded, so a later re-measure of the style is noticed. Merge it beside
 a `voice_id`: `{**style_voice("oversimplified", "eager"), "voice_id": ...}`.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
-
 ```pycon
 >>> doc = style_voice("oversimplified", "narrator")
 >>> doc["metadata"]["style_spec"]["name"], "targets" in doc["takes"]["cues"]["deadpan"]
 ('oversimplified', True)
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 
 # _autosummary/cutan.styles.html.md
@@ -11340,15 +11354,15 @@ author’s explicit request is not here: the matcher puts it first
 
 The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.
 
-* **Return type:**
-  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
-
 ```pycon
 >>> policy_of({"policy": {"locomotion": ["loco.glide"]}})
 {'locomotion': ['loco.glide']}
 >>> policy_of(None) is None
 True
 ```
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
 
 ### cutan.styles.policy_problems(policy)
 
@@ -11358,9 +11372,6 @@ Every aspect must be registered, every choice a method OF that aspect (by
 id: `loco.bounce`, not `bounce`), and every choice well formed (an id or
 `{method, args, version}`).
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> policy_problems({"locomotion": ["loco.bounce", "loco.glide"]})
 []
@@ -11368,6 +11379,9 @@ id: `loco.bounce`, not `bounce`), and every choice well formed (an id or
 policy locomotion: 'bounce' is not a locomotion method id; did you mean 'loco.bounce'?
 policy aspect 'dance' is not registered (aspects: expression, locomotion, speech)
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.styles.resolve_style_spec(ref)
 
@@ -11409,14 +11423,14 @@ spec it was copied from (name and digest) in `metadata`.
 style’s name, a path, a mapping). Save it as the skill’s step 3 says:
 `mall["styles"][pack.name] = pack.model_dump(mode="json")`.
 
-* **Return type:**
-  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
-
 ```pycon
 >>> pack = style_pack("south_park")
 >>> pack.name, pack.policy, pack.metadata["style_spec"]["name"]
 ('south_park', {'locomotion': ['loco.bounce']}, 'south_park')
 ```
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
 
 ### cutan.styles.style_spec(name)
 
@@ -11467,14 +11481,14 @@ style_voice_role`: target names resolved to values), with the spec it came
 from recorded, so a later re-measure of the style is noticed. Merge it beside
 a `voice_id`: `{**style_voice("oversimplified", "eager"), "voice_id": ...}`.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
-
 ```pycon
 >>> doc = style_voice("oversimplified", "narrator")
 >>> doc["metadata"]["style_spec"]["name"], "targets" in doc["takes"]["cues"]["deadpan"]
 ('oversimplified', True)
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 ### Modules
 
@@ -11596,15 +11610,15 @@ one unless `shot` and `index` name another (a scene-stage check).
 
 The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.
 
-* **Return type:**
-  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
-
 ```pycon
 >>> policy_of({"policy": {"locomotion": ["loco.glide"]}})
 {'locomotion': ['loco.glide']}
 >>> policy_of(None) is None
 True
 ```
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
 
 ### cutan.styles.policy.policy_problems(policy)
 
@@ -11614,9 +11628,6 @@ Every aspect must be registered, every choice a method OF that aspect (by
 id: `loco.bounce`, not `bounce`), and every choice well formed (an id or
 `{method, args, version}`).
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> policy_problems({"locomotion": ["loco.bounce", "loco.glide"]})
 []
@@ -11624,6 +11635,9 @@ id: `loco.bounce`, not `bounce`), and every choice well formed (an id or
 policy locomotion: 'bounce' is not a locomotion method id; did you mean 'loco.bounce'?
 policy aspect 'dance' is not registered (aspects: expression, locomotion, speech)
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.styles.policy.style_pack(spec)
 
@@ -11635,14 +11649,14 @@ spec it was copied from (name and digest) in `metadata`.
 style’s name, a path, a mapping). Save it as the skill’s step 3 says:
 `mall["styles"][pack.name] = pack.model_dump(mode="json")`.
 
-* **Return type:**
-  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
-
 ```pycon
 >>> pack = style_pack("south_park")
 >>> pack.name, pack.policy, pack.metadata["style_spec"]["name"]
 ('south_park', {'locomotion': ['loco.bounce']}, 'south_park')
 ```
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
 
 
 # _autosummary/cutan.verify.html.md
@@ -11795,7 +11809,7 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 The cadence of one shot, measured with the WHOLE clip’s change
 threshold so a shot’s numbers add up to the clip’s.
 
-### *class* cutan.verify.style.StyleLintResult(metrics, report, per_shot=<factory>)
+### *class* cutan.verify.style.StyleLintResult(metrics, report, per_shot=list())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -11841,9 +11855,6 @@ One `Finding` per target the metrics miss; `[]` when all hit.
 respects it — a style that sets `step_hz` is never told to drop it, one
 that leaves it unset is never told to set it:
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Finding`]
-
 ```pycon
 >>> m = measure_style(np.zeros((8, 4, 4, 3), np.uint8), fps=8.0, shot_durations=[1.0])
 >>> (f,) = check_targets(m, {"identical_frame_share": [0.5, 0.7]},
@@ -11855,6 +11866,9 @@ that leaves it unset is never told to set it:
 Raises `ValueError` for a target [`METRICS`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.METRICS) does not name, or a range
 that is not `[low, high]` with `low <= high`.
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Finding`]
+
 ### cutan.verify.style.film_shots(scene)
 
 `(shot id, seconds on screen)` per shot of an `an` render, in order.
@@ -11864,9 +11878,6 @@ except where a dissolve overlaps two shots: the film is that much shorter
 than their sum (`an.assemble.film_timeline()`), and each shot is
 counted from where its frames start in the film.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
-
 ```pycon
 >>> from an.ir.schema import Shot, Transition
 >>> film_shots(SceneIR(timeline=[
@@ -11875,6 +11886,9 @@ counted from where its frames start in the film.
 [('a', 1.5), ('b', 2.0)]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
 ### cutan.verify.style.load_style_spec(spec)
 
 A style spec as a dict: a style’s name, a path to a spec file, or a mapping.
@@ -11882,13 +11896,13 @@ A style spec as a dict: a style’s name, a path to a spec file, or a mapping.
 The rules are [`cutan.styles.resolve_style_spec()`](_autosummary/cutan.styles.html.md#cutan.styles.resolve_style_spec)’s (a bare name is
 always the shipped spec; `./name` or `name.yaml` is a file).
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
-
 ```pycon
 >>> load_style_spec("reiniger")["style"]
 'reiniger'
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 ### cutan.verify.style.measure_shots(frames, , fps, shot_durations=None, shot_ids=None, min_changed_pixels=8)
 
@@ -11898,9 +11912,6 @@ The shots are `shot_durations` (seconds, in order) when given, else the
 pixel cut detector’s. The step INTO each shot is the cut, not a pose
 change, so it belongs to no shot. A one-frame shot has no step of its own
 and measures as all-identical.
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ShotMetrics`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.ShotMetrics)]
 
 ```pycon
 >>> import numpy as np
@@ -11912,6 +11923,9 @@ and measures as all-identical.
 [('card', 1.0), ('map', 0.0)]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ShotMetrics`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.ShotMetrics)]
+
 ### cutan.verify.style.measure_style(frames, , fps, shot_durations=None, min_changed_pixels=8)
 
 Measure the [`METRICS`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.METRICS) on `frames`, an `(n, h, w, 3)` uint8 RGB array.
@@ -11921,9 +11935,6 @@ pixel cut detector is used. Ratios are rounded to three decimals.
 `min_changed_pixels` is the local-change rule’s size (`0`: the research’s
 frame-wide estimator alone, which the targets were first measured with).
 
-* **Return type:**
-  [`StyleMetrics`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.StyleMetrics)
-
 ```pycon
 >>> import numpy as np
 >>> f = np.zeros((6, 4, 4, 3), np.uint8)
@@ -11932,6 +11943,9 @@ frame-wide estimator alone, which the targets were first measured with).
 >>> m.identical_frame_share, m.one_frame_interval_share, m.cuts
 (0.0, 1.0, 0)
 ```
+
+* **Return type:**
+  [`StyleMetrics`](_autosummary/cutan.verify.style.html.md#cutan.verify.style.StyleMetrics)
 
 ### cutan.verify.style.measure_video(mp4, , shot_durations=None, width=320, height=180)
 
@@ -11978,18 +11992,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-14 04:58 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/7a152084a9a2a094e1b47a527d1a25e2c7477262"><code>7a15208</code></a> on branch <code>main</code>, for **cutan 0.0.52** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-18 13:09 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/7b90c13015dc482693808e88b9fcbb43a0af6c6a"><code>7b90c13</code></a> on branch <code>main</code>, for **cutan 0.0.53** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.52) is behind the latest release on PyPI (0.0.53): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.53) is behind the latest release on PyPI (0.0.54): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/7a152084a9a2a094e1b47a527d1a25e2c7477262"><code>7a152084a9a2a094e1b47a527d1a25e2c7477262</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/7b90c13015dc482693808e88b9fcbb43a0af6c6a"><code>7b90c13015dc482693808e88b9fcbb43a0af6c6a</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -12000,9 +12014,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/38513794596">38513794596</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/39130048257">39130048257</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>7a152084a9a2a094e1b47a527d1a25e2c7477262</code> (in the history of the built commit) |
+| Event commit | <code>7b90c13015dc482693808e88b9fcbb43a0af6c6a</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -12027,13 +12041,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.53/">0.0.53</a>, newer than the documented version (0.0.52).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.54/">0.0.54</a>, newer than the documented version (0.0.53).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 7a152084a9a2a094e1b47a527d1a25e2c7477262
+git checkout 7b90c13015dc482693808e88b9fcbb43a0af6c6a
 pip install "epythet==0.2.17"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
@@ -12054,6 +12068,16 @@ machine-readable copies of this documentation.
 ## Skills
 
 Skills are folders holding a `SKILL.md` (the [Agent Skills](https://agentskills.io) format): a description that tells an agent when to use it and a body with the procedure. Install one into your agent with `gh skill` (any host: `--agent claude-code`, `copilot`, `cursor`, `codex`, `gemini`), or use the copy bundled in the wheel.
+
+### `cutan-production-pack`
+
+Helps a writer or director turn a story idea, script or scene into a production pack for a cut-out animated film rendered by the cutan/an pipeline. The pack holds the scene file (shots, staging, motion, dialogue with emotions), the cast (character looks, builds, hats, hair, colours, voices), environments and backgrounds (sky gradients, drawn SVG plates, parallax layers), props, title cards, voices and a visual style (a custom look, or a named one such as South Park, OverSimplified, Kurzgesagt, Gilliam, Reiniger or Norstein), all in the exact formats cutan reads. Use when someone wants to write, plan, storyboard or spec a cut-out cartoon, an animated short, a character, a set, a background or a prop for cutan, or says “production pack”, “scene.md”, “cast”, “make a character for the animation”, “design the set”, “write the scene for the animation pipeline” or “in the style of” one of those shows.
+
+```bash
+gh skill install thorwhalen/cutan cutan-production-pack --agent claude-code
+```
+
+Source: [`skills/cutan-production-pack`](https://github.com/thorwhalen/cutan/tree/HEAD/skills/cutan-production-pack).
 
 ### `cutan`
 

@@ -30,6 +30,7 @@
 <meta content="cutan.carve.head | cutan" name="twitter:title"/>
 <link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
 <link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
@@ -214,15 +215,15 @@ detector’s confidence (1 for a hand box).</p>
 <dt class="sig sig-object py" id="cutan.carve.head.Face.of">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/head.html#Face.of"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.head.Face.of" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.head.Face.of'">¶</a></dt>
 <dd><p>A face from a <code class="docutils literal notranslate"><span class="pre">Face</span></code>, a box <code class="docutils literal notranslate"><span class="pre">(x0,</span> <span class="pre">y0,</span> <span class="pre">x1,</span> <span class="pre">y1)</span></code>, or a mapping (<code class="docutils literal notranslate"><span class="pre">box</span></code>, <code class="docutils literal notranslate"><span class="pre">jaw</span></code>, …).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Face</span><span class="o">.</span><span class="n">of</span><span class="p">({</span><span class="s2">"box"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="s2">"jaw"</span><span class="p">:</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">]]})</span><span class="o">.</span><span class="n">chin_y</span>
+</span><span id="line-2"><span class="go">12.0</span>
+</span></code></pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#cutan.carve.head.Face" title="cutan.carve.head.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a></span></p>
 </dd>
 </dl>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Face</span><span class="o">.</span><span class="n">of</span><span class="p">({</span><span class="s2">"box"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="s2">"jaw"</span><span class="p">:</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">]]})</span><span class="o">.</span><span class="n">chin_y</span>
-</span><span id="line-2"><span class="go">12.0</span>
-</span></code></pre></div>
-</div>
 </dd></dl>
 </dd></dl>
 <dl class="py data">
@@ -265,30 +266,30 @@ deeper at the chin), <code class="docutils literal notranslate"><span class="pre
 and <code class="docutils literal notranslate"><span class="pre">"none"</span></code> keeps everything. <code class="docutils literal notranslate"><span class="pre">neck</span></code> is the depth below the jaw (or
 the chin) in face-box heights. <code class="docutils literal notranslate"><span class="pre">offset</span></code>/<code class="docutils literal notranslate"><span class="pre">scale</span></code> map the face (given in
 source pixels) into the mask’s pixels.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">neck_cut</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="n">Face</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">)),</span> <span class="n">cut</span><span class="o">=</span><span class="s2">"flat"</span><span class="p">,</span> <span class="n">neck</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 </span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">25</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">90</span><span class="p">,</span> <span class="mi">25</span><span class="p">])</span>
 </span><span id="line-3"><span class="go">(1.0, 0.0)</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.carve.head.pick_face">
 <span class="sig-prename descclassname"><span class="pre">cutan.carve.head.</span></span><span class="sig-name descname"><span class="pre">pick_face</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">faces</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pick</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'largest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/head.html#pick_face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.head.pick_face" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.head.pick_face'">¶</a></dt>
 <dd><p>One face of several: <code class="docutils literal notranslate"><span class="pre">largest</span></code>, <code class="docutils literal notranslate"><span class="pre">leftmost</span></code>, <code class="docutils literal notranslate"><span class="pre">rightmost</span></code> or <code class="docutils literal notranslate"><span class="pre">best</span></code> (score).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">pick_face</span><span class="p">([</span><span class="n">Face</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span> <span class="n">Face</span><span class="p">((</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">20</span><span class="p">))])</span><span class="o">.</span><span class="n">box</span>
+</span><span id="line-2"><span class="go">(50.0, 0.0, 70.0, 20.0)</span>
+</span></code></pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#cutan.carve.head.Face" title="cutan.carve.head.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a></span></p>
 </dd>
 </dl>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">pick_face</span><span class="p">([</span><span class="n">Face</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span> <span class="n">Face</span><span class="p">((</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">20</span><span class="p">))])</span><span class="o">.</span><span class="n">box</span>
-</span><span id="line-2"><span class="go">(50.0, 0.0, 70.0, 20.0)</span>
-</span></code></pre></div>
-</div>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -319,7 +320,7 @@ source pixels) into the mask’s pixels.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=73f2ab08"></script>
+<script src="../_static/documentation_options.js?v=d78a2f11"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

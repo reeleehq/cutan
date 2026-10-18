@@ -92,10 +92,10 @@ The Rhubarb recognizer for a BCP-47 language tag (primary subtag only).
 Accepts the POSIX locale spelling too (`en_US`); an empty tag is refused
 rather than read as “non-English” (an#96 review).
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> recognizer_for("en"), recognizer_for("en-GB"), recognizer_for("en_US"), recognizer_for("fr")
 ('pocketSphinx', 'pocketSphinx', 'pocketSphinx', 'phonetic')
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

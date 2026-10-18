@@ -53,16 +53,16 @@ Conventions (locked in):
 
 ### Classes
 
-| [`CharacterDescriptor`](#cutan.characters.CharacterDescriptor)(\*\*data)   | The on-disk character schema.                                           |
-|----------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| [`Bone`](#cutan.characters.Bone)(\*\*data)                  | A skeleton joint with a local transform relative to its parent.         |
-| [`Slot`](#cutan.characters.Slot)(\*\*data)                  | A draw-order slot bound to a bone, displaying one attachment at a time. |
-| [`Attachment`](#cutan.characters.Attachment)(\*\*data)            | A drawable: an SVG path + anchor point (in 0..1 per-axis units).        |
-| [`Skin`](#cutan.characters.Skin)(\*\*data)                  | A named outfit/variant: maps slot → {attachment_name → Attachment}.     |
-| [`IdleAnimation`](#cutan.characters.IdleAnimation)(\*\*data)         | A named idle loop (e.g., breath, blink).                                |
-| [`AnimationTrack`](#cutan.characters.AnimationTrack)(\*\*data)        | A single channel inside an idle animation.                              |
+| [`CharacterDescriptor`](#cutan.characters.CharacterDescriptor)(\*[, origin, ...])             | The on-disk character schema.                                           |
+|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`Bone`](#cutan.characters.Bone)(\*, name[, parent, x, y, rotation_deg, ...])  | A skeleton joint with a local transform relative to its parent.         |
+| [`Slot`](#cutan.characters.Slot)(\*, name, bone[, draw_order, attachment])     | A draw-order slot bound to a bone, displaying one attachment at a time. |
+| [`Attachment`](#cutan.characters.Attachment)(\*, path[, anchor, x, y, width, ...])   | A drawable: an SVG path + anchor point (in 0..1 per-axis units).        |
+| [`Skin`](#cutan.characters.Skin)(\*[, name, slots])                            | A named outfit/variant: maps slot → {attachment_name → Attachment}.     |
+| [`IdleAnimation`](#cutan.characters.IdleAnimation)(\*, name[, duration, loop, tracks])  | A named idle loop (e.g., breath, blink).                                |
+| [`AnimationTrack`](#cutan.characters.AnimationTrack)(\*, target[, type, amplitude, ...]) | A single channel inside an idle animation.                              |
 
-### *class* cutan.characters.AnimationTrack(\*\*data)
+### *class* cutan.characters.AnimationTrack(\*, target, type='sine', amplitude=0.0, phase=0.0, frames=<factory>, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -88,7 +88,7 @@ list of `[time_s, value]` pairs evaluated in order.
 
 Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
 
-### *class* cutan.characters.Attachment(\*\*data)
+### *class* cutan.characters.Attachment(, path, anchor=(0.5, 0.5), x=0.0, y=0.0, width=None, height=None, source=None, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -117,7 +117,7 @@ on a CC0 body, credits each (an#220). `None` = the descriptor’s
 reserved part makes the render NOT PUBLISHABLE like any other.
 Omitted from the stored document when unset.
 
-#### width *: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### width *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[float](https://docs.python.org/3/builtins/functions.html#float)]*
 
 The size the part draws at, in **view_box units** — the rig’s units,
 the ones `x`/`y` and the bones use (an#220). \*\*A declared size
@@ -144,7 +144,7 @@ parts share one `head` bone and still land in different places — before
 this field they all stacked on the bone, because the descriptor had no
 way to say otherwise and the compiler used hardcoded literals instead.
 
-### *class* cutan.characters.Bone(\*\*data)
+### *class* cutan.characters.Bone(, name, parent=None, x=0.0, y=0.0, rotation_deg=0.0, scale_x=1.0, scale_y=1.0, pivot=None, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -160,11 +160,11 @@ A skeleton joint with a local transform relative to its parent.
 
 Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
 
-#### pivot *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### pivot *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 Optional pivot name — must match a circle in the SVG `skeleton` group.
 
-### *class* cutan.characters.CharacterDescriptor(\*\*data)
+### *class* cutan.characters.CharacterDescriptor(\*, origin=None, rest_rotation=None, nesting=None, schema_version='0.4.0', kind='CharacterDescriptor', name, display_name=None, view_box=(0, 0, 1024, 1024), voice_ref=None, source_svg=None, bones=<factory>, slots=<factory>, skins=<factory>, asset_sets=<factory>, animations=<factory>, source=None, face_overlay=True, expression_binding=None, gaze_travel=None, colour_roles=<factory>, metadata=<factory>, swap_poses=<factory>, rest_view=None, gait=None, speech=None, occluded=<factory>, \*\*extra_data)
 
 Bases: `RigDocument`
 
@@ -216,7 +216,7 @@ Additive: no schema bump, and a descriptor without it reads back as
 untagged. Keys are normalised to lowercase `#rrggbb`; a role must be
 one a pack can set (`an.styles.REACHABLE_ROLES`).
 
-#### expression_binding *: [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### expression_binding *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[list](https://docs.python.org/3/builtins/stdtypes.html#list)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]]]*
 
 How expression axes reach this rig (an#98), as a list of binding dicts —
 `{"axis", "slot", "property", "gain"[, "rig_scaled"]}` for a transform
@@ -239,7 +239,7 @@ from; this says what the art IS. The 0.2.0 → 0.3.0 migration derives it
 from the provenance string once, and `art_provenance` reverts to pure
 provenance/licensing metadata.
 
-#### gait *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### gait *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 This character’s default walk `gait` (one of `GAITS`, an#220);
 an author’s `gait` arg overrides it. `None` = the locomotion chain:
@@ -248,7 +248,7 @@ figure whose leg slots are hem halves declares `"hem"` once, here,
 rather than on every walk.
 Omitted from the stored document when unset.
 
-#### gaze_travel *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### gaze_travel *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]]*
 
 How far a pupil may travel from its rest, in view-box units per axis
 (an#99): the sclera’s clearance minus the pupil’s radius, written by
@@ -293,7 +293,7 @@ by `an character capabilities`. Keys are
 `OCCLUDABLE_FEATURES`. Omitted from the
 stored document when empty.
 
-#### rest_view *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### rest_view *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 The view the DEFAULT art is drawn in (an#220) — a declared fact about
 the art, like `face_overlay`. `None` means `DFLT_VIEW`
@@ -316,12 +316,12 @@ Field names match `illustration.ImageResult` exactly, so an adapter is a
 dict copy rather than a rename table — and a rename table is where a field
 quietly stops being carried. Pinned by test.
 
-#### source_svg *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### source_svg *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 Optional source SVG (relative path) that the parts/ folder was
 extracted from. Useful for re-slicing.
 
-#### speech *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)] | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### speech *: [Union](https://docs.python.org/3/library/typing.html#typing.Union)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)], [None](https://docs.python.org/3/builtins/constants.html#None)]*
 
 a
 method’s spelling (`mouth_chart`, `pulse`), its id
@@ -360,12 +360,12 @@ schema bump, and a descriptor without it reads back unposed.
 * **Type:**
   {key
 
-#### voice_ref *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### voice_ref *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 Voice-store id or path used by the audio pipeline. Optional; the scene
 can override per shot.
 
-### *class* cutan.characters.IdleAnimation(\*\*data)
+### *class* cutan.characters.IdleAnimation(\*, name, duration=1.0, loop=True, tracks=<factory>, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -381,7 +381,7 @@ True
 
 Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
 
-### *class* cutan.characters.Skin(\*\*data)
+### *class* cutan.characters.Skin(\*, name='default', slots=<factory>, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -397,7 +397,7 @@ A named outfit/variant: maps slot → {attachment_name → Attachment}.
 
 Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
 
-### *class* cutan.characters.Slot(\*\*data)
+### *class* cutan.characters.Slot(, name, bone, draw_order=0, attachment=None, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -409,7 +409,7 @@ A draw-order slot bound to a bone, displaying one attachment at a time.
 'mouth_x'
 ```
 
-#### attachment *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+#### attachment *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
 
 Default attachment name; the active attachment can change at runtime
 via animation tracks targeting `slot:<name>.attachment`.
@@ -455,13 +455,13 @@ Both images are resized to `size`, converted to grayscale, thresholded
 at the midpoint, and the intersection-over-union of the foreground (dark)
 pixels is computed.
 
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
-
 ```pycon
 >>> # Two identical silhouettes → IoU = 1.0; two empty → 0.0 (no overlap).
 >>> # Tested via test suite, not doctest, since it requires Playwright.
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.characters.extract_part(source, part_id, , crop_viewbox=True, padding=8.0)
 
@@ -524,9 +524,6 @@ Pass `extra_params` to forward style-specific options (e.g.
 
 Return `{"mouth_<letter>[_<form>]": <svg-string>, ...}` for every shape.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> svgs = generate_default_mouths()
 >>> 'mouth_x' in svgs and 'viewBox' in svgs['mouth_x']
@@ -534,6 +531,9 @@ True
 >>> sorted(generate_default_mouths(shapes=["a"], smile=0.35, form="happy"))
 ['mouth_a_happy']
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False)
 
@@ -716,9 +716,6 @@ unparseable descriptor, absent required parts or mouth shapes, a part that
 draws nothing, a prohibited construct, a letterboxed part, a joint name
 colliding with a part id, and an unpopulated `AssetSource`.
 
-* **Return type:**
-  `VerificationReport`
-
 ```pycon
 >>> import tempfile, pathlib
 >>> with tempfile.TemporaryDirectory() as d:
@@ -728,6 +725,9 @@ False
 >>> any("character.json" in f.description for f in report.findings)
 True
 ```
+
+* **Return type:**
+  `VerificationReport`
 
 ### cutan.characters.write_default_mouths(out_dir, , canvas=(256, 128), palette=None, shapes=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x'), variants=None)
 

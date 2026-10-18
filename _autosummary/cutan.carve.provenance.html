@@ -30,6 +30,7 @@
 <meta content="cutan.carve.provenance | cutan" name="twitter:title"/>
 <link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
 <link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
@@ -163,11 +164,6 @@ query: signed-URL tokens are credentials). A local file (a path, a
 <code class="docutils literal notranslate"><span class="pre">file:</span></code> URL) is recorded by its name only: provider <code class="docutils literal notranslate"><span class="pre">local</span></code>, the name
 in <code class="docutils literal notranslate"><span class="pre">extra.file</span></code>, no path anywhere; a <code class="docutils literal notranslate"><span class="pre">data:</span></code> URI is refused. <code class="docutils literal notranslate"><span class="pre">t</span></code>,
 <code class="docutils literal notranslate"><span class="pre">title</span></code> and <code class="docutils literal notranslate"><span class="pre">note</span></code> go into <code class="docutils literal notranslate"><span class="pre">extra</span></code> beside any other keyword.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">AssetSource</span></code></span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">frame_source</span><span class="p">(</span><span class="s2">"https://www.youtube.com/watch?v=AAGIi62-sAU&amp;si=track"</span><span class="p">,</span>
 </span><span id="line-2"><span class="gp">... </span>                 <span class="n">t</span><span class="o">=</span><span class="mf">34.6</span><span class="p">,</span> <span class="n">license</span><span class="o">=</span><span class="s2">"all-rights-reserved"</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">"OverSimplified"</span><span class="p">)</span>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">provider</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">url</span>
@@ -181,16 +177,16 @@ in <code class="docutils literal notranslate"><span class="pre">extra.file</span
 </span><span id="line-11"><span class="go">('local', None, 'clip.mp4', False)</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">AssetSource</span></code></span></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.carve.provenance.youtube_id">
 <span class="sig-prename descclassname"><span class="pre">cutan.carve.provenance.</span></span><span class="sig-name descname"><span class="pre">youtube_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/provenance.html#youtube_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.provenance.youtube_id" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.provenance.youtube_id'">¶</a></dt>
 <dd><p>The video id of a YouTube URL, else <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">youtube_id</span><span class="p">(</span><span class="s2">"https://www.youtube.com/watch?v=AAGIi62-sAU&amp;t=34"</span><span class="p">)</span>
 </span><span id="line-2"><span class="go">'AAGIi62-sAU'</span>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">youtube_id</span><span class="p">(</span><span class="s2">"https://youtu.be/AAGIi62-sAU?t=3"</span><span class="p">),</span> <span class="n">youtube_id</span><span class="p">(</span><span class="s2">"https://example.org/a.png"</span><span class="p">)</span>
@@ -199,6 +195,11 @@ in <code class="docutils literal notranslate"><span class="pre">extra.file</span
 </span><span id="line-6"><span class="go">(None, 'abc')</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></span></p>
+</dd>
+</dl>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -219,7 +220,7 @@ in <code class="docutils literal notranslate"><span class="pre">extra.file</span
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=73f2ab08"></script>
+<script src="../_static/documentation_options.js?v=d78a2f11"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

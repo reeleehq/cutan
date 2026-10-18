@@ -116,9 +116,6 @@ unparseable descriptor, absent required parts or mouth shapes, a part that
 draws nothing, a prohibited construct, a letterboxed part, a joint name
 colliding with a part id, and an unpopulated `AssetSource`.
 
-* **Return type:**
-  `VerificationReport`
-
 ```pycon
 >>> import tempfile, pathlib
 >>> with tempfile.TemporaryDirectory() as d:
@@ -128,3 +125,6 @@ False
 >>> any("character.json" in f.description for f in report.findings)
 True
 ```
+
+* **Return type:**
+  `VerificationReport`

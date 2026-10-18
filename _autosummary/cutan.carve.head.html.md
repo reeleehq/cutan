@@ -68,13 +68,13 @@ The lowest point of the jaw, else the box’s bottom.
 
 A face from a `Face`, a box `(x0, y0, x1, y1)`, or a mapping (`box`, `jaw`, …).
 
-* **Return type:**
-  [`Face`](#cutan.carve.head.Face)
-
 ```pycon
 >>> Face.of({"box": [0, 0, 10, 12], "jaw": [[0, 6], [5, 12], [10, 6]]}).chin_y
 12.0
 ```
+
+* **Return type:**
+  [`Face`](#cutan.carve.head.Face)
 
 ### cutan.carve.head.HEAD_CANVAS *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 512*
 
@@ -111,23 +111,23 @@ and `"none"` keeps everything. `neck` is the depth below the jaw (or
 the chin) in face-box heights. `offset`/`scale` map the face (given in
 source pixels) into the mask’s pixels.
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> m = neck_cut((100, 50), Face((10, 10, 40, 60)), cut="flat", neck=0.1)
 >>> float(m[50, 25]), float(m[90, 25])
 (1.0, 0.0)
 ```
 
+* **Return type:**
+  `ndarray`
+
 ### cutan.carve.head.pick_face(faces, pick='largest')
 
 One face of several: `largest`, `leftmost`, `rightmost` or `best` (score).
-
-* **Return type:**
-  [`Face`](#cutan.carve.head.Face)
 
 ```pycon
 >>> pick_face([Face((0, 0, 10, 10)), Face((50, 0, 70, 20))]).box
 (50.0, 0.0, 70.0, 20.0)
 ```
+
+* **Return type:**
+  [`Face`](#cutan.carve.head.Face)

@@ -59,7 +59,7 @@ The signals that look wrong, in words.
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
-### *class* cutan.carve.core.Carving(image, anchor, offset, scale, quality, recipe, source=None, meta=<factory>, mode='part')
+### *class* cutan.carve.core.Carving(image, anchor, offset, scale, quality, recipe, source=None, meta=dict(), mode='part')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -103,9 +103,6 @@ subject encloses, detach nothing, no choke, a 0.6 px feather, de-spill 1 px.
 
 Cut a part out of `image`; every coordinate is in the source image’s pixels.
 
-* **Return type:**
-  [`Carving`](#cutan.carve.core.Carving)
-
 image: a path, a PIL image or an RGB(A) array (`grab_frame` for video)
 matte: the strategy ([`cutan.carve.mattes`](cutan.carve.mattes.html.md#module-cutan.carve.mattes)): a name, a recipe mapping,
 
@@ -148,12 +145,12 @@ source: provenance ([`frame_source()`](cutan.carve.provenance.html.md#cutan.carv
 True
 ```
 
+* **Return type:**
+  [`Carving`](#cutan.carve.core.Carving)
+
 ### cutan.carve.core.carve_head(image, , face=None, locate=None, pick='largest', matte='flat_colour', cut='auto', neck=None, neck_soft=0.05, pad_x=1.05, pad_top=1.25, pad_bottom=1.0, upscale=3, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, canvas=512, face_h=270.0, centre=(256.0, 300.0), margin=6, view=None, source=None)
 
 A head cut out at the neck and normalised onto a `canvas`-px square.
-
-* **Return type:**
-  [`Carving`](#cutan.carve.core.Carving)
 
 face: the face, a [`Face`](cutan.carve.head.html.md#cutan.carve.head.Face) (box and, when known, a
 : jaw contour and landmarks), a box `(x0, y0, x1, y1)` or a mapping
@@ -188,6 +185,9 @@ the crop per image, the matte and the finish shared). The part’s anchor is `ce
 `meta` holds what a rig needs to hang it: the face box, the chin and the
 neck point, the head’s bounding box, the landmarks, all on the canvas.
 
+* **Return type:**
+  [`Carving`](#cutan.carve.core.Carving)
+
 ### cutan.carve.core.grab_frame(video, t, , ffmpeg='ffmpeg')
 
 The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).
@@ -199,10 +199,10 @@ The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).
 
 An `HxWx3` `uint8` RGB array from a path, a PIL image or an array.
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> load_rgb(np.zeros((4, 5, 4), np.uint8)).shape
 (4, 5, 3)
 ```
+
+* **Return type:**
+  `ndarray`

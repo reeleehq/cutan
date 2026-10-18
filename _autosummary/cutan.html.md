@@ -96,12 +96,12 @@ Level 6: `rest_pose_protection` (an#407), which `validate_character` says aloud.
 
 Refuse, with an upgrade hint, to load against an `an` older than this `cutan` needs.
 
-* **Return type:**
-  [`None`](https://docs.python.org/3/builtins/constants.html#None)
-
 ```pycon
 >>> require_an()
 ```
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.style_spec(name)
 

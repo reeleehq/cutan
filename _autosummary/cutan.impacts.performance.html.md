@@ -131,9 +131,6 @@ the timing wanders, not how far. `rho = 0` is independent jitter;
 `rho` near 1 is a player who drifts ahead or behind for several beats.
 `bias` is a constant lead (negative) or lag (positive).
 
-* **Return type:**
-  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)], [`object`](https://docs.python.org/3/builtins/functions.html#object)], [`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]
-
 ```pycon
 >>> import numpy as np
 >>> h = gaussian_humanizer(0.01, rho=0.5)
@@ -143,6 +140,9 @@ the timing wanders, not how far. `rho = 0` is independent jitter;
 >>> gaussian_humanizer()([0.0, 1.0], None)
 [0.0, 0.0]
 ```
+
+* **Return type:**
+  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)], [`object`](https://docs.python.org/3/builtins/functions.html#object)], [`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]
 
 ### cutan.impacts.performance.perform(tempo=100.0, , beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, humanizer=None, seed=0)
 
@@ -156,9 +156,6 @@ into offsets (default: none); each offset is then clamped to
 [`MAX_OFFSET_FRACTION`](#cutan.impacts.performance.MAX_OFFSET_FRACTION) of the gap to either neighbour, and the clamped
 value is what the event records — the ground truth is what was executed.
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImpactEvent`](#cutan.impacts.performance.ImpactEvent), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
-
 ```pycon
 >>> [e.beat for e in perform(120, beats=2, subdivision=2, pattern=(1, 0))]
 [0.0, 1.0]
@@ -166,12 +163,12 @@ value is what the event records — the ground truth is what was executed.
 [1.0, 0.5, 1.0, 0.5]
 ```
 
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImpactEvent`](#cutan.impacts.performance.ImpactEvent), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
 ### cutan.impacts.performance.tempo_map(tempo)
 
 Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](#cutan.impacts.performance.TempoMap).
-
-* **Return type:**
-  [`TempoMap`](#cutan.impacts.performance.TempoMap)
 
 ```pycon
 >>> tempo_map(90).points
@@ -179,3 +176,6 @@ Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](#cutan.impacts.perf
 >>> tempo_map([(0, 90), (16, 120)]).points
 ((0.0, 90.0), (16.0, 120.0))
 ```
+
+* **Return type:**
+  [`TempoMap`](#cutan.impacts.performance.TempoMap)

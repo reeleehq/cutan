@@ -66,11 +66,11 @@ style_voice_role`: target names resolved to values), with the spec it came
 from recorded, so a later re-measure of the style is noticed. Merge it beside
 a `voice_id`: `{**style_voice("oversimplified", "eager"), "voice_id": ...}`.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
-
 ```pycon
 >>> doc = style_voice("oversimplified", "narrator")
 >>> doc["metadata"]["style_spec"]["name"], "targets" in doc["takes"]["cues"]["deadpan"]
 ('oversimplified', True)
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]

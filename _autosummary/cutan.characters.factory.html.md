@@ -354,26 +354,26 @@ asset library and `an credits` read every file of the character that no
 stamp pins (a part re-carved later, a file added by hand) as UNVERIFIED,
 never as the factory’s (`an.credits._part_credits()`).
 
-* **Return type:**
-  `AssetSource`
-
 ```pycon
 >>> s = factory_descriptor_source(b"<svg/>")
 >>> (s.provider, s.license, len(s.sha256))
 ('an character factory', 'cc0-1.0', 64)
 ```
 
+* **Return type:**
+  `AssetSource`
+
 ### cutan.characters.factory.factory_source(data)
 
 The per-part source of a part this factory drew, pinned to its bytes.
-
-* **Return type:**
-  `AssetSource`
 
 ```pycon
 >>> factory_source(b"<svg/>").license, len(factory_source(b"<svg/>").sha256)
 ('cc0-1.0', 64)
 ```
+
+* **Return type:**
+  `AssetSource`
 
 ### cutan.characters.factory.gaze_travel_for(rx=14, ry=10, pupil_r=5)
 
@@ -383,13 +383,13 @@ axes’ unit circle maps onto. The compiler clamps the summed gaze to 0.95
 of that circle (`GAZE_ELLIPSE_MARGIN`), which is what keeps the pupil disc
 inside the white at every angle without a runtime mask.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> gaze_travel_for()
 {'x': 9.0, 'y': 5.0}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 ### cutan.characters.factory.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False)
 
@@ -518,14 +518,14 @@ guess at it. Multiply by
 `stage.scale`. The head reaches its drawing’s top edge (a hat stays
 inside it).
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> e = stage_extent(CharacterDescriptor(name="c"))
 >>> round(e["top"]), round(e["feet"])
 (169, 94)
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 ### cutan.characters.factory.stamp_factory_descriptor(char_dir)
 
@@ -552,14 +552,14 @@ would make every other character’s shared parts private. The stamp pins the
 digest, so a part later re-drawn or re-carved no longer matches it and stops
 being itemised as the factory’s — the stamp cannot launder new bytes.
 
-* **Return type:**
-  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
-
 paths: the relative paths this call has just DRAWN — required (an#249
 : R4-N1): a stamp says “the factory made these bytes”, so only the code
   that made them may write it. Stamping every part by default would label
   a part re-carved since as the factory’s `cc0`. A part carrying some
   other provider’s source is never re-stamped.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
 
 ### cutan.characters.factory.stamp_generated_head(char_dir, source)
 
@@ -605,9 +605,6 @@ Face offsets scale with `head_scale` (the face was drawn at it), limb
 offsets come from the build’s own joints. `slots` limits the poses to the
 slots a rig has (a rig without the eye stack has no pupils to pose).
 
-* **Return type:**
-  dict[str, dict[str, ‘SlotPose’]]
-
 ```pycon
 >>> poses = view_poses()
 >>> sorted(poses)
@@ -615,3 +612,6 @@ slots a rig has (a rig without the eye stack has no pupils to pose).
 >>> poses["front"], poses["back"]["mouth"].alpha, poses["side"]["arm_r"].x
 ({}, 0.0, -90.0)
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), SlotPose]]

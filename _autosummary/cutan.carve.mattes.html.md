@@ -186,9 +186,6 @@ A [`Matte`](#cutan.carve.mattes.Matte) from a strategy’s name, its recipe, a `
 A recipe (`Matte.recipe()`, as a carve records it) builds the same matte
 back, so a strategy with its settings is plain data (a batch spec, a CLI):
 
-* **Return type:**
-  [`Matte`](#cutan.carve.mattes.Matte)
-
 ```pycon
 >>> as_matte("chroma").name
 'chroma'
@@ -202,6 +199,9 @@ Traceback (most recent call last):
 ValueError: no matte strategy 'rainbow'; the strategies are: chroma, flat_colour, ...
 ```
 
+* **Return type:**
+  [`Matte`](#cutan.carve.mattes.Matte)
+
 ### cutan.carve.mattes.border_colours(rgb, , max_colours=3, min_share=0.08, bits=4)
 
 The dominant colours of the image’s border: the backdrop of a flat frame.
@@ -210,14 +210,14 @@ Border pixels are binned at `bits` per channel; every bin holding at least
 `min_share` of the border (up to `max_colours`, most frequent first)
 gives one colour, the median of its pixels.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int)]]
-
 ```pycon
 >>> img = np.zeros((20, 20, 3), np.uint8); img[:] = (250, 240, 230)
 >>> border_colours(img)
 [(250, 240, 230)]
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int)]]
 
 ### cutan.carve.mattes.register_matte(cls, , name=None)
 

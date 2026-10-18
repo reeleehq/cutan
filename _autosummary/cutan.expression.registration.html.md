@@ -37,8 +37,8 @@ Plain declarations: importing this module registers nothing.
 
 ### Classes
 
-| [`ExpressionAction`](#cutan.expression.registration.ExpressionAction)(\*\*data)   | Hold a facial expression on an entity (an#98, epic #9 Wave 6).   |
-|-------------------------------------------------------------------------------|------------------------------------------------------------------|
+| [`ExpressionAction`](#cutan.expression.registration.ExpressionAction)(\*[, name, kind, preset, ...])   | Hold a facial expression on an entity (an#98, epic #9 Wave 6).   |
+|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
 
 ### cutan.expression.registration.DFLT_EXPRESSION_BLEND_S *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.15*
 
@@ -56,7 +56,7 @@ a preset name (`happy`, `wry-smile`).
 * **Type:**
   What an emotion name may be
 
-### *class* cutan.expression.registration.ExpressionAction(\*\*data)
+### *class* cutan.expression.registration.ExpressionAction(\*, name=None, kind='expression', target, preset=None, axes=<factory>, intensity=1.0, duration=None, blend=0.15, \*\*extra_data)
 
 Bases: `ExtensionAction`
 
@@ -90,9 +90,6 @@ Hold a facial expression on an entity (an#98).
 `duration=None` runs to the shot end and counts as **zero** in a
 `sequence`, as a looping `play` does:
 
-* **Return type:**
-  [`ExpressionAction`](#cutan.expression.registration.ExpressionAction)
-
 ```pycon
 >>> [f.start for f in flatten(sequence(expression("a", "happy"), delay(1.0), expression("a", "sad")))]
 [0.0, 1.0]
@@ -100,12 +97,12 @@ Hold a facial expression on an entity (an#98).
 2.0
 ```
 
+* **Return type:**
+  [`ExpressionAction`](#cutan.expression.registration.ExpressionAction)
+
 ### cutan.expression.registration.expression_duration(action, extent)
 
 An expression’s span: its `duration`, else zero (it runs to the shot end).
-
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ```pycon
 >>> expression_duration(ExpressionAction(target="a", duration=2.0), None)
@@ -113,6 +110,9 @@ An expression’s span: its `duration`, else zero (it runs to the shot end).
 >>> expression_duration(ExpressionAction(target="a"), None)
 0.0
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.expression.registration.format_emotion(line)
 
@@ -128,13 +128,13 @@ The `[…]` content for `line` (`angry 0.4` with an intensity), or
 0.4]`’s to the emotion and its intensity (0..1, an#253); refuse anything
 else.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
-
 ```pycon
 >>> parse_emotion("Happy"), parse_emotion(" angry 0.4 ")
 ({'emotion': 'happy'}, {'emotion': 'angry', 'emotion_intensity': 0.4})
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 ### cutan.expression.registration.read_expression_md(item, , index)
 

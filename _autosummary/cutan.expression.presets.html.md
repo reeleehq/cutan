@@ -39,7 +39,7 @@ True
 | [`Preset`](#cutan.expression.presets.Preset)(name[, axes, mouth_form, anchor])   | A named expression: axis offsets, the mouth form it prefers, its anchor.   |
 |---------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
 
-### *class* cutan.expression.presets.Preset(name, axes=<factory>, mouth_form=None, anchor='')
+### *class* cutan.expression.presets.Preset(name, axes=dict(), mouth_form=None, anchor='')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -57,25 +57,25 @@ The `viseme@<form>` set this preset’s mouth prefers; `None` = `viseme`.
 
 The preset names, in declaration order.
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
-
 ```pycon
 >>> known_presets()[:3]
 ('neutral', 'happy', 'sad')
 ```
 
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
 ### cutan.expression.presets.mouth_form_of(preset)
 
 The `viseme@<form>` a preset prefers, or `None` for the neutral set.
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ```pycon
 >>> mouth_form_of("amused"), mouth_form_of("thinking"), mouth_form_of(None)
 ('happy', None, None)
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.expression.presets.preset_axes(preset, , axes=None, intensity=1.0)
 

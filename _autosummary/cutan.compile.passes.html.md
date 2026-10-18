@@ -99,13 +99,13 @@ The pupil nodes of the gaze stack (an#99); a rig without them takes gaze as a no
 
 The entity’s blink phase in [0, 1): the runtime’s rule, ported exactly.
 
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
-
 ```pycon
 >>> blink_phase("charlie")
 0.762
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.compile.passes.preset_context_of(vocab, , policy=None)
 

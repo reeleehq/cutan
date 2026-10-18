@@ -30,6 +30,7 @@
 <meta content="cutan.carve.prop | cutan" name="twitter:title"/>
 <link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
 <link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
@@ -181,11 +182,6 @@ carving’s source is kept beside it as <code class="docutils literal notranslat
 <dt class="sig sig-object py" id="cutan.carve.prop.write_prop">
 <span class="sig-prename descclassname"><span class="pre">cutan.carve.prop.</span></span><span class="sig-name descname"><span class="pre">write_prop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">carved</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_side</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relicense</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/prop.html#write_prop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.prop.write_prop" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.prop.write_prop'">¶</a></dt>
 <dd><p>Write <code class="docutils literal notranslate"><span class="pre">carved</span></code> to <code class="docutils literal notranslate"><span class="pre">folder</span></code> as <code class="docutils literal notranslate"><span class="pre">prop.json</span></code> + <code class="docutils literal notranslate"><span class="pre">parts/*.png</span></code>; return the descriptor.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropDescriptor</span></code></span></p>
-</dd>
-</dl>
 <p>name: the prop’s name (default: the folder’s name)
 unit: view_box units per carved pixel (default 1); or <code class="docutils literal notranslate"><span class="pre">max_side</span></code>: the</p>
 <blockquote>
@@ -209,6 +205,11 @@ that carving), never by hand from other carvings’ parts.</p>
 part, at its pivot, parented to the root, and one slot per part above the
 base, in the order the parts were listed. Nothing is written unless the
 whole descriptor is valid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropDescriptor</span></code></span></p>
+</dd>
+</dl>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -230,7 +231,7 @@ whole descriptor is valid.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=73f2ab08"></script>
+<script src="../_static/documentation_options.js?v=d78a2f11"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

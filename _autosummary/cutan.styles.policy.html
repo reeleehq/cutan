@@ -30,6 +30,7 @@
 <meta content="cutan.styles.policy | cutan" name="twitter:title"/>
 <link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
 <link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
@@ -266,17 +267,17 @@ one unless <code class="docutils literal notranslate"><span class="pre">shot</sp
 <dt class="sig sig-object py" id="cutan.styles.policy.policy_of">
 <span class="sig-prename descclassname"><span class="pre">cutan.styles.policy.</span></span><span class="sig-name descname"><span class="pre">policy_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/styles/policy.html#policy_of"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.styles.policy.policy_of" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.styles.policy.policy_of'">¶</a></dt>
 <dd><p>The policy block an object carries: a <code class="docutils literal notranslate"><span class="pre">policy</span></code> field (declared or extra) or key; else <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">policy_of</span><span class="p">({</span><span class="s2">"policy"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"locomotion"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"loco.glide"</span><span class="p">]}})</span>
 </span><span id="line-2"><span class="go">{'locomotion': ['loco.glide']}</span>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">policy_of</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
 </span><span id="line-4"><span class="go">True</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.styles.policy.policy_problems">
@@ -285,11 +286,6 @@ one unless <code class="docutils literal notranslate"><span class="pre">shot</sp
 <p>Every aspect must be registered, every choice a method OF that aspect (by
 id: <code class="docutils literal notranslate"><span class="pre">loco.bounce</span></code>, not <code class="docutils literal notranslate"><span class="pre">bounce</span></code>), and every choice well formed (an id or
 <code class="docutils literal notranslate"><span class="pre">{method,</span> <span class="pre">args,</span> <span class="pre">version}</span></code>).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">policy_problems</span><span class="p">({</span><span class="s2">"locomotion"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"loco.bounce"</span><span class="p">,</span> <span class="s2">"loco.glide"</span><span class="p">]})</span>
 </span><span id="line-2"><span class="go">[]</span>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">policy_problems</span><span class="p">({</span><span class="s2">"locomotion"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"bounce"</span><span class="p">],</span> <span class="s2">"dance"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"x"</span><span class="p">]}):</span> <span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
@@ -297,6 +293,11 @@ id: <code class="docutils literal notranslate"><span class="pre">loco.bounce</sp
 </span><span id="line-5"><span class="go">policy aspect 'dance' is not registered (aspects: expression, locomotion, speech)</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.styles.policy.style_pack">
@@ -307,16 +308,16 @@ spec it was copied from (name and digest) in <code class="docutils literal notra
 <p><code class="docutils literal notranslate"><span class="pre">spec</span></code> is anything <a class="reference internal" href="cutan.styles.html#cutan.styles.resolve_style_spec" title="cutan.styles.resolve_style_spec"><code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.styles.resolve_style_spec()</span></code></a> takes (a
 style’s name, a path, a mapping). Save it as the skill’s step 3 says:
 <code class="docutils literal notranslate"><span class="pre">mall["styles"][pack.name]</span> <span class="pre">=</span> <span class="pre">pack.model_dump(mode="json")</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span> <span class="o">=</span> <span class="n">style_pack</span><span class="p">(</span><span class="s2">"south_park"</span><span class="p">)</span>
 </span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pack</span><span class="o">.</span><span class="n">policy</span><span class="p">,</span> <span class="n">pack</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"style_spec"</span><span class="p">][</span><span class="s2">"name"</span><span class="p">]</span>
 </span><span id="line-3"><span class="go">('south_park', {'locomotion': ['loco.bounce']}, 'south_park')</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -344,7 +345,7 @@ style’s name, a path, a mapping). Save it as the skill’s step 3 says:
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=73f2ab08"></script>
+<script src="../_static/documentation_options.js?v=d78a2f11"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

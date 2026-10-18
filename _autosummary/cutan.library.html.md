@@ -68,9 +68,6 @@ Gait is deliberately not here: which walk methods apply is the capability
 matcher’s answer (`applicable("locomotion", asset)`, ADR 0002), derived from
 `limbs.legs`, not a second fact about the asset.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
-
 ```pycon
 >>> from cutan.characters.schema import CharacterDescriptor
 >>> doc = CharacterDescriptor(name="blob").model_dump(mode="json")
@@ -78,15 +75,15 @@ matcher’s answer (`applicable("locomotion", asset)`, ADR 0002), derived from
 ['swap.view']
 ```
 
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
+
 ### cutan.library.character_overrides(doc, art)
 
 The declared fields that REMOVED a capability (an#381): `occluded`
 when a declared cover is what keeps `face.brows` from an overlay face
 whose binding moves brows. (Overrides that show on an afforded capability
 are in its `overrides` param already.)
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ```pycon
 >>> character_overrides({"kind": "CharacterDescriptor", "name": "c",
@@ -96,14 +93,17 @@ are in its `overrides` param already.)
 []
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
 ### cutan.library.renders_as_placeholder(doc)
 
 Whether the compiler would draw this character only as its placeholder stand-in.
-
-* **Return type:**
-  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 ```pycon
 >>> renders_as_placeholder({"name": "alice"}), renders_as_placeholder({"parts": ["head"]})
 (True, False)
 ```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)

@@ -134,7 +134,7 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 The cadence of one shot, measured with the WHOLE clip’s change
 threshold so a shot’s numbers add up to the clip’s.
 
-### *class* cutan.verify.style.StyleLintResult(metrics, report, per_shot=<factory>)
+### *class* cutan.verify.style.StyleLintResult(metrics, report, per_shot=list())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -180,9 +180,6 @@ One `Finding` per target the metrics miss; `[]` when all hit.
 respects it — a style that sets `step_hz` is never told to drop it, one
 that leaves it unset is never told to set it:
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Finding`]
-
 ```pycon
 >>> m = measure_style(np.zeros((8, 4, 4, 3), np.uint8), fps=8.0, shot_durations=[1.0])
 >>> (f,) = check_targets(m, {"identical_frame_share": [0.5, 0.7]},
@@ -194,6 +191,9 @@ that leaves it unset is never told to set it:
 Raises `ValueError` for a target [`METRICS`](#cutan.verify.style.METRICS) does not name, or a range
 that is not `[low, high]` with `low <= high`.
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Finding`]
+
 ### cutan.verify.style.film_shots(scene)
 
 `(shot id, seconds on screen)` per shot of an `an` render, in order.
@@ -203,9 +203,6 @@ except where a dissolve overlaps two shots: the film is that much shorter
 than their sum (`an.assemble.film_timeline()`), and each shot is
 counted from where its frames start in the film.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
-
 ```pycon
 >>> from an.ir.schema import Shot, Transition
 >>> film_shots(SceneIR(timeline=[
@@ -214,6 +211,9 @@ counted from where its frames start in the film.
 [('a', 1.5), ('b', 2.0)]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
 ### cutan.verify.style.load_style_spec(spec)
 
 A style spec as a dict: a style’s name, a path to a spec file, or a mapping.
@@ -221,13 +221,13 @@ A style spec as a dict: a style’s name, a path to a spec file, or a mapping.
 The rules are [`cutan.styles.resolve_style_spec()`](cutan.styles.html.md#cutan.styles.resolve_style_spec)’s (a bare name is
 always the shipped spec; `./name` or `name.yaml` is a file).
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
-
 ```pycon
 >>> load_style_spec("reiniger")["style"]
 'reiniger'
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 ### cutan.verify.style.measure_shots(frames, , fps, shot_durations=None, shot_ids=None, min_changed_pixels=8)
 
@@ -237,9 +237,6 @@ The shots are `shot_durations` (seconds, in order) when given, else the
 pixel cut detector’s. The step INTO each shot is the cut, not a pose
 change, so it belongs to no shot. A one-frame shot has no step of its own
 and measures as all-identical.
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ShotMetrics`](#cutan.verify.style.ShotMetrics)]
 
 ```pycon
 >>> import numpy as np
@@ -251,6 +248,9 @@ and measures as all-identical.
 [('card', 1.0), ('map', 0.0)]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ShotMetrics`](#cutan.verify.style.ShotMetrics)]
+
 ### cutan.verify.style.measure_style(frames, , fps, shot_durations=None, min_changed_pixels=8)
 
 Measure the [`METRICS`](#cutan.verify.style.METRICS) on `frames`, an `(n, h, w, 3)` uint8 RGB array.
@@ -260,9 +260,6 @@ pixel cut detector is used. Ratios are rounded to three decimals.
 `min_changed_pixels` is the local-change rule’s size (`0`: the research’s
 frame-wide estimator alone, which the targets were first measured with).
 
-* **Return type:**
-  [`StyleMetrics`](#cutan.verify.style.StyleMetrics)
-
 ```pycon
 >>> import numpy as np
 >>> f = np.zeros((6, 4, 4, 3), np.uint8)
@@ -271,6 +268,9 @@ frame-wide estimator alone, which the targets were first measured with).
 >>> m.identical_frame_share, m.one_frame_interval_share, m.cuts
 (0.0, 1.0, 0)
 ```
+
+* **Return type:**
+  [`StyleMetrics`](#cutan.verify.style.StyleMetrics)
 
 ### cutan.verify.style.measure_video(mp4, , shot_durations=None, width=320, height=180)
 

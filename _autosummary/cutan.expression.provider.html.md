@@ -85,7 +85,7 @@ Bases: [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protoco
 
 The seam: whatever produces per-axis curves for one entity of one shot.
 
-### *class* cutan.expression.provider.ExpressionSpan(start, end, preset, axes=<factory>, intensity=1.0, blend=0.0, source='action')
+### *class* cutan.expression.provider.ExpressionSpan(start, end, preset, axes=dict(), intensity=1.0, blend=0.0, source='action')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 

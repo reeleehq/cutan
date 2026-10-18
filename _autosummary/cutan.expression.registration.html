@@ -30,6 +30,7 @@
 <meta content="cutan.expression.registration | cutan" name="twitter:title"/>
 <link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
 <link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
@@ -187,7 +188,7 @@ to the shot end, and its <code class="docutils literal notranslate"><span class=
 <p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.registration.ExpressionAction" title="cutan.expression.registration.ExpressionAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExpressionAction</span></code></a>(**data)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.registration.ExpressionAction" title="cutan.expression.registration.ExpressionAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExpressionAction</span></code></a>(*[, name, kind, preset, ...])</p></td>
 <td><p>Hold a facial expression on an entity (an#98, epic #9 Wave 6).</p></td>
 </tr>
 </tbody>
@@ -215,7 +216,7 @@ to the shot end, and its <code class="docutils literal notranslate"><span class=
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="cutan.expression.registration.ExpressionAction">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.expression.registration.</span></span><span class="sig-name descname"><span class="pre">ExpressionAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/registration.html#ExpressionAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.registration.ExpressionAction" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.registration.ExpressionAction'">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.expression.registration.</span></span><span class="sig-name descname"><span class="pre">ExpressionAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'expression'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**extra_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/registration.html#ExpressionAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.registration.ExpressionAction" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.registration.ExpressionAction'">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ExtensionAction</span></code></p>
 <p>Hold a facial expression on an entity (an#98, epic #9 Wave 6).</p>
 <p><code class="docutils literal notranslate"><span class="pre">preset</span></code> names one of <code class="xref py py-data docutils literal notranslate"><span class="pre">an.expression.presets.PRESETS</span></code>; <code class="docutils literal notranslate"><span class="pre">axes</span></code>
@@ -246,33 +247,33 @@ frame lands on it with <code class="docutils literal notranslate"><span class="p
 <dd><p>Hold a facial expression on an entity (an#98).</p>
 <p><code class="docutils literal notranslate"><span class="pre">duration=None</span></code> runs to the shot end and counts as <strong>zero</strong> in a
 <code class="docutils literal notranslate"><span class="pre">sequence</span></code>, as a looping <code class="docutils literal notranslate"><span class="pre">play</span></code> does:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#cutan.expression.registration.ExpressionAction" title="cutan.expression.registration.ExpressionAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionAction</span></code></a></span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">start</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">sequence</span><span class="p">(</span><span class="n">expression</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"happy"</span><span class="p">),</span> <span class="n">delay</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">expression</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"sad"</span><span class="p">)))]</span>
 </span><span id="line-2"><span class="go">[0.0, 1.0]</span>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">flatten</span><span class="p">(</span><span class="n">expression</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"angry"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">2.0</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">end</span>
 </span><span id="line-4"><span class="go">2.0</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#cutan.expression.registration.ExpressionAction" title="cutan.expression.registration.ExpressionAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionAction</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.expression.registration.expression_duration">
 <span class="sig-prename descclassname"><span class="pre">cutan.expression.registration.</span></span><span class="sig-name descname"><span class="pre">expression_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/registration.html#expression_duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.registration.expression_duration" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.registration.expression_duration'">¶</a></dt>
 <dd><p>An expression’s span: its <code class="docutils literal notranslate"><span class="pre">duration</span></code>, else zero (it runs to the shot end).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">expression_duration</span><span class="p">(</span><span class="n">ExpressionAction</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
 </span><span id="line-2"><span class="go">2.0</span>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">expression_duration</span><span class="p">(</span><span class="n">ExpressionAction</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s2">"a"</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
 </span><span id="line-4"><span class="go">0.0</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.expression.registration.format_emotion">
@@ -281,7 +282,7 @@ frame lands on it with <code class="docutils literal notranslate"><span class="p
 <code class="docutils literal notranslate"><span class="pre">None</span></code> when it carries no emotion.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -291,15 +292,15 @@ frame lands on it with <code class="docutils literal notranslate"><span class="p
 <dd><p><code class="docutils literal notranslate"><span class="pre">[happy]</span></code>’s content to the line’s emotion, lower-cased, and <code class="docutils literal notranslate"><span class="pre">[angry</span>
 <span class="pre">0.4]</span></code>’s to the emotion and its intensity (0..1, an#253); refuse anything
 else.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_emotion</span><span class="p">(</span><span class="s2">"Happy"</span><span class="p">),</span> <span class="n">parse_emotion</span><span class="p">(</span><span class="s2">" angry 0.4 "</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">({'emotion': 'happy'}, {'emotion': 'angry', 'emotion_intensity': 0.4})</span>
+</span></code></pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
 </dd>
 </dl>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_emotion</span><span class="p">(</span><span class="s2">"Happy"</span><span class="p">),</span> <span class="n">parse_emotion</span><span class="p">(</span><span class="s2">" angry 0.4 "</span><span class="p">)</span>
-</span><span id="line-2"><span class="go">({'emotion': 'happy'}, {'emotion': 'angry', 'emotion_intensity': 0.4})</span>
-</span></code></pre></div>
-</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.expression.registration.read_expression_md">
@@ -354,7 +355,7 @@ the next sync and then from the JSON on the next md edit.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=73f2ab08"></script>
+<script src="../_static/documentation_options.js?v=d78a2f11"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

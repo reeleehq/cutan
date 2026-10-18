@@ -33,9 +33,6 @@ query: signed-URL tokens are credentials). A local file (a path, a
 in `extra.file`, no path anywhere; a `data:` URI is refused. `t`,
 `title` and `note` go into `extra` beside any other keyword.
 
-* **Return type:**
-  `AssetSource`
-
 ```pycon
 >>> s = frame_source("https://www.youtube.com/watch?v=AAGIi62-sAU&si=track",
 ...                  t=34.6, license="all-rights-reserved", author="OverSimplified")
@@ -50,12 +47,12 @@ in `extra.file`, no path anywhere; a `data:` URI is refused. `t`,
 ('local', None, 'clip.mp4', False)
 ```
 
+* **Return type:**
+  `AssetSource`
+
 ### cutan.carve.provenance.youtube_id(url)
 
 The video id of a YouTube URL, else `None`.
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ```pycon
 >>> youtube_id("https://www.youtube.com/watch?v=AAGIi62-sAU&t=34")
@@ -65,3 +62,6 @@ The video id of a YouTube URL, else `None`.
 >>> youtube_id("https://notyoutube.com/watch?v=x"), youtube_id("https://WWW.YOUTUBE.COM:443/shorts/abc")
 (None, 'abc')
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)

@@ -137,15 +137,15 @@ A clip spec that cannot describe a clip.
 
 The cartesian product of the given axes over `base`.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ImpactClipSpec`](#cutan.impacts.clip.ImpactClipSpec)]
-
 ```pycon
 >>> len(impact_set_specs())
 24
 >>> {s.seed for s in impact_set_specs(seeds=(0, 1), fps=(30,))}
 {0, 1}
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ImpactClipSpec`](#cutan.impacts.clip.ImpactClipSpec)]
 
 ### cutan.impacts.clip.plan_impact_clip(spec)
 

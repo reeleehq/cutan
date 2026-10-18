@@ -72,9 +72,6 @@ the idle line rise about a sixth of its half width.
 
 Return `{"mouth_<letter>[_<form>]": <svg-string>, ...}` for every shape.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> svgs = generate_default_mouths()
 >>> 'mouth_x' in svgs and 'viewBox' in svgs['mouth_x']
@@ -83,17 +80,20 @@ True
 ['mouth_a_happy']
 ```
 
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
 ### cutan.characters.mouth_set.mouth_attachment_name(shape, form=None)
 
 The attachment (and file stem) of one mouth drawing.
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ```pycon
 >>> mouth_attachment_name("a"), mouth_attachment_name("a", "happy")
 ('mouth_a', 'mouth_a_happy')
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.mouth_set.write_default_mouths(out_dir, , canvas=(256, 128), palette=None, shapes=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'x'), variants=None)
 

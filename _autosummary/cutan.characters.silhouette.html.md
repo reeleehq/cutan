@@ -48,13 +48,13 @@ Both images are resized to `size`, converted to grayscale, thresholded
 at the midpoint, and the intersection-over-union of the foreground (dark)
 pixels is computed.
 
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
-
 ```pycon
 >>> # Two identical silhouettes → IoU = 1.0; two empty → 0.0 (no overlap).
 >>> # Tested via test suite, not doctest, since it requires Playwright.
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.characters.silhouette.render_character_silhouettes(char_dirs, out_dir, , size=512)
 

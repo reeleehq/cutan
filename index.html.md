@@ -42,6 +42,20 @@ The matte is a strategy: `flat_colour` (the default), `chroma`, `grabcut`, `poly
 
 The cut-out bench corpus (`misc/bench/`), `examples/` and the demo gallery (`misc/demos/`) live here too; `cutan.bench.run_bench()` runs the corpus through `an`’s bench runner.
 
+## Production packs from writers
+
+`skills/cutan-production-pack/` is an agent skill for people who write and direct but do not run cutan: uploaded to Claude.ai (zip the folder, or package it with the `skill-creator` skill), it has their Claude write a **production pack**: `scene.md`, a `cast.sh` of `an character new` commands, environments, props and their SVG drawings, and a `PRODUCTION.md` brief, in the formats this package reads. Its example pack (`examples/the-umbrella/`) is validated by `tests/test_production_pack_skill.py`, which also regenerates the skill’s vocabulary, preset, rig-path and style tables from the code.
+
+Receiving a pack:
+
+```bash
+python skills/cutan-production-pack/scripts/validate_pack.py <pack>   # cutan's own checks on a scratch project
+an init <id> --id --genre cutout_animation                            # then copy the pack in, run cast.sh's lines
+an validate <project> --strict-assets && an render <project>          # from the project root, and render
+```
+
+`validate_pack.py` runs only `an character ...` lines from `cast.sh` (no shell). Set the licence of the pack’s own drawings (their `source`) before publishing a render.
+
 ## Names that never change
 
 Moving the code renamed nothing that is stored. Scenes keep `renderer: cutout`, the genre keeps its slug `cutout_animation`, character descriptors keep their document kind and version, and asset ids keep their `character.` prefix. These names are in `cutan/__init__.py`. The old `an.characters`, `an.expression`, `an.impacts`, `an.audio.offline_lipsync`-style import paths still work in `an`, with a `MovedModuleWarning`.

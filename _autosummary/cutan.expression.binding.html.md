@@ -119,19 +119,19 @@ A declared binding is a list of dicts in the two dataclasses’ shapes
 `{"axis", "slot", "set_family"}`). An unknown axis in it is an error.
 
 * **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Union`[[`ChannelBinding`](#cutan.expression.binding.ChannelBinding), [`SetBinding`](#cutan.expression.binding.SetBinding)]]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`ChannelBinding`](#cutan.expression.binding.ChannelBinding), [`SetBinding`](#cutan.expression.binding.SetBinding)]]
 
 ### cutan.expression.binding.declared_mouth_variants(desc)
 
 `{form: set name}` for every `viseme@<form>` set the descriptor declares.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> declared_mouth_variants(CharacterDescriptor(name="m"))
 {}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.expression.binding.default_binding(desc)
 
@@ -143,7 +143,7 @@ end while on the RIGHT brow it lifts it — the axis says “+ = inner end
 up”, hence `-travel` on the left and `+travel` on the right.
 
 * **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Union`[[`ChannelBinding`](#cutan.expression.binding.ChannelBinding), [`SetBinding`](#cutan.expression.binding.SetBinding)]]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`ChannelBinding`](#cutan.expression.binding.ChannelBinding), [`SetBinding`](#cutan.expression.binding.SetBinding)]]
 
 ### cutan.expression.binding.expression_problems(desc, , preset, axes=(), who)
 
@@ -152,15 +152,15 @@ Every reason an expression cannot resolve on `desc` — empty means it can.
 Shared by `an validate` (each becomes an error Finding) and the compiler
 (which raises [`ExpressionResolutionError`](#cutan.expression.binding.ExpressionResolutionError) with the same list).
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> expression_problems(CharacterDescriptor(name="m"), preset="joyful", who="m")
 ["unknown expression preset 'joyful' (known: neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused)"]
 >>> expression_problems(CharacterDescriptor(name="m", face_overlay=False), preset="happy", who="m")[0].startswith("'m' has its face baked")
 True
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.expression.binding.lid_rung_problems(desc, preset, , axes=None, intensity=1.0, who=None)
 
@@ -172,9 +172,6 @@ expression at all. One sentence per lid axis that falls short; empty for a
 preset with no lid, a rig whose lids squash (no closed art: continuous), or
 a baked face.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> d = CharacterDescriptor(name="bob", asset_sets={"eyelid": {"OPEN": "o", "CLOSED": "c"}})
 >>> lid_rung_problems(d, None, axes={"lid_open_l": -0.45})
@@ -182,6 +179,9 @@ a baked face.
 >>> lid_rung_problems(d, None, axes={"lid_open_l": -0.9})
 []
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.expression.binding.missing_mouth_form(desc, preset, , who=None)
 
@@ -194,9 +194,6 @@ change (a baked face, a rig with no `viseme` set).
 One sentence for `an validate` (an `expression` and a dialogue
 `[emotion]`) and the compiler’s silent-mouth hold.
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
-
 ```pycon
 >>> d = CharacterDescriptor(name="ned", asset_sets={"viseme": {"X": "mouth_x"}})
 >>> missing_mouth_form(d, "angry")
@@ -204,6 +201,9 @@ One sentence for `an validate` (an `expression` and a dialogue
 >>> missing_mouth_form(d, "thinking") is None
 True
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.expression.binding.preset_axes(preset, , axes=None, intensity=1.0)
 
@@ -234,22 +234,22 @@ error, not a fallback.
 
 Whether any of `axes` is a gaze axis (a no-op on a rig without pupils).
 
-* **Return type:**
-  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
-
 ```pycon
 >>> touches_gaze(["gaze_x"]), touches_gaze(["brow_angle_l"])
 (True, False)
 ```
 
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
 ### cutan.expression.binding.variant_set_name(form)
 
 The swap-set name for a mouth form (`@` is a legal set-name character).
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ```pycon
 >>> variant_set_name("happy")
 'viseme@happy'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

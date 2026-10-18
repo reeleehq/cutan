@@ -64,13 +64,13 @@ The pupils rest at `(x, y)` (axis units) from `time` on.
 
 The generator’s seed for an entity — a pure function of its name.
 
-* **Return type:**
-  [`int`](https://docs.python.org/3/builtins/functions.html#int)
-
 ```pycon
 >>> gaze_seed("gale") == gaze_seed("gale") and gaze_seed("gale") != gaze_seed("nora")
 True
 ```
+
+* **Return type:**
+  [`int`](https://docs.python.org/3/builtins/functions.html#int)
 
 ### cutan.compile.gaze.saccade_track(entity_id, , duration, fps, blink_windows=None, amplitude=1.0)
 

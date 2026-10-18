@@ -50,11 +50,11 @@ True
 | [`PropArt`](#cutan.impacts.objects.PropArt)(ref, descriptor, parts)                     | A prop's descriptor and its SVG parts — what goes into a props store. |
 | [`StrokeChannel`](#cutan.impacts.objects.StrokeChannel)(target, property, ...)                | One animated property, AFFINE in stroke height `h`.                   |
 
-### cutan.impacts.objects.IMPACT_OBJECTS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[...], [ImpactObject](#cutan.impacts.objects.ImpactObject)]]* *= {'ball': <function ball>, 'stick': <function stick>}*
+### cutan.impacts.objects.IMPACT_OBJECTS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[..., [ImpactObject](#cutan.impacts.objects.ImpactObject)]]* *= {'ball': <function ball>, 'stick': <function stick>}*
 
 Name -> factory. The registry the clip spec and the CLI resolve names through.
 
-### *class* cutan.impacts.objects.ImpactObject(name, art, at, channels, keypoints, impact_keypoint, keypoint_nodes=<factory>, surface_art=None, surface_at=None, params=<factory>)
+### *class* cutan.impacts.objects.ImpactObject(name, art, at, channels, keypoints, impact_keypoint, keypoint_nodes=dict(), surface_art=None, surface_at=None, params=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -115,21 +115,18 @@ one side and falls back along the arc, its contact the arc’s lowest point.
 The angle that lifts it `drop` pixels is `acos(1 - drop / arc_radius)`;
 rotation is the one channel, affine in `h`, so the curve stays exact.
 
-* **Return type:**
-  [`ImpactObject`](#cutan.impacts.objects.ImpactObject)
-
 ```pycon
 >>> b = ball(arc_radius=300.0)
 >>> round(b.params["arc_sweep"], 4), b.at == (0.0, b.params["pivot_y"])
 (1.1226, True)
 ```
 
+* **Return type:**
+  [`ImpactObject`](#cutan.impacts.objects.ImpactObject)
+
 ### cutan.impacts.objects.impact_object(name, \*\*kwargs)
 
 Build a registered object by name.
-
-* **Return type:**
-  [`ImpactObject`](#cutan.impacts.objects.ImpactObject)
 
 ```pycon
 >>> impact_object("ball").name
@@ -139,6 +136,9 @@ Traceback (most recent call last):
   ...
 KeyError: "no impact object 'hammer'; known: ['ball', 'stick']"
 ```
+
+* **Return type:**
+  [`ImpactObject`](#cutan.impacts.objects.ImpactObject)
 
 ### cutan.impacts.objects.stick(, length=200.0, thickness=12.0, pivot=(-120.0, -30.0), contact_angle=0.35, swing=0.95, color='#111827', surface_color='#9ca3af', surface_size=(140.0, 24.0))
 

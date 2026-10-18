@@ -109,15 +109,15 @@ one unless `shot` and `index` name another (a scene-stage check).
 
 The policy block an object carries: a `policy` field (declared or extra) or key; else `None`.
 
-* **Return type:**
-  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
-
 ```pycon
 >>> policy_of({"policy": {"locomotion": ["loco.glide"]}})
 {'locomotion': ['loco.glide']}
 >>> policy_of(None) is None
 True
 ```
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
 
 ### cutan.styles.policy.policy_problems(policy)
 
@@ -127,9 +127,6 @@ Every aspect must be registered, every choice a method OF that aspect (by
 id: `loco.bounce`, not `bounce`), and every choice well formed (an id or
 `{method, args, version}`).
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> policy_problems({"locomotion": ["loco.bounce", "loco.glide"]})
 []
@@ -137,6 +134,9 @@ id: `loco.bounce`, not `bounce`), and every choice well formed (an id or
 policy locomotion: 'bounce' is not a locomotion method id; did you mean 'loco.bounce'?
 policy aspect 'dance' is not registered (aspects: expression, locomotion, speech)
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.styles.policy.style_pack(spec)
 
@@ -148,11 +148,11 @@ spec it was copied from (name and digest) in `metadata`.
 style’s name, a path, a mapping). Save it as the skill’s step 3 says:
 `mall["styles"][pack.name] = pack.model_dump(mode="json")`.
 
-* **Return type:**
-  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
-
 ```pycon
 >>> pack = style_pack("south_park")
 >>> pack.name, pack.policy, pack.metadata["style_spec"]["name"]
 ('south_park', {'locomotion': ['loco.bounce']}, 'south_park')
 ```
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)

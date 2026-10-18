@@ -47,9 +47,6 @@ The bone every carved prop hangs from, at the carving’s anchor.
 
 Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.
 
-* **Return type:**
-  `PropDescriptor`
-
 name: the prop’s name (default: the folder’s name)
 unit: view_box units per carved pixel (default 1); or `max_side`: the
 
@@ -73,3 +70,6 @@ The root bone sits at the carving’s anchor. A split prop gets one bone per
 part, at its pivot, parented to the root, and one slot per part above the
 base, in the order the parts were listed. Nothing is written unless the
 whole descriptor is valid.
+
+* **Return type:**
+  `PropDescriptor`

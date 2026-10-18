@@ -30,6 +30,7 @@
 <meta content="cutan.compile.coarticulate | cutan" name="twitter:title"/>
 <link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
 <link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
@@ -288,11 +289,6 @@ end; the rest then follows that shape, and <a class="reference internal" href="#
 is already at rest there. <code class="docutils literal notranslate"><span class="pre">rest</span></code> is the TRACK’s rest code (a track keyed
 in another convention closes with its own).</p>
 <p>The evidence, “Bye.” timed 0.0–0.5 s in a 1.84 s clip:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.compile.coarticulate.Cue" title="cutan.compile.coarticulate.Cue"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cue</span></code></a>]</span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">raw</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"A"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.167</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.333</span><span class="p">,</span> <span class="s2">"C"</span><span class="p">),</span> <span class="p">(</span><span class="mf">1.838</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">)]</span>
 </span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">c</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">code</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">close_after_speech</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">speech_end</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)]</span>
 </span><span id="line-3"><span class="go">[(0.0, 'X'), (0.0, 'A'), (0.167, 'B'), (0.333, 'C'), (0.5, 'X'), (1.838, 'X')]</span>
@@ -306,6 +302,11 @@ in another convention closes with its own).</p>
 </span><span id="line-3"><span class="go">[(1.025, 'B'), (1.025000001, 'X'), (2.0, 'X')]</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.compile.coarticulate.Cue" title="cutan.compile.coarticulate.Cue"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cue</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.compile.coarticulate.coarticulate">
@@ -313,11 +314,6 @@ in another convention closes with its own).</p>
 <dd><p>All the passes, in the order the module docstring gives.</p>
 <p><code class="docutils literal notranslate"><span class="pre">speech_end</span></code> (where the last word ends, when the line knows its words)
 closes the mouth there instead of at <code class="docutils literal notranslate"><span class="pre">end</span></code> (an#213):</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.compile.coarticulate.Cue" title="cutan.compile.coarticulate.Cue"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cue</span></code></a>]</span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">bye</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"A"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.167</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.333</span><span class="p">,</span> <span class="s2">"C"</span><span class="p">),</span> <span class="p">(</span><span class="mf">1.838</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">)]</span>
 </span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="nb">round</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">c</span><span class="o">.</span><span class="n">code</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">coarticulate</span><span class="p">(</span><span class="n">bye</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mf">1.838</span><span class="p">)][</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
 </span><span id="line-3"><span class="go">[(0.28, 'C'), (1.755, 'X')]</span>
@@ -348,6 +344,11 @@ typo, not a style:</p>
 </span><span id="line-4"><span class="gr">ValueError</span>: <span class="n">min_hold_s must be &gt; 0, got 0</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.compile.coarticulate.Cue" title="cutan.compile.coarticulate.Cue"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cue</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.compile.coarticulate.condense">
@@ -364,11 +365,6 @@ the hold doing its job. Ties go to the later arrival.</p>
 <p>The defect the epic names, verbatim semantics of the old compiler loop —
 ‘A’ (the closure) and ‘D’ (the open vowel) are gone and a 40 ms ‘B’ holds
 for 500 ms:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.compile.coarticulate.Cue" title="cutan.compile.coarticulate.Cue"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cue</span></code></a>]</span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">raw</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.30</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.34</span><span class="p">,</span> <span class="s2">"A"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.38</span><span class="p">,</span> <span class="s2">"D"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.80</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">)]</span>
 </span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">old</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">raw</span><span class="p">:</span>
@@ -410,6 +406,11 @@ it; C in turn opens the window at 0.28:</p>
 </span><span id="line-2"><span class="go">[(0.0, 'X')]</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.compile.coarticulate.Cue" title="cutan.compile.coarticulate.Cue"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cue</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.compile.coarticulate.decay">
@@ -417,17 +418,17 @@ it; C in turn opens the window at 0.28:</p>
 <dd><p>Give a shape <code class="docutils literal notranslate"><span class="pre">decay_s</span></code> to close: a rest arriving sooner than that after
 the shape before it is pushed out to <code class="docutils literal notranslate"><span class="pre">decay_s</span></code>, never past the next cue
 and never past <code class="docutils literal notranslate"><span class="pre">end</span></code> (a rest pushed to <code class="docutils literal notranslate"><span class="pre">end</span></code> is where the line closes).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.compile.coarticulate.Cue" title="cutan.compile.coarticulate.Cue"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cue</span></code></a>]</span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="nb">round</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">c</span><span class="o">.</span><span class="n">code</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">decay</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="s2">"D"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">)],</span> <span class="n">decay_s</span><span class="o">=</span><span class="mf">0.12</span><span class="p">)]</span>
 </span><span id="line-2"><span class="go">[(0.0, 'X'), (0.2, 'D'), (0.32, 'X'), (0.6, 'B')]</span>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="nb">round</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">c</span><span class="o">.</span><span class="n">code</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">decay</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="s2">"D"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.30</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">)],</span> <span class="n">decay_s</span><span class="o">=</span><span class="mf">0.12</span><span class="p">)]</span>
 </span><span id="line-4"><span class="go">[(0.0, 'X'), (0.2, 'D'), (0.3, 'B')]</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.compile.coarticulate.Cue" title="cutan.compile.coarticulate.Cue"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cue</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.compile.coarticulate.lead">
@@ -438,39 +439,34 @@ the state once the collision is over. An opening burst shorter than the
 lead (<code class="docutils literal notranslate"><span class="pre">[(0,</span> <span class="pre">X),</span> <span class="pre">(0.02,</span> <span class="pre">A),</span> <span class="pre">(0.05,</span> <span class="pre">D),</span> <span class="pre">(0.07,</span> <span class="pre">X)]</span></code>) therefore never opens
 the mouth; the hold would have refused a 70 ms word anyway, and the old
 condenser did.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="nb">round</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">c</span><span class="o">.</span><span class="n">code</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">lead</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="s2">"D"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">)],</span> <span class="n">lead_s</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)]</span>
+</span><span id="line-2"><span class="go">[(0.0, 'D'), (0.42, 'B')]</span>
+</span></code></pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.compile.coarticulate.Cue" title="cutan.compile.coarticulate.Cue"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cue</span></code></a>]</span></p>
 </dd>
 </dl>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="nb">round</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">c</span><span class="o">.</span><span class="n">code</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">lead</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="s2">"D"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">)],</span> <span class="n">lead_s</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)]</span>
-</span><span id="line-2"><span class="go">[(0.0, 'D'), (0.42, 'B')]</span>
-</span></code></pre></div>
-</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.compile.coarticulate.merge_duplicates">
 <span class="sig-prename descclassname"><span class="pre">cutan.compile.coarticulate.</span></span><span class="sig-name descname"><span class="pre">merge_duplicates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/compile/coarticulate.html#merge_duplicates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.coarticulate.merge_duplicates" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.coarticulate.merge_duplicates'">¶</a></dt>
 <dd><p>Drop a cue whose shape is the one already showing.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">c</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">code</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">merge_duplicates</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="s2">"C"</span><span class="p">)])]</span>
+</span><span id="line-2"><span class="go">[(0.0, 'X'), (0.1, 'B'), (0.3, 'C')]</span>
+</span></code></pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.compile.coarticulate.Cue" title="cutan.compile.coarticulate.Cue"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cue</span></code></a>]</span></p>
 </dd>
 </dl>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">c</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">code</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">merge_duplicates</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="s2">"C"</span><span class="p">)])]</span>
-</span><span id="line-2"><span class="go">[(0.0, 'X'), (0.1, 'B'), (0.3, 'C')]</span>
-</span></code></pre></div>
-</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.compile.coarticulate.suppress_weak">
 <span class="sig-prename descclassname"><span class="pre">cutan.compile.coarticulate.</span></span><span class="sig-name descname"><span class="pre">suppress_weak</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_weak_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/compile/coarticulate.html#suppress_weak"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.coarticulate.suppress_weak" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.coarticulate.suppress_weak'">¶</a></dt>
 <dd><p>Drop a weak (low-dominance) cue that would show for less than <code class="docutils literal notranslate"><span class="pre">max_weak_s</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.compile.coarticulate.Cue" title="cutan.compile.coarticulate.Cue"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cue</span></code></a>]</span></p>
-</dd>
-</dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">raw</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.20</span><span class="p">,</span> <span class="s2">"D"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.40</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.43</span><span class="p">,</span> <span class="s2">"D"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.80</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">)]</span>
 </span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">c</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">code</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">suppress_weak</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">max_weak_s</span><span class="o">=</span><span class="mf">0.04</span><span class="p">)]</span>
 </span><span id="line-3"><span class="go">[(0.0, 'X'), (0.2, 'D'), (0.8, 'X')]</span>
@@ -481,6 +477,11 @@ condenser did.</p>
 </span><span id="line-2"><span class="go">[(0.0, 'X'), (0.2, 'B'), (0.5, 'D')]</span>
 </span></code></pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#cutan.compile.coarticulate.Cue" title="cutan.compile.coarticulate.Cue"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cue</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -513,7 +514,7 @@ condenser did.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=73f2ab08"></script>
+<script src="../_static/documentation_options.js?v=d78a2f11"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

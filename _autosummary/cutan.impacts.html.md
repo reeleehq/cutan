@@ -218,7 +218,7 @@ the humanisation actually applied (post-clamp).
 * **Type:**
   `t_impact - t_grid`
 
-### *class* cutan.impacts.ImpactObject(name, art, at, channels, keypoints, impact_keypoint, keypoint_nodes=<factory>, surface_art=None, surface_at=None, params=<factory>)
+### *class* cutan.impacts.ImpactObject(name, art, at, channels, keypoints, impact_keypoint, keypoint_nodes=dict(), surface_art=None, surface_at=None, params=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -327,14 +327,14 @@ one side and falls back along the arc, its contact the arc’s lowest point.
 The angle that lifts it `drop` pixels is `acos(1 - drop / arc_radius)`;
 rotation is the one channel, affine in `h`, so the curve stays exact.
 
-* **Return type:**
-  [`ImpactObject`](cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
-
 ```pycon
 >>> b = ball(arc_radius=300.0)
 >>> round(b.params["arc_sweep"], 4), b.at == (0.0, b.params["pivot_y"])
 (1.1226, True)
 ```
+
+* **Return type:**
+  [`ImpactObject`](cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
 
 ### cutan.impacts.build_stroke(events, , kind='surface', duration, rise=0.18, fall=0.18, brake=0.03, rest_height=1.0, timings=None)
 
@@ -360,9 +360,6 @@ the timing wanders, not how far. `rho = 0` is independent jitter;
 `rho` near 1 is a player who drifts ahead or behind for several beats.
 `bias` is a constant lead (negative) or lag (positive).
 
-* **Return type:**
-  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)], [`object`](https://docs.python.org/3/builtins/functions.html#object)], [`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]
-
 ```pycon
 >>> import numpy as np
 >>> h = gaussian_humanizer(0.01, rho=0.5)
@@ -373,12 +370,12 @@ the timing wanders, not how far. `rho = 0` is independent jitter;
 [0.0, 0.0]
 ```
 
+* **Return type:**
+  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)], [`object`](https://docs.python.org/3/builtins/functions.html#object)], [`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]
+
 ### cutan.impacts.impact_object(name, \*\*kwargs)
 
 Build a registered object by name.
-
-* **Return type:**
-  [`ImpactObject`](cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
 
 ```pycon
 >>> impact_object("ball").name
@@ -389,12 +386,12 @@ Traceback (most recent call last):
 KeyError: "no impact object 'hammer'; known: ['ball', 'stick']"
 ```
 
+* **Return type:**
+  [`ImpactObject`](cutan.impacts.objects.html.md#cutan.impacts.objects.ImpactObject)
+
 ### cutan.impacts.impact_set_specs(, base=ImpactClipSpec(object='stick', kind='surface', tempo=((0.0, 96.0), (24.0, 132.0)), beats=24, subdivision=1, pattern=(1.0, 0.6, 0.8, 0.6), lead_in=0.5, tail=0.5, jitter_sd=0.012, jitter_rho=0.3, jitter_bias=0.0, rise=0.18, fall=0.18, brake=0.03, rise_sd=0.0, fall_sd=0.0, brake_sd=0.0, arc_radius=None, show_surface=None, fps=30.0, exposure=0.0, exposure_samples=None, timestamp_jitter_sd=0.0, timestamp_noise_sd=0.0, phase=0.0, timestamps='nominal', width=640, height=360, trajectory_hz=1000.0, seed=0), objects=('stick', 'ball'), kinds=('surface', 'air'), fps=(24, 30, 60), exposures=(0.0, 0.5), timestamp_jitter_sds=(0.0,), seeds=(0,))
 
 The cartesian product of the given axes over `base`.
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ImpactClipSpec`](cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec)]
 
 ```pycon
 >>> len(impact_set_specs())
@@ -402,6 +399,9 @@ The cartesian product of the given axes over `base`.
 >>> {s.seed for s in impact_set_specs(seeds=(0, 1), fps=(30,))}
 {0, 1}
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ImpactClipSpec`](cutan.impacts.clip.html.md#cutan.impacts.clip.ImpactClipSpec)]
 
 ### cutan.impacts.perform(tempo=100.0, , beats=16, subdivision=1, pattern=(1.0,), lead_in=0.5, humanizer=None, seed=0)
 
@@ -415,15 +415,15 @@ into offsets (default: none); each offset is then clamped to
 `MAX_OFFSET_FRACTION` of the gap to either neighbour, and the clamped
 value is what the event records — the ground truth is what was executed.
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImpactEvent`](cutan.impacts.performance.html.md#cutan.impacts.performance.ImpactEvent), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
-
 ```pycon
 >>> [e.beat for e in perform(120, beats=2, subdivision=2, pattern=(1, 0))]
 [0.0, 1.0]
 >>> [e.amplitude for e in perform(120, beats=1, subdivision=4, pattern=(1, .5))]
 [1.0, 0.5, 1.0, 0.5]
 ```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImpactEvent`](cutan.impacts.performance.html.md#cutan.impacts.performance.ImpactEvent), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
 
 ### cutan.impacts.plan_impact_clip(spec)
 
@@ -448,15 +448,15 @@ rounded end.
 
 Coerce a bpm, a `[(beat, bpm), ...]` list, or a [`TempoMap`](#cutan.impacts.TempoMap).
 
-* **Return type:**
-  [`TempoMap`](cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap)
-
 ```pycon
 >>> tempo_map(90).points
 ((0.0, 90.0),)
 >>> tempo_map([(0, 90), (16, 120)]).points
 ((0.0, 90.0), (16.0, 120.0))
 ```
+
+* **Return type:**
+  [`TempoMap`](cutan.impacts.performance.html.md#cutan.impacts.performance.TempoMap)
 
 ### cutan.impacts.write_impact_clip(spec, out_dir, , render=True, clip_dir=None)
 

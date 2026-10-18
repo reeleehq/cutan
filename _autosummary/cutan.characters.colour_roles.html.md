@@ -61,9 +61,6 @@ Two roles drawn in one literal cannot be told apart by a swap, and neither
 can a role and an untagged detail (a shoe, an outline) that happens to share
 it. One step in one channel is invisible and makes the key exact.
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> distinct_literal("#222222", {"#222222"})
 '#222223'
@@ -73,12 +70,12 @@ it. One step in one channel is invisible and makes the key exact.
 '#123456'
 ```
 
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
 ### cutan.characters.colour_roles.normalise_hex(colour)
 
 `'#ABC'` -> `'#aabbcc'`: the one spelling a literal is keyed by.
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ```pycon
 >>> normalise_hex("#A83249"), normalise_hex("#fa0")
@@ -88,6 +85,9 @@ Traceback (most recent call last):
 ...
 ValueError: 'red' is not a #rgb or #rrggbb colour
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.colour_roles.recolour_svg(svg, swaps)
 
@@ -99,9 +99,6 @@ fragment references — stays byte-for-byte. Literals match case- and
 length-insensitively (`#FA0` is `#ffaa00`). Deterministic, and cached by
 content: the same text and swaps are rewritten once per process.
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> recolour_svg('<g style="fill:#fa0;stroke:#000"><use href="#fa0"/></g>',
 ...              {"#ffaa00": "#010203"})
@@ -109,6 +106,9 @@ content: the same text and swaps are rewritten once per process.
 >>> recolour_svg('<rect data-fill="#aaa" fill="#aaa"/>', {"#aaaaaa": "#bbbbbb"})
 '<rect data-fill="#aaa" fill="#bbbbbb"/>'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.colour_roles.role_recolouring(roles, colour_for)
 
@@ -118,11 +118,11 @@ content: the same text and swaps are rewritten once per process.
 unset keeps its literal, and a role set to the colour it already has is not
 a swap — so a pack that changes nothing produces nothing to rewrite.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> role_recolouring({"#a83249": "clothing", "#3b2a1a": "hair"},
 ...                  {"clothing": "#202028"}.get)
 {'#a83249': '#202028'}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]

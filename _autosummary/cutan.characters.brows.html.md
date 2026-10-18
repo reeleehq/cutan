@@ -136,9 +136,6 @@ or a factory hat measured over them, an#284).
 The slots are the solver’s own binding’s, so the capability and the solver
 cannot disagree about which slots act.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
-
 ```pycon
 >>> from cutan.characters.schema import CharacterDescriptor
 >>> d = CharacterDescriptor(name="c")
@@ -148,6 +145,9 @@ cannot disagree about which slots act.
 >>> brow_affordance(d, {"left_brow": {"brow_l"}, "right_brow": {"brow_r"}}) is None
 True
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### cutan.characters.brows.brow_cover(desc)
 
@@ -166,13 +166,13 @@ compiler’s record and `an validate`.
 
 The path of the factory’s brow on `side` (`l` or `r`) in its canvas.
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> brow_path_d("l")
 'M 8 16 Q 40 4 72 8'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.brows.brow_range(, head_scale=1.0, views=('front', 'three_quarter', 'side'), presets=None)
 
@@ -199,26 +199,26 @@ brows live on slots of its own naming is read as having brows, and one
 whose declared binding moves no brow is read as having none. A binding
 that does not resolve moves nothing (`an validate` reports it).
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> from cutan.characters.schema import CharacterDescriptor
 >>> brow_slots(CharacterDescriptor(name="c"))
 ['left_brow', 'right_brow']
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
 ### cutan.characters.brows.ink_columns(discs)
 
 `{column: (top, bottom)}` of ink, per head-unit column (`round(x)`).
-
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
 
 ```pycon
 >>> ink_columns([(10.2, 5.0, 0.0), (10.4, 7.0, 0.0)])
 {10: (5.0, 7.0)}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]
 
 ### cutan.characters.brows.seat_above_brows(fragments, , head_scale=1.0, clearance=1.0, crown_min_y=0.5, min_flatten=0.6)
 
@@ -242,10 +242,10 @@ dips into the brows’ acting range: positive means it covers them (an#284).
 The inverse of [`seat_above_brows()`](#cutan.characters.brows.seat_above_brows) on its own transforms, so a
 character’s recorded seat is measured, not re-chosen.
 
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
-
 ```pycon
 >>> seat_overlap({"front": ""}, None)
 -inf
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)

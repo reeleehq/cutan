@@ -86,7 +86,7 @@ the pre-an#224 gaits and keep the shared defaults exactly (no pixel moves).
 
 The gaits that move a leg pair — and need one (the `limbs.legs` capability).
 
-### cutan.motion.PRESETS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[...], [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[[Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[SetAction, Tag(tag=[set](https://docs.python.org/3/builtins/stdtypes.html#set))] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[TweenAction, Tag(tag=tween)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[SequenceAction, Tag(tag=sequence)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[ParallelAction, Tag(tag=parallel)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[DelayAction, Tag(tag=delay)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[LoopAction, Tag(tag=loop)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[ExtensionAction, SerializeAsAny(), Tag(tag=extension)], Discriminator(discriminator=\_action_tag, custom_error_type=[None](https://docs.python.org/3/builtins/constants.html#None), custom_error_message=[None](https://docs.python.org/3/builtins/constants.html#None), custom_error_context=[None](https://docs.python.org/3/builtins/constants.html#None))]]]* *= {'crawl': <function crawl>, 'hop': <function hop>, 'nod': <function nod>, 'point': <function point>, 'pop_in': <function pop_in>, 'shake': <function shake>, 'slide_in': <function slide_in>, 'slide_out': <function slide_out>, 'speech_pulse': <function speech_pulse>, 'squash_stretch': <function squash_stretch>, 'turn': <function turn>, 'waddle': <function waddle>, 'walk': <function walk>}*
+### cutan.motion.PRESETS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[..., [Union](https://docs.python.org/3/library/typing.html#typing.Union)[SetAction, TweenAction, SequenceAction, ParallelAction, DelayAction, LoopAction, ExtensionAction]]]* *= {'crawl': <function crawl>, 'hop': <function hop>, 'nod': <function nod>, 'point': <function point>, 'pop_in': <function pop_in>, 'shake': <function shake>, 'slide_in': <function slide_in>, 'slide_out': <function slide_out>, 'speech_pulse': <function speech_pulse>, 'squash_stretch': <function squash_stretch>, 'turn': <function turn>, 'waddle': <function waddle>, 'walk': <function walk>}*
 
 Every preset a `play` can name — the core’s and the genre’s — the one table
 the skill, the demos, the vocabulary and the `play` fallback
@@ -97,7 +97,7 @@ name the core also has.
 
 [`PRESETS`](#cutan.motion.PRESETS)’ vocabulary versions.
 
-### cutan.motion.RIG_PRESETS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[...], [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[[Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[SetAction, Tag(tag=[set](https://docs.python.org/3/builtins/stdtypes.html#set))] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[TweenAction, Tag(tag=tween)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[SequenceAction, Tag(tag=sequence)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[ParallelAction, Tag(tag=parallel)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[DelayAction, Tag(tag=delay)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[LoopAction, Tag(tag=loop)] | [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[ExtensionAction, SerializeAsAny(), Tag(tag=extension)], Discriminator(discriminator=\_action_tag, custom_error_type=[None](https://docs.python.org/3/builtins/constants.html#None), custom_error_message=[None](https://docs.python.org/3/builtins/constants.html#None), custom_error_context=[None](https://docs.python.org/3/builtins/constants.html#None))]]]* *= {'nod': <function nod>, 'point': <function point>, 'speech_pulse': <function speech_pulse>, 'turn': <function turn>, 'waddle': <function waddle>, 'walk': <function walk>}*
+### cutan.motion.RIG_PRESETS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[..., [Union](https://docs.python.org/3/library/typing.html#typing.Union)[SetAction, TweenAction, SequenceAction, ParallelAction, DelayAction, LoopAction, ExtensionAction]]]* *= {'nod': <function nod>, 'point': <function point>, 'speech_pulse': <function speech_pulse>, 'turn': <function turn>, 'waddle': <function waddle>, 'walk': <function walk>}*
 
 The genre’s presets, by name.
 
@@ -127,9 +127,6 @@ layout put them.
 
 (These examples build character entities, the cut-out genre’s; they are not run here.)
 
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
-
 ```pycon
 >>> from an.ir.schema import AssetRef
 >>> two = Shot(id="s", entities=[
@@ -137,6 +134,9 @@ layout put them.
 >>> [f.action.to_value for f in _tweens(face_toward(two, "b", "a"))]
 [0.0, -1.0]
 ```
+
+* **Return type:**
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 ### cutan.motion.gait_params(gait, , scale=1.0, \*\*given)
 
@@ -148,15 +148,15 @@ hop) is stated for a figure at drawn scale 1 and multiplied by `scale`
 scene px as given. Angles and a leg’s `lift` (in the figure’s own frame,
 already scaled with it) never scale.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> gait_params("legs")["step_length"], gait_params("legs", scale=2.0)["step_length"]
 (80.0, 160.0)
 >>> gait_params("shuffle", scale=2.0, step_length=50.0)["step_length"]
 50.0
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 ### cutan.motion.nod(target, , part='head', angle=0.18, duration=0.5, count=2, rest=None)
 
@@ -165,13 +165,13 @@ Dip the head `count` times (a rotation of `<target>/<part>`).
 In a front-facing 2D cut-out a nod reads as a small head rotation about
 its pivot; `rest` is the HEAD’s rest, not the entity’s.
 
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
-
 ```pycon
 >>> [(f.action.target, round(f.action.to_value, 2)) for f in _tweens(nod("charlie", count=1))]
 [('charlie/head', 0.18), ('charlie/head', 0.0)]
 ```
+
+* **Return type:**
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 ### cutan.motion.point(target, , angle=-1.3, raise_duration=0.25, hold=0.6, easing=(0.34, 1.56, 0.64, 1.0), rest=None)
 
@@ -181,13 +181,13 @@ Swing an arm out to point, hold it, and lower it again.
 rig, `"maya/arm_r"` on a descriptor rig (and there, since that arm hangs
 on the viewer’s left, pass a positive `angle` to point outward).
 
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
-
 ```pycon
 >>> [(f.start, f.action.to_value) for f in _tweens(point("charlie/right_arm", hold=0.5))]
 [(0.0, -1.3), (0.75, 0.0)]
 ```
+
+* **Return type:**
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 ### cutan.motion.speech_pulse(target, , beats=(0.0,), strength=0.06, part='head', attack=0.06, release=0.1, rest=None)
 
@@ -204,13 +204,13 @@ settles is skipped, so the pulse never stacks. `strength=0` is a mime.
 tween rather than a settling `set`, so played once per syllable (as the
 speech aspect does) each pulse rides whatever the head is doing.
 
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
-
 ```pycon
 >>> [(round(f.start, 2), f.action.to_value) for f in _tweens(speech_pulse("al", beats=(0.0, 0.3)))]
 [(0.0, 1.06), (0.06, 1.0), (0.3, 1.06), (0.36, 1.0), (0.46, 1.0)]
 ```
+
+* **Return type:**
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 ### cutan.motion.turn(target, , to='back', direction='right', from_direction=None, duration=0.3, view_set='view', rest=None, step_hz=None)
 
@@ -241,9 +241,6 @@ so the character vanishes for a frame (an#273, South Park on twos). Such a
 turn is the style’s HARD SWAP instead: at its midpoint the view changes and
 `scale_x` takes the new facing, with no squash.
 
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
-
 ```pycon
 >>> def lands(a):  # a tween's end value, a set's value
 ...     return a.to_value if a.kind == "tween" else a.value
@@ -255,6 +252,9 @@ turn is the style’s HARD SWAP instead: at its midpoint the view changes and
 [(0.02, 'view', 'side'), (0.02, 'scale_x', 1.0)]
 ```
 
+* **Return type:**
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
+
 ### cutan.motion.waddle(target, , steps=4, step_duration=0.3, angle=0.1, lift=6.0, travel=0.0, rest=None)
 
 A walk cycle for a rig with no legs to animate: rock and bob per step.
@@ -264,9 +264,6 @@ Each step rocks the body to alternate sides by `angle` and bobs it up by
 carries the body sideways over the whole walk — the one `x` move here,
 so it is the one that needs `rest` in a multi-character shot.
 
-* **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
-
 ```pycon
 >>> w = _tweens(waddle("charlie", steps=2, travel=100))
 >>> sorted({f.action.property for f in w})
@@ -274,6 +271,9 @@ so it is the one that needs `rest` in a multi-character shot.
 >>> max(f.end for f in w)
 0.6
 ```
+
+* **Return type:**
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 ### cutan.motion.walk(target, , to_x=None, distance=None, direction=None, steps=None, step_s=None, step_length=None, stride=None, lift=None, bob=None, arm_swing=None, rock=None, hem_tilt=None, hop_height=None, lean=None, view=None, gait=None, legs=None, arms=None, parts=None, rest=None, scale=None)
 
@@ -382,4 +382,4 @@ then `walk`.
 ```
 
 * **Return type:**
-  `Union`[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
+  [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]

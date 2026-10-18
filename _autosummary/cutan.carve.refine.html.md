@@ -37,14 +37,14 @@ The alpha above which a pixel counts as the subject’s.
 
 Pull the matte’s edge in by `px` pixels (a smooth, distance-based erosion).
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> a = np.zeros((9, 9), np.float32); a[1:8, 1:8] = 1
 >>> float(choke(a, 2)[1, 4]), float(choke(a, 2)[4, 4])
 (0.0, 1.0)
 ```
+
+* **Return type:**
+  `ndarray`
 
 ### cutan.carve.refine.despill(rgb, alpha, rim, , solid=None)
 
@@ -62,9 +62,6 @@ outline stays an outline: it is solid, so its inner part is trusted. The
 share is of the subject’s pixels, the quality signal for a de-spill that
 repainted real content.
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[`ndarray`, [`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> rgb = np.zeros((7, 7, 3), np.uint8); rgb[:] = (0, 0, 255)  # a blue backdrop
 >>> rgb[1:6, 1:6] = (200, 0, 0); rgb[1, 1:6] = (100, 0, 160)   # a red subject, a spilt top row
@@ -73,6 +70,9 @@ repainted real content.
 >>> tuple(int(c) for c in out[1, 3]), round(share, 2)
 ((200, 0, 0), 0.64)
 ```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[`ndarray`, [`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 ### cutan.carve.refine.detach_bridges(mask, radius, , point=None)
 
@@ -84,9 +84,6 @@ largest), grows it back by `radius + 1` inside the original mask. Returns
 parts of what was removed, at least `radius²` px: a caption glyph, and also
 a thin part thinner than `2 * radius` px, which erosion cannot tell apart).
 
-* **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[`ndarray`, [`int`](https://docs.python.org/3/builtins/functions.html#int)]
-
 ```pycon
 >>> m = np.zeros((20, 40), bool); m[2:18, 2:18] = True   # a body
 >>> m[9:11, 18:24] = True; m[6:14, 24:32] = True          # a glyph on a 2-px neck
@@ -94,6 +91,9 @@ a thin part thinner than `2 * radius` px, which erosion cannot tell apart).
 >>> pieces, bool(out[10, 28]), bool(out[10, 10])
 (1, False, True)
 ```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[`ndarray`, [`int`](https://docs.python.org/3/builtins/functions.html#int)]
 
 ### cutan.carve.refine.feather(alpha, sigma)
 
@@ -106,14 +106,14 @@ Soften the edge with a Gaussian of `sigma` px (0 leaves it as it is).
 
 `mask` with every enclosed hole filled.
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> m = np.ones((5, 5), bool); m[2, 2] = False
 >>> bool(fill_holes(m)[2, 2])
 True
 ```
+
+* **Return type:**
+  `ndarray`
 
 ### cutan.carve.refine.keep_components(mask, , point=None, keep='point', min_share=0.02, gap=6)
 
@@ -125,9 +125,6 @@ the point is off the subject or not given) and the pieces lying within
 hat a matte separated by a sliver); `"largest"` keeps the largest only;
 `"all"` keeps everything.
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> m = np.zeros((10, 30), bool); m[1:9, 1:9] = True; m[4:6, 25:27] = True
 >>> int(keep_components(m, keep="largest").sum()), int(keep_components(m, keep="all").sum())
@@ -138,3 +135,6 @@ hat a matte separated by a sliver); `"largest"` keeps the largest only;
 >>> int(keep_components(m, point=(4, 4), min_share=0.05).sum())
 68
 ```
+
+* **Return type:**
+  `ndarray`

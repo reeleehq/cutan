@@ -130,9 +130,6 @@ in another convention closes with its own).
 
 The evidence, “Bye.” timed 0.0–0.5 s in a 1.84 s clip:
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
-
 ```pycon
 >>> raw = [(0, "X"), (0, "A"), (0.167, "B"), (0.333, "C"), (1.838, "X")]
 >>> [(c.time, c.code) for c in close_after_speech(raw, speech_end=0.5)]
@@ -149,15 +146,15 @@ A 25 ms last word whose second shape starts after it ends:
 [(1.025, 'B'), (1.025000001, 'X'), (2.0, 'X')]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
+
 ### cutan.compile.coarticulate.coarticulate(keys, , fps, end=None, min_hold_s=0.14, lead_s=0.08333333333333333, decay_s=0.12, rest='X', speech_end=None)
 
 All the passes, in the order the module docstring gives.
 
 `speech_end` (where the last word ends, when the line knows its words)
 closes the mouth there instead of at `end` (an#213):
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
 
 ```pycon
 >>> bye = [(0, "X"), (0, "A"), (0.167, "B"), (0.333, "C"), (1.838, "X")]
@@ -196,6 +193,9 @@ Traceback (most recent call last):
 ValueError: min_hold_s must be > 0, got 0
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
+
 ### cutan.compile.coarticulate.condense(keys, , min_hold_s, end=None)
 
 Enforce a minimum hold by voting, never by dropping.
@@ -212,9 +212,6 @@ the hold doing its job. Ties go to the later arrival.
 The defect the epic names, verbatim semantics of the old compiler loop —
 ‘A’ (the closure) and ‘D’ (the open vowel) are gone and a 40 ms ‘B’ holds
 for 500 ms:
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
 
 ```pycon
 >>> raw = [(0.0, "X"), (0.30, "B"), (0.34, "A"), (0.38, "D"), (0.80, "X")]
@@ -268,14 +265,14 @@ A winner equal to the shape already showing is merged:
 [(0.0, 'X')]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
+
 ### cutan.compile.coarticulate.decay(keys, , decay_s, rest='X', end=None)
 
 Give a shape `decay_s` to close: a rest arriving sooner than that after
 the shape before it is pushed out to `decay_s`, never past the next cue
 and never past `end` (a rest pushed to `end` is where the line closes).
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
 
 ```pycon
 >>> [(round(c.time, 3), c.code) for c in decay([(0.0, "X"), (0.2, "D"), (0.25, "X"), (0.6, "B")], decay_s=0.12)]
@@ -283,6 +280,9 @@ and never past `end` (a rest pushed to `end` is where the line closes).
 >>> [(round(c.time, 3), c.code) for c in decay([(0.0, "X"), (0.2, "D"), (0.25, "X"), (0.30, "B")], decay_s=0.12)]
 [(0.0, 'X'), (0.2, 'D'), (0.3, 'B')]
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
 
 ### cutan.compile.coarticulate.lead(keys, , lead_s)
 
@@ -294,32 +294,29 @@ lead (`[(0, X), (0.02, A), (0.05, D), (0.07, X)]`) therefore never opens
 the mouth; the hold would have refused a 70 ms word anyway, and the old
 condenser did.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
-
 ```pycon
 >>> [(round(c.time, 3), c.code) for c in lead([(0.0, "X"), (0.05, "D"), (0.5, "B")], lead_s=0.08)]
 [(0.0, 'D'), (0.42, 'B')]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
+
 ### cutan.compile.coarticulate.merge_duplicates(keys)
 
 Drop a cue whose shape is the one already showing.
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
 
 ```pycon
 >>> [(c.time, c.code) for c in merge_duplicates([(0, "X"), (0.1, "B"), (0.2, "B"), (0.3, "C")])]
 [(0.0, 'X'), (0.1, 'B'), (0.3, 'C')]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
+
 ### cutan.compile.coarticulate.suppress_weak(keys, , max_weak_s, end=None)
 
 Drop a weak (low-dominance) cue that would show for less than `max_weak_s`.
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]
 
 ```pycon
 >>> raw = [(0.0, "X"), (0.20, "D"), (0.40, "B"), (0.43, "D"), (0.80, "X")]
@@ -333,3 +330,6 @@ A weak cue that lasts is kept — this is not the minimum-hold pass:
 >>> [(c.time, c.code) for c in suppress_weak([(0.0, "X"), (0.2, "B"), (0.5, "D")], max_weak_s=0.04)]
 [(0.0, 'X'), (0.2, 'B'), (0.5, 'D')]
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Cue`](#cutan.compile.coarticulate.Cue)]

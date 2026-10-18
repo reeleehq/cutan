@@ -109,7 +109,7 @@ The signals that look wrong, in words.
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
-### *class* cutan.carve.Carving(image, anchor, offset, scale, quality, recipe, source=None, meta=<factory>, mode='part')
+### *class* cutan.carve.Carving(image, anchor, offset, scale, quality, recipe, source=None, meta=dict(), mode='part')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -195,13 +195,13 @@ The lowest point of the jaw, else the box’s bottom.
 
 A face from a `Face`, a box `(x0, y0, x1, y1)`, or a mapping (`box`, `jaw`, …).
 
-* **Return type:**
-  [`Face`](cutan.carve.head.html.md#cutan.carve.head.Face)
-
 ```pycon
 >>> Face.of({"box": [0, 0, 10, 12], "jaw": [[0, 6], [5, 12], [10, 6]]}).chin_y
 12.0
 ```
+
+* **Return type:**
+  [`Face`](cutan.carve.head.html.md#cutan.carve.head.Face)
 
 ### *class* cutan.carve.FlatColour(colours=None, tolerance=24.0, softness=16.0, edge=2.0, connected=True, seeds=None)
 
@@ -308,7 +308,7 @@ One lifted part: its RGBA image, its pivot in that image, where it sits in the c
 
 The pivot as an attachment anchor (0..1 of the image).
 
-### *class* cutan.carve.PartSet(carving, base, parts=<factory>)
+### *class* cutan.carve.PartSet(carving, base, parts=list())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -355,9 +355,6 @@ A [`Matte`](#cutan.carve.Matte) from a strategy’s name, its recipe, a `Matte`,
 A recipe (`Matte.recipe()`, as a carve records it) builds the same matte
 back, so a strategy with its settings is plain data (a batch spec, a CLI):
 
-* **Return type:**
-  [`Matte`](cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
-
 ```pycon
 >>> as_matte("chroma").name
 'chroma'
@@ -371,6 +368,9 @@ Traceback (most recent call last):
 ValueError: no matte strategy 'rainbow'; the strategies are: chroma, flat_colour, ...
 ```
 
+* **Return type:**
+  [`Matte`](cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
+
 ### cutan.carve.border_colours(rgb, , max_colours=3, min_share=0.08, bits=4)
 
 The dominant colours of the image’s border: the backdrop of a flat frame.
@@ -379,21 +379,18 @@ Border pixels are binned at `bits` per channel; every bin holding at least
 `min_share` of the border (up to `max_colours`, most frequent first)
 gives one colour, the median of its pixels.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int)]]
-
 ```pycon
 >>> img = np.zeros((20, 20, 3), np.uint8); img[:] = (250, 240, 230)
 >>> border_colours(img)
 [(250, 240, 230)]
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int)]]
+
 ### cutan.carve.carve(image, , matte='flat_colour', crop=None, box=None, point=None, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, upscale=1, pad=4, source=None)
 
 Cut a part out of `image`; every coordinate is in the source image’s pixels.
-
-* **Return type:**
-  [`Carving`](cutan.carve.core.html.md#cutan.carve.core.Carving)
 
 image: a path, a PIL image or an RGB(A) array (`grab_frame` for video)
 matte: the strategy ([`cutan.carve.mattes`](cutan.carve.mattes.html.md#module-cutan.carve.mattes)): a name, a recipe mapping,
@@ -437,12 +434,12 @@ source: provenance ([`frame_source()`](cutan.carve.provenance.html.md#cutan.carv
 True
 ```
 
+* **Return type:**
+  [`Carving`](cutan.carve.core.html.md#cutan.carve.core.Carving)
+
 ### cutan.carve.carve_head(image, , face=None, locate=None, pick='largest', matte='flat_colour', cut='auto', neck=None, neck_soft=0.05, pad_x=1.05, pad_top=1.25, pad_bottom=1.0, upscale=3, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, canvas=512, face_h=270.0, centre=(256.0, 300.0), margin=6, view=None, source=None)
 
 A head cut out at the neck and normalised onto a `canvas`-px square.
-
-* **Return type:**
-  [`Carving`](cutan.carve.core.html.md#cutan.carve.core.Carving)
 
 face: the face, a [`Face`](cutan.carve.head.html.md#cutan.carve.head.Face) (box and, when known, a
 : jaw contour and landmarks), a box `(x0, y0, x1, y1)` or a mapping
@@ -477,17 +474,20 @@ the crop per image, the matte and the finish shared). The part’s anchor is `ce
 `meta` holds what a rig needs to hang it: the face box, the chin and the
 neck point, the head’s bounding box, the landmarks, all on the canvas.
 
+* **Return type:**
+  [`Carving`](cutan.carve.core.html.md#cutan.carve.core.Carving)
+
 ### cutan.carve.check_requirements(, verbose=True)
 
 Which optional dependencies of carving are installed (printing how to get the rest).
-
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
 
 ```pycon
 >>> sorted(check_requirements(verbose=False))
 ['cv2', 'insightface', 'rembg']
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
 
 ### cutan.carve.frame_source(url, , license, t=None, author=None, author_url=None, title=None, provider=None, attribution=None, note=None, cacheable=True, \*\*extra)
 
@@ -504,9 +504,6 @@ query: signed-URL tokens are credentials). A local file (a path, a
 in `extra.file`, no path anywhere; a `data:` URI is refused. `t`,
 `title` and `note` go into `extra` beside any other keyword.
 
-* **Return type:**
-  `AssetSource`
-
 ```pycon
 >>> s = frame_source("https://www.youtube.com/watch?v=AAGIi62-sAU&si=track",
 ...                  t=34.6, license="all-rights-reserved", author="OverSimplified")
@@ -521,6 +518,9 @@ in `extra.file`, no path anywhere; a `data:` URI is refused. `t`,
 ('local', None, 'clip.mp4', False)
 ```
 
+* **Return type:**
+  `AssetSource`
+
 ### cutan.carve.grab_frame(video, t, , ffmpeg='ffmpeg')
 
 The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).
@@ -532,13 +532,13 @@ The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).
 
 An `HxWx3` `uint8` RGB array from a path, a PIL image or an array.
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> load_rgb(np.zeros((4, 5, 4), np.uint8)).shape
 (4, 5, 3)
 ```
+
+* **Return type:**
+  `ndarray`
 
 ### cutan.carve.neck_cut(shape, face, , cut='auto', neck=None, soft=0.05, offset=(0.0, 0.0), scale=1.0)
 
@@ -551,26 +551,26 @@ and `"none"` keeps everything. `neck` is the depth below the jaw (or
 the chin) in face-box heights. `offset`/`scale` map the face (given in
 source pixels) into the mask’s pixels.
 
-* **Return type:**
-  `ndarray`
-
 ```pycon
 >>> m = neck_cut((100, 50), Face((10, 10, 40, 60)), cut="flat", neck=0.1)
 >>> float(m[50, 25]), float(m[90, 25])
 (1.0, 0.0)
 ```
 
+* **Return type:**
+  `ndarray`
+
 ### cutan.carve.pick_face(faces, pick='largest')
 
 One face of several: `largest`, `leftmost`, `rightmost` or `best` (score).
-
-* **Return type:**
-  [`Face`](cutan.carve.head.html.md#cutan.carve.head.Face)
 
 ```pycon
 >>> pick_face([Face((0, 0, 10, 10)), Face((50, 0, 70, 20))]).box
 (50.0, 0.0, 70.0, 20.0)
 ```
+
+* **Return type:**
+  [`Face`](cutan.carve.head.html.md#cutan.carve.head.Face)
 
 ### cutan.carve.register_matte(cls, , name=None)
 
@@ -602,9 +602,6 @@ part moves. A part’s `origin` and `pivot` are in the carving’s pixels
 
 Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.
 
-* **Return type:**
-  `PropDescriptor`
-
 name: the prop’s name (default: the folder’s name)
 unit: view_box units per carved pixel (default 1); or `max_side`: the
 
@@ -629,12 +626,12 @@ part, at its pivot, parented to the root, and one slot per part above the
 base, in the order the parts were listed. Nothing is written unless the
 whole descriptor is valid.
 
+* **Return type:**
+  `PropDescriptor`
+
 ### cutan.carve.youtube_id(url)
 
 The video id of a YouTube URL, else `None`.
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ```pycon
 >>> youtube_id("https://www.youtube.com/watch?v=AAGIi62-sAU&t=34")
@@ -644,6 +641,9 @@ The video id of a YouTube URL, else `None`.
 >>> youtube_id("https://notyoutube.com/watch?v=x"), youtube_id("https://WWW.YOUTUBE.COM:443/shorts/abc")
 (None, 'abc')
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Modules
 

@@ -278,9 +278,6 @@ A preset that moves several nodes of the entity (it takes `parts`,
 `PARTS_ARG` — `walk`) gets `parts_of(entity)`’s paths with their
 `rest_of` poses, and every node its expansion moves is checked.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
-
 ```pycon
 >>> from cutan.characters.registration import PlayAction
 >>> flats = expand_preset_play(
@@ -292,6 +289,9 @@ A preset that moves several nodes of the entity (it takes `parts`,
 -5.0
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
+
 ### cutan.characters.play.facing_at(events, entity, t, , view_set='view')
 
 What `entity` shows at time `t`: the latest `view_set` swap set
@@ -299,9 +299,6 @@ on the entity and the sign of the latest `scale_x` it was given, at or
 before `t` (a tween counts from its END, when its value has landed; at
 one instant the one LATER in `events` wins — so pass them in authoring
 order, as [`resolve_turns()`](#cutan.characters.play.resolve_turns) does).
-
-* **Return type:**
-  [`Facing`](#cutan.characters.play.Facing)
 
 ```pycon
 >>> from an.ir.compose import flatten, sequence
@@ -311,14 +308,14 @@ order, as [`resolve_turns()`](#cutan.characters.play.resolve_turns) does).
 (Facing(view=None, direction=None), Facing(view='side', direction='left'))
 ```
 
+* **Return type:**
+  [`Facing`](#cutan.characters.play.Facing)
+
 ### cutan.characters.play.play_problems(desc, animation, , art_exists=None, args=None, duration=None, speed=1.0, loop=None)
 
 Every reason `play(<entity>, animation, ...)` cannot resolve — empty
 when it can. THE verdict `an validate` reports and the compiler raises
 on, for both sources (an#7, an#166).
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ```pycon
 >>> play_problems(None, "hop", args={"heigth": 3})
@@ -326,6 +323,9 @@ on, for both sources (an#7, an#166).
 >>> play_problems(None, "hop", loop=True)
 ["motion preset 'hop' is a one-shot: `loop: true` ...
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.play.play_source(desc, animation)
 
@@ -346,13 +346,13 @@ The ONE node path a preset play moves — `<target>/head` for a `nod`,
 the target itself for the rest. Read off the expansion rather than
 restated per preset, so a preset added later needs no entry here.
 
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
-
 ```pycon
 >>> preset_moved_node("charlie", "nod"), preset_moved_node("charlie", "hop")
 ('charlie/head', 'charlie')
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.play.preset_moved_nodes(action_target, animation, args=None, , parts=None)
 
@@ -360,15 +360,15 @@ Every node path a preset play moves. `parts` (the entity’s built part
 paths, relative to it) is what a multi-node preset chooses its limbs from;
 `None` lets it assume the rig contract’s names.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> preset_moved_nodes("bob", "walk", {"distance": 80}, parts=["torso", "left_leg", "right_leg"])
 ['bob', 'bob/left_leg', 'bob/right_leg']
 >>> preset_moved_nodes("charlie", "nod")
 ['charlie/head']
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.play.preset_play_span(action, context=None)
 
@@ -378,9 +378,6 @@ else the preset’s natural length divided by `speed`. What a
 source. `context` is what the compiler adds to the args before expanding
 ([`PresetContext`](#cutan.characters.play.PresetContext)): a walk’s length depends on its resolved gait and
 the figure’s scale, so the extent must see them too (cutan#12).
-
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ```pycon
 >>> from cutan.characters.registration import PlayAction
@@ -392,6 +389,9 @@ the figure’s scale, so the extent must see them too (cutan#12).
 >>> round(preset_play_span(walk), 6), round(preset_play_span(walk, {"scale": 2.0}), 6)
 (0.8, 0.4)
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.characters.play.preset_problems(animation, , args=None, duration=None, speed=1.0, loop=None)
 
@@ -409,13 +409,13 @@ building it (at the identity pose), so a value the preset itself refuses —
 Whether the motion preset `animation` has the keyword `name`
 (`False` for a name that is no preset: a descriptor animation takes nothing).
 
-* **Return type:**
-  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
-
 ```pycon
 >>> preset_takes("walk", "parts"), preset_takes("hop", "parts"), preset_takes("blink", "parts")
 (True, False, False)
 ```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 ### cutan.characters.play.preset_target_problems(animation, target)
 
@@ -425,15 +425,15 @@ entity’s PARTS (`walk`) is played on the entity, not on one of its parts
 resolution keys the whole character (cutan#22). Checked by the compiler
 and by `an validate` alike.
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> preset_target_problems("walk", "w/torso")
 ["motion preset 'walk' moves a whole character: play it on 'w', not on its part 'w/torso'"]
 >>> preset_target_problems("walk", "w"), preset_target_problems("point", "w/arm_r")
 ([], [])
 ```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.play.primary_slot_per_bone(desc)
 
@@ -447,14 +447,14 @@ slot itself, which puts eyes and mouth under `head` and leaves every limb
 a direct child of the entity. `nesting: bones` (an#340) follows the bone
 hierarchy to the nearest ancestor’s primary slot instead.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> from types import SimpleNamespace as NS
 >>> primary_slot_per_bone(NS(slots=[NS(name="head", bone="head"), NS(name="mouth", bone="head")]))["head"]
 'head'
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### cutan.characters.play.resolve_part_arg(animation, args=None, , parts=None)
 
@@ -466,15 +466,15 @@ under its torso (`torso/head`). A part that is built as named, or whose
 name matches no single built path’s last segment, is left as given (and
 reported unbuilt as before).
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
-
 ```pycon
 >>> resolve_part_arg("nod", {}, parts=["torso", "torso/head"])["part"]
 'torso/head'
 >>> resolve_part_arg("nod", {}, parts=["head", "torso"])  # built as named: as given
 {}
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### cutan.characters.play.resolve_play(desc, animation, , art_exists=None)
 
@@ -503,9 +503,6 @@ An explicit `from_direction` is kept — `turns` records it with the
 inferred state so `an validate` can say when the two disagree. A play
 that cannot resolve is left for [`play_problems()`](#cutan.characters.play.play_problems) to report.
 
-* **Return type:**
-  [`TurnResolution`](#cutan.characters.play.TurnResolution)
-
 ```pycon
 >>> from an.ir.compose import flatten, sequence
 >>> from cutan.characters.registration import PlayAction
@@ -517,6 +514,9 @@ that cannot resolve is left for [`play_problems()`](#cutan.characters.play.play_
 >>> res.flats[1].action.args["from_direction"], res.turns[1].before
 ('left', Facing(view='side', direction='left'))
 ```
+
+* **Return type:**
+  [`TurnResolution`](#cutan.characters.play.TurnResolution)
 
 ### cutan.characters.play.sampled_deviations(track, duration, fps)
 
@@ -536,9 +536,6 @@ got samples up to 0.1667 s and then held that value to the clip end, so
 the cycle-closing sample (equal to the first) was never emitted and the
 clip wrapped with a jump (an#7 review).
 
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> sine_sample_times(0.19, 24)[-2:]
 [0.16666666666666666, 0.19]
@@ -546,13 +543,13 @@ clip wrapped with a jump (an#7 review).
 145
 ```
 
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
 ### cutan.characters.play.slot_node_path(desc, slot_name)
 
 The node path of a slot RELATIVE to its entity (`head/left_eye`,
 `torso`) — the rig builder’s nesting rule, stated once.
-
-* **Return type:**
-  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ```pycon
 >>> slot_node_path(CharacterDescriptor(name="m"), "left_eye")
@@ -560,6 +557,9 @@ The node path of a slot RELATIVE to its entity (`head/left_eye`,
 >>> slot_node_path(CharacterDescriptor(name="m"), "torso")
 'torso'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.play.slot_parent(desc, slot)
 
@@ -578,12 +578,12 @@ slot (the head itself) — keyed on the bone, not on a slot named “head”.
 The compile pass hands them to `an.stage.rig.build_rig_subtree` as
 `skip_slots`.
 
-* **Return type:**
-  [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
-
 ```pycon
 >>> sorted(suppressed_slots(CharacterDescriptor(name="m", face_overlay=False)))
 ['left_brow', 'left_eye', 'mouth', 'right_brow', 'right_eye']
 >>> suppressed_slots(CharacterDescriptor(name="m"))
 frozenset()
 ```
+
+* **Return type:**
+  [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]

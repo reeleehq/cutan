@@ -30,10 +30,10 @@ Plain declarations: importing this module registers nothing.
 
 ### Classes
 
-| [`PlayAction`](#cutan.characters.registration.PlayAction)(\*\*data)   | Play a named animation of the target entity's descriptor (an#7).   |
-|-------------------------------------------------------------------------|--------------------------------------------------------------------|
+| [`PlayAction`](#cutan.characters.registration.PlayAction)(\*[, name, kind, duration, speed, ...])   | Play a named animation of the target entity's descriptor (an#7).   |
+|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
 
-### *class* cutan.characters.registration.PlayAction(\*\*data)
+### *class* cutan.characters.registration.PlayAction(, name=None, kind='play', target, animation, duration=None, speed=1.0, loop=None, args=None, \*\*extra_data)
 
 Bases: `ExtensionAction`
 
@@ -81,15 +81,15 @@ The shot that shows one character on its own (an#347’s
 the stage centre. `an library sheet` draws its first frame on a canvas
 sized from the descriptor’s `view_box` and trims it to what it shows.
 
-* **Return type:**
-  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
-
 ```pycon
 >>> from an.ir.schema import AssetRef
 >>> shot = character_specimen(AssetRef(kind="character", id="ned", store="characters", ref="ned"))
 >>> shot.renderer, [e.id for e in shot.entities], shot.actions
 ('cutout', ['ned'], [])
 ```
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
 
 ### cutan.characters.registration.default_play_extent(action)
 
@@ -99,15 +99,15 @@ preset’s natural length over `speed`, else `0.0`.
 The one resolver is `cutan.characters.play.play_extent()`; this is it with
 `desc=None`.
 
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
-
 ```pycon
 >>> default_play_extent(PlayAction(target="a", animation="hop"))
 0.5
 >>> default_play_extent(PlayAction(target="a", animation="not_a_preset"))
 0.0
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.characters.registration.play(target, animation, , duration=None, speed=1.0, loop=None, args=None)
 
@@ -119,9 +119,6 @@ occupies its **natural** length (a motion preset’s own length divided by
 `speed`; a non-looping descriptor animation’s likewise), so the sibling
 after it starts when it ends; a looping one runs to the shot end and
 occupies **zero**:
-
-* **Return type:**
-  [`PlayAction`](#cutan.characters.registration.PlayAction)
 
 ```pycon
 >>> [f.start for f in flatten(sequence(play("a", "idle_breath"), delay(1.0), play("a", "blink")))]
@@ -147,6 +144,9 @@ A name the descriptor does not declare falls back to a motion preset of
 {'height': 30}
 ```
 
+* **Return type:**
+  [`PlayAction`](#cutan.characters.registration.PlayAction)
+
 ### cutan.characters.registration.play_duration(action, extent)
 
 The span a `play` occupies: its `duration`, else its natural extent.
@@ -155,15 +155,15 @@ The span a `play` occupies: its `duration`, else its natural extent.
 one bound to the entity’s descriptor); without one, a motion preset’s own
 length ([`default_play_extent()`](#cutan.characters.registration.default_play_extent)).
 
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
-
 ```pycon
 >>> play_duration(PlayAction(target="a", animation="hop", duration=2.0), None)
 2.0
 >>> play_duration(PlayAction(target="a", animation="hop"), None)
 0.5
 ```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### cutan.characters.registration.read_play_md(item, , index)
 

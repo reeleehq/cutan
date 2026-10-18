@@ -87,9 +87,6 @@ which `viseme@<form>` set the mouth’s key indexes.
 
 Clamp every numeric axis to its range; an unknown axis is an error.
 
-* **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
-
 ```pycon
 >>> clamp_axes({"brow_height_l": 2.0, "lid_open_r": -3.0})
 {'brow_height_l': 1.0, 'lid_open_r': -1.0}
@@ -98,6 +95,9 @@ Traceback (most recent call last):
 ...
 ValueError: unknown expression axis 'eyebrow' (known: brow_angle_l, ...)
 ```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 ### cutan.expression.axes.lid_key(value, , available)
 
