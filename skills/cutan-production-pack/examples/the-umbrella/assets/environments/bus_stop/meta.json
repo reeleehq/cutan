@@ -1,0 +1,78 @@
+{
+  "kind": "EnvironmentDescriptor",
+  "name": "bus_stop",
+  "planes": [
+    {
+      "name": "sky",
+      "art": {
+        "kind": "gradient",
+        "gradient": {
+          "stops": [
+            "#1b2140",
+            "#e9a86b"
+          ]
+        }
+      },
+      "depth": 0.2
+    },
+    {
+      "name": "skyline",
+      "art": {
+        "kind": "image",
+        "src": "plates/skyline.svg"
+      },
+      "depth": 0.5,
+      "size": [
+        1800,
+        450
+      ],
+      "offset": [
+        0,
+        -25
+      ],
+      "source": {
+        "provider": "cutan production-pack example",
+        "author": "cutan contributors",
+        "license": "cc0-1.0"
+      }
+    },
+    {
+      "name": "ground",
+      "art": {
+        "kind": "fill",
+        "color": "#4a4f57"
+      },
+      "depth": 1.0,
+      "size": [
+        2400,
+        200
+      ],
+      "offset": [
+        0,
+        300
+      ]
+    },
+    {
+      "name": "shelter",
+      "art": {
+        "kind": "image",
+        "src": "plates/shelter.svg"
+      },
+      "depth": 1.0,
+      "size": [
+        400,
+        360
+      ],
+      "offset": [
+        300,
+        20
+      ],
+      "source": {
+        "provider": "cutan production-pack example",
+        "author": "cutan contributors",
+        "license": "cc0-1.0"
+      }
+    }
+  ],
+  "characters_after": "shelter"
+}

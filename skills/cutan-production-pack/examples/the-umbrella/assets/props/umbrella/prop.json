@@ -1,0 +1,31 @@
+{
+  "kind": "PropDescriptor",
+  "name": "umbrella",
+  "origin": [
+    412,
+    1010
+  ],
+  "slots": [
+    {
+      "name": "body",
+      "bone": "root",
+      "attachment": "umbrella"
+    }
+  ],
+  "skins": {
+    "default": {
+      "slots": {
+        "body": {
+          "umbrella": {
+            "path": "parts/umbrella.svg"
+          }
+        }
+      }
+    }
+  },
+  "source": {
+    "provider": "cutan production-pack example",
+    "author": "cutan contributors",
+    "license": "cc0-1.0"
+  }
+}
