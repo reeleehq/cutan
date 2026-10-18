@@ -51,9 +51,17 @@ NAME_RE = re.compile(r"^[a-z][a-z0-9_]{0,40}$")
 #: `--overwrite` and a network fetch (no `--offline`) never reach the factory.
 CAST_OPTIONS = {
     "new": {
-        "--offline": False, "--build": True, "--head-scale": True, "--hat": True,
-        "--hair-style": True, "--hair-length": True, "--sash": False, "--palette": True,
-        "--mouth-variants": True, "--no-views": False, "--voice-ref": True,
+        "--offline": False,
+        "--build": True,
+        "--head-scale": True,
+        "--hat": True,
+        "--hair-style": True,
+        "--hair-length": True,
+        "--sash": False,
+        "--palette": True,
+        "--mouth-variants": True,
+        "--no-views": False,
+        "--voice-ref": True,
     },
     "mouths": {"--variants": True},
     "add-half-lid": {"--fraction": True},
@@ -62,15 +70,33 @@ CAST_OPTIONS = {
 }
 #: What each cast subcommand prints when it worked (the `an` commands exit 0 on failure).
 CAST_SUCCESS = {
-    "new": "created character", "mouths": "wrote ", "add-half-lid": "added a HALF eyelid",
-    "add-views": "added the views", "add-gaze": "added the eye stack",
+    "new": "created character",
+    "mouths": "wrote ",
+    "add-half-lid": "added a HALF eyelid",
+    "add-views": "added the views",
+    "add-gaze": "added the eye stack",
 }
 FAILURE_MARKERS = ("[error]", "FAILED", "Traceback (most recent call last)")
 #: Factory notes that carry no `[warning]` marker but are one.
 NOTE_MARKERS = ("covers the brows",)
-VOICE_KEYS = {"provider", "voice_id", "model_id", "voice_settings", "seed", "effects", "takes", "loudness_offset_db"}
-VOICE_MODELS = {"eleven_v3", "eleven_v4", "eleven_v4_turbo", "eleven_v3_conversational",
-                "eleven_multilingual_v2", "eleven_turbo_v2_5"}
+VOICE_KEYS = {
+    "provider",
+    "voice_id",
+    "model_id",
+    "voice_settings",
+    "seed",
+    "effects",
+    "takes",
+    "loudness_offset_db",
+}
+VOICE_MODELS = {
+    "eleven_v3",
+    "eleven_v4",
+    "eleven_v4_turbo",
+    "eleven_v3_conversational",
+    "eleven_multilingual_v2",
+    "eleven_turbo_v2_5",
+}
 #: Run by the interpreter that runs `an`: the engine's own voice checks, one
 #: `[error]` line per problem.
 VOICE_CHECK = """
@@ -92,7 +118,17 @@ for key, doc in voices.items():
             print(f'  [error] voices/{key}.json: {e}')
 """
 SVG_NS = "{http://www.w3.org/2000/svg}"
-SVG_SHAPES = {"path", "rect", "circle", "ellipse", "polygon", "polyline", "line", "text", "use"}
+SVG_SHAPES = {
+    "path",
+    "rect",
+    "circle",
+    "ellipse",
+    "polygon",
+    "polyline",
+    "line",
+    "text",
+    "use",
+}
 SVG_FORBIDDEN = {"image", "script", "foreignObject"}
 
 
@@ -116,7 +152,11 @@ def _python_of(exe: str) -> str:
         first = Path(exe).read_text(encoding="utf-8", errors="replace").splitlines()[0]
     except (OSError, IndexError):
         return sys.executable
-    return first[2:].strip() if first.startswith("#!") and "python" in first else sys.executable
+    return (
+        first[2:].strip()
+        if first.startswith("#!") and "python" in first
+        else sys.executable
+    )
 
 
 class Report:
@@ -128,13 +168,17 @@ class Report:
 
     def add(self, label: str, ok: bool, out: str = "") -> bool:
         self.steps.append((label, ok))
-        self.warnings += out.count("[warning]") + sum(out.count(m) for m in NOTE_MARKERS)
+        self.warnings += out.count("[warning]") + sum(
+            out.count(m) for m in NOTE_MARKERS
+        )
         print(f"\n=== {label} {'OK' if ok else 'FAILED'}")
         if out:
             print(out)
         return ok
 
-    def run(self, cmd: list[str], *, cwd: Path, label: str, expect: str | None = None) -> bool:
+    def run(
+        self, cmd: list[str], *, cwd: Path, label: str, expect: str | None = None
+    ) -> bool:
         proc = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
         out = (proc.stdout + proc.stderr).strip()
         ok = (
@@ -185,7 +229,9 @@ def _checked_cast_line(argv: list[str], n: int, line: str) -> list[str]:
         return PackError(f"{CAST_FILE} line {n}: {why}: {line}")
 
     if argv[:2] != ["an", "character"] or len(argv) < 4 or argv[2] not in CAST_OPTIONS:
-        raise refuse(f"only `an character {{{'|'.join(CAST_OPTIONS)}}} <name> ...` is allowed")
+        raise refuse(
+            f"only `an character {{{'|'.join(CAST_OPTIONS)}}} <name> ...` is allowed"
+        )
     sub, name, rest = argv[2], argv[3], argv[4:]
     if not NAME_RE.match(name):
         raise refuse(f"{name!r} is not a character name (lowercase letters, digits, _)")
@@ -194,7 +240,9 @@ def _checked_cast_line(argv: list[str], n: int, line: str) -> list[str]:
     while i < len(rest):
         opt = rest[i]
         if opt not in allowed:
-            raise refuse(f"option {opt!r} is not allowed here (allowed: {', '.join(allowed) or 'none'})")
+            raise refuse(
+                f"option {opt!r} is not allowed here (allowed: {', '.join(allowed) or 'none'})"
+            )
         i += 2 if allowed[opt] else 1
     if i != len(rest):
         raise refuse(f"option {rest[-1]!r} needs a value")
@@ -222,17 +270,24 @@ def lint_svg(path: Path, *, exact_size: bool) -> list[str]:
             problems.append(f"no {dim}")
     if exact_size and len(box) == 4 and root.get("width") and root.get("height"):
         try:
-            if (float(root.get("width")), float(root.get("height"))) != (float(box[2]), float(box[3])):
+            if (float(root.get("width")), float(root.get("height"))) != (
+                float(box[2]),
+                float(box[3]),
+            ):
                 problems.append("width/height differ from the viewBox size")
         except ValueError:
             problems.append("width/height are not plain numbers")
     tags = {el.tag.replace(SVG_NS, "") for el in root.iter()}
     if tags & SVG_FORBIDDEN:
-        problems.append(f"forbidden element(s): {', '.join(sorted(tags & SVG_FORBIDDEN))}")
+        problems.append(
+            f"forbidden element(s): {', '.join(sorted(tags & SVG_FORBIDDEN))}"
+        )
     if not tags & SVG_SHAPES:
         problems.append("draws nothing (no shape element)")
     if _outside_links(root):
-        problems.append("links to an outside file, address or embedded data (only `#id` links are allowed)")
+        problems.append(
+            "links to an outside file, address or embedded data (only `#id` links are allowed)"
+        )
     return problems
 
 
@@ -241,9 +296,13 @@ def _outside_links(root: ET.Element) -> bool:
         for name, value in el.attrib.items():
             if name.endswith("href") and not value.startswith("#"):
                 return True
-            if re.search(r"url\(\s*['\"]?(?!#)", value) or value.strip().startswith(("data:", "//", "http:", "https:", "file:")):
+            if re.search(r"url\(\s*['\"]?(?!#)", value) or value.strip().startswith(
+                ("data:", "//", "http:", "https:", "file:")
+            ):
                 return True
-        if el.tag.replace(SVG_NS, "") == "style" and re.search(r"@import|url\(\s*['\"]?(?!#)", el.text or ""):
+        if el.tag.replace(SVG_NS, "") == "style" and re.search(
+            r"@import|url\(\s*['\"]?(?!#)", el.text or ""
+        ):
             return True
     return False
 
@@ -254,7 +313,11 @@ def _lint_svgs(pack: Path, report: Report) -> None:
         rel = svg.relative_to(pack)
         # A character part keeps its factory root tag, whose size may differ from its box.
         problems = lint_svg(svg, exact_size=chars not in svg.parents)
-        report.add(f"svg {rel.as_posix()}", not problems, "\n".join(f"  [error] {p}" for p in problems))
+        report.add(
+            f"svg {rel.as_posix()}",
+            not problems,
+            "\n".join(f"  [error] {p}" for p in problems),
+        )
 
 
 def _lint_voices(pack: Path, report: Report) -> None:
@@ -266,13 +329,24 @@ def _lint_voices(pack: Path, report: Report) -> None:
             report.add(f"voice {path.stem}", False, f"  [error] {e}")
             continue
         if not isinstance(doc, dict):
-            report.add(f"voice {path.stem}", False, "  [error] a voice document is a JSON object")
+            report.add(
+                f"voice {path.stem}",
+                False,
+                "  [error] a voice document is a JSON object",
+            )
             continue
-        problems = [f"  [error] unknown key {k!r} (allowed: {', '.join(sorted(VOICE_KEYS))})"
-                    for k in sorted(set(doc) - VOICE_KEYS)]
+        problems = [
+            f"  [error] unknown key {k!r} (allowed: {', '.join(sorted(VOICE_KEYS))})"
+            for k in sorted(set(doc) - VOICE_KEYS)
+        ]
         model = doc.get("model_id")
-        notes = [] if model is None or model in VOICE_MODELS else [
-            f"  [warning] model_id {model!r} is not one this skill knows ({', '.join(sorted(VOICE_MODELS))})"]
+        notes = (
+            []
+            if model is None or model in VOICE_MODELS
+            else [
+                f"  [warning] model_id {model!r} is not one this skill knows ({', '.join(sorted(VOICE_MODELS))})"
+            ]
+        )
         report.add(f"voice {path.stem}", not problems, "\n".join(problems + notes))
 
 
@@ -313,13 +387,19 @@ def validate_pack(pack: Path, *, workdir: Path) -> Report:
     _lint_voices(pack, report)
 
     project = workdir / "project"
-    if not report.run(an + ["init", str(project)], cwd=workdir, label="an init", expect="initialized"):
+    if not report.run(
+        an + ["init", str(project)], cwd=workdir, label="an init", expect="initialized"
+    ):
         return report
     pack_chars = pack / "assets" / "characters"
     redrawn = [d for d in _subdirs(pack_chars) if not (d / "character.json").exists()]
     for src in pack.rglob("*"):
         rel = src.relative_to(pack)
-        if src.is_dir() or rel.as_posix() in PACK_ONLY_FILES or any(d in src.parents for d in redrawn):
+        if (
+            src.is_dir()
+            or rel.as_posix() in PACK_ONLY_FILES
+            or any(d in src.parents for d in redrawn)
+        ):
             continue
         _copy(src, project / rel)
     # `an` syncs scene.md and ir/scene.json by age: make the pack's scene the newer.
@@ -327,23 +407,40 @@ def validate_pack(pack: Path, *, workdir: Path) -> Report:
     os.utime(project / "scene.md", (later, later))
 
     for argv in cast:
-        report.run(an + argv[1:], cwd=project, label=" ".join(argv[:4]), expect=CAST_SUCCESS[argv[2]])
+        report.run(
+            an + argv[1:],
+            cwd=project,
+            label=" ".join(argv[:4]),
+            expect=CAST_SUCCESS[argv[2]],
+        )
     chars = project / "assets" / "characters"
-    for d in redrawn:  # redrawn parts go over the factory's own, on the factory's canvas
+    for (
+        d
+    ) in redrawn:  # redrawn parts go over the factory's own, on the factory's canvas
         for src in sorted(d.rglob("*")):
             if src.is_file():
                 rel = src.relative_to(d)
                 problem = _redrawn_problem(src, chars / d.name / rel)
                 if problem:
-                    report.add(f"redrawn {d.name}/{rel.as_posix()}", False, f"  [error] {problem}")
+                    report.add(
+                        f"redrawn {d.name}/{rel.as_posix()}",
+                        False,
+                        f"  [error] {problem}",
+                    )
                 else:
                     _copy(src, chars / d.name / rel)
     if (project / "assets" / "voices").is_dir():
-        report.run([_python_of(an[0]), "-c", VOICE_CHECK, str(project / "assets" / "voices")],
-                   cwd=project, label="voices (engine checks)")
+        report.run(
+            [_python_of(an[0]), "-c", VOICE_CHECK, str(project / "assets" / "voices")],
+            cwd=project,
+            label="voices (engine checks)",
+        )
     for d in _subdirs(chars):
-        report.run(an + ["character", "validate", d.name, "--out-dir", str(chars)],
-                   cwd=project, label=f"character {d.name}")
+        report.run(
+            an + ["character", "validate", d.name, "--out-dir", str(chars)],
+            cwd=project,
+            label=f"character {d.name}",
+        )
     props = project / "assets" / "props"
     for d in _subdirs(props):
         try:
@@ -355,10 +452,17 @@ def validate_pack(pack: Path, *, workdir: Path) -> Report:
             report.add(f"prop {d.name}", False, f"  [error] prop.json: {e}")
             continue
         if kind == "PropDescriptor":
-            report.run(an + ["props", "validate", d.name, "--out-dir", str(props)],
-                       cwd=project, label=f"prop {d.name}")
-    report.run(an + ["validate", str(project), "--strict-assets"], cwd=project,
-               label="scene", expect="validation: passed")
+            report.run(
+                an + ["props", "validate", d.name, "--out-dir", str(props)],
+                cwd=project,
+                label=f"prop {d.name}",
+            )
+    report.run(
+        an + ["validate", str(project), "--strict-assets"],
+        cwd=project,
+        label="scene",
+        expect="validation: passed",
+    )
     return report
 
 
