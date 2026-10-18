@@ -112,6 +112,19 @@ def _render(path: Path, name: str) -> tuple[str, str]:
     return text, text[: m.start(2)] + fresh + text[m.end(2) :]
 
 
+def test_frontmatter_uploads():
+    """Claude.ai refuses a skill whose frontmatter is not YAML, whose name is not
+    its folder's, or whose description is over 1024 characters."""
+    import yaml
+
+    text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+    assert text.startswith("---\n")
+    meta = yaml.safe_load(text.split("---\n")[1])
+    assert set(meta) <= {"name", "description", "license", "allowed-tools", "metadata", "compatibility"}
+    assert meta["name"] == SKILL.name and re.fullmatch(r"[a-z0-9-]{1,64}", meta["name"])
+    assert 0 < len(meta["description"]) <= 1024 and "<" not in meta["description"]
+
+
 @pytest.mark.parametrize("path,name", GENERATED, ids=[n for _, n in GENERATED])
 def test_generated_blocks_are_current(path, name):
     text, fresh = _render(path, name)
