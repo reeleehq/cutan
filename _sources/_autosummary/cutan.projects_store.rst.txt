@@ -1,0 +1,20 @@
+cutan.projects\_store
+=====================
+
+.. automodule:: cutan.projects_store
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      cache_root
+      materialize_project
+      projects_store
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ProjectsStoreSettings
+   

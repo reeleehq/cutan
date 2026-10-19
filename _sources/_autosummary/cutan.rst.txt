@@ -42,6 +42,7 @@
    library
    motion
    nw
+   projects_store
    runtime
    styles
    verify

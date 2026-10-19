@@ -1,4 +1,4 @@
-> built 2026-10-18 13:09 UTC from 7b90c13 (main) · cutan 0.0.53. Details: build_info.json
+> built 2026-10-19 07:51 UTC from 0a76f38 (main) · cutan 0.0.54. Details: build_info.json
 
 # index.html.md
 
@@ -534,7 +534,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'eye', 'rect', 'mouth', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse', 'eye', 'mouth'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -9219,21 +9219,22 @@ The names of the style specs that ship with `cutan`, sorted.
 
 ### Modules
 
-| [`audio`](_autosummary/cutan.audio.html.md#module-cutan.audio)           | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.                 |
-|-------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
-| [`bench`](_autosummary/cutan.bench.html.md#module-cutan.bench)           | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.                     |
-| [`carve`](_autosummary/cutan.carve.html.md#module-cutan.carve)           | Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cutan#10). |
-| [`characters`](_autosummary/cutan.characters.html.md#module-cutan.characters) | Character art system: Spine-shaped descriptor + SVG sidecars.                                              |
-| [`compile`](_autosummary/cutan.compile.html.md#module-cutan.compile)       | The cut-out genre's compile passes, their lowering hooks and the visuals of its runtime.                   |
-| [`conftest`](_autosummary/cutan.conftest.html.md#module-cutan.conftest)     | Doctest collection for `cutan`: `nw` is an optional dependency of `cutan.nw` only.                         |
-| [`expression`](_autosummary/cutan.expression.html.md#module-cutan.expression) | Facial expression for the cutout face (an#98, epic #9 Wave 6).                                             |
-| [`genre`](_autosummary/cutan.genre.html.md#module-cutan.genre)           | The cut-out animation genre, declared as one object.                                                       |
-| [`impacts`](_autosummary/cutan.impacts.html.md#module-cutan.impacts)       | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                              |
-| [`library`](_autosummary/cutan.library.html.md#module-cutan.library)       | The character analyser: legs, arms, views and mouth chart, derived from the rig.                           |
-| [`motion`](_autosummary/cutan.motion.html.md#module-cutan.motion)         | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.                       |
-| [`runtime`](_autosummary/cutan.runtime.html.md#module-cutan.runtime)       | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).                  |
-| [`styles`](_autosummary/cutan.styles.html.md#module-cutan.styles)         | The named cut-out style specs, shipped as package data (cutan#4).                                          |
-| [`verify`](_autosummary/cutan.verify.html.md#module-cutan.verify)         | The cut-out style lint: measures a render against a named style spec.                                      |
+| [`audio`](_autosummary/cutan.audio.html.md#module-cutan.audio)                   | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.                 |
+|---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| [`bench`](_autosummary/cutan.bench.html.md#module-cutan.bench)                   | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.                     |
+| [`carve`](_autosummary/cutan.carve.html.md#module-cutan.carve)                   | Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cutan#10). |
+| [`characters`](_autosummary/cutan.characters.html.md#module-cutan.characters)         | Character art system: Spine-shaped descriptor + SVG sidecars.                                              |
+| [`compile`](_autosummary/cutan.compile.html.md#module-cutan.compile)               | The cut-out genre's compile passes, their lowering hooks and the visuals of its runtime.                   |
+| [`conftest`](_autosummary/cutan.conftest.html.md#module-cutan.conftest)             | Doctest collection for `cutan`: `nw` is an optional dependency of `cutan.nw` only.                         |
+| [`expression`](_autosummary/cutan.expression.html.md#module-cutan.expression)         | Facial expression for the cutout face (an#98, epic #9 Wave 6).                                             |
+| [`genre`](_autosummary/cutan.genre.html.md#module-cutan.genre)                   | The cut-out animation genre, declared as one object.                                                       |
+| [`impacts`](_autosummary/cutan.impacts.html.md#module-cutan.impacts)               | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                              |
+| [`library`](_autosummary/cutan.library.html.md#module-cutan.library)               | The character analyser: legs, arms, views and mouth chart, derived from the rig.                           |
+| [`motion`](_autosummary/cutan.motion.html.md#module-cutan.motion)                 | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.                       |
+| [`projects_store`](_autosummary/cutan.projects_store.html.md#module-cutan.projects_store) | Where a cutan project's files are read from: a disk folder or S3, by configuration.                        |
+| [`runtime`](_autosummary/cutan.runtime.html.md#module-cutan.runtime)               | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).                  |
+| [`styles`](_autosummary/cutan.styles.html.md#module-cutan.styles)                 | The named cut-out style specs, shipped as package data (cutan#4).                                          |
+| [`verify`](_autosummary/cutan.verify.html.md#module-cutan.verify)                 | The cut-out style lint: measures a render against a named style spec.                                      |
 
 
 # _autosummary/cutan.impacts.cli.html.md
@@ -11120,6 +11121,73 @@ then `walk`.
   [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
 
+# _autosummary/cutan.projects_store.html.md
+
+# cutan.projects_store
+
+Where a cutan project’s files are read from: a disk folder or S3, by configuration.
+
+The library’s `projects` kind is a mapping `relative path -> bytes` (ADR-0024:
+`s3://{bucket}/{tenant}/cutan/projects/{rel}` mirrors `~/.local/share/cutan/projects/{rel}`
+exactly, so both backends hold the same keys). [`projects_store()`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.projects_store) returns that
+mapping; [`materialize_project()`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.materialize_project) returns a real folder for tools that need files
+(ffmpeg, a browser), reading through a cache under `~/.cache/cutan/projects/`.
+
+Configuration (environment; the first match wins, `CUTAN_HOME` always forces local):
+
+- `CUTAN_HOME` set: local, under that root (an explicit root beats any S3 setting)
+- `CUTAN_PROJECTS_BACKEND=s3`: S3, with `CUTAN_S3_BUCKET` (default `tw-apps`),
+  `CUTAN_S3_PROFILE` (default `tw-server`) and `CUTAN_S3_TENANT` (default `thorwhalen`)
+- otherwise: local (the default)
+
+### Functions
+
+| `cache_root`()                                                                              |                                                                           |
+|---------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| [`materialize_project`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.materialize_project)(project_id, \*[, ...]) | A real folder holding `project_id`'s files.                               |
+| [`projects_store`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.projects_store)([settings])                 | The projects as `{relative path: bytes}`, over disk or S3 per `settings`. |
+
+### Classes
+
+| [`ProjectsStoreSettings`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.ProjectsStoreSettings)([backend, bucket, ...])   | Which backend holds the projects, and its S3 coordinates.   |
+|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+
+### *class* cutan.projects_store.ProjectsStoreSettings(backend='local', bucket='tw-apps', profile='tw-server', tenant='thorwhalen')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Which backend holds the projects, and its S3 coordinates.
+
+#### *classmethod* from_environ(environ=None)
+
+```pycon
+>>> ProjectsStoreSettings.from_environ({}).backend
+'local'
+>>> ProjectsStoreSettings.from_environ({"CUTAN_PROJECTS_BACKEND": "s3"}).backend
+'s3'
+>>> env = {"CUTAN_PROJECTS_BACKEND": "s3", "CUTAN_HOME": "/x"}
+>>> ProjectsStoreSettings.from_environ(env).backend
+'local'
+```
+
+### cutan.projects_store.materialize_project(project_id, , settings=None, store=None, cache=None)
+
+A real folder holding `project_id`’s files.
+
+Local backend: the project folder itself, no copy. S3: files are read through
+into the cache and kept; a cached file whose size matches the object’s is reused.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.projects_store.projects_store(settings=None)
+
+The projects as `{relative path: bytes}`, over disk or S3 per `settings`.
+
+* **Return type:**
+  [`MutableMapping`](https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping)
+
+
 # _autosummary/cutan.runtime.html.md
 
 # cutan.runtime
@@ -11992,18 +12060,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-18 13:09 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/7b90c13015dc482693808e88b9fcbb43a0af6c6a"><code>7b90c13</code></a> on branch <code>main</code>, for **cutan 0.0.53** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 07:51 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/0a76f38f1a0a65f8a61118a76051a0d3aff8c5b0"><code>0a76f38</code></a> on branch <code>main</code>, for **cutan 0.0.54** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.53) is behind the latest release on PyPI (0.0.54): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.54) is behind the latest release on PyPI (0.0.55): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/7b90c13015dc482693808e88b9fcbb43a0af6c6a"><code>7b90c13015dc482693808e88b9fcbb43a0af6c6a</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/0a76f38f1a0a65f8a61118a76051a0d3aff8c5b0"><code>0a76f38f1a0a65f8a61118a76051a0d3aff8c5b0</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -12014,9 +12082,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/39130048257">39130048257</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/39218289770">39218289770</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>7b90c13015dc482693808e88b9fcbb43a0af6c6a</code> (in the history of the built commit) |
+| Event commit | <code>0a76f38f1a0a65f8a61118a76051a0d3aff8c5b0</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -12041,13 +12109,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.54/">0.0.54</a>, newer than the documented version (0.0.53).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.55/">0.0.55</a>, newer than the documented version (0.0.54).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 7b90c13015dc482693808e88b9fcbb43a0af6c6a
+git checkout 0a76f38f1a0a65f8a61118a76051a0d3aff8c5b0
 pip install "epythet==0.2.17"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
