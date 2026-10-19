@@ -47,6 +47,11 @@ Repository = "https://github.com/thorwhalen/cutan"
 Documentation = "https://thorwhalen.github.io/cutan"
 
 [project.optional-dependencies]
+# cutan.projects_store with CUTAN_PROJECTS_BACKEND=s3 (cutan#88). Imported lazily.
+s3 = [
+    "s3dol",
+    "dol",
+]
 # The nw genre declaration (cutan.nw): a host that catalogs genres installs this.
 nw = [
     "nw",
