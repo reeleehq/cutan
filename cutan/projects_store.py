@@ -88,7 +88,10 @@ def projects_store(settings: Optional[ProjectsStoreSettings] = None) -> MutableM
 
 
 def cache_root() -> Path:
-    return Path(os.environ.get(CACHE_ENV) or Path.home() / ".cache" / LIBRARY_NAME) / PROJECTS_KIND
+    return (
+        Path(os.environ.get(CACHE_ENV) or Path.home() / ".cache" / LIBRARY_NAME)
+        / PROJECTS_KIND
+    )
 
 
 def materialize_project(
@@ -112,7 +115,7 @@ def materialize_project(
     for key in store:
         if not key.startswith(prefix):
             continue
-        target = dest / key[len(prefix):]
+        target = dest / key[len(prefix) :]
         data = store[key]
         if target.is_file() and target.stat().st_size == len(data):
             continue
