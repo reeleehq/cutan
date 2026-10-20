@@ -250,3 +250,15 @@ def test_flux_prompts_say_only_what_is_wanted():
 
     text = image_prompt("sky", "a summer evening", style="south_park", tool="flux")
     assert " no " not in f" {text.lower()} " and "Look:" in text
+
+
+def test_a_moving_window_plate_holds_only_what_is_at_infinity():
+    """Owner finding (2026-10-20): near objects painted into a moving view stay
+    still under moving poles; they are separate props (an#484)."""
+    from cutan.art_brief import ART_KINDS, VIEWPOINT_RULE, art_guidance
+
+    view = ART_KINDS["window_view"]
+    assert "no trees, no poles" in view.framing and "roadside" in " ".join(view.content)
+    assert "roadside" in ART_KINDS and "an#484" in ART_KINDS["roadside"].status
+    assert "looking back at the driver" in VIEWPOINT_RULE
+    assert art_guidance()["viewpoint"] == VIEWPOINT_RULE

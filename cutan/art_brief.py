@@ -11,7 +11,7 @@ what each piece of art must contain to be usable, so the writer-facing skill
 connector (its ``check this pack`` result) all say the same thing.
 
 - :data:`ART_KINDS`: each kind of art (sky, far, mid and near plates, the view
-  behind a car, a prop, a vehicle, a character reference sheet, character
+  through a moving window, roadside objects, a prop, a vehicle, a character reference sheet, character
   parts, a costume), with where it goes in a pack, its canvas, its background
   and what it must and must not show.
 - :func:`style_look`: a named style's look in words, for a prompt (the
@@ -45,6 +45,7 @@ __all__ = [
     "PAPER_DRAWINGS",
     "RASTER_SUFFIXES",
     "SVG_ONLY_NOTE",
+    "VIEWPOINT_RULE",
     "art_guidance",
     "image_prompt",
     "style_look",
@@ -75,6 +76,14 @@ SVG_ONLY_NOTE = (
     "parts) or JPEG (opaque plates). What each picture must show, and prompts "
     "to paste into a generator: the skill's references/art.md "
     "(cutan.art_brief.art_guidance())."
+)
+
+#: Art that touches a body says where the camera is relative to the character.
+VIEWPOINT_RULE = (
+    "Art that touches a character (a car's interior around the driver, a seat, a "
+    "steering wheel, a costume) states the camera's viewpoint relative to that "
+    "character in the prompt, e.g. 'seen from in front of the car, looking back at "
+    "the driver'; otherwise the picture and the character face different ways."
 )
 
 #: How to photograph or scan drawings made on paper so they can be cut out.
@@ -208,34 +217,67 @@ ART_KINDS: dict[str, ArtKind] = {
                 "what is in front of the characters: a railing, a bush, a counter, "
                 "a car's dashboard and window frames",
                 "kept to the edges and bottom of the frame so it does not hide faces",
+                "anything around a character (a dashboard, a seat, a steering wheel) "
+                "drawn from the camera's viewpoint relative to that character, stated "
+                "in the prompt",
             ),
             framing="A foreground element along the bottom edge of the frame, the "
-            "rest of the picture plain flat white and empty, seen straight on, no "
-            "people, no text",
+            "rest of the picture plain flat white and empty, seen from <where the "
+            "camera is relative to the characters, e.g. in front of the car looking "
+            "back at the driver>, no people, no text",
             aspect="16:9",
             status="ready if its background is transparent; a flat background is "
             "cut out by the pipeline owner first (cutan.carve)",
         ),
         ArtKind(
             key="window_view",
-            title="The view behind a car (or a train, a moving window)",
+            title="The view through a moving window (a car's rear or side window, a train)",
             goes_to=_PLATE_FILES
             + "; its own plate, behind the vehicle's interior plate",
-            canvas="a long strip, 3 to 4 frames wide (about 5000x1080), so it can "
-            "scroll past the windows for the whole shot",
+            canvas="16:9, at least 1920x1080 behind a rear window or windscreen (what "
+            "is at infinity does not move); a strip 2 to 3 frames wide behind a side "
+            "window, for a slow drift",
             background="opaque",
             content=(
-                "only the landscape or road seen through the windows: no car parts, "
-                "no window frame, no reflections",
-                "the horizon at one height along the whole strip; ideally the left "
-                "and right ends join so it can loop",
-                "the car's interior (seats, dashboard, window frames with the glass "
-                "left empty) is a separate near-layer picture",
+                "only what is effectively at infinity: the sky, the horizon, far "
+                "mountains, the sea, a distant skyline",
+                "nothing near or in the middle distance: no roadside trees, poles, "
+                "fences, road markings or nearby buildings. Those are separate "
+                "transparent props (`roadside`) that the scene moves in perspective "
+                "(an#484): painted into the plate they stay still while the poles "
+                "move, and the shot reads as broken",
+                "no car parts, no window frame, no reflections: the car's interior "
+                "is a separate near-layer picture with the glass left empty",
             ),
-            framing="A very wide panoramic strip of roadside landscape seen side-on "
-            "from a moving car, horizon level at one height throughout, no car parts, "
-            "no window frame, no people, no text",
-            aspect="4:1",
+            framing="A distant landscape seen far away: the sky and the horizon with "
+            "far mountains, empty flat land or calm sea stretching to the horizon, "
+            "everything small and far, nothing in the foreground or the middle "
+            "distance, no trees, no poles, no fences, no road, no buildings, no car "
+            "parts, no window frame, no people, no text",
+            aspect="16:9",
+        ),
+        ArtKind(
+            key="roadside",
+            title="Roadside objects for a moving view (a tree, a pole, a fence, a road dash)",
+            goes_to="assets/props/<object>/parts/<object>.png, one prop per object",
+            canvas="square, 1024x1024, like any prop; the object standing on the bottom edge",
+            background="transparent (or a plain flat white, cut out afterwards)",
+            content=(
+                "one object per picture, whole, upright, its base on the bottom edge",
+                "seen from the angle the window sees it: side-on through a side "
+                "window; from the road, straight on, through a rear window or "
+                "windscreen",
+                "two or three variants of what repeats (trees of different shapes) "
+                "so the stream does not look stamped",
+                "no ground under it, no cast shadow",
+            ),
+            framing="A single roadside object standing upright, whole and centred "
+            "with its base on the bottom edge of a square frame, seen from the road "
+            "at eye level, isolated on a plain flat white background, no ground, no "
+            "cast shadow, no text",
+            aspect="1:1",
+            status="the scene moves each one past the window in perspective (written "
+            "as moves in scene.md today; a declarative travelling view is an#484)",
         ),
         ArtKind(
             key="prop",
@@ -407,7 +449,7 @@ def art_guidance(*, style: str | Mapping | None = None) -> dict:
 
     >>> g = art_guidance(style="norstein")
     >>> sorted(g)
-    ['claude_svg', 'formats', 'generators', 'kinds', 'look', 'paper_drawings', 'prompt_recipe']
+    ['claude_svg', 'formats', 'generators', 'kinds', 'look', 'paper_drawings', 'prompt_recipe', 'viewpoint']
     >>> g["kinds"][0]["key"], g["look"].startswith("painted multiplane")
     ('sky', True)
     """
@@ -427,6 +469,7 @@ def art_guidance(*, style: str | Mapping | None = None) -> dict:
         "for an opaque plate; SVG from a vector tool if it follows the pack's SVG "
         "rules. Not PSD, HEIC, PDF or AI. Original files, not screenshots.",
         "kinds": kinds,
+        "viewpoint": VIEWPOINT_RULE,
         "paper_drawings": list(PAPER_DRAWINGS),
         "generators": dict(GENERATOR_TIPS),
     }
