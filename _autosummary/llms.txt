@@ -13,6 +13,7 @@
 - [cutan.audio.rhubarb_lipsync](cutan.audio.rhubarb_lipsync.html.md): RhubarbLipSync — calls the rhubarb-lip-sync binary for phoneme-aligned visemes.
 - [cutan.audio.whisper_lipsync](cutan.audio.whisper_lipsync.html.md): WhisperLipSync — faster-whisper word timestamps → viseme keyframes.
 - [cutan.bench](cutan.bench.html.md): The cut-out genre’s bench corpus: eight scenes that use characters, and their goldens.
+- [cutan.body_attachment](cutan.body_attachment.html.md): Props that depict part of a character’s body: the declaration, the geometry, the placement.
 - [cutan.carve](cutan.carve.html.md): Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cuta...
 - [cutan.carve.core](cutan.carve.core.html.md): The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.
 - [cutan.carve.head](cutan.carve.head.html.md): Head mode: a face located, the neck cut under the jaw, the head normalised on a fixed canvas.
@@ -43,6 +44,7 @@
 - [cutan.characters.validate](cutan.characters.validate.html.md): Whether an art package is one the compiler can actually render.
 - [cutan.characters.vocabulary](cutan.characters.vocabulary.html.md): The cut-out genre’s vocabulary entries: motion presets, expression presets, IR-field notes.
 - [cutan.compile](cutan.compile.html.md): The cut-out genre’s compile passes, their lowering hooks and the visuals of its runtime.
+- [cutan.compile.body](cutan.compile.body.html.md): Derive a body-attached prop’s placement from its character, in every shot.
 - [cutan.compile.coarticulate](cutan.compile.coarticulate.html.md): Co-articulation for a swap mouth: the passes between a provider’s raw viseme
 - [cutan.compile.gaze](cutan.compile.gaze.html.md): Ambient saccades for a cutout rig’s pupils: a seeded generator (an#99, epic #9 Wave 6).
 - [cutan.compile.lowering](cutan.compile.lowering.html.md): How the stage compiler lowers the cut-out genre’s actions, and reads a character’s swap sets.
@@ -72,6 +74,7 @@
 - [cutan.styles.copies](cutan.styles.copies.html.md): Copies of a style spec, and whether they are stale (cutan#19).
 - [cutan.styles.policy](cutan.styles.policy.html.md): A style’s policy: per-aspect method orders the compiler applies (ADR 0002 decision 4, cutan#9).
 - [cutan.verify](cutan.verify.html.md): The cut-out style lint: measures a render against a named style spec.
+- [cutan.verify.body](cutan.verify.body.html.md): Body continuity: a prop that depicts a character’s limbs must meet that character’s body.
 - [cutan.verify.style](cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 
 ## Optional

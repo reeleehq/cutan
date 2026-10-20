@@ -1,0 +1,47 @@
+cutan.body\_attachment
+======================
+
+.. automodule:: cutan.body_attachment
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      BODY_ATTACHMENT_KEY
+      BODY_OF_OVERRIDE
+      FIRST_PERSON
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      body_attachment_of
+      bound_character
+      start_state
+      entity_pose
+      character_view
+      rig_point_on_stage
+      socket_rig_point
+      fit_placement
+      solve_placement
+      place_body_prop
+      derivable_placement
+      derive_placement
+      character_model
+      prop_model
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      BodyAttachment
+      Socket
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      NotChecked
+      CrossedLimbs
+   

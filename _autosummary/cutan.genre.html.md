@@ -15,6 +15,9 @@ instead of being wired into the core. `CUTOUT` lists:
   acting on a character whose brows cannot act (an#252), the turn
   checks (contradicted `from_direction`, a mouth hidden while speaking) and
   view continuity across a cut, placed in the report where they always were;
+  and body continuity ([`cutan.verify.body`](cutan.verify.body.html.md#module-cutan.verify.body)): a prop that depicts a
+  character’s limbs is drawn in that character’s view, meets its bones, and
+  keeps that relation across shots;
 - its **capabilities** and the **character analyser** (ADR 0002:
   [`cutan.library`](cutan.library.html.md#module-cutan.library)), its **vocabulary** (motion and expression
   > presets, IR-field notes: [`cutan.characters.vocabulary`](cutan.characters.vocabulary.html.md#module-cutan.characters.vocabulary); the methods:

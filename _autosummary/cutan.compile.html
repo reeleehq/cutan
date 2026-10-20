@@ -35,7 +35,7 @@
 <link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="cutan.compile.coarticulate.html" rel="next" title="cutan.compile.coarticulate"/>
+<link href="cutan.compile.body.html" rel="next" title="cutan.compile.body"/>
 <link href="cutan.characters.vocabulary.html" rel="prev" title="cutan.characters.vocabulary"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
@@ -87,6 +87,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cutan.art_brief.html">cutan.art_brief</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.audio.html">cutan.audio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.bench.html">cutan.bench</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.body_attachment.html">cutan.body_attachment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.carve.html">cutan.carve</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.characters.html">cutan.characters</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cutan.compile</a></li>
@@ -136,16 +137,19 @@
 <p class="rubric">Modules</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.compile.coarticulate.html#module-cutan.compile.coarticulate" title="cutan.compile.coarticulate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coarticulate</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.compile.body.html#module-cutan.compile.body" title="cutan.compile.body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">body</span></code></a></p></td>
+<td><p>Derive a body-attached prop's placement from its character, in every shot.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.compile.coarticulate.html#module-cutan.compile.coarticulate" title="cutan.compile.coarticulate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coarticulate</span></code></a></p></td>
 <td><p>Co-articulation for a swap mouth: the passes between a provider's raw viseme track and the compiler's channel emission (an#97, epic #9 Wave 6).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cutan.compile.gaze.html#module-cutan.compile.gaze" title="cutan.compile.gaze"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaze</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.compile.gaze.html#module-cutan.compile.gaze" title="cutan.compile.gaze"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaze</span></code></a></p></td>
 <td><p>Ambient saccades for a cutout rig's pupils: a seeded generator (an#99, epic #9 Wave 6).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.compile.lowering.html#module-cutan.compile.lowering" title="cutan.compile.lowering"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lowering</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.compile.lowering.html#module-cutan.compile.lowering" title="cutan.compile.lowering"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lowering</span></code></a></p></td>
 <td><p>How the stage compiler lowers the cut-out genre's actions, and reads a character's swap sets.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cutan.compile.passes.html#module-cutan.compile.passes" title="cutan.compile.passes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">passes</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.compile.passes.html#module-cutan.compile.passes" title="cutan.compile.passes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">passes</span></code></a></p></td>
 <td><p>The cut-out passes over the stage compiler, and the helpers only they use.</p></td>
 </tr>
 </tbody>
@@ -162,7 +166,7 @@
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=2bfb35b6"></script>
+<script src="../_static/documentation_options.js?v=c3e19674"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -87,6 +87,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cutan.art_brief.html">cutan.art_brief</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.audio.html">cutan.audio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.bench.html">cutan.bench</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.body_attachment.html">cutan.body_attachment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.carve.html">cutan.carve</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.characters.html">cutan.characters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.compile.html">cutan.compile</a></li>
@@ -145,7 +146,10 @@ instead of being wired into the core. <code class="xref py py-data docutils lite
 <li><p>its <strong>semantic checks</strong>: <code class="docutils literal notranslate"><span class="pre">play</span></code> and <code class="docutils literal notranslate"><span class="pre">expression</span></code> resolution, brow
 acting on a character whose brows cannot act (an#252), the turn
 checks (contradicted <code class="docutils literal notranslate"><span class="pre">from_direction</span></code>, a mouth hidden while speaking) and
-view continuity across a cut, placed in the report where they always were;</p></li>
+view continuity across a cut, placed in the report where they always were;
+and body continuity (<a class="reference internal" href="cutan.verify.body.html#module-cutan.verify.body" title="cutan.verify.body"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cutan.verify.body</span></code></a>): a prop that depicts a
+character’s limbs is drawn in that character’s view, meets its bones, and
+keeps that relation across shots;</p></li>
 <li><p>its <strong>capabilities</strong> and the <strong>character analyser</strong> (ADR 0002:
 <a class="reference internal" href="cutan.library.html#module-cutan.library" title="cutan.library"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cutan.library</span></code></a>), its <strong>vocabulary</strong> (motion and expression</p>
 <blockquote>
@@ -202,7 +206,7 @@ library’s publish warning and the expression labels <code class="docutils lite
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=2bfb35b6"></script>
+<script src="../_static/documentation_options.js?v=c3e19674"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

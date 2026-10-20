@@ -33,6 +33,7 @@
    art_brief
    audio
    bench
+   body_attachment
    carve
    characters
    compile

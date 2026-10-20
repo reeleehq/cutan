@@ -10,4 +10,5 @@ cutan.verify
    :toctree:
    :recursive:
 
+   body
    style

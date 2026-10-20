@@ -1,0 +1,15 @@
+cutan.verify.body
+=================
+
+.. automodule:: cutan.verify.body
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      body_attachment_findings
+      check_body_attachments
+      check_body_attachment_consistency
+      consistency_findings
+   

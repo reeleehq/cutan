@@ -1,4 +1,4 @@
-> built 2026-10-20 23:18 UTC from 19a6ecb (main) · cutan 0.0.57. Details: build_info.json
+> built 2026-10-20 23:28 UTC from 57877e8 (main) · cutan 0.0.58. Details: build_info.json
 
 # index.html.md
 
@@ -712,7 +712,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'rect', 'mouth', 'ellipse', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'eye', 'ellipse', 'rect'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -768,6 +768,403 @@ The checkout whose `examples/` and `misc/bench/` hold the corpus.
 ### cutan.bench.run_bench(\*\*kwargs)
 
 `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.
+
+
+# _autosummary/cutan.body_attachment.html.md
+
+# cutan.body_attachment
+
+Props that depict part of a character’s body: the declaration, the geometry, the placement.
+
+A steering wheel with the driver’s hands on it, a sleeve holding a cup, a pair of
+forearms on a table: art that shows *somebody’s* limbs, drawn as one prop and laid
+over a rigged character. Three mistakes reached a viewer in one production, and
+no check that existed could see any of them:
+
+1. **The art was drawn from the wrong viewpoint.** The image model drew the wheel
+   from the driver’s seat (forearms coming from the camera), while the shot looked
+   at the driver from in front, through the windscreen.
+2. **The art did not meet the body.** Placed by hand, the wheel sat to the right of
+   the driver’s head and was wider than his body, so the arms in it could not come
+   from his shoulders.
+3. **The relation drifted between framings.** The two-shot and the close-up each
+   placed the wheel by hand, so the driver’s size relative to his own hands changed
+   at the cut.
+
+All three are now one contract, declared ONCE in the character’s own units (its
+bones) and derived for every framing. The declaration lives in the prop’s
+document, under `metadata.body_attachment` (the persisted key
+[`BODY_ATTACHMENT_KEY`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.BODY_ATTACHMENT_KEY)), because what a drawing depicts is a property of the
+drawing:
+
+```json
+{"kind": "PropDescriptor", "name": "wheel_hands", "...": "...",
+ "metadata": {"body_attachment": {
+     "schema_version": "0.1.0",
+     "character": "paul",
+     "view": "front",
+     "sockets": [
+         {"bone": "arm_l", "at": [0.20, 0.45]},
+         {"bone": "arm_r", "at": [0.80, 0.45]}
+     ]}}}
+```
+
+- `character` (optional): the character whose body the art shows, by scene
+  entity id, else store ref. A scene entity binds a reusable prop to another
+  character with `overrides: {body_of: jerry}` ([`BODY_OF_OVERRIDE`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.BODY_OF_OVERRIDE)).
+- `view`: the character’s view the art is drawn in, in the rig’s own words
+  (`front`, `three_quarter`, `side`, `back`, or any key of the
+  character’s `view` swap set), or [`FIRST_PERSON`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.FIRST_PERSON) when the camera IS the
+  character (valid only while the character is not on screen).
+- `sockets`: where each depicted limb meets the body, in the character’s REST
+  view. `bone` names the character’s bone (`arm_l` is the bone at the viewer’s
+  left on the factory rig, unmirrored); `at` is where that bone’s joint would be,
+  in the art’s `(u, v)` (0..1 of the drawn image, like an attachment
+  `anchor`). It may lie outside the image: forearms that vanish behind a wheel
+  still say where their shoulders are.
+- `scale` (optional): the prop’s `stage.scale` relative to the character’s.
+  Two sockets measure it; one socket needs it.
+- `tolerance` (default `DFLT_TOLERANCE`): how far a socket may land from
+  its bone, as a fraction of the span between the sockets’ bones on screen.
+  `scale_tolerance` (default `DFLT_SCALE_TOLERANCE`): how far the prop’s
+  size relative to the character may differ from the declared relation.
+
+Unknown keys are kept (forward-compatible): a later field is not “malformed” to
+an older `cutan`.
+
+**Placement is derived, not authored.** A body-attached prop with no
+`stage.at` is placed by its body in every shot (the `body_placement` compile
+pass, [`cutan.compile.body`](_autosummary/cutan.compile.body.html.md#module-cutan.compile.body)), so the relation cannot drift between a two-shot
+and a close-up. [`place_body_prop()`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.place_body_prop) is the same derivation as a function.
+[`cutan.verify.body`](_autosummary/cutan.verify.body.html.md#module-cutan.verify.body) checks a prop that IS placed by hand against it.
+
+```pycon
+>>> ba = BodyAttachment(character="paul", view="front", sockets=[
+...     {"bone": "arm_l", "at": [0.2, 0.45]}, {"bone": "arm_r", "at": [0.8, 0.45]}])
+>>> [s.bone for s in ba.sockets], ba.tolerance, ba.scale_tolerance
+(['arm_l', 'arm_r'], 0.25, 0.05)
+```
+
+### Module Attributes
+
+| [`BODY_ATTACHMENT_KEY`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.BODY_ATTACHMENT_KEY)   | The persisted key under a prop document's `metadata`.                                |
+|------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| [`BODY_OF_OVERRIDE`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.BODY_OF_OVERRIDE)      | The scene entity's `overrides` key that binds a prop to a character.                 |
+| [`FIRST_PERSON`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.FIRST_PERSON)          | The view of art seen through the character's own eyes (the camera is the character). |
+
+### Functions
+
+| [`body_attachment_of`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.body_attachment_of)(prop_doc)                       | The prop's [`BodyAttachment`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.BodyAttachment), or `None` when it declares none.                                                                                                                                                                                                                                     |
+|-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`bound_character`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.bound_character)(shot, prop_entity, ba)             | `(the character entity, its name)` the prop is bound to in `shot`: the entity's `overrides.body_of` first, else the declaration's `character`; by entity id, else by store ref when exactly one entity has it.                                                                                                                                   |
+| [`start_state`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.start_state)(shot)                                  | `{entity id: {property: value}}` from the `set` actions at the shot's start, on the entities' own nodes (a part's are ignored).                                                                                                                                                                                                                  |
+| [`entity_pose`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.entity_pose)(entity[, poses, sets])                 | The entity node's pose at the shot's start: the built pose when `poses` has it, else its `stage` placement, then any `set` at the start.                                                                                                                                                                                                         |
+| [`character_view`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.character_view)(char_entity, char_desc, sets)       | The character's view at the shot's start: a `view` set at 0, else its `rest_view`, else `front`.                                                                                                                                                                                                                                                 |
+| [`rig_point_on_stage`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.rig_point_on_stage)(desc, point, pose)              | Where `point` (view_box units of the rig `desc`) lands on the stage when the entity's node has `pose` (`x`, `y`, `scale_x`, `scale_y`, `rotation` in radians, as `an.motion.stage_poses()` reports it).                                                                                                                                          |
+| [`socket_rig_point`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.socket_rig_point)(prop_desc, socket, \*, art_size)  | The socket's `at` as a point of the prop's rig (view_box units).                                                                                                                                                                                                                                                                                 |
+| [`fit_placement`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.fit_placement)(sockets, targets, \*[, scale])       | The `(offset, scale)` that best maps `sockets` onto `targets`: `targets ≈ offset + scale * sockets` (least squares, uniform scale, no rotation, since a stage placement has none).                                                                                                                                                               |
+| [`solve_placement`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.solve_placement)(prop, char, ba, \*, art_size, ...) | The placement the declaration gives for a character at `character_pose` (unmirrored, unrotated: [`NotChecked`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.NotChecked) otherwise): `{"at", "scale", "residual_px", "span_px", "targets", "local"}` where `targets` are the bones on stage and `local` the sockets in the prop's own stage units at scale 1. |
+| [`place_body_prop`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.place_body_prop)(prop_desc, character_desc, ...)    | Where to put a body-depicting prop so its sockets meet the character's bones.                                                                                                                                                                                                                                                                    |
+| [`derivable_placement`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.derivable_placement)(shot, prop_entity, mall)       | The derived placement of `prop_entity` in `shot`, or `None` ([`derive_placement()`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.derive_placement) says why).                                                                                                                                                                                                      |
+| [`derive_placement`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.derive_placement)(shot, prop_entity, mall)          | `(the derived placement, "")` of `prop_entity` in `shot`, or `(None, why not)`.                                                                                                                                                                                                                                                                  |
+| [`character_model`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.character_model)(doc)                               | A `CharacterDescriptor` from a stored mapping (migrated), or the model as given.                                                                                                                                                                                                                                                                 |
+| [`prop_model`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.prop_model)(doc)                                    | A `PropDescriptor` from a stored mapping (migrated), or the model as given.                                                                                                                                                                                                                                                                      |
+
+### Classes
+
+| [`BodyAttachment`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.BodyAttachment)(\*[, schema_version, ...])   | A prop's declaration that it depicts part of a character's body.   |
+|----------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| [`Socket`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.Socket)(\*, bone, at[, slot])                | Where one depicted limb meets the character's body.                |
+
+### Exceptions
+
+| [`NotChecked`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.NotChecked)   | The geometry cannot be computed for a reason that is a limit of this check, not a fault of the art (a nested slot, a posed bone, unmeasurable art, a mirrored or rotated character): reported as `info`.   |
+|---------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`CrossedLimbs`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.CrossedLimbs) | The art's left limb would meet the body's right: drawn from the other side.                                                                                                                                |
+
+### cutan.body_attachment.BODY_ATTACHMENT_KEY *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'body_attachment'*
+
+The persisted key under a prop document’s `metadata`. Never renamed.
+
+### cutan.body_attachment.BODY_OF_OVERRIDE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'body_of'*
+
+The scene entity’s `overrides` key that binds a prop to a character.
+
+### *class* cutan.body_attachment.BodyAttachment(\*, schema_version='0.1.0', character=None, view, sockets=<factory>, scale=None, tolerance=0.25, scale_tolerance=0.05, \*\*extra_data)
+
+Bases: `BaseModel`
+
+A prop’s declaration that it depicts part of a character’s body.
+
+```pycon
+>>> BodyAttachment(view="")
+Traceback (most recent call last):
+...
+pydantic_core._pydantic_core.ValidationError: 1 validation error for BodyAttachment
+...
+>>> BodyAttachment(view="front", grip="later field").model_dump()["grip"]
+'later field'
+```
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow'}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+### *exception* cutan.body_attachment.CrossedLimbs
+
+Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+The art’s left limb would meet the body’s right: drawn from the other side.
+
+### cutan.body_attachment.FIRST_PERSON *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'first_person'*
+
+The view of art seen through the character’s own eyes (the camera is the character).
+
+### *exception* cutan.body_attachment.NotChecked
+
+Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+The geometry cannot be computed for a reason that is a limit of this
+check, not a fault of the art (a nested slot, a posed bone, unmeasurable art,
+a mirrored or rotated character): reported as `info`.
+
+### *class* cutan.body_attachment.Socket(, bone, at, slot=None, \*\*extra_data)
+
+Bases: `BaseModel`
+
+Where one depicted limb meets the character’s body.
+
+```pycon
+>>> Socket(bone="arm_l", at=(0.2, -0.4)).at
+(0.2, -0.4)
+```
+
+#### at *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]*
+
+That joint, in the art’s `(u, v)` (0..1 of the drawn image; outside is allowed).
+
+#### bone *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+The character’s bone the limb belongs to; its joint is the meeting point.
+
+#### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow'}*
+
+Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+#### slot *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
+
+the prop’s first slot.
+
+* **Type:**
+  The prop’s slot whose art `at` is measured on. `None`
+
+### cutan.body_attachment.body_attachment_of(prop_doc)
+
+The prop’s [`BodyAttachment`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.BodyAttachment), or `None` when it declares none.
+
+`prop_doc` is a `PropDescriptor` or the stored mapping. A malformed
+declaration raises (pydantic’s `ValidationError`): the check reports it.
+
+```pycon
+>>> body_attachment_of({"metadata": {}}) is None
+True
+>>> body_attachment_of({"metadata": ["not a mapping"]}) is None
+True
+>>> body_attachment_of({"metadata": {"body_attachment": {"view": "front"}}}).view
+'front'
+```
+
+* **Return type:**
+  [`BodyAttachment`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.BodyAttachment) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.body_attachment.bound_character(shot, prop_entity, ba)
+
+`(the character entity, its name)` the prop is bound to in `shot`:
+the entity’s `overrides.body_of` first, else the declaration’s
+`character`; by entity id, else by store ref when exactly one entity has
+it. The entity is `None` when absent or ambiguous; the name is `""` when
+nothing binds the prop.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`Any`](https://docs.python.org/3/library/typing.html#typing.Any), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### cutan.body_attachment.character_model(doc)
+
+A `CharacterDescriptor` from a stored mapping (migrated), or the model as given.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+### cutan.body_attachment.character_view(char_entity, char_desc, sets)
+
+The character’s view at the shot’s start: a `view` set at 0, else its
+`rest_view`, else `front`.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.body_attachment.derivable_placement(shot, prop_entity, mall)
+
+The derived placement of `prop_entity` in `shot`, or `None`
+([`derive_placement()`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.derive_placement) says why). Never raises.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.body_attachment.derive_placement(shot, prop_entity, mall)
+
+`(the derived placement, "")` of `prop_entity` in `shot`, or
+`(None, why not)`. Never raises.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict) | [`None`](https://docs.python.org/3/builtins/constants.html#None), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### cutan.body_attachment.entity_pose(entity, poses=None, sets=None)
+
+The entity node’s pose at the shot’s start: the built pose when `poses`
+has it, else its `stage` placement, then any `set` at the start.
+`None` when neither places it (the default layout, without built poses).
+
+```pycon
+>>> from an.ir.schema import AssetRef, StagePlacement
+>>> e = AssetRef(kind="prop", id="w", store="props", ref="w", stage=StagePlacement(at=(1, 2), scale=3))
+>>> entity_pose(e, None, {"x": 5})
+{'x': 5.0, 'y': 2.0, 'scale_x': 3.0, 'scale_y': 3.0, 'rotation': 0.0}
+```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.body_attachment.fit_placement(sockets, targets, , scale=1.0)
+
+The `(offset, scale)` that best maps `sockets` onto `targets`:
+`targets ≈ offset + scale * sockets` (least squares, uniform scale, no
+rotation, since a stage placement has none). With one socket (or sockets that
+coincide) the scale cannot be measured and `scale` is kept.
+
+A non-positive scale means the limbs are crossed.
+
+```pycon
+>>> fit_placement([(0, 0), (10, 0)], [(100, 50), (120, 50)])
+((100.0, 50.0), 2.0)
+>>> fit_placement([(5, 5)], [(100, 50)], scale=3.0)
+((85.0, 35.0), 3.0)
+>>> fit_placement([(0, 0), (10, 0)], [(120, 50), (100, 50)])[1]
+-2.0
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)], [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### cutan.body_attachment.place_body_prop(prop_desc, character_desc, , character_at, character_scale=1.0, art_size)
+
+Where to put a body-depicting prop so its sockets meet the character’s bones.
+
+Returns `{"at": [x, y], "scale": s, "residual_px": r}`: the prop’s
+`stage.at` and `stage.scale` for a character standing at
+`character_at` with `stage.scale` `character_scale` in its rest view,
+and the largest distance left between a socket and its bone. The compile
+pass does this for every prop placed without `stage.at`; call it for a
+hand-placed one.
+
+```pycon
+>>> from an.stage.props import PropDescriptor
+>>> from cutan.characters.schema import CharacterDescriptor
+>>> paul = CharacterDescriptor(name="paul")
+>>> wheel = PropDescriptor.model_validate({"name": "w", "slots": [
+...     {"name": "body", "bone": "root", "attachment": "w"}],
+...     "skins": {"default": {"slots": {"body": {"w": {"path": "parts/w.png"}}}}},
+...     "metadata": {"body_attachment": {"character": "paul", "view": "front",
+...         "sockets": [{"bone": "arm_l", "at": [0.1, 0.0]},
+...                     {"bone": "arm_r", "at": [0.9, 0.0]}]}}})
+>>> place_body_prop(wheel, paul, character_at=(200, 400), character_scale=2.0,
+...                 art_size=(500, 300))
+{'at': [200.0, 270.288], 'scale': 0.9, 'residual_px': 0.0}
+```
+
+The relation is the character’s: at another framing the prop’s scale moves
+with the character’s, in proportion.
+
+```pycon
+>>> place_body_prop(wheel, paul, character_at=(0, 0), character_scale=3.0,
+...                 art_size=(500, 300))["scale"]
+1.35
+```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### cutan.body_attachment.prop_model(doc)
+
+A `PropDescriptor` from a stored mapping (migrated), or the model as given.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+### cutan.body_attachment.rig_point_on_stage(desc, point, pose)
+
+Where `point` (view_box units of the rig `desc`) lands on the stage when
+the entity’s node has `pose` (`x`, `y`, `scale_x`, `scale_y`,
+`rotation` in radians, as `an.motion.stage_poses()` reports it).
+
+```pycon
+>>> from types import SimpleNamespace as NS
+>>> rig = NS(view_box=(0, 0, 345, 345), origin=(100, 100), bones=[])
+>>> rig_point_on_stage(rig, (110, 100), {"x": 5, "y": 0, "scale_x": 2, "scale_y": 2})
+(25.0, 0.0)
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### cutan.body_attachment.socket_rig_point(prop_desc, socket, , art_size)
+
+The socket’s `at` as a point of the prop’s rig (view_box units).
+
+`art_size` is what the slot’s drawn art rasterises at (pixels for a
+raster, the SVG’s size), as the compiler’s probe measures it, or a function
+of the attachment’s `path` returning it (`None`: unmeasurable); a
+declared `width`/`height` on the attachment wins, keeping the art’s
+aspect. Raises [`NotChecked`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.NotChecked) for what this v1 does not compute: a
+missing slot or art, unmeasurable art, a nested slot, a posed bone.
+
+```pycon
+>>> from an.stage.props import PropDescriptor
+>>> p = PropDescriptor.model_validate({"name": "w", "skins": {"default": {"slots": {
+...     "body": {"w": {"path": "parts/w.png"}}}}}, "slots": [
+...     {"name": "body", "bone": "root", "attachment": "w"}]})
+>>> socket_rig_point(p, Socket(bone="arm_l", at=(0.0, 0.5)), art_size=(400, 200))
+(312.0, 512.0)
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### cutan.body_attachment.solve_placement(prop, char, ba, , art_size, character_pose)
+
+The placement the declaration gives for a character at `character_pose`
+(unmirrored, unrotated: [`NotChecked`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.NotChecked) otherwise):
+`{"at", "scale", "residual_px", "span_px", "targets", "local"}` where
+`targets` are the bones on stage and `local` the sockets in the prop’s
+own stage units at scale 1. Raises [`CrossedLimbs`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.CrossedLimbs), [`NotChecked`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.NotChecked),
+or `ValueError` for a bone the character lacks.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### cutan.body_attachment.start_state(shot)
+
+`{entity id: {property: value}}` from the `set` actions at the shot’s
+start, on the entities’ own nodes (a part’s are ignored).
+
+```pycon
+>>> from an.ir.schema import SetAction, Shot
+>>> start_state(Shot(id="s", actions=[SetAction(target="p", property="view", value="side")]))
+{'p': {'view': 'side'}}
+```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
 
 
 # _autosummary/cutan.carve.core.html.md
@@ -5174,7 +5571,7 @@ each chain ends in a method that requires nothing.
 * **Type:**
   The genre’s aspects
 
-### cutan.characters.methods.CUTOUT_METHODS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Method, ...]* *= (Method(id='loco.legged_cycle', kind='method', version='2', name='legs', title='legged walk cycle', description='a legged walk cycle: in profile the legs swing about the hip in opposition, facing the camera the stepping leg lifts; the arms swing against the legs', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'lift': {'type': 'number', 'default': 10.0}, 'arm_swing': {'type': 'number', 'default': 0.3}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'legs'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.profile_cycle', kind='method', version='2', name='profile', title='profile walk cycle', description="the four poses of a walk seen in profile (contact, down, passing, up): with a side or three-quarter view showing the legs swing about the hip in opposition and the body sinks after each contact and rises before the next; asked while another view shows, it walks as legs (Reiniger's silhouettes, any figure drawn side-on)", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.45}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.35}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'profile'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()), Requirement(capability='swap.view', key='side', at_least=None, any_of=())), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)', 'swap.view:side': 'give the character a side view: \`an character add-views <name>\` (a factory character), or carve its art in profile and declare \`rest_view: side\` in character.json'}), Method(id='loco.shuffle', kind='method', version='2', name='shuffle', title='shuffle', description='the feet barely leave the ground: short, quick steps with little bob and arms close to the body (the old, the tired, the cautious)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.3}, 'step_length': {'type': 'number', 'default': 40.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 3.0}, 'arm_swing': {'type': 'number', 'default': 0.1}, 'bob': {'type': 'number', 'default': 1.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'shuffle'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.hem_sway', kind='method', version='2', name='hem', title='hem sway', description="a robe figure's walk: the leg slots are the two halves of the hem, which tilt about the hip as mirror images (the hem opens and closes) while the body sways and bobs facing the camera; in profile they swing like legs", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hem_tilt': {'type': 'number', 'default': 0.24}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hem'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': "carve the robe's hem into two halves on slots leg_l/leg_r, pivoted at the hip, and declare \`gait: hem\` in character.json"}), Method(id='loco.waddle', kind='method', version='2', name='waddle', title='waddle', description='the body rocks from foot to foot and bobs on each step; legs, if any, lift in turn (a penguin, a toddler, a squat figure)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 5.0}, 'bob': {'type': 'number', 'default': 4.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'waddle'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.hop', kind='method', version='2', name='hop', title='hop', description='the whole figure jumps on every step while it travels (a bird, a kangaroo, a gleeful character, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hop_height': {'type': 'number', 'default': 18.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hop'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.bounce', kind='method', version='2', name='bounce', title='bounce', description='the body bobs on every step while it slides; legs, if any, only flick (the South Park walk)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 8.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lift': {'type': 'number', 'default': 4.0}, 'stride': {'type': 'number', 'default': 0.1}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'bounce'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.rock', kind='method', version='2', name='rock', title='rock and bob', description='no leg moves: the body rocks side to side and bobs once per step while it travels (a blob, a sack, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'rock'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.glide', kind='method', version='2', name='glide', title='glide', description='the figure slides, leaning into the move with a gentle bob; no limb moves (a robe figure, a ghost, a sack — the default for any figure without legs)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 1.5, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lean': {'type': 'number', 'default': 0.04}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'glide'}},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='locomotion', remedies={}), Method(id='speech.mouth_chart', kind='method', version='1', name='mouth_chart', title='mouth chart lip-sync', description="lip-sync on the character's mouth chart: the line's visemes swap the mouth drawings (the nine Rhubarb shapes, or the character's own set)", usage='', params={}, examples=(), requires=(Requirement(capability='face.mouth', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='speech', remedies={'face.mouth': "give the character an overlay mouth: a \`mouth\` slot with the viseme set's drawings (\`an character mouths <dir>\`) and face_overlay: true"}), Method(id='speech.pose_only', kind='method', version='1', name='pulse', title='speech pulse', description='no lip-sync: the head (or the body) pulses on each syllable, so a baked face or a mime still reads as speaking', usage='', params={'type': 'object', 'properties': {'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=('a character with face_overlay: false speaks',), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='speech', remedies={}), Method(id='expr.full_face', kind='method', version='1', name='full_face', title='full-face expression', description="the expression acts with the whole face: the brows rise, knit and tilt, the lids open and close, the pupils move and the mouth takes the preset's form", usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'},), requires=(Requirement(capability='face.brows', key=None, at_least=None, any_of=()),), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='expression', remedies={'face.brows': "keep the brows clear: \`an character new\` seats a hat above them at most head scales — at this one it could not, so use a larger --head-scale, another --hat or --hat none; for drawn art, redraw what covers the brows and remove the descriptor's \`occluded\` entry, or give the face brow slots (left_brow/right_brow) with art"}), Method(id='expr.without_brows', kind='method', version='1', name='without_brows', title='expression without brows', description='the brows cannot be seen acting (covered, or not drawn): the lids, the gaze and the mouth form carry the expression', usage='', params={}, examples=('a character whose hat covers its brows takes [surprised]',), requires=(), levels=frozenset({'b-name', 'a'}), aspects=(), aspect='expression', remedies={}))*
+### cutan.characters.methods.CUTOUT_METHODS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Method, ...]* *= (Method(id='loco.legged_cycle', kind='method', version='2', name='legs', title='legged walk cycle', description='a legged walk cycle: in profile the legs swing about the hip in opposition, facing the camera the stepping leg lifts; the arms swing against the legs', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'lift': {'type': 'number', 'default': 10.0}, 'arm_swing': {'type': 'number', 'default': 0.3}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'legs'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.profile_cycle', kind='method', version='2', name='profile', title='profile walk cycle', description="the four poses of a walk seen in profile (contact, down, passing, up): with a side or three-quarter view showing the legs swing about the hip in opposition and the body sinks after each contact and rises before the next; asked while another view shows, it walks as legs (Reiniger's silhouettes, any figure drawn side-on)", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.45}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.35}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'profile'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()), Requirement(capability='swap.view', key='side', at_least=None, any_of=())), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)', 'swap.view:side': 'give the character a side view: \`an character add-views <name>\` (a factory character), or carve its art in profile and declare \`rest_view: side\` in character.json'}), Method(id='loco.shuffle', kind='method', version='2', name='shuffle', title='shuffle', description='the feet barely leave the ground: short, quick steps with little bob and arms close to the body (the old, the tired, the cautious)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.3}, 'step_length': {'type': 'number', 'default': 40.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 3.0}, 'arm_swing': {'type': 'number', 'default': 0.1}, 'bob': {'type': 'number', 'default': 1.0, 'description': 'scene px at drawn scale 1; scales with the figure'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'shuffle'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': 'split the legs into two slots named leg_l/leg_r, each with its art, pivoted at the hip (an-art-package skill; \`an character new\` builds them)'}), Method(id='loco.hem_sway', kind='method', version='2', name='hem', title='hem sway', description="a robe figure's walk: the leg slots are the two halves of the hem, which tilt about the hip as mirror images (the hem opens and closes) while the body sways and bobs facing the camera; in profile they swing like legs", usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hem_tilt': {'type': 'number', 'default': 0.24}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'stride': {'type': 'number', 'default': 0.35}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hem'}},), requires=(Requirement(capability='limbs.legs', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={'limbs.legs': "carve the robe's hem into two halves on slots leg_l/leg_r, pivoted at the hip, and declare \`gait: hem\` in character.json"}), Method(id='loco.waddle', kind='method', version='2', name='waddle', title='waddle', description='the body rocks from foot to foot and bobs on each step; legs, if any, lift in turn (a penguin, a toddler, a squat figure)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.12}, 'lift': {'type': 'number', 'default': 5.0}, 'bob': {'type': 'number', 'default': 4.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'waddle'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.hop', kind='method', version='2', name='hop', title='hop', description='the whole figure jumps on every step while it travels (a bird, a kangaroo, a gleeful character, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'hop_height': {'type': 'number', 'default': 18.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'hop'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.bounce', kind='method', version='2', name='bounce', title='bounce', description='the body bobs on every step while it slides; legs, if any, only flick (the South Park walk)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 8.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lift': {'type': 'number', 'default': 4.0}, 'stride': {'type': 'number', 'default': 0.1}, 'arm_swing': {'type': 'number', 'default': 0.15}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'bounce'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.rock', kind='method', version='2', name='rock', title='rock and bob', description='no leg moves: the body rocks side to side and bobs once per step while it travels (a blob, a sack, anything drawable)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'rock': {'type': 'number', 'default': 0.06}, 'bob': {'type': 'number', 'default': 6.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'arm_swing': {'type': 'number', 'default': 0.3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'rock'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='loco.glide', kind='method', version='2', name='glide', title='glide', description='the figure slides, leaning into the move with a gentle bob; no limb moves (a robe figure, a ghost, a sack — the default for any figure without legs)', usage='', params={'type': 'object', 'properties': {'step_s': {'type': 'number', 'default': 0.4}, 'step_length': {'type': 'number', 'default': 80.0, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'bob': {'type': 'number', 'default': 1.5, 'description': 'scene px at drawn scale 1; scales with the figure'}, 'lean': {'type': 'number', 'default': 0.04}, 'arm_swing': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk', 'args': {'gait': 'glide'}},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='locomotion', remedies={}), Method(id='speech.mouth_chart', kind='method', version='1', name='mouth_chart', title='mouth chart lip-sync', description="lip-sync on the character's mouth chart: the line's visemes swap the mouth drawings (the nine Rhubarb shapes, or the character's own set)", usage='', params={}, examples=(), requires=(Requirement(capability='face.mouth', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='speech', remedies={'face.mouth': "give the character an overlay mouth: a \`mouth\` slot with the viseme set's drawings (\`an character mouths <dir>\`) and face_overlay: true"}), Method(id='speech.pose_only', kind='method', version='1', name='pulse', title='speech pulse', description='no lip-sync: the head (or the body) pulses on each syllable, so a baked face or a mime still reads as speaking', usage='', params={'type': 'object', 'properties': {'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=('a character with face_overlay: false speaks',), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='speech', remedies={}), Method(id='expr.full_face', kind='method', version='1', name='full_face', title='full-face expression', description="the expression acts with the whole face: the brows rise, knit and tilt, the lids open and close, the pupils move and the mouth takes the preset's form", usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'},), requires=(Requirement(capability='face.brows', key=None, at_least=None, any_of=()),), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='expression', remedies={'face.brows': "keep the brows clear: \`an character new\` seats a hat above them at most head scales — at this one it could not, so use a larger --head-scale, another --hat or --hat none; for drawn art, redraw what covers the brows and remove the descriptor's \`occluded\` entry, or give the face brow slots (left_brow/right_brow) with art"}), Method(id='expr.without_brows', kind='method', version='1', name='without_brows', title='expression without brows', description='the brows cannot be seen acting (covered, or not drawn): the lids, the gaze and the mouth form carry the expression', usage='', params={}, examples=('a character whose hat covers its brows takes [surprised]',), requires=(), levels=frozenset({'a', 'b-name'}), aspects=(), aspect='expression', remedies={}))*
 
 The genre’s methods, as vocabulary entries (kind `method`).
 
@@ -7430,7 +7827,7 @@ registers nothing.
 | [`EXPRESSION_PRESET_VERSIONS`](_autosummary/cutan.characters.vocabulary.html.md#cutan.characters.vocabulary.EXPRESSION_PRESET_VERSIONS) | Each expression preset's vocabulary version (ADR 0003).                                                                                                                             |
 | [`CUTOUT_VOCABULARY`](_autosummary/cutan.characters.vocabulary.html.md#cutan.characters.vocabulary.CUTOUT_VOCABULARY)          | Everything this genre contributes to the vocabulary except its methods ([`cutan.characters.methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)). |
 
-### cutan.characters.vocabulary.CUTOUT_VOCABULARY *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Entry, ...]* *= (Entry(id='field.shot.actions.swap_set', kind='field', version='1', name='shot.actions.swap_set', title='', description='a set action that swaps a drawing (replacement animation)', usage="A set/tween property may also be the name of a swap set the target character's descriptor declares in asset_sets (e.g. 'viseme', 'eyelid', 'hands'), used with a 'set' action whose 'value' is one of that set's declared KEYS (replacement animation). The compiler refuses any other name with the declared sets listed. Never invent a set or a key.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='field.shot.actions.play', kind='field', version='1', name='shot.actions.play', title='', description='play a named animation of the target character, or a motion preset', usage="A 'play' action ({kind: play, target: <entity>, animation: <name>, [duration], [speed], [loop], [args]}) plays one of the target character's descriptor animations ('idle_breath', 'blink', or any it declares) or, for a name the descriptor does not declare, a motion preset (listed below) with 'args' as its parameters (e.g. {'height': 30}); a name in neither fails validation — never invent one. 'point' targets the arm node. A 'walk' picks its gait from the character's structure (its locomotion method, below) unless 'gait' is given.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('locomotion',)), Entry(id='field.shot.actions.expression', kind='field', version='1', name='shot.actions.expression', title='', description='hold a facial expression on a character', usage="An 'expression' action ({kind: expression, target: <entity>, preset: <name>, [axes: {axis: value}], [intensity], [duration], [blend]}) holds a facial expression on a character: brows, eyelids, and the mouth's set for any dialogue under it. 'preset' is an expression preset (listed below) — an unknown preset fails validation. Axes are offsets within their ranges: brow_height_l [-1, 1], brow_height_r [-1, 1], brow_angle_l [-1, 1], brow_angle_r [-1, 1], lid_open_l [-1, 0.5], lid_open_r [-1, 0.5], gaze_x [-1, 1], gaze_y [-1, 1]. 'duration' omitted = to the shot end. A character whose descriptor says face_overlay: false cannot take one.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='field.shot.dialogue.emotion', kind='field', version='1', name='shot.dialogue.emotion', title='', description='the mood a line is said in', usage="A dialogue line's 'emotion' is an expression preset name ([happy] on a scene.md line): it sets the face for the line and the voice's mood. When a line's wording changes, update its emotion if the mood changed too.", params={}, examples=(), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('speech',)), Entry(id='motion.pop_in', kind='motion_preset', version='1', name='pop_in', title='pop in', description='Grow from nothing to full size, overshooting and settling (an entrance).', usage='', params={'type': 'object', 'properties': {'duration': {'type': 'number', 'default': 0.45}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'pop_in'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.hop', kind='motion_preset', version='1', name='hop', title='hop', description='Jump up by \`height\` scene pixels and land back where it started.', usage='', params={'type': 'object', 'properties': {'height': {'type': 'number', 'default': 40.0}, 'duration': {'type': 'number', 'default': 0.5}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'hop'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.shake', kind='motion_preset', version='1', name='shake', title='shake', description='Tremble side to side \`cycles\` times and come back to rest (on \`x\`).', usage='', params={'type': 'object', 'properties': {'amplitude': {'type': 'number', 'default': 8.0}, 'duration': {'type': 'number', 'default': 0.4}, 'cycles': {'type': 'integer', 'default': 3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'shake'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.slide_in', kind='motion_preset', version='1', name='slide_in', title='slide in', description='Whip in from \`distance\` pixels off to one side, overshoot, and settle.', usage='', params={'type': 'object', 'properties': {'from_side': {'type': 'string', 'default': 'left'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_in'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.slide_out', kind='motion_preset', version='1', name='slide_out', title='slide out', description='Exit \`distance\` pixels off to one side, accelerating (an exit).', usage='', params={'type': 'object', 'properties': {'to_side': {'type': 'string', 'default': 'right'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'type': 'string', 'default': 'ease_in'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_out'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.squash_stretch', kind='motion_preset', version='1', name='squash_stretch', title='squash stretch', description='Squash (wide and short), stretch (narrow and tall), then settle.', usage='', params={'type': 'object', 'properties': {'amount': {'type': 'number', 'default': 0.2}, 'duration': {'type': 'number', 'default': 0.36}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'squash_stretch'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.crawl', kind='motion_preset', version='1', name='crawl', title='crawl', description='An opening crawl: lay \`target\` on a plane tilted away, and slide it up and away.', usage='', params={'type': 'object', 'properties': {'distance': {'type': 'number', 'default': 2400.0}, 'duration': {'type': 'number', 'default': 30.0}, 'start': {'type': 'number', 'default': None}, 'tilt': {'type': 'number', 'default': 0.96}, 'perspective': {'type': 'number', 'default': 1.0}, 'fade': {'type': 'array', 'default': [700.0, 1500.0]}, 'y': {'type': 'number', 'default': None}, 'easing': {'type': 'string', 'default': 'linear'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'crawl'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.nod', kind='motion_preset', version='1', name='nod', title='nod', description='Dip the head \`count\` times (a rotation of \`<target>/<part>\`).', usage='', params={'type': 'object', 'properties': {'part': {'type': 'string', 'default': 'head'}, 'angle': {'type': 'number', 'default': 0.18}, 'duration': {'type': 'number', 'default': 0.5}, 'count': {'type': 'integer', 'default': 2}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'nod'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.point', kind='motion_preset', version='1', name='point', title='point', description='Swing an arm out to point, hold it, and lower it again.', usage='', params={'type': 'object', 'properties': {'angle': {'type': 'number', 'default': -1.3}, 'raise_duration': {'type': 'number', 'default': 0.25}, 'hold': {'type': 'number', 'default': 0.6}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'point'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.waddle', kind='motion_preset', version='1', name='waddle', title='waddle', description='A walk cycle for a rig with no legs to animate: rock and bob per step.', usage='', params={'type': 'object', 'properties': {'steps': {'type': 'integer', 'default': 4}, 'step_duration': {'type': 'number', 'default': 0.3}, 'angle': {'type': 'number', 'default': 0.1}, 'lift': {'type': 'number', 'default': 6.0}, 'travel': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'waddle'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.turn', kind='motion_preset', version='2', name='turn', title='turn', description='Turn a character to the view \`to\` — the classic cut-out turn.', usage='', params={'type': 'object', 'properties': {'to': {'type': 'string', 'default': 'back'}, 'direction': {'type': 'string', 'default': 'right'}, 'from_direction': {'type': 'string', 'default': None}, 'duration': {'type': 'number', 'default': 0.3}, 'view_set': {'type': 'string', 'default': 'view'}, 'step_hz': {'type': 'number', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'turn'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='motion.walk', kind='motion_preset', version='4', name='walk', title='walk', description='Walk: the body travels on \`x\` while the gait moves it — legs that alternate, a hop, a bounce, a glide (an#214, an#224).', usage='', params={'type': 'object', 'properties': {'to_x': {'type': 'number', 'default': None}, 'distance': {'type': 'number', 'default': None}, 'direction': {'type': 'string', 'default': None}, 'steps': {'type': 'integer', 'default': None}, 'step_s': {'default': None}, 'step_length': {'type': 'number', 'default': None}, 'stride': {'type': 'number', 'default': None}, 'lift': {'type': 'number', 'default': None}, 'bob': {'type': 'number', 'default': None}, 'arm_swing': {'type': 'number', 'default': None}, 'rock': {'type': 'number', 'default': None}, 'hem_tilt': {'type': 'number', 'default': None}, 'hop_height': {'type': 'number', 'default': None}, 'lean': {'type': 'number', 'default': None}, 'view': {'type': 'string', 'default': None}, 'gait': {'type': 'string', 'default': None}, 'legs': {'type': 'array', 'default': None}, 'arms': {'type': 'array', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('locomotion',)), Entry(id='motion.speech_pulse', kind='motion_preset', version='1', name='speech_pulse', title='speech pulse', description='Pulse a part on each syllable: speech carried without a mouth.', usage='', params={'type': 'object', 'properties': {'beats': {'type': 'array', 'default': [0.0]}, 'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'speech_pulse'},), requires=(), levels=frozenset({'b-name', 'a'}), aspects=('speech',)), Entry(id='expression.neutral', kind='expression_preset', version='1', name='neutral', title='', description='the rest face: every axis at its neutral value', usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'neutral'}, '[neutral] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.happy', kind='expression_preset', version='1', name='happy', title='', description="expression-sheet preset: brow_angle_l +0.1, brow_angle_r +0.1, brow_height_l +0.2, brow_height_r +0.2, lid_open_l -0.2, lid_open_r -0.2; mouth form 'happy'", usage='FACS cross-reference 6+12', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'happy'}, '[happy] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.sad', kind='expression_preset', version='1', name='sad', title='', description="expression-sheet preset: brow_angle_l +0.6, brow_angle_r +0.6, brow_height_l +0.3, brow_height_r +0.3, lid_open_l -0.3, lid_open_r -0.3; mouth form 'sad'", usage='FACS cross-reference 1+4+15', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'sad'}, '[sad] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.angry', kind='expression_preset', version='2', name='angry', title='', description="expression-sheet preset: brow_angle_l -0.8, brow_angle_r -0.8, brow_height_l -0.6, brow_height_r -0.6, lid_open_l -0.45, lid_open_r -0.45; mouth form 'angry'", usage='FACS cross-reference 4+5+7+23', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'angry'}, '[angry] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.surprised', kind='expression_preset', version='1', name='surprised', title='', description="expression-sheet preset: brow_angle_l +0, brow_angle_r +0, brow_height_l +1, brow_height_r +1, lid_open_l +0.4, lid_open_r +0.4; mouth form 'surprised'", usage='FACS cross-reference 1+2+5+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'}, '[surprised] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.afraid', kind='expression_preset', version='1', name='afraid', title='', description="expression-sheet preset: brow_angle_l +0.5, brow_angle_r +0.5, brow_height_l +0.7, brow_height_r +0.7, lid_open_l +0.5, lid_open_r +0.5; mouth form 'afraid'", usage='FACS cross-reference 1+2+4+5+7+20+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'afraid'}, '[afraid] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.disgusted', kind='expression_preset', version='1', name='disgusted', title='', description="expression-sheet preset: brow_angle_l -0.3, brow_angle_r -0.3, brow_height_l -0.3, brow_height_r -0.3, lid_open_l -0.4, lid_open_r -0.4; mouth form 'disgusted'", usage='FACS cross-reference 9+15+17', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'disgusted'}, '[disgusted] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.thinking', kind='expression_preset', version='1', name='thinking', title='', description='expression-sheet preset: brow_angle_l +0.3, brow_angle_r -0.1, brow_height_l +0.5, brow_height_r -0.2, lid_open_l -0.1, lid_open_r -0.1', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'thinking'}, '[thinking] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.skeptical', kind='expression_preset', version='1', name='skeptical', title='', description='expression-sheet preset: brow_angle_l +0, brow_angle_r -0.2, brow_height_l +0.6, brow_height_r -0.3, lid_open_l +0, lid_open_r -0.2', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'skeptical'}, '[skeptical] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()), Entry(id='expression.amused', kind='expression_preset', version='1', name='amused', title='', description="expression-sheet preset: brow_angle_l +0.05, brow_angle_r +0.05, brow_height_l +0.1, brow_height_r +0.1, lid_open_l -0.1, lid_open_r -0.1; mouth form 'happy'", usage='FACS cross-reference happy at ~0.6', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'amused'}, '[amused] on a scene.md dialogue line'), requires=(), levels=frozenset({'b-name', 'a'}), aspects=()))*
+### cutan.characters.vocabulary.CUTOUT_VOCABULARY *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[Entry, ...]* *= (Entry(id='field.shot.actions.swap_set', kind='field', version='1', name='shot.actions.swap_set', title='', description='a set action that swaps a drawing (replacement animation)', usage="A set/tween property may also be the name of a swap set the target character's descriptor declares in asset_sets (e.g. 'viseme', 'eyelid', 'hands'), used with a 'set' action whose 'value' is one of that set's declared KEYS (replacement animation). The compiler refuses any other name with the declared sets listed. Never invent a set or a key.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='field.shot.actions.play', kind='field', version='1', name='shot.actions.play', title='', description='play a named animation of the target character, or a motion preset', usage="A 'play' action ({kind: play, target: <entity>, animation: <name>, [duration], [speed], [loop], [args]}) plays one of the target character's descriptor animations ('idle_breath', 'blink', or any it declares) or, for a name the descriptor does not declare, a motion preset (listed below) with 'args' as its parameters (e.g. {'height': 30}); a name in neither fails validation — never invent one. 'point' targets the arm node. A 'walk' picks its gait from the character's structure (its locomotion method, below) unless 'gait' is given.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('locomotion',)), Entry(id='field.shot.actions.expression', kind='field', version='1', name='shot.actions.expression', title='', description='hold a facial expression on a character', usage="An 'expression' action ({kind: expression, target: <entity>, preset: <name>, [axes: {axis: value}], [intensity], [duration], [blend]}) holds a facial expression on a character: brows, eyelids, and the mouth's set for any dialogue under it. 'preset' is an expression preset (listed below) — an unknown preset fails validation. Axes are offsets within their ranges: brow_height_l [-1, 1], brow_height_r [-1, 1], brow_angle_l [-1, 1], brow_angle_r [-1, 1], lid_open_l [-1, 0.5], lid_open_r [-1, 0.5], gaze_x [-1, 1], gaze_y [-1, 1]. 'duration' omitted = to the shot end. A character whose descriptor says face_overlay: false cannot take one.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='field.shot.dialogue.emotion', kind='field', version='1', name='shot.dialogue.emotion', title='', description='the mood a line is said in', usage="A dialogue line's 'emotion' is an expression preset name ([happy] on a scene.md line): it sets the face for the line and the voice's mood. When a line's wording changes, update its emotion if the mood changed too.", params={}, examples=(), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('speech',)), Entry(id='motion.pop_in', kind='motion_preset', version='1', name='pop_in', title='pop in', description='Grow from nothing to full size, overshooting and settling (an entrance).', usage='', params={'type': 'object', 'properties': {'duration': {'type': 'number', 'default': 0.45}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'pop_in'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.hop', kind='motion_preset', version='1', name='hop', title='hop', description='Jump up by \`height\` scene pixels and land back where it started.', usage='', params={'type': 'object', 'properties': {'height': {'type': 'number', 'default': 40.0}, 'duration': {'type': 'number', 'default': 0.5}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'hop'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.shake', kind='motion_preset', version='1', name='shake', title='shake', description='Tremble side to side \`cycles\` times and come back to rest (on \`x\`).', usage='', params={'type': 'object', 'properties': {'amplitude': {'type': 'number', 'default': 8.0}, 'duration': {'type': 'number', 'default': 0.4}, 'cycles': {'type': 'integer', 'default': 3}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'shake'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.slide_in', kind='motion_preset', version='1', name='slide_in', title='slide in', description='Whip in from \`distance\` pixels off to one side, overshoot, and settle.', usage='', params={'type': 'object', 'properties': {'from_side': {'type': 'string', 'default': 'left'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_in'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.slide_out', kind='motion_preset', version='1', name='slide_out', title='slide out', description='Exit \`distance\` pixels off to one side, accelerating (an exit).', usage='', params={'type': 'object', 'properties': {'to_side': {'type': 'string', 'default': 'right'}, 'distance': {'type': 'number', 'default': 600.0}, 'duration': {'type': 'number', 'default': 0.35}, 'easing': {'type': 'string', 'default': 'ease_in'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'slide_out'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.squash_stretch', kind='motion_preset', version='1', name='squash_stretch', title='squash stretch', description='Squash (wide and short), stretch (narrow and tall), then settle.', usage='', params={'type': 'object', 'properties': {'amount': {'type': 'number', 'default': 0.2}, 'duration': {'type': 'number', 'default': 0.36}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'squash_stretch'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.crawl', kind='motion_preset', version='1', name='crawl', title='crawl', description='An opening crawl: lay \`target\` on a plane tilted away, and slide it up and away.', usage='', params={'type': 'object', 'properties': {'distance': {'type': 'number', 'default': 2400.0}, 'duration': {'type': 'number', 'default': 30.0}, 'start': {'type': 'number', 'default': None}, 'tilt': {'type': 'number', 'default': 0.96}, 'perspective': {'type': 'number', 'default': 1.0}, 'fade': {'type': 'array', 'default': [700.0, 1500.0]}, 'y': {'type': 'number', 'default': None}, 'easing': {'type': 'string', 'default': 'linear'}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'crawl'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.nod', kind='motion_preset', version='1', name='nod', title='nod', description='Dip the head \`count\` times (a rotation of \`<target>/<part>\`).', usage='', params={'type': 'object', 'properties': {'part': {'type': 'string', 'default': 'head'}, 'angle': {'type': 'number', 'default': 0.18}, 'duration': {'type': 'number', 'default': 0.5}, 'count': {'type': 'integer', 'default': 2}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'nod'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.point', kind='motion_preset', version='1', name='point', title='point', description='Swing an arm out to point, hold it, and lower it again.', usage='', params={'type': 'object', 'properties': {'angle': {'type': 'number', 'default': -1.3}, 'raise_duration': {'type': 'number', 'default': 0.25}, 'hold': {'type': 'number', 'default': 0.6}, 'easing': {'default': [0.34, 1.56, 0.64, 1.0]}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'point'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.waddle', kind='motion_preset', version='1', name='waddle', title='waddle', description='A walk cycle for a rig with no legs to animate: rock and bob per step.', usage='', params={'type': 'object', 'properties': {'steps': {'type': 'integer', 'default': 4}, 'step_duration': {'type': 'number', 'default': 0.3}, 'angle': {'type': 'number', 'default': 0.1}, 'lift': {'type': 'number', 'default': 6.0}, 'travel': {'type': 'number', 'default': 0.0}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'waddle'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.turn', kind='motion_preset', version='2', name='turn', title='turn', description='Turn a character to the view \`to\` — the classic cut-out turn.', usage='', params={'type': 'object', 'properties': {'to': {'type': 'string', 'default': 'back'}, 'direction': {'type': 'string', 'default': 'right'}, 'from_direction': {'type': 'string', 'default': None}, 'duration': {'type': 'number', 'default': 0.3}, 'view_set': {'type': 'string', 'default': 'view'}, 'step_hz': {'type': 'number', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'turn'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='motion.walk', kind='motion_preset', version='4', name='walk', title='walk', description='Walk: the body travels on \`x\` while the gait moves it — legs that alternate, a hop, a bounce, a glide (an#214, an#224).', usage='', params={'type': 'object', 'properties': {'to_x': {'type': 'number', 'default': None}, 'distance': {'type': 'number', 'default': None}, 'direction': {'type': 'string', 'default': None}, 'steps': {'type': 'integer', 'default': None}, 'step_s': {'default': None}, 'step_length': {'type': 'number', 'default': None}, 'stride': {'type': 'number', 'default': None}, 'lift': {'type': 'number', 'default': None}, 'bob': {'type': 'number', 'default': None}, 'arm_swing': {'type': 'number', 'default': None}, 'rock': {'type': 'number', 'default': None}, 'hem_tilt': {'type': 'number', 'default': None}, 'hop_height': {'type': 'number', 'default': None}, 'lean': {'type': 'number', 'default': None}, 'view': {'type': 'string', 'default': None}, 'gait': {'type': 'string', 'default': None}, 'legs': {'type': 'array', 'default': None}, 'arms': {'type': 'array', 'default': None}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'walk'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('locomotion',)), Entry(id='motion.speech_pulse', kind='motion_preset', version='1', name='speech_pulse', title='speech pulse', description='Pulse a part on each syllable: speech carried without a mouth.', usage='', params={'type': 'object', 'properties': {'beats': {'type': 'array', 'default': [0.0]}, 'strength': {'type': 'number', 'default': 0.06}, 'part': {'type': 'string', 'default': 'head'}, 'attack': {'type': 'number', 'default': 0.06}, 'release': {'type': 'number', 'default': 0.1}}}, examples=({'kind': 'play', 'target': 'ned', 'animation': 'speech_pulse'},), requires=(), levels=frozenset({'a', 'b-name'}), aspects=('speech',)), Entry(id='expression.neutral', kind='expression_preset', version='1', name='neutral', title='', description='the rest face: every axis at its neutral value', usage='', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'neutral'}, '[neutral] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.happy', kind='expression_preset', version='1', name='happy', title='', description="expression-sheet preset: brow_angle_l +0.1, brow_angle_r +0.1, brow_height_l +0.2, brow_height_r +0.2, lid_open_l -0.2, lid_open_r -0.2; mouth form 'happy'", usage='FACS cross-reference 6+12', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'happy'}, '[happy] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.sad', kind='expression_preset', version='1', name='sad', title='', description="expression-sheet preset: brow_angle_l +0.6, brow_angle_r +0.6, brow_height_l +0.3, brow_height_r +0.3, lid_open_l -0.3, lid_open_r -0.3; mouth form 'sad'", usage='FACS cross-reference 1+4+15', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'sad'}, '[sad] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.angry', kind='expression_preset', version='2', name='angry', title='', description="expression-sheet preset: brow_angle_l -0.8, brow_angle_r -0.8, brow_height_l -0.6, brow_height_r -0.6, lid_open_l -0.45, lid_open_r -0.45; mouth form 'angry'", usage='FACS cross-reference 4+5+7+23', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'angry'}, '[angry] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.surprised', kind='expression_preset', version='1', name='surprised', title='', description="expression-sheet preset: brow_angle_l +0, brow_angle_r +0, brow_height_l +1, brow_height_r +1, lid_open_l +0.4, lid_open_r +0.4; mouth form 'surprised'", usage='FACS cross-reference 1+2+5+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'surprised'}, '[surprised] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.afraid', kind='expression_preset', version='1', name='afraid', title='', description="expression-sheet preset: brow_angle_l +0.5, brow_angle_r +0.5, brow_height_l +0.7, brow_height_r +0.7, lid_open_l +0.5, lid_open_r +0.5; mouth form 'afraid'", usage='FACS cross-reference 1+2+4+5+7+20+26', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'afraid'}, '[afraid] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.disgusted', kind='expression_preset', version='1', name='disgusted', title='', description="expression-sheet preset: brow_angle_l -0.3, brow_angle_r -0.3, brow_height_l -0.3, brow_height_r -0.3, lid_open_l -0.4, lid_open_r -0.4; mouth form 'disgusted'", usage='FACS cross-reference 9+15+17', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'disgusted'}, '[disgusted] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.thinking', kind='expression_preset', version='1', name='thinking', title='', description='expression-sheet preset: brow_angle_l +0.3, brow_angle_r -0.1, brow_height_l +0.5, brow_height_r -0.2, lid_open_l -0.1, lid_open_r -0.1', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'thinking'}, '[thinking] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.skeptical', kind='expression_preset', version='1', name='skeptical', title='', description='expression-sheet preset: brow_angle_l +0, brow_angle_r -0.2, brow_height_l +0.6, brow_height_r -0.3, lid_open_l +0, lid_open_r -0.2', usage='FACS cross-reference cartoon convention', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'skeptical'}, '[skeptical] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()), Entry(id='expression.amused', kind='expression_preset', version='1', name='amused', title='', description="expression-sheet preset: brow_angle_l +0.05, brow_angle_r +0.05, brow_height_l +0.1, brow_height_r +0.1, lid_open_l -0.1, lid_open_r -0.1; mouth form 'happy'", usage='FACS cross-reference happy at ~0.6', params={}, examples=({'kind': 'expression', 'target': 'ned', 'preset': 'amused'}, '[amused] on a scene.md dialogue line'), requires=(), levels=frozenset({'a', 'b-name'}), aspects=()))*
 
 Everything this genre contributes to the vocabulary except its methods
 ([`cutan.characters.methods`](_autosummary/cutan.characters.methods.html.md#module-cutan.characters.methods)).
@@ -7447,6 +7844,50 @@ locomotion method; `speech_pulse` IS the speech aspect’s last link.
 
 * **Type:**
   Which aspect a preset resolves when played (ADR 0002)
+
+
+# _autosummary/cutan.compile.body.html.md
+
+# cutan.compile.body
+
+Derive a body-attached prop’s placement from its character, in every shot.
+
+A prop that declares `metadata.body_attachment` ([`cutan.body_attachment`](_autosummary/cutan.body_attachment.html.md#module-cutan.body_attachment))
+and is placed WITHOUT `stage.at` is placed by its body: before the scene is
+built (the `body_placement` compile pass, order 90), its `stage.at` and
+`stage.scale` are derived from where its character stands in this shot, by
+[`cutan.body_attachment.place_body_prop()`](_autosummary/cutan.body_attachment.html.md#cutan.body_attachment.place_body_prop). The attachment is then declared
+once, in the character’s own units (its bones), and every framing (a two-shot,
+a close-up) derives the same relation: the prop’s size relative to the
+character and its anchor on the body cannot drift between shots.
+
+A prop placed WITH `stage.at` keeps the author’s placement, and
+`cutout.body_attachment` checks it against the same derivation.
+
+Nothing changes for a stored scene: no prop declared a body attachment before
+this existed, and a prop that declares none is never touched.
+
+```pycon
+>>> from an.ir.schema import Shot
+>>> derive_body_placements(Shot(id="s"), {}).id
+'s'
+```
+
+### Functions
+
+| [`derive_body_placements`](_autosummary/cutan.compile.body.html.md#cutan.compile.body.derive_body_placements)(shot, mall)   | `shot` with every body-attached prop that has no `stage.at` placed by its body.   |
+|---------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+
+### cutan.compile.body.derive_body_placements(shot, mall)
+
+`shot` with every body-attached prop that has no `stage.at` placed by
+its body. Returns `shot` itself when nothing is derived. A prop whose
+placement cannot be derived (no character in the shot, the character in the
+default layout or mirrored, a socket naming a missing bone, unmeasurable
+art, crossed limbs) is left as it is: `cutout.body_attachment` says why.
+
+* **Return type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
 
 
 # _autosummary/cutan.compile.coarticulate.html.md
@@ -7884,11 +8325,12 @@ The cut-out genre’s compile passes, their lowering hooks and the visuals of it
 
 ### Modules
 
-| [`coarticulate`](_autosummary/cutan.compile.coarticulate.html.md#module-cutan.compile.coarticulate)   | Co-articulation for a swap mouth: the passes between a provider's raw viseme track and the compiler's channel emission (an#97, epic #9 Wave 6).   |
-|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`gaze`](_autosummary/cutan.compile.gaze.html.md#module-cutan.compile.gaze)                   | Ambient saccades for a cutout rig's pupils: a seeded generator (an#99, epic #9 Wave 6).                                                           |
-| [`lowering`](_autosummary/cutan.compile.lowering.html.md#module-cutan.compile.lowering)           | How the stage compiler lowers the cut-out genre's actions, and reads a character's swap sets.                                                     |
-| [`passes`](_autosummary/cutan.compile.passes.html.md#module-cutan.compile.passes)               | The cut-out passes over the stage compiler, and the helpers only they use.                                                                        |
+| [`body`](_autosummary/cutan.compile.body.html.md#module-cutan.compile.body)                 | Derive a body-attached prop's placement from its character, in every shot.                                                                      |
+|-------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`coarticulate`](_autosummary/cutan.compile.coarticulate.html.md#module-cutan.compile.coarticulate) | Co-articulation for a swap mouth: the passes between a provider's raw viseme track and the compiler's channel emission (an#97, epic #9 Wave 6). |
+| [`gaze`](_autosummary/cutan.compile.gaze.html.md#module-cutan.compile.gaze)                 | Ambient saccades for a cutout rig's pupils: a seeded generator (an#99, epic #9 Wave 6).                                                         |
+| [`lowering`](_autosummary/cutan.compile.lowering.html.md#module-cutan.compile.lowering)         | How the stage compiler lowers the cut-out genre's actions, and reads a character's swap sets.                                                   |
+| [`passes`](_autosummary/cutan.compile.passes.html.md#module-cutan.compile.passes)             | The cut-out passes over the stage compiler, and the helpers only they use.                                                                      |
 
 
 # _autosummary/cutan.compile.lowering.html.md
@@ -9240,6 +9682,9 @@ instead of being wired into the core. `CUTOUT` lists:
   acting on a character whose brows cannot act (an#252), the turn
   checks (contradicted `from_direction`, a mouth hidden while speaking) and
   view continuity across a cut, placed in the report where they always were;
+  and body continuity ([`cutan.verify.body`](_autosummary/cutan.verify.body.html.md#module-cutan.verify.body)): a prop that depicts a
+  character’s limbs is drawn in that character’s view, meets its bones, and
+  keeps that relation across shots;
 - its **capabilities** and the **character analyser** (ADR 0002:
   [`cutan.library`](_autosummary/cutan.library.html.md#module-cutan.library)), its **vocabulary** (motion and expression
   > presets, IR-field notes: [`cutan.characters.vocabulary`](_autosummary/cutan.characters.vocabulary.html.md#module-cutan.characters.vocabulary); the methods:
@@ -9397,24 +9842,25 @@ The names of the style specs that ship with `cutan`, sorted.
 
 ### Modules
 
-| [`art_brief`](_autosummary/cutan.art_brief.html.md#module-cutan.art_brief)           | What art a cut-out film needs, and how to ask an image generator for it.                                   |
-|---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
-| [`audio`](_autosummary/cutan.audio.html.md#module-cutan.audio)                   | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.                 |
-| [`bench`](_autosummary/cutan.bench.html.md#module-cutan.bench)                   | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.                     |
-| [`carve`](_autosummary/cutan.carve.html.md#module-cutan.carve)                   | Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cutan#10). |
-| [`characters`](_autosummary/cutan.characters.html.md#module-cutan.characters)         | Character art system: Spine-shaped descriptor + SVG sidecars.                                              |
-| [`compile`](_autosummary/cutan.compile.html.md#module-cutan.compile)               | The cut-out genre's compile passes, their lowering hooks and the visuals of its runtime.                   |
-| [`conftest`](_autosummary/cutan.conftest.html.md#module-cutan.conftest)             | Doctest collection for `cutan`: `nw` is an optional dependency of `cutan.nw` only.                         |
-| [`expression`](_autosummary/cutan.expression.html.md#module-cutan.expression)         | Facial expression for the cutout face (an#98, epic #9 Wave 6).                                             |
-| [`genre`](_autosummary/cutan.genre.html.md#module-cutan.genre)                   | The cut-out animation genre, declared as one object.                                                       |
-| [`impacts`](_autosummary/cutan.impacts.html.md#module-cutan.impacts)               | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                              |
-| [`library`](_autosummary/cutan.library.html.md#module-cutan.library)               | The character analyser: legs, arms, views and mouth chart, derived from the rig.                           |
-| [`motion`](_autosummary/cutan.motion.html.md#module-cutan.motion)                 | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.                       |
-| [`pack`](_autosummary/cutan.pack.html.md#module-cutan.pack)                     | Check a cut-out production pack with cutan's own validators (cutan#87).                                    |
-| [`projects_store`](_autosummary/cutan.projects_store.html.md#module-cutan.projects_store) | Where a cutan project's files are read from: a disk folder or S3, by configuration.                        |
-| [`runtime`](_autosummary/cutan.runtime.html.md#module-cutan.runtime)               | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).                  |
-| [`styles`](_autosummary/cutan.styles.html.md#module-cutan.styles)                 | The named cut-out style specs, shipped as package data (cutan#4).                                          |
-| [`verify`](_autosummary/cutan.verify.html.md#module-cutan.verify)                 | The cut-out style lint: measures a render against a named style spec.                                      |
+| [`art_brief`](_autosummary/cutan.art_brief.html.md#module-cutan.art_brief)             | What art a cut-out film needs, and how to ask an image generator for it.                                   |
+|-----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| [`audio`](_autosummary/cutan.audio.html.md#module-cutan.audio)                     | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.                 |
+| [`bench`](_autosummary/cutan.bench.html.md#module-cutan.bench)                     | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.                     |
+| [`body_attachment`](_autosummary/cutan.body_attachment.html.md#module-cutan.body_attachment) | Props that depict part of a character's body: the declaration, the geometry, the placement.                |
+| [`carve`](_autosummary/cutan.carve.html.md#module-cutan.carve)                     | Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cutan#10). |
+| [`characters`](_autosummary/cutan.characters.html.md#module-cutan.characters)           | Character art system: Spine-shaped descriptor + SVG sidecars.                                              |
+| [`compile`](_autosummary/cutan.compile.html.md#module-cutan.compile)                 | The cut-out genre's compile passes, their lowering hooks and the visuals of its runtime.                   |
+| [`conftest`](_autosummary/cutan.conftest.html.md#module-cutan.conftest)               | Doctest collection for `cutan`: `nw` is an optional dependency of `cutan.nw` only.                         |
+| [`expression`](_autosummary/cutan.expression.html.md#module-cutan.expression)           | Facial expression for the cutout face (an#98, epic #9 Wave 6).                                             |
+| [`genre`](_autosummary/cutan.genre.html.md#module-cutan.genre)                     | The cut-out animation genre, declared as one object.                                                       |
+| [`impacts`](_autosummary/cutan.impacts.html.md#module-cutan.impacts)                 | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                              |
+| [`library`](_autosummary/cutan.library.html.md#module-cutan.library)                 | The character analyser: legs, arms, views and mouth chart, derived from the rig.                           |
+| [`motion`](_autosummary/cutan.motion.html.md#module-cutan.motion)                   | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.                       |
+| [`pack`](_autosummary/cutan.pack.html.md#module-cutan.pack)                       | Check a cut-out production pack with cutan's own validators (cutan#87).                                    |
+| [`projects_store`](_autosummary/cutan.projects_store.html.md#module-cutan.projects_store)   | Where a cutan project's files are read from: a disk folder or S3, by configuration.                        |
+| [`runtime`](_autosummary/cutan.runtime.html.md#module-cutan.runtime)                 | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).                  |
+| [`styles`](_autosummary/cutan.styles.html.md#module-cutan.styles)                   | The named cut-out style specs, shipped as package data (cutan#4).                                          |
+| [`verify`](_autosummary/cutan.verify.html.md#module-cutan.verify)                   | The cut-out style lint: measures a render against a named style spec.                                      |
 
 
 # _autosummary/cutan.impacts.cli.html.md
@@ -12121,6 +12567,116 @@ style’s name, a path, a mapping). Save it as the skill’s step 3 says:
   [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
 
 
+# _autosummary/cutan.verify.body.html.md
+
+# cutan.verify.body
+
+Body continuity: a prop that depicts a character’s limbs must meet that character’s body.
+
+Two checks `an validate` runs, over every prop entity whose document declares a
+`metadata.body_attachment` ([`cutan.body_attachment`](_autosummary/cutan.body_attachment.html.md#module-cutan.body_attachment)):
+
+`cutout.body_attachment`, once per shot, at the shot’s start:
+
+- **the character is there** when the art shows it from outside: a body part
+  whose character is not on stage is a warning. `first_person` art (the camera
+  IS the character) is the one view that needs the character OFF screen; with
+  it on screen it is an error;
+- **the view agrees**: the view the art declares is the character’s view (a
+  `view` set at the start, else its `rest_view`, else `front`). Art drawn
+  from the driver’s seat laid over a driver seen through the windscreen is this
+  error;
+- **the relation holds**, for a prop placed by hand (one placed without
+  `stage.at` is derived by the `body_placement` pass and holds by
+  construction): every socket lands within `tolerance` × the span between the
+  sockets’ bones of that bone; the prop’s size relative to the character is the
+  declared one within `scale_tolerance`; the limbs are not crossed; a mirrored
+  character carries a mirrored prop. The error says where the derivation puts it.
+
+`cutout.body_attachment_consistency`, once per scene: the same prop on the
+same character has the same size relative to the character, and the same anchor
+on the body in the character’s units, in every shot (the framings must not
+drift apart at a cut).
+
+Placements are the compiler’s: the entity nodes of the shot’s built stage
+(`an.motion.stage_poses()`, built only when a shot holds a declaring prop),
+with any `set` at the shot’s start applied.
+
+\*\*Reported as `info` and not checked (v1):\*\* the geometry while the
+character is in a view other than its rest view (sockets are declared on the
+rest view’s bones; a side view moves and hides arms), a rotated prop or
+character, a socket on a nested slot or a posed bone, art the store cannot
+measure. **Not checked at all:** motion during the shot (cutan#98), and whether
+the declaration is TRUE of the pixels: the sockets are the art author’s
+statement (a critic over probe frames is cutan#95).
+
+```pycon
+>>> from an.ir.schema import Shot
+>>> body_attachment_findings(Shot(id="s"), {})
+[]
+```
+
+### Functions
+
+| [`body_attachment_findings`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.body_attachment_findings)(shot, stores, \*[, ...])   | `[(severity, ir path, message)]` for every body-depicting prop in `shot`.                                                                                                                                                 |
+|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`check_body_attachments`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.check_body_attachments)(ctx)                         | The cut-out genre's per-shot body-continuity check ([`body_attachment_findings()`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.body_attachment_findings)).                                                                                         |
+| [`check_body_attachment_consistency`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.check_body_attachment_consistency)(ctx)              | The cut-out genre's cross-shot body-continuity check ([`consistency_findings()`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.consistency_findings)).                                                                                           |
+| [`consistency_findings`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.consistency_findings)(records)                       | The same prop on the same character across shots: one finding per pair whose size relative to the character, or anchor on the body (in the character's units), differs between shots beyond the declaration's tolerances. |
+
+### cutan.verify.body.body_attachment_findings(shot, stores, , poses=None, path='', records=None, index=None)
+
+`[(severity, ir path, message)]` for every body-depicting prop in `shot`.
+
+`stores` are the project’s stores by mall name (`props`, `characters`);
+a prop or character whose store is absent is not checked. `poses` are the
+shot’s built entity poses (`an.motion.stage_poses()`), or a function
+returning them (called only when a prop declares an attachment); `None`
+reads placements off the entities’ `stage`, after deriving the placements
+the compiler derives. `records`, when given, receives one measurement per
+checked prop for [`consistency_findings()`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.consistency_findings). Never raises.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
+
+### cutan.verify.body.check_body_attachment_consistency(ctx)
+
+The cut-out genre’s cross-shot body-continuity check ([`consistency_findings()`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.consistency_findings)).
+
+It reads the measurements `cutout.body_attachment` leaves in the
+validation’s memo, so the two must be selected together (`only=`).
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.verify.body.check_body_attachments(ctx)
+
+The cut-out genre’s per-shot body-continuity check ([`body_attachment_findings()`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.body_attachment_findings)).
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.verify.body.consistency_findings(records)
+
+The same prop on the same character across shots: one finding per pair
+whose size relative to the character, or anchor on the body (in the
+character’s units), differs between shots beyond the declaration’s
+tolerances.
+
+```pycon
+>>> r = lambda shot, ratio, ax: {"shot": shot, "where": f"timeline/{shot}/entities/1",
+...     "prop": "wheel", "character": "paul", "ratio": ratio, "anchor": (ax, 0.0),
+...     "span": 50.0, "tolerance": 0.25, "scale_tolerance": 0.05}
+>>> consistency_findings([r(0, 0.43, 0.0), r(3, 0.43, 1.0)])
+[]
+>>> [f[0] for f in consistency_findings([r(0, 0.43, 0.0), r(3, 0.52, 0.0)])]
+['error']
+```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
+
+
 # _autosummary/cutan.verify.html.md
 
 # cutan.verify
@@ -12129,8 +12685,9 @@ The cut-out style lint: measures a render against a named style spec.
 
 ### Modules
 
-| [`style`](_autosummary/cutan.verify.style.html.md#module-cutan.verify.style)   | Style lint: measure a render's cadence, cut rate and palette, and compare them to a style's targets.   |
-|------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| [`body`](_autosummary/cutan.verify.body.html.md#module-cutan.verify.body)   | Body continuity: a prop that depicts a character's limbs must meet that character's body.            |
+|----------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| [`style`](_autosummary/cutan.verify.style.html.md#module-cutan.verify.style) | Style lint: measure a render's cadence, cut rate and palette, and compare them to a style's targets. |
 
 
 # _autosummary/cutan.verify.style.html.md
@@ -12454,18 +13011,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-20 23:18 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/19a6ecb592c7b2129ffd7d2c3f73f8b7690821b1"><code>19a6ecb</code></a> on branch <code>main</code>, for **cutan 0.0.57** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 23:28 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/57877e876564aaa2655f2ec3a689d1d93e061ae7"><code>57877e8</code></a> on branch <code>main</code>, for **cutan 0.0.58** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.57) is behind the latest release on PyPI (0.0.58): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.58) is behind the latest release on PyPI (0.0.59): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/19a6ecb592c7b2129ffd7d2c3f73f8b7690821b1"><code>19a6ecb592c7b2129ffd7d2c3f73f8b7690821b1</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/57877e876564aaa2655f2ec3a689d1d93e061ae7"><code>57877e876564aaa2655f2ec3a689d1d93e061ae7</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -12476,9 +13033,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/39513607819">39513607819</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/39514743739">39514743739</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>19a6ecb592c7b2129ffd7d2c3f73f8b7690821b1</code> (in the history of the built commit) |
+| Event commit | <code>57877e876564aaa2655f2ec3a689d1d93e061ae7</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -12503,13 +13060,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.58/">0.0.58</a>, newer than the documented version (0.0.57).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.59/">0.0.59</a>, newer than the documented version (0.0.58).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 19a6ecb592c7b2129ffd7d2c3f73f8b7690821b1
+git checkout 57877e876564aaa2655f2ec3a689d1d93e061ae7
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -10,6 +10,7 @@ cutan.compile
    :toctree:
    :recursive:
 
+   body
    coarticulate
    gaze
    lowering

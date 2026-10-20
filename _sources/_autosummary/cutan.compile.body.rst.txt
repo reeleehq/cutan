@@ -1,0 +1,12 @@
+cutan.compile.body
+==================
+
+.. automodule:: cutan.compile.body
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      derive_body_placements
+   
