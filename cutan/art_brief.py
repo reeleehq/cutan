@@ -95,12 +95,14 @@ PAPER_DRAWINGS = (
 GENERATOR_TIPS = {
     "midjourney": "append the aspect (--ar 16:9 for a plate, --ar 1:1 for a prop) and "
     "--no text, letters, watermark; it cannot make a transparent background, so ask "
-    "for a plain flat white one; keep a character consistent with --cref <image URL>",
+    "for a plain flat white one; keep a character consistent with a reference image "
+    "(--oref <image URL> in V7, --cref in V6)",
     "gpt-image": "ChatGPT's image tool (gpt-image): write the prompt as plain sentences; "
     "it can make a transparent PNG when asked ('transparent background, PNG'); ask "
     "for edits of the same image to keep a character consistent",
-    "flux": "no negative prompt: say what you want, not what you do not; give the "
-    "size as an aspect (16:9, 1:1); a flat plain background, cut out afterwards",
+    "flux": "no negative prompt, and naming a thing tends to add it: use the "
+    "positive-only prompt (image_prompt(..., tool='flux') drops the 'no ...' words); "
+    "give the size as an aspect (16:9, 1:1); a flat plain background, cut out afterwards",
     "ideogram": "good at following a long description; switch magic prompt off so "
     "your words stay yours; ask for no text in the image",
     "recraft": "can draw in a vector style and export SVG, which suits the flat looks "
@@ -167,11 +169,13 @@ ART_KINDS: dict[str, ArtKind] = {
             content=(
                 "only what is far away, as one band across the whole width",
                 "the horizon at the same height from left to right",
-            ),
+        ),
             framing="A wide horizontal band of distant scenery across the whole "
             "width, horizon level and at the same height throughout, nothing in the "
             "foreground, no people, empty plain flat white sky above it, no text",
             aspect="21:9",
+            status="ready if its background is transparent; a flat background is "
+            "cut out by the pipeline owner first (cutan.carve)",
         ),
         ArtKind(
             key="mid",
@@ -185,11 +189,13 @@ ART_KINDS: dict[str, ArtKind] = {
                 "the floor line about three-quarters of the way down",
                 "the middle third left quiet: the characters stand and talk there",
                 "no characters in it",
-            ),
+        ),
             framing="A stage-like set seen straight on at eye level, the floor line "
             "three-quarters of the way down, the centre left open and uncluttered for "
             "characters, no people, no animals, no text",
             aspect="21:9",
+            status="ready if its background is transparent; a flat background is "
+            "cut out by the pipeline owner first (cutan.carve)",
         ),
         ArtKind(
             key="near",
@@ -201,11 +207,13 @@ ART_KINDS: dict[str, ArtKind] = {
                 "what is in front of the characters: a railing, a bush, a counter, "
                 "a car's dashboard and window frames",
                 "kept to the edges and bottom of the frame so it does not hide faces",
-            ),
+        ),
             framing="A foreground element along the bottom edge of the frame, the "
             "rest of the picture plain flat white and empty, seen straight on, no "
             "people, no text",
             aspect="16:9",
+            status="ready if its background is transparent; a flat background is "
+            "cut out by the pipeline owner first (cutan.carve)",
         ),
         ArtKind(
             key="window_view",
@@ -238,11 +246,13 @@ ART_KINDS: dict[str, ArtKind] = {
                 "seen from the angle the scene shows it",
                 "no cast shadow on a floor, no hands holding it",
                 "moving pieces (a lid, a door) as separate pictures",
-            ),
+        ),
             framing="A single object, whole and centred, filling a square frame, seen "
             "from the angle it is used at, nothing else in the picture, isolated on a "
             "plain flat white background, no cast shadow, no text",
             aspect="1:1",
+            status="ready if its background is transparent; a flat background is "
+            "cut out by the pipeline owner first (cutan.carve)",
         ),
         ArtKind(
             key="vehicle",
@@ -254,11 +264,13 @@ ART_KINDS: dict[str, ArtKind] = {
                 "the whole vehicle in three-quarter front view, wheels on one level line",
                 "nobody inside: windows dark or empty, so characters can be placed",
                 "wheels that must turn as separate pictures, seen at the same angle",
-            ),
+        ),
             framing="A whole car in three-quarter front view, filling the width of a "
             "square frame, wheels level, nobody inside, isolated on a plain flat white "
             "background, no road, no cast shadow, no text",
             aspect="1:1",
+            status="ready if its background is transparent; a flat background is "
+            "cut out by the pipeline owner first (cutan.carve)",
         ),
         ArtKind(
             key="character_sheet",
@@ -287,8 +299,8 @@ ART_KINDS: dict[str, ArtKind] = {
         ArtKind(
             key="character_parts",
             title="Character parts (a puppet in pieces)",
-            goes_to="an art package, assets/characters/<name>/parts/<part>.png, built "
-            "by the pipeline owner from `an character contract`",
+            goes_to="reference/<name>-parts/<part>.png; the pipeline owner builds the "
+            "art package from them (`an character contract`)",
             canvas="each part on its own canvas, all at the same scale",
             background="transparent",
             content=(
@@ -358,28 +370,41 @@ def image_prompt(
     kind: a key of :data:`ART_KINDS`
     subject: what the picture is of, in the writer's words
     style: a style name or spec (its look in words), or ``None`` for a placeholder
-    tool: ``"midjourney"`` appends its ``--ar`` and ``--no`` flags; any other
-        tool takes the plain prompt (see :data:`GENERATOR_TIPS`)
+    tool: ``"midjourney"`` appends its ``--ar`` and ``--no`` flags; ``"flux"``
+        drops the ``no ...`` words; any other tool takes the plain prompt (see
+        :data:`GENERATOR_TIPS`)
     """
     if kind not in ART_KINDS:
         raise KeyError(f"no art kind {kind!r}; the kinds are: {', '.join(ART_KINDS)}")
     k = ART_KINDS[kind]
-    text = f"{subject.strip().rstrip('.')}. {k.framing}. Look: {style_look(style)}."
+    framing, look = k.framing, style_look(style)
+    if tool == "flux":  # naming what is unwanted tends to add it
+        framing, look = _positive(framing), _positive(look)
+    text = f"{subject.strip().rstrip('.')}. {framing}. Look: {look}."
     if tool == "midjourney":
         no = _NO if k.has_figures else f"{_NO}, people"
         text += f" --ar {k.aspect} --no {no}"
     return text
 
 
+def _positive(words: str) -> str:
+    """``words`` without its ``no ...`` clauses.
+
+    >>> _positive("a sky, no ground, no text, soft light")
+    'a sky, soft light'
+    """
+    return ", ".join(c for c in words.split(", ") if not c.lower().startswith(("no ", "nothing ")))
+
+
 def art_guidance(*, style: str | Mapping | None = None) -> dict:
     """Everything a writer's Claude needs to ask for real art, as JSON-ready data.
 
-    With ``style``, each kind carries an example prompt in that look.
+    A prompt is ``prompt_recipe``: the subject, the kind's ``framing``, the ``look``.
 
     >>> g = art_guidance(style="norstein")
     >>> sorted(g)
-    ['claude_svg', 'formats', 'generators', 'kinds', 'look', 'paper_drawings']
-    >>> g["kinds"][0]["key"], "Look: painted multiplane" in g["kinds"][0]["example_prompt"]
+    ['claude_svg', 'formats', 'generators', 'kinds', 'look', 'paper_drawings', 'prompt_recipe']
+    >>> g["kinds"][0]["key"], g["look"].startswith("painted multiplane")
     ('sky', True)
     """
     look = style_look(style)
@@ -387,11 +412,13 @@ def art_guidance(*, style: str | Mapping | None = None) -> dict:
     for k in ART_KINDS.values():
         row = asdict(k)
         row["content"] = list(k.content)
-        row["example_prompt"] = image_prompt(k.key, f"<{k.title.lower()}>", style=style)
         kinds.append(row)
     return {
         "claude_svg": CLAUDE_SVG_NOTE,
         "look": look,
+        "prompt_recipe": "<subject in the writer's words>. <the kind's framing>. Look: "
+        "<look>. Never a show's, studio's or artist's name. Midjourney: add --ar "
+        "<the kind's aspect> --no text, letters, watermark.",
         "formats": "PNG (transparent background where a kind says so), JPEG or WebP "
         "for an opaque plate; SVG from a vector tool if it follows the pack's SVG "
         "rules. Not PSD, HEIC, PDF or AI. Original files, not screenshots.",

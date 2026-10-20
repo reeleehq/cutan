@@ -175,8 +175,9 @@ IMAGE_SIGNATURES = {
     ".webp": (b"RIFF",),
 }
 PACK_SUFFIXES = TEXT_SUFFIXES | frozenset(IMAGE_SIGNATURES)
-#: The largest picture a pack may hold, in bytes.
+#: The largest picture a pack may hold, in bytes, and in pixels (from its header).
 MAX_IMAGE_BYTES = 40 * 1024 * 1024
+MAX_IMAGE_PIXELS = 50_000_000
 #: Where a pack's drawings live (the art an all-SVG note counts).
 ART_GLOBS = (
     "assets/environments/*/plates/**/*",
@@ -477,6 +478,14 @@ def _image_problem(path: Path) -> str | None:
     if not ok:
         name = path.suffix.lstrip(".").upper().replace("JPG", "JPEG")
         return f"not a {path.suffix} picture (its first bytes say otherwise): export it again as {name}"
+    from an.stage.raster import image_size
+
+    try:
+        w, h = image_size(path)
+    except (OSError, ValueError) as e:
+        return f"not a readable picture: {e}"
+    if w * h > MAX_IMAGE_PIXELS:
+        return f"{w:.0f}x{h:.0f} is over {MAX_IMAGE_PIXELS:,} pixels: scale it down"
     return None
 
 
@@ -524,6 +533,20 @@ def _note_svg_only_art(pack: Path, report: PackReport) -> None:
     n = svg_only_art(pack)
     if n:
         report.notes.append(SVG_ONLY_NOTE.format(n=n))
+    from an.stage.raster import has_alpha
+
+    for part in sorted((pack / "assets" / "props").glob("*/parts/**/*")):
+        if part.suffix in IMAGE_SIGNATURES and part.is_file():
+            try:
+                opaque = has_alpha(part) is False
+            except (OSError, ValueError):
+                continue
+            if opaque:
+                report.notes.append(
+                    f"{part.relative_to(pack).as_posix()} has no transparent background: "
+                    "it shows as a rectangle, background included; cut it out first "
+                    "(a PNG with alpha, or cutan.carve)"
+                )
 
 
 def _lint_svgs(pack: Path, report: PackReport) -> None:
@@ -701,6 +724,7 @@ def _build_and_check(
             src.is_dir()
             or src.is_symlink()
             or src.suffix not in PACK_SUFFIXES
+            or (src.suffix in IMAGE_SIGNATURES and _image_problem(src))
             or rel.as_posix() in PACK_ONLY_FILES
             or any(d in src.parents for d in redrawn)
         ):

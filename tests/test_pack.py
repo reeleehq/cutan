@@ -214,3 +214,39 @@ def test_a_redrawn_factory_part_cannot_be_a_picture_yet(tmp_path):
     picture = tmp_path / "head.png"
     _png(picture, (8, 8))
     assert "cutan#92" in _redrawn_problem(picture, tmp_path / "head.png")
+
+
+def test_a_picture_s_declared_pixels_are_capped(tmp_path):
+    import struct
+    import zlib
+
+    from cutan import pack as pack_mod
+
+    pack = tmp_path / "pack"
+    big = pack / "assets" / "props" / "u" / "parts" / "big.png"
+    big.parent.mkdir(parents=True)
+    ihdr = struct.pack(">IIBBBBB", 100_000, 100_000, 8, 6, 0, 0, 0)
+    chunk = struct.pack(">I", len(ihdr)) + b"IHDR" + ihdr + struct.pack(">I", zlib.crc32(b"IHDR" + ihdr))
+    big.write_bytes(b"\x89PNG\r\n\x1a\n" + chunk)
+    assert "over 50,000,000 pixels" in pack_mod._image_problem(big)
+
+
+def test_an_opaque_prop_picture_gets_a_note(tmp_path):
+    from PIL import Image
+
+    from cutan.pack import _note_svg_only_art
+
+    pack = tmp_path / "pack"
+    part = pack / "assets" / "props" / "car" / "parts" / "car.jpg"
+    part.parent.mkdir(parents=True)
+    Image.new("RGB", (16, 16), (255, 255, 255)).save(part)
+    report = PackReport()
+    _note_svg_only_art(pack, report)
+    assert len(report.notes) == 1 and "no transparent background" in report.notes[0]
+
+
+def test_flux_prompts_say_only_what_is_wanted():
+    from cutan.art_brief import image_prompt
+
+    text = image_prompt("sky", "a summer evening", style="south_park", tool="flux")
+    assert " no " not in f" {text.lower()} " and "Look:" in text
