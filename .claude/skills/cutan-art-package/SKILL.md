@@ -174,6 +174,12 @@ shipped with an unattributed CC BY asset cannot be un-shipped. See
   a shoulder pivot drawn at the elbow yields a rig that is valid and wrong.
 - **Sub-pixel or stylistic consistency across a set.** That is `lookbook`'s
   problem, not this one's.
+- **Whether a prop that shows a body part was drawn from the camera's side.**
+  Hands on a wheel, a sleeve on a cup: declare `metadata.body_attachment` on the
+  prop (its character, the view drawn, a socket per limb) and `an validate`
+  checks the view and that the limbs meet the character's shoulders
+  (`cutan.body_attachment`; the `cutan` skill has the recipe). The sockets are
+  your statement about the drawing: check them on one probe frame.
 
 ## Traps
 

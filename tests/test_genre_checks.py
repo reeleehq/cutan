@@ -22,6 +22,7 @@ DECLARED = {
     "cutout.shot_policy",
     "cutout.style_copies",
     "cutout.view_continuity",
+    "cutout.body_attachment",
 }
 
 

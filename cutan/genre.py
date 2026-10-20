@@ -13,6 +13,8 @@ instead of being wired into the core. :data:`CUTOUT` lists:
   acting on a character whose brows cannot act (an#252), the turn
   checks (contradicted ``from_direction``, a mouth hidden while speaking) and
   view continuity across a cut, placed in the report where they always were;
+  and body continuity (:mod:`cutan.verify.body`): a prop that depicts a
+  character's limbs is drawn in that character's view and meets its bones;
 - its **capabilities** and the **character analyser** (ADR 0002:
   :mod:`cutan.library`), its **vocabulary** (motion and expression
   presets, IR-field notes: :mod:`cutan.characters.vocabulary`; the methods:
@@ -45,6 +47,7 @@ from cutan.styles.policy import check_shot_policy
 
 from cutan import GENRE_NAME, LIBRARY_NAME, require_an
 from cutan.characters import checks as _checks
+from cutan.verify.body import check_body_attachments
 from cutan.characters.methods import (
     CUTOUT_ASPECTS,
     CUTOUT_METHODS,
@@ -221,6 +224,15 @@ CUTOUT = Genre(
             check_declared_speech,
             order=100.6,
             description="a character's declared `speech` names a speech method at a current version",
+        ),
+        SemanticCheck(
+            "cutout.body_attachment",
+            check_body_attachments,
+            order=62,
+            description=(
+                "a prop that depicts a character's limbs is drawn in the view the "
+                "character is in, and its limbs meet that character's bones"
+            ),
         ),
         SemanticCheck(
             "cutout.character_refs",
