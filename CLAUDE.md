@@ -13,11 +13,12 @@
 cutan/genre.py        CUTOUT, the Genre object (entry point cutout_animation = "cutan.genre:CUTOUT"); nw.py: the nw declaration
 cutan/characters/     descriptor schema (CharacterDescriptor), factory, play resolution, methods, vocabulary, checks, CLI
 cutan/expression/     expression presets, axes, bindings, the face provider
-cutan/compile/        passes.py (the cut-out passes over an.stage.compile), lowering.py (play/expression lowering, swap declaration), coarticulate.py, gaze.py
+cutan/compile/        passes.py (the cut-out passes over an.stage.compile), body.py (body-attached props placed by their character), lowering.py (play/expression lowering, swap declaration), coarticulate.py, gaze.py
 cutan/audio/          lip-sync providers (offline, rhubarb, whisper, word timings)
-cutan/impacts/        impact choreography and ground truth;  cutan/verify/style.py: the style lint;  cutan/library.py: the character analyser
+cutan/impacts/        impact choreography and ground truth;  cutan/verify/style.py: the style lint;  cutan/verify/body.py: the body-continuity check;  cutan/library.py: the character analyser
 cutan/carve/          photo/frame → matted, provenance-carrying part: matte strategies, refine, head mode, split_parts, write_prop (cutan[carve])
 cutan/styles/         the named style specs (*.yaml, package data) and their loader: style_spec(name), style_specs(); python -m cutan.styles
+cutan/body_attachment.py  a prop that depicts a character's limbs: its `metadata.body_attachment` declaration, the socket geometry, place_body_prop
 cutan/motion.py       the rig presets (nod, point, turn, walk, waddle, speech_pulse; an#322) and PRESETS, the table a `play` resolves in
 cutan/runtime/        visuals.js: the procedural mouth and eye, registered through the stage runtime's anRegisterVisual
 cutan/pack.py         check_pack(): the production-pack checker (cutan#87), run by the skill's validate_pack.py and the reelee connector
@@ -28,7 +29,7 @@ skills/cutan-production-pack/  a Claude.ai skill for writers (not loaded by Clau
 
 ## Rules
 
-- **Persisted identifiers never change** (`cutan/__init__.py` lists them): `renderer: cutout`, the genre slug `cutout_animation`, the `CharacterDescriptor` document kind and its `schema_version`, the `character` asset kind and `characters` store, the action kinds `play` and `expression`, the compiled document's wire shape, the provenance provider string `"an character factory"` (licence `cc0-1.0`), the lip-sync provider names, the swap set names (`viseme`, `eyelid`, `view`, `hands`, `body_facing`) and the visual kinds `mouth` and `eye`.
+- **Persisted identifiers never change** (`cutan/__init__.py` lists them): `renderer: cutout`, the genre slug `cutout_animation`, the `CharacterDescriptor` document kind and its `schema_version`, the `character` asset kind and `characters` store, the action kinds `play` and `expression`, the compiled document's wire shape, the provenance provider string `"an character factory"` (licence `cc0-1.0`), the lip-sync provider names, the swap set names (`viseme`, `eyelid`, `view`, `hands`, `body_facing`), the visual kinds `mouth` and `eye`, a prop's `metadata.body_attachment` key with its fields (`schema_version`, `character`, `view`, `sockets[].bone/at/slot`, `scale`, `tolerance`, `scale_tolerance`), and the entity override key `body_of`.
 - **The pixel gate stays with the core.** The corpus contract hashes (`tests/test_expression_compose.py`) and the blessed golden frames (`misc/bench/golden/`) must not move without a bless record that says why. A PR here that can change a pixel is exercised against `an` main in CI. Never write that a rendering behaviour is "verified in CI" without saying where.
 - **Import `an` freely; `an` imports nothing of `cutan`.** If the core needs something from this package, add a registry or hook in `an` first (a service, `ActionKind.lowering`, `EntityKind.swap_declaration`, a compile pass, a runtime script). The compile passes may import `an.stage.compile` helpers (underscore names included): a genre depending on the core is allowed.
 - **A change to any module here changes the core's shot-cache key** (`an.stage.cache_key.genre_code_modules` keys every module of this package), so a cut-out shot re-renders after an upgrade. That is intended.
