@@ -46,6 +46,11 @@ RENDERER_NAME: str = "cutout"
 #: (``~/.local/share/cutan`` by default; ``CUTAN_HOME`` overrides it).
 LIBRARY_NAME: str = "cutan"
 
+#: The file, relative to a project folder, that says which projects store the
+#: folder belongs to and what it last synced with it (``cutan.projects_store``,
+#: cutan#91). Pushed with the project, so it is a key of the store too.
+PROJECT_STORE_RECORD: str = ".an/projects_store.json"
+
 #: The lowest ``an.genres.API_LEVEL`` this ``cutan`` runs against ("the lowest ``an``
 #: it supports", ADR 0001 decision 8, said without a version pin: ``an``'s version is
 #: assigned by CI at merge). Level 2 is the move itself: ``Genre.services``,
@@ -85,6 +90,7 @@ __all__ = [
     "ENTRY_POINT_VALUE",
     "GENRE_NAME",
     "LIBRARY_NAME",
+    "PROJECT_STORE_RECORD",
     "REQUIRED_AN_API_LEVEL",
     "RENDERER_NAME",
     "require_an",

@@ -5,13 +5,18 @@ The library's ``projects`` kind is a mapping ``relative path -> bytes`` (ADR-002
 exactly, so both backends hold the same keys). :func:`projects_store` returns that
 mapping; :func:`materialize_project` returns a real folder for tools that need files
 (ffmpeg, a browser), reading through a cache under ``~/.cache/cutan/projects/``;
-:func:`push_project` is the write half (cutan#91): it uploads what changed since the
-last push, can mirror deletions, and keeps the derived shot cache local.
+:func:`push_project` is the write half (cutan#91): it writes what changed since the
+folder last synced, never over a newer version another machine pushed, can delete
+what the folder no longer has, and keeps derived output local.
 
 A folder that belongs to a store carries the record ``.an/projects_store.json``
-(:data:`STORE_RECORD`): the store's coordinates and, after a push, each pushed
-file's size and sha256. ``an init <id> --id --genre cutout_animation`` creates a
-project in the cache folder with that record when the backend is S3
+(:data:`STORE_RECORD`): the store's coordinates and, per file, the size and sha256
+the folder last synced (``files``). The record is pushed with the project, so the
+store's copy says what the store holds and the folder's copy is the base a push
+compares both sides against (a three-way comparison: a file the folder did not
+change is never pushed over one the store changed, and a file both changed is a
+conflict that only ``force`` writes). ``an init <id> --id --genre cutout_animation``
+creates a project in the cache folder with that record when the backend is S3
 (:func:`new_project_dir`, the ``projects.dir.cutan`` service of ``an`` API level 7).
 
 Configuration (environment; the first match wins, ``CUTAN_HOME`` always forces local):
@@ -34,23 +39,30 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable, Mapping, Optional
 
-from . import LIBRARY_NAME
+from . import LIBRARY_NAME, PROJECT_STORE_RECORD
 
 PROJECTS_KIND = "projects"
 HOME_ENV = "CUTAN_HOME"
 BACKEND_ENV = "CUTAN_PROJECTS_BACKEND"
 CACHE_ENV = "CUTAN_CACHE"
 
-#: The file, relative to a project folder, that says which store the folder
-#: belongs to and what was last pushed there (``{"store": …, "files": {rel:
-#: {"size", "sha256"}}, "pushed_at"}``). Pushed with the project, so a folder
-#: materialised elsewhere knows it too.
-STORE_RECORD: str = ".an/projects_store.json"
+#: The record's path inside a project folder (:data:`cutan.PROJECT_STORE_RECORD`).
+STORE_RECORD: str = PROJECT_STORE_RECORD
 
-#: What a push keeps on the machine that made it: derived or transient, keyed
-#: by that machine. The shot cache (an#242) re-renders from the project; the
-#: render work dirs are a run's scratch. Each entry is a folder prefix or a file.
-DEFAULT_PUSH_EXCLUDES: tuple[str, ...] = ("artifacts/shot_cache/", ".an/render_work/")
+#: What a push keeps on the machine that made it: derived or transient output,
+#: keyed by that machine or re-made from the project. The shot cache (an#242) and
+#: the shot archive re-render from the project; the render work dirs are a run's
+#: scratch; render reports and probes are what ``an init`` keeps out of git
+#: (``an.project.PROJECT_GITIGNORE``, held equal by a test); a repository is
+#: not project content. Each entry is a folder prefix (ending in ``/``) or a file.
+DEFAULT_PUSH_EXCLUDES: tuple[str, ...] = (
+    ".git/",
+    ".an/render_work/",
+    "artifacts/shot_cache/",
+    "artifacts/shots/",
+    "artifacts/render_reports/",
+    "artifacts/probes/",
+)
 
 #: A project id is one folder name (the rule of ``an.library.root.project_dir``).
 _PROJECT_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
@@ -115,17 +127,21 @@ def _local_root() -> Path:
 
 
 def projects_store(settings: Optional[ProjectsStoreSettings] = None) -> MutableMapping:
-    """The projects as ``{relative path: bytes}``, over disk or S3 per ``settings``."""
+    """The projects as ``{relative path: bytes}``, over disk or S3 per ``settings``.
+
+    The local store creates a key's folders on write, so a project pushed into it
+    from a folder elsewhere lands whole.
+    """
     s = settings or ProjectsStoreSettings.from_environ()
     if s.backend == "s3":
         from s3dol import s3_store
 
         return s3_store(s.bucket, prefix=s.prefix, profile=s.profile)
-    from dol import Files
+    from dol import Files, mk_dirs_if_missing
 
     root = _local_root()
     root.mkdir(parents=True, exist_ok=True)
-    return Files(str(root))
+    return mk_dirs_if_missing(Files(str(root)))
 
 
 def cache_root() -> Path:
@@ -164,6 +180,12 @@ def _folder_for(
     return (cache or cache_root()) / project_id
 
 
+def _keys_under(store: Mapping, prefix: str) -> set[str]:
+    """The store's keys under ``prefix``, less directory markers (a key ending in
+    ``/``, which a console's "create folder" leaves and ``s3dol`` lists)."""
+    return {k for k in store if k.startswith(prefix) and not k.endswith("/")}
+
+
 # ----------------------------------------------------------------- the record
 
 
@@ -177,10 +199,14 @@ def read_record(folder: Path) -> dict:
     return doc if isinstance(doc, dict) else {}
 
 
+def _record_bytes(record: dict) -> bytes:
+    return (json.dumps(record, indent=2, sort_keys=True) + "\n").encode("utf-8")
+
+
 def _write_record(folder: Path, record: dict) -> bytes:
     path = Path(folder) / STORE_RECORD
     path.parent.mkdir(parents=True, exist_ok=True)
-    data = (json.dumps(record, indent=2, sort_keys=True) + "\n").encode("utf-8")
+    data = _record_bytes(record)
     path.write_bytes(data)
     return data
 
@@ -191,6 +217,31 @@ def _record_store(folder: Path, s: ProjectsStoreSettings) -> None:
     if record.get("store") == s.coordinates():
         return
     _write_record(folder, {**record, "store": s.coordinates()})
+
+
+def _store_record(store: Mapping, key: str) -> dict:
+    """The store's copy of the record, ``{}`` when it has none or it is unreadable."""
+    try:
+        data = store[key]
+    except (KeyError, OSError):
+        return {}
+    try:
+        doc = json.loads(bytes(data).decode("utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        return {}
+    return doc if isinstance(doc, dict) else {}
+
+
+def _sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def _file_digest(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
 
 
 # ----------------------------------------------------------------- read half
@@ -206,8 +257,11 @@ def materialize_project(
     """A real folder holding ``project_id``'s files.
 
     Local backend: the project folder itself, no copy. S3: files are read through
-    into the cache and kept; a cached file whose size matches the object's is reused,
-    and the folder records the store it belongs to (:data:`STORE_RECORD`).
+    into the cache and kept, and the folder records the store it belongs to
+    (:data:`STORE_RECORD`). A cached file is reused when its sha256 is the one
+    the store's record holds for it (a file the record does not know: when its
+    size matches the object's). The store wins: a cached file that differs is
+    overwritten, so push a folder's changes before pulling into it.
     """
     s = settings or ProjectsStoreSettings.from_environ()
     prefix = _project_prefix(project_id)
@@ -215,13 +269,22 @@ def materialize_project(
     if s.backend == "local" and store is None:
         return dest
     store = projects_store(s) if store is None else store
-    for key in store:
-        if not key.startswith(prefix):
-            continue
-        target = dest / key[len(prefix) :]
-        data = store[key]
-        if target.is_file() and target.stat().st_size == len(data):
-            continue
+    remote = _store_record(store, prefix + STORE_RECORD).get("files") or {}
+    for key in sorted(_keys_under(store, prefix)):
+        rel = key[len(prefix) :]
+        target = dest / rel
+        if target.is_file() and rel != STORE_RECORD:  # the record is always refreshed
+            want = (remote.get(rel) or {}).get("sha256")
+            if want is not None:
+                if _file_digest(target) == want:
+                    continue
+                data = store[key]
+            else:
+                data = store[key]
+                if target.stat().st_size == len(data):
+                    continue
+        else:
+            data = store[key]
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(data)
     dest.mkdir(parents=True, exist_ok=True)
@@ -245,7 +308,7 @@ def new_project_dir(
     already holds under the id read through first (so ``an init`` sees an
     existing project's ``scene.md`` and refuses to clobber it) and the record
     that the folder belongs to the store, which a later :func:`push_project`
-    reads.
+    reads. Nothing is uploaded: the push is explicit.
     """
     s = settings or ProjectsStoreSettings.from_environ()
     if s.backend == "local" and store is None:
@@ -259,7 +322,12 @@ def new_project_dir(
 
 @dataclass(frozen=True)
 class PushReport:
-    """What one :func:`push_project` did."""
+    """What one :func:`push_project` did, as relative paths.
+
+    ``stale``: files the folder did not change but the store did (or dropped)
+    since the folder last synced, so they were not pushed: pull first.
+    ``conflicts``: files both sides changed, not pushed without ``force``.
+    """
 
     project_id: str
     folder: Path
@@ -267,13 +335,20 @@ class PushReport:
     unchanged: tuple[str, ...]
     excluded: tuple[str, ...]
     deleted: tuple[str, ...]
+    stale: tuple[str, ...] = ()
+    conflicts: tuple[str, ...] = ()
 
     def __str__(self) -> str:
-        return (
+        text = (
             f"{self.project_id}: {len(self.written)} written, "
             f"{len(self.unchanged)} unchanged, {len(self.excluded)} kept local, "
             f"{len(self.deleted)} deleted"
         )
+        if self.stale:
+            text += f", {len(self.stale)} stale (pull first)"
+        if self.conflicts:
+            text += f", {len(self.conflicts)} in conflict (force to overwrite)"
+        return text
 
 
 def _excluder(exclude: Iterable[str]):
@@ -292,32 +367,9 @@ def _excluder(exclude: Iterable[str]):
     return excluded
 
 
-def _sha256(data: bytes) -> str:
-    return hashlib.sha256(data).hexdigest()
-
-
-def _file_digest(path: Path) -> str:
-    h = hashlib.sha256()
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-
-def _manifest_of(store: Mapping, key: str, folder: Path) -> dict:
-    """The last push's ``{rel: {size, sha256}}``: the store's record, else the folder's."""
-    try:
-        data = store[key]
-    except KeyError:
-        data = None
-    if data is not None:
-        try:
-            doc = json.loads(bytes(data).decode("utf-8"))
-        except (ValueError, UnicodeDecodeError):
-            doc = {}
-        if isinstance(doc, dict):
-            return doc.get("files") or {}
-    return read_record(folder).get("files") or {}
+def _same(a: Optional[dict], b: Optional[dict]) -> bool:
+    """Two record entries name the same bytes (by sha256)."""
+    return a is not None and b is not None and a.get("sha256") == b.get("sha256")
 
 
 def push_project(
@@ -328,24 +380,32 @@ def push_project(
     store: Optional[MutableMapping] = None,
     delete_missing: bool = False,
     exclude: Iterable[str] = DEFAULT_PUSH_EXCLUDES,
+    force: bool = False,
     cache: Optional[Path] = None,
 ) -> PushReport:
     """Write ``folder``'s files to the store under ``project_id/``: the inverse of
     :func:`materialize_project` (cutan#91).
 
-    ``folder`` defaults to where :func:`materialize_project` puts the project (the
-    cache folder on S3; the project folder itself locally, where a push is a no-op).
-    Only changed files are written: a file whose size and sha256 match the last
-    push's record (the store's copy of :data:`STORE_RECORD`, else the folder's) is
-    skipped without a read; a file the record does not know is compared with the
-    store's bytes when the key exists. ``exclude`` names what stays local
-    (:data:`DEFAULT_PUSH_EXCLUDES`). ``delete_missing`` makes the store's
-    ``project_id/`` prefix mirror what was pushed: keys the folder no longer has,
-    and keys the exclude rule keeps local, are deleted. The record is then
-    written to the folder and to the store.
+    ``folder`` defaults to where :func:`materialize_project` puts the project: the
+    cache folder on S3, the project folder itself locally (which is the store's
+    own copy, so that push does nothing). Each file is compared three ways: with
+    the store's record of it (the store's copy of :data:`STORE_RECORD`) and with
+    the folder's record (the base: what the folder last pulled or pushed; with
+    no base, the store's record stands in, so a first push from a folder with no
+    history writes its differences). A file equal to the store's is unchanged;
+    one the folder changed and the store did not is written; one the folder did
+    not change but the store did is ``stale`` and left alone; one both changed
+    is a ``conflict``, written only with ``force``. A file the records do not
+    know is compared with the store's bytes when the key exists. ``exclude``
+    names what stays local (:data:`DEFAULT_PUSH_EXCLUDES`); ``delete_missing``
+    deletes the store's keys the folder no longer has (a key the store gained or
+    changed since the base is kept, unless ``force``); excluded files the folder
+    still has are never deleted. The record is then written to the folder and,
+    when anything changed, to the store.
     """
     s = settings or ProjectsStoreSettings.from_environ()
     prefix = _project_prefix(project_id)
+    own_folder = s.backend == "local" and store is None
     store = projects_store(s) if store is None else store
     folder = (
         Path(folder) if folder is not None else _folder_for(project_id, s, None, cache)
@@ -353,58 +413,98 @@ def push_project(
     if not folder.is_dir():
         raise FileNotFoundError(f"no project folder to push at {folder}")
     excluded = _excluder(exclude)
+    local_files = sorted(p for p in folder.rglob("*") if p.is_file())
+    rels = [p.relative_to(folder).as_posix() for p in local_files]
+    if own_folder and folder.resolve() == (_local_root() / project_id).resolve():
+        # The folder IS the store's copy of the project: nothing to push, and
+        # nothing to delete (its derived output is not "missing" from itself).
+        kept = tuple(r for r in rels if excluded(r))
+        same = tuple(r for r in rels if r != STORE_RECORD and not excluded(r))
+        return PushReport(project_id, folder, (), same, kept, ())
+
     record_key = prefix + STORE_RECORD
-    existing = {key for key in store if key.startswith(prefix)}
-    known = _manifest_of(store, record_key, folder)
+    existing = _keys_under(store, prefix)
+    local_record = read_record(folder)
+    remote_doc = _store_record(store, record_key)
+    remote: dict = remote_doc.get("files") or {}
+    base: dict = local_record.get("files") or remote
+    has_base = bool(local_record.get("files"))
 
     written: list[str] = []
     unchanged: list[str] = []
     kept: list[str] = []
-    files: dict[str, dict] = {}
-    for path in sorted(p for p in folder.rglob("*") if p.is_file()):
-        rel = path.relative_to(folder).as_posix()
+    stale: list[str] = []
+    conflicts: list[str] = []
+    synced: dict[str, dict] = {}  # what this folder now agrees with the store on
+    for path, rel in zip(local_files, rels):
         if rel == STORE_RECORD:
             continue
         if excluded(rel):
             kept.append(rel)
             continue
-        size = path.stat().st_size
-        entry = known.get(rel) or {}
         key = prefix + rel
-        digest = None
-        if entry.get("size") == size:
-            digest = _file_digest(path)
-            if entry.get("sha256") == digest:
-                files[rel] = {"size": size, "sha256": digest}
-                unchanged.append(rel)
-                continue
-        data = path.read_bytes()
-        digest = digest or _sha256(data)
-        files[rel] = {"size": size, "sha256": digest}
-        if not entry and key in existing:
+        size = path.stat().st_size
+        local = {"size": size, "sha256": _file_digest(path)}
+        r, b = remote.get(rel), base.get(rel)
+        if _same(r, local) and (key in existing or key in store):
+            synced[rel] = local
+            unchanged.append(rel)
+            continue
+        if r is None and b is None and key in existing:
+            # Uploaded by hand (no record knows it): compare the bytes.
             current = store[key]
-            if len(current) == size and _sha256(current) == digest:
+            if len(current) == size and _sha256(current) == local["sha256"]:
+                synced[rel] = local
                 unchanged.append(rel)
                 continue
-        store[key] = data
+        if b is not None and _same(b, local) and not _same(r, b) and not force:
+            stale.append(rel)  # the store moved past this folder's copy
+            continue
+        both_changed = has_base and not _same(b, local) and not _same(r, b)
+        if both_changed and r is not None and not force:
+            conflicts.append(rel)
+            continue
+        store[key] = path.read_bytes()
+        synced[rel] = local
         written.append(rel)
 
     deleted: list[str] = []
     if delete_missing:
-        wanted = {prefix + rel for rel in files} | {record_key}
-        for key in sorted(existing - wanted):
+        here = set(rels)
+        for key in sorted(existing):
+            rel = key[len(prefix) :]
+            if rel == STORE_RECORD or rel in here:
+                continue
+            r, b = remote.get(rel), base.get(rel)
+            if has_base and r is not None and not _same(r, b) and not force:
+                stale.append(rel)  # the store gained or changed it since the base
+                continue
             del store[key]
-            deleted.append(key[len(prefix) :])
+            deleted.append(rel)
 
-    record = {
-        **read_record(folder),
-        "store": s.coordinates(),
-        "files": files,
-        "pushed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-    }
-    data = _write_record(folder, record)
-    if written or deleted or record_key not in existing or files != known:
-        store[record_key] = data
+    # Two records: the store's says what the store holds; the folder's says what
+    # the folder synced (its base), which differs by exactly the stale and
+    # conflicting files, left at the base entry the folder still agrees with.
+    store_files = {rel: e for rel, e in remote.items() if rel not in deleted}
+    store_files.update(synced)
+    base_files = {rel: e for rel, e in base.items() if rel not in deleted}
+    base_files.update(synced)
+    changed = bool(written or deleted) or not remote_doc or store_files != remote
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    if changed:
+        store[record_key] = _record_bytes(
+            {
+                **remote_doc,
+                "store": s.coordinates(),
+                "files": store_files,
+                "pushed_at": now,
+            }
+        )
+    local_doc = {**local_record, "store": s.coordinates(), "files": base_files}
+    if changed:
+        local_doc["pushed_at"] = now
+    if local_doc != local_record:
+        _write_record(folder, local_doc)
     return PushReport(
         project_id=project_id,
         folder=folder,
@@ -412,4 +512,6 @@ def push_project(
         unchanged=tuple(unchanged),
         excluded=tuple(kept),
         deleted=tuple(deleted),
+        stale=tuple(stale),
+        conflicts=tuple(conflicts),
     )

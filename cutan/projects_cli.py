@@ -20,21 +20,27 @@ from cutan.projects_store import materialize_project, push_project
 __all__ = ["push", "pull"]
 
 
-def push(project_id: str, folder: str = "", delete_missing: bool = False) -> str:
+def push(
+    project_id: str, folder: str = "", delete_missing: bool = False, force: bool = False
+) -> str:
     """Write what changed in a project folder to the projects store.
 
     project_id: the project's id (its folder name)
     folder: the folder to push (default: where `an projects pull` / `an init --id` put it)
-    delete_missing: also delete the store's keys the folder no longer has (and what stays local: the shot cache, render work), so the store mirrors the folder
+    delete_missing: also delete the store's keys the folder no longer has (never what the folder keeps local: the shot cache, render work)
+    force: also write files the store changed since this folder last synced (stale or in conflict), and delete keys it gained
     """
     report = push_project(
         project_id,
         folder=Path(folder) if folder else None,
         delete_missing=delete_missing,
+        force=force,
     )
     lines = [str(report)]
     lines += [f"  + {rel}" for rel in report.written]
     lines += [f"  - {rel}" for rel in report.deleted]
+    lines += [f"  ! stale (pull first): {rel}" for rel in report.stale]
+    lines += [f"  ! conflict (--force overwrites): {rel}" for rel in report.conflicts]
     return "\n".join(lines)
 
 
