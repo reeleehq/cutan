@@ -50,7 +50,9 @@ def derive_body_placements(shot: Any, mall: Mapping[str, Any]) -> Any:
             entities.append(entity)
             continue
         after = entity.stage.after if entity.stage is not None else None
-        stage = StagePlacement(at=tuple(placed["at"]), scale=placed["scale"], after=after)
+        stage = StagePlacement(
+            at=tuple(placed["at"]), scale=placed["scale"], after=after
+        )
         entities.append(entity.model_copy(update={"stage": stage}))
         changed = True
     return shot.model_copy(update={"entities": entities}) if changed else shot

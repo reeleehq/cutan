@@ -129,7 +129,9 @@ POSE_KEYS: tuple[str, ...] = ("x", "y", "scale_x", "scale_y", "rotation")
 _START_EPS: float = 1e-6
 
 #: The size a slot's art rasterises at, or a function of the art's path giving it.
-ArtSize = Union[tuple[float, float], None, Callable[[str], Optional[tuple[float, float]]]]
+ArtSize = Union[
+    tuple[float, float], None, Callable[[str], Optional[tuple[float, float]]]
+]
 
 
 class NotChecked(ValueError):
@@ -186,7 +188,9 @@ class BodyAttachment(BaseModel):
     sockets: list[Socket] = Field(default_factory=list)
     scale: Optional[float] = Field(default=None, gt=0, allow_inf_nan=False)
     tolerance: float = Field(default=DFLT_TOLERANCE, gt=0, allow_inf_nan=False)
-    scale_tolerance: float = Field(default=DFLT_SCALE_TOLERANCE, gt=0, allow_inf_nan=False)
+    scale_tolerance: float = Field(
+        default=DFLT_SCALE_TOLERANCE, gt=0, allow_inf_nan=False
+    )
 
 
 def _field(doc: Any, name: str, default: Any = None) -> Any:
@@ -264,7 +268,12 @@ def entity_pose(
         pose = {k: float(v) for k, v in poses[entity.id].items() if k in POSE_KEYS}
     elif entity.stage is not None and entity.stage.at is not None:
         s = float(entity.stage.scale)
-        pose = {"x": float(entity.stage.at[0]), "y": float(entity.stage.at[1]), "scale_x": s, "scale_y": s}
+        pose = {
+            "x": float(entity.stage.at[0]),
+            "y": float(entity.stage.at[1]),
+            "scale_x": s,
+            "scale_y": s,
+        }
     else:
         return None
     pose.setdefault("rotation", 0.0)
@@ -386,7 +395,12 @@ def socket_rig_point(
     >>> socket_rig_point(p, Socket(bone="arm_l", at=(0.0, 0.5)), art_size=(400, 200))
     (312.0, 512.0)
     """
-    from an.stage.rig import bone_positions, drawn_attachment, rest_transform, slot_parent_chain
+    from an.stage.rig import (
+        bone_positions,
+        drawn_attachment,
+        rest_transform,
+        slot_parent_chain,
+    )
 
     slot = (
         _first_slot(prop_desc)
@@ -396,10 +410,18 @@ def socket_rig_point(
     if slot is None:
         raise NotChecked(f"the prop has no slot {socket.slot!r}")
     if slot_parent_chain(prop_desc).get(slot.name) is not None:
-        raise NotChecked(f"slot {slot.name!r} is nested under another slot (not checked in v1)")
+        raise NotChecked(
+            f"slot {slot.name!r} is nested under another slot (not checked in v1)"
+        )
     bone = next((b for b in prop_desc.bones if b.name == slot.bone), None)
-    if bone is not None and rest_transform(bone) != {"rotation": 0.0, "scale_x": 1.0, "scale_y": 1.0}:
-        raise NotChecked(f"bone {bone.name!r} carries a rest rotation or scale (not checked in v1)")
+    if bone is not None and rest_transform(bone) != {
+        "rotation": 0.0,
+        "scale_x": 1.0,
+        "scale_y": 1.0,
+    }:
+        raise NotChecked(
+            f"bone {bone.name!r} carries a rest rotation or scale (not checked in v1)"
+        )
     skin = prop_desc.skins.get("default") or next(iter(prop_desc.skins.values()), None)
     drawn = drawn_attachment(prop_desc, skin, slot) if skin is not None else None
     if drawn is None:
@@ -409,7 +431,9 @@ def socket_rig_point(
     if not size or not (size[0] > 0 and size[1] > 0):
         # Without the art's own size the runtime contain-fits it inside whatever
         # box is declared, so a (u, v) of the art has no known place.
-        raise NotChecked(f"the art of slot {slot.name!r} ({att.path}) cannot be measured")
+        raise NotChecked(
+            f"the art of slot {slot.name!r} ({att.path}) cannot be measured"
+        )
     from an.stage.rig import attachment_box
 
     box = attachment_box(att.width, att.height, size)
@@ -463,7 +487,9 @@ def _validated(doc: Any, model: type, kind_name: str) -> Any:
         return model.model_validate(migrate(dict(doc), kind=kind_name))
     if isinstance(doc, model):
         return doc
-    raise TypeError(f"expected a {model.__name__} or its document, got {type(doc).__name__}")
+    raise TypeError(
+        f"expected a {model.__name__} or its document, got {type(doc).__name__}"
+    )
 
 
 def character_model(doc: Any) -> Any:
@@ -521,7 +547,9 @@ def solve_placement(
             f"the character has no bone {', '.join(map(repr, missing))} "
             f"(its bones: {', '.join(sorted(bones))})"
         )
-    targets = [rig_point_on_stage(char, bones[s.bone], character_pose) for s in ba.sockets]
+    targets = [
+        rig_point_on_stage(char, bones[s.bone], character_pose) for s in ba.sockets
+    ]
     unit = {"x": 0.0, "y": 0.0, "scale_x": 1.0, "scale_y": 1.0}
     local = [
         rig_point_on_stage(prop, socket_rig_point(prop, s, art_size=art_size), unit)
@@ -588,12 +616,18 @@ def place_body_prop(
     ba = body_attachment_of(prop)
     if ba is None:
         raise ValueError(f"prop {prop.name!r} declares no {BODY_ATTACHMENT_KEY}")
-    pose = {"x": character_at[0], "y": character_at[1],
-            "scale_x": character_scale, "scale_y": character_scale}
+    pose = {
+        "x": character_at[0],
+        "y": character_at[1],
+        "scale_x": character_scale,
+        "scale_y": character_scale,
+    }
     try:
         got = solve_placement(prop, char, ba, art_size=art_size, character_pose=pose)
     except CrossedLimbs:
-        raise ValueError(crossed_limbs_message(prop.name, ba, ba.character or char.name)) from None
+        raise ValueError(
+            crossed_limbs_message(prop.name, ba, ba.character or char.name)
+        ) from None
     return {k: got[k] for k in ("at", "scale", "residual_px")}
 
 
@@ -611,7 +645,9 @@ def prop_art_size(props_store: Any, ref: str) -> Callable[[str], Any]:
     return size
 
 
-def derive_placement(shot: Any, prop_entity: Any, mall: Mapping[str, Any]) -> tuple[dict | None, str]:
+def derive_placement(
+    shot: Any, prop_entity: Any, mall: Mapping[str, Any]
+) -> tuple[dict | None, str]:
     """``(the derived placement, "")`` of ``prop_entity`` in ``shot``, or
     ``(None, why not)``. Never raises."""
     try:
@@ -636,14 +672,23 @@ def derive_placement(shot: Any, prop_entity: Any, mall: Mapping[str, Any]) -> tu
         sets = start_state(shot)
         pose = entity_pose(who, None, sets.get(who.id, {}))
         if pose is None:
-            return None, f"{name!r} has no `stage.at` (the default layout): place {name!r}"
+            return (
+                None,
+                f"{name!r} has no `stage.at` (the default layout): place {name!r}",
+            )
         char = character_model(chars[who.ref])
         view = character_view(who, char, sets.get(who.id, {}))
         if view != rest_view_of(char):
-            return None, f"{name!r} starts the shot in the {view!r} view; sockets are declared on its rest view"
+            return (
+                None,
+                f"{name!r} starts the shot in the {view!r} view; sockets are declared on its rest view",
+            )
         got = solve_placement(
-            prop_model(raw), char, ba,
-            art_size=prop_art_size(props, prop_entity.ref), character_pose=pose,
+            prop_model(raw),
+            char,
+            ba,
+            art_size=prop_art_size(props, prop_entity.ref),
+            character_pose=pose,
         )
         if got["scale"] <= 1e-4:
             return None, "the derived scale is degenerate"
@@ -654,7 +699,9 @@ def derive_placement(shot: Any, prop_entity: Any, mall: Mapping[str, Any]) -> tu
         return None, str(e) or type(e).__name__
 
 
-def derivable_placement(shot: Any, prop_entity: Any, mall: Mapping[str, Any]) -> dict | None:
+def derivable_placement(
+    shot: Any, prop_entity: Any, mall: Mapping[str, Any]
+) -> dict | None:
     """The derived placement of ``prop_entity`` in ``shot``, or ``None``
     (:func:`derive_placement` says why). Never raises."""
     return derive_placement(shot, prop_entity, mall)[0]

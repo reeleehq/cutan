@@ -126,7 +126,11 @@ def body_attachment_findings(
             poses = poses()
         except Exception:  # noqa: BLE001 - the stage did not build: another check says why
             poses = None
-    unplaced = {e.id for e in shot.entities if e.kind == "prop" and (e.stage is None or e.stage.at is None)}
+    unplaced = {
+        e.id
+        for e in shot.entities
+        if e.kind == "prop" and (e.stage is None or e.stage.at is None)
+    }
     original = shot
     if poses is None:
         from cutan.compile.body import derive_body_placements
@@ -143,9 +147,19 @@ def body_attachment_findings(
                 if placed is None:
                     out.append(_not_derived(original, entity, raw, why, where))
                     continue
-            out.extend(_check_one(shot, entity, raw, stores, poses, sets, where, records, index))
+            out.extend(
+                _check_one(
+                    shot, entity, raw, stores, poses, sets, where, records, index
+                )
+            )
         except Exception as e:  # noqa: BLE001 - a crash here must not take `an validate` down
-            out.append(("info", where, f"prop {entity.id!r}: body attachment not checked ({type(e).__name__}: {e})"))
+            out.append(
+                (
+                    "info",
+                    where,
+                    f"prop {entity.id!r}: body attachment not checked ({type(e).__name__}: {e})",
+                )
+            )
     return out
 
 
@@ -167,29 +181,65 @@ def _not_derived(shot, entity, raw, why, where) -> Finding:
         ba = body_attachment_of(raw)
     except ValidationError:
         ba = None
-    if ba is not None and ba.view != FIRST_PERSON and bound_character(shot, entity, ba)[0] is not None:
-        return ("error", where, f"prop {entity.id!r} has no `stage.at` and cannot be placed by its body: {why}. It would be drawn at the stage centre; fix that, or place it by hand (`set scale_x` negative for a mirrored character)")
+    if (
+        ba is not None
+        and ba.view != FIRST_PERSON
+        and bound_character(shot, entity, ba)[0] is not None
+    ):
+        return (
+            "error",
+            where,
+            f"prop {entity.id!r} has no `stage.at` and cannot be placed by its body: {why}. It would be drawn at the stage centre; fix that, or place it by hand (`set scale_x` negative for a mirrored character)",
+        )
     if ba is not None and ba.view == FIRST_PERSON:
-        return ("info", where, f"prop {entity.id!r}: first-person art is placed by hand, not by a body")
-    return ("warning", where, f"prop {entity.id!r} has no `stage.at` and cannot be placed by its body: {why}")
+        return (
+            "info",
+            where,
+            f"prop {entity.id!r}: first-person art is placed by hand, not by a body",
+        )
+    return (
+        "warning",
+        where,
+        f"prop {entity.id!r} has no `stage.at` and cannot be placed by its body: {why}",
+    )
 
 
-def _check_one(shot, entity, raw, stores, poses, sets, where, records, index) -> list[Finding]:
+def _check_one(
+    shot, entity, raw, stores, poses, sets, where, records, index
+) -> list[Finding]:
     from pydantic import ValidationError
 
     try:
         ba = body_attachment_of(raw)
     except ValidationError as e:
         err = e.errors()[0]
-        return [("error", where, f"prop {entity.ref!r}: its {BODY_ATTACHMENT_KEY} is malformed: {err['msg']} at {'.'.join(map(str, err['loc']))}")]
+        return [
+            (
+                "error",
+                where,
+                f"prop {entity.ref!r}: its {BODY_ATTACHMENT_KEY} is malformed: {err['msg']} at {'.'.join(map(str, err['loc']))}",
+            )
+        ]
     who, name = bound_character(shot, entity, ba)
     label = f"prop {entity.id!r} (depicts {name or 'nobody'!r}'s body, seen {ba.view})"
     if not name:
-        return [("warning", where, f"{label}: no character is bound (declare `character`, or `overrides: {{body_of: <id>}}` on the entity)")]
+        return [
+            (
+                "warning",
+                where,
+                f"{label}: no character is bound (declare `character`, or `overrides: {{body_of: <id>}}` on the entity)",
+            )
+        ]
     if who is None:
         if ba.view == FIRST_PERSON:
             return []
-        return [("warning", where, f"{label}: {name!r} is not on stage in this shot (or names several entities), so the limbs it shows belong to nobody")]
+        return [
+            (
+                "warning",
+                where,
+                f"{label}: {name!r} is not on stage in this shot (or names several entities), so the limbs it shows belong to nobody",
+            )
+        ]
     chars = stores.get("characters")
     char = None
     if chars is not None and who.ref in chars:
@@ -200,25 +250,61 @@ def _check_one(shot, entity, raw, stores, poses, sets, where, records, index) ->
     csets = sets.get(who.id, {})
     view = character_view(who, char, csets)
     if ba.view == FIRST_PERSON:
-        return [("error", where, f"{label}: first-person art (the camera is {name!r}) while {name!r} is on screen; draw it from the shot's camera ({view} view of {name!r})")]
+        return [
+            (
+                "error",
+                where,
+                f"{label}: first-person art (the camera is {name!r}) while {name!r} is on screen; draw it from the shot's camera ({view} view of {name!r})",
+            )
+        ]
     if char is None:
         return []
     found: list[Finding] = []
     if view != ba.view:
-        found.append(("error", where, f"{label}: {name!r} is in the {view!r} view in this shot, so the art shows the body from another side than the camera does; draw it in the {view!r} view"))
+        found.append(
+            (
+                "error",
+                where,
+                f"{label}: {name!r} is in the {view!r} view in this shot, so the art shows the body from another side than the camera does; draw it in the {view!r} view",
+            )
+        )
         return found
     if not ba.sockets:
         return found
     if view != rest_view_of(char):
-        return found + [("info", where, f"{label}: sockets are checked in {name!r}'s rest view only ({rest_view_of(char)!r}), not {view!r}")]
+        return found + [
+            (
+                "info",
+                where,
+                f"{label}: sockets are checked in {name!r}'s rest view only ({rest_view_of(char)!r}), not {view!r}",
+            )
+        ]
     cpose = entity_pose(who, poses, csets)
     ppose = entity_pose(entity, poses, sets.get(entity.id, {}))
     if cpose is None or ppose is None:
-        return found + [("info", where, f"{label}: not placed with `stage.at` and not built, so its sockets were not checked")]
+        return found + [
+            (
+                "info",
+                where,
+                f"{label}: not placed with `stage.at` and not built, so its sockets were not checked",
+            )
+        ]
     if abs(ppose["rotation"]) > 1e-9:
-        return found + [("info", where, f"{label}: rotated at the shot's start, so its sockets were not checked")]
+        return found + [
+            (
+                "info",
+                where,
+                f"{label}: rotated at the shot's start, so its sockets were not checked",
+            )
+        ]
     if (cpose["scale_x"] < 0) != (ppose["scale_x"] < 0):
-        return found + [("error", where, f"{label}: {'the character is' if cpose['scale_x'] < 0 else 'the prop is'} mirrored and {'the prop is not' if cpose['scale_x'] < 0 else 'the character is not'}: mirror both (a negative `scale_x`) or neither")]
+        return found + [
+            (
+                "error",
+                where,
+                f"{label}: {'the character is' if cpose['scale_x'] < 0 else 'the prop is'} mirrored and {'the prop is not' if cpose['scale_x'] < 0 else 'the character is not'}: mirror both (a negative `scale_x`) or neither",
+            )
+        ]
     mirror_x = None  # the character's x when both are mirrored
     if cpose["scale_x"] < 0:  # both mirrored: check the unmirrored configuration
         cx = mirror_x = cpose["x"]
@@ -226,7 +312,13 @@ def _check_one(shot, entity, raw, stores, poses, sets, where, records, index) ->
         ppose = {**ppose, "x": 2 * cx - ppose["x"], "scale_x": -ppose["scale_x"]}
     props = stores["props"]
     try:
-        got = solve_placement(prop_model(raw), char, ba, art_size=prop_art_size(props, entity.ref), character_pose=cpose)
+        got = solve_placement(
+            prop_model(raw),
+            char,
+            ba,
+            art_size=prop_art_size(props, entity.ref),
+            character_pose=cpose,
+        )
     except CrossedLimbs:
         return found + [("error", where, crossed_limbs_message(entity.ref, ba, name))]
     except NotChecked as e:
@@ -236,7 +328,11 @@ def _check_one(shot, entity, raw, stores, poses, sets, where, records, index) ->
     sx, sy = ppose["scale_x"], ppose["scale_y"]
     placed = [(ppose["x"] + sx * q[0], ppose["y"] + sy * q[1]) for q in got["local"]]
     limit = ba.tolerance * got["span_px"]
-    off = [(s.bone, math.dist(a, b)) for s, a, b in zip(ba.sockets, placed, got["targets"]) if math.dist(a, b) > limit]
+    off = [
+        (s.bone, math.dist(a, b))
+        for s, a, b in zip(ba.sockets, placed, got["targets"])
+        if math.dist(a, b) > limit
+    ]
     ratio = sx / got["scale"] - 1.0
     measured_scale = len(ba.sockets) > 1 or ba.scale is not None
     if mirror_x is not None:
@@ -246,20 +342,42 @@ def _check_one(shot, entity, raw, stores, poses, sets, where, records, index) ->
     flagged = False
     if measured_scale and abs(ratio) > ba.scale_tolerance:
         flagged = True
-        found.append(("error", where, f"{label}: drawn {abs(ratio):.0%} {'larger' if ratio > 0 else 'smaller'} relative to {name!r} than its attachment says (at most {ba.scale_tolerance:.0%}). {fix}"))
+        found.append(
+            (
+                "error",
+                where,
+                f"{label}: drawn {abs(ratio):.0%} {'larger' if ratio > 0 else 'smaller'} relative to {name!r} than its attachment says (at most {ba.scale_tolerance:.0%}). {fix}",
+            )
+        )
     if off:
         flagged = True
         worst = ", ".join(f"{bone} {d:.0f} px off" for bone, d in off)
-        found.append(("error", where, f"{label}: its limbs do not meet {name!r}'s body ({worst}; at most {limit:.0f} px, {ba.tolerance:g} of the {got['span_px']:.0f} px span). {fix}"))
+        found.append(
+            (
+                "error",
+                where,
+                f"{label}: its limbs do not meet {name!r}'s body ({worst}; at most {limit:.0f} px, {ba.tolerance:g} of the {got['span_px']:.0f} px span). {fix}",
+            )
+        )
     if records is not None:
         cs = cpose["scale_x"]
-        records.append({
-            "shot": index, "where": where, "prop": entity.ref, "character": who.ref,
-            "ratio": sx / cs,
-            "anchor": ((ppose["x"] - cpose["x"]) / cs, (ppose["y"] - cpose["y"]) / cpose["scale_y"]),
-            "span": got["span_px"] / cs, "tolerance": ba.tolerance, "scale_tolerance": ba.scale_tolerance,
-            "flagged": flagged,
-        })
+        records.append(
+            {
+                "shot": index,
+                "where": where,
+                "prop": entity.ref,
+                "character": who.ref,
+                "ratio": sx / cs,
+                "anchor": (
+                    (ppose["x"] - cpose["x"]) / cs,
+                    (ppose["y"] - cpose["y"]) / cpose["scale_y"],
+                ),
+                "span": got["span_px"] / cs,
+                "tolerance": ba.tolerance,
+                "scale_tolerance": ba.scale_tolerance,
+                "flagged": flagged,
+            }
+        )
     return found
 
 
@@ -286,14 +404,32 @@ def consistency_findings(records: list[Mapping[str, Any]]) -> list[Finding]:
     for (prop, char), recs in groups.items():
         if len(recs) < 2:
             continue
-        lo, hi = min(recs, key=lambda r: r["ratio"]), max(recs, key=lambda r: r["ratio"])
+        lo, hi = (
+            min(recs, key=lambda r: r["ratio"]),
+            max(recs, key=lambda r: r["ratio"]),
+        )
         tol = min(r["scale_tolerance"] for r in recs)
         if hi["ratio"] > lo["ratio"] * (1 + tol):
-            out.append(("error", hi["where"], f"prop {prop!r} on {char!r}: its size relative to {char!r} is {hi['ratio']:.3g} in shot {hi['shot']} and {lo['ratio']:.3g} in shot {lo['shot']}: the framings drift apart at the cut. Leave out `stage.at` so every shot derives it from the body"))
+            out.append(
+                (
+                    "error",
+                    hi["where"],
+                    f"prop {prop!r} on {char!r}: its size relative to {char!r} is {hi['ratio']:.3g} in shot {hi['shot']} and {lo['ratio']:.3g} in shot {lo['shot']}: the framings drift apart at the cut. Leave out `stage.at` so every shot derives it from the body",
+                )
+            )
         limit = min(r["tolerance"] * r["span"] for r in recs)
-        far = max(((a, b) for a in recs for b in recs), key=lambda p: math.dist(p[0]["anchor"], p[1]["anchor"]))
+        far = max(
+            ((a, b) for a in recs for b in recs),
+            key=lambda p: math.dist(p[0]["anchor"], p[1]["anchor"]),
+        )
         if math.dist(far[0]["anchor"], far[1]["anchor"]) > limit:
-            out.append(("error", far[1]["where"], f"prop {prop!r} on {char!r}: it sits at a different place on {char!r}'s body in shot {far[0]['shot']} and shot {far[1]['shot']} ({math.dist(far[0]['anchor'], far[1]['anchor']):.0f} units of {char!r}'s own size apart, at most {limit:.0f}). Leave out `stage.at` so every shot derives it from the body"))
+            out.append(
+                (
+                    "error",
+                    far[1]["where"],
+                    f"prop {prop!r} on {char!r}: it sits at a different place on {char!r}'s body in shot {far[0]['shot']} and shot {far[1]['shot']} ({math.dist(far[0]['anchor'], far[1]['anchor']):.0f} units of {char!r}'s own size apart, at most {limit:.0f}). Leave out `stage.at` so every shot derives it from the body",
+                )
+            )
     return out
 
 
@@ -305,9 +441,12 @@ def check_body_attachments(ctx: Any) -> None:
         return
     records = ctx.memo.setdefault(RECORDS_KEY, [])
     for severity, where, message in body_attachment_findings(
-        ctx.shot, ctx.stores,
+        ctx.shot,
+        ctx.stores,
         poses=lambda: _stage_poses_of(ctx, ctx.index, ctx.shot),
-        path=ctx.path, records=records, index=ctx.index,
+        path=ctx.path,
+        records=records,
+        index=ctx.index,
     ):
         ctx.report.add(severity, where, message)
 
@@ -317,5 +456,7 @@ def check_body_attachment_consistency(ctx: Any) -> None:
 
     It reads the measurements ``cutout.body_attachment`` leaves in the
     validation's memo, so the two must be selected together (``only=``)."""
-    for severity, where, message in consistency_findings(ctx.memo.get(RECORDS_KEY) or []):
+    for severity, where, message in consistency_findings(
+        ctx.memo.get(RECORDS_KEY) or []
+    ):
         ctx.report.add(severity, where, message)
