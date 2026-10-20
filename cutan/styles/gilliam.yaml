@@ -30,6 +30,7 @@ targets:
   mean_shot_s: [12, 30]                    # measured 20 (two long shots)
 
 guidance:
+  image_prompt: Victorian engraving and vintage photograph collage, hand-tinted sepia colours, visible scissor-cut paper edges, surreal and theatrical, lit from above   # the look in words, for an image generator (cutan.art_brief); never a show's name
   construction: limbs cut from photographs and engravings, joined at pins; lit from above
   sources: public-domain engravings and photographs only; check the licence of every image (an-dev-licensing)
   mouth: a hinged jaw piece (a rotation tween) or a swap set

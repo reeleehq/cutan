@@ -32,6 +32,7 @@ GENERATED = (
     (REFS / "characters.md", "presets"),
     (REFS / "characters.md", "rig-paths"),
     (REFS / "styles.md", "styles"),
+    (REFS / "art.md", "art"),
 )
 
 
@@ -84,7 +85,7 @@ def _styles_block() -> str:
             if key in live:
                 out.append(f"- **{key}:** {flat(live[key])}")
         for key, value in spec.get("guidance", {}).items():
-            if key != "voice_acting":
+            if key not in ("voice_acting", "image_prompt"):  # image_prompt: art.md
                 out.append(f"- *{key}:* {flat(value)}")
         pack = style_pack(name).model_dump(mode="json", exclude_none=True)
         out += ["", f"`assets/styles/{name}.json`:", "", "```json", json.dumps(pack, indent=2), "```", ""]
@@ -101,7 +102,35 @@ def _rig_paths_block() -> str:
         return rig_paths_block(_rigs_mall(Path(tmp) / "p"))
 
 
-_BLOCKS = {"presets": _presets_block, "rig-paths": _rig_paths_block, "styles": _styles_block}
+def _art_block() -> str:
+    """What each kind of art must show, the looks in words, the generators' tips:
+    `cutan.art_brief`, the same source the pack checker and the connector use."""
+    from cutan.art_brief import ART_KINDS, GENERATOR_TIPS, PAPER_DRAWINGS, style_look
+    from cutan.styles import style_specs
+
+    out = ["### What each picture must show", ""]
+    for k in ART_KINDS.values():
+        out += [f"#### {k.title} (`{k.key}`)", ""]
+        out += [f"- **Goes to:** {k.goes_to}", f"- **Canvas:** {k.canvas}", f"- **Background:** {k.background}"]
+        out += [f"- {c[0].upper()}{c[1:]}." for c in k.content]
+        if k.status != "ready":
+            out.append(f"- **Then:** {k.status}.")
+        out += [f"- **Prompt words** (after the subject): {k.framing}. (Midjourney: `--ar {k.aspect}`)", ""]
+    out += ["### Each named style's look, in words", "", "| style | look (paste after `Look:`) |", "|---|---|"]
+    out += [f"| `{name}` | {style_look(name)} |" for name in style_specs()]
+    out += ["", "### Generators", ""]
+    out += [f"- **{tool}:** {tip}." for tool, tip in GENERATOR_TIPS.items()]
+    out += ["", "### Drawings made on paper", ""]
+    out += [f"- {line}" for line in PAPER_DRAWINGS]
+    return "\n".join(out) + "\n"
+
+
+_BLOCKS = {
+    "presets": _presets_block,
+    "rig-paths": _rig_paths_block,
+    "styles": _styles_block,
+    "art": _art_block,
+}
 
 
 def _render(path: Path, name: str) -> tuple[str, str]:

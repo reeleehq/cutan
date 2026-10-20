@@ -57,6 +57,7 @@ targets:
   mean_shot_s: [3, 5.5]                 # measured 4.2
 
 guidance:                    # not in `an` yet: apply by hand where you can, otherwise tell the user it was omitted
+  image_prompt: construction-paper cut-out look, simple round and geometric shapes, flat solid colours, thin near-black outlines, faint paper grain, no shading, no gradients, no perspective   # the look in words, for an image generator (cutan.art_brief); never a show's name
   construction: head, torso and limbs are single rigid pieces; no elbow or knee bends (the squat build is live; the near-circular head with eyes touching is not)
   eyes: two white ovals with pupil dots; brows appear when worried or angry; a half-lid per shot
   views: the show turns a figure by a hard swap between front and three-quarter heads; that is a plain `set` of the character's `view` (no `turn` play; on twos a near-one-frame turn squashes for two frames and vanishes for one, an#273), and the factory's three-quarter body is a stand-in for the show's head-only swap

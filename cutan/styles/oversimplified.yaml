@@ -133,6 +133,7 @@ prosody_targets:
     register_st: [3.8, 11.0]
 
 guidance:
+  image_prompt: flat 2D vector cartoon, bold simple shapes, muted earthy palette (brick red, sage green, ochre), thin dark outlines, minimal detail, no shading   # the look in words, for an image generator (cutan.art_brief); never a show's name
   construction: blocky body, stick limbs, oversized head (all live as `characters` knobs); brows and mouth only, no nose or ears
   identity: costume colour, hat, hair and sash tell figures apart (live as `characters.palette`, `hat`, `hair_style`/`hair_length` and `sash`); beards, crowns and uniforms beyond a sash are not
   crowds: dozens of identical figures; no instancing macro ships, so repeat entities by hand
