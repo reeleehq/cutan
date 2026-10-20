@@ -26,7 +26,7 @@ from cutan.body_attachment import (
     BODY_ATTACHMENT_KEY,
     body_attachment_of,
     place_body_prop,
-    socket_pairs,
+    solve_placement,
 )
 from cutan.characters import new_character
 from cutan.verify.body import body_attachment_findings
@@ -106,9 +106,9 @@ def test_the_sockets_land_on_the_shoulders_in_the_compiled_shot(project):
         x = w["transform"]["x"] + s * (t["x"] + (u - v["anchor_x"]) * v["width"])
         y = w["transform"]["y"] + s * (t["y"] + (vv - v["anchor_y"]) * v["height"])
         ba = body_attachment_of(project["props"]["wheel"])
-        targets, _ = socket_pairs(
+        targets = solve_placement(
             *_models(project), ba, art_size=ART,
-            character_pose={"x": PAUL_AT[0], "y": PAUL_AT[1], "scale_x": PAUL_SCALE, "scale_y": PAUL_SCALE})
+            character_pose={"x": PAUL_AT[0], "y": PAUL_AT[1], "scale_x": PAUL_SCALE, "scale_y": PAUL_SCALE})["targets"]
         bone = targets[[q["bone"] for q in SOCKETS].index(sock["bone"])]
         assert (x, y) == pytest.approx(bone, abs=0.5)
     paul = nodes["paul"]
@@ -128,9 +128,10 @@ def test_a_wheel_beside_the_head_and_wider_than_the_body_is_an_error(project):
     """The production's second mistake: placed by eye, right of the head, too big."""
     fit = _placed(project)
     shot = _shot("wheel", (fit["at"][0] + 90, fit["at"][1]), fit["scale"] * 1.8)
-    (f,) = _findings(project, shot)
-    assert f[0] == "error" and "do not meet 'paul'" in f[2]
-    assert f"[{fit['at'][0]:g}, {fit['at'][1]:g}]" in f[2]  # says where it belongs
+    size, meet = _findings(project, shot)
+    assert size[0] == "error" and "80% larger relative to 'paul'" in size[2]
+    assert meet[0] == "error" and "do not meet 'paul'" in meet[2]
+    assert f"[{fit['at'][0]:g}, {fit['at'][1]:g}]" in meet[2]  # says where it belongs
 
 
 def test_first_person_art_with_the_character_on_screen_is_an_error(project):
@@ -146,7 +147,8 @@ def test_art_of_another_view_is_an_error_and_a_turn_at_the_start_counts(project)
     found = _findings(project, _shot("wheel_back", fit["at"], fit["scale"]))
     assert [f[0] for f in found] == ["error"] and "'front' view" in found[0][2]
     turned = [SetAction(target="paul", property="view", value="back", at=0.0)]
-    assert _findings(project, _shot("wheel_back", fit["at"], fit["scale"], actions=turned)) == []
+    (f,) = _findings(project, _shot("wheel_back", fit["at"], fit["scale"], actions=turned))
+    assert f[0] == "info"  # the view agrees; sockets are declared on the rest view
 
 
 def test_crossed_limbs_are_refused(project):
@@ -178,7 +180,7 @@ def test_a_prop_without_a_declaration_and_an_absent_character(project):
 def test_a_malformed_declaration_is_an_error():
     shot = Shot(id="s", entities=[AssetRef(kind="prop", id="w", store="props", ref="w")])
     props = {"w": {"kind": "PropDescriptor", "name": "w",
-                   "metadata": {BODY_ATTACHMENT_KEY: {"character": "p", "view": "driver"}}}}
+                   "metadata": {BODY_ATTACHMENT_KEY: {"character": "p", "view": "front", "sockets": "x"}}}}
     (f,) = body_attachment_findings(shot, {"props": props})
     assert f[0] == "error" and "malformed" in f[2]
 
@@ -196,3 +198,106 @@ def test_an_validate_runs_it(project):
     report = validate_semantic(scene, available_characters=project["characters"],
                                available_props=project["props"])
     assert any("first-person" in f.description and f.severity == "error" for f in report.findings), report.findings
+
+
+def test_a_prop_without_stage_at_is_placed_by_its_body_in_every_framing(project):
+    """The production's third mistake: each framing placed the wheel by hand, so
+    Paul's size relative to his own hands changed at the cut. Without `stage.at`
+    the compiler derives it from Paul, in each framing, in proportion."""
+    from an.ir.schema import AssetRef as A
+
+    got = []
+    for at, scale in (((200.0, 300.0), 2.0), ((-50.0, 520.0), 3.4)):
+        shot = Shot(id="s", renderer="cutout", duration=1.0, entities=[
+            A(kind="character", id="paul", store="characters", ref="paul", stage=StagePlacement(at=at, scale=scale)),
+            A(kind="prop", id="w", store="props", ref="wheel")])
+        doc = to_dict(compile_shot(shot, project, strict_assets=True))
+        nodes = {n["name"]: n["transform"] for n in doc["scene"]["children"]}
+        got.append((nodes["w"]["scale_x"] / nodes["paul"]["scale_x"],
+                    ((nodes["w"]["x"] - nodes["paul"]["x"]) / scale, (nodes["w"]["y"] - nodes["paul"]["y"]) / scale)))
+        assert _findings(project, shot) == []
+    (r1, a1), (r2, a2) = got
+    assert r1 == pytest.approx(r2, rel=1e-3) and a1 == pytest.approx(a2, abs=0.01)
+
+
+def test_a_drifting_size_across_shots_is_caught_by_the_scene_check(project):
+    """Each shot's size within the scale tolerance of the declaration would pass
+    alone at 4% either way; across the cut the drift is 8%."""
+    import an.genres
+    from an.ir.schema import Meta, SceneIR
+    from an.ir.validate import validate_semantic
+
+    an.genres.load()
+    fit = _placed(project)
+    shots = [_shot("wheel", fit["at"], fit["scale"] * 1.04), _shot("wheel", fit["at"], fit["scale"] * 0.96)]
+    shots[1] = shots[1].model_copy(update={"id": "s2"})
+    report = validate_semantic(SceneIR(meta=Meta(title="t"), timeline=shots),
+                               available_characters=project["characters"], available_props=project["props"])
+    drift = [f for f in report.findings if "drift apart at the cut" in f.description]
+    assert drift and drift[0].severity == "error", report.findings
+
+
+def test_both_mirrored_passes_and_one_mirrored_is_an_error(project):
+    fit = _placed(project)
+    cx = PAUL_AT[0]
+    both = [SetAction(target="paul", property="scale_x", value=-PAUL_SCALE, at=0.0),
+            SetAction(target="w", property="scale_x", value=-fit["scale"], at=0.0),
+            SetAction(target="w", property="x", value=2 * cx - fit["at"][0], at=0.0)]
+    assert _findings(project, _shot("wheel", fit["at"], fit["scale"], actions=both)) == []
+    one = both[:1]
+    (f,) = _findings(project, _shot("wheel", fit["at"], fit["scale"], actions=one))
+    assert f[0] == "error" and "mirrored" in f[2]
+
+
+def test_a_view_other_than_the_rest_view_checks_the_view_not_the_sockets(project):
+    """Sockets are declared on the rest view's bones; a side view moves and hides arms."""
+    from cutan.body_attachment import BODY_ATTACHMENT_KEY as K
+
+    props = dict(project["props"].items()) if hasattr(project["props"], "items") else {}
+    side = json.loads(json.dumps(project["props"]["wheel"]))
+    side["metadata"][K]["view"] = "side"
+    stores = {"props": {"wheel": side}, "characters": project["characters"]}
+    turned = [SetAction(target="paul", property="view", value="side", at=0.0)]
+    (f,) = body_attachment_findings(_shot("wheel", (0, 0), 1.0, actions=turned), stores)
+    assert f[0] == "info" and "rest view only" in f[2]
+    del props
+
+
+def test_a_store_without_files_is_not_an_error(project):
+    """No filesystem root: the art cannot be measured, so the sockets are not checked."""
+    stores = {"props": {"wheel": project["props"]["wheel"]}, "characters": project["characters"]}
+    (f,) = body_attachment_findings(_shot("wheel", (0, 0), 1.0), stores)
+    assert f[0] == "info" and "cannot be measured" in f[2]
+
+
+def test_broken_documents_never_crash_the_check(project):
+    paul = project["characters"]["paul"]
+    good = project["props"]["wheel"]
+    cases = [
+        ({"wheel": {**good, "metadata": ["x"]}}, {"paul": paul}),
+        ({"wheel": {**good, "slots": "nope"}}, {"paul": paul}),
+        ({"wheel": good}, {"paul": "not a document"}),
+        ({"wheel": good}, {"paul": {**paul, "bones": "x"}}),
+    ]
+    for props, chars in cases:
+        found = body_attachment_findings(_shot("wheel", (0, 0), 1.0), {"props": props, "characters": chars})
+        assert all(f[0] in ("info", "warning", "error") for f in found)
+
+
+def test_the_scene_binds_a_reusable_prop_to_another_character(project):
+    from an.ir.schema import AssetRef as A
+
+    fit = _placed(project)
+    shot = Shot(id="s", renderer="cutout", duration=1.0, entities=[
+        A(kind="character", id="jerry", store="characters", ref="paul", stage=StagePlacement(at=PAUL_AT, scale=PAUL_SCALE)),
+        A(kind="prop", id="w", store="props", ref="wheel", overrides={"body_of": "jerry"},
+          stage=StagePlacement(at=fit["at"], scale=fit["scale"]))])
+    assert _findings(project, shot) == []
+
+
+def test_an_undeclared_prop_builds_no_stage():
+    calls = []
+    shot = Shot(id="s", entities=[AssetRef(kind="prop", id="p", store="props", ref="plain")])
+    body_attachment_findings(shot, {"props": {"plain": {"kind": "PropDescriptor", "name": "plain"}}},
+                             poses=lambda: calls.append(1))
+    assert calls == []

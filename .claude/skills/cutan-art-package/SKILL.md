@@ -176,10 +176,12 @@ shipped with an unattributed CC BY asset cannot be un-shipped. See
   problem, not this one's.
 - **Whether a prop that shows a body part was drawn from the camera's side.**
   Hands on a wheel, a sleeve on a cup: declare `metadata.body_attachment` on the
-  prop (its character, the view drawn, a socket per limb) and `an validate`
-  checks the view and that the limbs meet the character's shoulders
-  (`cutan.body_attachment`; the `cutan` skill has the recipe). The sockets are
-  your statement about the drawing: check them on one probe frame.
+  prop (its character, the view drawn, a socket per limb on the rest view) and
+  leave out its `stage.at`: it is placed by the character's bones in every
+  shot, and `an validate` checks the view and, in the rest view, that a
+  hand-placed prop's limbs meet the shoulders (`cutan.body_attachment`; the
+  `cutan` skill has the recipe and the limits). The sockets are your statement
+  about the drawing: check them on one probe frame.
 
 ## Traps
 

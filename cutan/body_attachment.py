@@ -2,8 +2,8 @@
 
 A steering wheel with the driver's hands on it, a sleeve holding a cup, a pair of
 forearms on a table: art that shows *somebody's* limbs, drawn as one prop and laid
-over a rigged character. Two mistakes reached a viewer in one production, and
-neither was visible to any check that existed:
+over a rigged character. Three mistakes reached a viewer in one production, and
+no check that existed could see any of them:
 
 1. **The art was drawn from the wrong viewpoint.** The image model drew the wheel
    from the driver's seat (forearms coming from the camera), while the shot looked
@@ -11,66 +11,89 @@ neither was visible to any check that existed:
 2. **The art did not meet the body.** Placed by hand, the wheel sat to the right of
    the driver's head and was wider than his body, so the arms in it could not come
    from his shoulders.
+3. **The relation drifted between framings.** The two-shot and the close-up each
+   placed the wheel by hand, so the driver's size relative to his own hands changed
+   at the cut.
 
-Both are now facts the prop *declares* and the genre *checks*. The declaration
-lives in the prop's own document, under ``metadata.body_attachment`` (the
-persisted key :data:`BODY_ATTACHMENT_KEY`), because what a drawing depicts is a
-property of the drawing:
+All three are now one contract, declared ONCE in the character's own units (its
+bones) and derived for every framing. The declaration lives in the prop's
+document, under ``metadata.body_attachment`` (the persisted key
+:data:`BODY_ATTACHMENT_KEY`), because what a drawing depicts is a property of the
+drawing:
 
 .. code-block:: json
 
     {"kind": "PropDescriptor", "name": "wheel_hands", "...": "...",
      "metadata": {"body_attachment": {
+         "schema_version": "0.1.0",
          "character": "paul",
          "view": "front",
          "sockets": [
-             {"bone": "arm_l", "at": [0.20, -0.35]},
-             {"bone": "arm_r", "at": [0.80, -0.35]}
+             {"bone": "arm_l", "at": [0.20, 0.45]},
+             {"bone": "arm_r", "at": [0.80, 0.45]}
          ]}}}
 
-- ``character``: the entity (scene id, else store ref) whose body the art shows.
-- ``view``: the view of that body the art is drawn in, in the rig's own words
-  (:data:`cutan.characters.schema.VIEWS`: ``front``, ``three_quarter``, ``side``,
-  ``back``), or :data:`FIRST_PERSON` for art seen through the character's own eyes
-  (valid only while the character is NOT on screen).
-- ``sockets``: where each depicted limb meets the body. ``bone`` names the
-  character's bone (``arm_l`` is the bone at the viewer's LEFT on the factory rig,
-  whatever side of the person it is); ``at`` is the point, in the art's own
-  ``(u, v)`` units (0..1 of the drawn image, like an attachment ``anchor``), where
-  that bone's joint would be. It may lie outside the image: forearms that vanish
-  behind a wheel still say where their shoulders are.
-- ``tolerance`` (optional, default :data:`DFLT_TOLERANCE`): how far a socket may
-  land from its bone, as a fraction of the distance between the sockets' bones on
-  screen (the shoulder span, for two arms).
+- ``character`` (optional): the character whose body the art shows, by scene
+  entity id, else store ref. A scene entity binds a reusable prop to another
+  character with ``overrides: {body_of: jerry}`` (:data:`BODY_OF_OVERRIDE`).
+- ``view``: the character's view the art is drawn in, in the rig's own words
+  (``front``, ``three_quarter``, ``side``, ``back``, or any key of the
+  character's ``view`` swap set), or :data:`FIRST_PERSON` when the camera IS the
+  character (valid only while the character is not on screen).
+- ``sockets``: where each depicted limb meets the body, in the character's REST
+  view. ``bone`` names the character's bone (``arm_l`` is the bone at the viewer's
+  left on the factory rig, unmirrored); ``at`` is where that bone's joint would be,
+  in the art's ``(u, v)`` (0..1 of the drawn image, like an attachment
+  ``anchor``). It may lie outside the image: forearms that vanish behind a wheel
+  still say where their shoulders are.
+- ``scale`` (optional): the prop's ``stage.scale`` relative to the character's.
+  Two sockets measure it; one socket needs it.
+- ``tolerance`` (default :data:`DFLT_TOLERANCE`): how far a socket may land from
+  its bone, as a fraction of the span between the sockets' bones on screen.
+  ``scale_tolerance`` (default :data:`DFLT_SCALE_TOLERANCE`): how far the prop's
+  size relative to the character may differ from the declared relation.
 
-:func:`place_body_prop` turns the declaration into a placement (the prop's
-``stage.at`` and ``stage.scale``) from where the character stands, so nobody
-places such a prop by eye; :mod:`cutan.verify.body` is the check ``an validate``
-runs on every shot.
+Unknown keys are kept (forward-compatible): a later field is not "malformed" to
+an older ``cutan``.
+
+**Placement is derived, not authored.** A body-attached prop with no
+``stage.at`` is placed by its body in every shot (the ``body_placement`` compile
+pass, :mod:`cutan.compile.body`), so the relation cannot drift between a two-shot
+and a close-up. :func:`place_body_prop` is the same derivation as a function.
+:mod:`cutan.verify.body` checks a prop that IS placed by hand against it.
 
 >>> ba = BodyAttachment(character="paul", view="front", sockets=[
-...     {"bone": "arm_l", "at": [0.2, -0.35]}, {"bone": "arm_r", "at": [0.8, -0.35]}])
->>> [s.bone for s in ba.sockets], ba.tolerance
-(['arm_l', 'arm_r'], 0.25)
+...     {"bone": "arm_l", "at": [0.2, 0.45]}, {"bone": "arm_r", "at": [0.8, 0.45]}])
+>>> [s.bone for s in ba.sockets], ba.tolerance, ba.scale_tolerance
+(['arm_l', 'arm_r'], 0.25, 0.05)
 """
 
 from __future__ import annotations
 
 import math
-from typing import Any, Callable, Literal, Mapping, Optional, Sequence, Union
+from typing import Any, Callable, Mapping, Optional, Sequence, Union
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 __all__ = [
     "BODY_ATTACHMENT_KEY",
+    "BODY_OF_OVERRIDE",
+    "FIRST_PERSON",
     "BodyAttachment",
     "Socket",
+    "NotChecked",
+    "CrossedLimbs",
     "body_attachment_of",
+    "bound_character",
+    "start_state",
+    "entity_pose",
+    "character_view",
     "rig_point_on_stage",
     "socket_rig_point",
     "fit_placement",
+    "solve_placement",
     "place_body_prop",
-    "socket_pairs",
+    "derivable_placement",
     "character_model",
     "prop_model",
 ]
@@ -78,11 +101,14 @@ __all__ = [
 #: The persisted key under a prop document's ``metadata``. Never renamed.
 BODY_ATTACHMENT_KEY: str = "body_attachment"
 
-#: The view of art seen through the character's own eyes (a first-person shot).
-FIRST_PERSON: str = "first_person"
+#: The scene entity's ``overrides`` key that binds a prop to a character.
+BODY_OF_OVERRIDE: str = "body_of"
 
-#: The views a declaration may name: the rig's views, plus the first person.
-BODY_VIEWS: tuple[str, ...] = ("front", "three_quarter", "side", "back", FIRST_PERSON)
+#: The declaration's version, written when a tool writes one.
+BODY_ATTACHMENT_SCHEMA_VERSION: str = "0.1.0"
+
+#: The view of art seen through the character's own eyes (the camera is the character).
+FIRST_PERSON: str = "first_person"
 
 #: How far a socket may land from its bone, as a fraction of the span between the
 #: sockets' bones on screen. A quarter of the shoulder span is about a hand's width
@@ -90,9 +116,29 @@ BODY_VIEWS: tuple[str, ...] = ("front", "three_quarter", "side", "back", FIRST_P
 #: production mistake (a wheel centred a head's width to one side).
 DFLT_TOLERANCE: float = 0.25
 
+#: How far the prop's size relative to its character may differ from the
+#: declared relation (a fraction). 5% is below what an eye notices across a cut;
+#: the production's drift was 20%.
+DFLT_SCALE_TOLERANCE: float = 0.05
+
+#: The root-node properties a ``set`` at the shot's start overrides.
+POSE_KEYS: tuple[str, ...] = ("x", "y", "scale_x", "scale_y", "rotation")
+
+#: A ``set`` at or before this time (seconds) counts as the shot's start.
+_START_EPS: float = 1e-6
+
 #: The size a slot's art rasterises at, or a function of the art's path giving it.
 ArtSize = Union[tuple[float, float], None, Callable[[str], Optional[tuple[float, float]]]]
 
+
+class NotChecked(ValueError):
+    """The geometry cannot be computed for a reason that is a limit of this
+    check, not a fault of the art (a nested slot, a posed bone, unmeasurable art,
+    a mirrored or rotated character): reported as ``info``."""
+
+
+class CrossedLimbs(ValueError):
+    """The art's left limb would meet the body's right: drawn from the other side."""
 
 
 class Socket(BaseModel):
@@ -102,7 +148,7 @@ class Socket(BaseModel):
     (0.2, -0.4)
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="allow")
 
     #: The character's bone the limb belongs to; its joint is the meeting point.
     bone: str
@@ -122,19 +168,24 @@ class Socket(BaseModel):
 class BodyAttachment(BaseModel):
     """A prop's declaration that it depicts part of a character's body.
 
-    >>> BodyAttachment(character="paul", view="driver", sockets=[])
+    >>> BodyAttachment(view="")
     Traceback (most recent call last):
     ...
     pydantic_core._pydantic_core.ValidationError: 1 validation error for BodyAttachment
     ...
+    >>> BodyAttachment(view="front", grip="later field").model_dump()["grip"]
+    'later field'
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="allow")
 
-    character: str
-    view: Literal["front", "three_quarter", "side", "back", "first_person"]
+    schema_version: str = BODY_ATTACHMENT_SCHEMA_VERSION
+    character: Optional[str] = None
+    view: str = Field(min_length=1)
     sockets: list[Socket] = Field(default_factory=list)
+    scale: Optional[float] = Field(default=None, gt=0, allow_inf_nan=False)
     tolerance: float = Field(default=DFLT_TOLERANCE, gt=0, allow_inf_nan=False)
+    scale_tolerance: float = Field(default=DFLT_SCALE_TOLERANCE, gt=0, allow_inf_nan=False)
 
 
 def _field(doc: Any, name: str, default: Any = None) -> Any:
@@ -151,14 +202,112 @@ def body_attachment_of(prop_doc: Any) -> BodyAttachment | None:
 
     >>> body_attachment_of({"metadata": {}}) is None
     True
-    >>> body_attachment_of({"metadata": {"body_attachment": {
-    ...     "character": "paul", "view": "front"}}}).view
+    >>> body_attachment_of({"metadata": ["not a mapping"]}) is None
+    True
+    >>> body_attachment_of({"metadata": {"body_attachment": {"view": "front"}}}).view
     'front'
     """
-    raw = (_field(prop_doc, "metadata") or {}).get(BODY_ATTACHMENT_KEY)
+    meta = _field(prop_doc, "metadata")
+    if not isinstance(meta, Mapping):
+        return None
+    raw = meta.get(BODY_ATTACHMENT_KEY)
     if raw is None:
         return None
     return BodyAttachment.model_validate(raw)
+
+
+# --- the shot's start --------------------------------------------------------
+
+
+def start_state(shot: Any) -> dict[str, dict[str, Any]]:
+    """``{entity id: {property: value}}`` from the ``set`` actions at the shot's
+    start, on the entities' own nodes (a part's are ignored).
+
+    >>> from an.ir.schema import SetAction, Shot
+    >>> start_state(Shot(id="s", actions=[SetAction(target="p", property="view", value="side")]))
+    {'p': {'view': 'side'}}
+    """
+    from an.motion import flatten
+
+    out: dict[str, dict[str, Any]] = {}
+    for action in getattr(shot, "actions", None) or []:
+        try:
+            leaves = flatten(action)
+        except Exception:  # noqa: BLE001 - an unresolvable action is another check's
+            continue
+        for leaf in leaves:
+            a = leaf.action
+            if getattr(a, "kind", None) != "set" or leaf.start > _START_EPS:
+                continue
+            target = str(a.target)
+            if "/" not in target:
+                out.setdefault(target, {})[a.property] = a.value
+    return out
+
+
+def entity_pose(
+    entity: Any,
+    poses: Mapping[str, Mapping[str, float]] | None = None,
+    sets: Mapping[str, Any] | None = None,
+) -> dict[str, float] | None:
+    """The entity node's pose at the shot's start: the built pose when ``poses``
+    has it, else its ``stage`` placement, then any ``set`` at the start.
+    ``None`` when neither places it (the default layout, without built poses).
+
+    >>> from an.ir.schema import AssetRef, StagePlacement
+    >>> e = AssetRef(kind="prop", id="w", store="props", ref="w", stage=StagePlacement(at=(1, 2), scale=3))
+    >>> entity_pose(e, None, {"x": 5})
+    {'x': 5.0, 'y': 2.0, 'scale_x': 3.0, 'scale_y': 3.0, 'rotation': 0.0}
+    """
+    if poses is not None and entity.id in poses:
+        pose = {k: float(v) for k, v in poses[entity.id].items() if k in POSE_KEYS}
+    elif entity.stage is not None and entity.stage.at is not None:
+        s = float(entity.stage.scale)
+        pose = {"x": float(entity.stage.at[0]), "y": float(entity.stage.at[1]), "scale_x": s, "scale_y": s}
+    else:
+        return None
+    pose.setdefault("rotation", 0.0)
+    for key in POSE_KEYS:
+        if key in (sets or {}):
+            try:
+                pose[key] = float(sets[key])
+            except (TypeError, ValueError):
+                pass
+    return pose
+
+
+def bound_character(shot: Any, prop_entity: Any, ba: BodyAttachment) -> tuple[Any, str]:
+    """``(the character entity, its name)`` the prop is bound to in ``shot``:
+    the entity's ``overrides.body_of`` first, else the declaration's
+    ``character``; by entity id, else by store ref when exactly one entity has
+    it. The entity is ``None`` when absent or ambiguous; the name is ``""`` when
+    nothing binds the prop.
+    """
+    name = (prop_entity.overrides or {}).get(BODY_OF_OVERRIDE) or ba.character or ""
+    chars = [e for e in shot.entities if e.kind == "character"]
+    by_id = [e for e in chars if e.id == name]
+    if by_id:
+        return by_id[0], name
+    by_ref = [e for e in chars if e.ref == name]
+    return (by_ref[0] if len(by_ref) == 1 else None), name
+
+
+def character_view(char_entity: Any, char_desc: Any, sets: Mapping[str, Any]) -> str:
+    """The character's view at the shot's start: a ``view`` set at 0, else its
+    ``rest_view``, else ``front``."""
+    from cutan.characters.schema import DFLT_VIEW, VIEW_CHANNEL
+
+    view = (sets or {}).get(VIEW_CHANNEL)
+    if isinstance(view, str) and view:
+        return view
+    return _field(char_desc, "rest_view") or DFLT_VIEW
+
+
+def rest_view_of(char_desc: Any) -> str:
+    """The view a character's bones are drawn in (sockets are declared in it)."""
+    from cutan.characters.schema import DFLT_VIEW
+
+    return _field(char_desc, "rest_view") or DFLT_VIEW
 
 
 # --- geometry -----------------------------------------------------------------
@@ -210,7 +359,7 @@ def rig_point_on_stage(
 def _first_slot(desc: Any) -> Any:
     slots = list(_field(desc, "slots") or [])
     if not slots:
-        raise ValueError("the prop has no slot to measure a socket on")
+        raise NotChecked("the prop has no slot to measure a socket on")
     return sorted(slots, key=lambda s: (s.draw_order, s.name))[0]
 
 
@@ -224,10 +373,10 @@ def socket_rig_point(
 
     ``art_size`` is what the slot's drawn art rasterises at (pixels for a
     raster, the SVG's size), as the compiler's probe measures it, or a function
-    of the attachment's ``path`` returning it (``None``: unmeasurable); a declared
-    ``width``/``height`` on the attachment wins, keeping the art's aspect.
-    Raises ``ValueError`` when the slot, its art or its box cannot be found, or
-    when the slot is nested under another (not supported by this v1).
+    of the attachment's ``path`` returning it (``None``: unmeasurable); a
+    declared ``width``/``height`` on the attachment wins, keeping the art's
+    aspect. Raises :class:`NotChecked` for what this v1 does not compute: a
+    missing slot or art, unmeasurable art, a nested slot, a posed bone.
 
     >>> from an.stage.props import PropDescriptor
     >>> p = PropDescriptor.model_validate({"name": "w", "skins": {"default": {"slots": {
@@ -236,7 +385,7 @@ def socket_rig_point(
     >>> socket_rig_point(p, Socket(bone="arm_l", at=(0.0, 0.5)), art_size=(400, 200))
     (312.0, 512.0)
     """
-    from an.stage.rig import attachment_box, bone_positions, drawn_attachment, slot_parent_chain
+    from an.stage.rig import bone_positions, drawn_attachment, rest_transform, slot_parent_chain
 
     slot = (
         _first_slot(prop_desc)
@@ -244,22 +393,25 @@ def socket_rig_point(
         else next((s for s in prop_desc.slots if s.name == socket.slot), None)
     )
     if slot is None:
-        raise ValueError(f"the prop has no slot {socket.slot!r}")
+        raise NotChecked(f"the prop has no slot {socket.slot!r}")
     if slot_parent_chain(prop_desc).get(slot.name) is not None:
-        raise ValueError(
-            f"slot {slot.name!r} is nested under another slot; measure sockets on a top-level slot"
-        )
+        raise NotChecked(f"slot {slot.name!r} is nested under another slot (not checked in v1)")
+    bone = next((b for b in prop_desc.bones if b.name == slot.bone), None)
+    if bone is not None and rest_transform(bone) != {"rotation": 0.0, "scale_x": 1.0, "scale_y": 1.0}:
+        raise NotChecked(f"bone {bone.name!r} carries a rest rotation or scale (not checked in v1)")
     skin = prop_desc.skins.get("default") or next(iter(prop_desc.skins.values()), None)
     drawn = drawn_attachment(prop_desc, skin, slot) if skin is not None else None
     if drawn is None:
-        raise ValueError(f"slot {slot.name!r} draws no attachment")
+        raise NotChecked(f"slot {slot.name!r} draws no attachment")
     att = drawn[1]
     size = art_size(att.path) if callable(art_size) else art_size
+    if not size or not (size[0] > 0 and size[1] > 0):
+        # Without the art's own size the runtime contain-fits it inside whatever
+        # box is declared, so a (u, v) of the art has no known place.
+        raise NotChecked(f"the art of slot {slot.name!r} ({att.path}) cannot be measured")
+    from an.stage.rig import attachment_box
+
     box = attachment_box(att.width, att.height, size)
-    if box is None:
-        raise ValueError(
-            f"the art of slot {slot.name!r} ({att.path}) cannot be measured and declares no box"
-        )
     bx, by = bone_positions(prop_desc).get(slot.bone, (0.0, 0.0))
     ax, ay = att.anchor
     u, v = socket.at
@@ -277,10 +429,7 @@ def fit_placement(
     rotation, since a stage placement has none). With one socket (or sockets that
     coincide) the scale cannot be measured and ``scale`` is kept.
 
-    A non-positive scale means the limbs are crossed: the art's left limb would
-    have to meet the body's right. That is not a placement; it is art drawn from
-    the other side (a back or first-person view of a front-facing rig), and the
-    returned scale is negative so the caller can say so.
+    A non-positive scale means the limbs are crossed.
 
     >>> fit_placement([(0, 0), (10, 0)], [(100, 50), (120, 50)])
     ((100.0, 50.0), 2.0)
@@ -311,7 +460,9 @@ def _validated(doc: Any, model: type, kind_name: str) -> Any:
         from an.ir.migrate import migrate
 
         return model.model_validate(migrate(dict(doc), kind=kind_name))
-    return doc
+    if isinstance(doc, model):
+        return doc
+    raise TypeError(f"expected a {model.__name__} or its document, got {type(doc).__name__}")
 
 
 def character_model(doc: Any) -> Any:
@@ -328,6 +479,72 @@ def prop_model(doc: Any) -> Any:
     return _validated(doc, PropDescriptor, PROP_DOCUMENT_KIND.name)
 
 
+def crossed_limbs_message(name: str, ba: BodyAttachment, character: str) -> str:
+    return (
+        f"prop {name!r}: its limbs are crossed relative to {character!r}'s bones "
+        f"(the art's {ba.sockets[0].bone} side meets the body's other side), so the art "
+        f"is drawn from the other side of the body than its declared view {ba.view!r}: "
+        "redraw it seen from the shot's camera, or fix the sockets' bones"
+    )
+
+
+def solve_placement(
+    prop: Any,
+    char: Any,
+    ba: BodyAttachment,
+    *,
+    art_size: ArtSize,
+    character_pose: Mapping[str, float],
+) -> dict[str, Any]:
+    """The placement the declaration gives for a character at ``character_pose``
+    (unmirrored, unrotated: :class:`NotChecked` otherwise):
+    ``{"at", "scale", "residual_px", "span_px", "targets", "local"}`` where
+    ``targets`` are the bones on stage and ``local`` the sockets in the prop's
+    own stage units at scale 1. Raises :class:`CrossedLimbs`, :class:`NotChecked`,
+    or ``ValueError`` for a bone the character lacks.
+    """
+    from an.stage.rig import bone_positions
+
+    sx = float(character_pose.get("scale_x", 1.0))
+    sy = float(character_pose.get("scale_y", 1.0))
+    if sx <= 0 or sy <= 0:
+        raise NotChecked("the character is mirrored at the shot's start")
+    if abs(float(character_pose.get("rotation", 0.0))) > 1e-9:
+        raise NotChecked("the character is rotated at the shot's start")
+    if not ba.sockets:
+        raise NotChecked("the declaration has no socket")
+    bones = bone_positions(char)
+    missing = [s.bone for s in ba.sockets if s.bone not in bones]
+    if missing:
+        raise ValueError(
+            f"the character has no bone {', '.join(map(repr, missing))} "
+            f"(its bones: {', '.join(sorted(bones))})"
+        )
+    targets = [rig_point_on_stage(char, bones[s.bone], character_pose) for s in ba.sockets]
+    unit = {"x": 0.0, "y": 0.0, "scale_x": 1.0, "scale_y": 1.0}
+    local = [
+        rig_point_on_stage(prop, socket_rig_point(prop, s, art_size=art_size), unit)
+        for s in ba.sockets
+    ]
+    fallback = (ba.scale or 1.0) * sx
+    (x, y), s = fit_placement(local, targets, scale=fallback)
+    if s <= 0:
+        raise CrossedLimbs("crossed")
+    placed = [(x + s * q[0], y + s * q[1]) for q in local]
+    span = max((math.dist(a, b) for a in targets for b in targets), default=0.0)
+    if span <= 0:  # one socket: half the body's bone height stands in for the span
+        ys = [p[1] for p in bones.values()]
+        span = (max(ys) - min(ys)) * _k(char) * sy / 2.0
+    return {
+        "at": [x, y],
+        "scale": round(s, 4),
+        "residual_px": round(max(math.dist(a, b) for a, b in zip(placed, targets)), 2),
+        "span_px": span,
+        "targets": targets,
+        "local": local,
+    }
+
+
 def place_body_prop(
     prop_desc: Any,
     character_desc: Any,
@@ -335,19 +552,15 @@ def place_body_prop(
     character_at: Sequence[float],
     character_scale: float = 1.0,
     art_size: ArtSize,
-    scale: float | None = None,
 ) -> dict[str, Any]:
     """Where to put a body-depicting prop so its sockets meet the character's bones.
 
     Returns ``{"at": [x, y], "scale": s, "residual_px": r}``: the prop's
-    ``stage.at`` and ``stage.scale``, derived from where the character stands
-    (``character_at``, ``character_scale``: its ``stage.at`` and ``stage.scale``),
-    and the largest distance left between a socket and its bone. ``scale`` is used
-    only when one socket cannot measure it (default: the character's scale).
-
-    Refuses (``ValueError``) a prop that declares no body attachment, a socket
-    naming a bone the character does not have, and crossed limbs (the fitted
-    scale is not positive: the art is drawn from the other side).
+    ``stage.at`` and ``stage.scale`` for a character standing at
+    ``character_at`` with ``stage.scale`` ``character_scale`` in its rest view,
+    and the largest distance left between a socket and its bone. The compile
+    pass does this for every prop placed without ``stage.at``; call it for a
+    hand-placed one.
 
     >>> from an.stage.props import PropDescriptor
     >>> from cutan.characters.schema import CharacterDescriptor
@@ -361,60 +574,70 @@ def place_body_prop(
     >>> place_body_prop(wheel, paul, character_at=(200, 400), character_scale=2.0,
     ...                 art_size=(500, 300))
     {'at': [200.0, 270.288], 'scale': 0.9, 'residual_px': 0.0}
+
+    The relation is the character's: at another framing the prop's scale moves
+    with the character's, in proportion.
+
+    >>> place_body_prop(wheel, paul, character_at=(0, 0), character_scale=3.0,
+    ...                 art_size=(500, 300))["scale"]
+    1.35
     """
     char = character_model(character_desc)
     prop = prop_model(prop_desc)
     ba = body_attachment_of(prop)
     if ba is None:
         raise ValueError(f"prop {prop.name!r} declares no {BODY_ATTACHMENT_KEY}")
-    if not ba.sockets:
-        raise ValueError(f"prop {prop.name!r}'s {BODY_ATTACHMENT_KEY} declares no socket")
-    targets, local = socket_pairs(
-        prop, char, ba, art_size=art_size,
-        character_pose={"x": character_at[0], "y": character_at[1],
-                        "scale_x": character_scale, "scale_y": character_scale},
-    )
-    (x, y), s = fit_placement(
-        local, targets, scale=character_scale if scale is None else scale
-    )
-    if s <= 0:
-        raise ValueError(crossed_limbs_message(prop.name, ba))
-    placed = [(x + s * q[0], y + s * q[1]) for q in local]
-    residual = max(math.dist(a, b) for a, b in zip(placed, targets))
-    return {"at": [x, y], "scale": round(s, 4), "residual_px": round(residual, 2)}
+    pose = {"x": character_at[0], "y": character_at[1],
+            "scale_x": character_scale, "scale_y": character_scale}
+    try:
+        got = solve_placement(prop, char, ba, art_size=art_size, character_pose=pose)
+    except CrossedLimbs:
+        raise ValueError(crossed_limbs_message(prop.name, ba, ba.character or char.name)) from None
+    return {k: got[k] for k in ("at", "scale", "residual_px")}
 
 
-def crossed_limbs_message(name: str, ba: BodyAttachment) -> str:
-    return (
-        f"prop {name!r}: its limbs are crossed relative to {ba.character!r}'s bones "
-        f"(the art's {ba.sockets[0].bone} side meets the body's other side), so the art "
-        f"is drawn from the other side of the body than its declared view {ba.view!r}: "
-        "redraw it seen from the shot's camera, or fix the sockets' bones"
-    )
+def prop_art_size(props_store: Any, ref: str) -> Callable[[str], Any]:
+    """``path -> size`` for a prop's art, by the compiler's own probe."""
+    from an.stage.rig import PROP_ART_PREFIX, art_src, part_probe
+
+    probe = part_probe(props_store, art_prefix=PROP_ART_PREFIX)
+
+    def size(path: str):
+        if probe is None:
+            return None
+        return probe(art_src(ref, path, art_prefix=PROP_ART_PREFIX))[1]
+
+    return size
 
 
-def socket_pairs(
-    prop: Any,
-    char: Any,
-    ba: BodyAttachment,
-    *,
-    art_size: ArtSize,
-    character_pose: Mapping[str, float],
-) -> tuple[list[tuple[float, float]], list[tuple[float, float]]]:
-    """``(bones on stage, sockets in the prop's local stage units at scale 1)``."""
-    from an.stage.rig import bone_positions
-
-    bones = bone_positions(char)
-    missing = [s.bone for s in ba.sockets if s.bone not in bones]
-    if missing:
-        raise ValueError(
-            f"{ba.character!r} has no bone {', '.join(map(repr, missing))} "
-            f"(its bones: {', '.join(sorted(bones))})"
+def derivable_placement(shot: Any, prop_entity: Any, mall: Mapping[str, Any]) -> dict | None:
+    """The derived placement of ``prop_entity`` in ``shot``, or ``None`` when it
+    cannot be derived (no declaration or socket, first-person art, no bound
+    character in the shot, the character in the default layout, mirrored,
+    rotated or turned away from its rest view at the start, art that cannot be
+    measured, crossed limbs, a missing bone). Never raises."""
+    try:
+        props, chars = mall.get("props"), mall.get("characters")
+        if props is None or chars is None or prop_entity.ref not in props:
+            return None
+        raw = props[prop_entity.ref]
+        if not isinstance(raw, Mapping) or raw.get("kind") != "PropDescriptor":
+            return None
+        ba = body_attachment_of(raw)
+        if ba is None or not ba.sockets or ba.view == FIRST_PERSON:
+            return None
+        who, _ = bound_character(shot, prop_entity, ba)
+        if who is None or who.ref not in chars:
+            return None
+        sets = start_state(shot)
+        pose = entity_pose(who, None, sets.get(who.id, {}))
+        char = character_model(chars[who.ref])
+        if pose is None or character_view(who, char, sets.get(who.id, {})) != rest_view_of(char):
+            return None
+        got = solve_placement(
+            prop_model(raw), char, ba,
+            art_size=prop_art_size(props, prop_entity.ref), character_pose=pose,
         )
-    targets = [rig_point_on_stage(char, bones[s.bone], character_pose) for s in ba.sockets]
-    unit = {"x": 0.0, "y": 0.0, "scale_x": 1.0, "scale_y": 1.0}
-    local = [
-        rig_point_on_stage(prop, socket_rig_point(prop, s, art_size=art_size), unit)
-        for s in ba.sockets
-    ]
-    return targets, local
+        return {"at": got["at"], "scale": got["scale"]}
+    except Exception:  # noqa: BLE001 - not derivable; the check says why
+        return None

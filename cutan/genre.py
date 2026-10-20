@@ -14,7 +14,8 @@ instead of being wired into the core. :data:`CUTOUT` lists:
   checks (contradicted ``from_direction``, a mouth hidden while speaking) and
   view continuity across a cut, placed in the report where they always were;
   and body continuity (:mod:`cutan.verify.body`): a prop that depicts a
-  character's limbs is drawn in that character's view and meets its bones;
+  character's limbs is drawn in that character's view, meets its bones, and
+  keeps that relation across shots;
 - its **capabilities** and the **character analyser** (ADR 0002:
   :mod:`cutan.library`), its **vocabulary** (motion and expression
   presets, IR-field notes: :mod:`cutan.characters.vocabulary`; the methods:
@@ -47,7 +48,10 @@ from cutan.styles.policy import check_shot_policy
 
 from cutan import GENRE_NAME, LIBRARY_NAME, require_an
 from cutan.characters import checks as _checks
-from cutan.verify.body import check_body_attachments
+from cutan.verify.body import (
+    check_body_attachment_consistency,
+    check_body_attachments,
+)
 from cutan.characters.methods import (
     CUTOUT_ASPECTS,
     CUTOUT_METHODS,
@@ -74,6 +78,15 @@ CUTOUT_GENRE_NAME: str = GENRE_NAME
 #: builder of a ``character``'s subtree inside the scene pass. Named by
 #: ``"module:function"`` so this declaration imports no engine.
 CUTOUT_COMPILE_PASSES: tuple[CompilePass, ...] = (
+    CompilePass(
+        "body_placement",
+        "cutan.compile.body:_body_placement_pass",
+        order=90,
+        description=(
+            "a body-attached prop placed without `stage.at` is placed by its "
+            "character's bones (cutan.body_attachment)"
+        ),
+    ),
     CompilePass(
         "style_policy",
         "cutan.compile.passes:_policy_pass",
@@ -248,6 +261,16 @@ CUTOUT = Genre(
             description=(
                 "the style pack and the voices copied from a style spec are not "
                 "stale against the installed spec (cutan#19)"
+            ),
+        ),
+        SemanticCheck(
+            "cutout.body_attachment_consistency",
+            check_body_attachment_consistency,
+            stage="finish",
+            order=11,
+            description=(
+                "a body-attached prop keeps its size and place relative to its "
+                "character across shots"
             ),
         ),
         SemanticCheck(
