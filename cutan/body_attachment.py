@@ -94,6 +94,7 @@ __all__ = [
     "solve_placement",
     "place_body_prop",
     "derivable_placement",
+    "derive_placement",
     "character_model",
     "prop_model",
 ]
@@ -610,34 +611,50 @@ def prop_art_size(props_store: Any, ref: str) -> Callable[[str], Any]:
     return size
 
 
-def derivable_placement(shot: Any, prop_entity: Any, mall: Mapping[str, Any]) -> dict | None:
-    """The derived placement of ``prop_entity`` in ``shot``, or ``None`` when it
-    cannot be derived (no declaration or socket, first-person art, no bound
-    character in the shot, the character in the default layout, mirrored,
-    rotated or turned away from its rest view at the start, art that cannot be
-    measured, crossed limbs, a missing bone). Never raises."""
+def derive_placement(shot: Any, prop_entity: Any, mall: Mapping[str, Any]) -> tuple[dict | None, str]:
+    """``(the derived placement, "")`` of ``prop_entity`` in ``shot``, or
+    ``(None, why not)``. Never raises."""
     try:
         props, chars = mall.get("props"), mall.get("characters")
         if props is None or chars is None or prop_entity.ref not in props:
-            return None
+            return None, "the props or characters store is not available"
         raw = props[prop_entity.ref]
         if not isinstance(raw, Mapping) or raw.get("kind") != "PropDescriptor":
-            return None
+            return None, "it is not a PropDescriptor"
         ba = body_attachment_of(raw)
-        if ba is None or not ba.sockets or ba.view == FIRST_PERSON:
-            return None
-        who, _ = bound_character(shot, prop_entity, ba)
+        if ba is None:
+            return None, f"it declares no {BODY_ATTACHMENT_KEY}"
+        if ba.view == FIRST_PERSON:
+            return None, "first-person art has no body on screen to follow"
+        if not ba.sockets:
+            return None, "its declaration has no socket"
+        if len(ba.sockets) == 1 and ba.scale is None:
+            return None, "one socket cannot measure the size: declare `scale`"
+        who, name = bound_character(shot, prop_entity, ba)
         if who is None or who.ref not in chars:
-            return None
+            return None, f"its character {name!r} is not on stage (or is ambiguous)"
         sets = start_state(shot)
         pose = entity_pose(who, None, sets.get(who.id, {}))
+        if pose is None:
+            return None, f"{name!r} has no `stage.at` (the default layout): place {name!r}"
         char = character_model(chars[who.ref])
-        if pose is None or character_view(who, char, sets.get(who.id, {})) != rest_view_of(char):
-            return None
+        view = character_view(who, char, sets.get(who.id, {}))
+        if view != rest_view_of(char):
+            return None, f"{name!r} starts the shot in the {view!r} view; sockets are declared on its rest view"
         got = solve_placement(
             prop_model(raw), char, ba,
             art_size=prop_art_size(props, prop_entity.ref), character_pose=pose,
         )
-        return {"at": got["at"], "scale": got["scale"]}
-    except Exception:  # noqa: BLE001 - not derivable; the check says why
-        return None
+        if got["scale"] <= 1e-4:
+            return None, "the derived scale is degenerate"
+        return {"at": got["at"], "scale": got["scale"]}, ""
+    except CrossedLimbs:
+        return None, "its limbs are crossed relative to the character's bones"
+    except Exception as e:  # noqa: BLE001 - not derivable; say why
+        return None, str(e) or type(e).__name__
+
+
+def derivable_placement(shot: Any, prop_entity: Any, mall: Mapping[str, Any]) -> dict | None:
+    """The derived placement of ``prop_entity`` in ``shot``, or ``None``
+    (:func:`derive_placement` says why). Never raises."""
+    return derive_placement(shot, prop_entity, mall)[0]

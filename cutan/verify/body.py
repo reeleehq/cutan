@@ -52,6 +52,7 @@ from cutan.body_attachment import (
     FIRST_PERSON,
     CrossedLimbs,
     NotChecked,
+    derive_placement,
     body_attachment_of,
     bound_character,
     character_model,
@@ -125,6 +126,8 @@ def body_attachment_findings(
             poses = poses()
         except Exception:  # noqa: BLE001 - the stage did not build: another check says why
             poses = None
+    unplaced = {e.id for e in shot.entities if e.kind == "prop" and (e.stage is None or e.stage.at is None)}
+    original = shot
     if poses is None:
         from cutan.compile.body import derive_body_placements
 
@@ -135,10 +138,40 @@ def body_attachment_findings(
         where = f"{path}/entities/{j}" if path else f"entities/{j}"
         entity = shot.entities[j]  # the derived placement, when there is one
         try:
+            if entity.id in unplaced and _parses(raw):
+                placed, why = derive_placement(original, original.entities[j], stores)
+                if placed is None:
+                    out.append(_not_derived(original, entity, raw, why, where))
+                    continue
             out.extend(_check_one(shot, entity, raw, stores, poses, sets, where, records, index))
         except Exception as e:  # noqa: BLE001 - a crash here must not take `an validate` down
             out.append(("info", where, f"prop {entity.id!r}: body attachment not checked ({type(e).__name__}: {e})"))
     return out
+
+
+def _parses(raw) -> bool:
+    try:
+        body_attachment_of(raw)
+        return True
+    except Exception:  # noqa: BLE001 - malformed: `_check_one` reports it
+        return False
+
+
+def _not_derived(shot, entity, raw, why, where) -> Finding:
+    """A body-attached prop without `stage.at` that could not be derived: the
+    compiler draws it at the stage centre, which is wrong for any body. First-person
+    art and an absent character are the per-shot check's findings instead."""
+    from pydantic import ValidationError
+
+    try:
+        ba = body_attachment_of(raw)
+    except ValidationError:
+        ba = None
+    if ba is not None and ba.view != FIRST_PERSON and bound_character(shot, entity, ba)[0] is not None:
+        return ("error", where, f"prop {entity.id!r} has no `stage.at` and cannot be placed by its body: {why}. It would be drawn at the stage centre; fix that, or place it by hand (`set scale_x` negative for a mirrored character)")
+    if ba is not None and ba.view == FIRST_PERSON:
+        return ("info", where, f"prop {entity.id!r}: first-person art is placed by hand, not by a body")
+    return ("warning", where, f"prop {entity.id!r} has no `stage.at` and cannot be placed by its body: {why}")
 
 
 def _check_one(shot, entity, raw, stores, poses, sets, where, records, index) -> list[Finding]:
@@ -186,8 +219,9 @@ def _check_one(shot, entity, raw, stores, poses, sets, where, records, index) ->
         return found + [("info", where, f"{label}: rotated at the shot's start, so its sockets were not checked")]
     if (cpose["scale_x"] < 0) != (ppose["scale_x"] < 0):
         return found + [("error", where, f"{label}: {'the character is' if cpose['scale_x'] < 0 else 'the prop is'} mirrored and {'the prop is not' if cpose['scale_x'] < 0 else 'the character is not'}: mirror both (a negative `scale_x`) or neither")]
+    mirror_x = None  # the character's x when both are mirrored
     if cpose["scale_x"] < 0:  # both mirrored: check the unmirrored configuration
-        cx = cpose["x"]
+        cx = mirror_x = cpose["x"]
         cpose = {**cpose, "scale_x": -cpose["scale_x"]}
         ppose = {**ppose, "x": 2 * cx - ppose["x"], "scale_x": -ppose["scale_x"]}
     props = stores["props"]
@@ -204,10 +238,17 @@ def _check_one(shot, entity, raw, stores, poses, sets, where, records, index) ->
     limit = ba.tolerance * got["span_px"]
     off = [(s.bone, math.dist(a, b)) for s, a, b in zip(ba.sockets, placed, got["targets"]) if math.dist(a, b) > limit]
     ratio = sx / got["scale"] - 1.0
-    fix = f"Leave out `stage.at` to have it placed by its body, or place it at [{got['at'][0]:g}, {got['at'][1]:g}] scale {got['scale']:.3g}"
-    if abs(ratio) > ba.scale_tolerance:
+    measured_scale = len(ba.sockets) > 1 or ba.scale is not None
+    if mirror_x is not None:
+        fix = f"Place it at [{2 * mirror_x - got['at'][0]:g}, {got['at'][1]:g}] with `set scale_x` {-got['scale']:.3g} at the start"
+    else:
+        fix = f"Leave out `stage.at` to have it placed by its body, or place it at [{got['at'][0]:g}, {got['at'][1]:g}] scale {got['scale']:.3g}"
+    flagged = False
+    if measured_scale and abs(ratio) > ba.scale_tolerance:
+        flagged = True
         found.append(("error", where, f"{label}: drawn {abs(ratio):.0%} {'larger' if ratio > 0 else 'smaller'} relative to {name!r} than its attachment says (at most {ba.scale_tolerance:.0%}). {fix}"))
     if off:
+        flagged = True
         worst = ", ".join(f"{bone} {d:.0f} px off" for bone, d in off)
         found.append(("error", where, f"{label}: its limbs do not meet {name!r}'s body ({worst}; at most {limit:.0f} px, {ba.tolerance:g} of the {got['span_px']:.0f} px span). {fix}"))
     if records is not None:
@@ -217,6 +258,7 @@ def _check_one(shot, entity, raw, stores, poses, sets, where, records, index) ->
             "ratio": sx / cs,
             "anchor": ((ppose["x"] - cpose["x"]) / cs, (ppose["y"] - cpose["y"]) / cpose["scale_y"]),
             "span": got["span_px"] / cs, "tolerance": ba.tolerance, "scale_tolerance": ba.scale_tolerance,
+            "flagged": flagged,
         })
     return found
 
@@ -237,6 +279,8 @@ def consistency_findings(records: list[Mapping[str, Any]]) -> list[Finding]:
     """
     groups: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
     for rec in records:
+        if rec.get("flagged"):
+            continue  # already an error in its own shot
         groups.setdefault((rec["prop"], rec["character"]), []).append(rec)
     out: list[Finding] = []
     for (prop, char), recs in groups.items():
@@ -269,6 +313,9 @@ def check_body_attachments(ctx: Any) -> None:
 
 
 def check_body_attachment_consistency(ctx: Any) -> None:
-    """The cut-out genre's cross-shot body-continuity check (:func:`consistency_findings`)."""
+    """The cut-out genre's cross-shot body-continuity check (:func:`consistency_findings`).
+
+    It reads the measurements ``cutout.body_attachment`` leaves in the
+    validation's memo, so the two must be selected together (``only=``)."""
     for severity, where, message in consistency_findings(ctx.memo.get(RECORDS_KEY) or []):
         ctx.report.add(severity, where, message)

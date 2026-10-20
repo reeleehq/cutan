@@ -301,3 +301,38 @@ def test_an_undeclared_prop_builds_no_stage():
     body_attachment_findings(shot, {"props": {"plain": {"kind": "PropDescriptor", "name": "plain"}}},
                              poses=lambda: calls.append(1))
     assert calls == []
+
+
+@pytest.mark.parametrize("case", ["default_layout", "mirrored", "side_view"])
+def test_a_prop_that_cannot_be_derived_says_why(project, case):
+    """No `stage.at` and no derivation: the compiler would draw it at the centre."""
+    from an.ir.schema import AssetRef as A
+
+    stage = None if case == "default_layout" else StagePlacement(at=PAUL_AT, scale=PAUL_SCALE)
+    actions = {"mirrored": [SetAction(target="paul", property="scale_x", value=-PAUL_SCALE, at=0.0)],
+               "side_view": [SetAction(target="paul", property="view", value="side", at=0.0)]}.get(case, [])
+    shot = Shot(id="s", renderer="cutout", duration=1.0, actions=actions, entities=[
+        A(kind="character", id="paul", store="characters", ref="paul", stage=stage),
+        A(kind="prop", id="w", store="props", ref="wheel")])
+    found = _findings(project, shot)
+    assert [f[0] for f in found] == ["error"] and "cannot be placed by its body" in found[0][2], found
+
+
+def test_one_socket_without_a_declared_scale_checks_no_size(project):
+    one = json.loads(json.dumps(project["props"]["wheel"]))
+    one["metadata"][BODY_ATTACHMENT_KEY]["sockets"] = SOCKETS[:1]
+    from cutan.body_attachment import solve_placement as solve, character_model, prop_model, body_attachment_of as bao
+    ba = bao(one)
+    pose = {"x": PAUL_AT[0], "y": PAUL_AT[1], "scale_x": PAUL_SCALE, "scale_y": PAUL_SCALE}
+    got = solve(prop_model(one), character_model(project["characters"]["paul"]), ba, art_size=ART, character_pose=pose)
+    # hand-placed at a quarter of the fallback scale, the socket still on the shoulder
+    s = got["scale"] / 4
+    q = got["local"][0]
+    at = (got["targets"][0][0] - s * q[0], got["targets"][0][1] - s * q[1])
+
+    class Store(dict):
+        _root = project["props"]._root if hasattr(project["props"], "_root") else None
+
+    props = Store(wheel=one)
+    found = body_attachment_findings(_shot("wheel", at, s), {"props": props, "characters": project["characters"]})
+    assert not [f for f in found if "larger" in f[2] or "smaller" in f[2]], found
