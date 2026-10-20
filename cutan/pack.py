@@ -197,7 +197,10 @@ class PackCheck:
         >>> PackCheck("x", False, "exit 2").errors
         ['exit 2']
         """
-        found = [_strip_marker(ln, ERROR_MARKER) for ln in _lines_with(self.output, (ERROR_MARKER,))]
+        found = [
+            _strip_marker(ln, ERROR_MARKER)
+            for ln in _lines_with(self.output, (ERROR_MARKER,))
+        ]
         if not self.ok and not found:
             last = [ln.strip() for ln in self.output.splitlines() if ln.strip()]
             found = [last[-1][:300] if last else "failed with no output"]
@@ -268,7 +271,8 @@ class PackReport:
     def format(self) -> str:
         """The full report as text: each step's verdict and output, then the summary."""
         parts = [
-            f"=== {c.label} {'OK' if c.ok else 'FAILED'}" + (f"\n{c.output}" if c.output else "")
+            f"=== {c.label} {'OK' if c.ok else 'FAILED'}"
+            + (f"\n{c.output}" if c.output else "")
             for c in self.checks
         ]
         return "\n\n".join([*parts, self.summary()])
@@ -363,7 +367,9 @@ def lint_svg(path: Path, *, exact_size: bool) -> list[str]:
             problems.append("width/height are not plain numbers")
     tags = {el.tag.replace(SVG_NS, "") for el in root.iter()}
     if tags & SVG_FORBIDDEN:
-        problems.append(f"forbidden element(s): {', '.join(sorted(tags & SVG_FORBIDDEN))}")
+        problems.append(
+            f"forbidden element(s): {', '.join(sorted(tags & SVG_FORBIDDEN))}"
+        )
     if not tags & SVG_SHAPES:
         problems.append("draws nothing (no shape element)")
     if _outside_links(root):
@@ -443,7 +449,9 @@ def _lint_voices(pack: Path, report: PackReport) -> None:
             report.add(label, False, f"  {ERROR_MARKER} {e}")
             continue
         if not isinstance(doc, dict):
-            report.add(label, False, f"  {ERROR_MARKER} a voice document is a JSON object")
+            report.add(
+                label, False, f"  {ERROR_MARKER} a voice document is a JSON object"
+            )
             continue
         problems = [
             f"  {ERROR_MARKER} unknown key {k!r} (allowed: {', '.join(sorted(VOICE_KEYS))})"
@@ -452,7 +460,8 @@ def _lint_voices(pack: Path, report: PackReport) -> None:
         problems += [
             f"  {ERROR_MARKER} {k!r} must be a string of {lo} to {hi} characters"
             for k, (lo, hi) in TEXT_KEY_LENGTHS.items()
-            if k in doc and not (isinstance(doc[k], str) and lo <= len(doc[k].strip()) <= hi)
+            if k in doc
+            and not (isinstance(doc[k], str) and lo <= len(doc[k].strip()) <= hi)
         ]
         model = doc.get("model_id")
         notes = (
@@ -505,7 +514,9 @@ class _Runner:
     """Runs one ``an`` step (secrets scrubbed from its environment, within the
     step timeout and what is left of the deadline) and records it in the report."""
 
-    def __init__(self, report: PackReport, *, timeout: float, deadline: float | None) -> None:
+    def __init__(
+        self, report: PackReport, *, timeout: float, deadline: float | None
+    ) -> None:
         import time
 
         self.report, self.timeout = report, timeout
@@ -520,11 +531,18 @@ class _Runner:
         if self._end is not None:
             left = self._end - self._clock()
             if left <= 0:
-                raise _OutOfTime("the check ran out of time; the remaining steps were not run")
+                raise _OutOfTime(
+                    "the check ran out of time; the remaining steps were not run"
+                )
             timeout = min(timeout, left)
         try:
             proc = subprocess.run(
-                cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout, env=self._env
+                cmd,
+                cwd=cwd,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                env=self._env,
             )
         except subprocess.TimeoutExpired:
             return self.report.add(
@@ -551,17 +569,23 @@ def _build_and_check(
 ) -> None:
     cast = cast_commands(pack)  # refuse a bad cast.sh before running anything
     if len(cast) > MAX_CAST_LINES:
-        raise PackError(f"{CAST_FILE} has {len(cast)} commands; a pack checked here has at most {MAX_CAST_LINES}")
+        raise PackError(
+            f"{CAST_FILE} has {len(cast)} commands; a pack checked here has at most {MAX_CAST_LINES}"
+        )
     for kind in ("characters", "props", "environments"):
         n = len(_subdirs(pack / "assets" / kind))
         if n > MAX_ASSET_FOLDERS:
-            raise PackError(f"assets/{kind} has {n} folders; at most {MAX_ASSET_FOLDERS}")
+            raise PackError(
+                f"assets/{kind} has {n} folders; at most {MAX_ASSET_FOLDERS}"
+            )
     _lint_files(pack, report)
     _lint_svgs(pack, report)
     _lint_voices(pack, report)
     run = _Runner(report, timeout=timeout, deadline=deadline)
     workdir = project.parent
-    if not run(an + ["init", str(project)], cwd=workdir, label="an init", expect="initialized"):
+    if not run(
+        an + ["init", str(project)], cwd=workdir, label="an init", expect="initialized"
+    ):
         return
     pack_chars = pack / "assets" / "characters"
     redrawn = [d for d in _subdirs(pack_chars) if not (d / "character.json").exists()]
@@ -581,22 +605,37 @@ def _build_and_check(
     os.utime(project / "scene.md", (later, later))
 
     for argv in cast:
-        run(an + argv[1:], cwd=project, label=" ".join(argv[:4]), expect=CAST_SUCCESS[argv[2]])
+        run(
+            an + argv[1:],
+            cwd=project,
+            label=" ".join(argv[:4]),
+            expect=CAST_SUCCESS[argv[2]],
+        )
     chars = project / "assets" / "characters"
-    for d in redrawn:  # redrawn parts go over the factory's own, on the factory's canvas
+    for (
+        d
+    ) in redrawn:  # redrawn parts go over the factory's own, on the factory's canvas
         for src in sorted(d.rglob("*")):
             if src.is_file() and not src.is_symlink() and src.suffix in PACK_SUFFIXES:
                 rel = src.relative_to(d)
                 problem = _redrawn_problem(src, chars / d.name / rel)
                 if problem:
                     report.add(
-                        f"redrawn {d.name}/{rel.as_posix()}", False, f"  {ERROR_MARKER} {problem}"
+                        f"redrawn {d.name}/{rel.as_posix()}",
+                        False,
+                        f"  {ERROR_MARKER} {problem}",
                     )
                 else:
                     _copy(src, chars / d.name / rel)
     if (project / "assets" / "voices").is_dir():
         run(
-            [python, *_NO_CWD_PATH, "-c", VOICE_CHECK, str(project / "assets" / "voices")],
+            [
+                python,
+                *_NO_CWD_PATH,
+                "-c",
+                VOICE_CHECK,
+                str(project / "assets" / "voices"),
+            ],
             cwd=project,
             label="voices (engine checks)",
         )
@@ -668,22 +707,37 @@ def check_pack(
     work.mkdir(parents=True, exist_ok=True)
     try:
         if not (pack / "scene.md").is_file():
-            raise PackError(f"{pack.name or pack} has no scene.md: is it a production pack?")
+            raise PackError(
+                f"{pack.name or pack} has no scene.md: is it a production pack?"
+            )
         _build_and_check(
-            pack, work / "project", report, an=an, python=python, timeout=timeout, deadline=deadline
+            pack,
+            work / "project",
+            report,
+            an=an,
+            python=python,
+            timeout=timeout,
+            deadline=deadline,
         )
     except PackError as e:
         report.add("pack", False, f"{ERROR_MARKER} {e}")
     except Exception as e:  # noqa: BLE001 - a malformed pack ends in a failed check, not a traceback
         report.add(
-            "pack", False, f"{ERROR_MARKER} the pack could not be checked: {type(e).__name__}: {e}"
+            "pack",
+            False,
+            f"{ERROR_MARKER} the pack could not be checked: {type(e).__name__}: {e}",
         )
     finally:
         if owned:
             shutil.rmtree(work, ignore_errors=True)
-    places = [(str(work / "project"), "<project>"), (str(work), "<scratch>"), (str(pack), "<pack>")]
+    places = [
+        (str(work / "project"), "<project>"),
+        (str(work), "<scratch>"),
+        (str(pack), "<pack>"),
+    ]
     report.checks = [
-        PackCheck(c.label, c.ok, _redact(c.output, places=places)) for c in report.checks
+        PackCheck(c.label, c.ok, _redact(c.output, places=places))
+        for c in report.checks
     ]
     return report
 
