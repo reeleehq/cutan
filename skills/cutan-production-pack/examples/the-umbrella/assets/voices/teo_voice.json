@@ -2,5 +2,6 @@
   "provider": "elevenlabs",
   "model_id": "eleven_v3",
   "voice_settings": {"stability": 0.0},
-  "effects": {"trim_silence": true, "tempo": 1.08}
+  "effects": {"trim_silence": true, "tempo": 1.08},
+  "notes": "A man in his 30s with a bright, quick, warm voice, a touch too loud: an eager optimist who sees the bright side of everything and says so, smiling as he talks."
 }

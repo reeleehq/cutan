@@ -20,6 +20,7 @@ cutan/carve/          photo/frame → matted, provenance-carrying part: matte st
 cutan/styles/         the named style specs (*.yaml, package data) and their loader: style_spec(name), style_specs(); python -m cutan.styles
 cutan/motion.py       the rig presets (nod, point, turn, walk, waddle, speech_pulse; an#322) and PRESETS, the table a `play` resolves in
 cutan/runtime/        visuals.js: the procedural mouth and eye, registered through the stage runtime's anRegisterVisual
+cutan/pack.py         check_pack(): the production-pack checker (cutan#87), run by the skill's validate_pack.py and the reelee connector
 cutan/bench.py        CUTOUT_FIXTURES and run_bench() over this repo's misc/bench/ corpus
 tests/  examples/  misc/bench/{corpus,golden}/  misc/demos/  misc/docs/ (design notes: locomotion_gaits.md)  .claude/skills/
 skills/cutan-production-pack/  a Claude.ai skill for writers (not loaded by Claude Code here): production packs; its tables are generated and checked by tests/test_production_pack_skill.py

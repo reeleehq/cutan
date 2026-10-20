@@ -2,5 +2,6 @@
   "provider": "elevenlabs",
   "model_id": "eleven_v3",
   "voice_settings": {"stability": 0.5},
-  "effects": {"trim_silence": true}
+  "effects": {"trim_silence": true},
+  "notes": "A woman in her late 20s with a low, dry voice: unhurried and understated, a little guarded, with a deadpan wit that only now and then lets warmth through."
 }

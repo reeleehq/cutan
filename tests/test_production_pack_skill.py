@@ -145,9 +145,12 @@ def test_vocabulary_sections_are_current():
 
 
 def _env_with_an() -> dict:
-    """The environment with this interpreter's scripts (`an`) first on PATH."""
+    """The environment with this interpreter's scripts (`an`) first on PATH, and
+    this checkout's `cutan` first on the import path (the skill's script runs
+    from its own folder, so it would otherwise import whatever cutan is installed)."""
     env = dict(os.environ)
     env["PATH"] = str(Path(sys.executable).parent) + os.pathsep + env.get("PATH", "")
+    env["PYTHONPATH"] = os.pathsep.join(p for p in (str(ROOT), env.get("PYTHONPATH")) if p)
     return env
 
 
@@ -163,13 +166,10 @@ def test_example_pack_passes_validate_pack(pack):
 
 
 def _validate_pack():
-    """The skill's own `validate_pack` module (it lives outside every package)."""
-    import importlib.util
+    """The pack checker the skill's `validate_pack.py` fronts (cutan#87)."""
+    import cutan.pack
 
-    spec = importlib.util.spec_from_file_location("validate_pack", SKILL / "scripts" / "validate_pack.py")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    return cutan.pack
 
 
 def test_factory_commands_in_the_skill_are_accepted(tmp_path):

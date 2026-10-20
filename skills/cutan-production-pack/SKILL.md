@@ -51,19 +51,28 @@ Ask the writer which optional elements they want; propose voices and a look when
 4. **Echo the plan back** as a shot list (shot id, length, framing, camera, what happens, lines) and get a yes before writing files.
 5. **Write the pack**: `cast.sh` first, then each environment and prop, the voices and the style pack if any, then `scene.md`, then `PRODUCTION.md`. The references hold every format.
 6. **Check it** (next section), fix what the check reports, and say plainly what you could not check.
-7. **Deliver**: zip the folder (`<production-id>.zip`) if you can create files, or else give each file in its own code block with its path as the heading. End with three lines for the writer: what is in the pack, what the pipeline will do with it, and any decisions you made that they did not ask for.
+7. **Design the voices with the writer** when the film has voice documents and the reelee connector is there (section below): the writer listens and chooses, and each choice becomes that voice's `voice_id`.
+8. **Deliver**: zip the folder (`<production-id>.zip`) if you can create files, or else give each file in its own code block with its path as the heading. End with three lines for the writer: what is in the pack, what the pipeline will do with it, and any decisions you made that they did not ask for.
 
 ## Checking the pack
 
-**If you can run code and install packages**, use the real validators: `pip install cutan` (pure Python, about 140 MB, it brings the `an` command; no browser needed), then
+Check before you deliver, with the first of these you have:
 
-```
-python scripts/validate_pack.py <pack folder>
-```
+1. **The reelee connector** (a `reelee_check_production_pack` tool is in your tools): send the pack's text files (`scene.md`, `cast.sh`, `PRODUCTION.md`, every `.json`) and SVG drawings as `files`, a map from each path inside the pack (`assets/props/umbrella/parts/umbrella.svg`) to its text. The server runs cutan's real checks and returns a report: `ok`, a `summary` line, and per check its `errors` and `warnings`. Nothing is installed on your side.
+2. **If you can run code and install packages**: `pip install cutan` (pure Python, about 140 MB, it brings the `an` command; no browser needed), then `python scripts/validate_pack.py <pack folder>` (add `--json` for the report as data).
+3. **Otherwise** go through `references/checklist.md` line by line, and write in `PRODUCTION.md` that the pack is unvalidated. Never claim a check you did not run.
 
-It lints every SVG, builds a scratch project, runs `cast.sh`, validates every character and prop, and runs `an validate --strict-assets` on the scene. Fix every error and every warning, rerun until it prints `PASS` with 0 warnings (a warning the writer has knowingly accepted, such as the wide-eyes warning of `surprised` below, may stay: say so in `PRODUCTION.md`), and keep the result for `PRODUCTION.md`. The validator's messages name the fix: follow them. Rendering a video needs a headless browser and is the pipeline owner's job, not yours.
+Both checks lint every SVG, build a scratch project, run `cast.sh`, validate every character and prop, and run `an validate --strict-assets` on the scene. Fix every error and every warning and check again until the summary says `PASS` with 0 warnings (a warning the writer has knowingly accepted, such as the wide-eyes warning of `surprised` below, may stay: say so in `PRODUCTION.md`), and keep the summary line for `PRODUCTION.md`. The messages name the fix: follow them. Rendering a video needs a headless browser and is the pipeline owner's job, not yours.
 
-**If you cannot run code**, go through `references/checklist.md` line by line, and write in `PRODUCTION.md` that the pack is unvalidated. Never claim a check you did not run.
+## Designing the voices (with the reelee connector)
+
+A voice document's `notes` describe the voice in words (`references/voices-and-looks.md`). With the connector, those words become voices the writer can hear, and the writer, not the pipeline owner, chooses. This matters most for an accent: only someone who knows it can tell a rural Yorkshire voice from a generic northern one.
+
+1. Price it first: `reelee_design_voices` with `dry_run: true` and `voices`, a map from each voice key to `{"notes": ..., "sample_text": ...}` (the sample text: 100 to 1000 characters of that character's own lines). It returns what the design would cost. Voice design is billed to the writer's connector budget: say the price and get a yes.
+2. Run it without `dry_run`. Each voice comes back with options `A`, `B`, `C`, each with a link to play its sample. Give the writer the links, voice by voice, and ask which sounds right. If none does, rewrite the notes with the writer (be concrete: region, age, texture, pace, what it must not sound like) and design again.
+3. For each choice, call `reelee_choose_voice` with the voice key and the option. It returns the `voice_id`: write it into that voice document, and record the choice in `PRODUCTION.md` under "Voices chosen".
+
+Without the connector, leave `voice_id` out and list the voice casting under open questions: the pipeline owner designs from the same notes (`an voices design`).
 
 ## The rules that bite most
 
@@ -78,7 +87,7 @@ It lints every SVG, builds a scratch project, runs `cast.sh`, validates every ch
 - **An emotion's mouth needs its mouth set**: `happy` and `amused` use the `happy` mouths, `sad` the `sad` ones, `angry` the `angry` ones. Give each character `--mouth-variants` for the moods its lines use (`happy,sad` is the default; add `angry`, `surprised`, `afraid`, `disgusted` as needed). `surprised` and `afraid` open the eyes wider than a factory eye can draw, so `an validate` warns on them: prefer `amused`, `skeptical`, `happy` or `thinking` unless the surprise matters.
 - **A slight emotion does not read at full-figure framing.** For a reaction, cut to a close single or `push_in`, use 0.5 or more, and add a gaze (`axes: {gaze_x: ...}`) or a body beat (`nod`, `hop`).
 - **Text on screen uses the built-in face**: plain ASCII plus curly quotes and the ellipsis character. No em dash, no accented letters on a title or label.
-- **No sound files in the pack.** Music and effects need licensed audio: describe what you want in `PRODUCTION.md` and leave the `sounds` keys out. A voice document sets how a character speaks; the particular voice (`voice_id`) is picked by the pipeline owner from your voice notes unless the writer names one.
+- **No sound files in the pack.** Music and effects need licensed audio: describe what you want in `PRODUCTION.md` and leave the `sounds` keys out. A voice document sets how a character speaks and carries its `notes`; the particular voice (`voice_id`) is the one the writer chose in the voice-design round, or one the writer names, or else the pipeline owner's pick from the notes.
 - **Real people, shows and brands:** a style is a look, not a copy. Never draw a real show's characters, logos or a living person's likeness.
 
 ## Art you draw

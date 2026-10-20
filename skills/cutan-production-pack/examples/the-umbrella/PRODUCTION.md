@@ -33,7 +33,7 @@ The two differ in build (tall and thin against short and round) and in colour (p
 
 ## Voices
 
-`mara_voice` and `teo_voice` are expressive ElevenLabs voices (`eleven_v3`) with the padding trimmed; Teo's runs 8% faster. The voices themselves are to be cast from the notes in the cast table.
+`mara_voice` and `teo_voice` are expressive ElevenLabs voices (`eleven_v3`) with the padding trimmed; Teo's runs 8% faster. Each voice document carries its notes (`notes`), so the voices can be designed from them and played to the writer, who chooses; the chosen voice becomes its `voice_id`.
 
 ## Sound
 
@@ -48,7 +48,7 @@ Light rain throughout, a distant bus pulling away under `regret`, a soft pop whe
 
 ## Open questions
 
-- Voice casting for both characters (the `voice_id` of each voice document).
+- Voice casting for both characters: design from the notes and the writer's choice (the `voice_id` of each voice document).
 - Licence for the three drawings (skyline, shelter, umbrella): this example marks them CC0.
 
 ## Check

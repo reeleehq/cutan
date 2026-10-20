@@ -1,10 +1,10 @@
 # Checking a pack by hand
 
-Use this when you cannot run `scripts/validate_pack.py`. Go through every item; each one is a mistake the validator would have caught.
+Use this only when neither the reelee connector's `reelee_check_production_pack` tool nor `scripts/validate_pack.py` can run. Go through every item; each one is a mistake the validator would have caught.
 
 **Files**
 - [ ] `scene.md`, `cast.sh`, `PRODUCTION.md` at the top of the pack; every `ref` in `scene.md` is a character in `cast.sh` (or a folder under `assets/characters/`), a folder under `assets/environments/` or `assets/props/`, or a built-in environment (`park`, `indoor`, `night`, `sunset`, `default`).
-- [ ] Every JSON file parses (double quotes, no trailing commas, no comments). Environments and props have their `kind` (`EnvironmentDescriptor`, `PropDescriptor`, `TextDescriptor` or `PathDescriptor`) and a `name` equal to their folder's; a style pack is `assets/styles/<name>.json` with `"kind": "StylePack"` and that `name`; a voice document has no `kind` and only the keys in `voices-and-looks.md`.
+- [ ] Every JSON file parses (double quotes, no trailing commas, no comments). Environments and props have their `kind` (`EnvironmentDescriptor`, `PropDescriptor`, `TextDescriptor` or `PathDescriptor`) and a `name` equal to their folder's; a style pack is `assets/styles/<name>.json` with `"kind": "StylePack"` and that `name`; a voice document has no `kind` and only the keys in `voices-and-looks.md`; its `notes` are a string of 20 to 1000 characters.
 - [ ] A `style_pack:` in the meta has its file in `assets/styles/`; every `--voice-ref` in `cast.sh` has its file in `assets/voices/`.
 - [ ] Every file an environment or prop points to (`src`, `path`) exists at that path inside the asset's own folder.
 - [ ] `cast.sh` holds only comments and `an character new <name> --offline ...` lines (plus `an character mouths`, `add-half-lid`, `add-views`, `add-gaze`), each option spelled as in `references/characters.md`, palette values quoted.
