@@ -17,7 +17,7 @@ an character new maya --offline
 - the rig, face, viseme, blink, gaze and swap-pose compile passes over the `an.stage` compiler (`cutan.compile`), and the mouth and eye visuals of the stage runtime (`cutan/runtime/visuals.js`);
 - the lip-sync providers `offline`, `rhubarb` and `whisper` (`cutan.audio`);
 - locomotion, speech, blink and turn methods with their requirements and defaults, and the cut-out vocabulary;
-- the `an character …` and `an impacts …` command namespaces;
+- the `an character …`, `an impacts …` and `an projects …` command namespaces;
 - carving parts out of photos and frames (`cutan.carve`, below);
 - the style lint (`python -m cutan.verify.style VIDEO <style>`) and the named style specs it measures against, shipped as package data: `cutan.style_spec("south_park")`, `python -m cutan.styles` to list them (the `cutan-style` skill applies one).
 

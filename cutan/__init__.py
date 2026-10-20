@@ -56,7 +56,9 @@ LIBRARY_NAME: str = "cutan"
 #: is nested chains (an#340): ``build_rig_subtree(skip_slots=)``, ``slot_parent_chain``,
 #: ``slot_node_paths``, ``rig_affordances``, ``RigError``.
 #: Level 6: ``rest_pose_protection`` (an#407), which ``validate_character`` says aloud.
-REQUIRED_AN_API_LEVEL: int = 6
+#: Level 7: the ``projects.dir.<library>`` service ``an init --id`` consults (cutan#91),
+#: which places a cut-out project in the cache folder when the projects store is S3.
+REQUIRED_AN_API_LEVEL: int = 7
 
 
 def require_an() -> None:
