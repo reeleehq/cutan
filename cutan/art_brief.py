@@ -169,7 +169,7 @@ ART_KINDS: dict[str, ArtKind] = {
             content=(
                 "only what is far away, as one band across the whole width",
                 "the horizon at the same height from left to right",
-        ),
+            ),
             framing="A wide horizontal band of distant scenery across the whole "
             "width, horizon level and at the same height throughout, nothing in the "
             "foreground, no people, empty plain flat white sky above it, no text",
@@ -189,7 +189,7 @@ ART_KINDS: dict[str, ArtKind] = {
                 "the floor line about three-quarters of the way down",
                 "the middle third left quiet: the characters stand and talk there",
                 "no characters in it",
-        ),
+            ),
             framing="A stage-like set seen straight on at eye level, the floor line "
             "three-quarters of the way down, the centre left open and uncluttered for "
             "characters, no people, no animals, no text",
@@ -200,14 +200,15 @@ ART_KINDS: dict[str, ArtKind] = {
         ArtKind(
             key="near",
             title="Near layer (foreground in front of the characters)",
-            goes_to=_PLATE_FILES + "; listed after the environment's characters_after plane",
+            goes_to=_PLATE_FILES
+            + "; listed after the environment's characters_after plane",
             canvas="the frame's width or wider (16:9 or 21:9)",
             background="transparent everywhere except the foreground object",
             content=(
                 "what is in front of the characters: a railing, a bush, a counter, "
                 "a car's dashboard and window frames",
                 "kept to the edges and bottom of the frame so it does not hide faces",
-        ),
+            ),
             framing="A foreground element along the bottom edge of the frame, the "
             "rest of the picture plain flat white and empty, seen straight on, no "
             "people, no text",
@@ -218,7 +219,8 @@ ART_KINDS: dict[str, ArtKind] = {
         ArtKind(
             key="window_view",
             title="The view behind a car (or a train, a moving window)",
-            goes_to=_PLATE_FILES + "; its own plate, behind the vehicle's interior plate",
+            goes_to=_PLATE_FILES
+            + "; its own plate, behind the vehicle's interior plate",
             canvas="a long strip, 3 to 4 frames wide (about 5000x1080), so it can "
             "scroll past the windows for the whole shot",
             background="opaque",
@@ -246,7 +248,7 @@ ART_KINDS: dict[str, ArtKind] = {
                 "seen from the angle the scene shows it",
                 "no cast shadow on a floor, no hands holding it",
                 "moving pieces (a lid, a door) as separate pictures",
-        ),
+            ),
             framing="A single object, whole and centred, filling a square frame, seen "
             "from the angle it is used at, nothing else in the picture, isolated on a "
             "plain flat white background, no cast shadow, no text",
@@ -264,7 +266,7 @@ ART_KINDS: dict[str, ArtKind] = {
                 "the whole vehicle in three-quarter front view, wheels on one level line",
                 "nobody inside: windows dark or empty, so characters can be placed",
                 "wheels that must turn as separate pictures, seen at the same angle",
-        ),
+            ),
             framing="A whole car in three-quarter front view, filling the width of a "
             "square frame, wheels level, nobody inside, isolated on a plain flat white "
             "background, no road, no cast shadow, no text",
@@ -393,7 +395,9 @@ def _positive(words: str) -> str:
     >>> _positive("a sky, no ground, no text, soft light")
     'a sky, soft light'
     """
-    return ", ".join(c for c in words.split(", ") if not c.lower().startswith(("no ", "nothing ")))
+    return ", ".join(
+        c for c in words.split(", ") if not c.lower().startswith(("no ", "nothing "))
+    )
 
 
 def art_guidance(*, style: str | Mapping | None = None) -> dict:
