@@ -13,7 +13,7 @@ what each piece of art must contain to be usable, so the writer-facing skill
 connector (its `check this pack` result) all say the same thing.
 
 - `ART_KINDS`: each kind of art (sky, far, mid and near plates, the view
-  behind a car, a prop, a vehicle, a character reference sheet, character
+  through a moving window, roadside objects, a prop, a vehicle, a character reference sheet, character
   parts, a costume), with where it goes in a pack, its canvas, its background
   and what it must and must not show.
 - [`style_look()`](#cutan.art_brief.style_look): a named style’s look in words, for a prompt (the
@@ -41,6 +41,7 @@ True
 |--------------------------------------------------------------------|---------------------------------------------------------------------------------|
 | [`CLAUDE_SVG_NOTE`](#cutan.art_brief.CLAUDE_SVG_NOTE)   | What Claude tells the writer before it draws anything itself.                   |
 | [`SVG_ONLY_NOTE`](#cutan.art_brief.SVG_ONLY_NOTE)     | The checker's note on a pack whose drawings are all hand-written SVG.           |
+| [`VIEWPOINT_RULE`](#cutan.art_brief.VIEWPOINT_RULE)    | Art that touches a body says where the camera is relative to the character.     |
 | [`PAPER_DRAWINGS`](#cutan.art_brief.PAPER_DRAWINGS)    | How to photograph or scan drawings made on paper so they can be cut out.        |
 | [`GENERATOR_TIPS`](#cutan.art_brief.GENERATOR_TIPS)    | how to get usable art out of it.                                                |
 
@@ -121,6 +122,10 @@ The picture formats a plate, a prop part or a character part may be (an#211).
 
 The checker’s note on a pack whose drawings are all hand-written SVG.
 
+### cutan.art_brief.VIEWPOINT_RULE *= "Art that touches a character (a car's interior around the driver, a seat, a steering wheel, a costume) states the camera's viewpoint relative to that character in the prompt, e.g. 'seen from in front of the car, looking back at the driver'; otherwise the picture and the character face different ways."*
+
+Art that touches a body says where the camera is relative to the character.
+
 ### cutan.art_brief.art_guidance(, style=None)
 
 Everything a writer’s Claude needs to ask for real art, as JSON-ready data.
@@ -130,7 +135,7 @@ A prompt is `prompt_recipe`: the subject, the kind’s `framing`, the `look`.
 ```pycon
 >>> g = art_guidance(style="norstein")
 >>> sorted(g)
-['claude_svg', 'formats', 'generators', 'kinds', 'look', 'paper_drawings', 'prompt_recipe']
+['claude_svg', 'formats', 'generators', 'kinds', 'look', 'paper_drawings', 'prompt_recipe', 'viewpoint']
 >>> g["kinds"][0]["key"], g["look"].startswith("painted multiplane")
 ('sky', True)
 ```

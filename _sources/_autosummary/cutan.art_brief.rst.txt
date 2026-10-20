@@ -11,6 +11,7 @@ cutan.art\_brief
       RASTER_SUFFIXES
       CLAUDE_SVG_NOTE
       SVG_ONLY_NOTE
+      VIEWPOINT_RULE
       PAPER_DRAWINGS
       GENERATOR_TIPS
    

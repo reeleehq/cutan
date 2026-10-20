@@ -194,7 +194,7 @@
 </span><span id="line-11"><span class="sd">connector (its ``check this pack`` result) all say the same thing.</span>
 </span><span id="line-12">
 </span><span id="line-13"><span class="sd">- :data:`ART_KINDS`: each kind of art (sky, far, mid and near plates, the view</span>
-</span><span id="line-14"><span class="sd">  behind a car, a prop, a vehicle, a character reference sheet, character</span>
+</span><span id="line-14"><span class="sd">  through a moving window, roadside objects, a prop, a vehicle, a character reference sheet, character</span>
 </span><span id="line-15"><span class="sd">  parts, a costume), with where it goes in a pack, its canvas, its background</span>
 </span><span id="line-16"><span class="sd">  and what it must and must not show.</span>
 </span><span id="line-17"><span class="sd">- :func:`style_look`: a named style's look in words, for a prompt (the</span>
@@ -228,398 +228,445 @@
 </span><span id="line-45">    <span class="s2">"PAPER_DRAWINGS"</span><span class="p">,</span>
 </span><span id="line-46">    <span class="s2">"RASTER_SUFFIXES"</span><span class="p">,</span>
 </span><span id="line-47">    <span class="s2">"SVG_ONLY_NOTE"</span><span class="p">,</span>
-</span><span id="line-48">    <span class="s2">"art_guidance"</span><span class="p">,</span>
-</span><span id="line-49">    <span class="s2">"image_prompt"</span><span class="p">,</span>
-</span><span id="line-50">    <span class="s2">"style_look"</span><span class="p">,</span>
-</span><span id="line-51"><span class="p">]</span>
-</span><span id="line-52">
-</span><span id="line-53"><span class="c1">#: The picture formats a plate, a prop part or a character part may be (an#211).</span>
-</span><span id="line-54"><span class="n">RASTER_SUFFIXES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">".png"</span><span class="p">,</span> <span class="s2">".jpg"</span><span class="p">,</span> <span class="s2">".jpeg"</span><span class="p">,</span> <span class="s2">".webp"</span><span class="p">)</span>
-</span><span id="line-55">
-</span><span id="line-56"><span class="c1">#: What Claude tells the writer before it draws anything itself.</span>
-</span><span id="line-57"><span class="n">CLAUDE_SVG_NOTE</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-58">    <span class="s2">"I can draw the art for you, but only as SVG: shapes I write as code. The "</span>
-</span><span id="line-59">    <span class="s2">"result is simple geometry in flat colours (circles, rectangles, smooth "</span>
-</span><span id="line-60">    <span class="s2">"curves), clean but very obviously computer-generated: no texture, no "</span>
-</span><span id="line-61">    <span class="s2">"brush or pencil line, little detail, stiff faces. It is fine for a "</span>
-</span><span id="line-62">    <span class="s2">"placeholder, a map, a title card or a deliberately flat look. For a film "</span>
-</span><span id="line-63">    <span class="s2">"that looks drawn, use a specialised image generator (Midjourney, "</span>
-</span><span id="line-64">    <span class="s2">"ChatGPT's image tool, Flux, Ideogram, Recraft) or photograph or scan "</span>
-</span><span id="line-65">    <span class="s2">"drawings made on paper, and give me the pictures: I will say what each "</span>
-</span><span id="line-66">    <span class="s2">"one must show, and write the prompts."</span>
-</span><span id="line-67"><span class="p">)</span>
-</span><span id="line-68">
-</span><span id="line-69"><span class="c1">#: The checker's note on a pack whose drawings are all hand-written SVG.</span>
-</span><span id="line-70"><span class="n">SVG_ONLY_NOTE</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-71">    <span class="s2">"every drawing in this pack is hand-written SVG (</span><span class="si">{n}</span><span class="s2"> file(s)): it will look "</span>
-</span><span id="line-72">    <span class="s2">"computer-generated (simple shapes, flat colours). Tell the writer, and "</span>
-</span><span id="line-73">    <span class="s2">"offer real art instead: pictures from an image generator or photos and "</span>
-</span><span id="line-74">    <span class="s2">"scans of paper drawings, as PNG (transparent background for props and "</span>
-</span><span id="line-75">    <span class="s2">"parts) or JPEG (opaque plates). What each picture must show, and prompts "</span>
-</span><span id="line-76">    <span class="s2">"to paste into a generator: the skill's references/art.md "</span>
-</span><span id="line-77">    <span class="s2">"(cutan.art_brief.art_guidance())."</span>
-</span><span id="line-78"><span class="p">)</span>
-</span><span id="line-79">
-</span><span id="line-80"><span class="c1">#: How to photograph or scan drawings made on paper so they can be cut out.</span>
-</span><span id="line-81"><span class="n">PAPER_DRAWINGS</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-82">    <span class="s2">"Draw each piece on its own sheet, or spread pieces out with a hand's width "</span>
-</span><span id="line-83">    <span class="s2">"of empty paper between them."</span><span class="p">,</span>
-</span><span id="line-84">    <span class="s2">"Use plain white or pale paper, and a background colour that appears nowhere "</span>
-</span><span id="line-85">    <span class="s2">"in the drawing; strong, closed outlines cut out cleanest."</span><span class="p">,</span>
-</span><span id="line-86">    <span class="s2">"Scan at 300 dpi, or photograph straight down in even daylight: no shadow of "</span>
-</span><span id="line-87">    <span class="s2">"the phone or the hand, no glare, no perspective, the sheet filling the frame."</span><span class="p">,</span>
-</span><span id="line-88">    <span class="s2">"Cut-paper pieces (actual scissors and card) are welcome: photograph them "</span>
-</span><span id="line-89">    <span class="s2">"flat on a contrasting background."</span><span class="p">,</span>
-</span><span id="line-90">    <span class="s2">"Send the original files (PNG or JPEG), not screenshots; the pipeline owner "</span>
-</span><span id="line-91">    <span class="s2">"cuts the pieces out (cutan.carve) and keeps who drew them and on what terms."</span><span class="p">,</span>
-</span><span id="line-92"><span class="p">)</span>
-</span><span id="line-93">
-</span><span id="line-94"><span class="c1">#: Per image generator: how to get usable art out of it.</span>
-</span><span id="line-95"><span class="n">GENERATOR_TIPS</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-96">    <span class="s2">"midjourney"</span><span class="p">:</span> <span class="s2">"append the aspect (--ar 16:9 for a plate, --ar 1:1 for a prop) and "</span>
-</span><span id="line-97">    <span class="s2">"--no text, letters, watermark; it cannot make a transparent background, so ask "</span>
-</span><span id="line-98">    <span class="s2">"for a plain flat white one; keep a character consistent with a reference image "</span>
-</span><span id="line-99">    <span class="s2">"(--oref &lt;image URL&gt; in V7, --cref in V6)"</span><span class="p">,</span>
-</span><span id="line-100">    <span class="s2">"gpt-image"</span><span class="p">:</span> <span class="s2">"ChatGPT's image tool (gpt-image): write the prompt as plain sentences; "</span>
-</span><span id="line-101">    <span class="s2">"it can make a transparent PNG when asked ('transparent background, PNG'); ask "</span>
-</span><span id="line-102">    <span class="s2">"for edits of the same image to keep a character consistent"</span><span class="p">,</span>
-</span><span id="line-103">    <span class="s2">"flux"</span><span class="p">:</span> <span class="s2">"no negative prompt, and naming a thing tends to add it: use the "</span>
-</span><span id="line-104">    <span class="s2">"positive-only prompt (image_prompt(..., tool='flux') drops the 'no ...' words); "</span>
-</span><span id="line-105">    <span class="s2">"give the size as an aspect (16:9, 1:1); a flat plain background, cut out afterwards"</span><span class="p">,</span>
-</span><span id="line-106">    <span class="s2">"ideogram"</span><span class="p">:</span> <span class="s2">"good at following a long description; switch magic prompt off so "</span>
-</span><span id="line-107">    <span class="s2">"your words stay yours; ask for no text in the image"</span><span class="p">,</span>
-</span><span id="line-108">    <span class="s2">"recraft"</span><span class="p">:</span> <span class="s2">"can draw in a vector style and export SVG, which suits the flat looks "</span>
-</span><span id="line-109">    <span class="s2">"(South Park-like, OverSimplified-like, Kurzgesagt-like); an SVG it exports must "</span>
-</span><span id="line-110">    <span class="s2">"still follow the pack's SVG rules (no embedded images)"</span><span class="p">,</span>
-</span><span id="line-111"><span class="p">}</span>
-</span><span id="line-112">
-</span><span id="line-113"><span class="c1">#: The negative words every prompt ends with (Midjourney's --no).</span>
-</span><span id="line-114"><span class="n">_NO</span> <span class="o">=</span> <span class="s2">"text, letters, watermark"</span>
-</span><span id="line-115">
-</span><span id="line-116">
+</span><span id="line-48">    <span class="s2">"VIEWPOINT_RULE"</span><span class="p">,</span>
+</span><span id="line-49">    <span class="s2">"art_guidance"</span><span class="p">,</span>
+</span><span id="line-50">    <span class="s2">"image_prompt"</span><span class="p">,</span>
+</span><span id="line-51">    <span class="s2">"style_look"</span><span class="p">,</span>
+</span><span id="line-52"><span class="p">]</span>
+</span><span id="line-53">
+</span><span id="line-54"><span class="c1">#: The picture formats a plate, a prop part or a character part may be (an#211).</span>
+</span><span id="line-55"><span class="n">RASTER_SUFFIXES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">".png"</span><span class="p">,</span> <span class="s2">".jpg"</span><span class="p">,</span> <span class="s2">".jpeg"</span><span class="p">,</span> <span class="s2">".webp"</span><span class="p">)</span>
+</span><span id="line-56">
+</span><span id="line-57"><span class="c1">#: What Claude tells the writer before it draws anything itself.</span>
+</span><span id="line-58"><span class="n">CLAUDE_SVG_NOTE</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-59">    <span class="s2">"I can draw the art for you, but only as SVG: shapes I write as code. The "</span>
+</span><span id="line-60">    <span class="s2">"result is simple geometry in flat colours (circles, rectangles, smooth "</span>
+</span><span id="line-61">    <span class="s2">"curves), clean but very obviously computer-generated: no texture, no "</span>
+</span><span id="line-62">    <span class="s2">"brush or pencil line, little detail, stiff faces. It is fine for a "</span>
+</span><span id="line-63">    <span class="s2">"placeholder, a map, a title card or a deliberately flat look. For a film "</span>
+</span><span id="line-64">    <span class="s2">"that looks drawn, use a specialised image generator (Midjourney, "</span>
+</span><span id="line-65">    <span class="s2">"ChatGPT's image tool, Flux, Ideogram, Recraft) or photograph or scan "</span>
+</span><span id="line-66">    <span class="s2">"drawings made on paper, and give me the pictures: I will say what each "</span>
+</span><span id="line-67">    <span class="s2">"one must show, and write the prompts."</span>
+</span><span id="line-68"><span class="p">)</span>
+</span><span id="line-69">
+</span><span id="line-70"><span class="c1">#: The checker's note on a pack whose drawings are all hand-written SVG.</span>
+</span><span id="line-71"><span class="n">SVG_ONLY_NOTE</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-72">    <span class="s2">"every drawing in this pack is hand-written SVG (</span><span class="si">{n}</span><span class="s2"> file(s)): it will look "</span>
+</span><span id="line-73">    <span class="s2">"computer-generated (simple shapes, flat colours). Tell the writer, and "</span>
+</span><span id="line-74">    <span class="s2">"offer real art instead: pictures from an image generator or photos and "</span>
+</span><span id="line-75">    <span class="s2">"scans of paper drawings, as PNG (transparent background for props and "</span>
+</span><span id="line-76">    <span class="s2">"parts) or JPEG (opaque plates). What each picture must show, and prompts "</span>
+</span><span id="line-77">    <span class="s2">"to paste into a generator: the skill's references/art.md "</span>
+</span><span id="line-78">    <span class="s2">"(cutan.art_brief.art_guidance())."</span>
+</span><span id="line-79"><span class="p">)</span>
+</span><span id="line-80">
+</span><span id="line-81"><span class="c1">#: Art that touches a body says where the camera is relative to the character.</span>
+</span><span id="line-82"><span class="n">VIEWPOINT_RULE</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-83">    <span class="s2">"Art that touches a character (a car's interior around the driver, a seat, a "</span>
+</span><span id="line-84">    <span class="s2">"steering wheel, a costume) states the camera's viewpoint relative to that "</span>
+</span><span id="line-85">    <span class="s2">"character in the prompt, e.g. 'seen from in front of the car, looking back at "</span>
+</span><span id="line-86">    <span class="s2">"the driver'; otherwise the picture and the character face different ways."</span>
+</span><span id="line-87"><span class="p">)</span>
+</span><span id="line-88">
+</span><span id="line-89"><span class="c1">#: How to photograph or scan drawings made on paper so they can be cut out.</span>
+</span><span id="line-90"><span class="n">PAPER_DRAWINGS</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-91">    <span class="s2">"Draw each piece on its own sheet, or spread pieces out with a hand's width "</span>
+</span><span id="line-92">    <span class="s2">"of empty paper between them."</span><span class="p">,</span>
+</span><span id="line-93">    <span class="s2">"Use plain white or pale paper, and a background colour that appears nowhere "</span>
+</span><span id="line-94">    <span class="s2">"in the drawing; strong, closed outlines cut out cleanest."</span><span class="p">,</span>
+</span><span id="line-95">    <span class="s2">"Scan at 300 dpi, or photograph straight down in even daylight: no shadow of "</span>
+</span><span id="line-96">    <span class="s2">"the phone or the hand, no glare, no perspective, the sheet filling the frame."</span><span class="p">,</span>
+</span><span id="line-97">    <span class="s2">"Cut-paper pieces (actual scissors and card) are welcome: photograph them "</span>
+</span><span id="line-98">    <span class="s2">"flat on a contrasting background."</span><span class="p">,</span>
+</span><span id="line-99">    <span class="s2">"Send the original files (PNG or JPEG), not screenshots; the pipeline owner "</span>
+</span><span id="line-100">    <span class="s2">"cuts the pieces out (cutan.carve) and keeps who drew them and on what terms."</span><span class="p">,</span>
+</span><span id="line-101"><span class="p">)</span>
+</span><span id="line-102">
+</span><span id="line-103"><span class="c1">#: Per image generator: how to get usable art out of it.</span>
+</span><span id="line-104"><span class="n">GENERATOR_TIPS</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-105">    <span class="s2">"midjourney"</span><span class="p">:</span> <span class="s2">"append the aspect (--ar 16:9 for a plate, --ar 1:1 for a prop) and "</span>
+</span><span id="line-106">    <span class="s2">"--no text, letters, watermark; it cannot make a transparent background, so ask "</span>
+</span><span id="line-107">    <span class="s2">"for a plain flat white one; keep a character consistent with a reference image "</span>
+</span><span id="line-108">    <span class="s2">"(--oref &lt;image URL&gt; in V7, --cref in V6)"</span><span class="p">,</span>
+</span><span id="line-109">    <span class="s2">"gpt-image"</span><span class="p">:</span> <span class="s2">"ChatGPT's image tool (gpt-image): write the prompt as plain sentences; "</span>
+</span><span id="line-110">    <span class="s2">"it can make a transparent PNG when asked ('transparent background, PNG'); ask "</span>
+</span><span id="line-111">    <span class="s2">"for edits of the same image to keep a character consistent"</span><span class="p">,</span>
+</span><span id="line-112">    <span class="s2">"flux"</span><span class="p">:</span> <span class="s2">"no negative prompt, and naming a thing tends to add it: use the "</span>
+</span><span id="line-113">    <span class="s2">"positive-only prompt (image_prompt(..., tool='flux') drops the 'no ...' words); "</span>
+</span><span id="line-114">    <span class="s2">"give the size as an aspect (16:9, 1:1); a flat plain background, cut out afterwards"</span><span class="p">,</span>
+</span><span id="line-115">    <span class="s2">"ideogram"</span><span class="p">:</span> <span class="s2">"good at following a long description; switch magic prompt off so "</span>
+</span><span id="line-116">    <span class="s2">"your words stay yours; ask for no text in the image"</span><span class="p">,</span>
+</span><span id="line-117">    <span class="s2">"recraft"</span><span class="p">:</span> <span class="s2">"can draw in a vector style and export SVG, which suits the flat looks "</span>
+</span><span id="line-118">    <span class="s2">"(South Park-like, OverSimplified-like, Kurzgesagt-like); an SVG it exports must "</span>
+</span><span id="line-119">    <span class="s2">"still follow the pack's SVG rules (no embedded images)"</span><span class="p">,</span>
+</span><span id="line-120"><span class="p">}</span>
+</span><span id="line-121">
+</span><span id="line-122"><span class="c1">#: The negative words every prompt ends with (Midjourney's --no).</span>
+</span><span id="line-123"><span class="n">_NO</span> <span class="o">=</span> <span class="s2">"text, letters, watermark"</span>
+</span><span id="line-124">
+</span><span id="line-125">
 <div class="viewcode-block" id="ArtKind">
 <a class="viewcode-back" href="../../_autosummary/cutan.art_brief.html#cutan.art_brief.ArtKind">[docs]</a>
-</span><span id="line-117"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-118"><span class="k">class</span><span class="w"> </span><span class="nc">ArtKind</span><span class="p">:</span>
-</span><span id="line-119"><span class="w">    </span><span class="sd">"""One kind of art a production pack can carry."""</span>
-</span><span id="line-120">
-</span><span id="line-121">    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-122">    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-123">    <span class="c1">#: Where the file goes in the pack.</span>
-</span><span id="line-124">    <span class="n">goes_to</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-125">    <span class="c1">#: Size and aspect, at the default 1280x720 frame.</span>
-</span><span id="line-126">    <span class="n">canvas</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-127">    <span class="c1">#: ``"opaque"`` or ``"transparent"`` (or a plain flat colour cut out afterwards).</span>
-</span><span id="line-128">    <span class="n">background</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-129">    <span class="c1">#: What the picture must show, and must not.</span>
-</span><span id="line-130">    <span class="n">content</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
-</span><span id="line-131">    <span class="c1">#: The words a generator prompt adds after the subject.</span>
-</span><span id="line-132">    <span class="n">framing</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-133">    <span class="c1">#: Midjourney's ``--ar`` for it.</span>
-</span><span id="line-134">    <span class="n">aspect</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-135">    <span class="c1">#: Who turns the picture into film: ``"ready"`` (the pack uses it as it is) or</span>
-</span><span id="line-136">    <span class="c1">#: what the pipeline owner still has to do with it.</span>
-</span><span id="line-137">    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"ready"</span>
-</span><span id="line-138">    <span class="c1">#: Whether the subject is a person or creature (no ``people`` in --no).</span>
-</span><span id="line-139">    <span class="n">has_figures</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+</span><span id="line-126"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-127"><span class="k">class</span><span class="w"> </span><span class="nc">ArtKind</span><span class="p">:</span>
+</span><span id="line-128"><span class="w">    </span><span class="sd">"""One kind of art a production pack can carry."""</span>
+</span><span id="line-129">
+</span><span id="line-130">    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-131">    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-132">    <span class="c1">#: Where the file goes in the pack.</span>
+</span><span id="line-133">    <span class="n">goes_to</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-134">    <span class="c1">#: Size and aspect, at the default 1280x720 frame.</span>
+</span><span id="line-135">    <span class="n">canvas</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-136">    <span class="c1">#: ``"opaque"`` or ``"transparent"`` (or a plain flat colour cut out afterwards).</span>
+</span><span id="line-137">    <span class="n">background</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-138">    <span class="c1">#: What the picture must show, and must not.</span>
+</span><span id="line-139">    <span class="n">content</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span><span id="line-140">    <span class="c1">#: The words a generator prompt adds after the subject.</span>
+</span><span id="line-141">    <span class="n">framing</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-142">    <span class="c1">#: Midjourney's ``--ar`` for it.</span>
+</span><span id="line-143">    <span class="n">aspect</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-144">    <span class="c1">#: Who turns the picture into film: ``"ready"`` (the pack uses it as it is) or</span>
+</span><span id="line-145">    <span class="c1">#: what the pipeline owner still has to do with it.</span>
+</span><span id="line-146">    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"ready"</span>
+</span><span id="line-147">    <span class="c1">#: Whether the subject is a person or creature (no ``people`` in --no).</span>
+</span><span id="line-148">    <span class="n">has_figures</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-</span><span id="line-140">
-</span><span id="line-141">
-</span><span id="line-142"><span class="n">_PLATE_FILES</span> <span class="o">=</span> <span class="s2">"assets/environments/&lt;set&gt;/plates/&lt;layer&gt;.png (or .jpg; an image plane in meta.json)"</span>
-</span><span id="line-143">
-</span><span id="line-144"><span class="n">ART_KINDS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ArtKind</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-145">    <span class="n">k</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="n">k</span>
-</span><span id="line-146">    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span>
-</span><span id="line-147">        <span class="n">ArtKind</span><span class="p">(</span>
-</span><span id="line-148">            <span class="n">key</span><span class="o">=</span><span class="s2">"sky"</span><span class="p">,</span>
-</span><span id="line-149">            <span class="n">title</span><span class="o">=</span><span class="s2">"Sky (the farthest plate)"</span><span class="p">,</span>
-</span><span id="line-150">            <span class="n">goes_to</span><span class="o">=</span><span class="n">_PLATE_FILES</span><span class="p">,</span>
-</span><span id="line-151">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"16:9, at least 1920x1080; the camera barely moves it (depth 0 to 0.2)"</span><span class="p">,</span>
-</span><span id="line-152">            <span class="n">background</span><span class="o">=</span><span class="s2">"opaque"</span><span class="p">,</span>
-</span><span id="line-153">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-154">                <span class="s2">"sky only: its colours, clouds, sun or moon, stars"</span><span class="p">,</span>
-</span><span id="line-155">                <span class="s2">"no ground, buildings or horizon objects: those are the next layers"</span><span class="p">,</span>
-</span><span id="line-156">            <span class="p">),</span>
-</span><span id="line-157">            <span class="n">framing</span><span class="o">=</span><span class="s2">"An empty sky filling the whole frame, no ground, no horizon, "</span>
-</span><span id="line-158">            <span class="s2">"no buildings, no people, no text"</span><span class="p">,</span>
-</span><span id="line-159">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"16:9"</span><span class="p">,</span>
-</span><span id="line-160">        <span class="p">),</span>
-</span><span id="line-161">        <span class="n">ArtKind</span><span class="p">(</span>
-</span><span id="line-162">            <span class="n">key</span><span class="o">=</span><span class="s2">"far"</span><span class="p">,</span>
-</span><span id="line-163">            <span class="n">title</span><span class="o">=</span><span class="s2">"Far layer (distant hills, skyline, sea)"</span><span class="p">,</span>
-</span><span id="line-164">            <span class="n">goes_to</span><span class="o">=</span><span class="n">_PLATE_FILES</span><span class="p">,</span>
-</span><span id="line-165">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"wide: about 2560x1080 (21:9), wider still when the camera pans; "</span>
-</span><span id="line-166">            <span class="s2">"parallax depth about 0.4"</span><span class="p">,</span>
-</span><span id="line-167">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent above its top edge, so the sky shows through "</span>
-</span><span id="line-168">            <span class="s2">"(or a plain flat colour there, cut out afterwards)"</span><span class="p">,</span>
-</span><span id="line-169">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-170">                <span class="s2">"only what is far away, as one band across the whole width"</span><span class="p">,</span>
-</span><span id="line-171">                <span class="s2">"the horizon at the same height from left to right"</span><span class="p">,</span>
-</span><span id="line-172">        <span class="p">),</span>
-</span><span id="line-173">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A wide horizontal band of distant scenery across the whole "</span>
-</span><span id="line-174">            <span class="s2">"width, horizon level and at the same height throughout, nothing in the "</span>
-</span><span id="line-175">            <span class="s2">"foreground, no people, empty plain flat white sky above it, no text"</span><span class="p">,</span>
-</span><span id="line-176">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"21:9"</span><span class="p">,</span>
-</span><span id="line-177">            <span class="n">status</span><span class="o">=</span><span class="s2">"ready if its background is transparent; a flat background is "</span>
-</span><span id="line-178">            <span class="s2">"cut out by the pipeline owner first (cutan.carve)"</span><span class="p">,</span>
-</span><span id="line-179">        <span class="p">),</span>
-</span><span id="line-180">        <span class="n">ArtKind</span><span class="p">(</span>
-</span><span id="line-181">            <span class="n">key</span><span class="o">=</span><span class="s2">"mid"</span><span class="p">,</span>
-</span><span id="line-182">            <span class="n">title</span><span class="o">=</span><span class="s2">"Mid layer (the set the characters stand in)"</span><span class="p">,</span>
-</span><span id="line-183">            <span class="n">goes_to</span><span class="o">=</span><span class="n">_PLATE_FILES</span><span class="p">,</span>
-</span><span id="line-184">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"wide: about 2560x1080 (21:9), enough to cover the frame and the "</span>
-</span><span id="line-185">            <span class="s2">"camera's pan; depth 1 (moves with the characters)"</span><span class="p">,</span>
-</span><span id="line-186">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent where the far layer and sky should show"</span><span class="p">,</span>
-</span><span id="line-187">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-188">                <span class="s2">"the street, room or landscape the characters stand in, at their scale"</span><span class="p">,</span>
-</span><span id="line-189">                <span class="s2">"the floor line about three-quarters of the way down"</span><span class="p">,</span>
-</span><span id="line-190">                <span class="s2">"the middle third left quiet: the characters stand and talk there"</span><span class="p">,</span>
-</span><span id="line-191">                <span class="s2">"no characters in it"</span><span class="p">,</span>
-</span><span id="line-192">        <span class="p">),</span>
-</span><span id="line-193">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A stage-like set seen straight on at eye level, the floor line "</span>
-</span><span id="line-194">            <span class="s2">"three-quarters of the way down, the centre left open and uncluttered for "</span>
-</span><span id="line-195">            <span class="s2">"characters, no people, no animals, no text"</span><span class="p">,</span>
-</span><span id="line-196">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"21:9"</span><span class="p">,</span>
-</span><span id="line-197">            <span class="n">status</span><span class="o">=</span><span class="s2">"ready if its background is transparent; a flat background is "</span>
-</span><span id="line-198">            <span class="s2">"cut out by the pipeline owner first (cutan.carve)"</span><span class="p">,</span>
-</span><span id="line-199">        <span class="p">),</span>
-</span><span id="line-200">        <span class="n">ArtKind</span><span class="p">(</span>
-</span><span id="line-201">            <span class="n">key</span><span class="o">=</span><span class="s2">"near"</span><span class="p">,</span>
-</span><span id="line-202">            <span class="n">title</span><span class="o">=</span><span class="s2">"Near layer (foreground in front of the characters)"</span><span class="p">,</span>
-</span><span id="line-203">            <span class="n">goes_to</span><span class="o">=</span><span class="n">_PLATE_FILES</span> <span class="o">+</span> <span class="s2">"; listed after the environment's characters_after plane"</span><span class="p">,</span>
-</span><span id="line-204">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"the frame's width or wider (16:9 or 21:9)"</span><span class="p">,</span>
-</span><span id="line-205">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent everywhere except the foreground object"</span><span class="p">,</span>
-</span><span id="line-206">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-207">                <span class="s2">"what is in front of the characters: a railing, a bush, a counter, "</span>
-</span><span id="line-208">                <span class="s2">"a car's dashboard and window frames"</span><span class="p">,</span>
-</span><span id="line-209">                <span class="s2">"kept to the edges and bottom of the frame so it does not hide faces"</span><span class="p">,</span>
-</span><span id="line-210">        <span class="p">),</span>
-</span><span id="line-211">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A foreground element along the bottom edge of the frame, the "</span>
-</span><span id="line-212">            <span class="s2">"rest of the picture plain flat white and empty, seen straight on, no "</span>
-</span><span id="line-213">            <span class="s2">"people, no text"</span><span class="p">,</span>
-</span><span id="line-214">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"16:9"</span><span class="p">,</span>
-</span><span id="line-215">            <span class="n">status</span><span class="o">=</span><span class="s2">"ready if its background is transparent; a flat background is "</span>
-</span><span id="line-216">            <span class="s2">"cut out by the pipeline owner first (cutan.carve)"</span><span class="p">,</span>
-</span><span id="line-217">        <span class="p">),</span>
-</span><span id="line-218">        <span class="n">ArtKind</span><span class="p">(</span>
-</span><span id="line-219">            <span class="n">key</span><span class="o">=</span><span class="s2">"window_view"</span><span class="p">,</span>
-</span><span id="line-220">            <span class="n">title</span><span class="o">=</span><span class="s2">"The view behind a car (or a train, a moving window)"</span><span class="p">,</span>
-</span><span id="line-221">            <span class="n">goes_to</span><span class="o">=</span><span class="n">_PLATE_FILES</span> <span class="o">+</span> <span class="s2">"; its own plate, behind the vehicle's interior plate"</span><span class="p">,</span>
-</span><span id="line-222">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"a long strip, 3 to 4 frames wide (about 5000x1080), so it can "</span>
-</span><span id="line-223">            <span class="s2">"scroll past the windows for the whole shot"</span><span class="p">,</span>
-</span><span id="line-224">            <span class="n">background</span><span class="o">=</span><span class="s2">"opaque"</span><span class="p">,</span>
-</span><span id="line-225">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-226">                <span class="s2">"only the landscape or road seen through the windows: no car parts, "</span>
-</span><span id="line-227">                <span class="s2">"no window frame, no reflections"</span><span class="p">,</span>
-</span><span id="line-228">                <span class="s2">"the horizon at one height along the whole strip; ideally the left "</span>
-</span><span id="line-229">                <span class="s2">"and right ends join so it can loop"</span><span class="p">,</span>
-</span><span id="line-230">                <span class="s2">"the car's interior (seats, dashboard, window frames with the glass "</span>
-</span><span id="line-231">                <span class="s2">"left empty) is a separate near-layer picture"</span><span class="p">,</span>
-</span><span id="line-232">            <span class="p">),</span>
-</span><span id="line-233">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A very wide panoramic strip of roadside landscape seen side-on "</span>
-</span><span id="line-234">            <span class="s2">"from a moving car, horizon level at one height throughout, no car parts, "</span>
-</span><span id="line-235">            <span class="s2">"no window frame, no people, no text"</span><span class="p">,</span>
-</span><span id="line-236">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"4:1"</span><span class="p">,</span>
-</span><span id="line-237">        <span class="p">),</span>
-</span><span id="line-238">        <span class="n">ArtKind</span><span class="p">(</span>
-</span><span id="line-239">            <span class="n">key</span><span class="o">=</span><span class="s2">"prop"</span><span class="p">,</span>
-</span><span id="line-240">            <span class="n">title</span><span class="o">=</span><span class="s2">"A prop (any object a scene shows)"</span><span class="p">,</span>
-</span><span id="line-241">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"assets/props/&lt;prop&gt;/parts/&lt;prop&gt;.png (in prop.json's skin)"</span><span class="p">,</span>
-</span><span id="line-242">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"square, 1024x1024; the object fills the square"</span><span class="p">,</span>
-</span><span id="line-243">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent (or a plain flat white, cut out afterwards)"</span><span class="p">,</span>
-</span><span id="line-244">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-245">                <span class="s2">"one object per picture, whole, not cropped"</span><span class="p">,</span>
-</span><span id="line-246">                <span class="s2">"seen from the angle the scene shows it"</span><span class="p">,</span>
-</span><span id="line-247">                <span class="s2">"no cast shadow on a floor, no hands holding it"</span><span class="p">,</span>
-</span><span id="line-248">                <span class="s2">"moving pieces (a lid, a door) as separate pictures"</span><span class="p">,</span>
-</span><span id="line-249">        <span class="p">),</span>
-</span><span id="line-250">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A single object, whole and centred, filling a square frame, seen "</span>
-</span><span id="line-251">            <span class="s2">"from the angle it is used at, nothing else in the picture, isolated on a "</span>
-</span><span id="line-252">            <span class="s2">"plain flat white background, no cast shadow, no text"</span><span class="p">,</span>
-</span><span id="line-253">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
-</span><span id="line-254">            <span class="n">status</span><span class="o">=</span><span class="s2">"ready if its background is transparent; a flat background is "</span>
-</span><span id="line-255">            <span class="s2">"cut out by the pipeline owner first (cutan.carve)"</span><span class="p">,</span>
-</span><span id="line-256">        <span class="p">),</span>
-</span><span id="line-257">        <span class="n">ArtKind</span><span class="p">(</span>
-</span><span id="line-258">            <span class="n">key</span><span class="o">=</span><span class="s2">"vehicle"</span><span class="p">,</span>
-</span><span id="line-259">            <span class="n">title</span><span class="o">=</span><span class="s2">"A vehicle seen from outside (a car in three-quarter view)"</span><span class="p">,</span>
-</span><span id="line-260">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"assets/props/&lt;car&gt;/parts/&lt;car&gt;.png"</span><span class="p">,</span>
-</span><span id="line-261">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"square, 1024x1024, like any prop; the car fills the width, the space above it empty"</span><span class="p">,</span>
-</span><span id="line-262">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent (or a plain flat white, cut out afterwards)"</span><span class="p">,</span>
-</span><span id="line-263">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-264">                <span class="s2">"the whole vehicle in three-quarter front view, wheels on one level line"</span><span class="p">,</span>
-</span><span id="line-265">                <span class="s2">"nobody inside: windows dark or empty, so characters can be placed"</span><span class="p">,</span>
-</span><span id="line-266">                <span class="s2">"wheels that must turn as separate pictures, seen at the same angle"</span><span class="p">,</span>
-</span><span id="line-267">        <span class="p">),</span>
-</span><span id="line-268">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A whole car in three-quarter front view, filling the width of a "</span>
-</span><span id="line-269">            <span class="s2">"square frame, wheels level, nobody inside, isolated on a plain flat white "</span>
-</span><span id="line-270">            <span class="s2">"background, no road, no cast shadow, no text"</span><span class="p">,</span>
-</span><span id="line-271">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
-</span><span id="line-272">            <span class="n">status</span><span class="o">=</span><span class="s2">"ready if its background is transparent; a flat background is "</span>
-</span><span id="line-273">            <span class="s2">"cut out by the pipeline owner first (cutan.carve)"</span><span class="p">,</span>
-</span><span id="line-274">        <span class="p">),</span>
-</span><span id="line-275">        <span class="n">ArtKind</span><span class="p">(</span>
-</span><span id="line-276">            <span class="n">key</span><span class="o">=</span><span class="s2">"character_sheet"</span><span class="p">,</span>
-</span><span id="line-277">            <span class="n">title</span><span class="o">=</span><span class="s2">"A character reference sheet"</span><span class="p">,</span>
-</span><span id="line-278">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"reference/&lt;name&gt;-sheet.png (a folder the scene does not use; PRODUCTION.md lists it)"</span><span class="p">,</span>
-</span><span id="line-279">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"landscape, about 3000x1500, the views side by side"</span><span class="p">,</span>
-</span><span id="line-280">            <span class="n">background</span><span class="o">=</span><span class="s2">"plain flat white"</span><span class="p">,</span>
-</span><span id="line-281">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-282">                <span class="s2">"the same character in front, three-quarter, side and back views, "</span>
-</span><span id="line-283">                <span class="s2">"full body, at the same scale and in the same light"</span><span class="p">,</span>
-</span><span id="line-284">                <span class="s2">"standing straight, arms hanging a little away from the body, legs a "</span>
-</span><span id="line-285">                <span class="s2">"little apart, so each limb can be cut out"</span><span class="p">,</span>
-</span><span id="line-286">                <span class="s2">"a face sheet on its own: eyes open and closed, and the mouth shapes "</span>
-</span><span id="line-287">                <span class="s2">"(closed, slightly open, wide open, O, E, F/V, M/B/P, L, rest)"</span><span class="p">,</span>
-</span><span id="line-288">                <span class="s2">"no text labels, no props in the hands"</span><span class="p">,</span>
-</span><span id="line-289">            <span class="p">),</span>
-</span><span id="line-290">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A character turnaround sheet: front, three-quarter, side and back "</span>
-</span><span id="line-291">            <span class="s2">"views side by side, full body, same scale and lighting in every view, "</span>
-</span><span id="line-292">            <span class="s2">"standing straight with arms slightly away from the body and legs slightly "</span>
-</span><span id="line-293">            <span class="s2">"apart, plain flat white background, no text, no labels"</span><span class="p">,</span>
-</span><span id="line-294">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"2:1"</span><span class="p">,</span>
-</span><span id="line-295">            <span class="n">status</span><span class="o">=</span><span class="s2">"the pipeline owner cuts it into parts (cutan.carve) and rigs it by "</span>
-</span><span id="line-296">            <span class="s2">"hand: allow for that work (cutan#92)"</span><span class="p">,</span>
-</span><span id="line-297">            <span class="n">has_figures</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="line-298">        <span class="p">),</span>
-</span><span id="line-299">        <span class="n">ArtKind</span><span class="p">(</span>
-</span><span id="line-300">            <span class="n">key</span><span class="o">=</span><span class="s2">"character_parts"</span><span class="p">,</span>
-</span><span id="line-301">            <span class="n">title</span><span class="o">=</span><span class="s2">"Character parts (a puppet in pieces)"</span><span class="p">,</span>
-</span><span id="line-302">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"reference/&lt;name&gt;-parts/&lt;part&gt;.png; the pipeline owner builds the "</span>
-</span><span id="line-303">            <span class="s2">"art package from them (`an character contract`)"</span><span class="p">,</span>
-</span><span id="line-304">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"each part on its own canvas, all at the same scale"</span><span class="p">,</span>
-</span><span id="line-305">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent"</span><span class="p">,</span>
-</span><span id="line-306">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-307">                <span class="s2">"head (no eyes or mouth drawn on it), torso, each arm, each leg; eyes "</span>
-</span><span id="line-308">                <span class="s2">"open and closed; nine mouth shapes"</span><span class="p">,</span>
-</span><span id="line-309">                <span class="s2">"each limb with a little extra at the joint so the pieces overlap"</span><span class="p">,</span>
-</span><span id="line-310">                <span class="s2">"a redrawn part of a factory character must be SVG for now (cutan#92)"</span><span class="p">,</span>
+</span><span id="line-149">
+</span><span id="line-150">
+</span><span id="line-151"><span class="n">_PLATE_FILES</span> <span class="o">=</span> <span class="s2">"assets/environments/&lt;set&gt;/plates/&lt;layer&gt;.png (or .jpg; an image plane in meta.json)"</span>
+</span><span id="line-152">
+</span><span id="line-153"><span class="n">ART_KINDS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ArtKind</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-154">    <span class="n">k</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="n">k</span>
+</span><span id="line-155">    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span>
+</span><span id="line-156">        <span class="n">ArtKind</span><span class="p">(</span>
+</span><span id="line-157">            <span class="n">key</span><span class="o">=</span><span class="s2">"sky"</span><span class="p">,</span>
+</span><span id="line-158">            <span class="n">title</span><span class="o">=</span><span class="s2">"Sky (the farthest plate)"</span><span class="p">,</span>
+</span><span id="line-159">            <span class="n">goes_to</span><span class="o">=</span><span class="n">_PLATE_FILES</span><span class="p">,</span>
+</span><span id="line-160">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"16:9, at least 1920x1080; the camera barely moves it (depth 0 to 0.2)"</span><span class="p">,</span>
+</span><span id="line-161">            <span class="n">background</span><span class="o">=</span><span class="s2">"opaque"</span><span class="p">,</span>
+</span><span id="line-162">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-163">                <span class="s2">"sky only: its colours, clouds, sun or moon, stars"</span><span class="p">,</span>
+</span><span id="line-164">                <span class="s2">"no ground, buildings or horizon objects: those are the next layers"</span><span class="p">,</span>
+</span><span id="line-165">            <span class="p">),</span>
+</span><span id="line-166">            <span class="n">framing</span><span class="o">=</span><span class="s2">"An empty sky filling the whole frame, no ground, no horizon, "</span>
+</span><span id="line-167">            <span class="s2">"no buildings, no people, no text"</span><span class="p">,</span>
+</span><span id="line-168">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"16:9"</span><span class="p">,</span>
+</span><span id="line-169">        <span class="p">),</span>
+</span><span id="line-170">        <span class="n">ArtKind</span><span class="p">(</span>
+</span><span id="line-171">            <span class="n">key</span><span class="o">=</span><span class="s2">"far"</span><span class="p">,</span>
+</span><span id="line-172">            <span class="n">title</span><span class="o">=</span><span class="s2">"Far layer (distant hills, skyline, sea)"</span><span class="p">,</span>
+</span><span id="line-173">            <span class="n">goes_to</span><span class="o">=</span><span class="n">_PLATE_FILES</span><span class="p">,</span>
+</span><span id="line-174">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"wide: about 2560x1080 (21:9), wider still when the camera pans; "</span>
+</span><span id="line-175">            <span class="s2">"parallax depth about 0.4"</span><span class="p">,</span>
+</span><span id="line-176">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent above its top edge, so the sky shows through "</span>
+</span><span id="line-177">            <span class="s2">"(or a plain flat colour there, cut out afterwards)"</span><span class="p">,</span>
+</span><span id="line-178">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-179">                <span class="s2">"only what is far away, as one band across the whole width"</span><span class="p">,</span>
+</span><span id="line-180">                <span class="s2">"the horizon at the same height from left to right"</span><span class="p">,</span>
+</span><span id="line-181">            <span class="p">),</span>
+</span><span id="line-182">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A wide horizontal band of distant scenery across the whole "</span>
+</span><span id="line-183">            <span class="s2">"width, horizon level and at the same height throughout, nothing in the "</span>
+</span><span id="line-184">            <span class="s2">"foreground, no people, empty plain flat white sky above it, no text"</span><span class="p">,</span>
+</span><span id="line-185">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"21:9"</span><span class="p">,</span>
+</span><span id="line-186">            <span class="n">status</span><span class="o">=</span><span class="s2">"ready if its background is transparent; a flat background is "</span>
+</span><span id="line-187">            <span class="s2">"cut out by the pipeline owner first (cutan.carve)"</span><span class="p">,</span>
+</span><span id="line-188">        <span class="p">),</span>
+</span><span id="line-189">        <span class="n">ArtKind</span><span class="p">(</span>
+</span><span id="line-190">            <span class="n">key</span><span class="o">=</span><span class="s2">"mid"</span><span class="p">,</span>
+</span><span id="line-191">            <span class="n">title</span><span class="o">=</span><span class="s2">"Mid layer (the set the characters stand in)"</span><span class="p">,</span>
+</span><span id="line-192">            <span class="n">goes_to</span><span class="o">=</span><span class="n">_PLATE_FILES</span><span class="p">,</span>
+</span><span id="line-193">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"wide: about 2560x1080 (21:9), enough to cover the frame and the "</span>
+</span><span id="line-194">            <span class="s2">"camera's pan; depth 1 (moves with the characters)"</span><span class="p">,</span>
+</span><span id="line-195">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent where the far layer and sky should show"</span><span class="p">,</span>
+</span><span id="line-196">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-197">                <span class="s2">"the street, room or landscape the characters stand in, at their scale"</span><span class="p">,</span>
+</span><span id="line-198">                <span class="s2">"the floor line about three-quarters of the way down"</span><span class="p">,</span>
+</span><span id="line-199">                <span class="s2">"the middle third left quiet: the characters stand and talk there"</span><span class="p">,</span>
+</span><span id="line-200">                <span class="s2">"no characters in it"</span><span class="p">,</span>
+</span><span id="line-201">            <span class="p">),</span>
+</span><span id="line-202">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A stage-like set seen straight on at eye level, the floor line "</span>
+</span><span id="line-203">            <span class="s2">"three-quarters of the way down, the centre left open and uncluttered for "</span>
+</span><span id="line-204">            <span class="s2">"characters, no people, no animals, no text"</span><span class="p">,</span>
+</span><span id="line-205">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"21:9"</span><span class="p">,</span>
+</span><span id="line-206">            <span class="n">status</span><span class="o">=</span><span class="s2">"ready if its background is transparent; a flat background is "</span>
+</span><span id="line-207">            <span class="s2">"cut out by the pipeline owner first (cutan.carve)"</span><span class="p">,</span>
+</span><span id="line-208">        <span class="p">),</span>
+</span><span id="line-209">        <span class="n">ArtKind</span><span class="p">(</span>
+</span><span id="line-210">            <span class="n">key</span><span class="o">=</span><span class="s2">"near"</span><span class="p">,</span>
+</span><span id="line-211">            <span class="n">title</span><span class="o">=</span><span class="s2">"Near layer (foreground in front of the characters)"</span><span class="p">,</span>
+</span><span id="line-212">            <span class="n">goes_to</span><span class="o">=</span><span class="n">_PLATE_FILES</span>
+</span><span id="line-213">            <span class="o">+</span> <span class="s2">"; listed after the environment's characters_after plane"</span><span class="p">,</span>
+</span><span id="line-214">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"the frame's width or wider (16:9 or 21:9)"</span><span class="p">,</span>
+</span><span id="line-215">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent everywhere except the foreground object"</span><span class="p">,</span>
+</span><span id="line-216">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-217">                <span class="s2">"what is in front of the characters: a railing, a bush, a counter, "</span>
+</span><span id="line-218">                <span class="s2">"a car's dashboard and window frames"</span><span class="p">,</span>
+</span><span id="line-219">                <span class="s2">"kept to the edges and bottom of the frame so it does not hide faces"</span><span class="p">,</span>
+</span><span id="line-220">                <span class="s2">"anything around a character (a dashboard, a seat, a steering wheel) "</span>
+</span><span id="line-221">                <span class="s2">"drawn from the camera's viewpoint relative to that character, stated "</span>
+</span><span id="line-222">                <span class="s2">"in the prompt"</span><span class="p">,</span>
+</span><span id="line-223">            <span class="p">),</span>
+</span><span id="line-224">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A foreground element along the bottom edge of the frame, the "</span>
+</span><span id="line-225">            <span class="s2">"rest of the picture plain flat white and empty, seen from &lt;where the "</span>
+</span><span id="line-226">            <span class="s2">"camera is relative to the characters, e.g. in front of the car looking "</span>
+</span><span id="line-227">            <span class="s2">"back at the driver&gt;, no people, no text"</span><span class="p">,</span>
+</span><span id="line-228">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"16:9"</span><span class="p">,</span>
+</span><span id="line-229">            <span class="n">status</span><span class="o">=</span><span class="s2">"ready if its background is transparent; a flat background is "</span>
+</span><span id="line-230">            <span class="s2">"cut out by the pipeline owner first (cutan.carve)"</span><span class="p">,</span>
+</span><span id="line-231">        <span class="p">),</span>
+</span><span id="line-232">        <span class="n">ArtKind</span><span class="p">(</span>
+</span><span id="line-233">            <span class="n">key</span><span class="o">=</span><span class="s2">"window_view"</span><span class="p">,</span>
+</span><span id="line-234">            <span class="n">title</span><span class="o">=</span><span class="s2">"The view through a moving window (a car's rear or side window, a train)"</span><span class="p">,</span>
+</span><span id="line-235">            <span class="n">goes_to</span><span class="o">=</span><span class="n">_PLATE_FILES</span>
+</span><span id="line-236">            <span class="o">+</span> <span class="s2">"; its own plate, behind the vehicle's interior plate"</span><span class="p">,</span>
+</span><span id="line-237">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"16:9, at least 1920x1080 behind a rear window or windscreen (what "</span>
+</span><span id="line-238">            <span class="s2">"is at infinity does not move); a strip 2 to 3 frames wide behind a side "</span>
+</span><span id="line-239">            <span class="s2">"window, for a slow drift"</span><span class="p">,</span>
+</span><span id="line-240">            <span class="n">background</span><span class="o">=</span><span class="s2">"opaque"</span><span class="p">,</span>
+</span><span id="line-241">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-242">                <span class="s2">"only what is effectively at infinity: the sky, the horizon, far "</span>
+</span><span id="line-243">                <span class="s2">"mountains, the sea, a distant skyline"</span><span class="p">,</span>
+</span><span id="line-244">                <span class="s2">"nothing near or in the middle distance: no roadside trees, poles, "</span>
+</span><span id="line-245">                <span class="s2">"fences, road markings or nearby buildings. Those are separate "</span>
+</span><span id="line-246">                <span class="s2">"transparent props (`roadside`) that the scene moves in perspective "</span>
+</span><span id="line-247">                <span class="s2">"(an#484): painted into the plate they stay still while the poles "</span>
+</span><span id="line-248">                <span class="s2">"move, and the shot reads as broken"</span><span class="p">,</span>
+</span><span id="line-249">                <span class="s2">"no car parts, no window frame, no reflections: the car's interior "</span>
+</span><span id="line-250">                <span class="s2">"is a separate near-layer picture with the glass left empty"</span><span class="p">,</span>
+</span><span id="line-251">            <span class="p">),</span>
+</span><span id="line-252">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A distant landscape seen far away: the sky and the horizon with "</span>
+</span><span id="line-253">            <span class="s2">"far mountains, empty flat land or calm sea stretching to the horizon, "</span>
+</span><span id="line-254">            <span class="s2">"everything small and far, nothing in the foreground or the middle "</span>
+</span><span id="line-255">            <span class="s2">"distance, no trees, no poles, no fences, no road, no buildings, no car "</span>
+</span><span id="line-256">            <span class="s2">"parts, no window frame, no people, no text"</span><span class="p">,</span>
+</span><span id="line-257">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"16:9"</span><span class="p">,</span>
+</span><span id="line-258">        <span class="p">),</span>
+</span><span id="line-259">        <span class="n">ArtKind</span><span class="p">(</span>
+</span><span id="line-260">            <span class="n">key</span><span class="o">=</span><span class="s2">"roadside"</span><span class="p">,</span>
+</span><span id="line-261">            <span class="n">title</span><span class="o">=</span><span class="s2">"Roadside objects for a moving view (a tree, a pole, a fence, a road dash)"</span><span class="p">,</span>
+</span><span id="line-262">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"assets/props/&lt;object&gt;/parts/&lt;object&gt;.png, one prop per object"</span><span class="p">,</span>
+</span><span id="line-263">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"square, 1024x1024, like any prop; the object standing on the bottom edge"</span><span class="p">,</span>
+</span><span id="line-264">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent (or a plain flat white, cut out afterwards)"</span><span class="p">,</span>
+</span><span id="line-265">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-266">                <span class="s2">"one object per picture, whole, upright, its base on the bottom edge"</span><span class="p">,</span>
+</span><span id="line-267">                <span class="s2">"seen from the angle the window sees it: side-on through a side "</span>
+</span><span id="line-268">                <span class="s2">"window; from the road, straight on, through a rear window or "</span>
+</span><span id="line-269">                <span class="s2">"windscreen"</span><span class="p">,</span>
+</span><span id="line-270">                <span class="s2">"two or three variants of what repeats (trees of different shapes) "</span>
+</span><span id="line-271">                <span class="s2">"so the stream does not look stamped"</span><span class="p">,</span>
+</span><span id="line-272">                <span class="s2">"no ground under it, no cast shadow"</span><span class="p">,</span>
+</span><span id="line-273">            <span class="p">),</span>
+</span><span id="line-274">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A single roadside object standing upright, whole and centred "</span>
+</span><span id="line-275">            <span class="s2">"with its base on the bottom edge of a square frame, seen from the road "</span>
+</span><span id="line-276">            <span class="s2">"at eye level, isolated on a plain flat white background, no ground, no "</span>
+</span><span id="line-277">            <span class="s2">"cast shadow, no text"</span><span class="p">,</span>
+</span><span id="line-278">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
+</span><span id="line-279">            <span class="n">status</span><span class="o">=</span><span class="s2">"the scene moves each one past the window in perspective (written "</span>
+</span><span id="line-280">            <span class="s2">"as moves in scene.md today; a declarative travelling view is an#484)"</span><span class="p">,</span>
+</span><span id="line-281">        <span class="p">),</span>
+</span><span id="line-282">        <span class="n">ArtKind</span><span class="p">(</span>
+</span><span id="line-283">            <span class="n">key</span><span class="o">=</span><span class="s2">"prop"</span><span class="p">,</span>
+</span><span id="line-284">            <span class="n">title</span><span class="o">=</span><span class="s2">"A prop (any object a scene shows)"</span><span class="p">,</span>
+</span><span id="line-285">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"assets/props/&lt;prop&gt;/parts/&lt;prop&gt;.png (in prop.json's skin)"</span><span class="p">,</span>
+</span><span id="line-286">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"square, 1024x1024; the object fills the square"</span><span class="p">,</span>
+</span><span id="line-287">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent (or a plain flat white, cut out afterwards)"</span><span class="p">,</span>
+</span><span id="line-288">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-289">                <span class="s2">"one object per picture, whole, not cropped"</span><span class="p">,</span>
+</span><span id="line-290">                <span class="s2">"seen from the angle the scene shows it"</span><span class="p">,</span>
+</span><span id="line-291">                <span class="s2">"no cast shadow on a floor, no hands holding it"</span><span class="p">,</span>
+</span><span id="line-292">                <span class="s2">"moving pieces (a lid, a door) as separate pictures"</span><span class="p">,</span>
+</span><span id="line-293">            <span class="p">),</span>
+</span><span id="line-294">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A single object, whole and centred, filling a square frame, seen "</span>
+</span><span id="line-295">            <span class="s2">"from the angle it is used at, nothing else in the picture, isolated on a "</span>
+</span><span id="line-296">            <span class="s2">"plain flat white background, no cast shadow, no text"</span><span class="p">,</span>
+</span><span id="line-297">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
+</span><span id="line-298">            <span class="n">status</span><span class="o">=</span><span class="s2">"ready if its background is transparent; a flat background is "</span>
+</span><span id="line-299">            <span class="s2">"cut out by the pipeline owner first (cutan.carve)"</span><span class="p">,</span>
+</span><span id="line-300">        <span class="p">),</span>
+</span><span id="line-301">        <span class="n">ArtKind</span><span class="p">(</span>
+</span><span id="line-302">            <span class="n">key</span><span class="o">=</span><span class="s2">"vehicle"</span><span class="p">,</span>
+</span><span id="line-303">            <span class="n">title</span><span class="o">=</span><span class="s2">"A vehicle seen from outside (a car in three-quarter view)"</span><span class="p">,</span>
+</span><span id="line-304">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"assets/props/&lt;car&gt;/parts/&lt;car&gt;.png"</span><span class="p">,</span>
+</span><span id="line-305">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"square, 1024x1024, like any prop; the car fills the width, the space above it empty"</span><span class="p">,</span>
+</span><span id="line-306">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent (or a plain flat white, cut out afterwards)"</span><span class="p">,</span>
+</span><span id="line-307">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-308">                <span class="s2">"the whole vehicle in three-quarter front view, wheels on one level line"</span><span class="p">,</span>
+</span><span id="line-309">                <span class="s2">"nobody inside: windows dark or empty, so characters can be placed"</span><span class="p">,</span>
+</span><span id="line-310">                <span class="s2">"wheels that must turn as separate pictures, seen at the same angle"</span><span class="p">,</span>
 </span><span id="line-311">            <span class="p">),</span>
-</span><span id="line-312">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A single body part of a cut-out puppet, isolated on a plain flat "</span>
-</span><span id="line-313">            <span class="s2">"white background, flat even lighting, no text"</span><span class="p">,</span>
-</span><span id="line-314">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
-</span><span id="line-315">            <span class="n">status</span><span class="o">=</span><span class="s2">"the pipeline owner assembles the art package (character.json)"</span><span class="p">,</span>
-</span><span id="line-316">            <span class="n">has_figures</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="line-317">        <span class="p">),</span>
-</span><span id="line-318">        <span class="n">ArtKind</span><span class="p">(</span>
-</span><span id="line-319">            <span class="n">key</span><span class="o">=</span><span class="s2">"costume"</span><span class="p">,</span>
-</span><span id="line-320">            <span class="n">title</span><span class="o">=</span><span class="s2">"A costume"</span><span class="p">,</span>
-</span><span id="line-321">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"reference/&lt;name&gt;-costume.png, or on the reference sheet; colours in PRODUCTION.md"</span><span class="p">,</span>
-</span><span id="line-322">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"as the reference sheet, or close-ups at 1024x1024"</span><span class="p">,</span>
-</span><span id="line-323">            <span class="n">background</span><span class="o">=</span><span class="s2">"plain flat white"</span><span class="p">,</span>
-</span><span id="line-324">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-325">                <span class="s2">"for a factory character: the colours by name or hex for the "</span>
-</span><span id="line-326">                <span class="s2">"clothing, accessory and legs (the cast line's --palette)"</span><span class="p">,</span>
-</span><span id="line-327">                <span class="s2">"for a drawn character: the costume on the reference sheet, with "</span>
-</span><span id="line-328">                <span class="s2">"close-ups of a hat, a pattern or a badge"</span><span class="p">,</span>
-</span><span id="line-329">                <span class="s2">"a costume change is a second reference sheet"</span><span class="p">,</span>
-</span><span id="line-330">            <span class="p">),</span>
-</span><span id="line-331">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A costume design sheet: the outfit laid out flat from the front, "</span>
-</span><span id="line-332">            <span class="s2">"with close-ups of its details, plain flat white background, no text"</span><span class="p">,</span>
-</span><span id="line-333">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
-</span><span id="line-334">            <span class="n">status</span><span class="o">=</span><span class="s2">"the pipeline owner applies it"</span><span class="p">,</span>
-</span><span id="line-335">        <span class="p">),</span>
-</span><span id="line-336">    <span class="p">)</span>
-</span><span id="line-337"><span class="p">}</span>
-</span><span id="line-338">
-</span><span id="line-339">
+</span><span id="line-312">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A whole car in three-quarter front view, filling the width of a "</span>
+</span><span id="line-313">            <span class="s2">"square frame, wheels level, nobody inside, isolated on a plain flat white "</span>
+</span><span id="line-314">            <span class="s2">"background, no road, no cast shadow, no text"</span><span class="p">,</span>
+</span><span id="line-315">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
+</span><span id="line-316">            <span class="n">status</span><span class="o">=</span><span class="s2">"ready if its background is transparent; a flat background is "</span>
+</span><span id="line-317">            <span class="s2">"cut out by the pipeline owner first (cutan.carve)"</span><span class="p">,</span>
+</span><span id="line-318">        <span class="p">),</span>
+</span><span id="line-319">        <span class="n">ArtKind</span><span class="p">(</span>
+</span><span id="line-320">            <span class="n">key</span><span class="o">=</span><span class="s2">"character_sheet"</span><span class="p">,</span>
+</span><span id="line-321">            <span class="n">title</span><span class="o">=</span><span class="s2">"A character reference sheet"</span><span class="p">,</span>
+</span><span id="line-322">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"reference/&lt;name&gt;-sheet.png (a folder the scene does not use; PRODUCTION.md lists it)"</span><span class="p">,</span>
+</span><span id="line-323">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"landscape, about 3000x1500, the views side by side"</span><span class="p">,</span>
+</span><span id="line-324">            <span class="n">background</span><span class="o">=</span><span class="s2">"plain flat white"</span><span class="p">,</span>
+</span><span id="line-325">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-326">                <span class="s2">"the same character in front, three-quarter, side and back views, "</span>
+</span><span id="line-327">                <span class="s2">"full body, at the same scale and in the same light"</span><span class="p">,</span>
+</span><span id="line-328">                <span class="s2">"standing straight, arms hanging a little away from the body, legs a "</span>
+</span><span id="line-329">                <span class="s2">"little apart, so each limb can be cut out"</span><span class="p">,</span>
+</span><span id="line-330">                <span class="s2">"a face sheet on its own: eyes open and closed, and the mouth shapes "</span>
+</span><span id="line-331">                <span class="s2">"(closed, slightly open, wide open, O, E, F/V, M/B/P, L, rest)"</span><span class="p">,</span>
+</span><span id="line-332">                <span class="s2">"no text labels, no props in the hands"</span><span class="p">,</span>
+</span><span id="line-333">            <span class="p">),</span>
+</span><span id="line-334">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A character turnaround sheet: front, three-quarter, side and back "</span>
+</span><span id="line-335">            <span class="s2">"views side by side, full body, same scale and lighting in every view, "</span>
+</span><span id="line-336">            <span class="s2">"standing straight with arms slightly away from the body and legs slightly "</span>
+</span><span id="line-337">            <span class="s2">"apart, plain flat white background, no text, no labels"</span><span class="p">,</span>
+</span><span id="line-338">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"2:1"</span><span class="p">,</span>
+</span><span id="line-339">            <span class="n">status</span><span class="o">=</span><span class="s2">"the pipeline owner cuts it into parts (cutan.carve) and rigs it by "</span>
+</span><span id="line-340">            <span class="s2">"hand: allow for that work (cutan#92)"</span><span class="p">,</span>
+</span><span id="line-341">            <span class="n">has_figures</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="line-342">        <span class="p">),</span>
+</span><span id="line-343">        <span class="n">ArtKind</span><span class="p">(</span>
+</span><span id="line-344">            <span class="n">key</span><span class="o">=</span><span class="s2">"character_parts"</span><span class="p">,</span>
+</span><span id="line-345">            <span class="n">title</span><span class="o">=</span><span class="s2">"Character parts (a puppet in pieces)"</span><span class="p">,</span>
+</span><span id="line-346">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"reference/&lt;name&gt;-parts/&lt;part&gt;.png; the pipeline owner builds the "</span>
+</span><span id="line-347">            <span class="s2">"art package from them (`an character contract`)"</span><span class="p">,</span>
+</span><span id="line-348">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"each part on its own canvas, all at the same scale"</span><span class="p">,</span>
+</span><span id="line-349">            <span class="n">background</span><span class="o">=</span><span class="s2">"transparent"</span><span class="p">,</span>
+</span><span id="line-350">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-351">                <span class="s2">"head (no eyes or mouth drawn on it), torso, each arm, each leg; eyes "</span>
+</span><span id="line-352">                <span class="s2">"open and closed; nine mouth shapes"</span><span class="p">,</span>
+</span><span id="line-353">                <span class="s2">"each limb with a little extra at the joint so the pieces overlap"</span><span class="p">,</span>
+</span><span id="line-354">                <span class="s2">"a redrawn part of a factory character must be SVG for now (cutan#92)"</span><span class="p">,</span>
+</span><span id="line-355">            <span class="p">),</span>
+</span><span id="line-356">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A single body part of a cut-out puppet, isolated on a plain flat "</span>
+</span><span id="line-357">            <span class="s2">"white background, flat even lighting, no text"</span><span class="p">,</span>
+</span><span id="line-358">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
+</span><span id="line-359">            <span class="n">status</span><span class="o">=</span><span class="s2">"the pipeline owner assembles the art package (character.json)"</span><span class="p">,</span>
+</span><span id="line-360">            <span class="n">has_figures</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="line-361">        <span class="p">),</span>
+</span><span id="line-362">        <span class="n">ArtKind</span><span class="p">(</span>
+</span><span id="line-363">            <span class="n">key</span><span class="o">=</span><span class="s2">"costume"</span><span class="p">,</span>
+</span><span id="line-364">            <span class="n">title</span><span class="o">=</span><span class="s2">"A costume"</span><span class="p">,</span>
+</span><span id="line-365">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"reference/&lt;name&gt;-costume.png, or on the reference sheet; colours in PRODUCTION.md"</span><span class="p">,</span>
+</span><span id="line-366">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"as the reference sheet, or close-ups at 1024x1024"</span><span class="p">,</span>
+</span><span id="line-367">            <span class="n">background</span><span class="o">=</span><span class="s2">"plain flat white"</span><span class="p">,</span>
+</span><span id="line-368">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-369">                <span class="s2">"for a factory character: the colours by name or hex for the "</span>
+</span><span id="line-370">                <span class="s2">"clothing, accessory and legs (the cast line's --palette)"</span><span class="p">,</span>
+</span><span id="line-371">                <span class="s2">"for a drawn character: the costume on the reference sheet, with "</span>
+</span><span id="line-372">                <span class="s2">"close-ups of a hat, a pattern or a badge"</span><span class="p">,</span>
+</span><span id="line-373">                <span class="s2">"a costume change is a second reference sheet"</span><span class="p">,</span>
+</span><span id="line-374">            <span class="p">),</span>
+</span><span id="line-375">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A costume design sheet: the outfit laid out flat from the front, "</span>
+</span><span id="line-376">            <span class="s2">"with close-ups of its details, plain flat white background, no text"</span><span class="p">,</span>
+</span><span id="line-377">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
+</span><span id="line-378">            <span class="n">status</span><span class="o">=</span><span class="s2">"the pipeline owner applies it"</span><span class="p">,</span>
+</span><span id="line-379">        <span class="p">),</span>
+</span><span id="line-380">    <span class="p">)</span>
+</span><span id="line-381"><span class="p">}</span>
+</span><span id="line-382">
+</span><span id="line-383">
 <div class="viewcode-block" id="style_look">
 <a class="viewcode-back" href="../../_autosummary/cutan.art_brief.html#cutan.art_brief.style_look">[docs]</a>
-</span><span id="line-340"><span class="k">def</span><span class="w"> </span><span class="nf">style_look</span><span class="p">(</span><span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-341"><span class="w">    </span><span class="sd">"""A style's look in words, for a prompt (``guidance.image_prompt`` of its spec).</span>
-</span><span id="line-342">
-</span><span id="line-343"><span class="sd">    ``style`` is a style's name, a spec mapping, or ``None`` (the writer's own look).</span>
-</span><span id="line-344">
-</span><span id="line-345"><span class="sd">    &gt;&gt;&gt; style_look("reiniger").startswith("black paper silhouette")</span>
-</span><span id="line-346"><span class="sd">    True</span>
-</span><span id="line-347"><span class="sd">    &gt;&gt;&gt; style_look(None)</span>
-</span><span id="line-348"><span class="sd">    '&lt;your look in words: medium, colours, line, texture&gt;'</span>
-</span><span id="line-349"><span class="sd">    """</span>
-</span><span id="line-350">    <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-351">        <span class="k">return</span> <span class="s2">"&lt;your look in words: medium, colours, line, texture&gt;"</span>
-</span><span id="line-352">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_style_spec</span>
-</span><span id="line-353">
-</span><span id="line-354">    <span class="n">spec</span> <span class="o">=</span> <span class="n">resolve_style_spec</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
-</span><span id="line-355">    <span class="n">look</span> <span class="o">=</span> <span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"guidance"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"image_prompt"</span><span class="p">)</span>
-</span><span id="line-356">    <span class="k">if</span> <span class="ow">not</span> <span class="n">look</span><span class="p">:</span>
-</span><span id="line-357">        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"style </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'style'</span><span class="p">)</span><span class="si">!r}</span><span class="s2"> has no guidance.image_prompt"</span><span class="p">)</span>
-</span><span id="line-358">    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">look</span><span class="p">)</span></div>
+</span><span id="line-384"><span class="k">def</span><span class="w"> </span><span class="nf">style_look</span><span class="p">(</span><span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-385"><span class="w">    </span><span class="sd">"""A style's look in words, for a prompt (``guidance.image_prompt`` of its spec).</span>
+</span><span id="line-386">
+</span><span id="line-387"><span class="sd">    ``style`` is a style's name, a spec mapping, or ``None`` (the writer's own look).</span>
+</span><span id="line-388">
+</span><span id="line-389"><span class="sd">    &gt;&gt;&gt; style_look("reiniger").startswith("black paper silhouette")</span>
+</span><span id="line-390"><span class="sd">    True</span>
+</span><span id="line-391"><span class="sd">    &gt;&gt;&gt; style_look(None)</span>
+</span><span id="line-392"><span class="sd">    '&lt;your look in words: medium, colours, line, texture&gt;'</span>
+</span><span id="line-393"><span class="sd">    """</span>
+</span><span id="line-394">    <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-395">        <span class="k">return</span> <span class="s2">"&lt;your look in words: medium, colours, line, texture&gt;"</span>
+</span><span id="line-396">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_style_spec</span>
+</span><span id="line-397">
+</span><span id="line-398">    <span class="n">spec</span> <span class="o">=</span> <span class="n">resolve_style_spec</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+</span><span id="line-399">    <span class="n">look</span> <span class="o">=</span> <span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"guidance"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"image_prompt"</span><span class="p">)</span>
+</span><span id="line-400">    <span class="k">if</span> <span class="ow">not</span> <span class="n">look</span><span class="p">:</span>
+</span><span id="line-401">        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"style </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'style'</span><span class="p">)</span><span class="si">!r}</span><span class="s2"> has no guidance.image_prompt"</span><span class="p">)</span>
+</span><span id="line-402">    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">look</span><span class="p">)</span></div>
 
-</span><span id="line-359">
-</span><span id="line-360">
+</span><span id="line-403">
+</span><span id="line-404">
 <div class="viewcode-block" id="image_prompt">
 <a class="viewcode-back" href="../../_autosummary/cutan.art_brief.html#cutan.art_brief.image_prompt">[docs]</a>
-</span><span id="line-361"><span class="k">def</span><span class="w"> </span><span class="nf">image_prompt</span><span class="p">(</span>
-</span><span id="line-362">    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-363">    <span class="n">subject</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-364">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-365">    <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-366">    <span class="n">tool</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-367"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-368"><span class="w">    </span><span class="sd">"""A prompt to paste into an image generator for one piece of art.</span>
-</span><span id="line-369">
-</span><span id="line-370"><span class="sd">    kind: a key of :data:`ART_KINDS`</span>
-</span><span id="line-371"><span class="sd">    subject: what the picture is of, in the writer's words</span>
-</span><span id="line-372"><span class="sd">    style: a style name or spec (its look in words), or ``None`` for a placeholder</span>
-</span><span id="line-373"><span class="sd">    tool: ``"midjourney"`` appends its ``--ar`` and ``--no`` flags; ``"flux"``</span>
-</span><span id="line-374"><span class="sd">        drops the ``no ...`` words; any other tool takes the plain prompt (see</span>
-</span><span id="line-375"><span class="sd">        :data:`GENERATOR_TIPS`)</span>
-</span><span id="line-376"><span class="sd">    """</span>
-</span><span id="line-377">    <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ART_KINDS</span><span class="p">:</span>
-</span><span id="line-378">        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no art kind </span><span class="si">{</span><span class="n">kind</span><span class="si">!r}</span><span class="s2">; the kinds are: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ART_KINDS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-379">    <span class="n">k</span> <span class="o">=</span> <span class="n">ART_KINDS</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span>
-</span><span id="line-380">    <span class="n">framing</span><span class="p">,</span> <span class="n">look</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">framing</span><span class="p">,</span> <span class="n">style_look</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
-</span><span id="line-381">    <span class="k">if</span> <span class="n">tool</span> <span class="o">==</span> <span class="s2">"flux"</span><span class="p">:</span>  <span class="c1"># naming what is unwanted tends to add it</span>
-</span><span id="line-382">        <span class="n">framing</span><span class="p">,</span> <span class="n">look</span> <span class="o">=</span> <span class="n">_positive</span><span class="p">(</span><span class="n">framing</span><span class="p">),</span> <span class="n">_positive</span><span class="p">(</span><span class="n">look</span><span class="p">)</span>
-</span><span id="line-383">    <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">subject</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">framing</span><span class="si">}</span><span class="s2">. Look: </span><span class="si">{</span><span class="n">look</span><span class="si">}</span><span class="s2">."</span>
-</span><span id="line-384">    <span class="k">if</span> <span class="n">tool</span> <span class="o">==</span> <span class="s2">"midjourney"</span><span class="p">:</span>
-</span><span id="line-385">        <span class="n">no</span> <span class="o">=</span> <span class="n">_NO</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">has_figures</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_NO</span><span class="si">}</span><span class="s2">, people"</span>
-</span><span id="line-386">        <span class="n">text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">" --ar </span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">aspect</span><span class="si">}</span><span class="s2"> --no </span><span class="si">{</span><span class="n">no</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-387">    <span class="k">return</span> <span class="n">text</span></div>
+</span><span id="line-405"><span class="k">def</span><span class="w"> </span><span class="nf">image_prompt</span><span class="p">(</span>
+</span><span id="line-406">    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-407">    <span class="n">subject</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-408">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-409">    <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-410">    <span class="n">tool</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-411"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-412"><span class="w">    </span><span class="sd">"""A prompt to paste into an image generator for one piece of art.</span>
+</span><span id="line-413">
+</span><span id="line-414"><span class="sd">    kind: a key of :data:`ART_KINDS`</span>
+</span><span id="line-415"><span class="sd">    subject: what the picture is of, in the writer's words</span>
+</span><span id="line-416"><span class="sd">    style: a style name or spec (its look in words), or ``None`` for a placeholder</span>
+</span><span id="line-417"><span class="sd">    tool: ``"midjourney"`` appends its ``--ar`` and ``--no`` flags; ``"flux"``</span>
+</span><span id="line-418"><span class="sd">        drops the ``no ...`` words; any other tool takes the plain prompt (see</span>
+</span><span id="line-419"><span class="sd">        :data:`GENERATOR_TIPS`)</span>
+</span><span id="line-420"><span class="sd">    """</span>
+</span><span id="line-421">    <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ART_KINDS</span><span class="p">:</span>
+</span><span id="line-422">        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no art kind </span><span class="si">{</span><span class="n">kind</span><span class="si">!r}</span><span class="s2">; the kinds are: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ART_KINDS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-423">    <span class="n">k</span> <span class="o">=</span> <span class="n">ART_KINDS</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span>
+</span><span id="line-424">    <span class="n">framing</span><span class="p">,</span> <span class="n">look</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">framing</span><span class="p">,</span> <span class="n">style_look</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+</span><span id="line-425">    <span class="k">if</span> <span class="n">tool</span> <span class="o">==</span> <span class="s2">"flux"</span><span class="p">:</span>  <span class="c1"># naming what is unwanted tends to add it</span>
+</span><span id="line-426">        <span class="n">framing</span><span class="p">,</span> <span class="n">look</span> <span class="o">=</span> <span class="n">_positive</span><span class="p">(</span><span class="n">framing</span><span class="p">),</span> <span class="n">_positive</span><span class="p">(</span><span class="n">look</span><span class="p">)</span>
+</span><span id="line-427">    <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">subject</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">framing</span><span class="si">}</span><span class="s2">. Look: </span><span class="si">{</span><span class="n">look</span><span class="si">}</span><span class="s2">."</span>
+</span><span id="line-428">    <span class="k">if</span> <span class="n">tool</span> <span class="o">==</span> <span class="s2">"midjourney"</span><span class="p">:</span>
+</span><span id="line-429">        <span class="n">no</span> <span class="o">=</span> <span class="n">_NO</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">has_figures</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_NO</span><span class="si">}</span><span class="s2">, people"</span>
+</span><span id="line-430">        <span class="n">text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">" --ar </span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">aspect</span><span class="si">}</span><span class="s2"> --no </span><span class="si">{</span><span class="n">no</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-431">    <span class="k">return</span> <span class="n">text</span></div>
 
-</span><span id="line-388">
-</span><span id="line-389">
-</span><span id="line-390"><span class="k">def</span><span class="w"> </span><span class="nf">_positive</span><span class="p">(</span><span class="n">words</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-391"><span class="w">    </span><span class="sd">"""``words`` without its ``no ...`` clauses.</span>
-</span><span id="line-392">
-</span><span id="line-393"><span class="sd">    &gt;&gt;&gt; _positive("a sky, no ground, no text, soft light")</span>
-</span><span id="line-394"><span class="sd">    'a sky, soft light'</span>
-</span><span id="line-395"><span class="sd">    """</span>
-</span><span id="line-396">    <span class="k">return</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">words</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">", "</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">"no "</span><span class="p">,</span> <span class="s2">"nothing "</span><span class="p">)))</span>
-</span><span id="line-397">
-</span><span id="line-398">
+</span><span id="line-432">
+</span><span id="line-433">
+</span><span id="line-434"><span class="k">def</span><span class="w"> </span><span class="nf">_positive</span><span class="p">(</span><span class="n">words</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-435"><span class="w">    </span><span class="sd">"""``words`` without its ``no ...`` clauses.</span>
+</span><span id="line-436">
+</span><span id="line-437"><span class="sd">    &gt;&gt;&gt; _positive("a sky, no ground, no text, soft light")</span>
+</span><span id="line-438"><span class="sd">    'a sky, soft light'</span>
+</span><span id="line-439"><span class="sd">    """</span>
+</span><span id="line-440">    <span class="k">return</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span><span id="line-441">        <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">words</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">", "</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">"no "</span><span class="p">,</span> <span class="s2">"nothing "</span><span class="p">))</span>
+</span><span id="line-442">    <span class="p">)</span>
+</span><span id="line-443">
+</span><span id="line-444">
 <div class="viewcode-block" id="art_guidance">
 <a class="viewcode-back" href="../../_autosummary/cutan.art_brief.html#cutan.art_brief.art_guidance">[docs]</a>
-</span><span id="line-399"><span class="k">def</span><span class="w"> </span><span class="nf">art_guidance</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span id="line-400"><span class="w">    </span><span class="sd">"""Everything a writer's Claude needs to ask for real art, as JSON-ready data.</span>
-</span><span id="line-401">
-</span><span id="line-402"><span class="sd">    A prompt is ``prompt_recipe``: the subject, the kind's ``framing``, the ``look``.</span>
-</span><span id="line-403">
-</span><span id="line-404"><span class="sd">    &gt;&gt;&gt; g = art_guidance(style="norstein")</span>
-</span><span id="line-405"><span class="sd">    &gt;&gt;&gt; sorted(g)</span>
-</span><span id="line-406"><span class="sd">    ['claude_svg', 'formats', 'generators', 'kinds', 'look', 'paper_drawings', 'prompt_recipe']</span>
-</span><span id="line-407"><span class="sd">    &gt;&gt;&gt; g["kinds"][0]["key"], g["look"].startswith("painted multiplane")</span>
-</span><span id="line-408"><span class="sd">    ('sky', True)</span>
-</span><span id="line-409"><span class="sd">    """</span>
-</span><span id="line-410">    <span class="n">look</span> <span class="o">=</span> <span class="n">style_look</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
-</span><span id="line-411">    <span class="n">kinds</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-412">    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ART_KINDS</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-</span><span id="line-413">        <span class="n">row</span> <span class="o">=</span> <span class="n">asdict</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-</span><span id="line-414">        <span class="n">row</span><span class="p">[</span><span class="s2">"content"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-</span><span id="line-415">        <span class="n">kinds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-</span><span id="line-416">    <span class="k">return</span> <span class="p">{</span>
-</span><span id="line-417">        <span class="s2">"claude_svg"</span><span class="p">:</span> <span class="n">CLAUDE_SVG_NOTE</span><span class="p">,</span>
-</span><span id="line-418">        <span class="s2">"look"</span><span class="p">:</span> <span class="n">look</span><span class="p">,</span>
-</span><span id="line-419">        <span class="s2">"prompt_recipe"</span><span class="p">:</span> <span class="s2">"&lt;subject in the writer's words&gt;. &lt;the kind's framing&gt;. Look: "</span>
-</span><span id="line-420">        <span class="s2">"&lt;look&gt;. Never a show's, studio's or artist's name. Midjourney: add --ar "</span>
-</span><span id="line-421">        <span class="s2">"&lt;the kind's aspect&gt; --no text, letters, watermark."</span><span class="p">,</span>
-</span><span id="line-422">        <span class="s2">"formats"</span><span class="p">:</span> <span class="s2">"PNG (transparent background where a kind says so), JPEG or WebP "</span>
-</span><span id="line-423">        <span class="s2">"for an opaque plate; SVG from a vector tool if it follows the pack's SVG "</span>
-</span><span id="line-424">        <span class="s2">"rules. Not PSD, HEIC, PDF or AI. Original files, not screenshots."</span><span class="p">,</span>
-</span><span id="line-425">        <span class="s2">"kinds"</span><span class="p">:</span> <span class="n">kinds</span><span class="p">,</span>
-</span><span id="line-426">        <span class="s2">"paper_drawings"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">PAPER_DRAWINGS</span><span class="p">),</span>
-</span><span id="line-427">        <span class="s2">"generators"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">GENERATOR_TIPS</span><span class="p">),</span>
-</span><span id="line-428">    <span class="p">}</span></div>
+</span><span id="line-445"><span class="k">def</span><span class="w"> </span><span class="nf">art_guidance</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+</span><span id="line-446"><span class="w">    </span><span class="sd">"""Everything a writer's Claude needs to ask for real art, as JSON-ready data.</span>
+</span><span id="line-447">
+</span><span id="line-448"><span class="sd">    A prompt is ``prompt_recipe``: the subject, the kind's ``framing``, the ``look``.</span>
+</span><span id="line-449">
+</span><span id="line-450"><span class="sd">    &gt;&gt;&gt; g = art_guidance(style="norstein")</span>
+</span><span id="line-451"><span class="sd">    &gt;&gt;&gt; sorted(g)</span>
+</span><span id="line-452"><span class="sd">    ['claude_svg', 'formats', 'generators', 'kinds', 'look', 'paper_drawings', 'prompt_recipe', 'viewpoint']</span>
+</span><span id="line-453"><span class="sd">    &gt;&gt;&gt; g["kinds"][0]["key"], g["look"].startswith("painted multiplane")</span>
+</span><span id="line-454"><span class="sd">    ('sky', True)</span>
+</span><span id="line-455"><span class="sd">    """</span>
+</span><span id="line-456">    <span class="n">look</span> <span class="o">=</span> <span class="n">style_look</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+</span><span id="line-457">    <span class="n">kinds</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-458">    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ART_KINDS</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+</span><span id="line-459">        <span class="n">row</span> <span class="o">=</span> <span class="n">asdict</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+</span><span id="line-460">        <span class="n">row</span><span class="p">[</span><span class="s2">"content"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span><span id="line-461">        <span class="n">kinds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</span><span id="line-462">    <span class="k">return</span> <span class="p">{</span>
+</span><span id="line-463">        <span class="s2">"claude_svg"</span><span class="p">:</span> <span class="n">CLAUDE_SVG_NOTE</span><span class="p">,</span>
+</span><span id="line-464">        <span class="s2">"look"</span><span class="p">:</span> <span class="n">look</span><span class="p">,</span>
+</span><span id="line-465">        <span class="s2">"prompt_recipe"</span><span class="p">:</span> <span class="s2">"&lt;subject in the writer's words&gt;. &lt;the kind's framing&gt;. Look: "</span>
+</span><span id="line-466">        <span class="s2">"&lt;look&gt;. Never a show's, studio's or artist's name. Midjourney: add --ar "</span>
+</span><span id="line-467">        <span class="s2">"&lt;the kind's aspect&gt; --no text, letters, watermark."</span><span class="p">,</span>
+</span><span id="line-468">        <span class="s2">"formats"</span><span class="p">:</span> <span class="s2">"PNG (transparent background where a kind says so), JPEG or WebP "</span>
+</span><span id="line-469">        <span class="s2">"for an opaque plate; SVG from a vector tool if it follows the pack's SVG "</span>
+</span><span id="line-470">        <span class="s2">"rules. Not PSD, HEIC, PDF or AI. Original files, not screenshots."</span><span class="p">,</span>
+</span><span id="line-471">        <span class="s2">"kinds"</span><span class="p">:</span> <span class="n">kinds</span><span class="p">,</span>
+</span><span id="line-472">        <span class="s2">"viewpoint"</span><span class="p">:</span> <span class="n">VIEWPOINT_RULE</span><span class="p">,</span>
+</span><span id="line-473">        <span class="s2">"paper_drawings"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">PAPER_DRAWINGS</span><span class="p">),</span>
+</span><span id="line-474">        <span class="s2">"generators"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">GENERATOR_TIPS</span><span class="p">),</span>
+</span><span id="line-475">    <span class="p">}</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -634,7 +681,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=8f83b1af"></script>
+    <script src="../../_static/documentation_options.js?v=2bfb35b6"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
