@@ -140,3 +140,77 @@ def test_the_report_names_no_server_path(tmp_path, monkeypatch):
     report = check_pack(pack)
     text = json.dumps(report.to_dict(with_output=True))
     assert str(tmp_path) not in text and "/etc/hostname" not in text and "/root/" not in text
+
+
+def _png(path: Path, size: tuple[int, int]) -> None:
+    """A picture with a transparent background and an opaque shape in the middle."""
+    from PIL import Image, ImageDraw
+
+    img = Image.new("RGBA", size, (0, 0, 0, 0))
+    w, h = size
+    ImageDraw.Draw(img).ellipse((w // 4, h // 4, 3 * w // 4, 3 * h // 4), fill=(200, 60, 40, 255))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    img.save(path)
+
+
+def test_an_all_svg_pack_gets_a_note_and_a_picture_removes_it(tmp_path):
+    """Hand-written SVG looks computer-made: the report says so (a note, never a failure)."""
+    from cutan.pack import _note_svg_only_art
+
+    pack = _example_copy(tmp_path)
+    report = PackReport()
+    _note_svg_only_art(pack, report)
+    assert len(report.notes) == 1 and "hand-written SVG (3 file(s))" in report.notes[0]
+    assert report.to_dict()["notes"] == report.notes and "note: " in report.format()
+    _png(pack / "assets" / "environments" / "bus_stop" / "plates" / "sky.png", (64, 36))
+    report = PackReport()
+    _note_svg_only_art(pack, report)
+    assert report.notes == []
+
+
+def test_a_picture_must_be_what_its_name_says(tmp_path):
+    from cutan.pack import _lint_files
+
+    pack = tmp_path / "pack"
+    _png(pack / "assets" / "props" / "u" / "parts" / "u.png", (8, 8))
+    (pack / "assets" / "props" / "u" / "parts" / "fake.png").write_bytes(b"#!/bin/sh\necho hi\n")
+    (pack / "assets" / "props" / "u" / "parts" / "fake.webp").write_bytes(b"RIFF\x00\x00\x00\x00WAVE")
+    report = PackReport()
+    _lint_files(pack, report)
+    assert {c.label for c in report.checks} == {
+        "file assets/props/u/parts/fake.png",
+        "file assets/props/u/parts/fake.webp",
+    }
+
+
+def test_a_pack_with_pictures_passes(tmp_path, monkeypatch):
+    """A plate and a prop as PNG (an#211) check like their SVG versions."""
+    _with_this_checkout(monkeypatch)
+    pack = _example_copy(tmp_path)
+    env = pack / "assets" / "environments" / "bus_stop"
+    (env / "plates" / "skyline.svg").unlink()
+    _png(env / "plates" / "skyline.png", (1600, 400))
+    meta = json.loads((env / "meta.json").read_text())
+    for plane in meta["planes"]:
+        if plane["name"] == "skyline":
+            plane["art"]["src"] = "plates/skyline.png"
+    (env / "meta.json").write_text(json.dumps(meta))
+    prop = pack / "assets" / "props" / "umbrella"
+    (prop / "parts" / "umbrella.svg").unlink()
+    _png(prop / "parts" / "umbrella.png", (1024, 1024))
+    doc = json.loads((prop / "prop.json").read_text())
+    doc["skins"]["default"]["slots"]["body"]["umbrella"]["path"] = "parts/umbrella.png"
+    (prop / "prop.json").write_text(json.dumps(doc))
+    report = check_pack(pack)
+    assert report.ok, report.format()
+    assert report.notes == []
+
+
+def test_a_redrawn_factory_part_cannot_be_a_picture_yet(tmp_path):
+    from cutan.pack import _redrawn_problem
+
+    factory = tmp_path / "head.svg"
+    factory.write_text("<svg/>")
+    picture = tmp_path / "head.png"
+    _png(picture, (8, 8))
+    assert "cutan#92" in _redrawn_problem(picture, tmp_path / "head.png")

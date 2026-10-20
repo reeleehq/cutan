@@ -50,7 +50,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "gilliam",
-      "sha256": "ddd46917233035c8a2733ca7aa860ef2712790a1d05e8d0ad732d9100bb1a4af"
+      "sha256": "32e42ab9fceeff9a74875bf3bfab3db8aaa1b28e57d86e12df225f300f8e61db"
     }
   },
   "entity_surfaces": {},
@@ -92,7 +92,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "kurzgesagt",
-      "sha256": "e58bea3706fecd6187ab3009a3bc8bf887a65e041041d88e6a085d5a39b2493e"
+      "sha256": "3f6883c9190e8c9d104542141325091a4a34ed87fe953624b0a0bd1ecd7351a7"
     }
   },
   "entity_surfaces": {},
@@ -130,7 +130,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "norstein",
-      "sha256": "c4f6861181db16c23503f6c9ce5a047c6b351bc4469004921ae0eb8b29df28a7"
+      "sha256": "42b220f04261823c1b9b70d39f3ec560e4626c6dc5a5de891431375946989527"
     }
   },
   "entity_surfaces": {},
@@ -177,7 +177,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "oversimplified",
-      "sha256": "d777eb41045989a882da5fd8e31936a0285680a4e97e337a6dcb1db94817f855"
+      "sha256": "ff180201f5762c6d606c821151ab2b253963b347fd75d42d8be689c8f2dbed5b"
     }
   },
   "entity_surfaces": {},
@@ -216,7 +216,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "reiniger",
-      "sha256": "46a01af77a040ce875b82c679316af35b616f47982e761aeb44fa146f1283a6a"
+      "sha256": "e0e7c1c508c2f723e3760f07fe8b5d2b69d72bd0be06843866f7ccc01f070a77"
     }
   },
   "entity_surfaces": {},
@@ -269,7 +269,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "south_park",
-      "sha256": "16b24d342e0a3b96a1ec47eca0a1a738e21de381f0fffdfdec9a43fe46f79065"
+      "sha256": "46803413697591f765db43c57db265061835246416c1267eb35fb01ece9d571a"
     }
   },
   "surface": {

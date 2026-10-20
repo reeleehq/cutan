@@ -41,6 +41,10 @@ Gradients use CSS's vocabulary: `{"stops": ["#141a33", "#f2c48a"]}` runs top to 
 - A title card or a map is just an environment: one `fill` plane at depth 0 (`examples/the-umbrella/assets/environments/title_card/`).
 - Built-in presets need no folder: `park`, `indoor`, `night`, `sunset`, `default`. They are plain; prefer your own.
 
+### A plate from a picture
+
+The best plates are the writer's pictures (from an image generator, or a scan of a painting): `references/art.md` says what each layer must show and how to prompt for it. A picture is an `image` plane like an SVG: `{"kind": "image", "src": "plates/street.png"}`, with a `size` of the picture's own aspect (a 2560x1080 picture: `"size": [2560, 1080]`, or `[1707, 720]` to show it frame-high at 720p). Layers above the sky need a transparent background where the layer behind should show (a PNG with alpha). Credit it with `source` (who made it, which tool).
+
 ### Drawing a plate (SVG)
 
 - Root: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 W H" width="W" height="H">`, with `width`/`height` equal to the viewBox size.
@@ -66,7 +70,7 @@ A prop is `assets/props/<key>/prop.json`, placed in a shot as `{kind: prop, id: 
 }
 ```
 
-- The drawing is `parts/<file>.svg` on a 1024x1024 canvas (`viewBox="0 0 1024 1024" width="1024" height="1024"`): draw the object to fill it as the prop's frame.
+- The drawing is `parts/<file>.svg`, or a picture `parts/<file>.png` (transparent background; `references/art.md`), on a 1024x1024 canvas (`viewBox="0 0 1024 1024" width="1024" height="1024"`): draw the object to fill it as the prop's frame.
 - `origin` is the point of the drawing (in those 1024 units) that lands on `stage.at`: the base of a lamp, the handle of an umbrella. Without it the prop is placed by its centre.
 - Size on screen: the 1024 canvas height shows as 345 px at `stage.scale: 1`, so an object filling the canvas is 345 px tall; scale it from there (a 1.2 m umbrella next to a 1.7 m character of 312 px: scale about 0.6).
 - To make a prop appear: `set` its `alpha` to 0 at 0, then back to 1, or `play` `pop_in` at that moment. It moves with `x`, `y`, `rotation`, `scale_x`, `scale_y` tweens like anything else.

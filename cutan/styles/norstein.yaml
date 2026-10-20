@@ -44,6 +44,7 @@ targets:
   cuts_per_min: [4, 7]            # measured 6.0 (a floor: dissolves are not counted)
 
 guidance:
+  image_prompt: painted multiplane cut-out, soft gouache and watercolour textures, muted earthy colours, misty translucent tracing-paper layers, soft edges, hushed atmosphere   # the look in words, for an image generator (cutan.art_brief); never a show's name
   fog: thin tracing paper between planes, not a blur; planes have no alpha field, so a fog plane is a pale plane whose node you fade, which is untested here
   dolly: depth-aware zoom is the real technique and is not built (an#110 deferred it)
   edges: soft, without a blur filter; needs painted art

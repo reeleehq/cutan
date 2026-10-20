@@ -49,6 +49,7 @@ targets:
   mean_shot_s: [5.5, 9]                 # measured 7.5
 
 guidance:
+  image_prompt: flat vector illustration, clean geometric shapes, no outlines, soft gradients, vivid saturated colours with soft glowing highlights, rounded corners, deep blue night tones   # the look in words, for an image generator (cutan.art_brief); never a show's name
   construction: flat vector shapes, no outlines, soft gradients (gradients need SVG art, since plane fills are flat)
   characters: birds and blobs seen at a distance, not lip-synced; narration is voiceover
   ambient_motion: star twinkle, particles, glow pulses and drift under every shot; no ambient layer ships, so add looping tweens by hand

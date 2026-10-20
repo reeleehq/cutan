@@ -9,6 +9,11 @@ Use this only when neither the reelee connector's `reelee_check_production_pack`
 - [ ] Every file an environment or prop points to (`src`, `path`) exists at that path inside the asset's own folder.
 - [ ] `cast.sh` holds only comments and `an character new <name> --offline ...` lines (plus `an character mouths`, `add-half-lid`, `add-views`, `add-gaze`), each option spelled as in `references/characters.md`, palette values quoted.
 
+**Pictures** (PNG, JPEG, WebP)
+- [ ] Each is a real file of its format (not renamed), at most 40 MB; layers above the sky and every prop have a transparent background; a prop is 1024x1024.
+- [ ] None is a redrawn factory part (those are SVG for now): a character's pictures go under `reference/`.
+- [ ] Each has its maker and tool recorded (`source`, or `PRODUCTION.md`).
+
 **SVG drawings**
 - [ ] Root has `xmlns="http://www.w3.org/2000/svg"`, a `viewBox`, and `width`/`height` equal to the viewBox's size; a redrawn character part keeps the factory file's root tag exactly, and has the same file name as the factory's.
 - [ ] Only shapes and groups; no `<image>`, `<script>`, `<foreignObject>`, no links to other files or addresses (`href` only to `#id`, no `url(http...)`, no `data:`). Valid XML (every tag closed, attributes quoted).

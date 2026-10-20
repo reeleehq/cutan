@@ -7,7 +7,8 @@ optional redrawn character parts) and ``PRODUCTION.md``. :func:`check_pack`
 builds a throwaway project from it and runs the real checks:
 
 1. lint every SVG drawing in the pack (root tag, size, forbidden elements,
-   outside links) and the keys of every voice document;
+   outside links), check that every picture (PNG, JPEG, WebP: plates, prop
+   parts, reference sheets) is one, and the keys of every voice document;
 2. ``an init`` a scratch project and copy the pack over it, except redrawn
    character parts (a character folder with no ``character.json``);
 3. run each ``cast.sh`` line, refusing anything but the factory commands and
@@ -23,7 +24,10 @@ one :class:`PackCheck` per step, each with its errors and warnings, so a caller
 (the skill's ``validate_pack.py``, the reelee connector's ``check this pack``
 tool) can print it or return it as data (:meth:`PackReport.to_dict`). A pack
 that cannot be checked at all (no ``scene.md``, a refused ``cast.sh`` line) is
-a report with one failed ``pack`` check, never an exception.
+a report with one failed ``pack`` check, never an exception. Its ``notes`` say
+what is neither an error nor a warning: a pack whose drawings are all
+hand-written SVG gets one, since such art looks computer-made
+(:mod:`cutan.art_brief` says what to ask for instead).
 
 Nothing is rendered: no browser, no network (``an character new`` must say
 ``--offline``), no paid call.
@@ -58,6 +62,8 @@ __all__ = [
     "check_pack",
     "lint_svg",
     "main",
+    "pack_art_guidance",
+    "svg_only_art",
 ]
 
 CAST_FILE = "cast.sh"
@@ -158,9 +164,25 @@ SVG_FORBIDDEN = frozenset({"image", "script", "foreignObject"})
 DFLT_STEP_TIMEOUT = 300.0
 #: Seconds the whole check may run; past it, the remaining steps are not run.
 DFLT_DEADLINE = 900.0
-#: The files a pack may hold (exact, lower-case suffixes). Nothing else is copied
-#: into the scratch project: no code, no images, no audio.
-PACK_SUFFIXES = frozenset({".md", ".sh", ".json", ".svg", ".txt", ".yaml", ".yml"})
+#: The text files a pack may hold (exact, lower-case suffixes).
+TEXT_SUFFIXES = frozenset({".md", ".sh", ".json", ".svg", ".txt", ".yaml", ".yml"})
+#: The pictures a pack may hold: plates, prop parts, reference sheets (an#211). Each
+#: must start with its format's signature; nothing else is copied: no code, no audio.
+IMAGE_SIGNATURES = {
+    ".png": (b"\x89PNG\r\n\x1a\n",),
+    ".jpg": (b"\xff\xd8\xff",),
+    ".jpeg": (b"\xff\xd8\xff",),
+    ".webp": (b"RIFF",),
+}
+PACK_SUFFIXES = TEXT_SUFFIXES | frozenset(IMAGE_SIGNATURES)
+#: The largest picture a pack may hold, in bytes.
+MAX_IMAGE_BYTES = 40 * 1024 * 1024
+#: Where a pack's drawings live (the art an all-SVG note counts).
+ART_GLOBS = (
+    "assets/environments/*/plates/**/*",
+    "assets/props/*/parts/**/*",
+    "assets/characters/*/parts/**/*",
+)
 #: Caps on the work one pack can ask for (each line or folder is one `an` process).
 MAX_CAST_LINES = 100
 MAX_ASSET_FOLDERS = 60
@@ -220,6 +242,9 @@ class PackReport:
     """Every step of a pack check, in order."""
 
     checks: list[PackCheck] = field(default_factory=list)
+    #: Information for the writer that is neither an error nor a warning (it
+    #: never fails a check): e.g. that every drawing is hand-written SVG.
+    notes: list[str] = field(default_factory=list)
 
     def add(self, label: str, ok: bool, output: str = "") -> bool:
         self.checks.append(PackCheck(label, ok, output.strip()))
@@ -265,6 +290,7 @@ class PackReport:
             "summary": self.summary(),
             "errors": self.errors,
             "warnings": self.warnings,
+            "notes": list(self.notes),
             "checks": checks,
         }
 
@@ -275,7 +301,8 @@ class PackReport:
             + (f"\n{c.output}" if c.output else "")
             for c in self.checks
         ]
-        return "\n\n".join([*parts, self.summary()])
+        notes = [f"note: {n}" for n in self.notes]
+        return "\n\n".join([*parts, *notes, self.summary()])
 
 
 def _lines_with(text: str, markers: Sequence[str]) -> list[str]:
@@ -424,6 +451,79 @@ def _lint_files(pack: Path, report: PackReport) -> None:
                 f"  {ERROR_MARKER} a pack holds only {', '.join(sorted(PACK_SUFFIXES))} files "
                 "(lower-case suffix); this one is not copied",
             )
+        elif src.is_file() and src.suffix in IMAGE_SIGNATURES:
+            problem = _image_problem(src)
+            if problem:
+                report.add(f"file {rel}", False, f"  {ERROR_MARKER} {problem}")
+
+
+def _image_problem(path: Path) -> str | None:
+    """Why a picture in a pack is refused (None when it is not).
+
+    >>> import tempfile
+    >>> p = Path(tempfile.mkdtemp()) / "a.png"
+    >>> _ = p.write_bytes(b"GIF89a...")
+    >>> _image_problem(p)
+    'not a .png picture (its first bytes say otherwise): export it again as PNG'
+    """
+    size = path.stat().st_size
+    if size > MAX_IMAGE_BYTES:
+        return f"{size // 2**20} MB; a picture in a pack is at most {MAX_IMAGE_BYTES // 2**20} MB"
+    with path.open("rb") as f:
+        head = f.read(12)
+    ok = any(head.startswith(sig) for sig in IMAGE_SIGNATURES[path.suffix])
+    if path.suffix == ".webp":
+        ok = ok and head[8:12] == b"WEBP"
+    if not ok:
+        name = path.suffix.lstrip(".").upper().replace("JPG", "JPEG")
+        return f"not a {path.suffix} picture (its first bytes say otherwise): export it again as {name}"
+    return None
+
+
+def svg_only_art(pack_dir: str | os.PathLike) -> int:
+    """How many drawings the pack has when every one is SVG (0 when any is a picture,
+    or there are none): hand-written SVG looks computer-made.
+
+    >>> svg_only_art("/no/such/pack")
+    0
+    """
+    pack = Path(pack_dir)
+    art = {p for g in ART_GLOBS for p in pack.glob(g) if p.is_file()}
+    svgs = [p for p in art if p.suffix == ".svg"]
+    return 0 if any(p.suffix in IMAGE_SIGNATURES for p in art) else len(svgs)
+
+
+_STYLE_PACK = re.compile(r"(?m)^\s*style_pack:\s*['\"]?([a-z][a-z0-9_]*)")
+
+
+def pack_art_guidance(pack_dir: str | os.PathLike) -> dict | None:
+    """What art to ask the writer for (:func:`cutan.art_brief.art_guidance`), in the
+    look of the pack's named style if it has one, when every drawing is SVG; else None.
+
+    >>> pack_art_guidance("/no/such/pack") is None
+    True
+    """
+    if not svg_only_art(pack_dir):
+        return None
+    from cutan.art_brief import art_guidance
+    from cutan.styles import style_specs
+
+    scene = Path(pack_dir) / "scene.md"
+    try:
+        m = _STYLE_PACK.search(scene.read_text(encoding="utf-8"))
+    except OSError:
+        m = None
+    style = m.group(1) if m and m.group(1) in style_specs() else None
+    return art_guidance(style=style)
+
+
+def _note_svg_only_art(pack: Path, report: PackReport) -> None:
+    """Note a pack whose drawings are all hand-written SVG (it will look computer-made)."""
+    from cutan.art_brief import SVG_ONLY_NOTE
+
+    n = svg_only_art(pack)
+    if n:
+        report.notes.append(SVG_ONLY_NOTE.format(n=n))
 
 
 def _lint_svgs(pack: Path, report: PackReport) -> None:
@@ -482,6 +582,11 @@ def _copy(src: Path, dst: Path) -> None:
 
 def _redrawn_problem(new: Path, factory: Path) -> str | None:
     """Why a redrawn part cannot replace the factory's (None when it can)."""
+    if new.suffix in IMAGE_SIGNATURES:
+        return (
+            "a redrawn factory part must be an SVG for now (cutan#92); put the "
+            "picture under reference/ and describe it in PRODUCTION.md"
+        )
     if not factory.exists():
         return (
             f"the factory made no {factory.name} for this character "
@@ -579,6 +684,7 @@ def _build_and_check(
                 f"assets/{kind} has {n} folders; at most {MAX_ASSET_FOLDERS}"
             )
     _lint_files(pack, report)
+    _note_svg_only_art(pack, report)
     _lint_svgs(pack, report)
     _lint_voices(pack, report)
     run = _Runner(report, timeout=timeout, deadline=deadline)
