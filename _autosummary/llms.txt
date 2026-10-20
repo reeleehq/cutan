@@ -6,6 +6,7 @@
 ## Pages in this subsection
 
 - [cutan](cutan.html.md): cutan: cut-out animation, as a genre package on the &#96;an&#96; core.
+- [cutan.art_brief](cutan.art_brief.html.md): What art a cut-out film needs, and how to ask an image generator for it.
 - [cutan.audio](cutan.audio.html.md): The cut-out genre’s lip-sync providers: letters, Rhubarb and word timings to mouth shapes.
 - [cutan.audio.injectable_lipsync](cutan.audio.injectable_lipsync.html.md): Lip-sync provider that consumes pre-computed word timings.
 - [cutan.audio.offline_lipsync](cutan.audio.offline_lipsync.html.md): OfflineLipSync — deterministic transcript → viseme track. No network, no binary.

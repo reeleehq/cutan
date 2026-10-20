@@ -30,6 +30,7 @@
    :toctree:
    :recursive:
 
+   art_brief
    audio
    bench
    carve

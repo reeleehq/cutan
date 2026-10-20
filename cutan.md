@@ -1,4 +1,4 @@
-> built 2026-10-20 11:17 UTC from 0ae4931 (main) · cutan 0.0.55. Details: build_info.json
+> built 2026-10-20 22:31 UTC from 536d12f (main) · cutan 0.0.56. Details: build_info.json
 
 # index.html.md
 
@@ -73,6 +73,179 @@ The genre’s asset library and agent-made projects live under `~/.local/share/c
 Read `CLAUDE.md`. In short: `pip install -e . --no-deps` next to an editable `an`, then `pytest`. The tests that render need a headless browser (`playwright install chromium`) and `ffmpeg`.
 
 <p class="epythet-aggregates">This documentation as a single file: <a href="cutan.md">cutan.md</a> (Markdown, for agents).</p>
+
+
+# _autosummary/cutan.art_brief.html.md
+
+# cutan.art_brief
+
+What art a cut-out film needs, and how to ask an image generator for it.
+
+Claude can draw for a production pack, but only by writing SVG: simple
+geometric shapes in flat colours, which read as obviously computer-made. A
+film looks far better with real art: pictures from a specialised image
+generator (Midjourney, GPT-image, Flux, Ideogram, Recraft…) or photographs
+and scans of drawings made on paper. This module is the one place that says
+what each piece of art must contain to be usable, so the writer-facing skill
+(`cutan-production-pack`, its `references/art.md`), the pack checker
+([`cutan.pack.check_pack()`](_autosummary/cutan.pack.html.md#cutan.pack.check_pack), its note on an all-SVG pack) and the reelee
+connector (its `check this pack` result) all say the same thing.
+
+- `ART_KINDS`: each kind of art (sky, far, mid and near plates, the view
+  behind a car, a prop, a vehicle, a character reference sheet, character
+  parts, a costume), with where it goes in a pack, its canvas, its background
+  and what it must and must not show.
+- [`style_look()`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.style_look): a named style’s look in words, for a prompt (the
+  `guidance.image_prompt` of its spec in `cutan/styles/`; never a show’s
+  name).
+- [`image_prompt()`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.image_prompt): a ready-to-paste prompt for one kind, subject and look.
+- [`art_guidance()`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.art_guidance): all of it as JSON-ready data.
+
+```pycon
+>>> sorted(ART_KINDS)[:3]
+['character_parts', 'character_sheet', 'costume']
+>>> print(image_prompt("prop", "a red umbrella, closed", style="south_park"))
+a red umbrella, closed. A single object, whole and centred, filling a square frame,
+seen from the angle it is used at, nothing else in the picture, isolated on a plain
+flat white background, no cast shadow, no text. Look: construction-paper cut-out
+look, simple round and geometric shapes, flat solid colours, thin near-black
+outlines, faint paper grain, no shading, no gradients, no perspective.
+>>> image_prompt("sky", "a summer evening", tool="midjourney").endswith("--ar 16:9 --no text, letters, watermark, people")
+True
+```
+
+### Module Attributes
+
+| [`RASTER_SUFFIXES`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.RASTER_SUFFIXES)   | The picture formats a plate, a prop part or a character part may be (an#211).   |
+|--------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| [`CLAUDE_SVG_NOTE`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.CLAUDE_SVG_NOTE)   | What Claude tells the writer before it draws anything itself.                   |
+| [`SVG_ONLY_NOTE`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.SVG_ONLY_NOTE)     | The checker's note on a pack whose drawings are all hand-written SVG.           |
+| [`PAPER_DRAWINGS`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.PAPER_DRAWINGS)    | How to photograph or scan drawings made on paper so they can be cut out.        |
+| [`GENERATOR_TIPS`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.GENERATOR_TIPS)    | how to get usable art out of it.                                                |
+
+### Functions
+
+| [`art_guidance`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.art_guidance)(\*[, style])                      | Everything a writer's Claude needs to ask for real art, as JSON-ready data.   |
+|-------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| [`image_prompt`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.image_prompt)(kind, subject, \*[, style, tool]) | A prompt to paste into an image generator for one piece of art.               |
+| [`style_look`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.style_look)(style)                              | A style's look in words, for a prompt (`guidance.image_prompt` of its spec).  |
+
+### Classes
+
+| [`ArtKind`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.ArtKind)(key, title, goes_to, canvas, ...[, ...])   | One kind of art a production pack can carry.   |
+|-----------------------------------------------------------------------------------------------------|------------------------------------------------|
+
+### *class* cutan.art_brief.ArtKind(key, title, goes_to, canvas, background, content, framing, aspect, status='ready', has_figures=False)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One kind of art a production pack can carry.
+
+#### aspect *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+Midjourney’s `--ar` for it.
+
+#### background *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+`"opaque"` or `"transparent"` (or a plain flat colour cut out afterwards).
+
+#### canvas *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+Size and aspect, at the default 1280x720 frame.
+
+#### content *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]*
+
+What the picture must show, and must not.
+
+#### framing *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+The words a generator prompt adds after the subject.
+
+#### goes_to *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+Where the file goes in the pack.
+
+#### has_figures *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= False*
+
+Whether the subject is a person or creature (no `people` in –no).
+
+#### status *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'ready'*
+
+`"ready"` (the pack uses it as it is) or
+what the pipeline owner still has to do with it.
+
+* **Type:**
+  Who turns the picture into film
+
+### cutan.art_brief.CLAUDE_SVG_NOTE *= "I can draw the art for you, but only as SVG: shapes I write as code. The result is simple geometry in flat colours (circles, rectangles, smooth curves), clean but very obviously computer-generated: no texture, no brush or pencil line, little detail, stiff faces. It is fine for a placeholder, a map, a title card or a deliberately flat look. For a film that looks drawn, use a specialised image generator (Midjourney, ChatGPT's image tool, Flux, Ideogram, Recraft) or photograph or scan drawings made on paper, and give me the pictures: I will say what each one must show, and write the prompts."*
+
+What Claude tells the writer before it draws anything itself.
+
+### cutan.art_brief.GENERATOR_TIPS *= {'flux': "no negative prompt, and naming a thing tends to add it: use the positive-only prompt (image_prompt(..., tool='flux') drops the 'no ...' words); give the size as an aspect (16:9, 1:1); a flat plain background, cut out afterwards", 'gpt-image': "ChatGPT's image tool (gpt-image): write the prompt as plain sentences; it can make a transparent PNG when asked ('transparent background, PNG'); ask for edits of the same image to keep a character consistent", 'ideogram': 'good at following a long description; switch magic prompt off so your words stay yours; ask for no text in the image', 'midjourney': 'append the aspect (--ar 16:9 for a plate, --ar 1:1 for a prop) and --no text, letters, watermark; it cannot make a transparent background, so ask for a plain flat white one; keep a character consistent with a reference image (--oref <image URL> in V7, --cref in V6)', 'recraft': "can draw in a vector style and export SVG, which suits the flat looks (South Park-like, OverSimplified-like, Kurzgesagt-like); an SVG it exports must still follow the pack's SVG rules (no embedded images)"}*
+
+how to get usable art out of it.
+
+* **Type:**
+  Per image generator
+
+### cutan.art_brief.PAPER_DRAWINGS *= ("Draw each piece on its own sheet, or spread pieces out with a hand's width of empty paper between them.", 'Use plain white or pale paper, and a background colour that appears nowhere in the drawing; strong, closed outlines cut out cleanest.', 'Scan at 300 dpi, or photograph straight down in even daylight: no shadow of the phone or the hand, no glare, no perspective, the sheet filling the frame.', 'Cut-paper pieces (actual scissors and card) are welcome: photograph them flat on a contrasting background.', 'Send the original files (PNG or JPEG), not screenshots; the pipeline owner cuts the pieces out (cutan.carve) and keeps who drew them and on what terms.')*
+
+How to photograph or scan drawings made on paper so they can be cut out.
+
+### cutan.art_brief.RASTER_SUFFIXES *= ('.png', '.jpg', '.jpeg', '.webp')*
+
+The picture formats a plate, a prop part or a character part may be (an#211).
+
+### cutan.art_brief.SVG_ONLY_NOTE *= "every drawing in this pack is hand-written SVG ({n} file(s)): it will look computer-generated (simple shapes, flat colours). Tell the writer, and offer real art instead: pictures from an image generator or photos and scans of paper drawings, as PNG (transparent background for props and parts) or JPEG (opaque plates). What each picture must show, and prompts to paste into a generator: the skill's references/art.md (cutan.art_brief.art_guidance())."*
+
+The checker’s note on a pack whose drawings are all hand-written SVG.
+
+### cutan.art_brief.art_guidance(, style=None)
+
+Everything a writer’s Claude needs to ask for real art, as JSON-ready data.
+
+A prompt is `prompt_recipe`: the subject, the kind’s `framing`, the `look`.
+
+```pycon
+>>> g = art_guidance(style="norstein")
+>>> sorted(g)
+['claude_svg', 'formats', 'generators', 'kinds', 'look', 'paper_drawings', 'prompt_recipe']
+>>> g["kinds"][0]["key"], g["look"].startswith("painted multiplane")
+('sky', True)
+```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+### cutan.art_brief.image_prompt(kind, subject, , style=None, tool=None)
+
+A prompt to paste into an image generator for one piece of art.
+
+kind: a key of `ART_KINDS`
+subject: what the picture is of, in the writer’s words
+style: a style name or spec (its look in words), or `None` for a placeholder
+tool: `"midjourney"` appends its `--ar` and `--no` flags; `"flux"`
+
+> drops the `no ...` words; any other tool takes the plain prompt (see
+> [`GENERATOR_TIPS`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.GENERATOR_TIPS))
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.art_brief.style_look(style)
+
+A style’s look in words, for a prompt (`guidance.image_prompt` of its spec).
+
+`style` is a style’s name, a spec mapping, or `None` (the writer’s own look).
+
+```pycon
+>>> style_look("reiniger").startswith("black paper silhouette")
+True
+>>> style_look(None)
+'<your look in words: medium, colours, line, texture>'
+```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 
 # _autosummary/cutan.audio.html.md
@@ -534,7 +707,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'rect', 'eye', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'mouth', 'rect', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -9219,8 +9392,9 @@ The names of the style specs that ship with `cutan`, sorted.
 
 ### Modules
 
-| [`audio`](_autosummary/cutan.audio.html.md#module-cutan.audio)                   | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.                 |
+| [`art_brief`](_autosummary/cutan.art_brief.html.md#module-cutan.art_brief)           | What art a cut-out film needs, and how to ask an image generator for it.                                   |
 |---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| [`audio`](_autosummary/cutan.audio.html.md#module-cutan.audio)                   | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.                 |
 | [`bench`](_autosummary/cutan.bench.html.md#module-cutan.bench)                   | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.                     |
 | [`carve`](_autosummary/cutan.carve.html.md#module-cutan.carve)                   | Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cutan#10). |
 | [`characters`](_autosummary/cutan.characters.html.md#module-cutan.characters)         | Character art system: Spine-shaped descriptor + SVG sidecars.                                              |
@@ -11135,7 +11309,8 @@ optional redrawn character parts) and `PRODUCTION.md`. [`check_pack()`](_autosum
 builds a throwaway project from it and runs the real checks:
 
 1. lint every SVG drawing in the pack (root tag, size, forbidden elements,
-   outside links) and the keys of every voice document;
+   outside links), check that every picture (PNG, JPEG, WebP: plates, prop
+   parts, reference sheets) is one, and the keys of every voice document;
 2. `an init` a scratch project and copy the pack over it, except redrawn
    character parts (a character folder with no `character.json`);
 3. run each `cast.sh` line, refusing anything but the factory commands and
@@ -11151,7 +11326,10 @@ one [`PackCheck`](_autosummary/cutan.pack.html.md#cutan.pack.PackCheck) per step
 (the skill’s `validate_pack.py`, the reelee connector’s `check this pack`
 tool) can print it or return it as data ([`PackReport.to_dict()`](_autosummary/cutan.pack.html.md#cutan.pack.PackReport.to_dict)). A pack
 that cannot be checked at all (no `scene.md`, a refused `cast.sh` line) is
-a report with one failed `pack` check, never an exception.
+a report with one failed `pack` check, never an exception. Its `notes` say
+what is neither an error nor a warning: a pack whose drawings are all
+hand-written SVG gets one, since such art looks computer-made
+([`cutan.art_brief`](_autosummary/cutan.art_brief.html.md#module-cutan.art_brief) says what to ask for instead).
 
 Nothing is rendered: no browser, no network (`an character new` must say
 `--offline`), no paid call.
@@ -11166,17 +11344,19 @@ Nothing is rendered: no browser, no network (`an character new` must say
 
 ### Functions
 
-| [`cast_commands`](_autosummary/cutan.pack.html.md#cutan.pack.cast_commands)(pack)                      | The `an character` commands of `cast.sh`; raise [`PackError`](_autosummary/cutan.pack.html.md#cutan.pack.PackError) on any other line.   |
-|-------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
-| [`check_pack`](_autosummary/cutan.pack.html.md#cutan.pack.check_pack)(pack_dir, \*[, workdir, ...]) | Check the production pack at `pack_dir`; return a [`PackReport`](_autosummary/cutan.pack.html.md#cutan.pack.PackReport).                  |
-| [`lint_svg`](_autosummary/cutan.pack.html.md#cutan.pack.lint_svg)(path, \*, exact_size)           | What is wrong with one SVG drawing (empty when nothing is).                                                                     |
-| [`main`](_autosummary/cutan.pack.html.md#cutan.pack.main)([argv])                             | `python -m cutan.pack <pack> [--keep] [--json]`: check a pack; exit 1 on a failure.                                             |
+| [`cast_commands`](_autosummary/cutan.pack.html.md#cutan.pack.cast_commands)(pack)                      | The `an character` commands of `cast.sh`; raise [`PackError`](_autosummary/cutan.pack.html.md#cutan.pack.PackError) on any other line.                                                                                                             |
+|-------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`check_pack`](_autosummary/cutan.pack.html.md#cutan.pack.check_pack)(pack_dir, \*[, workdir, ...]) | Check the production pack at `pack_dir`; return a [`PackReport`](_autosummary/cutan.pack.html.md#cutan.pack.PackReport).                                                                                                                            |
+| [`lint_svg`](_autosummary/cutan.pack.html.md#cutan.pack.lint_svg)(path, \*, exact_size)           | What is wrong with one SVG drawing (empty when nothing is).                                                                                                                                                                               |
+| [`main`](_autosummary/cutan.pack.html.md#cutan.pack.main)([argv])                             | `python -m cutan.pack <pack> [--keep] [--json]`: check a pack; exit 1 on a failure.                                                                                                                                                       |
+| [`pack_art_guidance`](_autosummary/cutan.pack.html.md#cutan.pack.pack_art_guidance)(pack_dir)              | What art to ask the writer for ([`cutan.art_brief.art_guidance()`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.art_guidance)), in the look of the pack's named style if it has one, when every drawing is SVG; else None. |
+| [`svg_only_art`](_autosummary/cutan.pack.html.md#cutan.pack.svg_only_art)(pack_dir)                   | How many drawings the pack has when every one is SVG (0 when any is a picture, or there are none): hand-written SVG looks computer-made.                                                                                                  |
 
 ### Classes
 
 | [`PackCheck`](_autosummary/cutan.pack.html.md#cutan.pack.PackCheck)(label, ok[, output])   | One step of a pack check: its label, its verdict and what it printed.   |
 |-----------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| [`PackReport`](_autosummary/cutan.pack.html.md#cutan.pack.PackReport)([checks])             | Every step of a pack check, in order.                                   |
+| [`PackReport`](_autosummary/cutan.pack.html.md#cutan.pack.PackReport)([checks, notes])      | Every step of a pack check, in order.                                   |
 
 ### Exceptions
 
@@ -11210,7 +11390,7 @@ Bases: [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exceptio
 
 A pack that cannot be checked at all (a missing file, a refused line).
 
-### *class* cutan.pack.PackReport(checks=list())
+### *class* cutan.pack.PackReport(checks=list(), notes=list())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -11226,6 +11406,11 @@ The full report as text: each step’s verdict and output, then the summary.
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+#### notes *: [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]*
+
+Information for the writer that is neither an error nor a warning (it
+never fails a check): e.g. that every drawing is hand-written SVG.
 
 #### summary()
 
@@ -11294,6 +11479,32 @@ What is wrong with one SVG drawing (empty when nothing is).
 ### cutan.pack.main(argv=None)
 
 `python -m cutan.pack <pack> [--keep] [--json]`: check a pack; exit 1 on a failure.
+
+* **Return type:**
+  [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
+### cutan.pack.pack_art_guidance(pack_dir)
+
+What art to ask the writer for ([`cutan.art_brief.art_guidance()`](_autosummary/cutan.art_brief.html.md#cutan.art_brief.art_guidance)), in the
+look of the pack’s named style if it has one, when every drawing is SVG; else None.
+
+```pycon
+>>> pack_art_guidance("/no/such/pack") is None
+True
+```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.pack.svg_only_art(pack_dir)
+
+How many drawings the pack has when every one is SVG (0 when any is a picture,
+or there are none): hand-written SVG looks computer-made.
+
+```pycon
+>>> svg_only_art("/no/such/pack")
+0
+```
 
 * **Return type:**
   [`int`](https://docs.python.org/3/builtins/functions.html#int)
@@ -12238,18 +12449,16 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-20 11:17 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/0ae49313f9dc30893acedd589c4caf1db010a8c4"><code>0ae4931</code></a> on branch <code>main</code>, for **cutan 0.0.55** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 22:31 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/536d12f176c4f3d330cb06b7048dde7659e08cf0"><code>536d12f</code></a> on branch <code>main</code>, for **cutan 0.0.56** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.55) is behind the latest release on PyPI (0.0.56): `pip install cutan` gives newer code than these docs describe.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/0ae49313f9dc30893acedd589c4caf1db010a8c4"><code>0ae49313f9dc30893acedd589c4caf1db010a8c4</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/536d12f176c4f3d330cb06b7048dde7659e08cf0"><code>536d12f176c4f3d330cb06b7048dde7659e08cf0</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -12260,15 +12469,15 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/39413375631">39413375631</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/39508147376">39508147376</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>0ae49313f9dc30893acedd589c4caf1db010a8c4</code> (in the history of the built commit) |
+| Event commit | <code>536d12f176c4f3d330cb06b7048dde7659e08cf0</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.19  |
+| epythet  | 0.2.22  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
 | Python   | 3.12.15 |
@@ -12287,14 +12496,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.56/">0.0.56</a>, newer than the documented version (0.0.55).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.56/">0.0.56</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 0ae49313f9dc30893acedd589c4caf1db010a8c4
-pip install "epythet==0.2.19"
+git checkout 536d12f176c4f3d330cb06b7048dde7659e08cf0
+pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 
@@ -12317,7 +12526,7 @@ Skills are folders holding a `SKILL.md` (the [Agent Skills](https://agentskills.
 
 ### `cutan-production-pack`
 
-Helps a writer or director turn a story idea, script or scene into a production pack for a cut-out animated film rendered by the cutan/an pipeline. The pack holds the scene file (shots, staging, motion, dialogue with emotions), the cast (character looks, builds, hats, hair, colours, voices), environments and backgrounds (sky gradients, drawn SVG plates, parallax layers), props, title cards, voices and a visual style (a custom look, or a named one such as South Park, OverSimplified, Kurzgesagt, Gilliam, Reiniger or Norstein), all in the exact formats cutan reads. Use when someone wants to write, plan, storyboard or spec a cut-out cartoon, an animated short, a character, a set, a background or a prop for cutan, or says “production pack”, “scene.md”, “cast”, “make a character for the animation”, “design the set”, “write the scene for the animation pipeline” or “in the style of” one of those shows.
+Helps a writer or director turn a story idea, script or scene into a production pack for a cut-out animated film rendered by the cutan/an pipeline. The pack holds the scene file (shots, staging, motion, dialogue with emotions), the cast (character looks, builds, hats, hair, colours, voices), environments and backgrounds (sky gradients, drawn or generated plates, parallax layers), props, title cards, voices and a visual style (a custom look, or a named one such as South Park, OverSimplified, Kurzgesagt, Gilliam, Reiniger or Norstein), all in the exact formats cutan reads. Use when someone wants to write, plan, storyboard or spec a cut-out cartoon, an animated short, a character, a set, a background or a prop for cutan, or says “production pack”, “scene.md”, “cast”, “make a character for the animation”, “design the set”, “write the scene for the animation pipeline” or “in the style of” one of those shows.
 
 ```bash
 gh skill install thorwhalen/cutan cutan-production-pack --agent claude-code

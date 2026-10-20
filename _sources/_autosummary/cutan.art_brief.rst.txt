@@ -1,0 +1,30 @@
+cutan.art\_brief
+================
+
+.. automodule:: cutan.art_brief
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      RASTER_SUFFIXES
+      CLAUDE_SVG_NOTE
+      SVG_ONLY_NOTE
+      PAPER_DRAWINGS
+      GENERATOR_TIPS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      art_guidance
+      image_prompt
+      style_look
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ArtKind
+   

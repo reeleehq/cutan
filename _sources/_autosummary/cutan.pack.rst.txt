@@ -12,6 +12,8 @@ cutan.pack
       check_pack
       lint_svg
       main
+      pack_art_guidance
+      svg_only_art
    
    .. rubric:: Classes
 

@@ -8,6 +8,7 @@
 - [cutan](index.html.md): Cut-out animation for &#96;an&#96;: rigged characters, faces and expressions, lip-sync, swap sets and views,...
 - [API reference](api.html.md): | &#96;cutan&#96;   | cutan: cut-out animation, as a genre package on the &#96;an&#96; core.   |
 - [cutan](_autosummary/cutan.html.md): cutan: cut-out animation, as a genre package on the &#96;an&#96; core.
+- [cutan.art_brief](_autosummary/cutan.art_brief.html.md): What art a cut-out film needs, and how to ask an image generator for it.
 - [cutan.audio](_autosummary/cutan.audio.html.md): The cut-out genre’s lip-sync providers: letters, Rhubarb and word timings to mouth shapes.
 - [cutan.audio.injectable_lipsync](_autosummary/cutan.audio.injectable_lipsync.html.md): Lip-sync provider that consumes pre-computed word timings.
 - [cutan.audio.offline_lipsync](_autosummary/cutan.audio.offline_lipsync.html.md): OfflineLipSync — deterministic transcript → viseme track. No network, no binary.
@@ -75,7 +76,7 @@
 - [cutan.verify](_autosummary/cutan.verify.html.md): The cut-out style lint: measures a render against a named style spec.
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-20 11:17 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-20 22:31 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

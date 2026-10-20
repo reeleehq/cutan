@@ -119,8 +119,9 @@ The names of the style specs that ship with `cutan`, sorted.
 
 ### Modules
 
-| [`audio`](cutan.audio.html.md#module-cutan.audio)                   | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.                 |
+| [`art_brief`](cutan.art_brief.html.md#module-cutan.art_brief)           | What art a cut-out film needs, and how to ask an image generator for it.                                   |
 |---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| [`audio`](cutan.audio.html.md#module-cutan.audio)                   | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.                 |
 | [`bench`](cutan.bench.html.md#module-cutan.bench)                   | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.                     |
 | [`carve`](cutan.carve.html.md#module-cutan.carve)                   | Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cutan#10). |
 | [`characters`](cutan.characters.html.md#module-cutan.characters)         | Character art system: Spine-shaped descriptor + SVG sidecars.                                              |

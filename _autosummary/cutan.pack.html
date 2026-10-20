@@ -84,6 +84,7 @@
 <ul class="current">
 <li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
 <li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="cutan.html">cutan<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="cutan.art_brief.html">cutan.art_brief</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.audio.html">cutan.audio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.bench.html">cutan.bench</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.carve.html">cutan.carve</a></li>
@@ -139,7 +140,8 @@ optional redrawn character parts) and <code class="docutils literal notranslate"
 builds a throwaway project from it and runs the real checks:</p>
 <ol class="arabic simple">
 <li><p>lint every SVG drawing in the pack (root tag, size, forbidden elements,
-outside links) and the keys of every voice document;</p></li>
+outside links), check that every picture (PNG, JPEG, WebP: plates, prop
+parts, reference sheets) is one, and the keys of every voice document;</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">init</span></code> a scratch project and copy the pack over it, except redrawn
 character parts (a character folder with no <code class="docutils literal notranslate"><span class="pre">character.json</span></code>);</p></li>
 <li><p>run each <code class="docutils literal notranslate"><span class="pre">cast.sh</span></code> line, refusing anything but the factory commands and
@@ -155,7 +157,10 @@ one <a class="reference internal" href="#cutan.pack.PackCheck" title="cutan.pack
 (the skill’s <code class="docutils literal notranslate"><span class="pre">validate_pack.py</span></code>, the reelee connector’s <code class="docutils literal notranslate"><span class="pre">check</span> <span class="pre">this</span> <span class="pre">pack</span></code>
 tool) can print it or return it as data (<a class="reference internal" href="#cutan.pack.PackReport.to_dict" title="cutan.pack.PackReport.to_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PackReport.to_dict()</span></code></a>). A pack
 that cannot be checked at all (no <code class="docutils literal notranslate"><span class="pre">scene.md</span></code>, a refused <code class="docutils literal notranslate"><span class="pre">cast.sh</span></code> line) is
-a report with one failed <code class="docutils literal notranslate"><span class="pre">pack</span></code> check, never an exception.</p>
+a report with one failed <code class="docutils literal notranslate"><span class="pre">pack</span></code> check, never an exception. Its <code class="docutils literal notranslate"><span class="pre">notes</span></code> say
+what is neither an error nor a warning: a pack whose drawings are all
+hand-written SVG gets one, since such art looks computer-made
+(<a class="reference internal" href="cutan.art_brief.html#module-cutan.art_brief" title="cutan.art_brief"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cutan.art_brief</span></code></a> says what to ask for instead).</p>
 <p>Nothing is rendered: no browser, no network (<code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span> <span class="pre">new</span></code> must say
 <code class="docutils literal notranslate"><span class="pre">--offline</span></code>), no paid call.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="o">=</span> <span class="n">check_pack</span><span class="p">(</span><span class="s2">"/no/such/pack"</span><span class="p">)</span>
@@ -180,6 +185,12 @@ a report with one failed <code class="docutils literal notranslate"><span class=
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.pack.main" title="cutan.pack.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>([argv])</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">cutan.pack</span> <span class="pre">&lt;pack&gt;</span> <span class="pre">[--keep]</span> <span class="pre">[--json]</span></code>: check a pack; exit 1 on a failure.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.pack.pack_art_guidance" title="cutan.pack.pack_art_guidance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pack_art_guidance</span></code></a>(pack_dir)</p></td>
+<td><p>What art to ask the writer for (<a class="reference internal" href="cutan.art_brief.html#cutan.art_brief.art_guidance" title="cutan.art_brief.art_guidance"><code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.art_brief.art_guidance()</span></code></a>), in the look of the pack's named style if it has one, when every drawing is SVG; else None.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.pack.svg_only_art" title="cutan.pack.svg_only_art"><code class="xref py py-obj docutils literal notranslate"><span class="pre">svg_only_art</span></code></a>(pack_dir)</p></td>
+<td><p>How many drawings the pack has when every one is SVG (0 when any is a picture, or there are none): hand-written SVG looks computer-made.</p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Classes</p>
@@ -188,7 +199,7 @@ a report with one failed <code class="docutils literal notranslate"><span class=
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.pack.PackCheck" title="cutan.pack.PackCheck"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PackCheck</span></code></a>(label, ok[, output])</p></td>
 <td><p>One step of a pack check: its label, its verdict and what it printed.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.pack.PackReport" title="cutan.pack.PackReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PackReport</span></code></a>([checks])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.pack.PackReport" title="cutan.pack.PackReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PackReport</span></code></a>([checks, notes])</p></td>
 <td><p>Every step of a pack check, in order.</p></td>
 </tr>
 </tbody>
@@ -233,7 +244,7 @@ a report with one failed <code class="docutils literal notranslate"><span class=
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="cutan.pack.PackReport">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.pack.</span></span><span class="sig-name descname"><span class="pre">PackReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/pack.html#PackReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.pack.PackReport" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.pack.PackReport'">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.pack.</span></span><span class="sig-name descname"><span class="pre">PackReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/pack.html#PackReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.pack.PackReport" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.pack.PackReport'">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
 <p>Every step of a pack check, in order.</p>
 <dl class="field-list simple">
@@ -252,6 +263,12 @@ a report with one failed <code class="docutils literal notranslate"><span class=
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
 </dd>
 </dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cutan.pack.PackReport.notes">
+<span class="sig-name descname"><span class="pre">notes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">list</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">]</span></span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.pack.PackReport.notes" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.pack.PackReport.notes'">¶</a></dt>
+<dd><p>Information for the writer that is neither an error nor a warning (it
+never fails a check): e.g. that every drawing is hand-written SVG.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="cutan.pack.PackReport.summary">
@@ -340,6 +357,36 @@ report names no server path (the scratch project is <code class="docutils litera
 </dd>
 </dl>
 </dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.pack.pack_art_guidance">
+<span class="sig-prename descclassname"><span class="pre">cutan.pack.</span></span><span class="sig-name descname"><span class="pre">pack_art_guidance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/pack.html#pack_art_guidance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.pack.pack_art_guidance" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.pack.pack_art_guidance'">¶</a></dt>
+<dd><p>What art to ask the writer for (<a class="reference internal" href="cutan.art_brief.html#cutan.art_brief.art_guidance" title="cutan.art_brief.art_guidance"><code class="xref py py-func docutils literal notranslate"><span class="pre">cutan.art_brief.art_guidance()</span></code></a>), in the
+look of the pack’s named style if it has one, when every drawing is SVG; else None.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">pack_art_guidance</span><span class="p">(</span><span class="s2">"/no/such/pack"</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+</span><span id="line-2"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.pack.svg_only_art">
+<span class="sig-prename descclassname"><span class="pre">cutan.pack.</span></span><span class="sig-name descname"><span class="pre">svg_only_art</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/pack.html#svg_only_art"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.pack.svg_only_art" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.pack.svg_only_art'">¶</a></dt>
+<dd><p>How many drawings the pack has when every one is SVG (0 when any is a picture,
+or there are none): hand-written SVG looks computer-made.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">svg_only_art</span><span class="p">(</span><span class="s2">"/no/such/pack"</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">0</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
@@ -353,6 +400,7 @@ report names no server path (the scratch project is <code class="docutils litera
 <li><a :data-current="activeSection === '#cutan.pack.PackReport'" class="reference internal" href="#cutan.pack.PackReport"><code class="docutils literal notranslate"><span class="pre">PackReport</span></code></a><ul>
 <li><a :data-current="activeSection === '#cutan.pack.PackReport.errors'" class="reference internal" href="#cutan.pack.PackReport.errors"><code class="docutils literal notranslate"><span class="pre">PackReport.errors</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.pack.PackReport.format'" class="reference internal" href="#cutan.pack.PackReport.format"><code class="docutils literal notranslate"><span class="pre">PackReport.format()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.pack.PackReport.notes'" class="reference internal" href="#cutan.pack.PackReport.notes"><code class="docutils literal notranslate"><span class="pre">PackReport.notes</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.pack.PackReport.summary'" class="reference internal" href="#cutan.pack.PackReport.summary"><code class="docutils literal notranslate"><span class="pre">PackReport.summary()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.pack.PackReport.to_dict'" class="reference internal" href="#cutan.pack.PackReport.to_dict"><code class="docutils literal notranslate"><span class="pre">PackReport.to_dict()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.pack.PackReport.warnings'" class="reference internal" href="#cutan.pack.PackReport.warnings"><code class="docutils literal notranslate"><span class="pre">PackReport.warnings</span></code></a></li>
@@ -362,6 +410,8 @@ report names no server path (the scratch project is <code class="docutils litera
 <li><a :data-current="activeSection === '#cutan.pack.check_pack'" class="reference internal" href="#cutan.pack.check_pack"><code class="docutils literal notranslate"><span class="pre">check_pack()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.pack.lint_svg'" class="reference internal" href="#cutan.pack.lint_svg"><code class="docutils literal notranslate"><span class="pre">lint_svg()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.pack.main'" class="reference internal" href="#cutan.pack.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.pack.pack_art_guidance'" class="reference internal" href="#cutan.pack.pack_art_guidance"><code class="docutils literal notranslate"><span class="pre">pack_art_guidance()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.pack.svg_only_art'" class="reference internal" href="#cutan.pack.svg_only_art"><code class="docutils literal notranslate"><span class="pre">svg_only_art()</span></code></a></li>
 </ul>
 </div>
 </aside>
@@ -375,7 +425,7 @@ report names no server path (the scratch project is <code class="docutils litera
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=b87b3bc5"></script>
+<script src="../_static/documentation_options.js?v=8f83b1af"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
