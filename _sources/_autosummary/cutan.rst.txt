@@ -42,6 +42,7 @@
    library
    motion
    nw
+   pack
    projects_store
    runtime
    styles

@@ -131,6 +131,7 @@ The names of the style specs that ship with `cutan`, sorted.
 | [`impacts`](cutan.impacts.html.md#module-cutan.impacts)               | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                              |
 | [`library`](cutan.library.html.md#module-cutan.library)               | The character analyser: legs, arms, views and mouth chart, derived from the rig.                           |
 | [`motion`](cutan.motion.html.md#module-cutan.motion)                 | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.                       |
+| [`pack`](cutan.pack.html.md#module-cutan.pack)                     | Check a cut-out production pack with cutan's own validators (cutan#87).                                    |
 | [`projects_store`](cutan.projects_store.html.md#module-cutan.projects_store) | Where a cutan project's files are read from: a disk folder or S3, by configuration.                        |
 | [`runtime`](cutan.runtime.html.md#module-cutan.runtime)               | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).                  |
 | [`styles`](cutan.styles.html.md#module-cutan.styles)                 | The named cut-out style specs, shipped as package data (cutan#4).                                          |

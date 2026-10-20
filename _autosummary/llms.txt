@@ -64,6 +64,7 @@
 - [cutan.impacts.truth](cutan.impacts.truth.html.md): Ground truth: what was intended, what was executed, and what each frame shows.
 - [cutan.library](cutan.library.html.md): The character analyser: legs, arms, views and mouth chart, derived from the rig.
 - [cutan.motion](cutan.motion.html.md): The cut-out genre’s motion presets: moves that name a rig’s parts or swap its views.
+- [cutan.pack](cutan.pack.html.md): Check a cut-out production pack with cutan’s own validators (cutan#87).
 - [cutan.projects_store](cutan.projects_store.html.md): Where a cutan project’s files are read from: a disk folder or S3, by configuration.
 - [cutan.runtime](cutan.runtime.html.md): JavaScript the cut-out genre adds to the stage runtime (&#96;visuals.js&#96;: the mouth and eye).
 - [cutan.styles](cutan.styles.html.md): The named cut-out style specs, shipped as package data (cutan#4).

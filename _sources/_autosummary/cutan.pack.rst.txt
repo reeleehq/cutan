@@ -1,0 +1,28 @@
+cutan.pack
+==========
+
+.. automodule:: cutan.pack
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      cast_commands
+      check_pack
+      lint_svg
+      main
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      PackCheck
+      PackReport
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      PackError
+   
