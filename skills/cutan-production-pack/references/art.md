@@ -19,8 +19,8 @@ The factory characters (`cast.sh`) are drawn by the pipeline and are not yours t
 
 | art | in the pack | status |
 |---|---|---|
-| set plates (sky, far, mid, near, the view behind a car) | `assets/environments/<set>/plates/<layer>.png` (or `.jpg`, `.webp`), named by an `image` plane in `meta.json` | used as they are when the background is transparent (the sky may be opaque); a flat background is cut out by the pipeline owner first |
-| props, vehicles | `assets/props/<prop>/parts/<prop>.png`, named by the prop's skin in `prop.json` | as plates: transparent is ready, a flat background is cut out first |
+| set plates (sky, far, mid, near, the view through a moving window) | `assets/environments/<set>/plates/<layer>.png` (or `.jpg`, `.webp`), named by an `image` plane in `meta.json` | used as they are when the background is transparent (the sky may be opaque); a flat background is cut out by the pipeline owner first |
+| props, vehicles, roadside objects | `assets/props/<prop>/parts/<prop>.png`, named by the prop's skin in `prop.json` | as plates: transparent is ready, a flat background is cut out first |
 | a character reference sheet, a costume | `reference/<name>-sheet.png`, listed in `PRODUCTION.md` | the pipeline owner cuts it into a puppet: it takes their time, so say so |
 | a redrawn part of a factory character | must be SVG for now | a picture goes under `reference/` with a description |
 
@@ -39,6 +39,14 @@ A prompt is the subject in the writer's words, then the kind's **prompt words**,
 - Keep the look identical in every prompt of the film, word for word: it is what makes the pictures belong together. With no named style, write the look once with the writer (medium, colours, line, texture) and reuse it.
 - **Never put a show's, studio's or artist's name in a prompt** ("in the style of ..."): describe the look. Never ask for a real person's likeness, a show's characters or a logo.
 - Generate each layer of a set separately, from the same look; generate the props one per picture.
+- **Say where the camera is** whenever the art touches a character: a car's interior around the driver, a seat, a steering wheel, a costume. "Seen from in front of the car, looking back at the driver" in the prompt; otherwise the picture and the character face different ways.
+- **A view through a moving window** (a car's rear or side window, a train) is two kinds of picture. The plate holds only what is effectively at infinity: the sky, the horizon, far mountains, the sea. Everything near or in the middle distance (roadside trees, poles, fences, road markings) is a separate transparent prop, one per object, which the scene moves past in perspective. A plate with near trees painted in stays still while the poles move, and reads as broken. The plate's prompt:
+
+  > a hot late afternoon in a dry southern landscape. A distant landscape seen far away: the sky and the horizon with far mountains, empty flat land or calm sea stretching to the horizon, everything small and far, nothing in the foreground or the middle distance, no trees, no poles, no fences, no road, no buildings, no car parts, no window frame, no people, no text. Look: <the film's look>. --ar 16:9
+
+  and each roadside object's (one per picture, two or three variants of a tree):
+
+  > an olive tree. A single roadside object standing upright, whole and centred with its base on the bottom edge of a square frame, seen from the road at eye level, isolated on a plain flat white background, no ground, no cast shadow, no text. Look: <the film's look>. --ar 1:1
 - For a character, make the reference sheet first, then ask for every other picture of it with that sheet as the reference image (Midjourney `--oref` in V7, `--cref` in V6; an edit in ChatGPT), so it stays the same person.
 - Give the writer the prompts in a list they can copy, one code block per picture, each headed with the file it becomes.
 
@@ -83,18 +91,31 @@ A prompt is the subject in the writer's words, then the kind's **prompt words**,
 - **Background:** transparent everywhere except the foreground object
 - What is in front of the characters: a railing, a bush, a counter, a car's dashboard and window frames.
 - Kept to the edges and bottom of the frame so it does not hide faces.
+- Anything around a character (a dashboard, a seat, a steering wheel) drawn from the camera's viewpoint relative to that character, stated in the prompt.
 - **Then:** ready if its background is transparent; a flat background is cut out by the pipeline owner first (cutan.carve).
-- **Prompt words** (after the subject): A foreground element along the bottom edge of the frame, the rest of the picture plain flat white and empty, seen straight on, no people, no text. (Midjourney: `--ar 16:9`)
+- **Prompt words** (after the subject): A foreground element along the bottom edge of the frame, the rest of the picture plain flat white and empty, seen from <where the camera is relative to the characters, e.g. in front of the car looking back at the driver>, no people, no text. (Midjourney: `--ar 16:9`)
 
-#### The view behind a car (or a train, a moving window) (`window_view`)
+#### The view through a moving window (a car's rear or side window, a train) (`window_view`)
 
 - **Goes to:** assets/environments/<set>/plates/<layer>.png (or .jpg; an image plane in meta.json); its own plate, behind the vehicle's interior plate
-- **Canvas:** a long strip, 3 to 4 frames wide (about 5000x1080), so it can scroll past the windows for the whole shot
+- **Canvas:** 16:9, at least 1920x1080 behind a rear window or windscreen (what is at infinity does not move); a strip 2 to 3 frames wide behind a side window, for a slow drift
 - **Background:** opaque
-- Only the landscape or road seen through the windows: no car parts, no window frame, no reflections.
-- The horizon at one height along the whole strip; ideally the left and right ends join so it can loop.
-- The car's interior (seats, dashboard, window frames with the glass left empty) is a separate near-layer picture.
-- **Prompt words** (after the subject): A very wide panoramic strip of roadside landscape seen side-on from a moving car, horizon level at one height throughout, no car parts, no window frame, no people, no text. (Midjourney: `--ar 4:1`)
+- Only what is effectively at infinity: the sky, the horizon, far mountains, the sea, a distant skyline.
+- Nothing near or in the middle distance: no roadside trees, poles, fences, road markings or nearby buildings. Those are separate transparent props (`roadside`) that the scene moves in perspective (an#484): painted into the plate they stay still while the poles move, and the shot reads as broken.
+- No car parts, no window frame, no reflections: the car's interior is a separate near-layer picture with the glass left empty.
+- **Prompt words** (after the subject): A distant landscape seen far away: the sky and the horizon with far mountains, empty flat land or calm sea stretching to the horizon, everything small and far, nothing in the foreground or the middle distance, no trees, no poles, no fences, no road, no buildings, no car parts, no window frame, no people, no text. (Midjourney: `--ar 16:9`)
+
+#### Roadside objects for a moving view (a tree, a pole, a fence, a road dash) (`roadside`)
+
+- **Goes to:** assets/props/<object>/parts/<object>.png, one prop per object
+- **Canvas:** square, 1024x1024, like any prop; the object standing on the bottom edge
+- **Background:** transparent (or a plain flat white, cut out afterwards)
+- One object per picture, whole, upright, its base on the bottom edge.
+- Seen from the angle the window sees it: side-on through a side window; from the road, straight on, through a rear window or windscreen.
+- Two or three variants of what repeats (trees of different shapes) so the stream does not look stamped.
+- No ground under it, no cast shadow.
+- **Then:** the scene moves each one past the window in perspective (written as moves in scene.md today; a declarative travelling view is an#484).
+- **Prompt words** (after the subject): A single roadside object standing upright, whole and centred with its base on the bottom edge of a square frame, seen from the road at eye level, isolated on a plain flat white background, no ground, no cast shadow, no text. (Midjourney: `--ar 1:1`)
 
 #### A prop (any object a scene shows) (`prop`)
 
