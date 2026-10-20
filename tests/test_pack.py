@@ -51,8 +51,8 @@ def test_unknown_voice_key_and_notes(tmp_path):
     shutil.copytree(EXAMPLE, pack)
     voices = pack / "assets" / "voices"
     voices.mkdir(parents=True, exist_ok=True)
-    (voices / "ok.json").write_text(json.dumps({"provider": "elevenlabs", "notes": "warm, slow, a Limerick lilt", "sample_text": "Hello there. " * 10}))
-    (voices / "bad.json").write_text(json.dumps({"provider": "elevenlabs", "accent": "limerick", "notes": 3}))
+    (voices / "ok.json").write_text(json.dumps({"provider": "elevenlabs", "notes": "warm, slow, a Yorkshire burr", "sample_text": "Hello there. " * 10}))
+    (voices / "bad.json").write_text(json.dumps({"provider": "elevenlabs", "accent": "yorkshire", "notes": 3}))
     from cutan.pack import _lint_voices
 
     report = PackReport()
@@ -75,3 +75,68 @@ def test_example_pack_passes(pack, tmp_path):
     assert report.ok, report.format()
     assert not report.warnings, report.warnings
     assert report.summary().startswith("PASS")
+
+
+def _example_copy(tmp_path):
+    pack = tmp_path / "pack"
+    shutil.copytree(EXAMPLE, pack)
+    return pack
+
+
+def _with_this_checkout(monkeypatch):
+    root = str(Path(__file__).resolve().parents[1])
+    import os
+
+    monkeypatch.setenv("PYTHONPATH", os.pathsep.join(p for p in (root, os.environ.get("PYTHONPATH")) if p))
+
+
+def test_code_in_a_pack_is_never_copied_or_imported(tmp_path, monkeypatch):
+    """A `dataclasses.py` (or any module) in the pack must not run in the `an` children."""
+    _with_this_checkout(monkeypatch)
+    pack = _example_copy(tmp_path)
+    marker = tmp_path / "ran"
+    (pack / "dataclasses.py").write_text(f"open({str(marker)!r}, 'w').write('x')\nraise SystemExit\n", encoding="utf-8")
+    (pack / "assets" / "props" / "umbrella" / "parts" / "extra.SVG").write_text("<svg/>", encoding="utf-8")
+    report = check_pack(pack)
+    assert not marker.exists()
+    labels = {c.label: c.ok for c in report.checks}
+    assert labels["file dataclasses.py"] is False
+    assert labels["file assets/props/umbrella/parts/extra.SVG"] is False
+
+
+def test_secrets_never_reach_the_children(monkeypatch):
+    from cutan.pack import _child_env
+
+    monkeypatch.setenv("ELEVEN_API_KEY", "k")
+    monkeypatch.setenv("REELEE_MCP_DOWNLOAD_SECRET", "s")
+    monkeypatch.setenv("AWS_ACCESS_KEY_ID", "a")
+    env = _child_env()
+    assert not {"ELEVEN_API_KEY", "REELEE_MCP_DOWNLOAD_SECRET", "AWS_ACCESS_KEY_ID"} & set(env)
+    assert "PATH" in env
+
+
+def test_work_is_capped(tmp_path):
+    from cutan.pack import MAX_CAST_LINES
+
+    pack = tmp_path / "pack"
+    pack.mkdir()
+    (pack / "scene.md").write_text("x", encoding="utf-8")
+    (pack / "cast.sh").write_text("an character add-views x\n" * (MAX_CAST_LINES + 1), encoding="utf-8")
+    report = check_pack(pack)
+    assert [c.label for c in report.checks] == ["pack"] and "at most" in report.errors[0]
+
+
+def test_the_deadline_stops_the_check(tmp_path, monkeypatch):
+    _with_this_checkout(monkeypatch)
+    report = check_pack(_example_copy(tmp_path), deadline=0.0)
+    assert not report.ok and any("ran out of time" in e for e in report.errors)
+
+
+def test_the_report_names_no_server_path(tmp_path, monkeypatch):
+    _with_this_checkout(monkeypatch)
+    pack = _example_copy(tmp_path)
+    meta = pack / "assets" / "environments" / "bus_stop" / "meta.json"
+    meta.write_text(meta.read_text(encoding="utf-8").replace("plates/shelter.svg", "/etc/hostname"), encoding="utf-8")
+    report = check_pack(pack)
+    text = json.dumps(report.to_dict(with_output=True))
+    assert str(tmp_path) not in text and "/etc/hostname" not in text and "/root/" not in text

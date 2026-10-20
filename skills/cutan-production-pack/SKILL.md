@@ -66,7 +66,7 @@ Both checks lint every SVG, build a scratch project, run `cast.sh`, validate eve
 
 ## Designing the voices (with the reelee connector)
 
-A voice document's `notes` describe the voice in words (`references/voices-and-looks.md`). With the connector, those words become voices the writer can hear, and the writer, not the pipeline owner, chooses. This matters most for an accent: only someone who knows it can tell a Limerick voice from a generic Irish one.
+A voice document's `notes` describe the voice in words (`references/voices-and-looks.md`). With the connector, those words become voices the writer can hear, and the writer, not the pipeline owner, chooses. This matters most for an accent: only someone who knows it can tell a rural Yorkshire voice from a generic northern one.
 
 1. Price it first: `reelee_design_voices` with `dry_run: true` and `voices`, a map from each voice key to `{"notes": ..., "sample_text": ...}` (the sample text: 100 to 1000 characters of that character's own lines). It returns what the design would cost. Voice design is billed to the writer's connector budget: say the price and get a yes.
 2. Run it without `dry_run`. Each voice comes back with options `A`, `B`, `C`, each with a link to play its sample. Give the writer the links, voice by voice, and ask which sounds right. If none does, rewrite the notes with the writer (be concrete: region, age, texture, pace, what it must not sound like) and design again.

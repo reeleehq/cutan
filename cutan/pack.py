@@ -156,9 +156,24 @@ SVG_SHAPES = frozenset(
 SVG_FORBIDDEN = frozenset({"image", "script", "foreignObject"})
 #: Seconds one step (one `an` command) may run before it counts as failed.
 DFLT_STEP_TIMEOUT = 300.0
+#: Seconds the whole check may run; past it, the remaining steps are not run.
+DFLT_DEADLINE = 900.0
+#: The files a pack may hold (exact, lower-case suffixes). Nothing else is copied
+#: into the scratch project: no code, no images, no audio.
+PACK_SUFFIXES = frozenset({".md", ".sh", ".json", ".svg", ".txt", ".yaml", ".yml"})
+#: Caps on the work one pack can ask for (each line or folder is one `an` process).
+MAX_CAST_LINES = 100
+MAX_ASSET_FOLDERS = 60
+#: ``-P``: the child does not put its working directory (the scratch project,
+#: which holds the pack's files) first on ``sys.path`` (Python 3.11+; on 3.10
+#: only :data:`PACK_SUFFIXES` keeps code out).
+_NO_CWD_PATH: tuple[str, ...] = ("-P",) if sys.version_info >= (3, 11) else ()
 #: How `an` is run by default: the interpreter running this code, so the check
 #: needs no `an` on PATH (a service's venv rarely puts its scripts there).
-DFLT_AN_COMMAND: tuple[str, ...] = (sys.executable, "-m", "an")
+DFLT_AN_COMMAND: tuple[str, ...] = (sys.executable, *_NO_CWD_PATH, "-m", "an")
+#: Environment variables a check's children never see (a server's keys).
+_SECRET_ENV = re.compile(r"KEY|SECRET|TOKEN|PASSW|CREDENTIAL|^AWS_|PRIVATE", re.I)
+_ABS_PATH = re.compile(r"(?<![\w.])/(?:[\w.@+-]+/)+[\w.@+-]*")
 
 
 class PackError(Exception):
@@ -184,7 +199,8 @@ class PackCheck:
         """
         found = [_strip_marker(ln, ERROR_MARKER) for ln in _lines_with(self.output, (ERROR_MARKER,))]
         if not self.ok and not found:
-            found = [self.output.strip() or "failed with no output"]
+            last = [ln.strip() for ln in self.output.splitlines() if ln.strip()]
+            found = [last[-1][:300] if last else "failed with no output"]
         return found
 
     @property
@@ -373,6 +389,37 @@ def _outside_links(root: ET.Element) -> bool:
     return False
 
 
+def _child_env() -> dict[str, str]:
+    """This process's environment minus anything that looks like a secret."""
+    return {k: v for k, v in os.environ.items() if not _SECRET_ENV.search(k)}
+
+
+def _redact(text: str, *, places: Sequence[tuple[str, str]]) -> str:
+    """``text`` with the given places renamed and any other absolute path hidden.
+
+    >>> _redact("at /tmp/x/project/a.svg and /etc/hostname", places=[("/tmp/x/project", "<project>")])
+    'at <project>/a.svg and <path>'
+    """
+    for path, name in places:
+        text = text.replace(path, name)
+    return _ABS_PATH.sub("<path>", text)
+
+
+def _lint_files(pack: Path, report: PackReport) -> None:
+    """Refuse every file a pack must not hold (by exact suffix) and every symlink."""
+    for src in sorted(pack.rglob("*")):
+        rel = src.relative_to(pack).as_posix()
+        if src.is_symlink():
+            report.add(f"file {rel}", False, f"  {ERROR_MARKER} a link, not a file")
+        elif src.is_file() and src.suffix not in PACK_SUFFIXES:
+            report.add(
+                f"file {rel}",
+                False,
+                f"  {ERROR_MARKER} a pack holds only {', '.join(sorted(PACK_SUFFIXES))} files "
+                "(lower-case suffix); this one is not copied",
+            )
+
+
 def _lint_svgs(pack: Path, report: PackReport) -> None:
     chars = pack / "assets" / "characters"
     for svg in sorted(pack.rglob("*.svg")):
@@ -450,22 +497,38 @@ def _subdirs(path: Path) -> list[Path]:
     return sorted(p for p in path.iterdir() if p.is_dir()) if path.is_dir() else []
 
 
-class _Runner:
-    """Runs one ``an`` step and records it in the report."""
+class _OutOfTime(PackError):
+    """The check's overall deadline passed."""
 
-    def __init__(self, report: PackReport, *, timeout: float) -> None:
+
+class _Runner:
+    """Runs one ``an`` step (secrets scrubbed from its environment, within the
+    step timeout and what is left of the deadline) and records it in the report."""
+
+    def __init__(self, report: PackReport, *, timeout: float, deadline: float | None) -> None:
+        import time
+
         self.report, self.timeout = report, timeout
+        self._clock = time.monotonic
+        self._end = None if deadline is None else self._clock() + deadline
+        self._env = _child_env()
 
     def __call__(
         self, cmd: list[str], *, cwd: Path, label: str, expect: str | None = None
     ) -> bool:
+        timeout = self.timeout
+        if self._end is not None:
+            left = self._end - self._clock()
+            if left <= 0:
+                raise _OutOfTime("the check ran out of time; the remaining steps were not run")
+            timeout = min(timeout, left)
         try:
             proc = subprocess.run(
-                cmd, cwd=cwd, capture_output=True, text=True, timeout=self.timeout
+                cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout, env=self._env
             )
         except subprocess.TimeoutExpired:
             return self.report.add(
-                label, False, f"  {ERROR_MARKER} took longer than {self.timeout:g} s"
+                label, False, f"  {ERROR_MARKER} took longer than {timeout:g} s"
             )
         out = (proc.stdout + proc.stderr).strip()
         ok = (
@@ -477,12 +540,26 @@ class _Runner:
 
 
 def _build_and_check(
-    pack: Path, project: Path, report: PackReport, *, an: list[str], python: str, timeout: float
+    pack: Path,
+    project: Path,
+    report: PackReport,
+    *,
+    an: list[str],
+    python: str,
+    timeout: float,
+    deadline: float | None,
 ) -> None:
     cast = cast_commands(pack)  # refuse a bad cast.sh before running anything
+    if len(cast) > MAX_CAST_LINES:
+        raise PackError(f"{CAST_FILE} has {len(cast)} commands; a pack checked here has at most {MAX_CAST_LINES}")
+    for kind in ("characters", "props", "environments"):
+        n = len(_subdirs(pack / "assets" / kind))
+        if n > MAX_ASSET_FOLDERS:
+            raise PackError(f"assets/{kind} has {n} folders; at most {MAX_ASSET_FOLDERS}")
+    _lint_files(pack, report)
     _lint_svgs(pack, report)
     _lint_voices(pack, report)
-    run = _Runner(report, timeout=timeout)
+    run = _Runner(report, timeout=timeout, deadline=deadline)
     workdir = project.parent
     if not run(an + ["init", str(project)], cwd=workdir, label="an init", expect="initialized"):
         return
@@ -493,6 +570,7 @@ def _build_and_check(
         if (
             src.is_dir()
             or src.is_symlink()
+            or src.suffix not in PACK_SUFFIXES
             or rel.as_posix() in PACK_ONLY_FILES
             or any(d in src.parents for d in redrawn)
         ):
@@ -507,7 +585,7 @@ def _build_and_check(
     chars = project / "assets" / "characters"
     for d in redrawn:  # redrawn parts go over the factory's own, on the factory's canvas
         for src in sorted(d.rglob("*")):
-            if src.is_file() and not src.is_symlink():
+            if src.is_file() and not src.is_symlink() and src.suffix in PACK_SUFFIXES:
                 rel = src.relative_to(d)
                 problem = _redrawn_problem(src, chars / d.name / rel)
                 if problem:
@@ -518,7 +596,7 @@ def _build_and_check(
                     _copy(src, chars / d.name / rel)
     if (project / "assets" / "voices").is_dir():
         run(
-            [python, "-c", VOICE_CHECK, str(project / "assets" / "voices")],
+            [python, *_NO_CWD_PATH, "-c", VOICE_CHECK, str(project / "assets" / "voices")],
             cwd=project,
             label="voices (engine checks)",
         )
@@ -559,6 +637,7 @@ def check_pack(
     an_command: Sequence[str] = DFLT_AN_COMMAND,
     python: str | None = None,
     timeout: float = DFLT_STEP_TIMEOUT,
+    deadline: float | None = DFLT_DEADLINE,
 ) -> PackReport:
     """Check the production pack at ``pack_dir``; return a :class:`PackReport`.
 
@@ -569,6 +648,13 @@ def check_pack(
     python: the interpreter for the engine's voice checks (default: the one in
         ``an_command`` when it starts with one, else this one)
     timeout: seconds one step may run before it counts as failed
+    deadline: seconds the whole check may run (``None``: no limit)
+
+    The pack is untrusted: only :data:`PACK_SUFFIXES` files are copied, the
+    ``an`` children run without the working directory on their import path
+    and without any secret-looking environment variable, the work is capped
+    (:data:`MAX_CAST_LINES`, :data:`MAX_ASSET_FOLDERS`, ``deadline``), and the
+    report names no server path (the scratch project is ``<project>``).
 
     A pack that cannot be checked at all gives a report with one failed
     ``pack`` check; nothing here raises on a bad pack.
@@ -583,7 +669,9 @@ def check_pack(
     try:
         if not (pack / "scene.md").is_file():
             raise PackError(f"{pack.name or pack} has no scene.md: is it a production pack?")
-        _build_and_check(pack, work / "project", report, an=an, python=python, timeout=timeout)
+        _build_and_check(
+            pack, work / "project", report, an=an, python=python, timeout=timeout, deadline=deadline
+        )
     except PackError as e:
         report.add("pack", False, f"{ERROR_MARKER} {e}")
     except Exception as e:  # noqa: BLE001 - a malformed pack ends in a failed check, not a traceback
@@ -593,6 +681,10 @@ def check_pack(
     finally:
         if owned:
             shutil.rmtree(work, ignore_errors=True)
+    places = [(str(work / "project"), "<project>"), (str(work), "<scratch>"), (str(pack), "<pack>")]
+    report.checks = [
+        PackCheck(c.label, c.ok, _redact(c.output, places=places)) for c in report.checks
+    ]
     return report
 
 
