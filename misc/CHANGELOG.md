@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-10-21
+- **A print on the clothing** (cutan#94): `an character new --clothing-pattern stripes|check|floral[:base=#..,motif=#..,leaf=#..,scale=1]` (`new_character(clothing_pattern=...)`, a string or a mapping; `cutan.characters.patterns`) draws an SVG `<pattern>` over the clothing fill of the torso, in every view, and the sleeves, under the outline, so a loud shirt, a striped jumper or a check suit tells two figures apart without redrawing. `base` is the clothing colour; the fill keeps its `clothing` role (a style pack still recolours it) and the print's literals carry no role and are kept distinct from the part's. Recorded in the descriptor's `metadata.clothing_pattern`; `add_views` and the recipe's replay redraw it. The default (`none`) is byte-identical: the variety goldens, the corpus hashes and the blessed frames do not move. Swap channels and the rig contract untouched. A raster tile as the fill is not done (see the issue).
+
 ## 2026-10-09
 - **New characters stand on their feet** (an#285, the maintainer's decision on an#423): `an character new` declares the rig's `origin` at its root bone by default (`--no-feet-origin` opts out; the Python factory's default stays off so rebuilt characters are unchanged). Existing characters are not migrated; `an character feet-origin <name> [--undo]` (`stand_on_feet`) converts one and prints how far to move its `stage.at`.
 

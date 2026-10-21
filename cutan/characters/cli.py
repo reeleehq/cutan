@@ -63,6 +63,7 @@ def new(
     hair_style: str = DFLT_HAIR_STYLE,
     hair_length: str = DFLT_HAIR_LENGTH,
     feet_origin: bool = True,
+    clothing_pattern: str = "",
 ) -> str:
     """Create a new character at ``out_dir``/``name``.
 
@@ -94,6 +95,10 @@ def new(
     hair_length: short (the default), medium (to the jaw) or long (past the
         chin) (offline head only); bald takes short
     sash: a diagonal band across the torso, in the accessory colour
+    clothing_pattern: a print on the clothing (torso in every view, sleeves):
+        stripes, check or floral, with colours and scale as
+        "floral:base=#e8735a,motif=#ffffff,leaf=#2f6b3a,scale=1" (base is the
+        clothing colour; none, the default, is a flat fill)
     views: draw the turnaround — back, side (a profile facing right) and
         three_quarter beside the front, as a `view` swap set (offline head
         only), so `play: turn` can turn the character (an#197)
@@ -132,6 +137,7 @@ def new(
             hair_style=hair_style,
             hair_length=hair_length,
             feet_origin=feet_origin,
+            clothing_pattern=clothing_pattern or None,
         )
     except ValueError as e:
         # A licence refusal is a message for a human, not a traceback. The
