@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-20T23:28:12Z",
+  "built_at": "2026-10-21T07:36:09Z",
   "package": {
     "name": "cutan",
-    "version": "0.0.58",
+    "version": "0.0.59",
     "display_name": "cutan",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "57877e876564aaa2655f2ec3a689d1d93e061ae7",
-    "short_commit": "57877e8",
+    "commit": "d3adeea46ada63a68b272f0f47c1a58437ef580c",
+    "short_commit": "d3adeea",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/cutan",
-    "commit_url": "https://github.com/reeleehq/cutan/commit/57877e876564aaa2655f2ec3a689d1d93e061ae7",
+    "commit_url": "https://github.com/reeleehq/cutan/commit/d3adeea46ada63a68b272f0f47c1a58437ef580c",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/cutan",
-    "sha": "57877e876564aaa2655f2ec3a689d1d93e061ae7",
+    "sha": "d3adeea46ada63a68b272f0f47c1a58437ef580c",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "39514743739",
-    "run_url": "https://github.com/reeleehq/cutan/actions/runs/39514743739",
+    "run_id": "39562476358",
+    "run_url": "https://github.com/reeleehq/cutan/actions/runs/39562476358",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -61,15 +61,13 @@
   "pypi": {
     "checked": true,
     "latest": "0.0.59",
-    "relation": "behind",
+    "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 57877e876564aaa2655f2ec3a689d1d93e061ae7\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout d3adeea46ada63a68b272f0f47c1a58437ef580c\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": false,
-    "notes": [
-      "The documented version (0.0.58) is behind the latest release on PyPI (0.0.59): `pip install cutan` gives newer code than these docs describe."
-    ]
+    "aligned": true,
+    "notes": []
   }
 }

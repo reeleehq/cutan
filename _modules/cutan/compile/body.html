@@ -236,16 +236,18 @@
 </span><span id="line-50">            <span class="n">entities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span>
 </span><span id="line-51">            <span class="k">continue</span>
 </span><span id="line-52">        <span class="n">after</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">after</span> <span class="k">if</span> <span class="n">entity</span><span class="o">.</span><span class="n">stage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-</span><span id="line-53">        <span class="n">stage</span> <span class="o">=</span> <span class="n">StagePlacement</span><span class="p">(</span><span class="n">at</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">placed</span><span class="p">[</span><span class="s2">"at"</span><span class="p">]),</span> <span class="n">scale</span><span class="o">=</span><span class="n">placed</span><span class="p">[</span><span class="s2">"scale"</span><span class="p">],</span> <span class="n">after</span><span class="o">=</span><span class="n">after</span><span class="p">)</span>
-</span><span id="line-54">        <span class="n">entities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"stage"</span><span class="p">:</span> <span class="n">stage</span><span class="p">}))</span>
-</span><span id="line-55">        <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="line-56">    <span class="k">return</span> <span class="n">shot</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"entities"</span><span class="p">:</span> <span class="n">entities</span><span class="p">})</span> <span class="k">if</span> <span class="n">changed</span> <span class="k">else</span> <span class="n">shot</span></div>
+</span><span id="line-53">        <span class="n">stage</span> <span class="o">=</span> <span class="n">StagePlacement</span><span class="p">(</span>
+</span><span id="line-54">            <span class="n">at</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">placed</span><span class="p">[</span><span class="s2">"at"</span><span class="p">]),</span> <span class="n">scale</span><span class="o">=</span><span class="n">placed</span><span class="p">[</span><span class="s2">"scale"</span><span class="p">],</span> <span class="n">after</span><span class="o">=</span><span class="n">after</span>
+</span><span id="line-55">        <span class="p">)</span>
+</span><span id="line-56">        <span class="n">entities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"stage"</span><span class="p">:</span> <span class="n">stage</span><span class="p">}))</span>
+</span><span id="line-57">        <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="line-58">    <span class="k">return</span> <span class="n">shot</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"entities"</span><span class="p">:</span> <span class="n">entities</span><span class="p">})</span> <span class="k">if</span> <span class="n">changed</span> <span class="k">else</span> <span class="n">shot</span></div>
 
-</span><span id="line-57">
-</span><span id="line-58">
-</span><span id="line-59"><span class="k">def</span><span class="w"> </span><span class="nf">_body_placement_pass</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-60"><span class="w">    </span><span class="sd">"""Cut-out: body-attached props placed by their body, before the scene is built."""</span>
-</span><span id="line-61">    <span class="n">state</span><span class="o">.</span><span class="n">shot</span> <span class="o">=</span> <span class="n">derive_body_placements</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">mall</span><span class="p">)</span>
+</span><span id="line-59">
+</span><span id="line-60">
+</span><span id="line-61"><span class="k">def</span><span class="w"> </span><span class="nf">_body_placement_pass</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-62"><span class="w">    </span><span class="sd">"""Cut-out: body-attached props placed by their body, before the scene is built."""</span>
+</span><span id="line-63">    <span class="n">state</span><span class="o">.</span><span class="n">shot</span> <span class="o">=</span> <span class="n">derive_body_placements</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">mall</span><span class="p">)</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -259,7 +261,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=c3e19674"></script>
+    <script src="../../../_static/documentation_options.js?v=6799126d"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
