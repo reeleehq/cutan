@@ -28,6 +28,7 @@ Use this only when neither the reelee connector's `reelee_check_production_pack`
 - [ ] `rotation` values are radians (between about -3.2 and 3.2), not degrees.
 - [ ] Anything that starts hidden or elsewhere has a `set` at `at: 0.0`.
 - [ ] A character in two consecutive shots: same `stage.at` and scale at the cut, or the second shot opens with `set`s of `x`, `y`, `scale_x`, `scale_y` at 0. A view other than `front`, or a negative `scale_x`, is set again at 0 in the next shot.
+- [ ] Several shots of one place (a conversation in two or three framings, a travelling view): a ` ```yaml world ` block and a `viewpoint` per shot (`scene-space.md`); under a travel, every plane of the environment is listed in `plates` as `far` or `vehicle`, and far plates hold only what is at infinity.
 - [ ] Motion presets and their `args` exist in the table in `references/characters.md`; `point` targets an arm, not the character.
 - [ ] Camera moves are from the list in `references/scene-format.md`; a style's allowed list respected.
 - [ ] Dialogue: emotions only from `neutral, happy, sad, angry, surprised, afraid, disgusted, thinking, skeptical, amused`; each character's `--mouth-variants` covers the moods it speaks in (`happy`/`amused` need `happy`, `sad` needs `sad`, `angry` needs `angry`, ...); only `(pause s)` or `(at s)` in parentheses before the colon.
