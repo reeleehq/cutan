@@ -4,6 +4,12 @@ cutan.audio.offline\_lipsync
 .. automodule:: cutan.audio.offline_lipsync
 
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      clip_words
+   
    .. rubric:: Classes
 
    .. autosummary::

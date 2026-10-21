@@ -1,4 +1,4 @@
-> built 2026-10-21 07:36 UTC from d3adeea (main) · cutan 0.0.59. Details: build_info.json
+> built 2026-10-21 07:54 UTC from 52490bb (main) · cutan 0.0.60. Details: build_info.json
 
 # index.html.md
 
@@ -514,6 +514,11 @@ you’ve installed the Rhubarb binary.
 True
 ```
 
+### Functions
+
+| [`clip_words`](_autosummary/cutan.audio.offline_lipsync.html.md#cutan.audio.offline_lipsync.clip_words)(audio)   | The word timings `audio` carries (`AudioClip.words`, a recorded take imported with a timed transcript — an#490), as a list; `None` when it has none or when the core predates the field.   |
+|----------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
 ### Classes
 
 | [`OfflineLipSync`](_autosummary/cutan.audio.offline_lipsync.html.md#cutan.audio.offline_lipsync.OfflineLipSync)(\*[, char_to_viseme])   | Default lip-sync provider: deterministic char-to-viseme mapping.   |
@@ -534,6 +539,20 @@ may re-make a missing track in memory (an#311, cutan#29).
 
 * **Type:**
   A pure function of the transcript, and nothing is billed
+
+### cutan.audio.offline_lipsync.clip_words(audio)
+
+The word timings `audio` carries (`AudioClip.words`, a recorded take
+imported with a timed transcript — an#490), as a list; `None` when it has
+none or when the core predates the field.
+
+```pycon
+>>> clip_words(AudioClip(duration=1.0)) is None
+True
+```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 
 # _autosummary/cutan.audio.rhubarb_lipsync.html.md
@@ -13011,16 +13030,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-21 07:36 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/d3adeea46ada63a68b272f0f47c1a58437ef580c"><code>d3adeea</code></a> on branch <code>main</code>, for **cutan 0.0.59** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-21 07:54 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/52490bb1a679f9c512adc68e849659c361d1837f"><code>52490bb</code></a> on branch <code>main</code>, for **cutan 0.0.60** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.60) is behind the latest release on PyPI (0.0.61): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/d3adeea46ada63a68b272f0f47c1a58437ef580c"><code>d3adeea46ada63a68b272f0f47c1a58437ef580c</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/52490bb1a679f9c512adc68e849659c361d1837f"><code>52490bb1a679f9c512adc68e849659c361d1837f</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -13031,9 +13052,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/39562476358">39562476358</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/39564670969">39564670969</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>d3adeea46ada63a68b272f0f47c1a58437ef580c</code> (in the history of the built commit) |
+| Event commit | <code>52490bb1a679f9c512adc68e849659c361d1837f</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -13058,13 +13079,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.59/">0.0.59</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.61/">0.0.61</a>, newer than the documented version (0.0.60).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout d3adeea46ada63a68b272f0f47c1a58437ef580c
+git checkout 52490bb1a679f9c512adc68e849659c361d1837f
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

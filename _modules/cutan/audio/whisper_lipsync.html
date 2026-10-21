@@ -222,114 +222,122 @@
 </span><span id="line-35"><span class="p">)</span>
 </span><span id="line-36"><span class="kn">from</span><span class="w"> </span><span class="nn">an.audio.tts</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioClip</span>
 </span><span id="line-37">
-</span><span id="line-38">
-</span><span id="line-39"><span class="c1"># Reuse the offline char→viseme mapping so the two providers stay consistent.</span>
-</span><span id="line-40"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.audio.offline_lipsync</span><span class="w"> </span><span class="kn">import</span> <span class="n">_CHAR_TO_VISEME</span><span class="p">,</span> <span class="n">_REST_VISEME</span>
-</span><span id="line-41">
-</span><span id="line-42">
-</span><span id="line-43"><span class="n">_DEFAULT_MODEL_SIZE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"tiny"</span>  <span class="c1"># ~75 MB; "base" gives slightly better word-timing</span>
-</span><span id="line-44"><span class="n">_DEFAULT_DEVICE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cpu"</span>
-</span><span id="line-45"><span class="n">_DEFAULT_COMPUTE_TYPE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"int8"</span>
-</span><span id="line-46"><span class="n">_MIN_WORD_GAP_FOR_REST</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-47">    <span class="mf">0.20</span>  <span class="c1"># seconds; insert rest viseme in gaps wider than this</span>
-</span><span id="line-48"><span class="p">)</span>
-</span><span id="line-49">
-</span><span id="line-50">
+</span><span id="line-38"><span class="c1"># Reuse the offline char→viseme mapping so the two providers stay consistent.</span>
+</span><span id="line-39"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.audio.offline_lipsync</span><span class="w"> </span><span class="kn">import</span> <span class="n">_CHAR_TO_VISEME</span><span class="p">,</span> <span class="n">_REST_VISEME</span><span class="p">,</span> <span class="n">clip_words</span>
+</span><span id="line-40">
+</span><span id="line-41"><span class="n">_DEFAULT_MODEL_SIZE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"tiny"</span>  <span class="c1"># ~75 MB; "base" gives slightly better word-timing</span>
+</span><span id="line-42"><span class="n">_DEFAULT_DEVICE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cpu"</span>
+</span><span id="line-43"><span class="n">_DEFAULT_COMPUTE_TYPE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"int8"</span>
+</span><span id="line-44"><span class="n">_MIN_WORD_GAP_FOR_REST</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-45">    <span class="mf">0.20</span>  <span class="c1"># seconds; insert rest viseme in gaps wider than this</span>
+</span><span id="line-46"><span class="p">)</span>
+</span><span id="line-47">
+</span><span id="line-48">
 <div class="viewcode-block" id="WhisperLipSync">
 <a class="viewcode-back" href="../../../_autosummary/cutan.audio.whisper_lipsync.html#cutan.audio.WhisperLipSync">[docs]</a>
-</span><span id="line-51"><span class="k">class</span><span class="w"> </span><span class="nc">WhisperLipSync</span><span class="p">:</span>
-</span><span id="line-52"><span class="w">    </span><span class="sd">"""faster-whisper word timestamps → visemes.</span>
-</span><span id="line-53">
-</span><span id="line-54"><span class="sd">    Implements the ``LipSyncProvider`` protocol. The model is lazy-loaded on</span>
-</span><span id="line-55"><span class="sd">    the first call (subsequent calls in the same process reuse the instance</span>
-</span><span id="line-56"><span class="sd">    via the class-level ``_model`` cache).</span>
-</span><span id="line-57"><span class="sd">    """</span>
-</span><span id="line-58">
-</span><span id="line-59">    <span class="c1">#: Whisper aligns from words, so the track carries them (an#96).</span>
-</span><span id="line-60">    <span class="n">emits_word_timings</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="line-61">
-</span><span id="line-62">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"whisper"</span>
-</span><span id="line-63">    <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span>
+</span><span id="line-49"><span class="k">class</span><span class="w"> </span><span class="nc">WhisperLipSync</span><span class="p">:</span>
+</span><span id="line-50"><span class="w">    </span><span class="sd">"""faster-whisper word timestamps → visemes.</span>
+</span><span id="line-51">
+</span><span id="line-52"><span class="sd">    Implements the ``LipSyncProvider`` protocol. The model is lazy-loaded on</span>
+</span><span id="line-53"><span class="sd">    the first call (subsequent calls in the same process reuse the instance</span>
+</span><span id="line-54"><span class="sd">    via the class-level ``_model`` cache).</span>
+</span><span id="line-55"><span class="sd">    """</span>
+</span><span id="line-56">
+</span><span id="line-57">    <span class="c1">#: Whisper aligns from words, so the track carries them (an#96).</span>
+</span><span id="line-58">    <span class="n">emits_word_timings</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="line-59">
+</span><span id="line-60">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"whisper"</span>
+</span><span id="line-61">    <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span>
+</span><span id="line-62">
+</span><span id="line-63">    <span class="n">_model</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># class-level cache so repeated align() calls share the model</span>
 </span><span id="line-64">
-</span><span id="line-65">    <span class="n">_model</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># class-level cache so repeated align() calls share the model</span>
-</span><span id="line-66">
-</span><span id="line-67">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-</span><span id="line-68">        <span class="bp">self</span><span class="p">,</span>
-</span><span id="line-69">        <span class="o">*</span><span class="p">,</span>
-</span><span id="line-70">        <span class="n">model_size</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_DEFAULT_MODEL_SIZE</span><span class="p">,</span>
-</span><span id="line-71">        <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_DEFAULT_DEVICE</span><span class="p">,</span>
-</span><span id="line-72">        <span class="n">compute_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_DEFAULT_COMPUTE_TYPE</span><span class="p">,</span>
-</span><span id="line-73">        <span class="n">char_to_viseme</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-74">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-75">        <span class="bp">self</span><span class="o">.</span><span class="n">model_size</span> <span class="o">=</span> <span class="n">model_size</span>
-</span><span id="line-76">        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
-</span><span id="line-77">        <span class="bp">self</span><span class="o">.</span><span class="n">compute_type</span> <span class="o">=</span> <span class="n">compute_type</span>
-</span><span id="line-78">        <span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-79">            <span class="nb">dict</span><span class="p">(</span><span class="n">char_to_viseme</span><span class="p">)</span> <span class="k">if</span> <span class="n">char_to_viseme</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_CHAR_TO_VISEME</span><span class="p">)</span>
-</span><span id="line-80">        <span class="p">)</span>
-</span><span id="line-81">
-</span><span id="line-82">    <span class="k">def</span><span class="w"> </span><span class="nf">_get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="line-83">        <span class="k">if</span> <span class="n">WhisperLipSync</span><span class="o">.</span><span class="n">_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-84">            <span class="k">return</span> <span class="n">WhisperLipSync</span><span class="o">.</span><span class="n">_model</span>
-</span><span id="line-85">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-86">            <span class="kn">from</span><span class="w"> </span><span class="nn">faster_whisper</span><span class="w"> </span><span class="kn">import</span> <span class="n">WhisperModel</span>  <span class="c1"># type: ignore</span>
-</span><span id="line-87">        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-88">            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-</span><span id="line-89">                <span class="s2">"faster-whisper not installed. pip install faster-whisper "</span>
-</span><span id="line-90">                <span class="s2">"(adds ~100 MB) or use the offline lipsync provider."</span>
-</span><span id="line-91">            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
-</span><span id="line-92">        <span class="n">WhisperLipSync</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">WhisperModel</span><span class="p">(</span>
-</span><span id="line-93">            <span class="bp">self</span><span class="o">.</span><span class="n">model_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">compute_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_type</span>
-</span><span id="line-94">        <span class="p">)</span>
-</span><span id="line-95">        <span class="k">return</span> <span class="n">WhisperLipSync</span><span class="o">.</span><span class="n">_model</span>
-</span><span id="line-96">
-</span><span id="line-97">    <span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="n">transcript</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VisemeTrack</span><span class="p">:</span>
-</span><span id="line-98">        <span class="c1"># faster-whisper takes a path or file-like. Materialize bytes to disk</span>
-</span><span id="line-99">        <span class="c1"># if the caller didn't pass a path.</span>
-</span><span id="line-100">        <span class="k">if</span> <span class="n">audio</span><span class="o">.</span><span class="n">path</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">audio</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="line-101">            <span class="n">audio_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">audio</span><span class="o">.</span><span class="n">path</span>
-</span><span id="line-102">            <span class="n">cleanup</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-103">        <span class="k">elif</span> <span class="n">audio</span><span class="o">.</span><span class="n">bytes_</span><span class="p">:</span>
-</span><span id="line-104">            <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">".bin"</span><span class="p">)</span>
-</span><span id="line-105">            <span class="n">tmp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">audio</span><span class="o">.</span><span class="n">bytes_</span><span class="p">)</span>
-</span><span id="line-106">            <span class="n">tmp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span><span id="line-107">            <span class="n">audio_path</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">name</span>
-</span><span id="line-108">            <span class="n">cleanup</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-</span><span id="line-109">        <span class="k">else</span><span class="p">:</span>
-</span><span id="line-110">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"AudioClip needs either .path or .bytes_"</span><span class="p">)</span>
-</span><span id="line-111">
-</span><span id="line-112">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-113">            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_model</span><span class="p">()</span>
-</span><span id="line-114">            <span class="n">segments</span><span class="p">,</span> <span class="n">_info</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">transcribe</span><span class="p">(</span>
-</span><span id="line-115">                <span class="nb">str</span><span class="p">(</span><span class="n">audio_path</span><span class="p">),</span>
-</span><span id="line-116">                <span class="n">word_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="line-117">                <span class="c1"># faster-whisper auto-detects language; pass the transcript as</span>
-</span><span id="line-118">                <span class="c1"># an "initial prompt" to bias decoding toward the known text.</span>
-</span><span id="line-119">                <span class="n">initial_prompt</span><span class="o">=</span><span class="n">transcript</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-120">            <span class="p">)</span>
-</span><span id="line-121">            <span class="n">words</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">WordTiming</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-122">            <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">segments</span><span class="p">:</span>
-</span><span id="line-123">                <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">seg</span><span class="o">.</span><span class="n">words</span> <span class="ow">or</span> <span class="p">[]:</span>
-</span><span id="line-124">                    <span class="n">words</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">w</span><span class="o">.</span><span class="n">word</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">start</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">end</span><span class="p">)))</span>
-</span><span id="line-125">        <span class="k">finally</span><span class="p">:</span>
-</span><span id="line-126">            <span class="k">if</span> <span class="n">cleanup</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-127">                <span class="k">try</span><span class="p">:</span>
-</span><span id="line-128">                    <span class="n">cleanup</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
-</span><span id="line-129">                <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-</span><span id="line-130">                    <span class="k">pass</span>
-</span><span id="line-131">
-</span><span id="line-132">        <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
-</span><span id="line-133">            <span class="n">visemes</span><span class="o">=</span><span class="n">word_timings_to_visemes</span><span class="p">(</span>
-</span><span id="line-134">                <span class="n">words</span><span class="p">,</span>
-</span><span id="line-135">                <span class="n">total_duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
-</span><span id="line-136">                <span class="n">char_to_viseme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span><span class="p">,</span>
-</span><span id="line-137">                <span class="n">rest_viseme</span><span class="o">=</span><span class="n">_REST_VISEME</span><span class="p">,</span>
-</span><span id="line-138">                <span class="n">min_gap_for_rest</span><span class="o">=</span><span class="n">_MIN_WORD_GAP_FOR_REST</span><span class="p">,</span>
-</span><span id="line-139">            <span class="p">),</span>
-</span><span id="line-140">            <span class="n">convention</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convention</span><span class="p">,</span>
-</span><span id="line-141">            <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
-</span><span id="line-142">            <span class="n">words</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">words</span><span class="p">),</span>
-</span><span id="line-143">        <span class="p">)</span></div>
+</span><span id="line-65">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="line-66">        <span class="bp">self</span><span class="p">,</span>
+</span><span id="line-67">        <span class="o">*</span><span class="p">,</span>
+</span><span id="line-68">        <span class="n">model_size</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_DEFAULT_MODEL_SIZE</span><span class="p">,</span>
+</span><span id="line-69">        <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_DEFAULT_DEVICE</span><span class="p">,</span>
+</span><span id="line-70">        <span class="n">compute_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_DEFAULT_COMPUTE_TYPE</span><span class="p">,</span>
+</span><span id="line-71">        <span class="n">char_to_viseme</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-72">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-73">        <span class="bp">self</span><span class="o">.</span><span class="n">model_size</span> <span class="o">=</span> <span class="n">model_size</span>
+</span><span id="line-74">        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+</span><span id="line-75">        <span class="bp">self</span><span class="o">.</span><span class="n">compute_type</span> <span class="o">=</span> <span class="n">compute_type</span>
+</span><span id="line-76">        <span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-77">            <span class="nb">dict</span><span class="p">(</span><span class="n">char_to_viseme</span><span class="p">)</span> <span class="k">if</span> <span class="n">char_to_viseme</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_CHAR_TO_VISEME</span><span class="p">)</span>
+</span><span id="line-78">        <span class="p">)</span>
+</span><span id="line-79">
+</span><span id="line-80">    <span class="k">def</span><span class="w"> </span><span class="nf">_get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="line-81">        <span class="k">if</span> <span class="n">WhisperLipSync</span><span class="o">.</span><span class="n">_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-82">            <span class="k">return</span> <span class="n">WhisperLipSync</span><span class="o">.</span><span class="n">_model</span>
+</span><span id="line-83">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-84">            <span class="kn">from</span><span class="w"> </span><span class="nn">faster_whisper</span><span class="w"> </span><span class="kn">import</span> <span class="n">WhisperModel</span>  <span class="c1"># type: ignore</span>
+</span><span id="line-85">        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-86">            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+</span><span id="line-87">                <span class="s2">"faster-whisper not installed. pip install faster-whisper "</span>
+</span><span id="line-88">                <span class="s2">"(adds ~100 MB) or use the offline lipsync provider."</span>
+</span><span id="line-89">            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+</span><span id="line-90">        <span class="n">WhisperLipSync</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">WhisperModel</span><span class="p">(</span>
+</span><span id="line-91">            <span class="bp">self</span><span class="o">.</span><span class="n">model_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">compute_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_type</span>
+</span><span id="line-92">        <span class="p">)</span>
+</span><span id="line-93">        <span class="k">return</span> <span class="n">WhisperLipSync</span><span class="o">.</span><span class="n">_model</span>
+</span><span id="line-94">
+</span><span id="line-95">    <span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="n">transcript</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VisemeTrack</span><span class="p">:</span>
+</span><span id="line-96">        <span class="n">known</span> <span class="o">=</span> <span class="n">clip_words</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span>
+</span><span id="line-97">        <span class="k">if</span> <span class="n">known</span><span class="p">:</span>
+</span><span id="line-98">            <span class="c1"># A recorded take whose words are already timed (an#490): no model</span>
+</span><span id="line-99">            <span class="c1"># run, the performance's own timings drive the mouth.</span>
+</span><span id="line-100">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_track_from_words</span><span class="p">(</span><span class="n">known</span><span class="p">,</span> <span class="n">audio</span><span class="p">)</span>
+</span><span id="line-101">        <span class="c1"># faster-whisper takes a path or file-like. Materialize bytes to disk</span>
+</span><span id="line-102">        <span class="c1"># if the caller didn't pass a path.</span>
+</span><span id="line-103">        <span class="k">if</span> <span class="n">audio</span><span class="o">.</span><span class="n">path</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">audio</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="line-104">            <span class="n">audio_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">audio</span><span class="o">.</span><span class="n">path</span>
+</span><span id="line-105">            <span class="n">cleanup</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-106">        <span class="k">elif</span> <span class="n">audio</span><span class="o">.</span><span class="n">bytes_</span><span class="p">:</span>
+</span><span id="line-107">            <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">".bin"</span><span class="p">)</span>
+</span><span id="line-108">            <span class="n">tmp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">audio</span><span class="o">.</span><span class="n">bytes_</span><span class="p">)</span>
+</span><span id="line-109">            <span class="n">tmp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="line-110">            <span class="n">audio_path</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">name</span>
+</span><span id="line-111">            <span class="n">cleanup</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-112">        <span class="k">else</span><span class="p">:</span>
+</span><span id="line-113">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"AudioClip needs either .path or .bytes_"</span><span class="p">)</span>
+</span><span id="line-114">
+</span><span id="line-115">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-116">            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_model</span><span class="p">()</span>
+</span><span id="line-117">            <span class="n">segments</span><span class="p">,</span> <span class="n">_info</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">transcribe</span><span class="p">(</span>
+</span><span id="line-118">                <span class="nb">str</span><span class="p">(</span><span class="n">audio_path</span><span class="p">),</span>
+</span><span id="line-119">                <span class="n">word_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="line-120">                <span class="c1"># faster-whisper auto-detects language; pass the transcript as</span>
+</span><span id="line-121">                <span class="c1"># an "initial prompt" to bias decoding toward the known text.</span>
+</span><span id="line-122">                <span class="n">initial_prompt</span><span class="o">=</span><span class="n">transcript</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-123">            <span class="p">)</span>
+</span><span id="line-124">            <span class="n">words</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">WordTiming</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-125">            <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">segments</span><span class="p">:</span>
+</span><span id="line-126">                <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">seg</span><span class="o">.</span><span class="n">words</span> <span class="ow">or</span> <span class="p">[]:</span>
+</span><span id="line-127">                    <span class="n">words</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">w</span><span class="o">.</span><span class="n">word</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">start</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">end</span><span class="p">)))</span>
+</span><span id="line-128">        <span class="k">finally</span><span class="p">:</span>
+</span><span id="line-129">            <span class="k">if</span> <span class="n">cleanup</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-130">                <span class="k">try</span><span class="p">:</span>
+</span><span id="line-131">                    <span class="n">cleanup</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+</span><span id="line-132">                <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+</span><span id="line-133">                    <span class="k">pass</span>
+</span><span id="line-134">
+</span><span id="line-135">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_track_from_words</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">audio</span><span class="p">)</span>
+</span><span id="line-136">
+</span><span id="line-137">    <span class="k">def</span><span class="w"> </span><span class="nf">_track_from_words</span><span class="p">(</span>
+</span><span id="line-138">        <span class="bp">self</span><span class="p">,</span> <span class="n">words</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">WordTiming</span><span class="p">],</span> <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span>
+</span><span id="line-139">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VisemeTrack</span><span class="p">:</span>
+</span><span id="line-140">        <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
+</span><span id="line-141">            <span class="n">visemes</span><span class="o">=</span><span class="n">word_timings_to_visemes</span><span class="p">(</span>
+</span><span id="line-142">                <span class="n">words</span><span class="p">,</span>
+</span><span id="line-143">                <span class="n">total_duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+</span><span id="line-144">                <span class="n">char_to_viseme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span><span class="p">,</span>
+</span><span id="line-145">                <span class="n">rest_viseme</span><span class="o">=</span><span class="n">_REST_VISEME</span><span class="p">,</span>
+</span><span id="line-146">                <span class="n">min_gap_for_rest</span><span class="o">=</span><span class="n">_MIN_WORD_GAP_FOR_REST</span><span class="p">,</span>
+</span><span id="line-147">            <span class="p">),</span>
+</span><span id="line-148">            <span class="n">convention</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convention</span><span class="p">,</span>
+</span><span id="line-149">            <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+</span><span id="line-150">            <span class="n">words</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">words</span><span class="p">),</span>
+</span><span id="line-151">        <span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -344,7 +352,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=6799126d"></script>
+    <script src="../../../_static/documentation_options.js?v=4d22d5b7"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

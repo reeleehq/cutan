@@ -22,6 +22,11 @@ you’ve installed the Rhubarb binary.
 True
 ```
 
+### Functions
+
+| [`clip_words`](#cutan.audio.offline_lipsync.clip_words)(audio)   | The word timings `audio` carries (`AudioClip.words`, a recorded take imported with a timed transcript — an#490), as a list; `None` when it has none or when the core predates the field.   |
+|----------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
 ### Classes
 
 | [`OfflineLipSync`](#cutan.audio.offline_lipsync.OfflineLipSync)(\*[, char_to_viseme])   | Default lip-sync provider: deterministic char-to-viseme mapping.   |
@@ -42,3 +47,17 @@ may re-make a missing track in memory (an#311, cutan#29).
 
 * **Type:**
   A pure function of the transcript, and nothing is billed
+
+### cutan.audio.offline_lipsync.clip_words(audio)
+
+The word timings `audio` carries (`AudioClip.words`, a recorded take
+imported with a timed transcript — an#490), as a list; `None` when it has
+none or when the core predates the field.
+
+```pycon
+>>> clip_words(AudioClip(duration=1.0)) is None
+True
+```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
