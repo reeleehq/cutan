@@ -8,7 +8,7 @@
 ```yaml meta  ...```              the film's settings (exactly one)
 ## Shot <id> (cutout)             one section per shot, in order
 <prose: what happens>
-```yaml shot ...```               length, camera, transition
+```yaml shot ...```               length, camera, transition, viewpoint (scene-space.md)
 ```yaml entities ...```           what is in the shot
 ```yaml actions ...```            what moves, and when
 ```dialogue ...```                who says what
@@ -57,6 +57,7 @@ transition: {kind: fade, duration: 0.6, color: "#000000"}
   - a follow: `{follow: {target: teo}}` keeps a walking character where it started in frame;
   - a shake on top of any of them: `{move: hold, shake: [{at: 1.2, duration: 0.4}]}` (an impact).
   A camera move must not show past the edge of the set: give planes enough `size`, or move less (`an validate` warns).
+- `viewpoint`: the name of a viewpoint from the ` ```yaml world ` block, or an inline one (`{subject: paul, size: close_up}`): the shot is a camera onto the scene's space, and its entities are placed for you (`scene-space.md`). Leave it out for a hand-placed shot.
 - `transition`: how this shot is **entered** (not on the first shot): `{kind: fade, duration: 0.6, color: "#000000"}` dips through a colour; `dissolve` overlaps the two shots, and `wipe` (with `direction: left|right|up|down`) overlaps them behind a moving edge: both make the film shorter by their duration (write the meta `duration`, above); leave it out for a hard cut.
 
 ## The `entities` block
