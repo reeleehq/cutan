@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-10-20
+- **The mouth follows a recorded take's words** (thorwhalen/an recorded voices): `OfflineLipSync` and `WhisperLipSync` read the word timings a clip carries (`AudioClip.words`, set by `an`'s `recorded` provider from a take imported with a timed transcript) and distribute the visemes over them — no even spread, no model run; `clip_words(audio)` is the one reader, and a clip without words behaves as before.
+
 ## 2026-10-09
 - **New characters stand on their feet** (an#285, the maintainer's decision on an#423): `an character new` declares the rig's `origin` at its root bone by default (`--no-feet-origin` opts out; the Python factory's default stays off so rebuilt characters are unchanged). Existing characters are not migrated; `an character feet-origin <name> [--undo]` (`stand_on_feet`) converts one and prints how far to move its `stage.at`.
 

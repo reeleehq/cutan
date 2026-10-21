@@ -35,10 +35,8 @@ from an.audio.lipsync import (
 )
 from an.audio.tts import AudioClip
 
-
 # Reuse the offline char→viseme mapping so the two providers stay consistent.
-from cutan.audio.offline_lipsync import _CHAR_TO_VISEME, _REST_VISEME
-
+from cutan.audio.offline_lipsync import _CHAR_TO_VISEME, _REST_VISEME, clip_words
 
 _DEFAULT_MODEL_SIZE: str = "tiny"  # ~75 MB; "base" gives slightly better word-timing
 _DEFAULT_DEVICE: str = "cpu"
@@ -95,6 +93,11 @@ class WhisperLipSync:
         return WhisperLipSync._model
 
     def align(self, audio: AudioClip, transcript: str) -> VisemeTrack:
+        known = clip_words(audio)
+        if known:
+            # A recorded take whose words are already timed (an#490): no model
+            # run, the performance's own timings drive the mouth.
+            return self._track_from_words(known, audio)
         # faster-whisper takes a path or file-like. Materialize bytes to disk
         # if the caller didn't pass a path.
         if audio.path and Path(audio.path).exists():
@@ -129,6 +132,11 @@ class WhisperLipSync:
                 except OSError:
                     pass
 
+        return self._track_from_words(words, audio)
+
+    def _track_from_words(
+        self, words: list[WordTiming], audio: AudioClip
+    ) -> VisemeTrack:
         return VisemeTrack(
             visemes=word_timings_to_visemes(
                 words,
