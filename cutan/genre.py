@@ -26,10 +26,11 @@ instead of being wired into the core. :data:`CUTOUT` lists:
 Its ``name`` is the persisted genre slug ``cutout_animation``, the one
 :mod:`cutan.nw` declares to ``nw`` (ADR 0001 decision 9: persisted identifiers do
 not change). It also offers the core **services** (:func:`an.genres.register_service`):
-the ``an character`` / ``an impacts`` CLI namespaces, the ``offline`` / ``rhubarb`` /
-``whisper`` lip-sync providers, the licence lookup for pre-``source`` descriptors, the
-library's publish warning and the expression labels ``judge_emotion`` uses; and the
-**runtime script** that draws the mouth and the eye.
+the ``an character`` / ``an impacts`` / ``an projects`` CLI namespaces, the ``offline`` /
+``rhubarb`` / ``whisper`` lip-sync providers, the licence lookup for pre-``source``
+descriptors, the library's publish warning, the expression labels ``judge_emotion`` uses
+and where ``an init --id`` creates a cut-out project (``projects.dir.cutan``, cutan#91);
+and the **runtime script** that draws the mouth and the eye.
 
 Importing this module registers nothing: :func:`an.genres.load` (or
 :func:`an.genres.register_genre`) does.
@@ -143,6 +144,10 @@ CUTOUT_VISUALS = RuntimeScript(
 CUTOUT_SERVICES: dict[str, str] = {
     "cli.character": "cutan.characters.cli:_dispatch_funcs",
     "cli.impacts": "cutan.impacts.cli:_dispatch_funcs",
+    "cli.projects": "cutan.projects_cli:_dispatch_funcs",
+    # Where `an init <id> --id --genre cutout_animation` creates the project
+    # (API level 7, cutan#91): the cache folder when the projects store is S3.
+    "projects.dir.cutan": "cutan.projects_store:new_project_dir",
     "lipsync.offline": "cutan.audio:offline_factory",
     "lipsync.rhubarb": "cutan.audio:rhubarb_factory",
     "lipsync.whisper": "cutan.audio:whisper_factory",
