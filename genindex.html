@@ -128,6 +128,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/cutan.library.html">cutan.library</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/cutan.pack.html">cutan.pack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/cutan.projects_cli.html">cutan.projects_cli</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/cutan.projects_store.html">cutan.projects_store</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/cutan.runtime.html">cutan.runtime</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/cutan.styles.html">cutan.styles</a></li>
@@ -590,6 +591,8 @@
 </li>
       <li><a href="_autosummary/cutan.characters.play.html#cutan.characters.play.TurnInference.contradicted">contradicted (cutan.characters.play.TurnInference property)</a>
 </li>
+      <li><a href="_autosummary/cutan.projects_store.html#cutan.projects_store.ProjectsStoreSettings.coordinates">coordinates() (cutan.projects_store.ProjectsStoreSettings method)</a>
+</li>
       <li><a href="_autosummary/cutan.body_attachment.html#cutan.body_attachment.CrossedLimbs">CrossedLimbs</a>
 </li>
       <li><a href="_autosummary/cutan.compile.coarticulate.html#cutan.compile.coarticulate.Cue">Cue (class in cutan.compile.coarticulate)</a>
@@ -1040,6 +1043,13 @@
 </li>
       </ul></li>
       <li>
+    cutan.projects_cli
+
+      <ul style="list-style-type:none">
+        <li><a href="_autosummary/cutan.projects_cli.html#module-cutan.projects_cli">module</a>
+</li>
+      </ul></li>
+      <li>
     cutan.projects_store
 
       <ul style="list-style-type:none">
@@ -1153,6 +1163,8 @@
       <li><a href="_autosummary/cutan.characters.mouth_set.html#cutan.characters.mouth_set.DEFAULT_MOUTH_VIEWBOX">DEFAULT_MOUTH_VIEWBOX (in module cutan.characters.mouth_set)</a>
 </li>
       <li><a href="_autosummary/cutan.characters.registration.html#cutan.characters.registration.default_play_extent">default_play_extent() (in module cutan.characters.registration)</a>
+</li>
+      <li><a href="_autosummary/cutan.projects_store.html#cutan.projects_store.DEFAULT_PUSH_EXCLUDES">DEFAULT_PUSH_EXCLUDES (in module cutan.projects_store)</a>
 </li>
       <li><a href="_autosummary/cutan.impacts.stroke.html#cutan.impacts.stroke.DEFAULT_RISE">DEFAULT_RISE (in module cutan.impacts.stroke)</a>
 </li>
@@ -1960,6 +1972,8 @@
 </li>
         <li><a href="_autosummary/cutan.pack.html#module-cutan.pack">cutan.pack</a>
 </li>
+        <li><a href="_autosummary/cutan.projects_cli.html#module-cutan.projects_cli">cutan.projects_cli</a>
+</li>
         <li><a href="_autosummary/cutan.projects_store.html#module-cutan.projects_store">cutan.projects_store</a>
 </li>
         <li><a href="_autosummary/cutan.runtime.html#module-cutan.runtime">cutan.runtime</a>
@@ -2030,6 +2044,8 @@
         <li><a href="_autosummary/cutan.characters.factory.html#cutan.characters.factory.new_character">(in module cutan.characters.factory)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/cutan.projects_store.html#cutan.projects_store.new_project_dir">new_project_dir() (in module cutan.projects_store)</a>
+</li>
       <li><a href="_autosummary/cutan.characters.licenses.html#cutan.characters.licenses.NO_ATTRIBUTION_REQUIRED">NO_ATTRIBUTION_REQUIRED (in module cutan.characters.licenses)</a>
 </li>
   </ul></td>
@@ -2204,8 +2220,6 @@
       </ul></li>
       <li><a href="_autosummary/cutan.compile.passes.html#cutan.compile.passes.POLICY_PRODUCT">POLICY_PRODUCT (in module cutan.compile.passes)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_autosummary/cutan.compile.passes.html#cutan.compile.passes.POLICY_SKIP_KIND">POLICY_SKIP_KIND (in module cutan.compile.passes)</a>
 </li>
       <li><a href="_autosummary/cutan.styles.html#cutan.styles.PolicyError">PolicyError</a>, <a href="_autosummary/cutan.styles.policy.html#cutan.styles.policy.PolicyError">[1]</a>
@@ -2216,6 +2230,8 @@
         <li><a href="_autosummary/cutan.carve.mattes.html#cutan.carve.mattes.Polygon">(class in cutan.carve.mattes)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_autosummary/cutan.impacts.html#cutan.impacts.ImpactObject.pose">pose() (cutan.impacts.ImpactObject method)</a>
 
       <ul style="list-style-type:none">
@@ -2272,6 +2288,8 @@
 </li>
       <li><a href="_autosummary/cutan.verify.style.html#cutan.verify.style.project_of_render">project_of_render() (in module cutan.verify.style)</a>
 </li>
+      <li><a href="_autosummary/cutan.html#cutan.PROJECT_STORE_RECORD">PROJECT_STORE_RECORD (in module cutan)</a>
+</li>
       <li><a href="_autosummary/cutan.projects_store.html#cutan.projects_store.projects_store">projects_store() (in module cutan.projects_store)</a>
 </li>
       <li><a href="_autosummary/cutan.projects_store.html#cutan.projects_store.ProjectsStoreSettings">ProjectsStoreSettings (class in cutan.projects_store)</a>
@@ -2294,9 +2312,17 @@
         <li><a href="_autosummary/cutan.carve.core.html#cutan.carve.core.Carving.provenance">(cutan.carve.core.Carving method)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/cutan.projects_cli.html#cutan.projects_cli.pull">pull() (in module cutan.projects_cli)</a>
+</li>
       <li><a href="_autosummary/cutan.characters.factory.html#cutan.characters.factory.PUPIL_COLOUR">PUPIL_COLOUR (in module cutan.characters.factory)</a>
 </li>
       <li><a href="_autosummary/cutan.compile.passes.html#cutan.compile.passes.PUPIL_NODE_NAMES">PUPIL_NODE_NAMES (in module cutan.compile.passes)</a>
+</li>
+      <li><a href="_autosummary/cutan.projects_cli.html#cutan.projects_cli.push">push() (in module cutan.projects_cli)</a>
+</li>
+      <li><a href="_autosummary/cutan.projects_store.html#cutan.projects_store.push_project">push_project() (in module cutan.projects_store)</a>
+</li>
+      <li><a href="_autosummary/cutan.projects_store.html#cutan.projects_store.PushReport">PushReport (class in cutan.projects_store)</a>
 </li>
   </ul></td>
   </tr>
@@ -2312,6 +2338,8 @@
       <li><a href="_autosummary/cutan.expression.registration.html#cutan.expression.registration.read_expression_md">read_expression_md() (in module cutan.expression.registration)</a>
 </li>
       <li><a href="_autosummary/cutan.characters.registration.html#cutan.characters.registration.read_play_md">read_play_md() (in module cutan.characters.registration)</a>
+</li>
+      <li><a href="_autosummary/cutan.projects_store.html#cutan.projects_store.read_record">read_record() (in module cutan.projects_store)</a>
 </li>
       <li><a href="_autosummary/cutan.characters.factory.html#cutan.characters.factory.RECIPE_KEY">RECIPE_KEY (in module cutan.characters.factory)</a>
 </li>
@@ -2602,6 +2630,8 @@
         <li><a href="_autosummary/cutan.impacts.objects.html#cutan.impacts.objects.stick">(in module cutan.impacts.objects)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/cutan.projects_store.html#cutan.projects_store.STORE_RECORD">STORE_RECORD (in module cutan.projects_store)</a>
+</li>
       <li><a href="_autosummary/cutan.impacts.html#cutan.impacts.Stroke">Stroke (class in cutan.impacts)</a>
 
       <ul style="list-style-type:none">
@@ -2976,7 +3006,7 @@
 </footer>
     </div>
     
-    <script src="_static/documentation_options.js?v=4d22d5b7"></script>
+    <script src="_static/documentation_options.js?v=e95a51ae"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>

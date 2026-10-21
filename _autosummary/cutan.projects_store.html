@@ -36,7 +36,7 @@
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
 <link href="cutan.runtime.html" rel="next" title="cutan.runtime"/>
-<link href="cutan.pack.html" rel="prev" title="cutan.pack"/>
+<link href="cutan.projects_cli.html" rel="prev" title="cutan.projects_cli"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -98,6 +98,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cutan.library.html">cutan.library</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.pack.html">cutan.pack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.projects_cli.html">cutan.projects_cli</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">cutan.projects_store</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.runtime.html">cutan.runtime</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.styles.html">cutan.styles</a></li>
@@ -133,12 +134,24 @@
 <div id="content" role="main">
 <section id="module-cutan.projects_store">
 <span id="cutan-projects-store"></span><h1>cutan.projects_store<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-cutan.projects_store">¶</a></h1>
-<p>Where a cutan project’s files are read from: a disk folder or S3, by configuration.</p>
+<p>Where a cutan project’s files are read from and written to: a disk folder or S3, by configuration.</p>
 <p>The library’s <code class="docutils literal notranslate"><span class="pre">projects</span></code> kind is a mapping <code class="docutils literal notranslate"><span class="pre">relative</span> <span class="pre">path</span> <span class="pre">-&gt;</span> <span class="pre">bytes</span></code> (ADR-0024:
 <code class="docutils literal notranslate"><span class="pre">s3://{bucket}/{tenant}/cutan/projects/{rel}</span></code> mirrors <code class="docutils literal notranslate"><span class="pre">~/.local/share/cutan/projects/{rel}</span></code>
 exactly, so both backends hold the same keys). <a class="reference internal" href="#cutan.projects_store.projects_store" title="cutan.projects_store.projects_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">projects_store()</span></code></a> returns that
 mapping; <a class="reference internal" href="#cutan.projects_store.materialize_project" title="cutan.projects_store.materialize_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">materialize_project()</span></code></a> returns a real folder for tools that need files
-(ffmpeg, a browser), reading through a cache under <code class="docutils literal notranslate"><span class="pre">~/.cache/cutan/projects/</span></code>.</p>
+(ffmpeg, a browser), reading through a cache under <code class="docutils literal notranslate"><span class="pre">~/.cache/cutan/projects/</span></code>;
+<a class="reference internal" href="#cutan.projects_store.push_project" title="cutan.projects_store.push_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">push_project()</span></code></a> is the write half (cutan#91): it writes what changed since the
+folder last synced, never over a newer version another machine pushed, can delete
+what the folder no longer has, and keeps derived output local.</p>
+<p>A folder that belongs to a store carries the record <code class="docutils literal notranslate"><span class="pre">.an/projects_store.json</span></code>
+(<a class="reference internal" href="#cutan.projects_store.STORE_RECORD" title="cutan.projects_store.STORE_RECORD"><code class="xref py py-data docutils literal notranslate"><span class="pre">STORE_RECORD</span></code></a>): the store’s coordinates and, per file, the size and sha256
+the folder last synced (<code class="docutils literal notranslate"><span class="pre">files</span></code>). The record is pushed with the project, so the
+store’s copy says what the store holds and the folder’s copy is the base a push
+compares both sides against (a three-way comparison: a file the folder did not
+change is never pushed over one the store changed, and a file both changed is a
+conflict that only <code class="docutils literal notranslate"><span class="pre">force</span></code> writes). <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">init</span> <span class="pre">&lt;id&gt;</span> <span class="pre">--id</span> <span class="pre">--genre</span> <span class="pre">cutout_animation</span></code>
+creates a project in the cache folder with that record when the backend is S3
+(<a class="reference internal" href="#cutan.projects_store.new_project_dir" title="cutan.projects_store.new_project_dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">new_project_dir()</span></code></a>, the <code class="docutils literal notranslate"><span class="pre">projects.dir.cutan</span></code> service of <code class="docutils literal notranslate"><span class="pre">an</span></code> API level 7).</p>
 <p>Configuration (environment; the first match wins, <code class="docutils literal notranslate"><span class="pre">CUTAN_HOME</span></code> always forces local):</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">CUTAN_HOME</span></code> set: local, under that root (an explicit root beats any S3 setting)</p></li>
@@ -146,6 +159,17 @@ mapping; <a class="reference internal" href="#cutan.projects_store.materialize_p
 <code class="docutils literal notranslate"><span class="pre">CUTAN_S3_PROFILE</span></code> (default <code class="docutils literal notranslate"><span class="pre">tw-server</span></code>) and <code class="docutils literal notranslate"><span class="pre">CUTAN_S3_TENANT</span></code> (default <code class="docutils literal notranslate"><span class="pre">thorwhalen</span></code>)</p></li>
 <li><p>otherwise: local (the default)</p></li>
 </ul>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.projects_store.STORE_RECORD" title="cutan.projects_store.STORE_RECORD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STORE_RECORD</span></code></a></p></td>
+<td><p>The record's path inside a project folder (<a class="reference internal" href="cutan.html#cutan.PROJECT_STORE_RECORD" title="cutan.PROJECT_STORE_RECORD"><code class="xref py py-data docutils literal notranslate"><span class="pre">cutan.PROJECT_STORE_RECORD</span></code></a>).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.projects_store.DEFAULT_PUSH_EXCLUDES" title="cutan.projects_store.DEFAULT_PUSH_EXCLUDES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_PUSH_EXCLUDES</span></code></a></p></td>
+<td><p>derived or transient output, keyed by that machine or re-made from the project.</p></td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -155,8 +179,17 @@ mapping; <a class="reference internal" href="#cutan.projects_store.materialize_p
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.projects_store.materialize_project" title="cutan.projects_store.materialize_project"><code class="xref py py-obj docutils literal notranslate"><span class="pre">materialize_project</span></code></a>(project_id, *[, ...])</p></td>
 <td><p>A real folder holding <code class="docutils literal notranslate"><span class="pre">project_id</span></code>'s files.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.projects_store.projects_store" title="cutan.projects_store.projects_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">projects_store</span></code></a>([settings])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.projects_store.new_project_dir" title="cutan.projects_store.new_project_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">new_project_dir</span></code></a>(project_id, *[, default, ...])</p></td>
+<td><p>Where <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">init</span> <span class="pre">&lt;id&gt;</span> <span class="pre">--id</span> <span class="pre">--genre</span> <span class="pre">cutout_animation</span></code> creates the project.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.projects_store.projects_store" title="cutan.projects_store.projects_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">projects_store</span></code></a>([settings])</p></td>
 <td><p>The projects as <code class="docutils literal notranslate"><span class="pre">{relative</span> <span class="pre">path:</span> <span class="pre">bytes}</span></code>, over disk or S3 per <code class="docutils literal notranslate"><span class="pre">settings</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.projects_store.push_project" title="cutan.projects_store.push_project"><code class="xref py py-obj docutils literal notranslate"><span class="pre">push_project</span></code></a>(project_id, *[, folder, ...])</p></td>
+<td><p>Write <code class="docutils literal notranslate"><span class="pre">folder</span></code>'s files to the store under <code class="docutils literal notranslate"><span class="pre">project_id/</span></code>: the inverse of <a class="reference internal" href="#cutan.projects_store.materialize_project" title="cutan.projects_store.materialize_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">materialize_project()</span></code></a> (cutan#91).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.projects_store.read_record" title="cutan.projects_store.read_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_record</span></code></a>(folder)</p></td>
+<td><p>The folder's <a class="reference internal" href="#cutan.projects_store.STORE_RECORD" title="cutan.projects_store.STORE_RECORD"><code class="xref py py-data docutils literal notranslate"><span class="pre">STORE_RECORD</span></code></a>, <code class="docutils literal notranslate"><span class="pre">{}</span></code> when it has none or it is unreadable.</p></td>
 </tr>
 </tbody>
 </table>
@@ -166,8 +199,26 @@ mapping; <a class="reference internal" href="#cutan.projects_store.materialize_p
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.projects_store.ProjectsStoreSettings" title="cutan.projects_store.ProjectsStoreSettings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectsStoreSettings</span></code></a>([backend, bucket, ...])</p></td>
 <td><p>Which backend holds the projects, and its S3 coordinates.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.projects_store.PushReport" title="cutan.projects_store.PushReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PushReport</span></code></a>(project_id, folder, written, ...)</p></td>
+<td><p>What one <a class="reference internal" href="#cutan.projects_store.push_project" title="cutan.projects_store.push_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">push_project()</span></code></a> did, as relative paths.</p></td>
+</tr>
 </tbody>
 </table>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.projects_store.DEFAULT_PUSH_EXCLUDES">
+<span class="sig-prename descclassname"><span class="pre">cutan.projects_store.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_PUSH_EXCLUDES</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">tuple</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('.git/',</span> <span class="pre">'.an/render_work/',</span> <span class="pre">'artifacts/shot_cache/',</span> <span class="pre">'artifacts/shots/',</span> <span class="pre">'artifacts/render_reports/',</span> <span class="pre">'artifacts/probes/')</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_store.DEFAULT_PUSH_EXCLUDES" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_store.DEFAULT_PUSH_EXCLUDES'">¶</a></dt>
+<dd><p>derived or transient output,
+keyed by that machine or re-made from the project. The shot cache (an#242) and
+the shot archive re-render from the project; the render work dirs are a run’s
+scratch; render reports and probes are what <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">init</span></code> keeps out of git
+(<code class="docutils literal notranslate"><span class="pre">an.project.PROJECT_GITIGNORE</span></code>, held equal by a test); a repository is
+not project content. Each entry is a folder prefix (ending in <code class="docutils literal notranslate"><span class="pre">/</span></code>) or a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>What a push keeps on the machine that made it</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="cutan.projects_store.ProjectsStoreSettings">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.projects_store.</span></span><span class="sig-name descname"><span class="pre">ProjectsStoreSettings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'local'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tw-apps'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tw-server'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tenant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'thorwhalen'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/projects_store.html#ProjectsStoreSettings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_store.ProjectsStoreSettings" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_store.ProjectsStoreSettings'">¶</a></dt>
@@ -175,6 +226,20 @@ mapping; <a class="reference internal" href="#cutan.projects_store.materialize_p
 <p>Which backend holds the projects, and its S3 coordinates.</p>
 <dl class="field-list simple">
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cutan.projects_store.ProjectsStoreSettings.coordinates">
+<span class="sig-name descname"><span class="pre">coordinates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/projects_store.html#ProjectsStoreSettings.coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_store.ProjectsStoreSettings.coordinates" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_store.ProjectsStoreSettings.coordinates'">¶</a></dt>
+<dd><p>What a project folder records about its store (no credentials, no profile).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">ProjectsStoreSettings</span><span class="p">()</span><span class="o">.</span><span class="n">coordinates</span><span class="p">()[</span><span class="s2">"backend"</span><span class="p">]</span>
+</span><span id="line-2"><span class="go">'local'</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="cutan.projects_store.ProjectsStoreSettings.from_environ">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_environ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">environ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/projects_store.html#ProjectsStoreSettings.from_environ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_store.ProjectsStoreSettings.from_environ" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_store.ProjectsStoreSettings.from_environ'">¶</a></dt>
@@ -191,12 +256,49 @@ mapping; <a class="reference internal" href="#cutan.projects_store.materialize_p
 </dl>
 </dd></dl>
 </dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cutan.projects_store.PushReport">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.projects_store.</span></span><span class="sig-name descname"><span class="pre">PushReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unchanged</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excluded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deleted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conflicts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/projects_store.html#PushReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_store.PushReport" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_store.PushReport'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>What one <a class="reference internal" href="#cutan.projects_store.push_project" title="cutan.projects_store.push_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">push_project()</span></code></a> did, as relative paths.</p>
+<p><code class="docutils literal notranslate"><span class="pre">stale</span></code>: files the folder did not change but the store did (or dropped)
+since the folder last synced, so they were not pushed: pull first.
+<code class="docutils literal notranslate"><span class="pre">conflicts</span></code>: files both sides changed, not pushed without <code class="docutils literal notranslate"><span class="pre">force</span></code>.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.projects_store.STORE_RECORD">
+<span class="sig-prename descclassname"><span class="pre">cutan.projects_store.</span></span><span class="sig-name descname"><span class="pre">STORE_RECORD</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'.an/projects_store.json'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_store.STORE_RECORD" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_store.STORE_RECORD'">¶</a></dt>
+<dd><p>The record’s path inside a project folder (<a class="reference internal" href="cutan.html#cutan.PROJECT_STORE_RECORD" title="cutan.PROJECT_STORE_RECORD"><code class="xref py py-data docutils literal notranslate"><span class="pre">cutan.PROJECT_STORE_RECORD</span></code></a>).</p>
+</dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.projects_store.materialize_project">
 <span class="sig-prename descclassname"><span class="pre">cutan.projects_store.</span></span><span class="sig-name descname"><span class="pre">materialize_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/projects_store.html#materialize_project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_store.materialize_project" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_store.materialize_project'">¶</a></dt>
 <dd><p>A real folder holding <code class="docutils literal notranslate"><span class="pre">project_id</span></code>’s files.</p>
 <p>Local backend: the project folder itself, no copy. S3: files are read through
-into the cache and kept; a cached file whose size matches the object’s is reused.</p>
+into the cache and kept, and the folder records the store it belongs to
+(<a class="reference internal" href="#cutan.projects_store.STORE_RECORD" title="cutan.projects_store.STORE_RECORD"><code class="xref py py-data docutils literal notranslate"><span class="pre">STORE_RECORD</span></code></a>). A cached file is reused when its sha256 is the one
+the store’s record holds for it (a file the record does not know: when its
+size matches the object’s). The store wins: a cached file that differs is
+overwritten, so push a folder’s changes before pulling into it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.projects_store.new_project_dir">
+<span class="sig-prename descclassname"><span class="pre">cutan.projects_store.</span></span><span class="sig-name descname"><span class="pre">new_project_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/projects_store.html#new_project_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_store.new_project_dir" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_store.new_project_dir'">¶</a></dt>
+<dd><p>Where <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">init</span> <span class="pre">&lt;id&gt;</span> <span class="pre">--id</span> <span class="pre">--genre</span> <span class="pre">cutout_animation</span></code> creates the project.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">projects.dir.cutan</span></code> service (<code class="docutils literal notranslate"><span class="pre">an</span></code> API level 7): the core computes
+its own default (<code class="docutils literal notranslate"><span class="pre">&lt;root&gt;/projects/&lt;id&gt;</span></code>) and hands it over as <code class="docutils literal notranslate"><span class="pre">default</span></code>.
+Local backend: that default. S3: the cache folder, with what the store
+already holds under the id read through first (so <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">init</span></code> sees an
+existing project’s <code class="docutils literal notranslate"><span class="pre">scene.md</span></code> and refuses to clobber it) and the record
+that the folder belongs to the store, which a later <a class="reference internal" href="#cutan.projects_store.push_project" title="cutan.projects_store.push_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">push_project()</span></code></a>
+reads. Nothing is uploaded: the push is explicit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
@@ -207,9 +309,48 @@ into the cache and kept; a cached file whose size matches the object’s is reus
 <dt class="sig sig-object py" id="cutan.projects_store.projects_store">
 <span class="sig-prename descclassname"><span class="pre">cutan.projects_store.</span></span><span class="sig-name descname"><span class="pre">projects_store</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/projects_store.html#projects_store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_store.projects_store" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_store.projects_store'">¶</a></dt>
 <dd><p>The projects as <code class="docutils literal notranslate"><span class="pre">{relative</span> <span class="pre">path:</span> <span class="pre">bytes}</span></code>, over disk or S3 per <code class="docutils literal notranslate"><span class="pre">settings</span></code>.</p>
+<p>The local store creates a key’s folders on write, so a project pushed into it
+from a folder elsewhere lands whole.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MutableMapping</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.projects_store.push_project">
+<span class="sig-prename descclassname"><span class="pre">cutan.projects_store.</span></span><span class="sig-name descname"><span class="pre">push_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('.git/',</span> <span class="pre">'.an/render_work/',</span> <span class="pre">'artifacts/shot_cache/',</span> <span class="pre">'artifacts/shots/',</span> <span class="pre">'artifacts/render_reports/',</span> <span class="pre">'artifacts/probes/')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/projects_store.html#push_project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_store.push_project" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_store.push_project'">¶</a></dt>
+<dd><p>Write <code class="docutils literal notranslate"><span class="pre">folder</span></code>’s files to the store under <code class="docutils literal notranslate"><span class="pre">project_id/</span></code>: the inverse of
+<a class="reference internal" href="#cutan.projects_store.materialize_project" title="cutan.projects_store.materialize_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">materialize_project()</span></code></a> (cutan#91).</p>
+<p><code class="docutils literal notranslate"><span class="pre">folder</span></code> defaults to where <a class="reference internal" href="#cutan.projects_store.materialize_project" title="cutan.projects_store.materialize_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">materialize_project()</span></code></a> puts the project: the
+cache folder on S3, the project folder itself locally (which is the store’s
+own copy, so that push does nothing). Each file is compared three ways: with
+the store’s record of it (the store’s copy of <a class="reference internal" href="#cutan.projects_store.STORE_RECORD" title="cutan.projects_store.STORE_RECORD"><code class="xref py py-data docutils literal notranslate"><span class="pre">STORE_RECORD</span></code></a>) and with
+the folder’s record (the base: what the folder last pulled or pushed; with
+no base, the store’s record stands in, so a first push from a folder with no
+history writes its differences). A file equal to the store’s is unchanged;
+one the folder changed and the store did not is written; one the folder did
+not change but the store did is <code class="docutils literal notranslate"><span class="pre">stale</span></code> and left alone; one both changed
+is a <code class="docutils literal notranslate"><span class="pre">conflict</span></code>, written only with <code class="docutils literal notranslate"><span class="pre">force</span></code>. A file the records do not
+know is compared with the store’s bytes when the key exists. <code class="docutils literal notranslate"><span class="pre">exclude</span></code>
+names what stays local (<a class="reference internal" href="#cutan.projects_store.DEFAULT_PUSH_EXCLUDES" title="cutan.projects_store.DEFAULT_PUSH_EXCLUDES"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEFAULT_PUSH_EXCLUDES</span></code></a>); <code class="docutils literal notranslate"><span class="pre">delete_missing</span></code>
+deletes the store’s keys the folder no longer has (a key the store gained or
+changed since the base is kept, unless <code class="docutils literal notranslate"><span class="pre">force</span></code>); excluded files the folder
+still has are never deleted. The record is then written to the folder and,
+when anything changed, to the store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#cutan.projects_store.PushReport" title="cutan.projects_store.PushReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">PushReport</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.projects_store.read_record">
+<span class="sig-prename descclassname"><span class="pre">cutan.projects_store.</span></span><span class="sig-name descname"><span class="pre">read_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/projects_store.html#read_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_store.read_record" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_store.read_record'">¶</a></dt>
+<dd><p>The folder’s <a class="reference internal" href="#cutan.projects_store.STORE_RECORD" title="cutan.projects_store.STORE_RECORD"><code class="xref py py-data docutils literal notranslate"><span class="pre">STORE_RECORD</span></code></a>, <code class="docutils literal notranslate"><span class="pre">{}</span></code> when it has none or it is unreadable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -217,12 +358,19 @@ into the cache and kept; a cached file whose size matches the object’s is reus
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
+<li><a :data-current="activeSection === '#cutan.projects_store.DEFAULT_PUSH_EXCLUDES'" class="reference internal" href="#cutan.projects_store.DEFAULT_PUSH_EXCLUDES"><code class="docutils literal notranslate"><span class="pre">DEFAULT_PUSH_EXCLUDES</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.projects_store.ProjectsStoreSettings'" class="reference internal" href="#cutan.projects_store.ProjectsStoreSettings"><code class="docutils literal notranslate"><span class="pre">ProjectsStoreSettings</span></code></a><ul>
+<li><a :data-current="activeSection === '#cutan.projects_store.ProjectsStoreSettings.coordinates'" class="reference internal" href="#cutan.projects_store.ProjectsStoreSettings.coordinates"><code class="docutils literal notranslate"><span class="pre">ProjectsStoreSettings.coordinates()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.projects_store.ProjectsStoreSettings.from_environ'" class="reference internal" href="#cutan.projects_store.ProjectsStoreSettings.from_environ"><code class="docutils literal notranslate"><span class="pre">ProjectsStoreSettings.from_environ()</span></code></a></li>
 </ul>
 </li>
+<li><a :data-current="activeSection === '#cutan.projects_store.PushReport'" class="reference internal" href="#cutan.projects_store.PushReport"><code class="docutils literal notranslate"><span class="pre">PushReport</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.projects_store.STORE_RECORD'" class="reference internal" href="#cutan.projects_store.STORE_RECORD"><code class="docutils literal notranslate"><span class="pre">STORE_RECORD</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.projects_store.materialize_project'" class="reference internal" href="#cutan.projects_store.materialize_project"><code class="docutils literal notranslate"><span class="pre">materialize_project()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.projects_store.new_project_dir'" class="reference internal" href="#cutan.projects_store.new_project_dir"><code class="docutils literal notranslate"><span class="pre">new_project_dir()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.projects_store.projects_store'" class="reference internal" href="#cutan.projects_store.projects_store"><code class="docutils literal notranslate"><span class="pre">projects_store()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.projects_store.push_project'" class="reference internal" href="#cutan.projects_store.push_project"><code class="docutils literal notranslate"><span class="pre">push_project()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.projects_store.read_record'" class="reference internal" href="#cutan.projects_store.read_record"><code class="docutils literal notranslate"><span class="pre">read_record()</span></code></a></li>
 </ul>
 </div>
 </aside>
@@ -236,7 +384,7 @@ into the cache and kept; a cached file whose size matches the object’s is reus
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=4d22d5b7"></script>
+<script src="../_static/documentation_options.js?v=e95a51ae"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

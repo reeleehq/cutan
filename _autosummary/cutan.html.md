@@ -38,6 +38,7 @@ them changes when code moves between distributions.
 | [`ENTRY_POINT_VALUE`](#cutan.ENTRY_POINT_VALUE)     | Where the entry point points.                                                                                                                                                           |
 | [`RENDERER_NAME`](#cutan.RENDERER_NAME)         | The persisted renderer name of cut-out shots (`an.stage` claims it).                                                                                                                    |
 | [`LIBRARY_NAME`](#cutan.LIBRARY_NAME)          | The package whose data root holds the genre's asset library and projects (`~/.local/share/cutan` by default; `CUTAN_HOME` overrides it).                                                |
+| [`PROJECT_STORE_RECORD`](#cutan.PROJECT_STORE_RECORD)  | The file, relative to a project folder, that says which projects store the folder belongs to and what it last synced with it (`cutan.projects_store`, cutan#91).                        |
 | [`REQUIRED_AN_API_LEVEL`](#cutan.REQUIRED_AN_API_LEVEL) | The lowest `an.genres.API_LEVEL` this `cutan` runs against ("the lowest `an` it supports", ADR 0001 decision 8, said without a version pin: `an`'s version is assigned by CI at merge). |
 
 ### Functions
@@ -75,11 +76,17 @@ the `an.genres` entry-point name and the `nw` genre id.
 The package whose data root holds the genre’s asset library and projects
 (`~/.local/share/cutan` by default; `CUTAN_HOME` overrides it).
 
+### cutan.PROJECT_STORE_RECORD *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '.an/projects_store.json'*
+
+The file, relative to a project folder, that says which projects store the
+folder belongs to and what it last synced with it (`cutan.projects_store`,
+cutan#91). Pushed with the project, so it is a key of the store too.
+
 ### cutan.RENDERER_NAME *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'cutout'*
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
-### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 6*
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 7*
 
 The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
 it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
@@ -91,6 +98,8 @@ pose (an#339): `register_rest_pose_migration` and `rig_rest_problems`. Level 5
 is nested chains (an#340): `build_rig_subtree(skip_slots=)`, `slot_parent_chain`,
 `slot_node_paths`, `rig_affordances`, `RigError`.
 Level 6: `rest_pose_protection` (an#407), which `validate_character` says aloud.
+Level 7: the `projects.dir.<library>` service `an init --id` consults (cutan#91),
+which places a cut-out project in the cache folder when the projects store is S3.
 
 ### cutan.require_an()
 
@@ -134,7 +143,8 @@ The names of the style specs that ship with `cutan`, sorted.
 | [`library`](cutan.library.html.md#module-cutan.library)                 | The character analyser: legs, arms, views and mouth chart, derived from the rig.                           |
 | [`motion`](cutan.motion.html.md#module-cutan.motion)                   | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.                       |
 | [`pack`](cutan.pack.html.md#module-cutan.pack)                       | Check a cut-out production pack with cutan's own validators (cutan#87).                                    |
-| [`projects_store`](cutan.projects_store.html.md#module-cutan.projects_store)   | Where a cutan project's files are read from: a disk folder or S3, by configuration.                        |
+| [`projects_cli`](cutan.projects_cli.html.md#module-cutan.projects_cli)       | `an projects ...` — a store-backed project from the shell (cutan#91).                                      |
+| [`projects_store`](cutan.projects_store.html.md#module-cutan.projects_store)   | Where a cutan project's files are read from and written to: a disk folder or S3, by configuration.         |
 | [`runtime`](cutan.runtime.html.md#module-cutan.runtime)                 | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).                  |
 | [`styles`](cutan.styles.html.md#module-cutan.styles)                   | The named cut-out style specs, shipped as package data (cutan#4).                                          |
 | [`verify`](cutan.verify.html.md#module-cutan.verify)                   | The cut-out style lint: measures a render against a named style spec.                                      |

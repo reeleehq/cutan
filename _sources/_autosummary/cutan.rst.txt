@@ -14,6 +14,7 @@
       ENTRY_POINT_VALUE
       RENDERER_NAME
       LIBRARY_NAME
+      PROJECT_STORE_RECORD
       REQUIRED_AN_API_LEVEL
    
    .. rubric:: Functions
@@ -45,6 +46,7 @@
    motion
    nw
    pack
+   projects_cli
    projects_store
    runtime
    styles

@@ -29,10 +29,11 @@ instead of being wired into the core. `CUTOUT` lists:
 Its `name` is the persisted genre slug `cutout_animation`, the one
 `cutan.nw` declares to `nw` (ADR 0001 decision 9: persisted identifiers do
 not change). It also offers the core **services** (`an.genres.register_service()`):
-the `an character` / `an impacts` CLI namespaces, the `offline` / `rhubarb` /
-`whisper` lip-sync providers, the licence lookup for pre-`source` descriptors, the
-library’s publish warning and the expression labels `judge_emotion` uses; and the
-**runtime script** that draws the mouth and the eye.
+the `an character` / `an impacts` / `an projects` CLI namespaces, the `offline` /
+`rhubarb` / `whisper` lip-sync providers, the licence lookup for pre-`source`
+descriptors, the library’s publish warning, the expression labels `judge_emotion` uses
+and where `an init --id` creates a cut-out project (`projects.dir.cutan`, cutan#91);
+and the **runtime script** that draws the mouth and the eye.
 
 Importing this module registers nothing: `an.genres.load()` (or
 `an.genres.register_genre()`) does.

@@ -128,6 +128,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.library.html">cutan.library</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.pack.html">cutan.pack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.projects_cli.html">cutan.projects_cli</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.projects_store.html">cutan.projects_store</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.runtime.html">cutan.runtime</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.styles.html">cutan.styles</a></li>
@@ -182,142 +183,549 @@
 
     <div id="content" role="main">
       <h1>Source code for cutan.projects_store</h1><div class="highlight"><pre>
-<span></span><code><span id="line-1"><span class="sd">"""Where a cutan project's files are read from: a disk folder or S3, by configuration.</span>
+<span></span><code><span id="line-1"><span class="sd">"""Where a cutan project's files are read from and written to: a disk folder or S3, by configuration.</span>
 </span><span id="line-2">
 </span><span id="line-3"><span class="sd">The library's ``projects`` kind is a mapping ``relative path -&gt; bytes`` (ADR-0024:</span>
 </span><span id="line-4"><span class="sd">``s3://{bucket}/{tenant}/cutan/projects/{rel}`` mirrors ``~/.local/share/cutan/projects/{rel}``</span>
 </span><span id="line-5"><span class="sd">exactly, so both backends hold the same keys). :func:`projects_store` returns that</span>
 </span><span id="line-6"><span class="sd">mapping; :func:`materialize_project` returns a real folder for tools that need files</span>
-</span><span id="line-7"><span class="sd">(ffmpeg, a browser), reading through a cache under ``~/.cache/cutan/projects/``.</span>
-</span><span id="line-8">
-</span><span id="line-9"><span class="sd">Configuration (environment; the first match wins, ``CUTAN_HOME`` always forces local):</span>
-</span><span id="line-10">
-</span><span id="line-11"><span class="sd">- ``CUTAN_HOME`` set: local, under that root (an explicit root beats any S3 setting)</span>
-</span><span id="line-12"><span class="sd">- ``CUTAN_PROJECTS_BACKEND=s3``: S3, with ``CUTAN_S3_BUCKET`` (default ``tw-apps``),</span>
-</span><span id="line-13"><span class="sd">  ``CUTAN_S3_PROFILE`` (default ``tw-server``) and ``CUTAN_S3_TENANT`` (default ``thorwhalen``)</span>
-</span><span id="line-14"><span class="sd">- otherwise: local (the default)</span>
-</span><span id="line-15"><span class="sd">"""</span>
-</span><span id="line-16">
-</span><span id="line-17"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-</span><span id="line-18">
-</span><span id="line-19"><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-</span><span id="line-20"><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">MutableMapping</span>
-</span><span id="line-21"><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-</span><span id="line-22"><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-</span><span id="line-23"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span>
-</span><span id="line-24">
-</span><span id="line-25"><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">LIBRARY_NAME</span>
-</span><span id="line-26">
-</span><span id="line-27"><span class="n">PROJECTS_KIND</span> <span class="o">=</span> <span class="s2">"projects"</span>
-</span><span id="line-28"><span class="n">HOME_ENV</span> <span class="o">=</span> <span class="s2">"CUTAN_HOME"</span>
-</span><span id="line-29"><span class="n">BACKEND_ENV</span> <span class="o">=</span> <span class="s2">"CUTAN_PROJECTS_BACKEND"</span>
-</span><span id="line-30"><span class="n">CACHE_ENV</span> <span class="o">=</span> <span class="s2">"CUTAN_CACHE"</span>
+</span><span id="line-7"><span class="sd">(ffmpeg, a browser), reading through a cache under ``~/.cache/cutan/projects/``;</span>
+</span><span id="line-8"><span class="sd">:func:`push_project` is the write half (cutan#91): it writes what changed since the</span>
+</span><span id="line-9"><span class="sd">folder last synced, never over a newer version another machine pushed, can delete</span>
+</span><span id="line-10"><span class="sd">what the folder no longer has, and keeps derived output local.</span>
+</span><span id="line-11">
+</span><span id="line-12"><span class="sd">A folder that belongs to a store carries the record ``.an/projects_store.json``</span>
+</span><span id="line-13"><span class="sd">(:data:`STORE_RECORD`): the store's coordinates and, per file, the size and sha256</span>
+</span><span id="line-14"><span class="sd">the folder last synced (``files``). The record is pushed with the project, so the</span>
+</span><span id="line-15"><span class="sd">store's copy says what the store holds and the folder's copy is the base a push</span>
+</span><span id="line-16"><span class="sd">compares both sides against (a three-way comparison: a file the folder did not</span>
+</span><span id="line-17"><span class="sd">change is never pushed over one the store changed, and a file both changed is a</span>
+</span><span id="line-18"><span class="sd">conflict that only ``force`` writes). ``an init &lt;id&gt; --id --genre cutout_animation``</span>
+</span><span id="line-19"><span class="sd">creates a project in the cache folder with that record when the backend is S3</span>
+</span><span id="line-20"><span class="sd">(:func:`new_project_dir`, the ``projects.dir.cutan`` service of ``an`` API level 7).</span>
+</span><span id="line-21">
+</span><span id="line-22"><span class="sd">Configuration (environment; the first match wins, ``CUTAN_HOME`` always forces local):</span>
+</span><span id="line-23">
+</span><span id="line-24"><span class="sd">- ``CUTAN_HOME`` set: local, under that root (an explicit root beats any S3 setting)</span>
+</span><span id="line-25"><span class="sd">- ``CUTAN_PROJECTS_BACKEND=s3``: S3, with ``CUTAN_S3_BUCKET`` (default ``tw-apps``),</span>
+</span><span id="line-26"><span class="sd">  ``CUTAN_S3_PROFILE`` (default ``tw-server``) and ``CUTAN_S3_TENANT`` (default ``thorwhalen``)</span>
+</span><span id="line-27"><span class="sd">- otherwise: local (the default)</span>
+</span><span id="line-28"><span class="sd">"""</span>
+</span><span id="line-29">
+</span><span id="line-30"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 </span><span id="line-31">
-</span><span id="line-32">
+</span><span id="line-32"><span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+</span><span id="line-33"><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+</span><span id="line-34"><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="line-35"><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+</span><span id="line-36"><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">MutableMapping</span>
+</span><span id="line-37"><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+</span><span id="line-38"><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+</span><span id="line-39"><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+</span><span id="line-40"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span>
+</span><span id="line-41">
+</span><span id="line-42"><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">LIBRARY_NAME</span><span class="p">,</span> <span class="n">PROJECT_STORE_RECORD</span>
+</span><span id="line-43">
+</span><span id="line-44"><span class="n">PROJECTS_KIND</span> <span class="o">=</span> <span class="s2">"projects"</span>
+</span><span id="line-45"><span class="n">HOME_ENV</span> <span class="o">=</span> <span class="s2">"CUTAN_HOME"</span>
+</span><span id="line-46"><span class="n">BACKEND_ENV</span> <span class="o">=</span> <span class="s2">"CUTAN_PROJECTS_BACKEND"</span>
+</span><span id="line-47"><span class="n">CACHE_ENV</span> <span class="o">=</span> <span class="s2">"CUTAN_CACHE"</span>
+</span><span id="line-48">
+</span><span id="line-49"><span class="c1">#: The record's path inside a project folder (:data:`cutan.PROJECT_STORE_RECORD`).</span>
+</span><span id="line-50"><span class="n">STORE_RECORD</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">PROJECT_STORE_RECORD</span>
+</span><span id="line-51">
+</span><span id="line-52"><span class="c1">#: What a push keeps on the machine that made it: derived or transient output,</span>
+</span><span id="line-53"><span class="c1">#: keyed by that machine or re-made from the project. The shot cache (an#242) and</span>
+</span><span id="line-54"><span class="c1">#: the shot archive re-render from the project; the render work dirs are a run's</span>
+</span><span id="line-55"><span class="c1">#: scratch; render reports and probes are what ``an init`` keeps out of git</span>
+</span><span id="line-56"><span class="c1">#: (``an.project.PROJECT_GITIGNORE``, held equal by a test); a repository is</span>
+</span><span id="line-57"><span class="c1">#: not project content. Each entry is a folder prefix (ending in ``/``) or a file.</span>
+</span><span id="line-58"><span class="n">DEFAULT_PUSH_EXCLUDES</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-59">    <span class="s2">".git/"</span><span class="p">,</span>
+</span><span id="line-60">    <span class="s2">".an/render_work/"</span><span class="p">,</span>
+</span><span id="line-61">    <span class="s2">"artifacts/shot_cache/"</span><span class="p">,</span>
+</span><span id="line-62">    <span class="s2">"artifacts/shots/"</span><span class="p">,</span>
+</span><span id="line-63">    <span class="s2">"artifacts/render_reports/"</span><span class="p">,</span>
+</span><span id="line-64">    <span class="s2">"artifacts/probes/"</span><span class="p">,</span>
+</span><span id="line-65"><span class="p">)</span>
+</span><span id="line-66">
+</span><span id="line-67"><span class="c1">#: A project id is one folder name (the rule of ``an.library.root.project_dir``).</span>
+</span><span id="line-68"><span class="n">_PROJECT_ID</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[A-Za-z0-9][A-Za-z0-9._-]*"</span><span class="p">)</span>
+</span><span id="line-69">
+</span><span id="line-70">
 <div class="viewcode-block" id="ProjectsStoreSettings">
 <a class="viewcode-back" href="../../_autosummary/cutan.projects_store.html#cutan.projects_store.ProjectsStoreSettings">[docs]</a>
-</span><span id="line-33"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-34"><span class="k">class</span><span class="w"> </span><span class="nc">ProjectsStoreSettings</span><span class="p">:</span>
-</span><span id="line-35"><span class="w">    </span><span class="sd">"""Which backend holds the projects, and its S3 coordinates."""</span>
-</span><span id="line-36">
-</span><span id="line-37">    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"local"</span>
-</span><span id="line-38">    <span class="n">bucket</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"tw-apps"</span>
-</span><span id="line-39">    <span class="n">profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"tw-server"</span>
-</span><span id="line-40">    <span class="n">tenant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"thorwhalen"</span>
-</span><span id="line-41">
-</span><span id="line-42">    <span class="nd">@property</span>
-</span><span id="line-43">    <span class="k">def</span><span class="w"> </span><span class="nf">prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-44">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tenant</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">LIBRARY_NAME</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">PROJECTS_KIND</span><span class="si">}</span><span class="s2">/"</span>
-</span><span id="line-45">
+</span><span id="line-71"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-72"><span class="k">class</span><span class="w"> </span><span class="nc">ProjectsStoreSettings</span><span class="p">:</span>
+</span><span id="line-73"><span class="w">    </span><span class="sd">"""Which backend holds the projects, and its S3 coordinates."""</span>
+</span><span id="line-74">
+</span><span id="line-75">    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"local"</span>
+</span><span id="line-76">    <span class="n">bucket</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"tw-apps"</span>
+</span><span id="line-77">    <span class="n">profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"tw-server"</span>
+</span><span id="line-78">    <span class="n">tenant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"thorwhalen"</span>
+</span><span id="line-79">
+</span><span id="line-80">    <span class="nd">@property</span>
+</span><span id="line-81">    <span class="k">def</span><span class="w"> </span><span class="nf">prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-82">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tenant</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">LIBRARY_NAME</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">PROJECTS_KIND</span><span class="si">}</span><span class="s2">/"</span>
+</span><span id="line-83">
+<div class="viewcode-block" id="ProjectsStoreSettings.coordinates">
+<a class="viewcode-back" href="../../_autosummary/cutan.projects_store.html#cutan.projects_store.ProjectsStoreSettings.coordinates">[docs]</a>
+</span><span id="line-84">    <span class="k">def</span><span class="w"> </span><span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+</span><span id="line-85"><span class="w">        </span><span class="sd">"""What a project folder records about its store (no credentials, no profile).</span>
+</span><span id="line-86">
+</span><span id="line-87"><span class="sd">        &gt;&gt;&gt; ProjectsStoreSettings().coordinates()["backend"]</span>
+</span><span id="line-88"><span class="sd">        'local'</span>
+</span><span id="line-89"><span class="sd">        """</span>
+</span><span id="line-90">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"local"</span><span class="p">:</span>
+</span><span id="line-91">            <span class="k">return</span> <span class="p">{</span><span class="s2">"backend"</span><span class="p">:</span> <span class="s2">"local"</span><span class="p">}</span>
+</span><span id="line-92">        <span class="k">return</span> <span class="p">{</span>
+</span><span id="line-93">            <span class="s2">"backend"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
+</span><span id="line-94">            <span class="s2">"bucket"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
+</span><span id="line-95">            <span class="s2">"tenant"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tenant</span><span class="p">,</span>
+</span><span id="line-96">            <span class="s2">"prefix"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span>
+</span><span id="line-97">        <span class="p">}</span></div>
+
+</span><span id="line-98">
 <div class="viewcode-block" id="ProjectsStoreSettings.from_environ">
 <a class="viewcode-back" href="../../_autosummary/cutan.projects_store.html#cutan.projects_store.ProjectsStoreSettings.from_environ">[docs]</a>
-</span><span id="line-46">    <span class="nd">@classmethod</span>
-</span><span id="line-47">    <span class="k">def</span><span class="w"> </span><span class="nf">from_environ</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">environ</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="line-48"><span class="w">        </span><span class="sd">"""</span>
-</span><span id="line-49"><span class="sd">        &gt;&gt;&gt; ProjectsStoreSettings.from_environ({}).backend</span>
-</span><span id="line-50"><span class="sd">        'local'</span>
-</span><span id="line-51"><span class="sd">        &gt;&gt;&gt; ProjectsStoreSettings.from_environ({"CUTAN_PROJECTS_BACKEND": "s3"}).backend</span>
-</span><span id="line-52"><span class="sd">        's3'</span>
-</span><span id="line-53"><span class="sd">        &gt;&gt;&gt; env = {"CUTAN_PROJECTS_BACKEND": "s3", "CUTAN_HOME": "/x"}</span>
-</span><span id="line-54"><span class="sd">        &gt;&gt;&gt; ProjectsStoreSettings.from_environ(env).backend</span>
-</span><span id="line-55"><span class="sd">        'local'</span>
-</span><span id="line-56"><span class="sd">        """</span>
-</span><span id="line-57">        <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span> <span class="k">if</span> <span class="n">environ</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">environ</span>
-</span><span id="line-58">        <span class="n">backend</span> <span class="o">=</span> <span class="s2">"local"</span> <span class="k">if</span> <span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">HOME_ENV</span><span class="p">)</span> <span class="k">else</span> <span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BACKEND_ENV</span><span class="p">,</span> <span class="s2">"local"</span><span class="p">)</span>
-</span><span id="line-59">        <span class="k">if</span> <span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"local"</span><span class="p">,</span> <span class="s2">"s3"</span><span class="p">):</span>
-</span><span id="line-60">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">BACKEND_ENV</span><span class="si">}</span><span class="s2"> must be 'local' or 's3', got </span><span class="si">{</span><span class="n">backend</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-61">        <span class="n">d</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
-</span><span id="line-62">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-</span><span id="line-63">            <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
-</span><span id="line-64">            <span class="n">bucket</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"CUTAN_S3_BUCKET"</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">bucket</span><span class="p">),</span>
-</span><span id="line-65">            <span class="n">profile</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"CUTAN_S3_PROFILE"</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">profile</span><span class="p">),</span>
-</span><span id="line-66">            <span class="n">tenant</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"CUTAN_S3_TENANT"</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">tenant</span><span class="p">),</span>
-</span><span id="line-67">        <span class="p">)</span></div>
+</span><span id="line-99">    <span class="nd">@classmethod</span>
+</span><span id="line-100">    <span class="k">def</span><span class="w"> </span><span class="nf">from_environ</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">environ</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="line-101"><span class="w">        </span><span class="sd">"""</span>
+</span><span id="line-102"><span class="sd">        &gt;&gt;&gt; ProjectsStoreSettings.from_environ({}).backend</span>
+</span><span id="line-103"><span class="sd">        'local'</span>
+</span><span id="line-104"><span class="sd">        &gt;&gt;&gt; ProjectsStoreSettings.from_environ({"CUTAN_PROJECTS_BACKEND": "s3"}).backend</span>
+</span><span id="line-105"><span class="sd">        's3'</span>
+</span><span id="line-106"><span class="sd">        &gt;&gt;&gt; env = {"CUTAN_PROJECTS_BACKEND": "s3", "CUTAN_HOME": "/x"}</span>
+</span><span id="line-107"><span class="sd">        &gt;&gt;&gt; ProjectsStoreSettings.from_environ(env).backend</span>
+</span><span id="line-108"><span class="sd">        'local'</span>
+</span><span id="line-109"><span class="sd">        """</span>
+</span><span id="line-110">        <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span> <span class="k">if</span> <span class="n">environ</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">environ</span>
+</span><span id="line-111">        <span class="n">backend</span> <span class="o">=</span> <span class="s2">"local"</span> <span class="k">if</span> <span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">HOME_ENV</span><span class="p">)</span> <span class="k">else</span> <span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BACKEND_ENV</span><span class="p">,</span> <span class="s2">"local"</span><span class="p">)</span>
+</span><span id="line-112">        <span class="k">if</span> <span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"local"</span><span class="p">,</span> <span class="s2">"s3"</span><span class="p">):</span>
+</span><span id="line-113">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">BACKEND_ENV</span><span class="si">}</span><span class="s2"> must be 'local' or 's3', got </span><span class="si">{</span><span class="n">backend</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-114">        <span class="n">d</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+</span><span id="line-115">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+</span><span id="line-116">            <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+</span><span id="line-117">            <span class="n">bucket</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"CUTAN_S3_BUCKET"</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">bucket</span><span class="p">),</span>
+</span><span id="line-118">            <span class="n">profile</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"CUTAN_S3_PROFILE"</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">profile</span><span class="p">),</span>
+</span><span id="line-119">            <span class="n">tenant</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"CUTAN_S3_TENANT"</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">tenant</span><span class="p">),</span>
+</span><span id="line-120">        <span class="p">)</span></div>
 </div>
 
-</span><span id="line-68">
-</span><span id="line-69">
-</span><span id="line-70"><span class="k">def</span><span class="w"> </span><span class="nf">_local_root</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-71">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.library.root</span><span class="w"> </span><span class="kn">import</span> <span class="n">library_root</span>
-</span><span id="line-72">
-</span><span id="line-73">    <span class="k">return</span> <span class="n">library_root</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="n">LIBRARY_NAME</span><span class="p">)</span> <span class="o">/</span> <span class="n">PROJECTS_KIND</span>
-</span><span id="line-74">
-</span><span id="line-75">
+</span><span id="line-121">
+</span><span id="line-122">
+</span><span id="line-123"><span class="k">def</span><span class="w"> </span><span class="nf">_local_root</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-124">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.library.root</span><span class="w"> </span><span class="kn">import</span> <span class="n">library_root</span>
+</span><span id="line-125">
+</span><span id="line-126">    <span class="k">return</span> <span class="n">library_root</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="n">LIBRARY_NAME</span><span class="p">)</span> <span class="o">/</span> <span class="n">PROJECTS_KIND</span>
+</span><span id="line-127">
+</span><span id="line-128">
 <div class="viewcode-block" id="projects_store">
 <a class="viewcode-back" href="../../_autosummary/cutan.projects_store.html#cutan.projects_store.projects_store">[docs]</a>
-</span><span id="line-76"><span class="k">def</span><span class="w"> </span><span class="nf">projects_store</span><span class="p">(</span><span class="n">settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProjectsStoreSettings</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MutableMapping</span><span class="p">:</span>
-</span><span id="line-77"><span class="w">    </span><span class="sd">"""The projects as ``{relative path: bytes}``, over disk or S3 per ``settings``."""</span>
-</span><span id="line-78">    <span class="n">s</span> <span class="o">=</span> <span class="n">settings</span> <span class="ow">or</span> <span class="n">ProjectsStoreSettings</span><span class="o">.</span><span class="n">from_environ</span><span class="p">()</span>
-</span><span id="line-79">    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"s3"</span><span class="p">:</span>
-</span><span id="line-80">        <span class="kn">from</span><span class="w"> </span><span class="nn">s3dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">s3_store</span>
-</span><span id="line-81">
-</span><span id="line-82">        <span class="k">return</span> <span class="n">s3_store</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">profile</span><span class="p">)</span>
-</span><span id="line-83">    <span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Files</span>
-</span><span id="line-84">
-</span><span id="line-85">    <span class="n">root</span> <span class="o">=</span> <span class="n">_local_root</span><span class="p">()</span>
-</span><span id="line-86">    <span class="n">root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-87">    <span class="k">return</span> <span class="n">Files</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">))</span></div>
+</span><span id="line-129"><span class="k">def</span><span class="w"> </span><span class="nf">projects_store</span><span class="p">(</span><span class="n">settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProjectsStoreSettings</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MutableMapping</span><span class="p">:</span>
+</span><span id="line-130"><span class="w">    </span><span class="sd">"""The projects as ``{relative path: bytes}``, over disk or S3 per ``settings``.</span>
+</span><span id="line-131">
+</span><span id="line-132"><span class="sd">    The local store creates a key's folders on write, so a project pushed into it</span>
+</span><span id="line-133"><span class="sd">    from a folder elsewhere lands whole.</span>
+</span><span id="line-134"><span class="sd">    """</span>
+</span><span id="line-135">    <span class="n">s</span> <span class="o">=</span> <span class="n">settings</span> <span class="ow">or</span> <span class="n">ProjectsStoreSettings</span><span class="o">.</span><span class="n">from_environ</span><span class="p">()</span>
+</span><span id="line-136">    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"s3"</span><span class="p">:</span>
+</span><span id="line-137">        <span class="kn">from</span><span class="w"> </span><span class="nn">s3dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">s3_store</span>
+</span><span id="line-138">
+</span><span id="line-139">        <span class="k">return</span> <span class="n">s3_store</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">profile</span><span class="p">)</span>
+</span><span id="line-140">    <span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Files</span><span class="p">,</span> <span class="n">mk_dirs_if_missing</span>
+</span><span id="line-141">
+</span><span id="line-142">    <span class="n">root</span> <span class="o">=</span> <span class="n">_local_root</span><span class="p">()</span>
+</span><span id="line-143">    <span class="n">root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-144">    <span class="k">return</span> <span class="n">mk_dirs_if_missing</span><span class="p">(</span><span class="n">Files</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">)))</span></div>
 
-</span><span id="line-88">
-</span><span id="line-89">
-</span><span id="line-90"><span class="k">def</span><span class="w"> </span><span class="nf">cache_root</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-91">    <span class="k">return</span> <span class="p">(</span>
-</span><span id="line-92">        <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CACHE_ENV</span><span class="p">)</span> <span class="ow">or</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">".cache"</span> <span class="o">/</span> <span class="n">LIBRARY_NAME</span><span class="p">)</span>
-</span><span id="line-93">        <span class="o">/</span> <span class="n">PROJECTS_KIND</span>
-</span><span id="line-94">    <span class="p">)</span>
-</span><span id="line-95">
-</span><span id="line-96">
+</span><span id="line-145">
+</span><span id="line-146">
+</span><span id="line-147"><span class="k">def</span><span class="w"> </span><span class="nf">cache_root</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-148">    <span class="k">return</span> <span class="p">(</span>
+</span><span id="line-149">        <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CACHE_ENV</span><span class="p">)</span> <span class="ow">or</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">".cache"</span> <span class="o">/</span> <span class="n">LIBRARY_NAME</span><span class="p">)</span>
+</span><span id="line-150">        <span class="o">/</span> <span class="n">PROJECTS_KIND</span>
+</span><span id="line-151">    <span class="p">)</span>
+</span><span id="line-152">
+</span><span id="line-153">
+</span><span id="line-154"><span class="k">def</span><span class="w"> </span><span class="nf">_project_prefix</span><span class="p">(</span><span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-155"><span class="w">    </span><span class="sd">"""``"&lt;id&gt;/"``, refusing an id that is not one folder name.</span>
+</span><span id="line-156">
+</span><span id="line-157"><span class="sd">    &gt;&gt;&gt; _project_prefix("alice-and-bob")</span>
+</span><span id="line-158"><span class="sd">    'alice-and-bob/'</span>
+</span><span id="line-159"><span class="sd">    &gt;&gt;&gt; _project_prefix("../escape")  # doctest: +IGNORE_EXCEPTION_DETAIL</span>
+</span><span id="line-160"><span class="sd">    Traceback (most recent call last):</span>
+</span><span id="line-161"><span class="sd">    ValueError: ...</span>
+</span><span id="line-162"><span class="sd">    """</span>
+</span><span id="line-163">    <span class="k">if</span> <span class="ow">not</span> <span class="n">_PROJECT_ID</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">project_id</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">):</span>
+</span><span id="line-164">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="line-165">            <span class="sa">f</span><span class="s2">"project id </span><span class="si">{</span><span class="n">project_id</span><span class="si">!r}</span><span class="s2"> must be one folder name "</span>
+</span><span id="line-166">            <span class="s2">"(letters, digits, '.', '_' or '-'; no path separators)"</span>
+</span><span id="line-167">        <span class="p">)</span>
+</span><span id="line-168">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">project_id</span><span class="si">}</span><span class="s2">/"</span>
+</span><span id="line-169">
+</span><span id="line-170">
+</span><span id="line-171"><span class="k">def</span><span class="w"> </span><span class="nf">_folder_for</span><span class="p">(</span>
+</span><span id="line-172">    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-173">    <span class="n">s</span><span class="p">:</span> <span class="n">ProjectsStoreSettings</span><span class="p">,</span>
+</span><span id="line-174">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">],</span>
+</span><span id="line-175">    <span class="n">cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span>
+</span><span id="line-176"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-177"><span class="w">    </span><span class="sd">"""The local backend's project folder itself, else the cache folder."""</span>
+</span><span id="line-178">    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"local"</span> <span class="ow">and</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-179">        <span class="k">return</span> <span class="n">_local_root</span><span class="p">()</span> <span class="o">/</span> <span class="n">project_id</span>
+</span><span id="line-180">    <span class="k">return</span> <span class="p">(</span><span class="n">cache</span> <span class="ow">or</span> <span class="n">cache_root</span><span class="p">())</span> <span class="o">/</span> <span class="n">project_id</span>
+</span><span id="line-181">
+</span><span id="line-182">
+</span><span id="line-183"><span class="k">def</span><span class="w"> </span><span class="nf">_keys_under</span><span class="p">(</span><span class="n">store</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-184"><span class="w">    </span><span class="sd">"""The store's keys under ``prefix``, less directory markers (a key ending in</span>
+</span><span id="line-185"><span class="sd">    ``/``, which a console's "create folder" leaves and ``s3dol`` lists)."""</span>
+</span><span id="line-186">    <span class="k">return</span> <span class="p">{</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">store</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)}</span>
+</span><span id="line-187">
+</span><span id="line-188">
+</span><span id="line-189"><span class="c1"># ----------------------------------------------------------------- the record</span>
+</span><span id="line-190">
+</span><span id="line-191">
+<div class="viewcode-block" id="read_record">
+<a class="viewcode-back" href="../../_autosummary/cutan.projects_store.html#cutan.projects_store.read_record">[docs]</a>
+</span><span id="line-192"><span class="k">def</span><span class="w"> </span><span class="nf">read_record</span><span class="p">(</span><span class="n">folder</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+</span><span id="line-193"><span class="w">    </span><span class="sd">"""The folder's :data:`STORE_RECORD`, ``{}`` when it has none or it is unreadable."""</span>
+</span><span id="line-194">    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span> <span class="o">/</span> <span class="n">STORE_RECORD</span>
+</span><span id="line-195">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-196">        <span class="n">doc</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-197">    <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+</span><span id="line-198">        <span class="k">return</span> <span class="p">{}</span>
+</span><span id="line-199">    <span class="k">return</span> <span class="n">doc</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span></div>
+
+</span><span id="line-200">
+</span><span id="line-201">
+</span><span id="line-202"><span class="k">def</span><span class="w"> </span><span class="nf">_record_bytes</span><span class="p">(</span><span class="n">record</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+</span><span id="line-203">    <span class="k">return</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span><span id="line-204">
+</span><span id="line-205">
+</span><span id="line-206"><span class="k">def</span><span class="w"> </span><span class="nf">_write_record</span><span class="p">(</span><span class="n">folder</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+</span><span id="line-207">    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span> <span class="o">/</span> <span class="n">STORE_RECORD</span>
+</span><span id="line-208">    <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-209">    <span class="n">data</span> <span class="o">=</span> <span class="n">_record_bytes</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</span><span id="line-210">    <span class="n">path</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="line-211">    <span class="k">return</span> <span class="n">data</span>
+</span><span id="line-212">
+</span><span id="line-213">
+</span><span id="line-214"><span class="k">def</span><span class="w"> </span><span class="nf">_record_store</span><span class="p">(</span><span class="n">folder</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">ProjectsStoreSettings</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-215"><span class="w">    </span><span class="sd">"""Say which store ``folder`` belongs to, keeping what else the record holds."""</span>
+</span><span id="line-216">    <span class="n">record</span> <span class="o">=</span> <span class="n">read_record</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+</span><span id="line-217">    <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"store"</span><span class="p">)</span> <span class="o">==</span> <span class="n">s</span><span class="o">.</span><span class="n">coordinates</span><span class="p">():</span>
+</span><span id="line-218">        <span class="k">return</span>
+</span><span id="line-219">    <span class="n">_write_record</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="p">{</span><span class="o">**</span><span class="n">record</span><span class="p">,</span> <span class="s2">"store"</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">coordinates</span><span class="p">()})</span>
+</span><span id="line-220">
+</span><span id="line-221">
+</span><span id="line-222"><span class="k">def</span><span class="w"> </span><span class="nf">_store_record</span><span class="p">(</span><span class="n">store</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+</span><span id="line-223"><span class="w">    </span><span class="sd">"""The store's copy of the record, ``{}`` when it has none or it is unreadable."""</span>
+</span><span id="line-224">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-225">        <span class="n">data</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</span><span id="line-226">    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
+</span><span id="line-227">        <span class="k">return</span> <span class="p">{}</span>
+</span><span id="line-228">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-229">        <span class="n">doc</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-230">    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">):</span>
+</span><span id="line-231">        <span class="k">return</span> <span class="p">{}</span>
+</span><span id="line-232">    <span class="k">return</span> <span class="n">doc</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
+</span><span id="line-233">
+</span><span id="line-234">
+</span><span id="line-235"><span class="k">def</span><span class="w"> </span><span class="nf">_sha256</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-236">    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+</span><span id="line-237">
+</span><span id="line-238">
+</span><span id="line-239"><span class="k">def</span><span class="w"> </span><span class="nf">_file_digest</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-240">    <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
+</span><span id="line-241">    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="line-242">        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">),</span> <span class="sa">b</span><span class="s2">""</span><span class="p">):</span>
+</span><span id="line-243">            <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+</span><span id="line-244">    <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+</span><span id="line-245">
+</span><span id="line-246">
+</span><span id="line-247"><span class="c1"># ----------------------------------------------------------------- read half</span>
+</span><span id="line-248">
+</span><span id="line-249">
 <div class="viewcode-block" id="materialize_project">
 <a class="viewcode-back" href="../../_autosummary/cutan.projects_store.html#cutan.projects_store.materialize_project">[docs]</a>
-</span><span id="line-97"><span class="k">def</span><span class="w"> </span><span class="nf">materialize_project</span><span class="p">(</span>
-</span><span id="line-98">    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-99">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-100">    <span class="n">settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProjectsStoreSettings</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-101">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-102">    <span class="n">cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-103"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-104"><span class="w">    </span><span class="sd">"""A real folder holding ``project_id``'s files.</span>
-</span><span id="line-105">
-</span><span id="line-106"><span class="sd">    Local backend: the project folder itself, no copy. S3: files are read through</span>
-</span><span id="line-107"><span class="sd">    into the cache and kept; a cached file whose size matches the object's is reused.</span>
-</span><span id="line-108"><span class="sd">    """</span>
-</span><span id="line-109">    <span class="n">s</span> <span class="o">=</span> <span class="n">settings</span> <span class="ow">or</span> <span class="n">ProjectsStoreSettings</span><span class="o">.</span><span class="n">from_environ</span><span class="p">()</span>
-</span><span id="line-110">    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"local"</span> <span class="ow">and</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-111">        <span class="k">return</span> <span class="n">_local_root</span><span class="p">()</span> <span class="o">/</span> <span class="n">project_id</span>
-</span><span id="line-112">    <span class="n">store</span> <span class="o">=</span> <span class="n">projects_store</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">store</span>
-</span><span id="line-113">    <span class="n">dest</span> <span class="o">=</span> <span class="p">(</span><span class="n">cache</span> <span class="ow">or</span> <span class="n">cache_root</span><span class="p">())</span> <span class="o">/</span> <span class="n">project_id</span>
-</span><span id="line-114">    <span class="n">prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">project_id</span><span class="si">}</span><span class="s2">/"</span>
-</span><span id="line-115">    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">store</span><span class="p">:</span>
-</span><span id="line-116">        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
-</span><span id="line-117">            <span class="k">continue</span>
-</span><span id="line-118">        <span class="n">target</span> <span class="o">=</span> <span class="n">dest</span> <span class="o">/</span> <span class="n">key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:]</span>
-</span><span id="line-119">        <span class="n">data</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-</span><span id="line-120">        <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">target</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-</span><span id="line-121">            <span class="k">continue</span>
-</span><span id="line-122">        <span class="n">target</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-123">        <span class="n">target</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span><span id="line-124">    <span class="n">dest</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-125">    <span class="k">return</span> <span class="n">dest</span></div>
+</span><span id="line-250"><span class="k">def</span><span class="w"> </span><span class="nf">materialize_project</span><span class="p">(</span>
+</span><span id="line-251">    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-252">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-253">    <span class="n">settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProjectsStoreSettings</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-254">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-255">    <span class="n">cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-256"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-257"><span class="w">    </span><span class="sd">"""A real folder holding ``project_id``'s files.</span>
+</span><span id="line-258">
+</span><span id="line-259"><span class="sd">    Local backend: the project folder itself, no copy. S3: files are read through</span>
+</span><span id="line-260"><span class="sd">    into the cache and kept, and the folder records the store it belongs to</span>
+</span><span id="line-261"><span class="sd">    (:data:`STORE_RECORD`). A cached file is reused when its sha256 is the one</span>
+</span><span id="line-262"><span class="sd">    the store's record holds for it (a file the record does not know: when its</span>
+</span><span id="line-263"><span class="sd">    size matches the object's). The store wins: a cached file that differs is</span>
+</span><span id="line-264"><span class="sd">    overwritten, so push a folder's changes before pulling into it.</span>
+</span><span id="line-265"><span class="sd">    """</span>
+</span><span id="line-266">    <span class="n">s</span> <span class="o">=</span> <span class="n">settings</span> <span class="ow">or</span> <span class="n">ProjectsStoreSettings</span><span class="o">.</span><span class="n">from_environ</span><span class="p">()</span>
+</span><span id="line-267">    <span class="n">prefix</span> <span class="o">=</span> <span class="n">_project_prefix</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+</span><span id="line-268">    <span class="n">dest</span> <span class="o">=</span> <span class="n">_folder_for</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+</span><span id="line-269">    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"local"</span> <span class="ow">and</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-270">        <span class="k">return</span> <span class="n">dest</span>
+</span><span id="line-271">    <span class="n">store</span> <span class="o">=</span> <span class="n">projects_store</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">store</span>
+</span><span id="line-272">    <span class="n">remote</span> <span class="o">=</span> <span class="n">_store_record</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">STORE_RECORD</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"files"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+</span><span id="line-273">    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_keys_under</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)):</span>
+</span><span id="line-274">        <span class="n">rel</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:]</span>
+</span><span id="line-275">        <span class="n">target</span> <span class="o">=</span> <span class="n">dest</span> <span class="o">/</span> <span class="n">rel</span>
+</span><span id="line-276">        <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">rel</span> <span class="o">!=</span> <span class="n">STORE_RECORD</span><span class="p">:</span>  <span class="c1"># the record is always refreshed</span>
+</span><span id="line-277">            <span class="n">want</span> <span class="o">=</span> <span class="p">(</span><span class="n">remote</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sha256"</span><span class="p">)</span>
+</span><span id="line-278">            <span class="k">if</span> <span class="n">want</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-279">                <span class="k">if</span> <span class="n">_file_digest</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">==</span> <span class="n">want</span><span class="p">:</span>
+</span><span id="line-280">                    <span class="k">continue</span>
+</span><span id="line-281">                <span class="n">data</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</span><span id="line-282">            <span class="k">else</span><span class="p">:</span>
+</span><span id="line-283">                <span class="n">data</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</span><span id="line-284">                <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+</span><span id="line-285">                    <span class="k">continue</span>
+</span><span id="line-286">        <span class="k">else</span><span class="p">:</span>
+</span><span id="line-287">            <span class="n">data</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</span><span id="line-288">        <span class="n">target</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-289">        <span class="n">target</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="line-290">    <span class="n">dest</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-291">    <span class="n">_record_store</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+</span><span id="line-292">    <span class="k">return</span> <span class="n">dest</span></div>
+
+</span><span id="line-293">
+</span><span id="line-294">
+<div class="viewcode-block" id="new_project_dir">
+<a class="viewcode-back" href="../../_autosummary/cutan.projects_store.html#cutan.projects_store.new_project_dir">[docs]</a>
+</span><span id="line-295"><span class="k">def</span><span class="w"> </span><span class="nf">new_project_dir</span><span class="p">(</span>
+</span><span id="line-296">    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-297">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-298">    <span class="n">default</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-299">    <span class="n">settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProjectsStoreSettings</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-300">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-301">    <span class="n">cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-302"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-303"><span class="w">    </span><span class="sd">"""Where ``an init &lt;id&gt; --id --genre cutout_animation`` creates the project.</span>
+</span><span id="line-304">
+</span><span id="line-305"><span class="sd">    The ``projects.dir.cutan`` service (``an`` API level 7): the core computes</span>
+</span><span id="line-306"><span class="sd">    its own default (``&lt;root&gt;/projects/&lt;id&gt;``) and hands it over as ``default``.</span>
+</span><span id="line-307"><span class="sd">    Local backend: that default. S3: the cache folder, with what the store</span>
+</span><span id="line-308"><span class="sd">    already holds under the id read through first (so ``an init`` sees an</span>
+</span><span id="line-309"><span class="sd">    existing project's ``scene.md`` and refuses to clobber it) and the record</span>
+</span><span id="line-310"><span class="sd">    that the folder belongs to the store, which a later :func:`push_project`</span>
+</span><span id="line-311"><span class="sd">    reads. Nothing is uploaded: the push is explicit.</span>
+</span><span id="line-312"><span class="sd">    """</span>
+</span><span id="line-313">    <span class="n">s</span> <span class="o">=</span> <span class="n">settings</span> <span class="ow">or</span> <span class="n">ProjectsStoreSettings</span><span class="o">.</span><span class="n">from_environ</span><span class="p">()</span>
+</span><span id="line-314">    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"local"</span> <span class="ow">and</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-315">        <span class="n">_project_prefix</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+</span><span id="line-316">        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">default</span><span class="p">)</span> <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_local_root</span><span class="p">()</span> <span class="o">/</span> <span class="n">project_id</span>
+</span><span id="line-317">    <span class="k">return</span> <span class="n">materialize_project</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span></div>
+
+</span><span id="line-318">
+</span><span id="line-319">
+</span><span id="line-320"><span class="c1"># ----------------------------------------------------------------- write half</span>
+</span><span id="line-321">
+</span><span id="line-322">
+<div class="viewcode-block" id="PushReport">
+<a class="viewcode-back" href="../../_autosummary/cutan.projects_store.html#cutan.projects_store.PushReport">[docs]</a>
+</span><span id="line-323"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-324"><span class="k">class</span><span class="w"> </span><span class="nc">PushReport</span><span class="p">:</span>
+</span><span id="line-325"><span class="w">    </span><span class="sd">"""What one :func:`push_project` did, as relative paths.</span>
+</span><span id="line-326">
+</span><span id="line-327"><span class="sd">    ``stale``: files the folder did not change but the store did (or dropped)</span>
+</span><span id="line-328"><span class="sd">    since the folder last synced, so they were not pushed: pull first.</span>
+</span><span id="line-329"><span class="sd">    ``conflicts``: files both sides changed, not pushed without ``force``.</span>
+</span><span id="line-330"><span class="sd">    """</span>
+</span><span id="line-331">
+</span><span id="line-332">    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-333">    <span class="n">folder</span><span class="p">:</span> <span class="n">Path</span>
+</span><span id="line-334">    <span class="n">written</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span><span id="line-335">    <span class="n">unchanged</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span><span id="line-336">    <span class="n">excluded</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span><span id="line-337">    <span class="n">deleted</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span><span id="line-338">    <span class="n">stale</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+</span><span id="line-339">    <span class="n">conflicts</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+</span><span id="line-340">
+</span><span id="line-341">    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-342">        <span class="n">text</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-343">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s2"> written, "</span>
+</span><span id="line-344">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unchanged</span><span class="p">)</span><span class="si">}</span><span class="s2"> unchanged, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">excluded</span><span class="p">)</span><span class="si">}</span><span class="s2"> kept local, "</span>
+</span><span id="line-345">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deleted</span><span class="p">)</span><span class="si">}</span><span class="s2"> deleted"</span>
+</span><span id="line-346">        <span class="p">)</span>
+</span><span id="line-347">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stale</span><span class="p">:</span>
+</span><span id="line-348">            <span class="n">text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">", </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stale</span><span class="p">)</span><span class="si">}</span><span class="s2"> stale (pull first)"</span>
+</span><span id="line-349">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conflicts</span><span class="p">:</span>
+</span><span id="line-350">            <span class="n">text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">", </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conflicts</span><span class="p">)</span><span class="si">}</span><span class="s2"> in conflict (force to overwrite)"</span>
+</span><span id="line-351">        <span class="k">return</span> <span class="n">text</span></div>
+
+</span><span id="line-352">
+</span><span id="line-353">
+</span><span id="line-354"><span class="k">def</span><span class="w"> </span><span class="nf">_excluder</span><span class="p">(</span><span class="n">exclude</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+</span><span id="line-355"><span class="w">    </span><span class="sd">"""``rel -&gt; bool``: whether an entry (a folder prefix ending in ``/``, or a file) covers it.</span>
+</span><span id="line-356">
+</span><span id="line-357"><span class="sd">    &gt;&gt;&gt; keep = _excluder(("artifacts/shot_cache/", "notes.txt"))</span>
+</span><span id="line-358"><span class="sd">    &gt;&gt;&gt; keep("artifacts/shot_cache/blobs/x"), keep("notes.txt"), keep("artifacts/audio/a.wav")</span>
+</span><span id="line-359"><span class="sd">    (True, True, False)</span>
+</span><span id="line-360"><span class="sd">    """</span>
+</span><span id="line-361">    <span class="n">folders</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exclude</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"/"</span><span class="p">))</span>
+</span><span id="line-362">    <span class="n">files</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exclude</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"/"</span><span class="p">))</span>
+</span><span id="line-363">
+</span><span id="line-364">    <span class="k">def</span><span class="w"> </span><span class="nf">excluded</span><span class="p">(</span><span class="n">rel</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-365">        <span class="k">return</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">files</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">rel</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">folders</span><span class="p">)</span>
+</span><span id="line-366">
+</span><span id="line-367">    <span class="k">return</span> <span class="n">excluded</span>
+</span><span id="line-368">
+</span><span id="line-369">
+</span><span id="line-370"><span class="k">def</span><span class="w"> </span><span class="nf">_same</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">b</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-371"><span class="w">    </span><span class="sd">"""Two record entries name the same bytes (by sha256)."""</span>
+</span><span id="line-372">    <span class="k">return</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sha256"</span><span class="p">)</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sha256"</span><span class="p">)</span>
+</span><span id="line-373">
+</span><span id="line-374">
+<div class="viewcode-block" id="push_project">
+<a class="viewcode-back" href="../../_autosummary/cutan.projects_store.html#cutan.projects_store.push_project">[docs]</a>
+</span><span id="line-375"><span class="k">def</span><span class="w"> </span><span class="nf">push_project</span><span class="p">(</span>
+</span><span id="line-376">    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-377">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-378">    <span class="n">folder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-379">    <span class="n">settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProjectsStoreSettings</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-380">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MutableMapping</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-381">    <span class="n">delete_missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-382">    <span class="n">exclude</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_PUSH_EXCLUDES</span><span class="p">,</span>
+</span><span id="line-383">    <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-384">    <span class="n">cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-385"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PushReport</span><span class="p">:</span>
+</span><span id="line-386"><span class="w">    </span><span class="sd">"""Write ``folder``'s files to the store under ``project_id/``: the inverse of</span>
+</span><span id="line-387"><span class="sd">    :func:`materialize_project` (cutan#91).</span>
+</span><span id="line-388">
+</span><span id="line-389"><span class="sd">    ``folder`` defaults to where :func:`materialize_project` puts the project: the</span>
+</span><span id="line-390"><span class="sd">    cache folder on S3, the project folder itself locally (which is the store's</span>
+</span><span id="line-391"><span class="sd">    own copy, so that push does nothing). Each file is compared three ways: with</span>
+</span><span id="line-392"><span class="sd">    the store's record of it (the store's copy of :data:`STORE_RECORD`) and with</span>
+</span><span id="line-393"><span class="sd">    the folder's record (the base: what the folder last pulled or pushed; with</span>
+</span><span id="line-394"><span class="sd">    no base, the store's record stands in, so a first push from a folder with no</span>
+</span><span id="line-395"><span class="sd">    history writes its differences). A file equal to the store's is unchanged;</span>
+</span><span id="line-396"><span class="sd">    one the folder changed and the store did not is written; one the folder did</span>
+</span><span id="line-397"><span class="sd">    not change but the store did is ``stale`` and left alone; one both changed</span>
+</span><span id="line-398"><span class="sd">    is a ``conflict``, written only with ``force``. A file the records do not</span>
+</span><span id="line-399"><span class="sd">    know is compared with the store's bytes when the key exists. ``exclude``</span>
+</span><span id="line-400"><span class="sd">    names what stays local (:data:`DEFAULT_PUSH_EXCLUDES`); ``delete_missing``</span>
+</span><span id="line-401"><span class="sd">    deletes the store's keys the folder no longer has (a key the store gained or</span>
+</span><span id="line-402"><span class="sd">    changed since the base is kept, unless ``force``); excluded files the folder</span>
+</span><span id="line-403"><span class="sd">    still has are never deleted. The record is then written to the folder and,</span>
+</span><span id="line-404"><span class="sd">    when anything changed, to the store.</span>
+</span><span id="line-405"><span class="sd">    """</span>
+</span><span id="line-406">    <span class="n">s</span> <span class="o">=</span> <span class="n">settings</span> <span class="ow">or</span> <span class="n">ProjectsStoreSettings</span><span class="o">.</span><span class="n">from_environ</span><span class="p">()</span>
+</span><span id="line-407">    <span class="n">prefix</span> <span class="o">=</span> <span class="n">_project_prefix</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+</span><span id="line-408">    <span class="n">own_folder</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"local"</span> <span class="ow">and</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span>
+</span><span id="line-409">    <span class="n">store</span> <span class="o">=</span> <span class="n">projects_store</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">store</span>
+</span><span id="line-410">    <span class="n">folder</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-411">        <span class="n">Path</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span> <span class="k">if</span> <span class="n">folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_folder_for</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+</span><span id="line-412">    <span class="p">)</span>
+</span><span id="line-413">    <span class="k">if</span> <span class="ow">not</span> <span class="n">folder</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+</span><span id="line-414">        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no project folder to push at </span><span class="si">{</span><span class="n">folder</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-415">    <span class="n">excluded</span> <span class="o">=</span> <span class="n">_excluder</span><span class="p">(</span><span class="n">exclude</span><span class="p">)</span>
+</span><span id="line-416">    <span class="n">local_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">folder</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">())</span>
+</span><span id="line-417">    <span class="n">rels</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">local_files</span><span class="p">]</span>
+</span><span id="line-418">    <span class="k">if</span> <span class="n">own_folder</span> <span class="ow">and</span> <span class="n">folder</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="n">_local_root</span><span class="p">()</span> <span class="o">/</span> <span class="n">project_id</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">():</span>
+</span><span id="line-419">        <span class="c1"># The folder IS the store's copy of the project: nothing to push, and</span>
+</span><span id="line-420">        <span class="c1"># nothing to delete (its derived output is not "missing" from itself).</span>
+</span><span id="line-421">        <span class="n">kept</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rels</span> <span class="k">if</span> <span class="n">excluded</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+</span><span id="line-422">        <span class="n">same</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rels</span> <span class="k">if</span> <span class="n">r</span> <span class="o">!=</span> <span class="n">STORE_RECORD</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">excluded</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+</span><span id="line-423">        <span class="k">return</span> <span class="n">PushReport</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="p">(),</span> <span class="n">same</span><span class="p">,</span> <span class="n">kept</span><span class="p">,</span> <span class="p">())</span>
+</span><span id="line-424">
+</span><span id="line-425">    <span class="n">record_key</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">STORE_RECORD</span>
+</span><span id="line-426">    <span class="n">existing</span> <span class="o">=</span> <span class="n">_keys_under</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span>
+</span><span id="line-427">    <span class="n">local_record</span> <span class="o">=</span> <span class="n">read_record</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+</span><span id="line-428">    <span class="n">remote_doc</span> <span class="o">=</span> <span class="n">_store_record</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">record_key</span><span class="p">)</span>
+</span><span id="line-429">    <span class="n">remote</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">remote_doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"files"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+</span><span id="line-430">    <span class="n">base</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">local_record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"files"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">remote</span>
+</span><span id="line-431">    <span class="n">has_base</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">local_record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"files"</span><span class="p">))</span>
+</span><span id="line-432">
+</span><span id="line-433">    <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-434">    <span class="n">unchanged</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-435">    <span class="n">kept</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-436">    <span class="n">stale</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-437">    <span class="n">conflicts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-438">    <span class="n">synced</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># what this folder now agrees with the store on</span>
+</span><span id="line-439">    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">rel</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">local_files</span><span class="p">,</span> <span class="n">rels</span><span class="p">):</span>
+</span><span id="line-440">        <span class="k">if</span> <span class="n">rel</span> <span class="o">==</span> <span class="n">STORE_RECORD</span><span class="p">:</span>
+</span><span id="line-441">            <span class="k">continue</span>
+</span><span id="line-442">        <span class="k">if</span> <span class="n">excluded</span><span class="p">(</span><span class="n">rel</span><span class="p">):</span>
+</span><span id="line-443">            <span class="n">kept</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span>
+</span><span id="line-444">            <span class="k">continue</span>
+</span><span id="line-445">        <span class="n">key</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">rel</span>
+</span><span id="line-446">        <span class="n">size</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span>
+</span><span id="line-447">        <span class="n">local</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"size"</span><span class="p">:</span> <span class="n">size</span><span class="p">,</span> <span class="s2">"sha256"</span><span class="p">:</span> <span class="n">_file_digest</span><span class="p">(</span><span class="n">path</span><span class="p">)}</span>
+</span><span id="line-448">        <span class="n">r</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">remote</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rel</span><span class="p">),</span> <span class="n">base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span>
+</span><span id="line-449">        <span class="k">if</span> <span class="n">_same</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">local</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="n">existing</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">store</span><span class="p">):</span>
+</span><span id="line-450">            <span class="n">synced</span><span class="p">[</span><span class="n">rel</span><span class="p">]</span> <span class="o">=</span> <span class="n">local</span>
+</span><span id="line-451">            <span class="n">unchanged</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span>
+</span><span id="line-452">            <span class="k">continue</span>
+</span><span id="line-453">        <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">existing</span><span class="p">:</span>
+</span><span id="line-454">            <span class="c1"># Uploaded by hand (no record knows it): compare the bytes.</span>
+</span><span id="line-455">            <span class="n">current</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</span><span id="line-456">            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current</span><span class="p">)</span> <span class="o">==</span> <span class="n">size</span> <span class="ow">and</span> <span class="n">_sha256</span><span class="p">(</span><span class="n">current</span><span class="p">)</span> <span class="o">==</span> <span class="n">local</span><span class="p">[</span><span class="s2">"sha256"</span><span class="p">]:</span>
+</span><span id="line-457">                <span class="n">synced</span><span class="p">[</span><span class="n">rel</span><span class="p">]</span> <span class="o">=</span> <span class="n">local</span>
+</span><span id="line-458">                <span class="n">unchanged</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span>
+</span><span id="line-459">                <span class="k">continue</span>
+</span><span id="line-460">        <span class="k">if</span> <span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_same</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">local</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_same</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+</span><span id="line-461">            <span class="n">stale</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span>  <span class="c1"># the store moved past this folder's copy</span>
+</span><span id="line-462">            <span class="k">continue</span>
+</span><span id="line-463">        <span class="n">both_changed</span> <span class="o">=</span> <span class="n">has_base</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_same</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">local</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_same</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</span><span id="line-464">        <span class="k">if</span> <span class="n">both_changed</span> <span class="ow">and</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+</span><span id="line-465">            <span class="n">conflicts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span>
+</span><span id="line-466">            <span class="k">continue</span>
+</span><span id="line-467">        <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span>
+</span><span id="line-468">        <span class="n">synced</span><span class="p">[</span><span class="n">rel</span><span class="p">]</span> <span class="o">=</span> <span class="n">local</span>
+</span><span id="line-469">        <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span>
+</span><span id="line-470">
+</span><span id="line-471">    <span class="n">deleted</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-472">    <span class="k">if</span> <span class="n">delete_missing</span><span class="p">:</span>
+</span><span id="line-473">        <span class="n">here</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">rels</span><span class="p">)</span>
+</span><span id="line-474">        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">existing</span><span class="p">):</span>
+</span><span id="line-475">            <span class="n">rel</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:]</span>
+</span><span id="line-476">            <span class="k">if</span> <span class="n">rel</span> <span class="o">==</span> <span class="n">STORE_RECORD</span> <span class="ow">or</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">here</span><span class="p">:</span>
+</span><span id="line-477">                <span class="k">continue</span>
+</span><span id="line-478">            <span class="n">r</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">remote</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rel</span><span class="p">),</span> <span class="n">base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span>
+</span><span id="line-479">            <span class="k">if</span> <span class="n">has_base</span> <span class="ow">and</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_same</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+</span><span id="line-480">                <span class="n">stale</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span>  <span class="c1"># the store gained or changed it since the base</span>
+</span><span id="line-481">                <span class="k">continue</span>
+</span><span id="line-482">            <span class="k">del</span> <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</span><span id="line-483">            <span class="n">deleted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span>
+</span><span id="line-484">
+</span><span id="line-485">    <span class="c1"># Two records: the store's says what the store holds; the folder's says what</span>
+</span><span id="line-486">    <span class="c1"># the folder synced (its base), which differs by exactly the stale and</span>
+</span><span id="line-487">    <span class="c1"># conflicting files, left at the base entry the folder still agrees with.</span>
+</span><span id="line-488">    <span class="n">store_files</span> <span class="o">=</span> <span class="p">{</span><span class="n">rel</span><span class="p">:</span> <span class="n">e</span> <span class="k">for</span> <span class="n">rel</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">remote</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">rel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">deleted</span><span class="p">}</span>
+</span><span id="line-489">    <span class="n">store_files</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">synced</span><span class="p">)</span>
+</span><span id="line-490">    <span class="n">base_files</span> <span class="o">=</span> <span class="p">{</span><span class="n">rel</span><span class="p">:</span> <span class="n">e</span> <span class="k">for</span> <span class="n">rel</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">base</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">rel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">deleted</span><span class="p">}</span>
+</span><span id="line-491">    <span class="n">base_files</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">synced</span><span class="p">)</span>
+</span><span id="line-492">    <span class="n">changed</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">written</span> <span class="ow">or</span> <span class="n">deleted</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">remote_doc</span> <span class="ow">or</span> <span class="n">store_files</span> <span class="o">!=</span> <span class="n">remote</span>
+</span><span id="line-493">    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">timespec</span><span class="o">=</span><span class="s2">"seconds"</span><span class="p">)</span>
+</span><span id="line-494">    <span class="k">if</span> <span class="n">changed</span><span class="p">:</span>
+</span><span id="line-495">        <span class="n">store</span><span class="p">[</span><span class="n">record_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_record_bytes</span><span class="p">(</span>
+</span><span id="line-496">            <span class="p">{</span>
+</span><span id="line-497">                <span class="o">**</span><span class="n">remote_doc</span><span class="p">,</span>
+</span><span id="line-498">                <span class="s2">"store"</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">coordinates</span><span class="p">(),</span>
+</span><span id="line-499">                <span class="s2">"files"</span><span class="p">:</span> <span class="n">store_files</span><span class="p">,</span>
+</span><span id="line-500">                <span class="s2">"pushed_at"</span><span class="p">:</span> <span class="n">now</span><span class="p">,</span>
+</span><span id="line-501">            <span class="p">}</span>
+</span><span id="line-502">        <span class="p">)</span>
+</span><span id="line-503">    <span class="n">local_doc</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">local_record</span><span class="p">,</span> <span class="s2">"store"</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">coordinates</span><span class="p">(),</span> <span class="s2">"files"</span><span class="p">:</span> <span class="n">base_files</span><span class="p">}</span>
+</span><span id="line-504">    <span class="k">if</span> <span class="n">changed</span><span class="p">:</span>
+</span><span id="line-505">        <span class="n">local_doc</span><span class="p">[</span><span class="s2">"pushed_at"</span><span class="p">]</span> <span class="o">=</span> <span class="n">now</span>
+</span><span id="line-506">    <span class="k">if</span> <span class="n">local_doc</span> <span class="o">!=</span> <span class="n">local_record</span><span class="p">:</span>
+</span><span id="line-507">        <span class="n">_write_record</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">local_doc</span><span class="p">)</span>
+</span><span id="line-508">    <span class="k">return</span> <span class="n">PushReport</span><span class="p">(</span>
+</span><span id="line-509">        <span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span>
+</span><span id="line-510">        <span class="n">folder</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span>
+</span><span id="line-511">        <span class="n">written</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">written</span><span class="p">),</span>
+</span><span id="line-512">        <span class="n">unchanged</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">unchanged</span><span class="p">),</span>
+</span><span id="line-513">        <span class="n">excluded</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">kept</span><span class="p">),</span>
+</span><span id="line-514">        <span class="n">deleted</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">deleted</span><span class="p">),</span>
+</span><span id="line-515">        <span class="n">stale</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">stale</span><span class="p">),</span>
+</span><span id="line-516">        <span class="n">conflicts</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">conflicts</span><span class="p">),</span>
+</span><span id="line-517">    <span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -332,7 +740,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=4d22d5b7"></script>
+    <script src="../../_static/documentation_options.js?v=e95a51ae"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

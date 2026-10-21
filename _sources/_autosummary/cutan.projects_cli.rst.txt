@@ -1,0 +1,13 @@
+cutan.projects\_cli
+===================
+
+.. automodule:: cutan.projects_cli
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      push
+      pull
+   

@@ -4,17 +4,28 @@ cutan.projects\_store
 .. automodule:: cutan.projects_store
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      STORE_RECORD
+      DEFAULT_PUSH_EXCLUDES
+   
    .. rubric:: Functions
 
    .. autosummary::
    
       cache_root
       materialize_project
+      new_project_dir
       projects_store
+      push_project
+      read_record
    
    .. rubric:: Classes
 
    .. autosummary::
    
       ProjectsStoreSettings
+      PushReport
    

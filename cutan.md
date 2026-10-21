@@ -1,4 +1,4 @@
-> built 2026-10-21 07:54 UTC from 52490bb (main) · cutan 0.0.60. Details: build_info.json
+> built 2026-10-21 08:00 UTC from c151794 (main) · cutan 0.0.61. Details: build_info.json
 
 # index.html.md
 
@@ -23,7 +23,7 @@ an character new maya --offline
 - the rig, face, viseme, blink, gaze and swap-pose compile passes over the `an.stage` compiler (`cutan.compile`), and the mouth and eye visuals of the stage runtime (`cutan/runtime/visuals.js`);
 - the lip-sync providers `offline`, `rhubarb` and `whisper` (`cutan.audio`);
 - locomotion, speech, blink and turn methods with their requirements and defaults, and the cut-out vocabulary;
-- the `an character …` and `an impacts …` command namespaces;
+- the `an character …`, `an impacts …` and `an projects …` command namespaces;
 - carving parts out of photos and frames (`cutan.carve`, below);
 - the style lint (`python -m cutan.verify.style VIDEO <style>`) and the named style specs it measures against, shipped as package data: `cutan.style_spec("south_park")`, `python -m cutan.styles` to list them (the `cutan-style` skill applies one).
 
@@ -731,7 +731,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'rect', 'eye', 'ellipse', 'mouth'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'ellipse', 'rect', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -9715,10 +9715,11 @@ instead of being wired into the core. `CUTOUT` lists:
 Its `name` is the persisted genre slug `cutout_animation`, the one
 `cutan.nw` declares to `nw` (ADR 0001 decision 9: persisted identifiers do
 not change). It also offers the core **services** (`an.genres.register_service()`):
-the `an character` / `an impacts` CLI namespaces, the `offline` / `rhubarb` /
-`whisper` lip-sync providers, the licence lookup for pre-`source` descriptors, the
-library’s publish warning and the expression labels `judge_emotion` uses; and the
-**runtime script** that draws the mouth and the eye.
+the `an character` / `an impacts` / `an projects` CLI namespaces, the `offline` /
+`rhubarb` / `whisper` lip-sync providers, the licence lookup for pre-`source`
+descriptors, the library’s publish warning, the expression labels `judge_emotion` uses
+and where `an init --id` creates a cut-out project (`projects.dir.cutan`, cutan#91);
+and the **runtime script** that draws the mouth and the eye.
 
 Importing this module registers nothing: `an.genres.load()` (or
 `an.genres.register_genre()`) does.
@@ -9780,6 +9781,7 @@ them changes when code moves between distributions.
 | [`ENTRY_POINT_VALUE`](_autosummary/cutan.html.md#cutan.ENTRY_POINT_VALUE)     | Where the entry point points.                                                                                                                                                           |
 | [`RENDERER_NAME`](_autosummary/cutan.html.md#cutan.RENDERER_NAME)         | The persisted renderer name of cut-out shots (`an.stage` claims it).                                                                                                                    |
 | [`LIBRARY_NAME`](_autosummary/cutan.html.md#cutan.LIBRARY_NAME)          | The package whose data root holds the genre's asset library and projects (`~/.local/share/cutan` by default; `CUTAN_HOME` overrides it).                                                |
+| [`PROJECT_STORE_RECORD`](_autosummary/cutan.html.md#cutan.PROJECT_STORE_RECORD)  | The file, relative to a project folder, that says which projects store the folder belongs to and what it last synced with it (`cutan.projects_store`, cutan#91).                        |
 | [`REQUIRED_AN_API_LEVEL`](_autosummary/cutan.html.md#cutan.REQUIRED_AN_API_LEVEL) | The lowest `an.genres.API_LEVEL` this `cutan` runs against ("the lowest `an` it supports", ADR 0001 decision 8, said without a version pin: `an`'s version is assigned by CI at merge). |
 
 ### Functions
@@ -9817,11 +9819,17 @@ the `an.genres` entry-point name and the `nw` genre id.
 The package whose data root holds the genre’s asset library and projects
 (`~/.local/share/cutan` by default; `CUTAN_HOME` overrides it).
 
+### cutan.PROJECT_STORE_RECORD *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '.an/projects_store.json'*
+
+The file, relative to a project folder, that says which projects store the
+folder belongs to and what it last synced with it (`cutan.projects_store`,
+cutan#91). Pushed with the project, so it is a key of the store too.
+
 ### cutan.RENDERER_NAME *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'cutout'*
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
-### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 6*
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 7*
 
 The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
 it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
@@ -9833,6 +9841,8 @@ pose (an#339): `register_rest_pose_migration` and `rig_rest_problems`. Level 5
 is nested chains (an#340): `build_rig_subtree(skip_slots=)`, `slot_parent_chain`,
 `slot_node_paths`, `rig_affordances`, `RigError`.
 Level 6: `rest_pose_protection` (an#407), which `validate_character` says aloud.
+Level 7: the `projects.dir.<library>` service `an init --id` consults (cutan#91),
+which places a cut-out project in the cache folder when the projects store is S3.
 
 ### cutan.require_an()
 
@@ -9876,7 +9886,8 @@ The names of the style specs that ship with `cutan`, sorted.
 | [`library`](_autosummary/cutan.library.html.md#module-cutan.library)                 | The character analyser: legs, arms, views and mouth chart, derived from the rig.                           |
 | [`motion`](_autosummary/cutan.motion.html.md#module-cutan.motion)                   | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.                       |
 | [`pack`](_autosummary/cutan.pack.html.md#module-cutan.pack)                       | Check a cut-out production pack with cutan's own validators (cutan#87).                                    |
-| [`projects_store`](_autosummary/cutan.projects_store.html.md#module-cutan.projects_store)   | Where a cutan project's files are read from: a disk folder or S3, by configuration.                        |
+| [`projects_cli`](_autosummary/cutan.projects_cli.html.md#module-cutan.projects_cli)       | `an projects ...` — a store-backed project from the shell (cutan#91).                                      |
+| [`projects_store`](_autosummary/cutan.projects_store.html.md#module-cutan.projects_store)   | Where a cutan project's files are read from and written to: a disk folder or S3, by configuration.         |
 | [`runtime`](_autosummary/cutan.runtime.html.md#module-cutan.runtime)                 | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).                  |
 | [`styles`](_autosummary/cutan.styles.html.md#module-cutan.styles)                   | The named cut-out style specs, shipped as package data (cutan#4).                                          |
 | [`verify`](_autosummary/cutan.verify.html.md#module-cutan.verify)                   | The cut-out style lint: measures a render against a named style spec.                                      |
@@ -11980,17 +11991,74 @@ or there are none): hand-written SVG looks computer-made.
   [`int`](https://docs.python.org/3/builtins/functions.html#int)
 
 
+# _autosummary/cutan.projects_cli.html.md
+
+# cutan.projects_cli
+
+`an projects ...` — a store-backed project from the shell (cutan#91).
+
+Thin string-typed wrappers over [`cutan.projects_store`](_autosummary/cutan.projects_store.html.md#module-cutan.projects_store), dispatched by typer
+the same way as `an character ...` (the `cli.projects` service):
+
+> an projects push <id> [–folder DIR] [–delete-missing]
+> an projects pull <id>
+
+Both read the backend from the environment (`CUTAN_PROJECTS_BACKEND=s3`,
+`CUTAN_HOME` forces local). On the local backend a push of the project’s own
+folder is a no-op, and a pull prints the folder.
+
+### Functions
+
+| [`push`](_autosummary/cutan.projects_cli.html.md#cutan.projects_cli.push)(project_id[, folder, delete_missing, force])   | Write what changed in a project folder to the projects store.                    |
+|------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| [`pull`](_autosummary/cutan.projects_cli.html.md#cutan.projects_cli.pull)(project_id)                                    | Read a project from the projects store into a real folder, and print the folder. |
+
+### cutan.projects_cli.pull(project_id)
+
+Read a project from the projects store into a real folder, and print the folder.
+
+project_id: the project’s id (its folder name)
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.projects_cli.push(project_id, folder='', delete_missing=False, force=False)
+
+Write what changed in a project folder to the projects store.
+
+project_id: the project’s id (its folder name)
+folder: the folder to push (default: where `an projects pull` / `an init --id` put it)
+delete_missing: also delete the store’s keys the folder no longer has (never what the folder keeps local: the shot cache, render work)
+force: also write files the store changed since this folder last synced (stale or in conflict), and delete keys it gained
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+
 # _autosummary/cutan.projects_store.html.md
 
 # cutan.projects_store
 
-Where a cutan project’s files are read from: a disk folder or S3, by configuration.
+Where a cutan project’s files are read from and written to: a disk folder or S3, by configuration.
 
 The library’s `projects` kind is a mapping `relative path -> bytes` (ADR-0024:
 `s3://{bucket}/{tenant}/cutan/projects/{rel}` mirrors `~/.local/share/cutan/projects/{rel}`
 exactly, so both backends hold the same keys). [`projects_store()`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.projects_store) returns that
 mapping; [`materialize_project()`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.materialize_project) returns a real folder for tools that need files
-(ffmpeg, a browser), reading through a cache under `~/.cache/cutan/projects/`.
+(ffmpeg, a browser), reading through a cache under `~/.cache/cutan/projects/`;
+[`push_project()`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.push_project) is the write half (cutan#91): it writes what changed since the
+folder last synced, never over a newer version another machine pushed, can delete
+what the folder no longer has, and keeps derived output local.
+
+A folder that belongs to a store carries the record `.an/projects_store.json`
+([`STORE_RECORD`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.STORE_RECORD)): the store’s coordinates and, per file, the size and sha256
+the folder last synced (`files`). The record is pushed with the project, so the
+store’s copy says what the store holds and the folder’s copy is the base a push
+compares both sides against (a three-way comparison: a file the folder did not
+change is never pushed over one the store changed, and a file both changed is a
+conflict that only `force` writes). `an init <id> --id --genre cutout_animation`
+creates a project in the cache folder with that record when the backend is S3
+([`new_project_dir()`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.new_project_dir), the `projects.dir.cutan` service of `an` API level 7).
 
 Configuration (environment; the first match wins, `CUTAN_HOME` always forces local):
 
@@ -11999,23 +12067,57 @@ Configuration (environment; the first match wins, `CUTAN_HOME` always forces loc
   `CUTAN_S3_PROFILE` (default `tw-server`) and `CUTAN_S3_TENANT` (default `thorwhalen`)
 - otherwise: local (the default)
 
+### Module Attributes
+
+| [`STORE_RECORD`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.STORE_RECORD)          | The record's path inside a project folder ([`cutan.PROJECT_STORE_RECORD`](_autosummary/cutan.html.md#cutan.PROJECT_STORE_RECORD)).   |
+|------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`DEFAULT_PUSH_EXCLUDES`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.DEFAULT_PUSH_EXCLUDES) | derived or transient output, keyed by that machine or re-made from the project.                                                                       |
+
 ### Functions
 
-| `cache_root`()                                                                              |                                                                           |
-|---------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
-| [`materialize_project`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.materialize_project)(project_id, \*[, ...]) | A real folder holding `project_id`'s files.                               |
-| [`projects_store`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.projects_store)([settings])                 | The projects as `{relative path: bytes}`, over disk or S3 per `settings`. |
+| `cache_root`()                                                                                   |                                                                                                                                                            |
+|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`materialize_project`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.materialize_project)(project_id, \*[, ...])      | A real folder holding `project_id`'s files.                                                                                                                |
+| [`new_project_dir`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.new_project_dir)(project_id, \*[, default, ...]) | Where `an init <id> --id --genre cutout_animation` creates the project.                                                                                    |
+| [`projects_store`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.projects_store)([settings])                      | The projects as `{relative path: bytes}`, over disk or S3 per `settings`.                                                                                  |
+| [`push_project`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.push_project)(project_id, \*[, folder, ...])     | Write `folder`'s files to the store under `project_id/`: the inverse of [`materialize_project()`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.materialize_project) (cutan#91). |
+| [`read_record`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.read_record)(folder)                             | The folder's [`STORE_RECORD`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.STORE_RECORD), `{}` when it has none or it is unreadable.                                     |
 
 ### Classes
 
-| [`ProjectsStoreSettings`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.ProjectsStoreSettings)([backend, bucket, ...])   | Which backend holds the projects, and its S3 coordinates.   |
-|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+| [`ProjectsStoreSettings`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.ProjectsStoreSettings)([backend, bucket, ...])   | Which backend holds the projects, and its S3 coordinates.                                        |
+|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| [`PushReport`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.PushReport)(project_id, folder, written, ...)    | What one [`push_project()`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.push_project) did, as relative paths. |
+
+### cutan.projects_store.DEFAULT_PUSH_EXCLUDES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('.git/', '.an/render_work/', 'artifacts/shot_cache/', 'artifacts/shots/', 'artifacts/render_reports/', 'artifacts/probes/')*
+
+derived or transient output,
+keyed by that machine or re-made from the project. The shot cache (an#242) and
+the shot archive re-render from the project; the render work dirs are a run’s
+scratch; render reports and probes are what `an init` keeps out of git
+(`an.project.PROJECT_GITIGNORE`, held equal by a test); a repository is
+not project content. Each entry is a folder prefix (ending in `/`) or a file.
+
+* **Type:**
+  What a push keeps on the machine that made it
 
 ### *class* cutan.projects_store.ProjectsStoreSettings(backend='local', bucket='tw-apps', profile='tw-server', tenant='thorwhalen')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 Which backend holds the projects, and its S3 coordinates.
+
+#### coordinates()
+
+What a project folder records about its store (no credentials, no profile).
+
+```pycon
+>>> ProjectsStoreSettings().coordinates()["backend"]
+'local'
+```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 #### *classmethod* from_environ(environ=None)
 
@@ -12029,12 +12131,45 @@ Which backend holds the projects, and its S3 coordinates.
 'local'
 ```
 
+### *class* cutan.projects_store.PushReport(project_id, folder, written, unchanged, excluded, deleted, stale=(), conflicts=())
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+What one [`push_project()`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.push_project) did, as relative paths.
+
+`stale`: files the folder did not change but the store did (or dropped)
+since the folder last synced, so they were not pushed: pull first.
+`conflicts`: files both sides changed, not pushed without `force`.
+
+### cutan.projects_store.STORE_RECORD *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '.an/projects_store.json'*
+
+The record’s path inside a project folder ([`cutan.PROJECT_STORE_RECORD`](_autosummary/cutan.html.md#cutan.PROJECT_STORE_RECORD)).
+
 ### cutan.projects_store.materialize_project(project_id, , settings=None, store=None, cache=None)
 
 A real folder holding `project_id`’s files.
 
 Local backend: the project folder itself, no copy. S3: files are read through
-into the cache and kept; a cached file whose size matches the object’s is reused.
+into the cache and kept, and the folder records the store it belongs to
+([`STORE_RECORD`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.STORE_RECORD)). A cached file is reused when its sha256 is the one
+the store’s record holds for it (a file the record does not know: when its
+size matches the object’s). The store wins: a cached file that differs is
+overwritten, so push a folder’s changes before pulling into it.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.projects_store.new_project_dir(project_id, , default=None, settings=None, store=None, cache=None)
+
+Where `an init <id> --id --genre cutout_animation` creates the project.
+
+The `projects.dir.cutan` service (`an` API level 7): the core computes
+its own default (`<root>/projects/<id>`) and hands it over as `default`.
+Local backend: that default. S3: the cache folder, with what the store
+already holds under the id read through first (so `an init` sees an
+existing project’s `scene.md` and refuses to clobber it) and the record
+that the folder belongs to the store, which a later [`push_project()`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.push_project)
+reads. Nothing is uploaded: the push is explicit.
 
 * **Return type:**
   [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
@@ -12043,8 +12178,43 @@ into the cache and kept; a cached file whose size matches the object’s is reus
 
 The projects as `{relative path: bytes}`, over disk or S3 per `settings`.
 
+The local store creates a key’s folders on write, so a project pushed into it
+from a folder elsewhere lands whole.
+
 * **Return type:**
   [`MutableMapping`](https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping)
+
+### cutan.projects_store.push_project(project_id, , folder=None, settings=None, store=None, delete_missing=False, exclude=('.git/', '.an/render_work/', 'artifacts/shot_cache/', 'artifacts/shots/', 'artifacts/render_reports/', 'artifacts/probes/'), force=False, cache=None)
+
+Write `folder`’s files to the store under `project_id/`: the inverse of
+[`materialize_project()`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.materialize_project) (cutan#91).
+
+`folder` defaults to where [`materialize_project()`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.materialize_project) puts the project: the
+cache folder on S3, the project folder itself locally (which is the store’s
+own copy, so that push does nothing). Each file is compared three ways: with
+the store’s record of it (the store’s copy of [`STORE_RECORD`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.STORE_RECORD)) and with
+the folder’s record (the base: what the folder last pulled or pushed; with
+no base, the store’s record stands in, so a first push from a folder with no
+history writes its differences). A file equal to the store’s is unchanged;
+one the folder changed and the store did not is written; one the folder did
+not change but the store did is `stale` and left alone; one both changed
+is a `conflict`, written only with `force`. A file the records do not
+know is compared with the store’s bytes when the key exists. `exclude`
+names what stays local ([`DEFAULT_PUSH_EXCLUDES`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.DEFAULT_PUSH_EXCLUDES)); `delete_missing`
+deletes the store’s keys the folder no longer has (a key the store gained or
+changed since the base is kept, unless `force`); excluded files the folder
+still has are never deleted. The record is then written to the folder and,
+when anything changed, to the store.
+
+* **Return type:**
+  [`PushReport`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.PushReport)
+
+### cutan.projects_store.read_record(folder)
+
+The folder’s [`STORE_RECORD`](_autosummary/cutan.projects_store.html.md#cutan.projects_store.STORE_RECORD), `{}` when it has none or it is unreadable.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 
 # _autosummary/cutan.runtime.html.md
@@ -13030,18 +13200,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-21 07:54 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/52490bb1a679f9c512adc68e849659c361d1837f"><code>52490bb</code></a> on branch <code>main</code>, for **cutan 0.0.60** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-21 08:00 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/c151794e20c5baeea7bf8d61479ab154f95df17d"><code>c151794</code></a> on branch <code>main</code>, for **cutan 0.0.61** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.60) is behind the latest release on PyPI (0.0.61): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.61) is behind the latest release on PyPI (0.0.62): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/52490bb1a679f9c512adc68e849659c361d1837f"><code>52490bb1a679f9c512adc68e849659c361d1837f</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/c151794e20c5baeea7bf8d61479ab154f95df17d"><code>c151794e20c5baeea7bf8d61479ab154f95df17d</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -13052,9 +13222,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/39564670969">39564670969</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/39565429625">39565429625</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>52490bb1a679f9c512adc68e849659c361d1837f</code> (in the history of the built commit) |
+| Event commit | <code>c151794e20c5baeea7bf8d61479ab154f95df17d</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -13079,13 +13249,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.61/">0.0.61</a>, newer than the documented version (0.0.60).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.62/">0.0.62</a>, newer than the documented version (0.0.61).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 52490bb1a679f9c512adc68e849659c361d1837f
+git checkout c151794e20c5baeea7bf8d61479ab154f95df17d
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

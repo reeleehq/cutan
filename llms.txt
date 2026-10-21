@@ -70,7 +70,8 @@
 - [cutan.library](_autosummary/cutan.library.html.md): The character analyser: legs, arms, views and mouth chart, derived from the rig.
 - [cutan.motion](_autosummary/cutan.motion.html.md): The cut-out genre’s motion presets: moves that name a rig’s parts or swap its views.
 - [cutan.pack](_autosummary/cutan.pack.html.md): Check a cut-out production pack with cutan’s own validators (cutan#87).
-- [cutan.projects_store](_autosummary/cutan.projects_store.html.md): Where a cutan project’s files are read from: a disk folder or S3, by configuration.
+- [cutan.projects_cli](_autosummary/cutan.projects_cli.html.md): &#96;an projects ...&#96; — a store-backed project from the shell (cutan#91).
+- [cutan.projects_store](_autosummary/cutan.projects_store.html.md): Where a cutan project’s files are read from and written to: a disk folder or S3, by configuration.
 - [cutan.runtime](_autosummary/cutan.runtime.html.md): JavaScript the cut-out genre adds to the stage runtime (&#96;visuals.js&#96;: the mouth and eye).
 - [cutan.styles](_autosummary/cutan.styles.html.md): The named cut-out style specs, shipped as package data (cutan#4).
 - [cutan.styles.copies](_autosummary/cutan.styles.copies.html.md): Copies of a style spec, and whether they are stale (cutan#19).
@@ -79,7 +80,7 @@
 - [cutan.verify.body](_autosummary/cutan.verify.body.html.md): Body continuity: a prop that depicts a character’s limbs must meet that character’s body.
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-21 07:54 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-21 08:00 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

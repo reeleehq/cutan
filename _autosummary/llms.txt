@@ -68,7 +68,8 @@
 - [cutan.library](cutan.library.html.md): The character analyser: legs, arms, views and mouth chart, derived from the rig.
 - [cutan.motion](cutan.motion.html.md): The cut-out genre’s motion presets: moves that name a rig’s parts or swap its views.
 - [cutan.pack](cutan.pack.html.md): Check a cut-out production pack with cutan’s own validators (cutan#87).
-- [cutan.projects_store](cutan.projects_store.html.md): Where a cutan project’s files are read from: a disk folder or S3, by configuration.
+- [cutan.projects_cli](cutan.projects_cli.html.md): &#96;an projects ...&#96; — a store-backed project from the shell (cutan#91).
+- [cutan.projects_store](cutan.projects_store.html.md): Where a cutan project’s files are read from and written to: a disk folder or S3, by configuration.
 - [cutan.runtime](cutan.runtime.html.md): JavaScript the cut-out genre adds to the stage runtime (&#96;visuals.js&#96;: the mouth and eye).
 - [cutan.styles](cutan.styles.html.md): The named cut-out style specs, shipped as package data (cutan#4).
 - [cutan.styles.copies](cutan.styles.copies.html.md): Copies of a style spec, and whether they are stale (cutan#19).

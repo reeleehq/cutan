@@ -98,6 +98,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cutan.library.html">cutan.library</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.pack.html">cutan.pack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.projects_cli.html">cutan.projects_cli</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.projects_store.html">cutan.projects_store</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.runtime.html">cutan.runtime</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.styles.html">cutan.styles</a></li>
@@ -165,10 +166,11 @@ method requiring nothing.</p>
 <p>Its <code class="docutils literal notranslate"><span class="pre">name</span></code> is the persisted genre slug <code class="docutils literal notranslate"><span class="pre">cutout_animation</span></code>, the one
 <code class="xref py py-mod docutils literal notranslate"><span class="pre">cutan.nw</span></code> declares to <code class="docutils literal notranslate"><span class="pre">nw</span></code> (ADR 0001 decision 9: persisted identifiers do
 not change). It also offers the core <strong>services</strong> (<code class="xref py py-func docutils literal notranslate"><span class="pre">an.genres.register_service()</span></code>):
-the <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span></code> / <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">impacts</span></code> CLI namespaces, the <code class="docutils literal notranslate"><span class="pre">offline</span></code> / <code class="docutils literal notranslate"><span class="pre">rhubarb</span></code> /
-<code class="docutils literal notranslate"><span class="pre">whisper</span></code> lip-sync providers, the licence lookup for pre-<code class="docutils literal notranslate"><span class="pre">source</span></code> descriptors, the
-library’s publish warning and the expression labels <code class="docutils literal notranslate"><span class="pre">judge_emotion</span></code> uses; and the
-<strong>runtime script</strong> that draws the mouth and the eye.</p>
+the <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span></code> / <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">impacts</span></code> / <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">projects</span></code> CLI namespaces, the <code class="docutils literal notranslate"><span class="pre">offline</span></code> /
+<code class="docutils literal notranslate"><span class="pre">rhubarb</span></code> / <code class="docutils literal notranslate"><span class="pre">whisper</span></code> lip-sync providers, the licence lookup for pre-<code class="docutils literal notranslate"><span class="pre">source</span></code>
+descriptors, the library’s publish warning, the expression labels <code class="docutils literal notranslate"><span class="pre">judge_emotion</span></code> uses
+and where <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">init</span> <span class="pre">--id</span></code> creates a cut-out project (<code class="docutils literal notranslate"><span class="pre">projects.dir.cutan</span></code>, cutan#91);
+and the <strong>runtime script</strong> that draws the mouth and the eye.</p>
 <p>Importing this module registers nothing: <code class="xref py py-func docutils literal notranslate"><span class="pre">an.genres.load()</span></code> (or
 <code class="xref py py-func docutils literal notranslate"><span class="pre">an.genres.register_genre()</span></code>) does.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">CUTOUT</span><span class="o">.</span><span class="n">provides</span><span class="p">()[</span><span class="s2">"action kinds"</span><span class="p">]</span>
@@ -206,7 +208,7 @@ library’s publish warning and the expression labels <code class="docutils lite
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=4d22d5b7"></script>
+<script src="../_static/documentation_options.js?v=e95a51ae"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
