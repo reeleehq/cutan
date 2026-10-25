@@ -102,9 +102,9 @@ camera: {move: hold}
 
 ```yaml entities
 - {kind: environment, id: set, store: environments, ref: bus_stop}
-- {kind: character, id: teo, store: characters, ref: teo, stage: {at: [-200, 200], scale: 1.1}}
-- {kind: prop, id: umbrella, store: props, ref: umbrella, stage: {at: [-112, 118], scale: 0.6}}
 - {kind: character, id: mara, store: characters, ref: mara, stage: {at: [180, 200], scale: 1.0}}
+- {kind: character, id: teo, store: characters, ref: teo, stage: {at: [-200, 200], scale: 1.1}}
+- {kind: prop, id: umbrella, store: props, ref: umbrella, stage: {at: [-112, 118], scale: 0.6, after: teo}}
 ```
 
 ```yaml actions
@@ -113,8 +113,10 @@ camera: {move: hold}
 - {kind: set, target: mara, property: scale_y, value: 1.0, at: 0.0}
 - {kind: set, target: mara, property: scale_x, value: -1.0, at: 0.0}
 - {kind: set, target: mara, property: view, value: three_quarter, at: 0.0}
-- {kind: set, target: umbrella, property: alpha, value: 0.0, at: 0.0}
-- {kind: set, target: umbrella, property: alpha, value: 1.0, at: 1.2}
+- {kind: set, target: teo, property: x, value: -200, at: 0.0}
+- {kind: set, target: teo, property: y, value: 200, at: 0.0}
+- {kind: set, target: umbrella, property: scale_x, value: 0.0, at: 0.0}
+- {kind: set, target: umbrella, property: scale_y, value: 0.0, at: 0.0}
 - {kind: play, target: umbrella, animation: pop_in, start: 1.2}
 - {kind: tween, target: teo/arm_r, property: rotation, to: -1.3, duration: 0.3, start: 1.0}
 - {kind: play, target: mara, animation: hop, args: {height: 20}, start: 3.9}

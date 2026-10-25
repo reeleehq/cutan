@@ -27,6 +27,10 @@ Use this only when neither the reelee connector's `reelee_check_production_pack`
 - [ ] Every action ends inside its shot (`start` + length <= `duration`; a walk takes about `distance / (80 x stage scale)` steps of 0.4 s each: 560 px at scale 1.1 is 6 steps, 2.4 s).
 - [ ] `rotation` values are radians (between about -3.2 and 3.2), not degrees.
 - [ ] Anything that starts hidden or elsewhere has a `set` at `at: 0.0`.
+- [ ] A prop that pops in later is hidden by `set`s of its `scale_x` and `scale_y` to `0` at `0.0`, not by `alpha`: `pop_in` grows from scale 0, so a prop shown at full size and then popped jumps.
+- [ ] Two characters or props that overlap on screen (a prop held in a hand, one figure in front of another) say which is in front: `stage: {..., after: <the one behind>}`.
+- [ ] Characters keep their front-to-back order across shots (the order they are listed in, or `after:`); a shot that flips it says so with `after:`.
+- [ ] A character left out of a shot (a close-up on someone else) and back in a later one is placed again at `at: 0.0` there (`set`s of `x` and `y`), or the cut into the shot that skips time has `transition: {..., time_jump: true}`.
 - [ ] A character in two consecutive shots: same `stage.at` and scale at the cut, or the second shot opens with `set`s of `x`, `y`, `scale_x`, `scale_y` at 0. A view other than `front`, or a negative `scale_x`, is set again at 0 in the next shot.
 - [ ] Several shots of one place (a conversation in two or three framings, a travelling view): a ` ```yaml world ` block and a `viewpoint` per shot (`scene-space.md`); under a travel, every plane of the environment is listed in `plates` as `far` or `vehicle`, and far plates hold only what is at infinity.
 - [ ] Motion presets and their `args` exist in the table in `references/characters.md`; `point` targets an arm, not the character.
