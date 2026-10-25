@@ -71,6 +71,12 @@ faces = [
     "insightface",
     "onnxruntime",
 ]
+# carve(superres="realesr-animevideov3"): learned super resolution of a
+# low-resolution frame (cutan#110); the 2.5 MB model is fetched on first use.
+superres = [
+    "cutan[carve]",
+    "onnxruntime",
+]
 dev = [
     "an[stage]",
     "nw",
