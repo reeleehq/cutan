@@ -144,7 +144,7 @@ parts share one `head` bone and still land in different places — before
 this field they all stacked on the bone, because the descriptor had no
 way to say otherwise and the compiler used hardcoded literals instead.
 
-### *class* cutan.characters.Bone(, name, parent=None, x=0.0, y=0.0, rotation_deg=0.0, scale_x=1.0, scale_y=1.0, pivot=None, \*\*extra_data)
+### *class* cutan.characters.Bone(, name, parent=None, x=0.0, y=0.0, rotation_deg=0.0, scale_x=1.0, scale_y=1.0, pivot=None, limits=None, \*\*extra_data)
 
 Bases: `RigModel`
 
@@ -155,6 +155,14 @@ A skeleton joint with a local transform relative to its parent.
 >>> b.parent
 'torso'
 ```
+
+#### limits *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]]*
+
+The range this bone’s part may turn through relative to its parent’s,
+`[lo, hi]` degrees about the rest pose (ADR 0008: an elbow is
+`[-150, 0]`). `None`, the default, is a free pin. Read by the
+`solve` pass (`rig_structure()`); a scene’s `joints:` overrides
+it. Omitted from the stored document when unset.
 
 #### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True}*
 
