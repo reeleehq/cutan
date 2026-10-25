@@ -87,7 +87,7 @@ Every factory character has four views: `front` (rest), `three_quarter`, `side` 
 
 Played by name with `{kind: play, target: <id or part>, animation: <preset>, args: {...}, start: <s>}`. Distances are scene pixels, angles radians, times seconds. Each preset starts from the pose the character has at that moment.
 
-- `hop` (whole character): a jump of `height` px. `shake`: a tremble. `pop_in`: grows from nothing (an entrance; also good for a prop appearing). `slide_in` / `slide_out`: whips in from / out to a side. `squash_stretch`: a cartoon bounce.
+- `hop` (whole character): a jump of `height` px. `shake`: a tremble. `pop_in`: grows from nothing (an entrance; also good for a prop appearing: hide it until then with `set`s of `scale_x` and `scale_y` to `0` at `0.0`). `slide_in` / `slide_out`: whips in from / out to a side. `squash_stretch`: a cartoon bounce.
 - `nod`: dips the head `count` times. Target the character (`part: head` is the default).
 - `point`: swings an arm out, holds, lowers. **Target the arm**: `teo/arm_r` with a negative `angle` (`-1.3`), `teo/arm_l` with a positive one. To raise an arm and keep it up, use a tween instead: `{kind: tween, target: teo/arm_r, property: rotation, to: -1.3, duration: 0.3, start: 1.0}` (`-2.1` is up and out, `-2.6`/`-2.2` alternated is a wave).
 - `turn`, `walk`: above. `waddle`: an old-style rocking walk. `speech_pulse`: the head pulses on syllables (for a character with no mouth). `crawl`: a Star Wars text crawl, on a text prop.

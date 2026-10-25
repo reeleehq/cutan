@@ -17,6 +17,15 @@ Every core name a scene may use, with its version and the spectrum levels it acc
 | `parallel` | 1 | a | run children at once |
 | `delay` | 1 | a | an empty span that consumes time |
 | `loop` | 1 | a | repeat a child count times |
+| `pin` | 1 | a | hold a body's point exactly at a point for a span (a rod, a nail) |
+| `pull` | 1 | a | draw a body's point toward a point or along a path (a string) |
+| `join` | 1 | a | enforce a declared joint from an instant on |
+| `unjoin` | 1 | a | let a declared joint go from an instant on |
+| `grasp` | 1 | a | reach an item with a body's point (a hand) and take it, keeping its pose |
+| `place` | 1 | a | bring a held item onto the ground, a socket or a point, and let it go there |
+| `release` | 1 | a | let a held item go: it falls, or is tossed, onto the ground |
+| `handover` | 1 | a | give a held item to another holder (a hand, a socket) |
+| `swap` | 1 | a | take the item a holder has and give it another in its place |
 
 ### Entity kinds
 
