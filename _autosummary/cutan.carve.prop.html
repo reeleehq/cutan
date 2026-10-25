@@ -148,6 +148,14 @@ included, so publishing it records the rights without a single flag:</p>
 from a shell.) One pixel of the carving is one view_box unit times <code class="docutils literal notranslate"><span class="pre">unit</span></code>,
 and each part declares its size, so the prop draws the same whatever the
 resolution the art was carved at.</p>
+<p><strong>Where a hand holds it.</strong> <code class="docutils literal notranslate"><span class="pre">landmarks=</span></code> names points of the prop (a sabre’s
+grip and its tip, a mug’s handle) in the source’s pixels, the same frame as
+<code class="docutils literal notranslate"><span class="pre">point</span></code>. Each is written as a bone with no slot, hung from the root: what
+<code class="docutils literal notranslate"><span class="pre">an</span></code> reads as a rig’s named point (<code class="docutils literal notranslate"><span class="pre">an.stage.rig.rig_structure</span></code>’s
+<code class="docutils literal notranslate"><span class="pre">anchors</span></code>), so a scene addresses it as <code class="docutils literal notranslate"><span class="pre">&lt;prop&gt;@&lt;name&gt;</span></code> (a joint’s
+<code class="docutils literal notranslate"><span class="pre">wheel@grip</span></code>), and a bone called <a class="reference internal" href="#cutan.carve.prop.GRIP" title="cutan.carve.prop.GRIP"><code class="xref py py-data docutils literal notranslate"><span class="pre">GRIP</span></code></a> is where the hold verbs take
+the prop by default (an#502). Two landmarks give an axis: <code class="docutils literal notranslate"><span class="pre">grip</span></code> and <code class="docutils literal notranslate"><span class="pre">tip</span></code>
+say which way the blade points from the hand.</p>
 <p><strong>Rights are never loosened by accident.</strong> A descriptor with no <code class="docutils literal notranslate"><span class="pre">source</span></code>
 means “we made this” to <code class="docutils literal notranslate"><span class="pre">an</span></code>, so a carving with no provenance is refused
 unless the caller says the art is its own (<code class="docutils literal notranslate"><span class="pre">ours=True</span></code>). A <code class="docutils literal notranslate"><span class="pre">source=</span></code> that
@@ -162,6 +170,9 @@ carving’s source is kept beside it as <code class="docutils literal notranslat
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.carve.prop.BASE_SLOT" title="cutan.carve.prop.BASE_SLOT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BASE_SLOT</span></code></a></p></td>
 <td><p>The slot of the base art (a single-part prop's only slot).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.carve.prop.GRIP" title="cutan.carve.prop.GRIP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GRIP</span></code></a></p></td>
+<td><p>The landmark a hand takes a prop by when a scene names no other (an's hold verbs read a bone of this name; an#502).</p></td>
 </tr>
 </tbody>
 </table>
@@ -179,13 +190,19 @@ carving’s source is kept beside it as <code class="docutils literal notranslat
 <dd><p>The slot of the base art (a single-part prop’s only slot).</p>
 </dd></dl>
 <dl class="py data">
+<dt class="sig sig-object py" id="cutan.carve.prop.GRIP">
+<span class="sig-prename descclassname"><span class="pre">cutan.carve.prop.</span></span><span class="sig-name descname"><span class="pre">GRIP</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'grip'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.prop.GRIP" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.prop.GRIP'">¶</a></dt>
+<dd><p>The landmark a hand takes a prop by when a scene names no other (an’s hold
+verbs read a bone of this name; an#502).</p>
+</dd></dl>
+<dl class="py data">
 <dt class="sig sig-object py" id="cutan.carve.prop.ROOT_BONE">
 <span class="sig-prename descclassname"><span class="pre">cutan.carve.prop.</span></span><span class="sig-name descname"><span class="pre">ROOT_BONE</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'root'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.prop.ROOT_BONE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.prop.ROOT_BONE'">¶</a></dt>
 <dd><p>The bone every carved prop hangs from, at the carving’s anchor.</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.carve.prop.write_prop">
-<span class="sig-prename descclassname"><span class="pre">cutan.carve.prop.</span></span><span class="sig-name descname"><span class="pre">write_prop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">carved</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_side</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relicense</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/prop.html#write_prop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.prop.write_prop" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.prop.write_prop'">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cutan.carve.prop.</span></span><span class="sig-name descname"><span class="pre">write_prop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">carved</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_side</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relicense</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/carve/prop.html#write_prop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.carve.prop.write_prop" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.carve.prop.write_prop'">¶</a></dt>
 <dd><p>Write <code class="docutils literal notranslate"><span class="pre">carved</span></code> to <code class="docutils literal notranslate"><span class="pre">folder</span></code> as <code class="docutils literal notranslate"><span class="pre">prop.json</span></code> + <code class="docutils literal notranslate"><span class="pre">parts/*.png</span></code>; return the descriptor.</p>
 <p>name: the prop’s name (default: the folder’s name)
 unit: view_box units per carved pixel (default 1); or <code class="docutils literal notranslate"><span class="pre">max_side</span></code>: the</p>
@@ -203,10 +220,19 @@ relicense: <code class="docutils literal notranslate"><span class="pre">{"by":</
 descriptor’s <code class="docutils literal notranslate"><span class="pre">source.extra.relicensed</span></code>; <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">library</span> <span class="pre">publish</span></code> does not
 read it, so say it again there (<code class="docutils literal notranslate"><span class="pre">relicense=</span></code>) when publishing.</p>
 </div></blockquote>
+<dl class="simple">
+<dt>landmarks: named points of the prop in the source’s pixels, each written</dt><dd><p>as a slotless bone on the root: <code class="docutils literal notranslate"><span class="pre">{"grip":</span> <span class="pre">(x,</span> <span class="pre">y),</span> <span class="pre">"tip":</span> <span class="pre">(x,</span> <span class="pre">y)}</span></code>
+(<code class="docutils literal notranslate"><span class="pre">grip</span></code>, <a class="reference internal" href="#cutan.carve.prop.GRIP" title="cutan.carve.prop.GRIP"><code class="xref py py-data docutils literal notranslate"><span class="pre">GRIP</span></code></a>, is where a hand takes it). See the module
+docstring. They are points of the prop as a whole: on a split prop a
+landmark does not follow a part that turns (a grip on a moving lid).</p>
+</dd>
+</dl>
 <p>A <a class="reference internal" href="cutan.carve.html#cutan.carve.PartSet" title="cutan.carve.PartSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">PartSet</span></code></a> is written with its carving’s provenance:
 build one with <a class="reference internal" href="cutan.carve.html#cutan.carve.split_parts" title="cutan.carve.split_parts"><code class="xref py py-func docutils literal notranslate"><span class="pre">split_parts()</span></code></a> (its parts are cut from
 that carving), never by hand from other carvings’ parts.</p>
-<p>The root bone sits at the carving’s anchor. A split prop gets one bone per
+<p>The root bone sits at the carving’s anchor, and the descriptor declares it
+the rig’s <code class="docutils literal notranslate"><span class="pre">origin</span></code>: the prop stands where it is put by its anchor, whatever
+other bones (parts, landmarks) it has. A split prop gets one bone per
 part, at its pivot, parented to the root, and one slot per part above the
 base, in the order the parts were listed. Nothing is written unless the
 whole descriptor is valid.</p>
@@ -221,6 +247,7 @@ whole descriptor is valid.</p>
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
 <li><a :data-current="activeSection === '#cutan.carve.prop.BASE_SLOT'" class="reference internal" href="#cutan.carve.prop.BASE_SLOT"><code class="docutils literal notranslate"><span class="pre">BASE_SLOT</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.carve.prop.GRIP'" class="reference internal" href="#cutan.carve.prop.GRIP"><code class="docutils literal notranslate"><span class="pre">GRIP</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.carve.prop.ROOT_BONE'" class="reference internal" href="#cutan.carve.prop.ROOT_BONE"><code class="docutils literal notranslate"><span class="pre">ROOT_BONE</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.carve.prop.write_prop'" class="reference internal" href="#cutan.carve.prop.write_prop"><code class="docutils literal notranslate"><span class="pre">write_prop()</span></code></a></li>
 </ul>
@@ -236,7 +263,7 @@ whole descriptor is valid.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=dea2dbc4"></script>
+<script src="../_static/documentation_options.js?v=7ada5fdd"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

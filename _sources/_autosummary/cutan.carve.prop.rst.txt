@@ -10,6 +10,7 @@ cutan.carve.prop
    
       ROOT_BONE
       BASE_SLOT
+      GRIP
    
    .. rubric:: Functions
 

@@ -598,7 +598,7 @@ part moves. A part’s `origin` and `pivot` are in the carving’s pixels
 * **Return type:**
   [`PartSet`](cutan.carve.parts.html.md#cutan.carve.parts.PartSet)
 
-### cutan.carve.write_prop(carved, folder, , name=None, unit=None, max_side=None, display_name=None, source=None, ours=False, relicense=None, overwrite=False)
+### cutan.carve.write_prop(carved, folder, , name=None, unit=None, max_side=None, display_name=None, source=None, ours=False, relicense=None, landmarks=None, overwrite=False)
 
 Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.
 
@@ -617,11 +617,19 @@ relicense: `{"by": who, "reason": why}` (both non-empty), required for a
 > descriptor’s `source.extra.relicensed`; `an library publish` does not
 > read it, so say it again there (`relicense=`) when publishing.
 
+landmarks: named points of the prop in the source’s pixels, each written
+: as a slotless bone on the root: `{"grip": (x, y), "tip": (x, y)}`
+  (`grip`, `GRIP`, is where a hand takes it). See the module
+  docstring. They are points of the prop as a whole: on a split prop a
+  landmark does not follow a part that turns (a grip on a moving lid).
+
 A [`PartSet`](#cutan.carve.PartSet) is written with its carving’s provenance:
 build one with [`split_parts()`](#cutan.carve.split_parts) (its parts are cut from
 that carving), never by hand from other carvings’ parts.
 
-The root bone sits at the carving’s anchor. A split prop gets one bone per
+The root bone sits at the carving’s anchor, and the descriptor declares it
+the rig’s `origin`: the prop stands where it is put by its anchor, whatever
+other bones (parts, landmarks) it has. A split prop gets one bone per
 part, at its pivot, parented to the root, and one slot per part above the
 base, in the order the parts were listed. Nothing is written unless the
 whole descriptor is valid.
