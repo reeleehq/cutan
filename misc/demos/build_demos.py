@@ -2396,6 +2396,124 @@ def _build_manim_shot(work: Path) -> Path:
     return _render(_project(work, scene_md=md, characters=()), strict_assets=True)
 
 
+#: The hold demo's floor line (stage y) and scale: two factory characters a
+#: third of their size, standing on it.
+HOLD_GROUND: float = 110.0
+HOLD_SCALE: float = 0.35
+
+
+def _hold_props(work: Path) -> None:
+    """A crate with a ``top`` socket and a cup with a ``grip`` bone, drawn here
+    as two flat SVGs (no third-party art)."""
+
+    def prop(
+        name: str, bones: list, size: tuple[int, int], anchor: list, colour: str
+    ) -> None:
+        d = work / "assets" / "props" / name
+        (d / "parts").mkdir(parents=True, exist_ok=True)
+        w, h = size
+        (d / "parts" / "body.svg").write_text(
+            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}">'
+            f'<rect width="{w}" height="{h}" rx="{min(w, h) // 8}" fill="{colour}" stroke="#222" stroke-width="4"/></svg>',
+            encoding="utf-8",
+        )
+        (d / "prop.json").write_text(
+            json.dumps(
+                {
+                    "kind": "PropDescriptor",
+                    "schema_version": "0.2.0",
+                    "name": name,
+                    "view_box": [0, 0, 400, 400],
+                    "origin": [200.0, 200.0],
+                    "bones": bones,
+                    "slots": [
+                        {
+                            "name": "body",
+                            "bone": "root",
+                            "draw_order": 0,
+                            "attachment": "body",
+                        }
+                    ],
+                    "skins": {
+                        "default": {
+                            "name": "default",
+                            "slots": {
+                                "body": {
+                                    "body": {"path": "parts/body.svg", "anchor": anchor}
+                                }
+                            },
+                        }
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    prop(
+        "crate",
+        # The socket is where the cup's grip sits when it stands on the lid: a
+        # socket holds an item by its grip, not by its base.
+        [
+            {"name": "root", "x": 200.0, "y": 200.0},
+            {"name": "top", "parent": "root", "x": 0.0, "y": -34.5},
+        ],
+        (240, 150),
+        [0.5, 0.0],
+        "#b08040",
+    )
+    prop(
+        "cup",
+        [
+            {"name": "root", "x": 200.0, "y": 200.0},
+            {"name": "grip", "parent": "root", "x": 0.0, "y": -55.0},
+        ],
+        (80, 110),
+        [0.5, 1.0],
+        "#c83a3a",
+    )
+
+
+def _build_holds(work: Path) -> Path:
+    """Holding things (an#502): Ned takes a cup off a crate, carries it to Kim,
+    the two reach and meet, Kim takes it, swings her arm and tosses it to land
+    on the floor. No hand is keyframed: the verbs move the hands."""
+    from cutan.characters import new_character
+
+    s, g = HOLD_SCALE, HOLD_GROUND
+    md = (
+        _meta("Holding things: grasp, hand over, toss", 5.4)
+        + "\n"
+        + f"## Shot holds (cutout)\n\n```yaml shot\nduration: 5.4\nsolve: {{ground: {g}}}\n```\n"
+        + "\n```yaml entities\n"
+        f"- {{kind: prop, id: crate, store: props, ref: crate, stage: {{at: [-105, {g - 150 * 345 / 400 * 0.4:.2f}], scale: 0.4}}}}\n"
+        f"- {{kind: character, id: ned, store: characters, ref: ned, stage: {{at: [-150, {g}], scale: {s}, after: crate}}}}\n"
+        f"- {{kind: character, id: kim, store: characters, ref: kim, stage: {{at: [50, {g}], scale: {s}}}}}\n"
+        "- {kind: prop, id: cup, store: props, ref: cup, stage: {at: [-105, 0], scale: 0.25, after: kim}, overrides: {held_by: crate@top}}\n"
+        "```\n"
+        "\n```yaml actions\n"
+        f"- {{kind: set, target: kim, property: scale_x, value: {-s}, at: 0.0}}\n"
+        "- {kind: grasp, by: ned@hand_r, item: cup, start: 0.3, reach: 0.5}\n"
+        "- {kind: play, target: ned, animation: walk, args: {distance: 140, gait: glide}, start: 1.4, duration: 1.0}\n"
+        "- {kind: handover, item: cup, to: kim@hand_r, meet: 0.5, start: 2.6, reach: 0.5}\n"
+        "- {kind: tween, target: kim/arm_r, property: rotation, to: -1.4, duration: 0.3, start: 4.0}\n"
+        "- {kind: release, item: cup, at: 4.25, onto: ground@20, arc: 30}\n"
+        "- {kind: tween, target: kim/arm_r, property: rotation, to: 0.0, duration: 0.4, start: 4.35}\n"
+        "```\n"
+    )
+    project = _project(work, scene_md=md, characters=())
+    for name in ("ned", "kim"):
+        new_character(
+            project / "assets" / "characters",
+            name=name,
+            seed=name,
+            use_dicebear=False,
+            overwrite=True,
+            feet_origin=True,
+        )
+    _hold_props(project)
+    return _render(project, strict_assets=True)
+
+
 DEMOS: tuple[Demo, ...] = (
     Demo(
         slug="text-to-video",
@@ -3151,6 +3269,29 @@ DEMOS: tuple[Demo, ...] = (
             "in `artifacts/contact_sheets/`."
         ),
         build=_build_manim_shot,
+    ),
+    Demo(
+        slug="holds",
+        title="Holding things: grasp, hand over, toss",
+        shows=(
+            "Ned takes a cup off a crate, walks to Kim, both reach and meet halfway, "
+            "Kim takes it, swings her arm and tosses it; it lands on the floor at the "
+            "spot named, on an arc. No hand is keyframed: the verbs move the hands "
+            "(a minimum-jerk reach to the item's grip, a retract), the cup changes "
+            "hands at the frame the hand arrives and never slides, and it turns to how "
+            "the hand holds things. Narrower than it looks: the factory figure cannot "
+            "reach the floor (long legs, no knee), so the cup starts on a crate; a body "
+            "bends at the hip only (`lean`), and the cup draws over both characters "
+            "(`stage.after`), whoever holds it."
+        ),
+        how=(
+            "`{kind: grasp, by: ned@hand_r, item: cup}`, `{kind: handover, item: cup, "
+            "to: kim@hand_r, meet: 0.5}`, `{kind: release, item: cup, onto: ground@20, "
+            "arc: 30}`; the cup starts `overrides: {held_by: crate@top}` and the floor is "
+            "`solve: {ground: 110}`. The core's hold layer is `an/stage/hold.py`; "
+            "`ned@hand_r` is named by `cutan.characters.hands`."
+        ),
+        build=_build_holds,
     ),
 )
 

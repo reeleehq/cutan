@@ -63,7 +63,9 @@ PROJECT_STORE_RECORD: str = ".an/projects_store.json"
 #: Level 6: ``rest_pose_protection`` (an#407), which ``validate_character`` says aloud.
 #: Level 7: the ``projects.dir.<library>`` service ``an init --id`` consults (cutan#91),
 #: which places a cut-out project in the cache folder when the projects store is S3.
-REQUIRED_AN_API_LEVEL: int = 7
+#: Level 8: ``EntityKind.landmarks`` (an#502), through which a character's hands are
+#: named points (``stu@hand_r``) for the core's hold verbs.
+REQUIRED_AN_API_LEVEL: int = 8
 
 
 def require_an() -> None:

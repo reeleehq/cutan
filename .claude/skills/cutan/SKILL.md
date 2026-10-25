@@ -23,6 +23,26 @@ description: Use when making a cut-out animated character video with `an`: rigge
 
 - **Several shots of one place** (a two-shot and its close singles, a car and the road): describe the place once as the scene's `world` and give each shot a `viewpoint` (ADR 0009 in `an`; grammar and example in `an`'s skill reference `scene-and-shots.md`, "One world, many shots"). Characters are members at `[x, y, z]` with a `height`; a body-attached prop is `attached: {to: paul}` with no position and no `stage.at`, so the `body_placement` pass places it from the character's DERIVED placement in every framing and the wheel-to-Paul ratio cannot drift; a viewpoint `subject: paul, size: close_up` is a camera computed from the rig's measured extent (`SHOT_SIZES` is a human-proportion table until this genre registers rig landmarks: a factory head is 36 % of the body, so `close_up` cuts at the shoulders). `an validate` says what the world added, where a hand placement disagrees, and when two characters swap sides across a cut; `an world show <dir>` prints each framed shot as compiled. Views are not chosen from the viewpoint yet (a reverse angle still needs `view: back` by hand) and gaze is not checked against it: filed.
 
+## Holding things: pick up, carry, put down, hand over, swap (an#502)
+
+Never fake a hand-over with swap slots on the hands and a free prop flown between them. The core's hold verbs (`an` skill, `references/holding-things.md`) move the item between holders and move the hand to it; this genre names the hands: **`<character>@hand_r`** and **`@hand_l`** (`cutan.characters.hands`: the far end of the arm's chain, the forearm when the rig has an elbow, a `hand_r` part's middle when one is drawn; a `hand_r` bone, when a rig has one, wins). `hand_l` is the viewer's left on the unmirrored rig, so a character mirrored with a negative `scale_x` reaches toward the viewer's left with `hand_r`.
+
+```yaml
+# yaml shot:     solve: {ground: 502}      (the floor line, stage y)
+# yaml entities: the item is its own prop, drawn over its carrier
+- {kind: prop, id: musket, store: props, ref: weapon-musket-os, stage: {at: [-640, 480], scale: 0.706, after: stu}, overrides: {held_by: ground}}
+# yaml actions
+- {kind: grasp, by: stu@hand_r, item: musket, start: 2.0, reach: 0.55}          # bends to reach the floor
+- {kind: place, item: musket, onto: nap/arm_r/weapon, start: 7.0}                # into the figurine's hand
+- {kind: swap, holder: nap/arm_r/weapon, take: musket, give: sword, by: stu@hand_r, start: 10.4}
+- {kind: release, item: musket, at: 13.4, onto: ground@-420, arc: 60}           # tossed onto the floor
+```
+
+- **The socket of a figurine** is its weapon slot's node (`nap/arm_r/weapon`): the item's grip goes to that node's pivot, aligned with it, at the item's own size. Draw the free item at the size the figurine's own drawing had (the stage scale that gives the same scene px per unit), and switch the figurine's own swap set to its empty key at 0 (`set nap/arm_r/weapon weapon none`) so only the free item is drawn. A figurine that never moves a hand is held still; it is not solved.
+- **What a hand can reach.** A one-piece arm (a carved stick figure's, the factory's) reaches only points at its length from the shoulder: the body bends at the hip (`lean`, up to 60° by default) to bring nearer and farther points in, its head and other arm bending with it, its legs planted. Measured on the carved Stu at stage scale 2: an item lying on the floor beside him takes a 35-45° bend; his far hand handing something across his body to a figurine he stands next to took 71° (refused at the 60° default, with "move stu about 22 px to the right"). The factory figure (long legs, no knee) cannot reach the floor at all: put what it picks up on a crate or a table (`held_by: crate@top`, a socket bone at the height of the item's grip), or stage the character closer. A crouch (legs that bend) is not built.
+- **`an validate` says it** when a hand cannot arrive (`unreachable_hold`, with which way and how far to move the carrier), when holds contradict (`hold_conflict`), and when an item lay above the floor when it was taken (`floating_item`: say `held_by: ground`). Fix the staging, never the hold.
+- A carried item turns to how the hand holds things over the retract (`align`, as the figurine holds it: drawn as it is along the arm), mirrors when the character turns round, and keeps its pose at every change of hands. Lip-sync, gaze and expressions are untouched.
+
 ## Turning and facing
 
 An `an character new --offline` character carries a **turnaround** (an#197): a `view` swap set with keys `front` (its rest), `three_quarter`, `side` and `back`, drawn on the head and torso, plus a **pose per view** in the descriptor's `swap_poses`: the back hides the whole face, the profile hides the far eye and arm and slides the near eye and the mouth to the edge, the three-quarter shifts the face toward the facing side. `side` is drawn facing the **viewer's right**; a negative `scale_x` on the character root mirrors it to face left.
