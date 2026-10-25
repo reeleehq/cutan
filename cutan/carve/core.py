@@ -307,6 +307,7 @@ def _quality(
     detached: int,
     point: tuple[float, float] | None,
     neck_px: int = _NECK_PX,
+    px: float = 1.0,
 ) -> CarveQuality:
     cv2 = _cv2()
     subject = alpha > refine.SUBJECT
@@ -324,7 +325,8 @@ def _quality(
         inside = cv2.distanceTransform(
             np.pad(subject.astype(np.uint8), 1), cv2.DIST_L2, 3
         )
-        interior = inside[1:-1, 1:-1] >= 3
+        # 3 source px in: the feather (in source px) never reaches there
+        interior = inside[1:-1, 1:-1] >= 3 * px
         if interior.any():
             soft = float((alpha[interior] < 0.95).mean())
     attached = 0
@@ -561,6 +563,7 @@ def carve(
         detached=c.detached,
         point=None if point is None else ((point[0] - x0) * k, (point[1] - y0) * k),
         neck_px=_NECK_PX * k,
+        px=k,
     )
     rgba = np.dstack([colours, np.round(alpha * 255).astype(np.uint8)])
     trim = _trim_box(alpha, pad * k)
@@ -624,7 +627,7 @@ def carve_head(
     pad_x: float = 1.05,
     pad_top: float = 1.25,
     pad_bottom: float = 1.0,
-    upscale: int = 3,
+    upscale: int | None = None,
     superres: str | Mapping[str, Any] | SuperResLike | None = None,
     keep: str = KEEP,
     fill_holes: bool = FILL_HOLES,
@@ -652,7 +655,8 @@ def carve_head(
         ``neck`` its depth in face-box heights, ``neck_soft`` its soft edge
     pad_x, pad_top, pad_bottom: the crop around the face, in face-box widths
         (each side) and heights (above, below)
-    upscale: matte at this whole factor (heads are small in a frame)
+    upscale: matte at this whole factor (heads are small in a frame); default
+        3, or 1 with ``superres`` (the model's pixels are not interpolated again)
     superres: super-resolve the crop first (:func:`carve`'s): the head is
         normalised from the new pixels instead of interpolated ones
     face_h, centre: the face box is scaled to ``face_h`` px high and its
@@ -678,8 +682,8 @@ def carve_head(
         )
     cv2 = _cv2()
     rgb = load_rgb(image)
-    up = _upscale_factor(upscale)
     sr = as_superres(superres)
+    up = _upscale_factor(upscale if upscale is not None else (3 if sr is None else 1))
     located_by = None
     if face is None:
         locator = locate or InsightFaceLocator()
@@ -736,6 +740,7 @@ def carve_head(
         detached=c.detached,
         point=c.hint.point,
         neck_px=round(_NECK_PX * s),  # the head is measured at the upscaled size
+        px=s,
     )
     rgba = np.dstack([colours, np.round(alpha * 255).astype(np.uint8)])
 

@@ -35,8 +35,7 @@ from __future__ import annotations
 import hashlib
 import os
 import tempfile
-import urllib.request
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
@@ -66,6 +65,11 @@ MODELS_DIR_ENV: str = "CUTAN_MODELS_DIR"
 #: Pixels of context each tile shares with its neighbours (each side, source px):
 #: a tile's output is kept only away from its border, so no seam shows.
 DFLT_OVERLAP: int = 16
+#: Seconds a model download may stall before it is given up.
+DOWNLOAD_TIMEOUT_S: float = 60.0
+#: Where the model runs. Not in the recipe: providers agree in intent, not
+#: necessarily to the last bit.
+DFLT_PROVIDERS: tuple[str, ...] = ("CPUExecutionProvider",)
 
 
 @runtime_checkable
@@ -136,11 +140,17 @@ def _fetch(model: ModelFile, *, folder: Path, download: bool) -> Path:
         raise FileNotFoundError(
             f"{path} is missing; download it from {model.url} (or pass download=True)"
         )
+    import shutil
+    import urllib.request
+
     folder.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=folder, suffix=".part")
-    os.close(fd)
     try:
-        urllib.request.urlretrieve(model.url, tmp)  # noqa: S310 - a pinned https URL
+        with (
+            os.fdopen(fd, "wb") as out,
+            urllib.request.urlopen(model.url, timeout=DOWNLOAD_TIMEOUT_S) as r,  # noqa: S310 - a pinned https URL
+        ):
+            shutil.copyfileobj(r, out)
         got = _sha256(Path(tmp))
         if got != model.sha256:
             raise ValueError(
@@ -210,8 +220,13 @@ class RealESRGAN(SuperRes):
         same file (checked by hash too; never written to the recipe)
     overlap: source px each tile shares with its neighbours (each side)
     session: an already-built ``onnxruntime.InferenceSession`` (or anything
-        with its ``run(names, feeds)``), instead of loading the model
+        with its ``run(names, feeds)``), instead of loading the model; the
+        recipe then says the pixels came from an injected session, not the
+        pinned model, and cannot be replayed
+    providers: ONNX Runtime's execution providers (a GPU's first)
     download: fetch the model when it is not in the cache
+    sha256: the model's hash a recipe recorded: refused unless it is the one
+        :data:`MODELS` pins for ``model`` (a replay never runs another model)
 
     The model sees ``[0, 1]`` RGB in ``NCHW`` and returns the same ``factor``x.
     The image is mirrored at its border, so the edge tiles see context too.
@@ -224,13 +239,20 @@ class RealESRGAN(SuperRes):
         path: str | Path | None = None,
         overlap: int = DFLT_OVERLAP,
         session: Any = None,
+        providers: Sequence[str] = DFLT_PROVIDERS,
         download: bool = True,
+        sha256: str | None = None,
     ):
         if model not in MODELS:
             raise ValueError(
                 f"no super-resolution model {model!r}; the models are: {', '.join(sorted(MODELS))}"
             )
         spec = MODELS[model]
+        if sha256 is not None and sha256 != spec.sha256:
+            raise ValueError(
+                f"the recipe's {model!r} has sha256 {sha256}, but this cutan pins "
+                f"{spec.sha256}: refused, so a replay never runs another model"
+            )
         if spec.tile is not None and not 0 <= 2 * overlap < spec.tile:
             raise ValueError(
                 f"overlap is 0 to {spec.tile // 2 - 1} px for {model!r}, not {overlap!r}"
@@ -238,6 +260,7 @@ class RealESRGAN(SuperRes):
         self.name, self.model, self.factor = model, model, spec.factor
         self.overlap, self.path, self.download = int(overlap), path, download
         self._spec, self._session = spec, session
+        self._injected, self.providers = session is not None, tuple(providers)
 
     def _settings(self) -> dict[str, Any]:
         # never the local ``path``: a recipe is provenance, published with the art
@@ -257,13 +280,15 @@ class RealESRGAN(SuperRes):
 
     def recipe(self) -> dict[str, Any]:
         """The name, the settings and the model's hash (what made these pixels)."""
+        if self._injected:
+            return {**super().recipe(), "session": "injected"}
         return {**super().recipe(), "sha256": self._spec.sha256}
 
     def session(self) -> Any:
         if self._session is None:
             ort = require("onnxruntime")
             self._session = ort.InferenceSession(
-                str(self.model_file()), providers=["CPUExecutionProvider"]
+                str(self.model_file()), providers=list(self.providers)
             )
         return self._session
 
@@ -337,14 +362,18 @@ def as_superres(spec: str | Mapping[str, Any] | SuperResLike | None) -> SuperRes
     if isinstance(spec, Mapping):
         params = dict(spec)
         name = params.pop("superres", None)
-        params.pop("sha256", None)  # recorded, not a setting: the model's name pins it
+        if params.pop("session", None) == "injected":
+            raise ValueError(
+                f"this {name!r} recipe was made by an injected session, not a pinned "
+                "model: it cannot be replayed"
+            )
         if name not in SUPERRES:
             raise ValueError(
                 f"no super-resolution strategy {name!r}; the strategies are: "
                 f"{', '.join(sorted(SUPERRES))}"
             )
         return SUPERRES[name](**params)
-    if callable(spec):
+    if callable(spec):  # recorded as module:qualname, replayable once registered
         return _Function(spec)
     raise TypeError(
         f"superres is a strategy name, a recipe or a callable rgb -> rgb, not {spec!r}"
