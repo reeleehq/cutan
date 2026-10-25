@@ -9,6 +9,7 @@ cutan.carve
    .. autosummary::
    
       as_matte
+      as_superres
       border_colours
       carve
       carve_head
@@ -19,6 +20,7 @@ cutan.carve
       neck_cut
       pick_face
       register_matte
+      register_superres
       split_parts
       write_prop
       youtube_id
@@ -42,7 +44,10 @@ cutan.carve
       PartSet
       PartSpec
       Polygon
+      RealESRGAN
       Rembg
+      Resample
+      SuperRes
    
    .. rubric:: Exceptions
 
@@ -63,3 +68,4 @@ cutan.carve
    prop
    provenance
    refine
+   superres

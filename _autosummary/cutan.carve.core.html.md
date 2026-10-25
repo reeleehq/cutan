@@ -2,8 +2,8 @@
 
 The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.
 
-[`carve()`](#cutan.carve.core.carve) runs crop → (upscale) → matte → keep → fill holes → detach
-bridges → choke → feather → de-spill → trim, and returns a [`Carving`](#cutan.carve.core.Carving):
+[`carve()`](#cutan.carve.core.carve) runs crop → (super-resolve) → (upscale) → matte → keep → fill
+holes → detach bridges → choke → feather → de-spill → trim, and returns a [`Carving`](#cutan.carve.core.Carving):
 the RGBA part, where it came from in the source, its anchor, its quality
 signals, and the recipe that cut it (recorded with its provenance).
 [`carve_head()`](#cutan.carve.core.carve_head) is the same pipeline with a neck cut and the head
@@ -99,7 +99,7 @@ The finishing defaults [`carve()`](#cutan.carve.core.carve) and [`carve_head()`]
 so the two cannot drift): keep the component under the point, fill what the
 subject encloses, detach nothing, no choke, a 0.6 px feather, de-spill 1 px.
 
-### cutan.carve.core.carve(image, , matte='flat_colour', crop=None, box=None, point=None, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, upscale=1, pad=4, source=None)
+### cutan.carve.core.carve(image, , matte='flat_colour', crop=None, box=None, point=None, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, upscale=1, superres=None, pad=4, source=None)
 
 Cut a part out of `image`; every coordinate is in the source image’s pixels.
 
@@ -132,6 +132,16 @@ despill: re-paint the edge from the subject’s pixels at least this many px
 upscale: matte at this whole factor of the source resolution, then come
 : back: smoother edges on small or low-resolution subjects
 
+superres: a super-resolution strategy ([`cutan.carve.superres`](cutan.carve.superres.html.md#module-cutan.carve.superres)) applied
+: to the crop before the matte, whose resolution the part KEEPS: a name
+  (`"realesr-animevideov3"`, x4, for cartoon frames; `"resample"`), a
+  recipe, or any `rgb -> rgb` callable a whole factor larger. Every
+  coordinate and px amount (`detach`, `choke`, `feather`,
+  `despill`, `pad`) stays in the source’s pixels; `to_part` maps
+  them into the larger part (`scale` is the factor), and the strategy’s
+  recipe (a model’s sha256 included) is in the carving’s `recipe`, so
+  its provenance says the pixels were made, not captured
+
 pad: transparent px left around the trimmed part
 source: provenance ([`frame_source()`](cutan.carve.provenance.html.md#cutan.carve.provenance.frame_source)), kept
 
@@ -148,7 +158,7 @@ True
 * **Return type:**
   [`Carving`](#cutan.carve.core.Carving)
 
-### cutan.carve.core.carve_head(image, , face=None, locate=None, pick='largest', matte='flat_colour', cut='auto', neck=None, neck_soft=0.05, pad_x=1.05, pad_top=1.25, pad_bottom=1.0, upscale=3, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, canvas=512, face_h=270.0, centre=(256.0, 300.0), margin=6, view=None, source=None)
+### cutan.carve.core.carve_head(image, , face=None, locate=None, pick='largest', matte='flat_colour', cut='auto', neck=None, neck_soft=0.05, pad_x=1.05, pad_top=1.25, pad_bottom=1.0, upscale=None, superres=None, keep='point', fill_holes=True, detach=0, choke=0, feather=0.6, despill=1, canvas=512, face_h=270.0, centre=(256.0, 300.0), margin=6, view=None, source=None)
 
 A head cut out at the neck and normalised onto a `canvas`-px square.
 
@@ -167,11 +177,15 @@ cut: the neck cut, `"auto"` (along the jaw when the face has a contour,
 pad_x, pad_top, pad_bottom: the crop around the face, in face-box widths
 : (each side) and heights (above, below)
 
-upscale: matte at this whole factor (heads are small in a frame)
-face_h, centre: the face box is scaled to `face_h` px high and its
+upscale: matte at this whole factor (heads are small in a frame); default
+: 3, or 1 with `superres` (the model’s pixels are not interpolated again)
 
-> centre put on `centre`, unless the head would then leave the canvas
-> (less `margin`), in which case it is scaled down to fit
+superres: super-resolve the crop first ([`carve()`](#cutan.carve.core.carve)’s): the head is
+: normalised from the new pixels instead of interpolated ones
+
+face_h, centre: the face box is scaled to `face_h` px high and its
+: centre put on `centre`, unless the head would then leave the canvas
+  (less `margin`), in which case it is scaled down to fit
 
 view: the view the head is drawn in, one of the rig’s views (`front`,
 : `three_quarter`, `side`, `back`), recorded for the step that puts

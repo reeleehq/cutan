@@ -231,7 +231,9 @@ The base keeps the rest, and stays opaque under a part’s soft edge (no
 seam at rest); where a part was enclosed by the base, <code class="docutils literal notranslate"><span class="pre">paint_out</span></code>
 re-paints the base under it (<code class="docutils literal notranslate"><span class="pre">cv2.inpaint</span></code>) so it stays whole when the
 part moves. A part’s <code class="docutils literal notranslate"><span class="pre">origin</span></code> and <code class="docutils literal notranslate"><span class="pre">pivot</span></code> are in the carving’s pixels
-(where <a class="reference internal" href="cutan.carve.html#cutan.carve.write_prop" title="cutan.carve.write_prop"><code class="xref py py-func docutils literal notranslate"><span class="pre">write_prop()</span></code></a> places it).</p>
+(where <a class="reference internal" href="cutan.carve.html#cutan.carve.write_prop" title="cutan.carve.write_prop"><code class="xref py py-func docutils literal notranslate"><span class="pre">write_prop()</span></code></a> places it). <code class="docutils literal notranslate"><span class="pre">inpaint_radius</span></code>,
+<code class="docutils literal notranslate"><span class="pre">pad</span></code> and a spec’s <code class="docutils literal notranslate"><span class="pre">grow</span></code> count the carving’s pixels too: on a
+super-resolved carving (<code class="docutils literal notranslate"><span class="pre">carving.scale</span></code> 4) scale them by it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#cutan.carve.parts.PartSet" title="cutan.carve.parts.PartSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">PartSet</span></code></a></span></p>
@@ -262,7 +264,7 @@ part moves. A part’s <code class="docutils literal notranslate"><span class="p
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=7ada5fdd"></script>
+<script src="../_static/documentation_options.js?v=b153cf10"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

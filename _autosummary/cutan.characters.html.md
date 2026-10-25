@@ -769,6 +769,7 @@ namespace as the default, so the output is a valid standalone SVG.
 | [`dicebear`](cutan.characters.dicebear.html.md#module-cutan.characters.dicebear)         | DiceBear HTTP API client + best-effort post-processing.                                               |
 | [`drawn`](cutan.characters.drawn.html.md#module-cutan.characters.drawn)               | What the character factory wrote, as it wrote it: the in-memory log behind its record of drawn bytes. |
 | [`factory`](cutan.characters.factory.html.md#module-cutan.characters.factory)           | High-level entry points: build and inspect a character.                                               |
+| [`hands`](cutan.characters.hands.html.md#module-cutan.characters.hands)               | A character's hands as named points: `ned@hand_r` (an#502, reeleehq/cutan#104).                       |
 | [`idle`](cutan.characters.idle.html.md#module-cutan.characters.idle)                 | Idle animation factories: breath, blink, weight-shift.                                                |
 | [`licenses`](cutan.characters.licenses.html.md#module-cutan.characters.licenses)         | DiceBear per-style licences, as data.                                                                 |
 | [`lids`](cutan.characters.lids.html.md#module-cutan.characters.lids)                 | A HALF eyelid drawing, made from a character's own OPEN and CLOSED lid art (cutan#65).                |

@@ -1,0 +1,33 @@
+cutan.carve.superres
+====================
+
+.. automodule:: cutan.carve.superres
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      MODELS_DIR_ENV
+      MODELS
+      SUPERRES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      as_superres
+      factor_of
+      models_dir
+      register_superres
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ModelFile
+      RealESRGAN
+      Resample
+      SuperRes
+      SuperResLike
+   

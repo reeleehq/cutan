@@ -251,7 +251,7 @@ cutan#91). Pushed with the project, so it is a key of the store too.</p>
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="cutan.REQUIRED_AN_API_LEVEL">
-<span class="sig-prename descclassname"><span class="pre">cutan.</span></span><span class="sig-name descname"><span class="pre">REQUIRED_AN_API_LEVEL</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">int</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.REQUIRED_AN_API_LEVEL" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.REQUIRED_AN_API_LEVEL'">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cutan.</span></span><span class="sig-name descname"><span class="pre">REQUIRED_AN_API_LEVEL</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">int</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.REQUIRED_AN_API_LEVEL" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.REQUIRED_AN_API_LEVEL'">¶</a></dt>
 <dd><p>The lowest <code class="docutils literal notranslate"><span class="pre">an.genres.API_LEVEL</span></code> this <code class="docutils literal notranslate"><span class="pre">cutan</span></code> runs against (“the lowest <code class="docutils literal notranslate"><span class="pre">an</span></code>
 it supports”, ADR 0001 decision 8, said without a version pin: <code class="docutils literal notranslate"><span class="pre">an</span></code>’s version is
 assigned by CI at merge). Level 2 is the move itself: <code class="docutils literal notranslate"><span class="pre">Genre.services</span></code>,
@@ -263,7 +263,9 @@ is nested chains (an#340): <code class="docutils literal notranslate"><span clas
 <code class="docutils literal notranslate"><span class="pre">slot_node_paths</span></code>, <code class="docutils literal notranslate"><span class="pre">rig_affordances</span></code>, <code class="docutils literal notranslate"><span class="pre">RigError</span></code>.
 Level 6: <code class="docutils literal notranslate"><span class="pre">rest_pose_protection</span></code> (an#407), which <code class="docutils literal notranslate"><span class="pre">validate_character</span></code> says aloud.
 Level 7: the <code class="docutils literal notranslate"><span class="pre">projects.dir.&lt;library&gt;</span></code> service <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">init</span> <span class="pre">--id</span></code> consults (cutan#91),
-which places a cut-out project in the cache folder when the projects store is S3.</p>
+which places a cut-out project in the cache folder when the projects store is S3.
+Level 8: <code class="docutils literal notranslate"><span class="pre">EntityKind.landmarks</span></code> (an#502), through which a character’s hands are
+named points (<code class="docutils literal notranslate"><span class="pre">stu@hand_r</span></code>) for the core’s hold verbs.</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.require_an">
@@ -388,7 +390,7 @@ which places a cut-out project in the cache folder when the projects store is S3
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=7ada5fdd"></script>
+<script src="../_static/documentation_options.js?v=b153cf10"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

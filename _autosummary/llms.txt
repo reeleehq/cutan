@@ -22,6 +22,7 @@
 - [cutan.carve.prop](cutan.carve.prop.html.md): Write a carving (or a carving split into parts) as a library-ready prop folder.
 - [cutan.carve.provenance](cutan.carve.provenance.html.md): Where carved pixels came from: an &#96;AssetSource&#96; for a frame of a video or an image.
 - [cutan.carve.refine](cutan.carve.refine.html.md): Clean a raw matte into a cut-out’s alpha: keep the subject, close it, edge it, de-spill it.
+- [cutan.carve.superres](cutan.carve.superres.html.md): Super-resolution strategies: more pixels for a part carved from a low-resolution frame (cutan#110).
 - [cutan.characters](cutan.characters.html.md): Character art system: Spine-shaped descriptor + SVG sidecars.
 - [cutan.characters.brows](cutan.characters.brows.html.md): Brow acting: where the brows can go, what may not draw there, and the &#96;face.brows&#96; capability.
 - [cutan.characters.checks](cutan.characters.checks.html.md): The cut-out genre’s semantic checks: &#96;play&#96;, &#96;expression&#96;, turns, views and character refs.
@@ -30,6 +31,7 @@
 - [cutan.characters.dicebear](cutan.characters.dicebear.html.md): DiceBear HTTP API client + best-effort post-processing.
 - [cutan.characters.drawn](cutan.characters.drawn.html.md): What the character factory wrote, as it wrote it: the in-memory log behind its record of drawn bytes...
 - [cutan.characters.factory](cutan.characters.factory.html.md): High-level entry points: build and inspect a character.
+- [cutan.characters.hands](cutan.characters.hands.html.md): A character’s hands as named points: &#96;ned@hand_r&#96; (an#502, reeleehq/cutan#104).
 - [cutan.characters.idle](cutan.characters.idle.html.md): Idle animation factories: breath, blink, weight-shift.
 - [cutan.characters.licenses](cutan.characters.licenses.html.md): DiceBear per-style licences, as data.
 - [cutan.characters.lids](cutan.characters.lids.html.md): A HALF eyelid drawing, made from a character’s own OPEN and CLOSED lid art (cutan#65).

@@ -1,0 +1,18 @@
+cutan.characters.hands
+======================
+
+.. automodule:: cutan.characters.hands
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      HANDS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      character_landmarks
+   

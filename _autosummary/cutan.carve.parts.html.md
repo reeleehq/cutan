@@ -84,7 +84,9 @@ The base keeps the rest, and stays opaque under a part’s soft edge (no
 seam at rest); where a part was enclosed by the base, `paint_out`
 re-paints the base under it (`cv2.inpaint`) so it stays whole when the
 part moves. A part’s `origin` and `pivot` are in the carving’s pixels
-(where [`write_prop()`](cutan.carve.html.md#cutan.carve.write_prop) places it).
+(where [`write_prop()`](cutan.carve.html.md#cutan.carve.write_prop) places it). `inpaint_radius`,
+`pad` and a spec’s `grow` count the carving’s pixels too: on a
+super-resolved carving (`carving.scale` 4) scale them by it.
 
 * **Return type:**
   [`PartSet`](#cutan.carve.parts.PartSet)

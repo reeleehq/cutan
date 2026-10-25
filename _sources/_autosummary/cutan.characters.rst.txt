@@ -51,6 +51,7 @@ cutan.characters
    dicebear
    drawn
    factory
+   hands
    idle
    licenses
    lids
