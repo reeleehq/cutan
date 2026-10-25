@@ -33,6 +33,9 @@ carving's source is kept beside it as ``extra.carved_from`` either way.
 from __future__ import annotations
 
 import json
+import math
+import re
+import warnings
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -51,9 +54,12 @@ BASE_SLOT: str = "body"
 #: The landmark a hand takes a prop by when a scene names no other (an's hold
 #: verbs read a bone of this name; an#502).
 GRIP: str = "grip"
-#: Characters a landmark's name may not hold: a scene addresses it as
-#: ``<prop>@<name>``, and ``u,v`` there is a fraction of the drawing.
-_NOT_IN_A_LANDMARK = frozenset("@/, \t\n")
+#: What a landmark's name may be: what a scene writes after ``@``
+#: (``sabre@grip``), where ``u,v`` would be a fraction of the drawing instead.
+_LANDMARK_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_.-]*")
+#: How far outside the part a landmark may lie (a fraction of its larger side)
+#: before it is called a slip (part pixels given where source pixels belong).
+LANDMARK_MARGIN: float = 0.5
 
 Point = tuple[float, float]
 
@@ -125,10 +131,11 @@ def _landmark_bones(
     bones = []
     for name, at in landmarks.items():
         name = str(name)
-        if not name.strip() or set(name) & _NOT_IN_A_LANDMARK:
+        if not _LANDMARK_NAME.fullmatch(name):
             raise ValueError(
                 f"a landmark's name is what a scene writes after '@' (stu@hand_r, "
-                f"sabre@grip): no '@', '/', ',' or spaces, not {name!r}"
+                f"sabre@grip): a letter or '_', then letters, digits, '_', '.', '-'; "
+                f"not {name!r}"
             )
         if name in taken:
             raise ValueError(
@@ -136,11 +143,22 @@ def _landmark_bones(
             )
         try:
             x, y = (float(v) for v in at)
+            if not (math.isfinite(x) and math.isfinite(y)):
+                raise ValueError
         except (TypeError, ValueError):
             raise ValueError(
-                f"landmark {name!r}: a point is (x, y) in the source's pixels, not {at!r}"
+                f"landmark {name!r}: a point is (x, y) in the source's pixels, finite, "
+                f"not {at!r}"
             ) from None
         ((px, py),) = carving.to_part([(x, y)])
+        slack = LANDMARK_MARGIN * max(w, h)
+        if not (-slack <= px <= w + slack and -slack <= py <= h + slack):
+            warnings.warn(
+                f"landmark {name!r} at {(x, y)} (source px) lies far outside the part "
+                f"(at {(round(px), round(py))} of its {w}x{h} px): a point in the "
+                "part's pixels where the source's belong?",
+                stacklevel=3,
+            )
         taken.add(name)
         bones.append(
             {
@@ -182,13 +200,16 @@ def write_prop(
     landmarks: named points of the prop in the source's pixels, each written
         as a slotless bone on the root: ``{"grip": (x, y), "tip": (x, y)}``
         (``grip``, :data:`GRIP`, is where a hand takes it). See the module
-        docstring.
+        docstring. They are points of the prop as a whole: on a split prop a
+        landmark does not follow a part that turns (a grip on a moving lid).
 
     A :class:`~cutan.carve.PartSet` is written with its carving's provenance:
     build one with :func:`~cutan.carve.split_parts` (its parts are cut from
     that carving), never by hand from other carvings' parts.
 
-    The root bone sits at the carving's anchor. A split prop gets one bone per
+    The root bone sits at the carving's anchor, and the descriptor declares it
+    the rig's ``origin``: the prop stands where it is put by its anchor, whatever
+    other bones (parts, landmarks) it has. A split prop gets one bone per
     part, at its pivot, parented to the root, and one slot per part above the
     base, in the order the parts were listed. Nothing is written unless the
     whole descriptor is valid.
@@ -259,6 +280,9 @@ def write_prop(
             "name": name or folder.name,
             "display_name": display_name,
             "view_box": [0, 0, max(1, round(w * unit)), max(1, round(h * unit))],
+            # the root bone: without it an's origin is the bones' extent centre,
+            # which a part's pivot or a landmark would move
+            "origin": [0.0, 0.0],
             "bones": bones,
             "slots": slots,
             "skins": {"default": {"name": "default", "slots": attachments}},

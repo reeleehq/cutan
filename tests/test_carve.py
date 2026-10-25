@@ -583,10 +583,14 @@ def test_write_prop_landmarks_are_the_rigs_named_points(tmp_path):
     for name, at in (("grip", grip), ("tip", tip)):
         (px, py), (ax, ay) = part.to_part([at])[0], (part.anchor[0] * part.size[0], part.anchor[1] * part.size[1])
         want = ((px - ax) * unit * k, (py - ay) * unit * k)
-        got = np.subtract(anchors[name].offset, anchors["root"].offset)
-        assert np.allclose(got, want, atol=0.05 * k), (name, got, want)
-    for bad, match in (({"a@b": grip}, "after '@'"), ({"root": grip}, "already a bone"),
-                       ({"grip": (1,)}, "a point is")):
+        assert np.allclose(anchors[name].offset, want, atol=0.05 * k), (name, anchors[name].offset, want)
+    # a landmark never moves where the prop stands: the root (its anchor) is the origin
+    assert anchors["root"].offset == (0.0, 0.0) and tuple(doc.origin) == (0.0, 0.0)
+    with pytest.warns(UserWarning, match="far outside the part"):
+        write_prop(part, tmp_path / "slip", landmarks={"grip": (5000, -900)})
+    for bad, match in (({"a@b": grip}, "after '@'"), ({"a:b": grip}, "after '@'"),
+                       ({"root": grip}, "already a bone"), ({"grip": (1,)}, "a point is"),
+                       ({"grip": (float("nan"), 1)}, "finite")):
         with pytest.raises(ValueError, match=match):
             write_prop(part, tmp_path / "x", landmarks=bad, overwrite=True)
     assert [b.name for b in write_prop(part, tmp_path / "plain").bones] == ["root"]
