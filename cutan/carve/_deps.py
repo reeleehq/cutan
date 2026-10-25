@@ -1,8 +1,9 @@
 """The optional dependencies of ``cutan.carve``, imported lazily with an install hint.
 
-Carving needs OpenCV (``pip install "cutan[carve]"``); two matte strategies
-need more: ``rembg`` (``cutan[rembg]``) and the face locator ``insightface``
-(``cutan[faces]``). Nothing here is imported until a carve runs, so
+Carving needs OpenCV (``pip install "cutan[carve]"``); some strategies
+need more: ``rembg`` (``cutan[rembg]``), the face locator ``insightface``
+(``cutan[faces]``) and the super-resolution model's ``onnxruntime``
+(``cutan[superres]``). Nothing here is imported until a carve runs, so
 ``import cutan`` stays light.
 """
 
@@ -17,6 +18,10 @@ OPTIONAL_DEPENDENCIES: dict[str, tuple[str, str]] = {
     "cv2": ("carving (every matte strategy)", 'pip install "cutan[carve]"'),
     "rembg": ("the rembg matte", 'pip install "cutan[rembg]"'),
     "insightface": ("the face locator of carve_head", 'pip install "cutan[faces]"'),
+    "onnxruntime": (
+        "the super-resolution model (superres=)",
+        'pip install "cutan[superres]"',
+    ),
 }
 
 
@@ -44,7 +49,7 @@ def check_requirements(*, verbose: bool = True) -> dict[str, bool]:
     """Which optional dependencies of carving are installed (printing how to get the rest).
 
     >>> sorted(check_requirements(verbose=False))
-    ['cv2', 'insightface', 'rembg']
+    ['cv2', 'insightface', 'onnxruntime', 'rembg']
     """
     found = {
         name: importlib.util.find_spec(name) is not None

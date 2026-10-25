@@ -16,6 +16,10 @@ a neural matte wins on photos, GrabCut on a single prop in a rough box.
 - **One part:** :func:`carve` (``matte=`` a name from :data:`MATTES` or a
   :class:`Matte`; ``Polygon(points) & FlatColour()`` is a hand outline cleaned
   by a key). A video frame comes from :func:`grab_frame`.
+- **A low-resolution frame:** ``superres=`` (:mod:`cutan.carve.superres`)
+  makes new pixels before the matte and the part keeps them:
+  ``"realesr-animevideov3"`` (x4, for cartoon frames, ``cutan[superres]``)
+  turns a 3 px blade into a 12 px one; coordinates stay in the source's pixels.
 - **A head:** :func:`carve_head` cuts the neck under the jaw and puts the face
   on a fixed canvas (512², the face centre as origin); the face is a hand box
   or found by a locator (``insightface``, ``pip install "cutan[faces]"``).
@@ -66,9 +70,18 @@ from cutan.carve.mattes import (
 from cutan.carve.parts import Part, PartSet, PartSpec, split_parts
 from cutan.carve.prop import write_prop
 from cutan.carve.provenance import frame_source, youtube_id
+from cutan.carve.superres import (
+    SUPERRES,
+    RealESRGAN,
+    Resample,
+    SuperRes,
+    as_superres,
+    register_superres,
+)
 
 __all__ = [
     "MATTES",
+    "SUPERRES",
     "CarveQuality",
     "Carving",
     "Chroma",
@@ -85,8 +98,12 @@ __all__ = [
     "PartSet",
     "PartSpec",
     "Polygon",
+    "RealESRGAN",
     "Rembg",
+    "Resample",
+    "SuperRes",
     "as_matte",
+    "as_superres",
     "border_colours",
     "carve",
     "carve_head",
@@ -97,6 +114,7 @@ __all__ = [
     "neck_cut",
     "pick_face",
     "register_matte",
+    "register_superres",
     "split_parts",
     "write_prop",
     "youtube_id",

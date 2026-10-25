@@ -1,7 +1,7 @@
 """The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.
 
-:func:`carve` runs crop → (upscale) → matte → keep → fill holes → detach
-bridges → choke → feather → de-spill → trim, and returns a :class:`Carving`:
+:func:`carve` runs crop → (super-resolve) → (upscale) → matte → keep → fill
+holes → detach bridges → choke → feather → de-spill → trim, and returns a :class:`Carving`:
 the RGBA part, where it came from in the source, its anchor, its quality
 signals, and the recipe that cut it (recorded with its provenance).
 :func:`carve_head` is the same pipeline with a neck cut and the head
@@ -41,6 +41,7 @@ from cutan.carve.head import (
     pick_face,
 )
 from cutan.carve.mattes import Hint, MatteLike, _plain, as_matte
+from cutan.carve.superres import SuperRes, SuperResLike, as_superres, factor_of
 
 __all__ = [
     "CHOKE",
@@ -343,9 +344,13 @@ def _quality(
 
 @dataclass
 class _Cut:
-    """The carve's working state, in the (cropped, upscaled) region's pixels."""
+    """The carve's working state, in the (cropped, super-resolved, upscaled) region's pixels."""
 
     rgb: np.ndarray
+    #: The region at the part's own resolution: the source's pixels, or the
+    #: super-resolved ones (``k`` times the source's on each side).
+    base: np.ndarray
+    k: int
     raw: np.ndarray
     alpha: np.ndarray
     hint: Hint
@@ -366,19 +371,26 @@ def _cut(
     holes: bool,
     detach: float,
     gate: Any = None,
+    superres: SuperRes | None = None,
 ) -> _Cut:
     cv2 = _cv2()
     h, w = rgb.shape[:2]
     region = _clip_box(crop, w, h) if crop is not None else (0, 0, w, h)
     x0, y0, x1, y1 = region
     sub = rgb[y0:y1, x0:x1]
+    k = 1
+    if superres is not None:  # new pixels, which the part keeps
+        big = np.asarray(superres(np.ascontiguousarray(sub)))
+        k = factor_of(sub.shape, big.shape)
+        sub = np.ascontiguousarray(big, dtype=np.uint8)
+    base = sub
     if upscale != 1:  # linear: Lanczos rings, and the ringing darkens a rim
         sub = cv2.resize(
             sub,
-            ((x1 - x0) * upscale, (y1 - y0) * upscale),
+            (sub.shape[1] * upscale, sub.shape[0] * upscale),
             interpolation=cv2.INTER_LINEAR,
         )
-    s = float(upscale)
+    s = float(k * upscale)
     hint = Hint(offset=(float(x0), float(y0)), scale=s)
     hint = replace(
         hint,
@@ -411,7 +423,9 @@ def _cut(
     support = cv2.dilate(filled.astype(np.uint8), np.ones((reach, reach), np.uint8)) > 0
     fringe = support & ~filled & (raw <= refine.SUBJECT)
     alpha = np.where(filled, np.where(mask, raw, 1.0), np.where(fringe, raw, 0.0))
-    return _Cut(sub, raw, alpha.astype(np.float32), hint, region, detached, m.recipe())
+    return _Cut(
+        sub, base, k, raw, alpha.astype(np.float32), hint, region, detached, m.recipe()
+    )
 
 
 def _finish_alpha(
@@ -460,6 +474,7 @@ def carve(
     feather: float = FEATHER,
     despill: int = DESPILL,
     upscale: int = 1,
+    superres: str | Mapping[str, Any] | SuperResLike | None = None,
     pad: int = 4,
     source: AssetSource | None = None,
 ) -> Carving:
@@ -484,6 +499,15 @@ def carve(
         fuzzy fringe; 0: off)
     upscale: matte at this whole factor of the source resolution, then come
         back: smoother edges on small or low-resolution subjects
+    superres: a super-resolution strategy (:mod:`cutan.carve.superres`) applied
+        to the crop before the matte, whose resolution the part KEEPS: a name
+        (``"realesr-animevideov3"``, x4, for cartoon frames; ``"resample"``), a
+        recipe, or any ``rgb -> rgb`` callable a whole factor larger. Every
+        coordinate and px amount (``detach``, ``choke``, ``feather``,
+        ``despill``, ``pad``) stays in the source's pixels; ``to_part`` maps
+        them into the larger part (``scale`` is the factor), and the strategy's
+        recipe (a model's sha256 included) is in the carving's ``recipe``, so
+        its provenance says the pixels were made, not captured
     pad: transparent px left around the trimmed part
     source: provenance (:func:`~cutan.carve.provenance.frame_source`), kept
         with the recipe and the quality in ``Carving.provenance()``
@@ -497,6 +521,7 @@ def carve(
     """
     rgb = load_rgb(image)
     up = _upscale_factor(upscale)
+    sr = as_superres(superres)
     c = _cut(
         rgb,
         matte=matte,
@@ -507,21 +532,24 @@ def carve(
         keep=keep,
         holes=fill_holes,
         detach=detach,
+        superres=sr,
     )
-    s = c.hint.scale
+    s, k = c.hint.scale, c.k
     solid = refine.choke(c.alpha, choke * s)
     alpha = _finish_alpha(c.alpha, choke=choke, feather=feather, s=s)
     raw = c.raw
     x0, y0, x1, y1 = c.region
-    region_rgb = rgb[y0:y1, x0:x1]
-    if up != 1:  # back to the source resolution: the source's own pixels
-        size = (x1 - x0, y1 - y0)
+    region_rgb = c.base
+    if (
+        up != 1
+    ):  # back to the part's resolution: the source's (or super-resolved) pixels
+        size = (region_rgb.shape[1], region_rgb.shape[0])
         alpha, raw, solid = (
             np.clip(_cv2().resize(a, size, interpolation=_cv2().INTER_AREA), 0, 1)
             for a in (alpha, raw, solid)
         )
     colours, repainted = (
-        refine.despill(region_rgb, alpha, despill, solid=solid)
+        refine.despill(region_rgb, alpha, round(despill * k), solid=solid)
         if despill
         else (region_rgb, 0.0)
     )
@@ -531,19 +559,20 @@ def carve(
         raw,
         repainted=repainted,
         detached=c.detached,
-        point=None if point is None else (point[0] - x0, point[1] - y0),
+        point=None if point is None else ((point[0] - x0) * k, (point[1] - y0) * k),
+        neck_px=_NECK_PX * k,
     )
     rgba = np.dstack([colours, np.round(alpha * 255).astype(np.uint8)])
-    trim = _trim_box(alpha, pad)
+    trim = _trim_box(alpha, pad * k)
     if trim is None:
         raise _nothing_left(c.matte_recipe, c.region)
     tx0, ty0, tx1, ty1 = trim
     part = Image.fromarray(np.ascontiguousarray(rgba[ty0:ty1, tx0:tx1]), "RGBA")
-    offset = (float(x0 + tx0), float(y0 + ty0))
+    offset = (float(x0 + tx0 / k), float(y0 + ty0 / k))
     if point is not None:
         anchor = (
-            (point[0] - offset[0]) / part.width,
-            (point[1] - offset[1]) / part.height,
+            (point[0] - offset[0]) * k / part.width,
+            (point[1] - offset[1]) * k / part.height,
         )
     else:
         anchor = (0.5, 0.5)
@@ -560,18 +589,19 @@ def carve(
         "despill": despill,
         "upscale": up,
         "pad": pad,
+        **({"superres": sr.recipe()} if sr is not None else {}),
     }
     return Carving(
         image=part,
         anchor=(float(anchor[0]), float(anchor[1])),
         offset=offset,
-        scale=1.0,
+        scale=float(k),
         quality=quality,
         recipe=recipe,
         source=source,
         meta={
             "region_in_source": list(c.region),
-            "source_to_part": _affine(offset, 1.0),
+            "source_to_part": _affine(offset, float(k)),
         },
         mode="part",
     )
@@ -595,6 +625,7 @@ def carve_head(
     pad_top: float = 1.25,
     pad_bottom: float = 1.0,
     upscale: int = 3,
+    superres: str | Mapping[str, Any] | SuperResLike | None = None,
     keep: str = KEEP,
     fill_holes: bool = FILL_HOLES,
     detach: float = DETACH,
@@ -622,6 +653,8 @@ def carve_head(
     pad_x, pad_top, pad_bottom: the crop around the face, in face-box widths
         (each side) and heights (above, below)
     upscale: matte at this whole factor (heads are small in a frame)
+    superres: super-resolve the crop first (:func:`carve`'s): the head is
+        normalised from the new pixels instead of interpolated ones
     face_h, centre: the face box is scaled to ``face_h`` px high and its
         centre put on ``centre``, unless the head would then leave the canvas
         (less ``margin``), in which case it is scaled down to fit
@@ -646,6 +679,7 @@ def carve_head(
     cv2 = _cv2()
     rgb = load_rgb(image)
     up = _upscale_factor(upscale)
+    sr = as_superres(superres)
     located_by = None
     if face is None:
         locator = locate or InsightFaceLocator()
@@ -682,6 +716,7 @@ def carve_head(
         holes=fill_holes,
         detach=detach,
         gate=gate,
+        superres=sr,
     )
     s = c.hint.scale
     # the neck cut stays soft: re-apply it after the holes were filled
@@ -779,6 +814,7 @@ def carve_head(
         "centre": list(centre),
         "margin": margin,
         "view": view,
+        **({"superres": sr.recipe()} if sr is not None else {}),
     }
     meta = {
         "region_in_source": list(c.region),
