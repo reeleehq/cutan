@@ -561,3 +561,24 @@ def test_rights_and_privacy_holes_found_in_round_two(tmp_path):
     assert "pw" not in json.dumps(signed.model_dump()) and "Amz" not in json.dumps(signed.model_dump())
     with pytest.raises(ValueError, match="data: URI"):
         frame_source("data:image/png;base64,AAAA", license=None)
+
+
+def test_write_prop_declares_grip_points_in_the_arts_uv(tmp_path):
+    src = frame_source("https://www.youtube.com/watch?v=abcdefghijk", t=3,
+                       license="all-rights-reserved")
+    part = carve(_img("cartoon"), point=(160, 150), detach=3, source=src)
+    grip = (150, 160)
+    doc = write_prop(part, tmp_path / "sabre",
+                     grips={"hand": {"at": grip, "toward": (170, 120)}, "off_hand": (165, 140)})
+    decl = doc.metadata["grip"]
+    assert decl["schema_version"] == "0.1.0"
+    hand, off = decl["points"]
+    assert hand["name"] == "hand" and set(hand) == {"name", "at", "toward"} and set(off) == {"name", "at"}
+    (px, py), = part.to_part([grip])
+    w, h = part.size
+    assert hand["at"] == [round(px / w, 4), round(py / h, 4)]
+    on_disk = json.loads((tmp_path / "sabre" / "prop.json").read_text())
+    assert on_disk["metadata"]["grip"] == decl
+    with pytest.raises(ValueError, match="grip 'bad'"):
+        write_prop(part, tmp_path / "x", grips={"bad": {"toward": (1, 2)}})
+    assert "grip" not in write_prop(part, tmp_path / "plain").metadata

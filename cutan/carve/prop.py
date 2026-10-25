@@ -13,6 +13,13 @@ from a shell.) One pixel of the carving is one view_box unit times ``unit``,
 and each part declares its size, so the prop draws the same whatever the
 resolution the art was carved at.
 
+**Where a hand holds it.** ``grips=`` declares named grip points (a sabre's
+hilt, a mug's handle) in the source's pixels, the same frame as ``point``; they
+are written under the prop's ``metadata.grip`` (:data:`GRIP_KEY`) in the art's
+``(u, v)``, the shape ``body_attachment`` sockets use, so a rig's hand (cutan#97,
+cutan#104) can be put on them. A grip may also name ``toward``: a second point
+giving the held axis (the blade's tip), so the prop can be turned to the hand.
+
 **Rights are never loosened by accident.** A descriptor with no ``source``
 means "we made this" to ``an``, so a carving with no provenance is refused
 unless the caller says the art is its own (``ours=True``). A ``source=`` that
@@ -33,12 +40,18 @@ from an.stage.props import PropDescriptor
 from cutan.carve.core import Carving
 from cutan.carve.parts import PartSet
 
-__all__ = ["BASE_SLOT", "ROOT_BONE", "write_prop"]
+__all__ = ["BASE_SLOT", "GRIP_KEY", "ROOT_BONE", "write_prop"]
 
 #: The bone every carved prop hangs from, at the carving's anchor.
 ROOT_BONE: str = "root"
 #: The slot of the base art (a single-part prop's only slot).
 BASE_SLOT: str = "body"
+#: The persisted key under a prop document's ``metadata`` for its grip points. Never renamed.
+GRIP_KEY: str = "grip"
+#: The version of the grip declaration this module writes.
+GRIP_SCHEMA_VERSION: str = "0.1.0"
+
+Point = tuple[float, float]
 
 
 def _looser(new: AssetSource, old: AssetSource) -> bool:
@@ -86,6 +99,53 @@ def _provenance(
     return source.model_copy(update={"extra": extra})
 
 
+def _grip_points(
+    carving: Carving, grips: Mapping[str, Point | Mapping[str, Point]]
+) -> dict[str, Any]:
+    """``grips`` (source pixels) as the ``metadata.grip`` declaration, in the art's ``(u, v)``.
+
+    >>> import numpy as np
+    >>> img = np.full((60, 80, 3), 250, np.uint8); img[15:45, 20:60] = (30, 90, 200)
+    >>> from cutan.carve import carve
+    >>> part = carve(img, point=(30, 40))
+    >>> g = _grip_points(part, {"hand": (30, 40), "guard": {"at": (40, 30), "toward": (55, 20)}})
+    >>> g["points"][0]["at"] == [round(a, 4) for a in part.anchor]   # the carve's point IS its anchor
+    True
+    >>> [p["name"] for p in g["points"]], sorted(g["points"][1])
+    (['hand', 'guard'], ['at', 'name', 'toward'])
+    """
+    w, h = carving.size
+
+    def uv(p: Any, name: str) -> list[float]:
+        try:
+            x, y = (float(v) for v in p)
+        except (TypeError, ValueError):
+            raise ValueError(
+                f"grip {name!r}: a point is (x, y) in the source's pixels, not {p!r}"
+            ) from None
+        (px, py), = carving.to_part([(x, y)])
+        return [round(px / w, 4), round(py / h, 4)]
+
+    points = []
+    for name, spec in grips.items():
+        if not str(name).strip():
+            raise ValueError("a grip needs a non-empty name")
+        if isinstance(spec, Mapping):
+            unknown = set(spec) - {"at", "toward"}
+            if "at" not in spec or unknown:
+                raise ValueError(
+                    f"grip {name!r}: a mapping takes 'at' (required) and 'toward', "
+                    f"not {sorted(unknown) or 'no at'}"
+                )
+            entry = {"name": str(name), "at": uv(spec["at"], name)}
+            if spec.get("toward") is not None:
+                entry["toward"] = uv(spec["toward"], name)
+        else:
+            entry = {"name": str(name), "at": uv(spec, name)}
+        points.append(entry)
+    return {"schema_version": GRIP_SCHEMA_VERSION, "points": points}
+
+
 def write_prop(
     carved: Carving | PartSet,
     folder: str | Path,
@@ -97,6 +157,7 @@ def write_prop(
     source: AssetSource | None = None,
     ours: bool = False,
     relicense: Mapping[str, str] | None = None,
+    grips: Mapping[str, Point | Mapping[str, Point]] | None = None,
     overwrite: bool = False,
 ) -> PropDescriptor:
     """Write ``carved`` to ``folder`` as ``prop.json`` + ``parts/*.png``; return the descriptor.
@@ -111,6 +172,10 @@ def write_prop(
         ``source`` that loosens the carving's licence class. Recorded in the
         descriptor's ``source.extra.relicensed``; ``an library publish`` does not
         read it, so say it again there (``relicense=``) when publishing.
+    grips: named points where a hand holds the prop, in the source's pixels:
+        ``{"hand": (x, y)}`` or ``{"hand": {"at": (x, y), "toward": (x, y)}}``
+        (``toward``: the held axis, e.g. a blade's tip). Written to
+        ``metadata.grip`` in the art's ``(u, v)``; see the module docstring.
 
     A :class:`~cutan.carve.PartSet` is written with its carving's provenance:
     build one with :func:`~cutan.carve.split_parts` (its parts are cut from
@@ -192,7 +257,8 @@ def write_prop(
                     "mode": carving.mode,
                     "anchor": list(carving.anchor),
                     **carving.meta,
-                }
+                },
+                **({GRIP_KEY: _grip_points(carving, grips)} if grips else {}),
             },
         }
     )
