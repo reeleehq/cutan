@@ -561,3 +561,36 @@ def test_rights_and_privacy_holes_found_in_round_two(tmp_path):
     assert "pw" not in json.dumps(signed.model_dump()) and "Amz" not in json.dumps(signed.model_dump())
     with pytest.raises(ValueError, match="data: URI"):
         frame_source("data:image/png;base64,AAAA", license=None)
+
+
+def test_write_prop_landmarks_are_the_rigs_named_points(tmp_path):
+    """A landmark is a slotless bone on the root, and an reads it where it was
+    given: ``rig_structure``'s anchor of that name sits at the source point."""
+    from an.stage.rig import SCENE_PX_PER_VIEW_BOX, rig_structure
+
+    src = frame_source("https://www.youtube.com/watch?v=abcdefghijk", t=3,
+                       license="all-rights-reserved")
+    part = carve(_img("cartoon"), point=(160, 150), detach=3, source=src)
+    grip, tip = (150, 160), (170, 120)
+    doc = write_prop(part, tmp_path / "sabre", max_side=100, landmarks={"grip": grip, "tip": tip})
+    assert [b.name for b in doc.bones] == ["root", "grip", "tip"]
+    assert all(b.parent == "root" for b in doc.bones[1:])
+    assert {s.bone for s in doc.slots} == {"root"}  # landmarks draw nothing
+    on_disk = PropDescriptor.model_validate_json((tmp_path / "sabre" / "prop.json").read_text())
+    anchors = rig_structure(on_disk).anchors
+    k = SCENE_PX_PER_VIEW_BOX / doc.view_box[3]
+    unit = doc.view_box[3] / part.size[1]
+    for name, at in (("grip", grip), ("tip", tip)):
+        (px, py), (ax, ay) = part.to_part([at])[0], (part.anchor[0] * part.size[0], part.anchor[1] * part.size[1])
+        want = ((px - ax) * unit * k, (py - ay) * unit * k)
+        assert np.allclose(anchors[name].offset, want, atol=0.05 * k), (name, anchors[name].offset, want)
+    # a landmark never moves where the prop stands: the root (its anchor) is the origin
+    assert anchors["root"].offset == (0.0, 0.0) and tuple(doc.origin) == (0.0, 0.0)
+    with pytest.warns(UserWarning, match="far outside the part"):
+        write_prop(part, tmp_path / "slip", landmarks={"grip": (5000, -900)})
+    for bad, match in (({"a@b": grip}, "after '@'"), ({"a:b": grip}, "after '@'"),
+                       ({"root": grip}, "already a bone"), ({"grip": (1,)}, "a point is"),
+                       ({"grip": (float("nan"), 1)}, "finite")):
+        with pytest.raises(ValueError, match=match):
+            write_prop(part, tmp_path / "x", landmarks=bad, overwrite=True)
+    assert [b.name for b in write_prop(part, tmp_path / "plain").bones] == ["root"]
