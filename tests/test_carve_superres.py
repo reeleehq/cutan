@@ -230,3 +230,22 @@ def test_the_real_model_sharpens_a_thin_line():
     # the model's edge is harder than interpolation's: fewer half-transparent pixels
     soft = lambda p: float(((p.alpha > 0.1) & (p.alpha < 0.9)).mean())  # noqa: E731
     assert soft(part) < soft(interp)
+
+
+def test_landmarks_of_a_superresolved_part_stay_at_their_source_points(tmp_path):
+    from an.stage.rig import SCENE_PX_PER_VIEW_BOX, rig_structure
+
+    plain = carve(_img("cartoon"), point=(160, 150), detach=3)
+    big = carve(_img("cartoon"), point=(160, 150), detach=3, superres=Resample(4))
+    marks = {"grip": (150, 160), "tip": (170, 120)}
+    # the same prop drawn from 4x the pixels: its points land at the same scene place
+    a, b = (
+        rig_structure(write_prop(p, tmp_path / n, ours=True, landmarks=marks)).anchors
+        for p, n in ((plain, "plain"), (big, "big"))
+    )
+    ka = SCENE_PX_PER_VIEW_BOX / plain.size[1]
+    kb = SCENE_PX_PER_VIEW_BOX / big.size[1]
+    for name in marks:
+        assert np.allclose(
+            np.divide(a[name].offset, ka), np.divide(b[name].offset, kb * 4), atol=0.5
+        )
