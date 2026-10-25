@@ -91,6 +91,7 @@ def _split_arm(d: Path) -> None:
 
 
 def _shot(cup_at: tuple[float, float]) -> Shot:
+    grasp = {"kind": "grasp", "by": "ned@hand_r", "item": "cup"}
     return Shot.model_validate(
         {
             "id": "s",
@@ -112,7 +113,10 @@ def _shot(cup_at: tuple[float, float]) -> Shot:
                 },
             ],
             "actions": [
-                {"kind": "grasp", "by": "ned@hand_r", "item": "cup", "start": 0.3}
+                {
+                    "kind": "sequence",
+                    "children": [{"kind": "delay", "duration": 0.3}, grasp],
+                }
             ],
         }
     )
@@ -141,16 +145,36 @@ def test_a_character_rig_names_its_hands():
 
 @pytest.mark.parametrize("elbow", [False, True], ids=["one-piece arm", "elbow"])
 def test_a_character_takes_a_cup_by_its_hand(tmp_path, elbow):
-    project = load(_project(tmp_path / "p", elbow=elbow))
+    """The grip is on the far end of the arm's LAST part (the forearm when there
+    is an elbow) at the frame the cup is taken, measured on the compiled nodes."""
+    from an.stage.solve import _local_box, _pivot, end_effector
+    from an.stage.tree import walk_children
+
+    root = _project(tmp_path / "p", elbow=elbow)
+    desc = json.loads(
+        (root / "assets" / "characters" / "ned" / "character.json").read_text()
+    )
+    slot, point = character_landmarks(desc)["hand_r"]
+    assert (slot, point) == (("fore_r" if elbow else "arm_r"), None)
+    project = load(root)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         doc = compile_shot(_shot((70.0, 60.0)), project.mall, fps=24, width=W, height=H)
-    holds = doc.meta.extensions["solve"]["holds"]
-    (g,) = holds["gestures"]
-    assert g["by"] == "ned@hand_r" and g["gap"] <= 0.5, g
+    (g,) = doc.meta.extensions["solve"]["holds"]["gestures"]
+    assert g["by"] == "ned@hand_r" and g["start"] == 0.3 and g["gap"] <= 0.5, g
     contact = round(g["contact"] * 24) / 24
     pose = evaluate_timeline(timeline_from_scene(doc), contact)
-    k = 345.0 / 400.0 * 0.3  # the cup's scene px per view-box unit at stage scale 0.3
+    nodes = dict(walk_children(doc.scene))
+    part = next(
+        p
+        for p in nodes
+        if p.startswith("ned/") and p.endswith("/" + slot) or p == f"ned/{slot}"
+    )
+    hand = screen_position(
+        doc,
+        part,
+        pose=pose,
+        point=end_effector(_local_box(nodes[part]), _pivot(nodes[part])),
+    )
     grip = screen_position(doc, "cup", pose=pose, point=(30.0 * 345.0 / 400.0, 0.0))
-    hand = holds["gestures"][0]["hand"]
-    assert math.dist(grip, (hand[0] + W / 2, hand[1] + H / 2)) < 0.5 + k
+    assert math.dist(hand, grip) < 0.5
