@@ -13,12 +13,14 @@ from a shell.) One pixel of the carving is one view_box unit times ``unit``,
 and each part declares its size, so the prop draws the same whatever the
 resolution the art was carved at.
 
-**Where a hand holds it.** ``grips=`` declares named grip points (a sabre's
-hilt, a mug's handle) in the source's pixels, the same frame as ``point``; they
-are written under the prop's ``metadata.grip`` (:data:`GRIP_KEY`) in the art's
-``(u, v)``, the shape ``body_attachment`` sockets use, so a rig's hand (cutan#97,
-cutan#104) can be put on them. A grip may also name ``toward``: a second point
-giving the held axis (the blade's tip), so the prop can be turned to the hand.
+**Where a hand holds it.** ``landmarks=`` names points of the prop (a sabre's
+grip and its tip, a mug's handle) in the source's pixels, the same frame as
+``point``. Each is written as a bone with no slot, hung from the root: what
+``an`` reads as a rig's named point (``an.stage.rig.rig_structure``'s
+``anchors``), so a scene addresses it as ``<prop>@<name>`` (a joint's
+``wheel@grip``), and a bone called :data:`GRIP` is where the hold verbs take
+the prop by default (an#502). Two landmarks give an axis: ``grip`` and ``tip``
+say which way the blade points from the hand.
 
 **Rights are never loosened by accident.** A descriptor with no ``source``
 means "we made this" to ``an``, so a carving with no provenance is refused
@@ -40,16 +42,18 @@ from an.stage.props import PropDescriptor
 from cutan.carve.core import Carving
 from cutan.carve.parts import PartSet
 
-__all__ = ["BASE_SLOT", "GRIP_KEY", "ROOT_BONE", "write_prop"]
+__all__ = ["BASE_SLOT", "GRIP", "ROOT_BONE", "write_prop"]
 
 #: The bone every carved prop hangs from, at the carving's anchor.
 ROOT_BONE: str = "root"
 #: The slot of the base art (a single-part prop's only slot).
 BASE_SLOT: str = "body"
-#: The persisted key under a prop document's ``metadata`` for its grip points. Never renamed.
-GRIP_KEY: str = "grip"
-#: The version of the grip declaration this module writes.
-GRIP_SCHEMA_VERSION: str = "0.1.0"
+#: The landmark a hand takes a prop by when a scene names no other (an's hold
+#: verbs read a bone of this name; an#502).
+GRIP: str = "grip"
+#: Characters a landmark's name may not hold: a scene addresses it as
+#: ``<prop>@<name>``, and ``u,v`` there is a fraction of the drawing.
+_NOT_IN_A_LANDMARK = frozenset("@/, \t\n")
 
 Point = tuple[float, float]
 
@@ -99,51 +103,54 @@ def _provenance(
     return source.model_copy(update={"extra": extra})
 
 
-def _grip_points(
-    carving: Carving, grips: Mapping[str, Point | Mapping[str, Point]]
-) -> dict[str, Any]:
-    """``grips`` (source pixels) as the ``metadata.grip`` declaration, in the art's ``(u, v)``.
+def _landmark_bones(
+    carving: Carving,
+    landmarks: Mapping[str, Point],
+    *,
+    unit: float,
+    taken: set[str],
+) -> list[dict[str, Any]]:
+    """``landmarks`` (source pixels) as slotless bones hung from the root, in
+    view_box units from the carving's anchor (where the root bone sits).
 
     >>> import numpy as np
     >>> img = np.full((60, 80, 3), 250, np.uint8); img[15:45, 20:60] = (30, 90, 200)
     >>> from cutan.carve import carve
     >>> part = carve(img, point=(30, 40))
-    >>> g = _grip_points(part, {"hand": (30, 40), "guard": {"at": (40, 30), "toward": (55, 20)}})
-    >>> g["points"][0]["at"] == [round(a, 4) for a in part.anchor]   # the carve's point IS its anchor
-    True
-    >>> [p["name"] for p in g["points"]], sorted(g["points"][1])
-    (['hand', 'guard'], ['at', 'name', 'toward'])
+    >>> _landmark_bones(part, {"grip": (30, 40), "tip": (55, 20)}, unit=0.5, taken={"root"})
+    [{'name': 'grip', 'parent': 'root', 'x': 0.0, 'y': 0.0}, {'name': 'tip', 'parent': 'root', 'x': 12.5, 'y': -10.0}]
     """
     w, h = carving.size
-
-    def uv(p: Any, name: str) -> list[float]:
+    ax, ay = carving.anchor[0] * w, carving.anchor[1] * h
+    bones = []
+    for name, at in landmarks.items():
+        name = str(name)
+        if not name.strip() or set(name) & _NOT_IN_A_LANDMARK:
+            raise ValueError(
+                f"a landmark's name is what a scene writes after '@' (stu@hand_r, "
+                f"sabre@grip): no '@', '/', ',' or spaces, not {name!r}"
+            )
+        if name in taken:
+            raise ValueError(
+                f"landmark {name!r} is already a bone of this prop (the root or a part)"
+            )
         try:
-            x, y = (float(v) for v in p)
+            x, y = (float(v) for v in at)
         except (TypeError, ValueError):
             raise ValueError(
-                f"grip {name!r}: a point is (x, y) in the source's pixels, not {p!r}"
+                f"landmark {name!r}: a point is (x, y) in the source's pixels, not {at!r}"
             ) from None
-        (px, py), = carving.to_part([(x, y)])
-        return [round(px / w, 4), round(py / h, 4)]
-
-    points = []
-    for name, spec in grips.items():
-        if not str(name).strip():
-            raise ValueError("a grip needs a non-empty name")
-        if isinstance(spec, Mapping):
-            unknown = set(spec) - {"at", "toward"}
-            if "at" not in spec or unknown:
-                raise ValueError(
-                    f"grip {name!r}: a mapping takes 'at' (required) and 'toward', "
-                    f"not {sorted(unknown) or 'no at'}"
-                )
-            entry = {"name": str(name), "at": uv(spec["at"], name)}
-            if spec.get("toward") is not None:
-                entry["toward"] = uv(spec["toward"], name)
-        else:
-            entry = {"name": str(name), "at": uv(spec, name)}
-        points.append(entry)
-    return {"schema_version": GRIP_SCHEMA_VERSION, "points": points}
+        ((px, py),) = carving.to_part([(x, y)])
+        taken.add(name)
+        bones.append(
+            {
+                "name": name,
+                "parent": ROOT_BONE,
+                "x": round((px - ax) * unit, 3) + 0.0,
+                "y": round((py - ay) * unit, 3) + 0.0,
+            }
+        )
+    return bones
 
 
 def write_prop(
@@ -157,7 +164,7 @@ def write_prop(
     source: AssetSource | None = None,
     ours: bool = False,
     relicense: Mapping[str, str] | None = None,
-    grips: Mapping[str, Point | Mapping[str, Point]] | None = None,
+    landmarks: Mapping[str, Point] | None = None,
     overwrite: bool = False,
 ) -> PropDescriptor:
     """Write ``carved`` to ``folder`` as ``prop.json`` + ``parts/*.png``; return the descriptor.
@@ -172,10 +179,10 @@ def write_prop(
         ``source`` that loosens the carving's licence class. Recorded in the
         descriptor's ``source.extra.relicensed``; ``an library publish`` does not
         read it, so say it again there (``relicense=``) when publishing.
-    grips: named points where a hand holds the prop, in the source's pixels:
-        ``{"hand": (x, y)}`` or ``{"hand": {"at": (x, y), "toward": (x, y)}}``
-        (``toward``: the held axis, e.g. a blade's tip). Written to
-        ``metadata.grip`` in the art's ``(u, v)``; see the module docstring.
+    landmarks: named points of the prop in the source's pixels, each written
+        as a slotless bone on the root: ``{"grip": (x, y), "tip": (x, y)}``
+        (``grip``, :data:`GRIP`, is where a hand takes it). See the module
+        docstring.
 
     A :class:`~cutan.carve.PartSet` is written with its carving's provenance:
     build one with :func:`~cutan.carve.split_parts` (its parts are cut from
@@ -242,6 +249,10 @@ def write_prop(
             attach(part.name, part.name, part.image, part.anchor, part.draw_order)
     else:
         attach(BASE_SLOT, ROOT_BONE, carving.image, carving.anchor, 0)
+    if landmarks:
+        bones += _landmark_bones(
+            carving, landmarks, unit=unit, taken={b["name"] for b in bones}
+        )
 
     doc = PropDescriptor.model_validate(
         {
@@ -257,8 +268,7 @@ def write_prop(
                     "mode": carving.mode,
                     "anchor": list(carving.anchor),
                     **carving.meta,
-                },
-                **({GRIP_KEY: _grip_points(carving, grips)} if grips else {}),
+                }
             },
         }
     )

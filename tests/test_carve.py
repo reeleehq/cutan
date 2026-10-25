@@ -563,22 +563,30 @@ def test_rights_and_privacy_holes_found_in_round_two(tmp_path):
         frame_source("data:image/png;base64,AAAA", license=None)
 
 
-def test_write_prop_declares_grip_points_in_the_arts_uv(tmp_path):
+def test_write_prop_landmarks_are_the_rigs_named_points(tmp_path):
+    """A landmark is a slotless bone on the root, and an reads it where it was
+    given: ``rig_structure``'s anchor of that name sits at the source point."""
+    from an.stage.rig import SCENE_PX_PER_VIEW_BOX, rig_structure
+
     src = frame_source("https://www.youtube.com/watch?v=abcdefghijk", t=3,
                        license="all-rights-reserved")
     part = carve(_img("cartoon"), point=(160, 150), detach=3, source=src)
-    grip = (150, 160)
-    doc = write_prop(part, tmp_path / "sabre",
-                     grips={"hand": {"at": grip, "toward": (170, 120)}, "off_hand": (165, 140)})
-    decl = doc.metadata["grip"]
-    assert decl["schema_version"] == "0.1.0"
-    hand, off = decl["points"]
-    assert hand["name"] == "hand" and set(hand) == {"name", "at", "toward"} and set(off) == {"name", "at"}
-    (px, py), = part.to_part([grip])
-    w, h = part.size
-    assert hand["at"] == [round(px / w, 4), round(py / h, 4)]
-    on_disk = json.loads((tmp_path / "sabre" / "prop.json").read_text())
-    assert on_disk["metadata"]["grip"] == decl
-    with pytest.raises(ValueError, match="grip 'bad'"):
-        write_prop(part, tmp_path / "x", grips={"bad": {"toward": (1, 2)}})
-    assert "grip" not in write_prop(part, tmp_path / "plain").metadata
+    grip, tip = (150, 160), (170, 120)
+    doc = write_prop(part, tmp_path / "sabre", max_side=100, landmarks={"grip": grip, "tip": tip})
+    assert [b.name for b in doc.bones] == ["root", "grip", "tip"]
+    assert all(b.parent == "root" for b in doc.bones[1:])
+    assert {s.bone for s in doc.slots} == {"root"}  # landmarks draw nothing
+    on_disk = PropDescriptor.model_validate_json((tmp_path / "sabre" / "prop.json").read_text())
+    anchors = rig_structure(on_disk).anchors
+    k = SCENE_PX_PER_VIEW_BOX / doc.view_box[3]
+    unit = doc.view_box[3] / part.size[1]
+    for name, at in (("grip", grip), ("tip", tip)):
+        (px, py), (ax, ay) = part.to_part([at])[0], (part.anchor[0] * part.size[0], part.anchor[1] * part.size[1])
+        want = ((px - ax) * unit * k, (py - ay) * unit * k)
+        got = np.subtract(anchors[name].offset, anchors["root"].offset)
+        assert np.allclose(got, want, atol=0.05 * k), (name, got, want)
+    for bad, match in (({"a@b": grip}, "after '@'"), ({"root": grip}, "already a bone"),
+                       ({"grip": (1,)}, "a point is")):
+        with pytest.raises(ValueError, match=match):
+            write_prop(part, tmp_path / "x", landmarks=bad, overwrite=True)
+    assert [b.name for b in write_prop(part, tmp_path / "plain").bones] == ["root"]
