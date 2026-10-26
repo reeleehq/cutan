@@ -82,9 +82,14 @@ def replace_part_art(
     except (OSError, ValueError) as e:
         raise SetPartError(f"{picture.name} is not a readable picture: {e}") from None
     new_rel = str(Path(old_rel).with_suffix(picture.suffix.lower()).as_posix())
-    old_file, new_file = inside_folder(char_dir, old_rel), inside_folder(char_dir, new_rel)
+    old_file, new_file = (
+        inside_folder(char_dir, old_rel),
+        inside_folder(char_dir, new_rel),
+    )
     if old_file is None or new_file is None:
-        raise SetPartError(f"{old_rel!r} leaves the character's folder: {ASSET_REF_RULE}")
+        raise SetPartError(
+            f"{old_rel!r} leaves the character's folder: {ASSET_REF_RULE}"
+        )
     width = None
     if old_file.is_file():
         try:

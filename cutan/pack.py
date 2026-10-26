@@ -805,8 +805,14 @@ def _build_and_check(
                 rel = src.relative_to(d)
                 problem = _redrawn_problem(src, chars / d.name / rel)
                 if problem is None and (
-                    (src.suffix == ".svg" and any(src.with_suffix(x).is_file() for x in IMAGE_SIGNATURES))
-                    or (src.suffix in IMAGE_SIGNATURES and src.with_suffix(".svg").is_file())
+                    (
+                        src.suffix == ".svg"
+                        and any(src.with_suffix(x).is_file() for x in IMAGE_SIGNATURES)
+                    )
+                    or (
+                        src.suffix in IMAGE_SIGNATURES
+                        and src.with_suffix(".svg").is_file()
+                    )
                 ):
                     problem = (
                         f"two drawings for {rel.with_suffix('').as_posix()}: keep "
