@@ -358,7 +358,7 @@ def from_sheet(name: str, sheet: str, recipe: str, out_dir: str = "") -> str:
     try:
         parts, source, ours = load_recipe(json.loads(Path(recipe).read_text(encoding="utf-8")))
         report = sheet_to_package(sheet, parts, char_dir, source=source, ours=ours)
-    except (SetPartError, MissingDependencyError, OSError, ValueError, KeyError) as e:
+    except (SetPartError, MissingDependencyError, OSError, ValueError, KeyError, TypeError) as e:
         return failed(f"{type(e).__name__}: {e}")
     return report.format()
 

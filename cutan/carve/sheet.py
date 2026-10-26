@@ -101,6 +101,10 @@ class SheetPart:
             raise ValueError(f"{self.attachment!r}: a part needs its `crop`")
         if self.mode == "head" and self.crop is not None:
             raise ValueError(f"{self.attachment!r}: a head is found by carve['face'], not a crop")
+        if self.mode == "head" and "face" not in self.carve:
+            raise ValueError(
+                f"{self.attachment!r}: a head needs carve['face'] (a sheet has several faces)"
+            )
         if clash := _OWNED & set(self.carve):
             raise ValueError(
                 f"{self.attachment!r}: {sorted(clash)} are not recipe arguments "
@@ -153,7 +157,9 @@ def load_recipe(doc: Mapping[str, Any]) -> tuple[list[SheetPart], AssetSource | 
     ``{"schema_version": 1, "source": {frame_source's arguments} | null,
     "ours": false, "parts": [{"attachment", "crop", "carve", "mode"}]}``
     """
-    version = doc.get("schema_version", RECIPE_SCHEMA_VERSION)
+    if not isinstance(doc, Mapping) or "parts" not in doc:
+        raise ValueError('a recipe is a JSON object with a "parts" list')
+    version = doc.get("schema_version", RECIPE_SCHEMA_VERSION)  # absent: the current one
     if version != RECIPE_SCHEMA_VERSION:
         raise ValueError(f"recipe schema_version {version!r}; this reads {RECIPE_SCHEMA_VERSION}")
     source = frame_source(**doc["source"]) if doc.get("source") else None
@@ -166,8 +172,12 @@ def _snapshot(char_dir: Path, into: Path) -> Path:
 
 
 def _restore(snapshot: Path, char_dir: Path) -> None:
+    """Put ``snapshot`` back: the copy is made beside the character first, so a
+    failure to remove the half-written one cannot leave nothing behind."""
+    beside = char_dir.with_name(char_dir.name + ".restore")
+    shutil.copytree(snapshot, beside)
     shutil.rmtree(char_dir)
-    shutil.copytree(snapshot, char_dir)
+    beside.rename(char_dir)
 
 
 def sheet_to_package(

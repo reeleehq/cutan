@@ -168,3 +168,18 @@ def test_a_recipe_of_another_version_is_refused():
 
     with pytest.raises(ValueError, match="schema_version 2"):
         load_recipe({"schema_version": 2, "parts": []})
+
+
+def test_cli_reports_recipe_typos_instead_of_a_traceback(char, sheet, tmp_path):
+    from cutan.characters.cli import from_sheet
+
+    Image.fromarray(sheet).save(tmp_path / "sheet.png")
+    for i, doc in enumerate([[], {"parts": [{"attachment": "head", "crop": [0, 0, 9, 9], "typo": 1}]}, {"ours": True}]):
+        (tmp_path / f"{i}.json").write_text(json.dumps(doc))
+        out = from_sheet(char.name, str(tmp_path / "sheet.png"), str(tmp_path / f"{i}.json"), out_dir=str(char.parent))
+        assert "Error" in out and "Traceback" not in out
+
+
+def test_a_head_needs_its_face():
+    with pytest.raises(ValueError, match="needs carve"):
+        SheetPart("head", mode="head")
