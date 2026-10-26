@@ -11,7 +11,7 @@ Use this only when neither the reelee connector's `reelee_check_production_pack`
 
 **Pictures** (PNG, JPEG, WebP)
 - [ ] Each is a real file of its format (not renamed), at most 40 MB; layers above the sky and every prop have a transparent background; a prop is 1024x1024.
-- [ ] None is a redrawn factory part (those are SVG for now): a character's pictures go under `reference/`.
+- [ ] A picture that replaces a factory part is named like the factory's SVG (`parts/head.png` for `parts/head.svg`) and has a transparent background; a whole reference sheet goes under `reference/`.
 - [ ] Each has its maker and tool recorded (`source`, or `PRODUCTION.md`).
 
 **SVG drawings**

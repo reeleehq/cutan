@@ -351,7 +351,8 @@ ART_KINDS: dict[str, ArtKind] = {
                 "head (no eyes or mouth drawn on it), torso, each arm, each leg; eyes "
                 "open and closed; nine mouth shapes",
                 "each limb with a little extra at the joint so the pieces overlap",
-                "a redrawn part of a factory character must be SVG for now (cutan#92)",
+                "a part that replaces a factory character's own is a PNG with alpha named like the "
+                "factory's SVG (`assets/characters/<name>/parts/head.png` for `parts/head.svg`)",
             ),
             framing="A single body part of a cut-out puppet, isolated on a plain flat "
             "white background, flat even lighting, no text",
