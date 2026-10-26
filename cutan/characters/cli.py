@@ -34,6 +34,7 @@ from cutan.characters.descriptor_io import (
     validate_raw,
     write_descriptor,
 )
+from cutan.characters.patterns import resolve_tile_paths
 from cutan.characters.factory import DFLT_HAIR_LENGTH, DFLT_HAIR_STYLE
 from cutan.characters.factory import new_character as _new_character
 from cutan.characters.validate import format_report as _format_report
@@ -106,7 +107,9 @@ def new(
     clothing_pattern: a print on the clothing (torso in every view, sleeves):
         stripes, check or floral, with colours and scale as
         "floral:base=#e8735a,motif=#ffffff,leaf=#2f6b3a,scale=1" (base is the
-        clothing colour; none, the default, is a flat fill)
+        clothing colour; none, the default, is a flat fill); or your own tile,
+        "tile:image=tile.png,scale=1" (a PNG up to 32 px a side and 3 KB; its
+        pixels are drawn as vectors, and its bytes are recorded in the descriptor)
     views: draw the turnaround — back, side (a profile facing right) and
         three_quarter beside the front, as a `view` swap set (offline head
         only), so `play: turn` can turn the character (an#197)
@@ -147,7 +150,7 @@ def new(
             hair_style=hair_style,
             hair_length=hair_length,
             feet_origin=feet_origin,
-            clothing_pattern=clothing_pattern or None,
+            clothing_pattern=resolve_tile_paths(clothing_pattern or None),
         )
     except ValueError as e:
         # A licence refusal is a message for a human, not a traceback. The

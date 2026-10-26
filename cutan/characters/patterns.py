@@ -10,9 +10,17 @@ recolours it; the print's own literals carry no role and are made distinct from
 the part's role literals, so a swap never catches them. The swap channels and
 the rig contract are untouched: a print is paint, not geometry.
 
+``tile`` is a print you draw yourself: a small PNG (:data:`MAX_TILE_SIDE` px a side,
+:data:`MAX_TILE_BYTES` bytes), one pixel per rect. It is vectors on purpose: the
+core refuses an ``<image>`` inside a part's SVG (an#211: it hides its pixels from
+every check), and the tile's bytes live in the recorded spec as base64, so the
+factory's recipe replays it on any machine (a file path could not be replayed).
+:func:`read_tile` turns a file into that base64.
+
 A spec is one string on the command line or one mapping in the descriptor::
 
     floral:base=#e8735a,motif=#ffffff,leaf=#2f6b3a
+    tile:image=<base64 of a small PNG>,base=#345678
     stripes
     check:scale=0.7
     none
@@ -28,7 +36,12 @@ True
 
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+import base64
+import binascii
+import functools
+import io
+from dataclasses import dataclass, field, replace
+from pathlib import Path
 from typing import Mapping, Optional, Union
 
 from cutan.characters.colour_roles import distinct_literal, normalise_hex
@@ -42,10 +55,23 @@ __all__ = [
     "pattern_overlay",
     "painted_fill",
     "distinct_pattern",
+    "read_tile",
+    "resolve_tile_paths",
+    "MAX_TILE_SIDE",
+    "MAX_TILE_BYTES",
 ]
 
 #: The prints the factory draws; ``none`` is the flat default.
-PATTERN_KINDS: tuple[str, ...] = ("none", "stripes", "check", "floral")
+PATTERN_KINDS: tuple[str, ...] = ("none", "stripes", "check", "floral", "tile")
+#: The print drawn from the caller's own PNG tile.
+TILE_KIND = "tile"
+#: A tile's limits: its PNG's bytes (they sit in the recipe, which is bounded) and its side.
+MAX_TILE_BYTES: int = 3_072
+MAX_TILE_SIDE: int = 32
+#: The first characters of any base64 PNG: how a path is told from inline bytes.
+_PNG_B64 = "iVBORw0KGgo"
+#: The 8-bit modes a tile may be in (a 16-bit one converts differently across Pillow versions).
+_TILE_MODES = ("1", "L", "LA", "P", "RGB", "RGBA")
 #: The id of the ``<pattern>`` element in a part, referenced by its overlay.
 PATTERN_ID: str = "clothing_print"
 #: The tile's side in a part's own units at ``scale`` 1: about seven across the
@@ -59,6 +85,7 @@ _PARAMS: dict[str, tuple[str, ...]] = {
     "stripes": ("base", "motif", "scale"),
     "check": ("base", "motif", "scale"),
     "floral": ("base", "motif", "leaf", "scale"),
+    TILE_KIND: ("base", "image", "scale"),
 }
 _MIN_SCALE, _MAX_SCALE = 0.25, 4.0
 
@@ -72,6 +99,10 @@ class ClothingPattern:
     motif: str = DFLT_MOTIF
     leaf: str = DFLT_LEAF
     scale: float = 1.0
+    #: ``tile``: the PNG, base64 (what the descriptor records).
+    image: Optional[str] = field(default=None, repr=False)
+    #: ``tile``: drawn colour per colour of the image, set by :func:`distinct_pattern`.
+    palette: tuple = field(default=(), compare=False, repr=False)
 
     def as_dict(self) -> dict:
         """The spec as a mapping, defaults left out: what the descriptor records."""
@@ -82,6 +113,8 @@ class ClothingPattern:
             out["motif"] = self.motif
         if self.kind == "floral" and self.leaf != DFLT_LEAF:
             out["leaf"] = self.leaf
+        if self.image is not None:
+            out["image"] = self.image
         if self.scale != 1.0:
             out["scale"] = self.scale
         return out
@@ -89,6 +122,95 @@ class ClothingPattern:
     @property
     def tile(self) -> float:
         return PATTERN_TILE * self.scale
+
+
+def _tile_png(data: bytes):
+    """The tile's pixels as an RGBA image, or ``ValueError`` saying why not."""
+    from PIL import Image
+
+    if len(data) > MAX_TILE_BYTES:
+        raise ValueError(
+            f"a clothing tile is at most {MAX_TILE_BYTES} bytes; this is {len(data)}"
+        )
+    try:
+        img = Image.open(io.BytesIO(data))
+        if img.format != "PNG":
+            raise ValueError("not a PNG")
+        size, mode = img.size, img.mode
+    except Exception as e:  # noqa: BLE001 - any decoder failure is "not a usable tile"
+        raise ValueError(f"a clothing tile must be a PNG: {e}") from None
+    if max(size) > MAX_TILE_SIDE:  # before the pixels are decoded
+        raise ValueError(
+            f"a clothing tile is at most {MAX_TILE_SIDE} px a side; this is {size[0]}x{size[1]}"
+        )
+    if mode not in _TILE_MODES or getattr(img, "n_frames", 1) > 1:
+        raise ValueError(
+            f"a clothing tile is one 8-bit PNG frame ({', '.join(_TILE_MODES)}); this is {mode}"
+            + (" with several frames" if mode in _TILE_MODES else "")
+        )
+    try:
+        img.load()
+    except Exception as e:  # noqa: BLE001
+        raise ValueError(f"a clothing tile must be a PNG: {e}") from None
+    return img.convert("RGBA")
+
+
+def read_tile(path: Union[str, Path]) -> str:
+    """A tile PNG file as the base64 a ``tile`` spec carries (checked on the way).
+
+    >>> import tempfile, pathlib
+    >>> from PIL import Image
+    >>> with tempfile.TemporaryDirectory() as d:
+    ...     Image.new("RGBA", (2, 2), (200, 30, 30, 255)).save(pathlib.Path(d) / "t.png")
+    ...     tile = read_tile(pathlib.Path(d) / "t.png")
+    >>> tile.startswith("iVBORw0KGgo") and parse_clothing_pattern({"kind": "tile", "image": tile}).kind
+    'tile'
+    """
+    try:
+        data = Path(path).read_bytes()
+    except OSError as e:
+        raise ValueError(f"clothing tile {str(path)!r} cannot be read: {e.strerror or e}") from None
+    _tile_png(data)
+    return base64.b64encode(data).decode("ascii")
+
+
+def resolve_tile_paths(spec: Union[str, Mapping, None]) -> Union[str, Mapping, None]:
+    """``spec`` with a file given as ``image=`` read into its base64, so the spec
+    that is recorded (and replayed elsewhere) holds the bytes, not a path.
+
+    >>> resolve_tile_paths("stripes")
+    'stripes'
+    >>> resolve_tile_paths({"kind": "tile", "image": "iVBORw0KGgoAAAA"})["image"]
+    'iVBORw0KGgoAAAA'
+    """
+    def one(value: object) -> object:
+        text = str(value)
+        return value if text.startswith(_PNG_B64) else read_tile(text)
+
+    if isinstance(spec, Mapping):
+        wanted = spec.get("kind") == TILE_KIND and "image" in spec
+        return {**spec, "image": one(spec["image"])} if wanted else spec
+    if not isinstance(spec, str) or "image=" not in spec:
+        return spec
+    kind, sep, rest = spec.partition(":")
+    if kind.strip() != TILE_KIND:  # the parser says what is wrong with it
+        return spec
+    items = []
+    for item in rest.split(","):
+        key, eq, value = item.partition("=")
+        items.append(f"{key}={one(value.strip())}" if key.strip() == "image" and eq else item)
+    return kind + sep + ",".join(items)
+
+
+def _image(value: object) -> str:
+    try:
+        data = base64.b64decode(str(value), validate=True)
+    except (binascii.Error, ValueError):
+        raise ValueError(
+            "clothing pattern image= is the base64 of a PNG (read_tile(path) makes it)"
+        ) from None
+    _tile_png(data)
+    return base64.b64encode(data).decode("ascii")
 
 
 def _colour(name: str, value: object) -> str:
@@ -110,7 +232,7 @@ def parse_clothing_pattern(
     >>> parse_clothing_pattern("plaid")
     Traceback (most recent call last):
     ...
-    ValueError: unknown clothing pattern 'plaid'; known: none, stripes, check, floral
+    ValueError: unknown clothing pattern 'plaid'; known: none, stripes, check, floral, tile
     >>> parse_clothing_pattern("stripes:leaf=#000")
     Traceback (most recent call last):
     ...
@@ -151,6 +273,8 @@ def parse_clothing_pattern(
             raise ValueError(
                 f"clothing pattern {kind!r} takes {', '.join(allowed)}; not {key!r}"
             )
+    if kind == TILE_KIND and "image" not in params:
+        raise ValueError("clothing pattern 'tile' needs image= (a small PNG, base64)")
     scale = params.get("scale", 1.0)
     try:
         scale = float(scale)
@@ -166,7 +290,29 @@ def parse_clothing_pattern(
         motif=_colour("motif", params["motif"]) if "motif" in params else DFLT_MOTIF,
         leaf=_colour("leaf", params["leaf"]) if "leaf" in params else DFLT_LEAF,
         scale=scale,
+        image=_image(params["image"]) if kind == TILE_KIND else None,
     )
+
+
+@functools.lru_cache(maxsize=32)
+def _decode_tile(image: str) -> tuple[tuple[int, int], tuple[tuple[int, int, int, str, int], ...]]:
+    """``((w, h), runs)`` of a base64 tile: ``(x, y, run, hex, alpha)`` for each
+    horizontal run of one colour (transparent pixels draw nothing)."""
+    img = _tile_png(base64.b64decode(image))
+    w, h = img.size
+    px = img.load()
+    runs = []
+    for y in range(h):
+        x = 0
+        while x < w:
+            r, g, b, a = px[x, y]
+            run = 1
+            while x + run < w and px[x + run, y] == (r, g, b, a):
+                run += 1
+            if a:
+                runs.append((x, y, run, f"#{r:02x}{g:02x}{b:02x}", a))
+            x += run
+    return (w, h), tuple(runs)
 
 
 def distinct_pattern(pattern: ClothingPattern, taken: set[str]) -> ClothingPattern:
@@ -176,6 +322,13 @@ def distinct_pattern(pattern: ClothingPattern, taken: set[str]) -> ClothingPatte
     >>> distinct_pattern(ClothingPattern("stripes", motif="#ffffff"), {"#ffffff"}).motif
     '#fffffe'
     """
+    if pattern.kind == TILE_KIND:
+        used = set(taken)
+        palette = {}
+        for colour in sorted({c for *_, c, _ in _decode_tile(pattern.image)[1]}):
+            palette[colour] = distinct_literal(colour, used)
+            used.add(palette[colour])
+        return replace(pattern, palette=tuple(sorted(palette.items())))
     motif = distinct_literal(pattern.motif, taken)
     leaf = distinct_literal(pattern.leaf, taken | {motif})
     return replace(pattern, motif=motif, leaf=leaf)
@@ -184,6 +337,21 @@ def distinct_pattern(pattern: ClothingPattern, taken: set[str]) -> ClothingPatte
 def _tile_content(pattern: ClothingPattern) -> str:
     t = pattern.tile
     m = pattern.motif
+    if pattern.kind == TILE_KIND:
+        (w, h), runs = _decode_tile(pattern.image)
+        k = t / max(w, h)
+        colours = dict(pattern.palette)
+        by_paint: dict[tuple[str, int], list[str]] = {}
+        for x, y, run, c, a in runs:
+            by_paint.setdefault((colours.get(c, c), a), []).append(
+                f"M{x * k:g} {y * k:g}h{run * k:g}v{k:g}h{-run * k:g}z"
+            )
+        return "".join(
+            f'<path d="{"".join(d)}" fill="{c}"'
+            + (f' fill-opacity="{a / 255:.3f}"' if a < 255 else "")
+            + ' shape-rendering="crispEdges"/>'
+            for (c, a), d in by_paint.items()
+        )
     if pattern.kind == "stripes":
         return f'<rect x="0" y="0" width="{t:g}" height="{t / 2:g}" fill="{m}"/>'
     if pattern.kind == "check":
@@ -220,9 +388,13 @@ def pattern_defs(pattern: ClothingPattern) -> str:
     True
     """
     t = pattern.tile
+    cw = ch = t
+    if pattern.kind == TILE_KIND:  # a tile that is not square repeats on its own cell
+        (w, h), _ = _decode_tile(pattern.image)
+        cw, ch = t * w / max(w, h), t * h / max(w, h)
     return (
         f'<defs><pattern id="{PATTERN_ID}" patternUnits="userSpaceOnUse" '
-        f'x="0" y="0" width="{t:g}" height="{t:g}">{_tile_content(pattern)}</pattern></defs>'
+        f'x="0" y="0" width="{cw:g}" height="{ch:g}">{_tile_content(pattern)}</pattern></defs>'
     )
 
 
