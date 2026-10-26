@@ -19,6 +19,7 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
+from an.ir.compose import delay, sequence
 from an.ir.schema import AssetRef, Shot, StagePlacement
 from an.ir.validate import validate_semantic
 from an.project import init, load
@@ -28,6 +29,7 @@ from an.stage.timeline import evaluate_timeline, screen_position, timeline_from_
 from an.stage.tree import walk_children
 from cutan.body_attachment import BODY_ATTACHMENT_KEY
 from cutan.characters import new_character
+from cutan.characters.registration import play
 from cutan.compile.body import body_attachment_pins, derive_body_placements
 
 ART = (400, 200)
@@ -225,3 +227,26 @@ def test_validate_says_when_the_motion_pulls_a_followed_socket_off_its_bone(proj
     # and a nod it can follow is silent
     quiet = _validate(project, _shot([NOD]), {"cutout.body_attachment"})
     assert [f for f in quiet.findings if "bone" in f.description and "socket" in f.description] == []
+
+
+# --- a view change mid-shot (cutan#98) -----------------------------------------
+
+
+def _swap_said(project, actions):
+    report = _validate(project, _shot(actions), {"cutout.body_attachment"})
+    return [f.description for f in report.findings if "changes to the" in f.description]
+
+
+def test_validate_says_when_the_character_changes_view_under_a_prop_drawn_from_the_front(project):
+    set_side = {"kind": "set", "target": "paul", "property": "view", "value": "side", "at": 0.5}
+    said = _swap_said(project, [set_side])
+    assert len(said) == 1 and "'side' view at 0.50 s" in said[0], said
+    turn = sequence(delay(0.4), play("paul", "turn", args={"to": "side"}))
+    said = _swap_said(project, [turn])
+    assert len(said) == 1 and "0.55 s" in said[0], said
+
+
+def test_a_view_that_never_changes_or_changes_at_the_start_is_not_a_swap(project):
+    at_start = {"kind": "set", "target": "paul", "property": "view", "value": "front", "at": 0.5}
+    assert _swap_said(project, [at_start]) == []  # to the view the art shows
+    assert _swap_said(project, [NOD]) == []

@@ -36,7 +36,10 @@ character, a socket on a nested slot or a posed bone, art the store cannot
 measure. **Motion during the shot** (cutan#98) is not measured here: when the
 character moves, the ``body_placement`` pass lowers the sockets to ``pin``
 joints (:func:`cutan.compile.body.body_attachment_pins`) and this check says,
-with the time, when the motion pulls one off its bone (:func:`_follow_findings`). **Not checked at all:** whether the
+with the time, when the motion pulls one off its bone (:func:`_follow_findings`). A **view change during the shot** (a ``set view`` or a played ``turn``) while a
+prop drawn from the former view stays on is a warning with the time
+(:func:`view_swap_findings`); the sockets are not followed through the new view.
+**Not checked at all:** whether the
 declaration is TRUE of the pixels: the sockets are the art author's statement
 (a critic over probe frames is cutan#95).
 
@@ -69,6 +72,7 @@ from cutan.body_attachment import (
     rest_view_of,
     solve_placement,
     start_state,
+    view_changes,
 )
 
 __all__ = [
@@ -77,6 +81,7 @@ __all__ = [
     "check_body_attachments",
     "check_body_attachment_consistency",
     "consistency_findings",
+    "view_swap_findings",
 ]
 
 #: Where the per-shot check leaves its measurements for the scene-level one.
@@ -456,6 +461,55 @@ def check_body_attachments(ctx: Any) -> None:
     ):
         ctx.report.add(severity, where, message)
     _follow_findings(ctx)
+    for severity, where, message in view_swap_findings(
+        ctx.shot, ctx.stores, path=ctx.path
+    ):
+        ctx.report.add(severity, where, message)
+
+
+def view_swap_findings(
+    shot: Any, stores: Mapping[str, Any], *, path: str = ""
+) -> list[Finding]:
+    """A character that changes view after the shot's start while a prop drawn
+    from its former view stays on (cutan#98): the art no longer shows the body
+    from the side the camera sees it, and the sockets are declared on the rest
+    view. One warning per change, with the time. Never raises.
+
+    >>> from an.ir.schema import Shot
+    >>> view_swap_findings(Shot(id="s"), {})
+    []
+    """
+    props, chars = stores.get("props"), stores.get("characters")
+    changes = view_changes(shot)
+    if props is None or chars is None or not changes:
+        return []
+    sets = start_state(shot)
+    out: list[Finding] = []
+    for j, entity, raw in _declaring_props(shot, props):
+        try:
+            ba = body_attachment_of(raw)
+            who, name = bound_character(shot, entity, ba)
+            if who is None or ba.view == FIRST_PERSON or who.id not in changes:
+                continue
+            char = character_model(chars[who.ref]) if who.ref in chars else None
+            current = character_view(who, char, sets.get(who.id, {}))
+        except Exception:  # noqa: BLE001 - another check reports a broken declaration
+            continue
+        for time, view in changes[who.id]:
+            if current == ba.view and view != ba.view:
+                where = f"{path}/entities/{j}" if path else f"entities/{j}"
+                out.append(
+                    (
+                        "warning",
+                        where,
+                        f"prop {entity.id!r} (depicts {name!r}'s body, seen {ba.view}): {name!r} "
+                        f"changes to the {view!r} view at {time:.2f} s while the prop stays on, so "
+                        f"from then the art shows the body from another side than the camera does. "
+                        f"Swap the prop's drawing at {time:.2f} s, or hide it.",
+                    )
+                )
+            current = view
+    return out
 
 
 def _follow_findings(ctx: Any) -> None:

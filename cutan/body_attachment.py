@@ -86,6 +86,7 @@ __all__ = [
     "body_attachment_of",
     "bound_character",
     "start_state",
+    "view_changes",
     "entity_pose",
     "character_view",
     "rig_point_on_stage",
@@ -248,6 +249,49 @@ def start_state(shot: Any) -> dict[str, dict[str, Any]]:
             if "/" not in target:
                 out.setdefault(target, {})[a.property] = a.value
     return out
+
+
+def view_changes(shot: Any) -> dict[str, list[tuple[float, str]]]:
+    """``{entity id: [(time, view), ...]}``, in time order, for every ``view`` set
+    AFTER the shot's start on an entity's own node (``turn`` expands to such
+    sets), cutan#98.
+
+    >>> from an.ir.schema import SetAction, Shot
+    >>> shot = Shot(id="s", actions=[SetAction(target="p", property="view", value="side", at=2.0),
+    ...                              SetAction(target="p", property="view", value="front", at=0.0)])
+    >>> view_changes(shot)
+    {'p': [(2.0, 'side')]}
+    """
+    from an.motion import flatten
+
+    from cutan.characters.schema import VIEW_CHANNEL
+    from cutan.motion import DFLT_TURN_DURATION, DFLT_TURN_TO
+
+    out: dict[str, list[tuple[float, str]]] = {}
+    for action in getattr(shot, "actions", None) or []:
+        try:
+            leaves = flatten(action)
+        except Exception:  # noqa: BLE001 - an unresolvable action is another check's
+            continue
+        for leaf in leaves:
+            a = leaf.action
+            target = str(getattr(a, "target", ""))
+            if getattr(a, "kind", None) == "play" and a.animation == "turn":
+                # A played turn swaps the view at its midpoint (`motion.turn`).
+                args = dict(getattr(a, "args", None) or {})
+                span = float(a.duration or args.get("duration") or DFLT_TURN_DURATION)
+                span /= float(a.speed or 1.0)
+                to = str(args.get("to", DFLT_TURN_TO))
+                if "/" not in target:
+                    out.setdefault(target, []).append((float(leaf.start) + span / 2, to))
+            elif (
+                getattr(a, "kind", None) == "set"
+                and a.property == VIEW_CHANNEL
+                and leaf.start > _START_EPS
+                and "/" not in target
+            ):
+                out.setdefault(target, []).append((float(leaf.start), str(a.value)))
+    return {k: sorted(v) for k, v in out.items()}
 
 
 def entity_pose(
