@@ -26,7 +26,7 @@ from typing import Iterator
 
 from an.base import swap_set_name_problem
 from an.ir.migrate import migrate
-from an.stores._common import ASSET_REF_RULE, asset_ref_problems, inside_folder
+from an.stores._common import asset_ref_problems, inside_folder
 from cutan.characters.schema import (
     EYELID_CHANNEL,
     VISEME_CHANNEL,
