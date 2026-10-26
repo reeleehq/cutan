@@ -161,8 +161,15 @@ def part_path(char_dir: str | Path, attachment: str) -> str:
 
 
 def set_part(
-    char_dir: str | Path, attachment: str, picture: str | Path, **kwargs
+    char_dir: str | Path,
+    attachment: str,
+    picture: str | Path,
+    *,
+    anchor: tuple[float, float] | None = None,
+    source: AssetSource | None = None,
 ) -> PartReplacement:
     """Replace the drawing of ``attachment`` (see :func:`part_path`) with
-    ``picture``; ``kwargs`` (``anchor``, ``source``) as :func:`replace_part_art`."""
-    return replace_part_art(char_dir, part_path(char_dir, attachment), picture, **kwargs)
+    ``picture``; ``anchor`` and ``source`` as :func:`replace_part_art`."""
+    return replace_part_art(
+        char_dir, part_path(char_dir, attachment), picture, anchor=anchor, source=source
+    )

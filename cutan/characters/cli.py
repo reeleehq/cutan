@@ -343,25 +343,22 @@ def from_sheet(name: str, sheet: str, recipe: str, out_dir: str = "") -> str:
 
     name: character id (a factory character: ``an character new``)
     sheet: the reference sheet picture
-    recipe: a JSON file ``{"source": {"url": ..., "license": ...} | null, "ours": false,
+    recipe: a JSON file (``cutan.carve.sheet.load_recipe``) ``{"source": {"url": ..., "license": ...} | null, "ours": false,
         "parts": [{"attachment": "head", "crop": [x0, y0, x1, y1], "carve": {"matte": ..., "point": [x, y]}}]}``;
         ``source`` is ``frame_source``'s arguments; a sheet with neither a source nor ``"ours": true`` is refused
     out_dir: parent directory; defaults to ./assets/characters
     """
-    from cutan.carve import MissingDependencyError, frame_source
-    from cutan.carve.sheet import sheet_to_package
+    from cutan.carve import MissingDependencyError
+    from cutan.carve.sheet import load_recipe, sheet_to_package
     from cutan.characters.set_part import SetPartError
 
     char_dir = _resolve_target(out_dir) / name
     if not (char_dir / "character.json").is_file():
         return f"no character at {char_dir}"
     try:
-        doc = json.loads(Path(recipe).read_text(encoding="utf-8"))
-        source = frame_source(**doc["source"]) if doc.get("source") else None
-        report = sheet_to_package(
-            sheet, doc["parts"], char_dir, source=source, ours=bool(doc.get("ours"))
-        )
-    except (SetPartError, MissingDependencyError, OSError, ValueError, KeyError, TypeError) as e:
+        parts, source, ours = load_recipe(json.loads(Path(recipe).read_text(encoding="utf-8")))
+        report = sheet_to_package(sheet, parts, char_dir, source=source, ours=ours)
+    except (SetPartError, MissingDependencyError, OSError, ValueError, KeyError) as e:
         return failed(f"{type(e).__name__}: {e}")
     return report.format()
 
