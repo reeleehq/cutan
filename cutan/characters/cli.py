@@ -318,6 +318,32 @@ def add_views(name: str, out_dir: str = "") -> str:
     return f"added the views to {desc.parent} (descriptor: {desc.name})"
 
 
+def add_limits(
+    name: str, out_dir: str = "", style: str = "", overwrite: bool = False
+) -> str:
+    """Give ``name`` hinge limits on its bones, by part type (cutan#104): the
+    neck, the shoulders (and the elbows and wrists of a split arm) turn only
+    through a range, which bounds the solver wherever a shot pins or pulls a
+    part. Opt-in; a character made before keeps its bones as they are. Idempotent.
+
+    name: character id
+    out_dir: parent directory; defaults to ./assets/characters
+    style: a shipped style whose `joints.limits` replace the genre's ranges
+        (`marionette` is loose)
+    overwrite: replace ranges the bones already carry (kept otherwise)
+    """
+    from cutan.characters.factory import add_limits as _add_limits
+
+    char_dir = _resolve_target(out_dir) / name
+    if not (char_dir / "character.json").is_file():
+        return f"no character at {char_dir}"
+    try:
+        desc = _add_limits(char_dir, style=style or None, overwrite=overwrite)
+    except ValueError as e:
+        return str(e)
+    return f"wrote hinge limits on {desc.parent} (descriptor: {desc.name})"
+
+
 def feet_origin(name: str, out_dir: str = "", undo: bool = False) -> str:
     """Make an existing character stand on its feet (an#285): its stage point
     (`stage.at`) becomes where its feet are, as for a character `an character
@@ -732,6 +758,7 @@ _dispatch_funcs = [
     add_gaze,
     add_half_lid,
     add_views,
+    add_limits,
     feet_origin,
     validate,
     capabilities,

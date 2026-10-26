@@ -817,6 +817,7 @@ def bones_from_pivots(
     pivots: Mapping[str, tuple[float, float]],
     *,
     bones: list[Bone] | None = None,
+    limits: Mapping[str, tuple[float, float]] | None = None,
 ) -> list[Bone]:
     """Re-place a bone rig onto an illustrator's own joint coordinates.
 
@@ -834,6 +835,11 @@ def bones_from_pivots(
     against its parent's resolved absolute position — and parents are resolved
     first, which is why this walks in declaration order rather than by index.
 
+    ``limits`` (default: none, so a rig is as it always was) is a table of hinge
+    ranges by part type (:func:`cutan.characters.limits.limits_table`) written
+    onto the typed bones as they are placed: the artist's joints come with the
+    ranges a figure's joints have (cutan#104).
+
     >>> bones = bones_from_pivots({"neck": (500.0, 300.0), "root": (500.0, 900.0)})
     >>> head = next(b for b in bones if b.name == "head")
     >>> root = next(b for b in bones if b.name == "root")
@@ -842,6 +848,9 @@ def bones_from_pivots(
     >>> torso = next(b for b in bones if b.name == "torso")
     >>> round(head.y + torso.y + root.y)          # absolute, back to the neck
     300
+    >>> from cutan.characters.limits import GENRE_LIMITS
+    >>> [(b.name, b.limits) for b in bones_from_pivots({}, limits=GENRE_LIMITS) if b.limits][:2]
+    [('head', (-45.0, 45.0)), ('arm_l', (-60.0, 180.0))]
     """
     rig = [b.model_copy(deep=True) for b in (bones or _default_bones())]
     by_name = {b.name: b for b in rig}
@@ -865,6 +874,10 @@ def bones_from_pivots(
         base = absolute(parent) if parent is not None else (0.0, 0.0)
         bone.x = target[0] - base[0]
         bone.y = target[1] - base[1]
+    if limits is not None:
+        from cutan.characters.limits import apply_limits
+
+        apply_limits(rig, table=limits)
     return rig
 
 

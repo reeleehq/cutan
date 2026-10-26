@@ -182,6 +182,10 @@ can collide with a part id. That is a workaround for a missing namespace, not a 
 The structural answer is a reserved joint-name namespace that `validate_character`
 enforces.
 
+## Hinge limits per part type (cutan#104)
+
+`Bone.limits` (degrees about the rest angle) is the core's: `an.stage.rig.rig_structure` reads every `Bone.parent` as a hinge and the `solve` pass keeps the part inside the range wherever a shot declares a joint (`pin`, `pull`, `join`); a shot that declares none ignores it, byte for byte. The genre writes the ranges **by part type** (`cutan.characters.limits`): `part_type(bone)` reads the bone's name (`head` is a neck, `arm_*` a shoulder, `forearm_*`/`fore_*` an elbow, `hand_*` a wrist, `leg_*` a hip, `shin_*` a knee), `GENRE_LIMITS` holds the defaults and a style spec overrides them under `joints.limits` (`limits_table(style)`; `marionette`'s are loose). **The sign convention** is written for the right side (the bone ending `_r`, at the viewer's right): positive is clockwise on screen, so inward (toward the body) for a right arm; the left side is the mirror, `(-hi, -lo)`; the head is symmetric. `factory.add_limits(char_dir, style=None)` (`an character add-limits <name> [--style marionette]`) writes them onto a character: opt-in, idempotent, a recipe step, and a range the artist already wrote is kept. **A new character carries none** (its contract hashes must not move). `bones_from_pivots(pivots, limits=table)` writes them as it places an illustrator's joints; `promote` does not, so a promoted rig stays a free pin until someone asks.
+
 ## Colour roles and proportions: the factory's side of the contract
 
 - **`colour_roles`** (`{part path: {"#rrggbb": role}}`) is how a StylePack reaches SVG art. It

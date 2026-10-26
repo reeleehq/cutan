@@ -830,7 +830,12 @@ RECIPE_KEY: str = "factory"
 #: The version of the recipe's format.
 RECIPE_VERSION: int = 1
 #: The drawing calls a recipe may replay, by name.
-_REPLAYABLE: tuple[str, ...] = ("new_character", "add_gaze", "add_views")
+_REPLAYABLE: tuple[str, ...] = (
+    "new_character",
+    "add_gaze",
+    "add_views",
+    "add_limits",
+)
 #: Parameters a recipe never records: where the folder is, and whether to overwrite it.
 _NOT_RECIPE: frozenset[str] = frozenset({"out_dir", "char_dir", "overwrite"})
 #: How deep in drawing calls this thread is: only the outermost call is a step.
@@ -2500,6 +2505,43 @@ def add_views(char_dir: str | Path) -> Path:
     )
 
 
+@_records_what_it_drew
+def add_limits(
+    char_dir: str | Path, *, style: str | None = None, overwrite: bool = False
+) -> Path:
+    """Write hinge limits onto a character's bones, by part type (cutan#104).
+
+    The neck, the shoulders, and (when the arm is split, :func:`add_forearms`)
+    the elbows and wrists get the genre's ranges (:data:`cutan.characters.limits.GENRE_LIMITS`),
+    or the ones the shipped style ``style`` declares under ``joints.limits``.
+    They bound the solver wherever a shot declares a joint (``pin``, ``pull``,
+    ``join``); a scene that declares none compiles as it did. Opt-in, one
+    character at a time: a character made before is never converted implicitly,
+    and the default factory character does not carry them (its contract hashes
+    must not move). A bone that already has a range is the artist's and is kept
+    unless ``overwrite``; ``style`` names a shipped style spec (a recipe replays
+    it by name). Idempotent. Returns the descriptor path.
+    """
+    from an.ir.migrate import migrate
+
+    from cutan.characters.limits import apply_limits, limits_table
+
+    if style is not None:
+        from cutan.styles import style_specs
+
+        if style not in style_specs():
+            raise ValueError(
+                f"no style spec named {style!r}; the specs are: {', '.join(style_specs())}"
+            )
+    desc_path = Path(char_dir) / "character.json"
+    raw = json.loads(desc_path.read_text(encoding="utf-8"))
+    desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
+    apply_limits(desc.bones, table=limits_table(style), overwrite=overwrite)
+    desc.metadata["limits"] = style or "genre"
+    desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+    return desc_path
+
+
 #: The most drawing steps a recipe may replay, and the most bytes of JSON its
 #: parameters may take: the replay runs on whoever reads the descriptor, so
 #: its cost is bounded here, not by the recipe's author (review-292 R3).
@@ -2509,7 +2551,7 @@ MAX_RECIPE_BYTES: int = 16_384
 _SAFE_NAME = re.compile(r"[A-Za-z0-9_][A-Za-z0-9._-]{0,63}")
 #: The calls a recipe may replay AFTER its first step (never a second
 #: `new_character`: one drawing per recipe, review-292 R2).
-_LATER_STEPS: tuple[str, ...] = ("add_gaze", "add_views")
+_LATER_STEPS: tuple[str, ...] = ("add_gaze", "add_views", "add_limits")
 
 
 def _replay_params(call: str, params) -> dict | None:
@@ -2563,7 +2605,13 @@ def _code_identity() -> tuple[int, ...]:
     """What the replay's result depends on besides the recipe: the drawing code as loaded."""
     return tuple(
         id(globals()[n])
-        for n in ("new_character", "add_gaze", "add_views", "stamp_factory_parts")
+        for n in (
+            "new_character",
+            "add_gaze",
+            "add_views",
+            "add_limits",
+            "stamp_factory_parts",
+        )
     )
 
 
