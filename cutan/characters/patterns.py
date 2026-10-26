@@ -169,7 +169,9 @@ def read_tile(path: Union[str, Path]) -> str:
     try:
         data = Path(path).read_bytes()
     except OSError as e:
-        raise ValueError(f"clothing tile {str(path)!r} cannot be read: {e.strerror or e}") from None
+        raise ValueError(
+            f"clothing tile {str(path)!r} cannot be read: {e.strerror or e}"
+        ) from None
     _tile_png(data)
     return base64.b64encode(data).decode("ascii")
 
@@ -183,6 +185,7 @@ def resolve_tile_paths(spec: Union[str, Mapping, None]) -> Union[str, Mapping, N
     >>> resolve_tile_paths({"kind": "tile", "image": "iVBORw0KGgoAAAA"})["image"]
     'iVBORw0KGgoAAAA'
     """
+
     def one(value: object) -> object:
         text = str(value)
         return value if text.startswith(_PNG_B64) else read_tile(text)
@@ -198,7 +201,9 @@ def resolve_tile_paths(spec: Union[str, Mapping, None]) -> Union[str, Mapping, N
     items = []
     for item in rest.split(","):
         key, eq, value = item.partition("=")
-        items.append(f"{key}={one(value.strip())}" if key.strip() == "image" and eq else item)
+        items.append(
+            f"{key}={one(value.strip())}" if key.strip() == "image" and eq else item
+        )
     return kind + sep + ",".join(items)
 
 
@@ -295,7 +300,9 @@ def parse_clothing_pattern(
 
 
 @functools.lru_cache(maxsize=32)
-def _decode_tile(image: str) -> tuple[tuple[int, int], tuple[tuple[int, int, int, str, int], ...]]:
+def _decode_tile(
+    image: str,
+) -> tuple[tuple[int, int], tuple[tuple[int, int, int, str, int], ...]]:
     """``((w, h), runs)`` of a base64 tile: ``(x, y, run, hex, alpha)`` for each
     horizontal run of one colour (transparent pixels draw nothing)."""
     img = _tile_png(base64.b64decode(image))
