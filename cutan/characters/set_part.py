@@ -21,10 +21,11 @@ import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from an.ir.assets import AssetSource
 from an.stage.raster import art_size
 from an.stores._common import ASSET_REF_RULE, inside_folder
 
-__all__ = ["PartReplacement", "SetPartError", "replace_part_art", "set_part"]
+__all__ = ["PartReplacement", "SetPartError", "part_path", "replace_part_art", "set_part"]
 
 
 class SetPartError(ValueError):
@@ -52,13 +53,20 @@ class PartReplacement:
 
 
 def replace_part_art(
-    char_dir: str | Path, old_rel: str, picture: str | Path
+    char_dir: str | Path,
+    old_rel: str,
+    picture: str | Path,
+    *,
+    anchor: tuple[float, float] | None = None,
+    source: AssetSource | None = None,
 ) -> PartReplacement:
     """Draw every attachment that used ``old_rel`` (``parts/head.svg``) with ``picture``.
 
     The attachment keeps the WIDTH the old drawing rasterised at (``art_size``,
     declared only when it declared none: the picture's height follows its own
-    aspect, so a differently shaped picture is not squashed). Raises :class:`SetPartError` when no attachment
+    aspect, so a differently shaped picture is not squashed). ``anchor`` (``(u, v)``
+    in 0..1 of the picture) replaces the attachments' anchor (default: keep it);
+    ``source`` is pinned to them as the picture's provenance. Raises :class:`SetPartError` when no attachment
     draws ``old_rel``, when ``picture`` is not a readable PNG/JPEG/WebP, or when
     a path leaves the character's folder.
     """
@@ -100,6 +108,10 @@ def replace_part_art(
     for att in users:
         att["path"] = new_rel
         att.pop("source", None)  # pinned to the factory's drawing
+        if source is not None:
+            att["source"] = source.model_dump(mode="json", exclude_none=True)
+        if anchor is not None:
+            att["anchor"] = list(anchor)
         if width and not att.get("width"):
             att["width"] = width
     (raw.get("colour_roles") or {}).pop(old_rel, None)
@@ -126,11 +138,10 @@ def replace_part_art(
     return PartReplacement(desc_path, new_rel, derived)
 
 
-def set_part(
-    char_dir: str | Path, attachment: str, picture: str | Path
-) -> PartReplacement:
-    """Replace the drawing of ``attachment`` (``name``, or ``slot/name`` when
-    several slots carry that name) with ``picture``; see :func:`replace_part_art`."""
+def part_path(char_dir: str | Path, attachment: str) -> str:
+    """The file ``attachment`` (``name``, or ``slot/name`` when several slots carry
+    that name) is drawn by, as the descriptor records it (``parts/head.svg``).
+    Raises :class:`SetPartError` when it names no attachment or an ambiguous one."""
     raw = json.loads((Path(char_dir) / "character.json").read_text(encoding="utf-8"))
     slot_wanted, _, name_wanted = attachment.rpartition("/")
     found = {
@@ -146,4 +157,19 @@ def set_part(
             f"{attachment!r} is drawn by several files ({', '.join(sorted(map(str, paths)))}): "
             "name it slot/name"
         )
-    return replace_part_art(char_dir, paths.pop(), picture)
+    return paths.pop()
+
+
+def set_part(
+    char_dir: str | Path,
+    attachment: str,
+    picture: str | Path,
+    *,
+    anchor: tuple[float, float] | None = None,
+    source: AssetSource | None = None,
+) -> PartReplacement:
+    """Replace the drawing of ``attachment`` (see :func:`part_path`) with
+    ``picture``; ``anchor`` and ``source`` as :func:`replace_part_art`."""
+    return replace_part_art(
+        char_dir, part_path(char_dir, attachment), picture, anchor=anchor, source=source
+    )
