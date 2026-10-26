@@ -407,15 +407,16 @@ def sheet_to_package(
     unit = _check_unit(unit)
     char_dir = Path(char_dir)
     recipe = [p if isinstance(p, SheetPart) else SheetPart(**p) for p in parts]
+    desc = functools.cache(lambda: load_descriptor(char_dir))
     files: dict[str, str] = {}
     for p in recipe:  # fails on an unknown or ambiguous attachment, writes nothing
         for name in (p.attachment, *p.split):
+            find_attachment(desc(), name)  # the resolver `place_attachment` uses
             rel = part_path(char_dir, name)
             if rel in files:
                 raise ValueError(f"{name!r} and {files[rel]!r} are both drawn by {rel}")
             files[rel] = name
     image = load_rgb(sheet)
-    desc = functools.cache(lambda: load_descriptor(char_dir))
     with tempfile.TemporaryDirectory(prefix="cutan-sheet-") as tmp:
         folder = Path(work_dir) if work_dir is not None else Path(tmp)
         folder.mkdir(parents=True, exist_ok=True)

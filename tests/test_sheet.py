@@ -640,3 +640,10 @@ def test_a_typo_in_a_split_spec_fails_before_anything_is_carved():
             (0, 0, 9, 9),
             split={"arm_l": {"mask": [], "pivot": (1, 1), "typo": 1}},
         )
+
+
+def test_a_name_in_two_slots_is_refused_before_anything_is_written(char, sheet):
+    before = (char / "character.json").read_bytes()
+    with pytest.raises(ValueError, match="several slots"):
+        sheet_to_package(sheet, [SheetPart("open", (0, 0, 100, 120))], char, source=SOURCE)
+    assert (char / "character.json").read_bytes() == before
