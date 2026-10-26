@@ -65,7 +65,9 @@ PROJECT_STORE_RECORD: str = ".an/projects_store.json"
 #: which places a cut-out project in the cache folder when the projects store is S3.
 #: Level 8: ``EntityKind.landmarks`` (an#502), through which a character's hands are
 #: named points (``stu@hand_r``) for the core's hold verbs.
-REQUIRED_AN_API_LEVEL: int = 8
+#: Level 9: ``an.cli_status.failed`` (an#480), which ``an character`` commands return
+#: to exit non-zero on a failure.
+REQUIRED_AN_API_LEVEL: int = 9
 
 
 def require_an() -> None:

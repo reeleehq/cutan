@@ -27,6 +27,7 @@ import textwrap
 from pathlib import Path
 from typing import Any, Optional
 
+from an.cli_status import failed
 from cutan.characters.factory import DFLT_HAIR_LENGTH, DFLT_HAIR_STYLE
 from cutan.characters.factory import new_character as _new_character
 from cutan.characters.validate import format_report as _format_report
@@ -110,9 +111,11 @@ def new(
         variants = _parse_variants(mouth_variants)
         palette_map = _parse_palette(palette)
     except ValueError as e:
-        return str(e)
+        return failed(str(e))
     if style not in DICEBEAR_STYLES:
-        return f"unknown DiceBear style: {style!r}. Known: {', '.join(DICEBEAR_STYLES)}"
+        return failed(
+            f"unknown DiceBear style: {style!r}. Known: {', '.join(DICEBEAR_STYLES)}"
+        )
     try:
         desc = _new_character(
             target,
@@ -139,7 +142,7 @@ def new(
         # sibling branch above already returns its rejection as a string; a
         # gate added below the CLI without a flag above it made every CC BY
         # style unreachable AND ugly.
-        return str(e)
+        return failed(str(e))
     doc = json.loads(desc.read_text(encoding="utf-8"))
     note = (
         "; no views: a DiceBear head's face is baked, so its back and profile "
@@ -204,11 +207,11 @@ def mouths(
         try:
             palette_dict = json.loads(palette)
         except json.JSONDecodeError as e:
-            return f"invalid palette JSON: {e}"
+            return failed(f"invalid palette JSON: {e}")
     try:
         variant_map = _parse_variants(variants)
     except ValueError as e:
-        return str(e)
+        return failed(str(e))
     from cutan.characters.factory import recording_drawn
 
     with recording_drawn(char_dir):
@@ -263,11 +266,11 @@ def add_gaze(name: str, out_dir: str = "", overwrite_eyes: bool = False) -> str:
 
     char_dir = _resolve_target(out_dir) / name
     if not (char_dir / "character.json").is_file():
-        return f"no character at {char_dir}"
+        return failed(f"no character at {char_dir}")
     try:
         desc = _add_gaze(char_dir, overwrite_eyes=overwrite_eyes)
     except ValueError as e:
-        return str(e)
+        return failed(str(e))
     return f"added the eye stack to {desc.parent} (descriptor: {desc.name})"
 
 
@@ -289,11 +292,11 @@ def add_half_lid(
 
     char_dir = _resolve_target(out_dir) / name
     if not (char_dir / "character.json").is_file():
-        return f"no character at {char_dir}"
+        return failed(f"no character at {char_dir}")
     try:
         _add_half_lid(char_dir, fraction=fraction, overwrite=overwrite)
     except (HalfLidError, OSError) as e:
-        return str(e)
+        return failed(str(e))
     return f"added a HALF eyelid drawing to {char_dir}"
 
 
@@ -340,11 +343,11 @@ def add_views(name: str, out_dir: str = "") -> str:
 
     char_dir = _resolve_target(out_dir) / name
     if not (char_dir / "character.json").is_file():
-        return f"no character at {char_dir}"
+        return failed(f"no character at {char_dir}")
     try:
         desc = _add_views(char_dir)
     except ValueError as e:
-        return str(e)
+        return failed(str(e))
     return f"added the views to {desc.parent} (descriptor: {desc.name})"
 
 
@@ -365,11 +368,11 @@ def add_forearms(name: str, out_dir: str = "", elbow_at: float = 0.5) -> str:
 
     char_dir = _resolve_target(out_dir) / name
     if not (char_dir / "character.json").is_file():
-        return f"no character at {char_dir}"
+        return failed(f"no character at {char_dir}")
     try:
         desc = _add_forearms(char_dir, elbow_at=elbow_at)
     except ValueError as e:
-        return str(e)
+        return failed(str(e))
     return f"split the arms of {desc.parent} (descriptor: {desc.name})"
 
 
@@ -391,11 +394,11 @@ def add_limits(
 
     char_dir = _resolve_target(out_dir) / name
     if not (char_dir / "character.json").is_file():
-        return f"no character at {char_dir}"
+        return failed(f"no character at {char_dir}")
     try:
         desc = _add_limits(char_dir, style=style or None, overwrite=overwrite)
     except ValueError as e:
-        return str(e)
+        return failed(str(e))
     return f"wrote hinge limits on {desc.parent} (descriptor: {desc.name})"
 
 
@@ -413,11 +416,11 @@ def feet_origin(name: str, out_dir: str = "", undo: bool = False) -> str:
 
     char_dir = _resolve_target(out_dir) / name
     if not (char_dir / "character.json").is_file():
-        return f"no character at {char_dir}"
+        return failed(f"no character at {char_dir}")
     try:
         moved = stand_on_feet(char_dir, undo=undo)
     except ValueError as e:
-        return str(e)
+        return failed(str(e))
     feet = moved["after"]["feet"]
     where = "its feet" if not feet else f"{feet:g} px above its feet"
     shift = moved["shift"]
@@ -492,7 +495,8 @@ def validate(name: str, out_dir: str = "") -> str:
     """
     target = _resolve_target(out_dir) / name
     report = _validate_character(target, name=name)
-    return _format_report(report, name=name)
+    text = _format_report(report, name=name)
+    return text if report.passed else failed(text)  # exit 1 on FAILED (an#480)
 
 
 def capabilities(
@@ -635,7 +639,7 @@ def preview(
     """
     target = _resolve_target(out_dir) / name
     if not target.exists():
-        return f"no such character: {target}"
+        return failed(f"no such character: {target}")
     html_path = _write_preview_html(target, name=name)
     if open_browser:
         import webbrowser
@@ -781,7 +785,7 @@ def record(
 
     target = _resolve_target(out_dir) / name
     if not target.exists():
-        return f"no such character: {target}"
+        return failed(f"no such character: {target}")
     out = record_character(
         target,
         name=name,
