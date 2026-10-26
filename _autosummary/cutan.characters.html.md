@@ -769,28 +769,29 @@ namespace as the default, so the output is a valid standalone SVG.
 
 ### Modules
 
-| [`brows`](cutan.characters.brows.html.md#module-cutan.characters.brows)               | Brow acting: where the brows can go, what may not draw there, and the `face.brows` capability.        |
-|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
-| [`checks`](cutan.characters.checks.html.md#module-cutan.characters.checks)             | The cut-out genre's semantic checks: `play`, `expression`, turns, views and character refs.           |
-| [`cli`](cutan.characters.cli.html.md#module-cutan.characters.cli)                   | User-facing character CLI subcommands.                                                                |
-| [`colour_roles`](cutan.characters.colour_roles.html.md#module-cutan.characters.colour_roles) | Colour roles: which colour literal in which part is skin, clothing, hair…                             |
-| [`dicebear`](cutan.characters.dicebear.html.md#module-cutan.characters.dicebear)         | DiceBear HTTP API client + best-effort post-processing.                                               |
-| [`drawn`](cutan.characters.drawn.html.md#module-cutan.characters.drawn)               | What the character factory wrote, as it wrote it: the in-memory log behind its record of drawn bytes. |
-| [`factory`](cutan.characters.factory.html.md#module-cutan.characters.factory)           | High-level entry points: build and inspect a character.                                               |
-| [`hands`](cutan.characters.hands.html.md#module-cutan.characters.hands)               | A character's hands as named points: `ned@hand_r` (an#502, reeleehq/cutan#104).                       |
-| [`idle`](cutan.characters.idle.html.md#module-cutan.characters.idle)                 | Idle animation factories: breath, blink, weight-shift.                                                |
-| [`licenses`](cutan.characters.licenses.html.md#module-cutan.characters.licenses)         | DiceBear per-style licences, as data.                                                                 |
-| [`lids`](cutan.characters.lids.html.md#module-cutan.characters.lids)                 | A HALF eyelid drawing, made from a character's own OPEN and CLOSED lid art (cutan#65).                |
-| [`limits`](cutan.characters.limits.html.md#module-cutan.characters.limits)             | Hinge limits per part type: how far a cut-out figure's joints may turn (cutan#104).                   |
-| [`methods`](cutan.characters.methods.html.md#module-cutan.characters.methods)           | The cut-out genre's methods and aspects, and their compile-time resolution (ADR 0002).                |
-| [`mouth_set`](cutan.characters.mouth_set.html.md#module-cutan.characters.mouth_set)       | Generate the 9-shape default mouth set as parametric SVGs.                                            |
-| [`patterns`](cutan.characters.patterns.html.md#module-cutan.characters.patterns)         | Clothing prints for the factory's figures (cutan#94): an SVG `<pattern>` over the clothing fill.      |
-| [`play`](cutan.characters.play.html.md#module-cutan.characters.play)                 | Resolve a `play` against a character descriptor — the renderer-free half (an#7).                      |
-| [`record`](cutan.characters.record.html.md#module-cutan.characters.record)             | Record a character's preview HTML to an mp4.                                                          |
-| [`registration`](cutan.characters.registration.html.md#module-cutan.characters.registration) | The character side of the cut-out genre, as declarations: `play` and `character`.                     |
-| [`schema`](cutan.characters.schema.html.md#module-cutan.characters.schema)             | Character descriptor schema (Spine-shaped, Pydantic v2).                                              |
-| [`set_part`](cutan.characters.set_part.html.md#module-cutan.characters.set_part)         | Replace a factory part's drawing with a picture (cutan#92).                                           |
-| [`silhouette`](cutan.characters.silhouette.html.md#module-cutan.characters.silhouette)     | Silhouette rendering and comparison for the silhouette test.                                          |
-| [`svg_utils`](cutan.characters.svg_utils.html.md#module-cutan.characters.svg_utils)       | SVG manipulation: namespace-aware DOM helpers using stdlib `xml.etree`.                               |
-| [`validate`](cutan.characters.validate.html.md#module-cutan.characters.validate)         | Whether an art package is one the compiler can actually render.                                       |
-| [`vocabulary`](cutan.characters.vocabulary.html.md#module-cutan.characters.vocabulary)     | The cut-out genre's vocabulary entries: motion presets, expression presets, IR-field notes.           |
+| [`brows`](cutan.characters.brows.html.md#module-cutan.characters.brows)                 | Brow acting: where the brows can go, what may not draw there, and the `face.brows` capability.        |
+|------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| [`checks`](cutan.characters.checks.html.md#module-cutan.characters.checks)               | The cut-out genre's semantic checks: `play`, `expression`, turns, views and character refs.           |
+| [`cli`](cutan.characters.cli.html.md#module-cutan.characters.cli)                     | User-facing character CLI subcommands.                                                                |
+| [`colour_roles`](cutan.characters.colour_roles.html.md#module-cutan.characters.colour_roles)   | Colour roles: which colour literal in which part is skin, clothing, hair…                             |
+| [`descriptor_io`](cutan.characters.descriptor_io.html.md#module-cutan.characters.descriptor_io) | Read, check and write a character's `character.json` (cutan#129).                                     |
+| [`dicebear`](cutan.characters.dicebear.html.md#module-cutan.characters.dicebear)           | DiceBear HTTP API client + best-effort post-processing.                                               |
+| [`drawn`](cutan.characters.drawn.html.md#module-cutan.characters.drawn)                 | What the character factory wrote, as it wrote it: the in-memory log behind its record of drawn bytes. |
+| [`factory`](cutan.characters.factory.html.md#module-cutan.characters.factory)             | High-level entry points: build and inspect a character.                                               |
+| [`hands`](cutan.characters.hands.html.md#module-cutan.characters.hands)                 | A character's hands as named points: `ned@hand_r` (an#502, reeleehq/cutan#104).                       |
+| [`idle`](cutan.characters.idle.html.md#module-cutan.characters.idle)                   | Idle animation factories: breath, blink, weight-shift.                                                |
+| [`licenses`](cutan.characters.licenses.html.md#module-cutan.characters.licenses)           | DiceBear per-style licences, as data.                                                                 |
+| [`lids`](cutan.characters.lids.html.md#module-cutan.characters.lids)                   | A HALF eyelid drawing, made from a character's own OPEN and CLOSED lid art (cutan#65).                |
+| [`limits`](cutan.characters.limits.html.md#module-cutan.characters.limits)               | Hinge limits per part type: how far a cut-out figure's joints may turn (cutan#104).                   |
+| [`methods`](cutan.characters.methods.html.md#module-cutan.characters.methods)             | The cut-out genre's methods and aspects, and their compile-time resolution (ADR 0002).                |
+| [`mouth_set`](cutan.characters.mouth_set.html.md#module-cutan.characters.mouth_set)         | Generate the 9-shape default mouth set as parametric SVGs.                                            |
+| [`patterns`](cutan.characters.patterns.html.md#module-cutan.characters.patterns)           | Clothing prints for the factory's figures (cutan#94): an SVG `<pattern>` over the clothing fill.      |
+| [`play`](cutan.characters.play.html.md#module-cutan.characters.play)                   | Resolve a `play` against a character descriptor — the renderer-free half (an#7).                      |
+| [`record`](cutan.characters.record.html.md#module-cutan.characters.record)               | Record a character's preview HTML to an mp4.                                                          |
+| [`registration`](cutan.characters.registration.html.md#module-cutan.characters.registration)   | The character side of the cut-out genre, as declarations: `play` and `character`.                     |
+| [`schema`](cutan.characters.schema.html.md#module-cutan.characters.schema)               | Character descriptor schema (Spine-shaped, Pydantic v2).                                              |
+| [`set_part`](cutan.characters.set_part.html.md#module-cutan.characters.set_part)           | Replace a factory part's drawing with a picture (cutan#92).                                           |
+| [`silhouette`](cutan.characters.silhouette.html.md#module-cutan.characters.silhouette)       | Silhouette rendering and comparison for the silhouette test.                                          |
+| [`svg_utils`](cutan.characters.svg_utils.html.md#module-cutan.characters.svg_utils)         | SVG manipulation: namespace-aware DOM helpers using stdlib `xml.etree`.                               |
+| [`validate`](cutan.characters.validate.html.md#module-cutan.characters.validate)           | Whether an art package is one the compiler can actually render.                                       |
+| [`vocabulary`](cutan.characters.vocabulary.html.md#module-cutan.characters.vocabulary)       | The cut-out genre's vocabulary entries: motion presets, expression presets, IR-field notes.           |

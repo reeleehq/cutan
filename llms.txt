@@ -31,6 +31,7 @@
 - [cutan.characters.checks](_autosummary/cutan.characters.checks.html.md): The cut-out genre’s semantic checks: &#96;play&#96;, &#96;expression&#96;, turns, views and character refs.
 - [cutan.characters.cli](_autosummary/cutan.characters.cli.html.md): User-facing character CLI subcommands.
 - [cutan.characters.colour_roles](_autosummary/cutan.characters.colour_roles.html.md): Colour roles: which colour literal in which part is skin, clothing, hair…
+- [cutan.characters.descriptor_io](_autosummary/cutan.characters.descriptor_io.html.md): Read, check and write a character’s &#96;character.json&#96; (cutan#129).
 - [cutan.characters.dicebear](_autosummary/cutan.characters.dicebear.html.md): DiceBear HTTP API client + best-effort post-processing.
 - [cutan.characters.drawn](_autosummary/cutan.characters.drawn.html.md): What the character factory wrote, as it wrote it: the in-memory log behind its record of drawn bytes...
 - [cutan.characters.factory](_autosummary/cutan.characters.factory.html.md): High-level entry points: build and inspect a character.
@@ -88,7 +89,7 @@
 - [cutan.verify.cadence](_autosummary/cutan.verify.cadence.html.md): Pre-render cadence lint: the scene’s timing against its style spec (catalogue B6, an#519 rank 5).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 15:58 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 16:43 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

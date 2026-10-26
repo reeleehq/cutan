@@ -1,0 +1,23 @@
+cutan.characters.descriptor\_io
+===============================
+
+.. automodule:: cutan.characters.descriptor_io
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DESCRIPTOR_FILE
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      descriptor_path
+      load_descriptor
+      read_raw
+      save_raw
+      validate_raw
+      write_descriptor
+   

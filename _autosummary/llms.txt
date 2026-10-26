@@ -29,6 +29,7 @@
 - [cutan.characters.checks](cutan.characters.checks.html.md): The cut-out genre’s semantic checks: &#96;play&#96;, &#96;expression&#96;, turns, views and character refs.
 - [cutan.characters.cli](cutan.characters.cli.html.md): User-facing character CLI subcommands.
 - [cutan.characters.colour_roles](cutan.characters.colour_roles.html.md): Colour roles: which colour literal in which part is skin, clothing, hair…
+- [cutan.characters.descriptor_io](cutan.characters.descriptor_io.html.md): Read, check and write a character’s &#96;character.json&#96; (cutan#129).
 - [cutan.characters.dicebear](cutan.characters.dicebear.html.md): DiceBear HTTP API client + best-effort post-processing.
 - [cutan.characters.drawn](cutan.characters.drawn.html.md): What the character factory wrote, as it wrote it: the in-memory log behind its record of drawn bytes...
 - [cutan.characters.factory](cutan.characters.factory.html.md): High-level entry points: build and inspect a character.

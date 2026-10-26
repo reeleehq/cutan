@@ -48,6 +48,7 @@ cutan.characters
    checks
    cli
    colour_roles
+   descriptor_io
    dicebear
    drawn
    factory
