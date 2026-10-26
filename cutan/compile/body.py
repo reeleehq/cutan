@@ -112,21 +112,32 @@ def _moves(shot: Any, entity_id: str) -> bool:
             target = str(getattr(a, "target", "") or "")
             if kind not in MOTION_KINDS or target.split("/", 1)[0] != entity_id:
                 continue
-            if kind == "tween" and getattr(a, "property", None) not in MOTION_PROPERTIES:
+            if (
+                kind == "tween"
+                and getattr(a, "property", None) not in MOTION_PROPERTIES
+            ):
                 continue
             return True
     return False
 
 
 def why_not_followed(
-    shot: Any, prop_entity: Any, mall: Mapping[str, Any], *, placed: Mapping[str, Any] | None = None
+    shot: Any,
+    prop_entity: Any,
+    mall: Mapping[str, Any],
+    *,
+    placed: Mapping[str, Any] | None = None,
 ) -> str:
     """Why a body-attached prop that moves with its character is NOT given pins
     ('' when it is followed, or when there is nothing to follow). For ``an
     validate``: the prop would be placed once and left behind by the motion."""
     from an.stage.solve import shot_declares_solve
 
-    from cutan.body_attachment import body_attachment_of, bound_character, derive_placement
+    from cutan.body_attachment import (
+        body_attachment_of,
+        bound_character,
+        derive_placement,
+    )
 
     ba = body_attachment_of(mall["props"][prop_entity.ref])
     who, _ = bound_character(shot, prop_entity, ba)
@@ -151,7 +162,11 @@ def why_not_followed(
 
 
 def body_attachment_pins(
-    shot: Any, prop_entity: Any, mall: Mapping[str, Any], *, placed: Mapping[str, Any] | None = None
+    shot: Any,
+    prop_entity: Any,
+    mall: Mapping[str, Any],
+    *,
+    placed: Mapping[str, Any] | None = None,
 ) -> list[Any]:
     """The ``pin`` actions that keep a body-attached prop's sockets on its character's bones.
 

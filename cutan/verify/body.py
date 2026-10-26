@@ -469,7 +469,9 @@ def _follow_findings(ctx: Any) -> None:
     mall = ctx.stores
     declaring = False
     for i, entity in enumerate(ctx.shot.entities):
-        if entity.kind != "prop" or (entity.stage is not None and entity.stage.at is not None):
+        if entity.kind != "prop" or (
+            entity.stage is not None and entity.stage.at is not None
+        ):
             continue
         try:
             raw = mall["props"][entity.ref]

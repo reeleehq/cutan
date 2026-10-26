@@ -67,7 +67,9 @@ def _point(at: Any) -> str:
 
 
 def _bone_names(rig: Any) -> set[str]:
-    bones = rig.get("bones") if isinstance(rig, Mapping) else getattr(rig, "bones", None)
+    bones = (
+        rig.get("bones") if isinstance(rig, Mapping) else getattr(rig, "bones", None)
+    )
     return {
         str(b.get("name") if isinstance(b, Mapping) else b.name) for b in bones or ()
     }
@@ -176,7 +178,9 @@ def write_control_bar(
         "view_box": [0, 0, _BAR_VIEW_BOX, _BAR_VIEW_BOX],
         "origin": [centre, centre],
         "bones": [{"name": "root", "x": centre, "y": centre}],
-        "slots": [{"name": "bar", "bone": "root", "draw_order": 0, "attachment": "bar"}],
+        "slots": [
+            {"name": "bar", "bone": "root", "draw_order": 0, "attachment": "bar"}
+        ],
         "skins": {
             "default": {
                 "name": "default",
