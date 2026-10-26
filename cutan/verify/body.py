@@ -473,43 +473,75 @@ def view_swap_findings(
     """A character that changes view after the shot's start while a prop drawn
     from its former view stays on (cutan#98): the art no longer shows the body
     from the side the camera sees it, and the sockets are declared on the rest
-    view. One warning per change, with the time. Never raises.
+    view. One warning per change, with the time, read off the timeline the
+    compiler resolves (a played ``turn`` swaps at its own midpoint). A prop that
+    changes its own look (alpha, a swap set) by then is the author's answer and
+    is not warned about. Never raises.
 
     >>> from an.ir.schema import Shot
     >>> view_swap_findings(Shot(id="s"), {})
     []
     """
+    from cutan.characters.checks import _turn_resolution
+    from cutan.characters.play import facing_at
+
     props, chars = stores.get("props"), stores.get("characters")
-    changes = view_changes(shot)
-    if props is None or chars is None or not changes:
+    if props is None or chars is None or not _declaring_props(shot, props):
         return []
-    sets = start_state(shot)
-    out: list[Finding] = []
-    for j, entity, raw in _declaring_props(shot, props):
-        try:
+    try:
+        resolved = _turn_resolution(shot, stores)
+        if resolved is None:
+            return []
+        events = resolved[0].events
+        changes = view_changes(events)
+        out: list[Finding] = []
+        for j, entity, raw in _declaring_props(shot, props):
             ba = body_attachment_of(raw)
             who, name = bound_character(shot, entity, ba)
             if who is None or ba.view == FIRST_PERSON or who.id not in changes:
                 continue
             char = character_model(chars[who.ref]) if who.ref in chars else None
-            current = character_view(who, char, sets.get(who.id, {}))
-        except Exception:  # noqa: BLE001 - another check reports a broken declaration
-            continue
-        for time, view in changes[who.id]:
-            if current == ba.view and view != ba.view:
-                where = f"{path}/entities/{j}" if path else f"entities/{j}"
-                out.append(
-                    (
-                        "warning",
-                        where,
-                        f"prop {entity.id!r} (depicts {name!r}'s body, seen {ba.view}): {name!r} "
-                        f"changes to the {view!r} view at {time:.2f} s while the prop stays on, so "
-                        f"from then the art shows the body from another side than the camera does. "
-                        f"Swap the prop's drawing at {time:.2f} s, or hide it.",
+            current = character_view(
+                who, char, {"view": facing_at(events, who.id, 0.0).view}
+            )
+            for time, view in changes[who.id]:
+                if (
+                    current == ba.view
+                    and view != ba.view
+                    and not _changes_own_look(events, entity.id, by=time)
+                ):
+                    where = f"{path}/entities/{j}" if path else f"entities/{j}"
+                    out.append(
+                        (
+                            "warning",
+                            where,
+                            f"prop {entity.id!r} (depicts {name!r}'s body, seen {ba.view}): {name!r} "
+                            f"changes to the {view!r} view at {time:.2f} s while the prop stays on, so "
+                            f"from then the art shows the body from another side than the camera does. "
+                            f"Swap the prop's drawing, or hide it (alpha), by then.",
+                        )
                     )
-                )
-            current = view
-    return out
+                current = view
+        return out
+    except Exception:  # noqa: BLE001 - a broken play or declaration is another check's
+        return []
+
+
+def _changes_own_look(events: Any, prop_id: str, *, by: float) -> bool:
+    """Whether the prop sets its own ``alpha`` or a swap set at or before ``by``."""
+    from an.stage.compile import TRANSFORM_PROPERTIES
+
+    for flat in events:
+        a = flat.action
+        target = str(getattr(a, "target", ""))
+        prop = getattr(a, "property", None)
+        if (
+            target.split("/", 1)[0] == prop_id
+            and flat.start <= by + 1e-6
+            and (prop == "alpha" or (getattr(a, "kind", None) == "set" and prop not in TRANSFORM_PROPERTIES))
+        ):
+            return True
+    return False
 
 
 def _follow_findings(ctx: Any) -> None:

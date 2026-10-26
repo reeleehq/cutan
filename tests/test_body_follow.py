@@ -250,3 +250,18 @@ def test_a_view_that_never_changes_or_changes_at_the_start_is_not_a_swap(project
     at_start = {"kind": "set", "target": "paul", "property": "view", "value": "front", "at": 0.5}
     assert _swap_said(project, [at_start]) == []  # to the view the art shows
     assert _swap_said(project, [NOD]) == []
+
+
+def test_the_time_is_the_compilers_not_a_copy_of_the_preset(project):
+    turn = sequence(delay(0.2), play("paul", "turn", args={"to": "side"}, duration=0.8))
+    said = _swap_said(project, [turn])
+    assert len(said) == 1 and "0.60 s" in said[0], said
+
+
+def test_a_malformed_turn_does_not_crash_validate_and_a_hidden_prop_is_not_warned(project):
+    assert _swap_said(project, [play("paul", "turn", args={"to": "side", "duration": "fast"})]) == []
+    hide = {"kind": "set", "target": "w", "property": "alpha", "value": 0.0, "at": 0.4}
+    swap = {"kind": "set", "target": "paul", "property": "view", "value": "side", "at": 0.5}
+    assert _swap_said(project, [hide, swap]) == []
+    late = {**hide, "at": 0.8}
+    assert len(_swap_said(project, [late, swap])) == 1
