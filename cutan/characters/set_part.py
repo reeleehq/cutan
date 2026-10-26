@@ -25,7 +25,13 @@ from an.ir.assets import AssetSource
 from an.stage.raster import art_size
 from an.stores._common import ASSET_REF_RULE, inside_folder
 
-__all__ = ["PartReplacement", "SetPartError", "part_path", "replace_part_art", "set_part"]
+__all__ = [
+    "PartReplacement",
+    "SetPartError",
+    "part_path",
+    "replace_part_art",
+    "set_part",
+]
 
 
 class SetPartError(ValueError):

@@ -100,7 +100,9 @@ class SheetPart:
         if self.mode == "part" and self.crop is None:
             raise ValueError(f"{self.attachment!r}: a part needs its `crop`")
         if self.mode == "head" and self.crop is not None:
-            raise ValueError(f"{self.attachment!r}: a head is found by carve['face'], not a crop")
+            raise ValueError(
+                f"{self.attachment!r}: a head is found by carve['face'], not a crop"
+            )
         if self.mode == "head" and "face" not in self.carve:
             raise ValueError(
                 f"{self.attachment!r}: a head needs carve['face'] (a sheet has several faces)"
@@ -147,11 +149,15 @@ class SheetReport:
         lines = [f"{len(self.parts)} part(s) set from the sheet"]
         lines += [f"  warning: {w}" for w in self.warnings]
         if self.derived:
-            lines.append(f"  still the factory's drawings, derived from them: {', '.join(self.derived)}")
+            lines.append(
+                f"  still the factory's drawings, derived from them: {', '.join(self.derived)}"
+            )
         return "\n".join(lines)
 
 
-def load_recipe(doc: Mapping[str, Any]) -> tuple[list[SheetPart], AssetSource | None, bool]:
+def load_recipe(
+    doc: Mapping[str, Any],
+) -> tuple[list[SheetPart], AssetSource | None, bool]:
     """``(parts, source, ours)`` from a recipe document.
 
     ``{"schema_version": 1, "source": {frame_source's arguments} | null,
@@ -159,9 +165,13 @@ def load_recipe(doc: Mapping[str, Any]) -> tuple[list[SheetPart], AssetSource | 
     """
     if not isinstance(doc, Mapping) or "parts" not in doc:
         raise ValueError('a recipe is a JSON object with a "parts" list')
-    version = doc.get("schema_version", RECIPE_SCHEMA_VERSION)  # absent: the current one
+    version = doc.get(
+        "schema_version", RECIPE_SCHEMA_VERSION
+    )  # absent: the current one
     if version != RECIPE_SCHEMA_VERSION:
-        raise ValueError(f"recipe schema_version {version!r}; this reads {RECIPE_SCHEMA_VERSION}")
+        raise ValueError(
+            f"recipe schema_version {version!r}; this reads {RECIPE_SCHEMA_VERSION}"
+        )
     source = frame_source(**doc["source"]) if doc.get("source") else None
     parts = [SheetPart(**p) for p in doc["parts"]]
     return parts, source, bool(doc.get("ours"))
@@ -214,7 +224,9 @@ def sheet_to_package(
     for p in recipe:  # fails on an unknown or ambiguous attachment, writes nothing
         rel = part_path(char_dir, p.attachment)
         if rel in files:
-            raise ValueError(f"{p.attachment!r} and {files[rel]!r} are both drawn by {rel}")
+            raise ValueError(
+                f"{p.attachment!r} and {files[rel]!r} are both drawn by {rel}"
+            )
         files[rel] = p.attachment
     image = load_rgb(sheet)
     with tempfile.TemporaryDirectory(prefix="cutan-sheet-") as tmp:
@@ -240,7 +252,9 @@ def sheet_to_package(
                     anchor=carving.anchor if p.anchored else None,
                     source=carving.provenance(),
                 )
-                warnings = carving.quality.warnings() + ([] if p.anchored else [_NO_ANCHOR])
+                warnings = carving.quality.warnings() + (
+                    [] if p.anchored else [_NO_ANCHOR]
+                )
                 results.append(PartResult(p.attachment, warnings, done))
         except BaseException:
             _restore(snapshot, char_dir)
