@@ -262,7 +262,9 @@ clothing_pattern: a print on the clothing (torso in every view, sleeves):
 
 > stripes, check or floral, with colours and scale as
 > “floral:base=#e8735a,motif=#ffffff,leaf=#2f6b3a,scale=1” (base is the
-> clothing colour; none, the default, is a flat fill)
+> clothing colour; none, the default, is a flat fill); or your own tile,
+> “tile:image=tile.png,scale=1” (a PNG up to 32 px a side and 3 KB; its
+> pixels are drawn as vectors, and its bytes are recorded in the descriptor)
 
 views: draw the turnaround — back, side (a profile facing right) and
 : three_quarter beside the front, as a `view` swap set (offline head

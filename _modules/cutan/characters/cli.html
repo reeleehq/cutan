@@ -220,217 +220,217 @@
 </span><span id="line-34">    <span class="n">validate_raw</span><span class="p">,</span>
 </span><span id="line-35">    <span class="n">write_descriptor</span><span class="p">,</span>
 </span><span id="line-36"><span class="p">)</span>
-</span><span id="line-37"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_HAIR_LENGTH</span><span class="p">,</span> <span class="n">DFLT_HAIR_STYLE</span>
-</span><span id="line-38"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">new_character</span> <span class="k">as</span> <span class="n">_new_character</span>
-</span><span id="line-39"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_report</span> <span class="k">as</span> <span class="n">_format_report</span>
-</span><span id="line-40"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_contract</span> <span class="k">as</span> <span class="n">_render_contract</span>
-</span><span id="line-41"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_character</span> <span class="k">as</span> <span class="n">_validate_character</span>
-</span><span id="line-42"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.mouth_set</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_default_mouths</span>
-</span><span id="line-43"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.dicebear</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-</span><span id="line-44">    <span class="n">DICEBEAR_DEFAULT_STYLE</span><span class="p">,</span>
-</span><span id="line-45">    <span class="n">DICEBEAR_STYLES</span><span class="p">,</span>
-</span><span id="line-46"><span class="p">)</span>
-</span><span id="line-47">
+</span><span id="line-37"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.patterns</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_tile_paths</span>
+</span><span id="line-38"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_HAIR_LENGTH</span><span class="p">,</span> <span class="n">DFLT_HAIR_STYLE</span>
+</span><span id="line-39"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">new_character</span> <span class="k">as</span> <span class="n">_new_character</span>
+</span><span id="line-40"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_report</span> <span class="k">as</span> <span class="n">_format_report</span>
+</span><span id="line-41"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_contract</span> <span class="k">as</span> <span class="n">_render_contract</span>
+</span><span id="line-42"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_character</span> <span class="k">as</span> <span class="n">_validate_character</span>
+</span><span id="line-43"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.mouth_set</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_default_mouths</span>
+</span><span id="line-44"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.dicebear</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-45">    <span class="n">DICEBEAR_DEFAULT_STYLE</span><span class="p">,</span>
+</span><span id="line-46">    <span class="n">DICEBEAR_STYLES</span><span class="p">,</span>
+</span><span id="line-47"><span class="p">)</span>
 </span><span id="line-48">
-</span><span id="line-49"><span class="k">def</span><span class="w"> </span><span class="nf">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-50">    <span class="k">if</span> <span class="n">out_dir</span><span class="p">:</span>
-</span><span id="line-51">        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
-</span><span id="line-52">    <span class="k">return</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"characters"</span>
-</span><span id="line-53">
+</span><span id="line-49">
+</span><span id="line-50"><span class="k">def</span><span class="w"> </span><span class="nf">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-51">    <span class="k">if</span> <span class="n">out_dir</span><span class="p">:</span>
+</span><span id="line-52">        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+</span><span id="line-53">    <span class="k">return</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"characters"</span>
 </span><span id="line-54">
+</span><span id="line-55">
 <div class="viewcode-block" id="new">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.cli.html#cutan.characters.cli.new">[docs]</a>
-</span><span id="line-55"><span class="k">def</span><span class="w"> </span><span class="nf">new</span><span class="p">(</span>
-</span><span id="line-56">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-57">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-58">    <span class="n">seed</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-59">    <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DICEBEAR_DEFAULT_STYLE</span><span class="p">,</span>
-</span><span id="line-60">    <span class="n">voice_ref</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-61">    <span class="n">offline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-62">    <span class="n">acknowledge_attribution</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-63">    <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-64">    <span class="n">mouth_variants</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"happy,sad"</span><span class="p">,</span>
-</span><span id="line-65">    <span class="n">palette</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-66">    <span class="n">build</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"regular"</span><span class="p">,</span>
-</span><span id="line-67">    <span class="n">head_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
-</span><span id="line-68">    <span class="n">hat</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"none"</span><span class="p">,</span>
-</span><span id="line-69">    <span class="n">sash</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-70">    <span class="n">views</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="line-71">    <span class="n">hair_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_HAIR_STYLE</span><span class="p">,</span>
-</span><span id="line-72">    <span class="n">hair_length</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_HAIR_LENGTH</span><span class="p">,</span>
-</span><span id="line-73">    <span class="n">feet_origin</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="line-74">    <span class="n">clothing_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-75"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-76"><span class="w">    </span><span class="sd">"""Create a new character at ``out_dir``/``name``.</span>
-</span><span id="line-77">
-</span><span id="line-78"><span class="sd">    name: character id (used as the directory name and descriptor 'name')</span>
-</span><span id="line-79"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
-</span><span id="line-80"><span class="sd">    seed: deterministic seed for DiceBear; defaults to ``name``</span>
-</span><span id="line-81"><span class="sd">    style: DiceBear style. The default is CC0 — no attribution duty. Some styles</span>
-</span><span id="line-82"><span class="sd">        are CC BY 4.0 and oblige whoever ships the video to credit the artist;</span>
-</span><span id="line-83"><span class="sd">        those need --acknowledge-attribution. Run `an credits &lt;project&gt;` to see</span>
-</span><span id="line-84"><span class="sd">        what a project owes.</span>
-</span><span id="line-85"><span class="sd">    voice_ref: voice id stored in the descriptor's ``voice_ref`` field</span>
-</span><span id="line-86"><span class="sd">    offline: skip DiceBear and use the deterministic geometric fallback</span>
-</span><span id="line-87"><span class="sd">    acknowledge_attribution: accept the attribution duty of a CC BY style</span>
-</span><span id="line-88"><span class="sd">    overwrite: replace an existing directory at the target</span>
-</span><span id="line-89"><span class="sd">    mouth_variants: comma-separated mouth forms to draw as `viseme@&lt;form&gt;`</span>
-</span><span id="line-90"><span class="sd">        sets (an#98) — a form an expression preset prefers (happy, sad, angry,</span>
-</span><span id="line-91"><span class="sd">        surprised, afraid, disgusted); "" for the neutral set only</span>
-</span><span id="line-92"><span class="sd">    palette: colours by StylePack role, "skin=#f1c9a5,clothing=#2e7d4f" (or a</span>
-</span><span id="line-93"><span class="sd">        JSON object); roles: skin, hair, clothing, leg, accessory</span>
-</span><span id="line-94"><span class="sd">    build: body proportions — regular, squat (round body, short legs), tall,</span>
-</span><span id="line-95"><span class="sd">        stick (small blocky body, stick limbs)</span>
-</span><span id="line-96"><span class="sd">    head_scale: the head and its whole face scaled together (1.0 = regular)</span>
-</span><span id="line-97"><span class="sd">    hat: none, cap, beanie, bowler or bicorne (offline head only), in the</span>
-</span><span id="line-98"><span class="sd">        accessory colour, worn above the brows so expressions read (a hat that</span>
-</span><span id="line-99"><span class="sd">        cannot clear them on a very small head is recorded, and</span>
-</span><span id="line-100"><span class="sd">        `an character capabilities` says the brows cannot act)</span>
-</span><span id="line-101"><span class="sd">    hair_style: peak (the default), bald, bun or curly (offline head only),</span>
-</span><span id="line-102"><span class="sd">        in the hair colour</span>
-</span><span id="line-103"><span class="sd">    hair_length: short (the default), medium (to the jaw) or long (past the</span>
-</span><span id="line-104"><span class="sd">        chin) (offline head only); bald takes short</span>
-</span><span id="line-105"><span class="sd">    sash: a diagonal band across the torso, in the accessory colour</span>
-</span><span id="line-106"><span class="sd">    clothing_pattern: a print on the clothing (torso in every view, sleeves):</span>
-</span><span id="line-107"><span class="sd">        stripes, check or floral, with colours and scale as</span>
-</span><span id="line-108"><span class="sd">        "floral:base=#e8735a,motif=#ffffff,leaf=#2f6b3a,scale=1" (base is the</span>
-</span><span id="line-109"><span class="sd">        clothing colour; none, the default, is a flat fill)</span>
-</span><span id="line-110"><span class="sd">    views: draw the turnaround — back, side (a profile facing right) and</span>
-</span><span id="line-111"><span class="sd">        three_quarter beside the front, as a `view` swap set (offline head</span>
-</span><span id="line-112"><span class="sd">        only), so `play: turn` can turn the character (an#197)</span>
-</span><span id="line-113"><span class="sd">    feet_origin: put the stage point at the feet (the rig's root bone), so</span>
-</span><span id="line-114"><span class="sd">        `stage.at` is where the character stands and every build placed at one</span>
-</span><span id="line-115"><span class="sd">        y stands on one floor line (an#285). On by default; --no-feet-origin</span>
-</span><span id="line-116"><span class="sd">        places it by the middle of its bones, as characters made before were</span>
-</span><span id="line-117"><span class="sd">        (convert one of those with `an character feet-origin`)</span>
-</span><span id="line-118"><span class="sd">    """</span>
-</span><span id="line-119">    <span class="n">target</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
-</span><span id="line-120">    <span class="n">target</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-121">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-122">        <span class="n">variants</span> <span class="o">=</span> <span class="n">_parse_variants</span><span class="p">(</span><span class="n">mouth_variants</span><span class="p">)</span>
-</span><span id="line-123">        <span class="n">palette_map</span> <span class="o">=</span> <span class="n">_parse_palette</span><span class="p">(</span><span class="n">palette</span><span class="p">)</span>
-</span><span id="line-124">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-125">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-</span><span id="line-126">    <span class="k">if</span> <span class="n">style</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DICEBEAR_STYLES</span><span class="p">:</span>
-</span><span id="line-127">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span>
-</span><span id="line-128">            <span class="sa">f</span><span class="s2">"unknown DiceBear style: </span><span class="si">{</span><span class="n">style</span><span class="si">!r}</span><span class="s2">. Known: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DICEBEAR_STYLES</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-129">        <span class="p">)</span>
-</span><span id="line-130">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-131">        <span class="n">desc</span> <span class="o">=</span> <span class="n">_new_character</span><span class="p">(</span>
-</span><span id="line-132">            <span class="n">target</span><span class="p">,</span>
-</span><span id="line-133">            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-</span><span id="line-134">            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-135">            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
-</span><span id="line-136">            <span class="n">voice_ref</span><span class="o">=</span><span class="n">voice_ref</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-137">            <span class="n">use_dicebear</span><span class="o">=</span><span class="ow">not</span> <span class="n">offline</span><span class="p">,</span>
-</span><span id="line-138">            <span class="n">acknowledge_attribution</span><span class="o">=</span><span class="n">acknowledge_attribution</span><span class="p">,</span>
-</span><span id="line-139">            <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
-</span><span id="line-140">            <span class="n">mouth_variants</span><span class="o">=</span><span class="n">variants</span><span class="p">,</span>
-</span><span id="line-141">            <span class="n">palette</span><span class="o">=</span><span class="n">palette_map</span><span class="p">,</span>
-</span><span id="line-142">            <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">,</span>
-</span><span id="line-143">            <span class="n">head_scale</span><span class="o">=</span><span class="n">head_scale</span><span class="p">,</span>
-</span><span id="line-144">            <span class="n">hat</span><span class="o">=</span><span class="n">hat</span><span class="p">,</span>
-</span><span id="line-145">            <span class="n">sash</span><span class="o">=</span><span class="n">sash</span><span class="p">,</span>
-</span><span id="line-146">            <span class="n">views</span><span class="o">=</span><span class="n">views</span><span class="p">,</span>
-</span><span id="line-147">            <span class="n">hair_style</span><span class="o">=</span><span class="n">hair_style</span><span class="p">,</span>
-</span><span id="line-148">            <span class="n">hair_length</span><span class="o">=</span><span class="n">hair_length</span><span class="p">,</span>
-</span><span id="line-149">            <span class="n">feet_origin</span><span class="o">=</span><span class="n">feet_origin</span><span class="p">,</span>
-</span><span id="line-150">            <span class="n">clothing_pattern</span><span class="o">=</span><span class="n">clothing_pattern</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-151">        <span class="p">)</span>
-</span><span id="line-152">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-153">        <span class="c1"># A licence refusal is a message for a human, not a traceback. The</span>
-</span><span id="line-154">        <span class="c1"># sibling branch above already returns its rejection as a string; a</span>
-</span><span id="line-155">        <span class="c1"># gate added below the CLI without a flag above it made every CC BY</span>
-</span><span id="line-156">        <span class="c1"># style unreachable AND ugly.</span>
-</span><span id="line-157">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-</span><span id="line-158">    <span class="n">doc</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">desc</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
-</span><span id="line-159">    <span class="n">note</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-160">        <span class="s2">"; no views: a DiceBear head's face is baked, so its back and profile "</span>
-</span><span id="line-161">        <span class="s2">"cannot be drawn (use --offline to turn it)"</span>
-</span><span id="line-162">        <span class="k">if</span> <span class="n">views</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">offline</span> <span class="ow">and</span> <span class="s2">"view"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"asset_sets"</span><span class="p">,</span> <span class="p">{})</span>
-</span><span id="line-163">        <span class="k">else</span> <span class="s2">""</span>
-</span><span id="line-164">    <span class="p">)</span>
-</span><span id="line-165">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">stage_extent</span>
-</span><span id="line-166">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterDescriptor</span>
-</span><span id="line-167">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.migrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">migrate</span>
-</span><span id="line-168">
-</span><span id="line-169">    <span class="n">ext</span> <span class="o">=</span> <span class="n">stage_extent</span><span class="p">(</span>
-</span><span id="line-170">        <span class="n">validate_raw</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
-</span><span id="line-171">    <span class="p">)</span>
-</span><span id="line-172">    <span class="n">note</span> <span class="o">+=</span> <span class="p">(</span>
-</span><span id="line-173">        <span class="sa">f</span><span class="s2">"; stands </span><span class="si">{</span><span class="n">ext</span><span class="p">[</span><span class="s1">'height'</span><span class="p">]</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> px tall at stage.scale 1 — its top "</span>
-</span><span id="line-174">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ext</span><span class="p">[</span><span class="s1">'top'</span><span class="p">]</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> px above its stage point, its feet </span><span class="si">{</span><span class="n">ext</span><span class="p">[</span><span class="s1">'feet'</span><span class="p">]</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> px below"</span>
-</span><span id="line-175">    <span class="p">)</span>
-</span><span id="line-176">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.brows</span><span class="w"> </span><span class="kn">import</span> <span class="n">BROWS_FEATURE</span><span class="p">,</span> <span class="n">brow_cover</span>
-</span><span id="line-177">
-</span><span id="line-178">    <span class="c1"># derived from the knobs and the recorded seat (an#284), plus any override</span>
-</span><span id="line-179">    <span class="n">covers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"occluded"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span>
-</span><span id="line-180">    <span class="n">derived</span> <span class="o">=</span> <span class="n">brow_cover</span><span class="p">(</span>
-</span><span id="line-181">        <span class="n">validate_raw</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
-</span><span id="line-182">    <span class="p">)</span>
-</span><span id="line-183">    <span class="k">if</span> <span class="n">derived</span><span class="p">:</span>
-</span><span id="line-184">        <span class="n">covers</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">BROWS_FEATURE</span><span class="p">,</span> <span class="n">derived</span><span class="p">)</span>
-</span><span id="line-185">    <span class="k">for</span> <span class="n">feature</span><span class="p">,</span> <span class="n">cover</span> <span class="ow">in</span> <span class="n">covers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="line-186">        <span class="n">note</span> <span class="o">+=</span> <span class="p">(</span>
-</span><span id="line-187">            <span class="sa">f</span><span class="s2">"; </span><span class="si">{</span><span class="n">cover</span><span class="si">}</span><span class="s2"> covers the </span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">, so expressions cannot act with them "</span>
-</span><span id="line-188">            <span class="s2">"(see `an character capabilities`)"</span>
-</span><span id="line-189">        <span class="p">)</span>
-</span><span id="line-190">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"created character at </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2"> (descriptor: </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)</span><span class="si">{</span><span class="n">note</span><span class="si">}</span><span class="s2">"</span></div>
+</span><span id="line-56"><span class="k">def</span><span class="w"> </span><span class="nf">new</span><span class="p">(</span>
+</span><span id="line-57">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-58">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-59">    <span class="n">seed</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-60">    <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DICEBEAR_DEFAULT_STYLE</span><span class="p">,</span>
+</span><span id="line-61">    <span class="n">voice_ref</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-62">    <span class="n">offline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-63">    <span class="n">acknowledge_attribution</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-64">    <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-65">    <span class="n">mouth_variants</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"happy,sad"</span><span class="p">,</span>
+</span><span id="line-66">    <span class="n">palette</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-67">    <span class="n">build</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"regular"</span><span class="p">,</span>
+</span><span id="line-68">    <span class="n">head_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+</span><span id="line-69">    <span class="n">hat</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"none"</span><span class="p">,</span>
+</span><span id="line-70">    <span class="n">sash</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-71">    <span class="n">views</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="line-72">    <span class="n">hair_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_HAIR_STYLE</span><span class="p">,</span>
+</span><span id="line-73">    <span class="n">hair_length</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_HAIR_LENGTH</span><span class="p">,</span>
+</span><span id="line-74">    <span class="n">feet_origin</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="line-75">    <span class="n">clothing_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-76"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-77"><span class="w">    </span><span class="sd">"""Create a new character at ``out_dir``/``name``.</span>
+</span><span id="line-78">
+</span><span id="line-79"><span class="sd">    name: character id (used as the directory name and descriptor 'name')</span>
+</span><span id="line-80"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
+</span><span id="line-81"><span class="sd">    seed: deterministic seed for DiceBear; defaults to ``name``</span>
+</span><span id="line-82"><span class="sd">    style: DiceBear style. The default is CC0 — no attribution duty. Some styles</span>
+</span><span id="line-83"><span class="sd">        are CC BY 4.0 and oblige whoever ships the video to credit the artist;</span>
+</span><span id="line-84"><span class="sd">        those need --acknowledge-attribution. Run `an credits &lt;project&gt;` to see</span>
+</span><span id="line-85"><span class="sd">        what a project owes.</span>
+</span><span id="line-86"><span class="sd">    voice_ref: voice id stored in the descriptor's ``voice_ref`` field</span>
+</span><span id="line-87"><span class="sd">    offline: skip DiceBear and use the deterministic geometric fallback</span>
+</span><span id="line-88"><span class="sd">    acknowledge_attribution: accept the attribution duty of a CC BY style</span>
+</span><span id="line-89"><span class="sd">    overwrite: replace an existing directory at the target</span>
+</span><span id="line-90"><span class="sd">    mouth_variants: comma-separated mouth forms to draw as `viseme@&lt;form&gt;`</span>
+</span><span id="line-91"><span class="sd">        sets (an#98) — a form an expression preset prefers (happy, sad, angry,</span>
+</span><span id="line-92"><span class="sd">        surprised, afraid, disgusted); "" for the neutral set only</span>
+</span><span id="line-93"><span class="sd">    palette: colours by StylePack role, "skin=#f1c9a5,clothing=#2e7d4f" (or a</span>
+</span><span id="line-94"><span class="sd">        JSON object); roles: skin, hair, clothing, leg, accessory</span>
+</span><span id="line-95"><span class="sd">    build: body proportions — regular, squat (round body, short legs), tall,</span>
+</span><span id="line-96"><span class="sd">        stick (small blocky body, stick limbs)</span>
+</span><span id="line-97"><span class="sd">    head_scale: the head and its whole face scaled together (1.0 = regular)</span>
+</span><span id="line-98"><span class="sd">    hat: none, cap, beanie, bowler or bicorne (offline head only), in the</span>
+</span><span id="line-99"><span class="sd">        accessory colour, worn above the brows so expressions read (a hat that</span>
+</span><span id="line-100"><span class="sd">        cannot clear them on a very small head is recorded, and</span>
+</span><span id="line-101"><span class="sd">        `an character capabilities` says the brows cannot act)</span>
+</span><span id="line-102"><span class="sd">    hair_style: peak (the default), bald, bun or curly (offline head only),</span>
+</span><span id="line-103"><span class="sd">        in the hair colour</span>
+</span><span id="line-104"><span class="sd">    hair_length: short (the default), medium (to the jaw) or long (past the</span>
+</span><span id="line-105"><span class="sd">        chin) (offline head only); bald takes short</span>
+</span><span id="line-106"><span class="sd">    sash: a diagonal band across the torso, in the accessory colour</span>
+</span><span id="line-107"><span class="sd">    clothing_pattern: a print on the clothing (torso in every view, sleeves):</span>
+</span><span id="line-108"><span class="sd">        stripes, check or floral, with colours and scale as</span>
+</span><span id="line-109"><span class="sd">        "floral:base=#e8735a,motif=#ffffff,leaf=#2f6b3a,scale=1" (base is the</span>
+</span><span id="line-110"><span class="sd">        clothing colour; none, the default, is a flat fill); or your own tile,</span>
+</span><span id="line-111"><span class="sd">        "tile:image=tile.png,scale=1" (a PNG up to 32 px a side and 3 KB; its</span>
+</span><span id="line-112"><span class="sd">        pixels are drawn as vectors, and its bytes are recorded in the descriptor)</span>
+</span><span id="line-113"><span class="sd">    views: draw the turnaround — back, side (a profile facing right) and</span>
+</span><span id="line-114"><span class="sd">        three_quarter beside the front, as a `view` swap set (offline head</span>
+</span><span id="line-115"><span class="sd">        only), so `play: turn` can turn the character (an#197)</span>
+</span><span id="line-116"><span class="sd">    feet_origin: put the stage point at the feet (the rig's root bone), so</span>
+</span><span id="line-117"><span class="sd">        `stage.at` is where the character stands and every build placed at one</span>
+</span><span id="line-118"><span class="sd">        y stands on one floor line (an#285). On by default; --no-feet-origin</span>
+</span><span id="line-119"><span class="sd">        places it by the middle of its bones, as characters made before were</span>
+</span><span id="line-120"><span class="sd">        (convert one of those with `an character feet-origin`)</span>
+</span><span id="line-121"><span class="sd">    """</span>
+</span><span id="line-122">    <span class="n">target</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+</span><span id="line-123">    <span class="n">target</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-124">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-125">        <span class="n">variants</span> <span class="o">=</span> <span class="n">_parse_variants</span><span class="p">(</span><span class="n">mouth_variants</span><span class="p">)</span>
+</span><span id="line-126">        <span class="n">palette_map</span> <span class="o">=</span> <span class="n">_parse_palette</span><span class="p">(</span><span class="n">palette</span><span class="p">)</span>
+</span><span id="line-127">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-128">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span><span id="line-129">    <span class="k">if</span> <span class="n">style</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DICEBEAR_STYLES</span><span class="p">:</span>
+</span><span id="line-130">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span>
+</span><span id="line-131">            <span class="sa">f</span><span class="s2">"unknown DiceBear style: </span><span class="si">{</span><span class="n">style</span><span class="si">!r}</span><span class="s2">. Known: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DICEBEAR_STYLES</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-132">        <span class="p">)</span>
+</span><span id="line-133">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-134">        <span class="n">desc</span> <span class="o">=</span> <span class="n">_new_character</span><span class="p">(</span>
+</span><span id="line-135">            <span class="n">target</span><span class="p">,</span>
+</span><span id="line-136">            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+</span><span id="line-137">            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-138">            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+</span><span id="line-139">            <span class="n">voice_ref</span><span class="o">=</span><span class="n">voice_ref</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-140">            <span class="n">use_dicebear</span><span class="o">=</span><span class="ow">not</span> <span class="n">offline</span><span class="p">,</span>
+</span><span id="line-141">            <span class="n">acknowledge_attribution</span><span class="o">=</span><span class="n">acknowledge_attribution</span><span class="p">,</span>
+</span><span id="line-142">            <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
+</span><span id="line-143">            <span class="n">mouth_variants</span><span class="o">=</span><span class="n">variants</span><span class="p">,</span>
+</span><span id="line-144">            <span class="n">palette</span><span class="o">=</span><span class="n">palette_map</span><span class="p">,</span>
+</span><span id="line-145">            <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">,</span>
+</span><span id="line-146">            <span class="n">head_scale</span><span class="o">=</span><span class="n">head_scale</span><span class="p">,</span>
+</span><span id="line-147">            <span class="n">hat</span><span class="o">=</span><span class="n">hat</span><span class="p">,</span>
+</span><span id="line-148">            <span class="n">sash</span><span class="o">=</span><span class="n">sash</span><span class="p">,</span>
+</span><span id="line-149">            <span class="n">views</span><span class="o">=</span><span class="n">views</span><span class="p">,</span>
+</span><span id="line-150">            <span class="n">hair_style</span><span class="o">=</span><span class="n">hair_style</span><span class="p">,</span>
+</span><span id="line-151">            <span class="n">hair_length</span><span class="o">=</span><span class="n">hair_length</span><span class="p">,</span>
+</span><span id="line-152">            <span class="n">feet_origin</span><span class="o">=</span><span class="n">feet_origin</span><span class="p">,</span>
+</span><span id="line-153">            <span class="n">clothing_pattern</span><span class="o">=</span><span class="n">resolve_tile_paths</span><span class="p">(</span><span class="n">clothing_pattern</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">),</span>
+</span><span id="line-154">        <span class="p">)</span>
+</span><span id="line-155">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-156">        <span class="c1"># A licence refusal is a message for a human, not a traceback. The</span>
+</span><span id="line-157">        <span class="c1"># sibling branch above already returns its rejection as a string; a</span>
+</span><span id="line-158">        <span class="c1"># gate added below the CLI without a flag above it made every CC BY</span>
+</span><span id="line-159">        <span class="c1"># style unreachable AND ugly.</span>
+</span><span id="line-160">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span><span id="line-161">    <span class="n">doc</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">desc</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-162">    <span class="n">note</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-163">        <span class="s2">"; no views: a DiceBear head's face is baked, so its back and profile "</span>
+</span><span id="line-164">        <span class="s2">"cannot be drawn (use --offline to turn it)"</span>
+</span><span id="line-165">        <span class="k">if</span> <span class="n">views</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">offline</span> <span class="ow">and</span> <span class="s2">"view"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"asset_sets"</span><span class="p">,</span> <span class="p">{})</span>
+</span><span id="line-166">        <span class="k">else</span> <span class="s2">""</span>
+</span><span id="line-167">    <span class="p">)</span>
+</span><span id="line-168">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">stage_extent</span>
+</span><span id="line-169">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterDescriptor</span>
+</span><span id="line-170">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.migrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">migrate</span>
+</span><span id="line-171">
+</span><span id="line-172">    <span class="n">ext</span> <span class="o">=</span> <span class="n">stage_extent</span><span class="p">(</span><span class="n">validate_raw</span><span class="p">(</span><span class="n">doc</span><span class="p">))</span>
+</span><span id="line-173">    <span class="n">note</span> <span class="o">+=</span> <span class="p">(</span>
+</span><span id="line-174">        <span class="sa">f</span><span class="s2">"; stands </span><span class="si">{</span><span class="n">ext</span><span class="p">[</span><span class="s1">'height'</span><span class="p">]</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> px tall at stage.scale 1 — its top "</span>
+</span><span id="line-175">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ext</span><span class="p">[</span><span class="s1">'top'</span><span class="p">]</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> px above its stage point, its feet </span><span class="si">{</span><span class="n">ext</span><span class="p">[</span><span class="s1">'feet'</span><span class="p">]</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> px below"</span>
+</span><span id="line-176">    <span class="p">)</span>
+</span><span id="line-177">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.brows</span><span class="w"> </span><span class="kn">import</span> <span class="n">BROWS_FEATURE</span><span class="p">,</span> <span class="n">brow_cover</span>
+</span><span id="line-178">
+</span><span id="line-179">    <span class="c1"># derived from the knobs and the recorded seat (an#284), plus any override</span>
+</span><span id="line-180">    <span class="n">covers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"occluded"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span>
+</span><span id="line-181">    <span class="n">derived</span> <span class="o">=</span> <span class="n">brow_cover</span><span class="p">(</span><span class="n">validate_raw</span><span class="p">(</span><span class="n">doc</span><span class="p">))</span>
+</span><span id="line-182">    <span class="k">if</span> <span class="n">derived</span><span class="p">:</span>
+</span><span id="line-183">        <span class="n">covers</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">BROWS_FEATURE</span><span class="p">,</span> <span class="n">derived</span><span class="p">)</span>
+</span><span id="line-184">    <span class="k">for</span> <span class="n">feature</span><span class="p">,</span> <span class="n">cover</span> <span class="ow">in</span> <span class="n">covers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="line-185">        <span class="n">note</span> <span class="o">+=</span> <span class="p">(</span>
+</span><span id="line-186">            <span class="sa">f</span><span class="s2">"; </span><span class="si">{</span><span class="n">cover</span><span class="si">}</span><span class="s2"> covers the </span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">, so expressions cannot act with them "</span>
+</span><span id="line-187">            <span class="s2">"(see `an character capabilities`)"</span>
+</span><span id="line-188">        <span class="p">)</span>
+</span><span id="line-189">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"created character at </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2"> (descriptor: </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)</span><span class="si">{</span><span class="n">note</span><span class="si">}</span><span class="s2">"</span></div>
 
+</span><span id="line-190">
 </span><span id="line-191">
-</span><span id="line-192">
 <div class="viewcode-block" id="mouths">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.cli.html#cutan.characters.cli.mouths">[docs]</a>
-</span><span id="line-193"><span class="k">def</span><span class="w"> </span><span class="nf">mouths</span><span class="p">(</span>
-</span><span id="line-194">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-195">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-196">    <span class="n">palette</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-197">    <span class="n">variants</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"happy,sad"</span><span class="p">,</span>
-</span><span id="line-198"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-199"><span class="w">    </span><span class="sd">"""Regenerate the default 9-shape mouth set for ``name``, plus its</span>
-</span><span id="line-200"><span class="sd">    `viseme@&lt;form&gt;` variants, and declare them in the descriptor.</span>
-</span><span id="line-201">
-</span><span id="line-202"><span class="sd">    Useful when you want to reset a character's mouth art to the offline</span>
-</span><span id="line-203"><span class="sd">    fallback (e.g. after experimenting with hand-drawn mouths), or to give a</span>
-</span><span id="line-204"><span class="sd">    pre-an#98 character the variant sets its expressions prefer.</span>
-</span><span id="line-205">
-</span><span id="line-206"><span class="sd">    name: character id</span>
-</span><span id="line-207"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
-</span><span id="line-208"><span class="sd">    palette: optional JSON string to override colors, e.g. '{"lip":"#a44"}'</span>
-</span><span id="line-209"><span class="sd">    variants: comma-separated mouth forms (see `an character new`); "" = none</span>
-</span><span id="line-210"><span class="sd">    """</span>
-</span><span id="line-211">
-</span><span id="line-212">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
-</span><span id="line-213">    <span class="n">target</span> <span class="o">=</span> <span class="n">char_dir</span> <span class="o">/</span> <span class="s2">"parts"</span> <span class="o">/</span> <span class="s2">"mouth"</span>
-</span><span id="line-214">    <span class="n">palette_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-215">    <span class="k">if</span> <span class="n">palette</span><span class="p">:</span>
-</span><span id="line-216">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-217">            <span class="n">palette_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">palette</span><span class="p">)</span>
-</span><span id="line-218">        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-219">            <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"invalid palette JSON: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-220">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-221">        <span class="n">variant_map</span> <span class="o">=</span> <span class="n">_parse_variants</span><span class="p">(</span><span class="n">variants</span><span class="p">)</span>
-</span><span id="line-222">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-223">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-</span><span id="line-224">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">recording_drawn</span>
-</span><span id="line-225">
-</span><span id="line-226">    <span class="k">with</span> <span class="n">recording_drawn</span><span class="p">(</span><span class="n">char_dir</span><span class="p">):</span>
-</span><span id="line-227">        <span class="n">written</span> <span class="o">=</span> <span class="n">write_default_mouths</span><span class="p">(</span>
-</span><span id="line-228">            <span class="n">target</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette_dict</span><span class="p">,</span> <span class="n">variants</span><span class="o">=</span><span class="n">variant_map</span>
-</span><span id="line-229">        <span class="p">)</span>
-</span><span id="line-230">        <span class="n">_stamp_mouths</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">written</span><span class="p">,</span> <span class="n">variant_map</span><span class="p">)</span>
-</span><span id="line-231">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s2"> mouth shapes to </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span></div>
+</span><span id="line-192"><span class="k">def</span><span class="w"> </span><span class="nf">mouths</span><span class="p">(</span>
+</span><span id="line-193">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-194">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-195">    <span class="n">palette</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-196">    <span class="n">variants</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"happy,sad"</span><span class="p">,</span>
+</span><span id="line-197"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-198"><span class="w">    </span><span class="sd">"""Regenerate the default 9-shape mouth set for ``name``, plus its</span>
+</span><span id="line-199"><span class="sd">    `viseme@&lt;form&gt;` variants, and declare them in the descriptor.</span>
+</span><span id="line-200">
+</span><span id="line-201"><span class="sd">    Useful when you want to reset a character's mouth art to the offline</span>
+</span><span id="line-202"><span class="sd">    fallback (e.g. after experimenting with hand-drawn mouths), or to give a</span>
+</span><span id="line-203"><span class="sd">    pre-an#98 character the variant sets its expressions prefer.</span>
+</span><span id="line-204">
+</span><span id="line-205"><span class="sd">    name: character id</span>
+</span><span id="line-206"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
+</span><span id="line-207"><span class="sd">    palette: optional JSON string to override colors, e.g. '{"lip":"#a44"}'</span>
+</span><span id="line-208"><span class="sd">    variants: comma-separated mouth forms (see `an character new`); "" = none</span>
+</span><span id="line-209"><span class="sd">    """</span>
+</span><span id="line-210">
+</span><span id="line-211">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
+</span><span id="line-212">    <span class="n">target</span> <span class="o">=</span> <span class="n">char_dir</span> <span class="o">/</span> <span class="s2">"parts"</span> <span class="o">/</span> <span class="s2">"mouth"</span>
+</span><span id="line-213">    <span class="n">palette_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-214">    <span class="k">if</span> <span class="n">palette</span><span class="p">:</span>
+</span><span id="line-215">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-216">            <span class="n">palette_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">palette</span><span class="p">)</span>
+</span><span id="line-217">        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-218">            <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"invalid palette JSON: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-219">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-220">        <span class="n">variant_map</span> <span class="o">=</span> <span class="n">_parse_variants</span><span class="p">(</span><span class="n">variants</span><span class="p">)</span>
+</span><span id="line-221">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-222">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span><span id="line-223">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">recording_drawn</span>
+</span><span id="line-224">
+</span><span id="line-225">    <span class="k">with</span> <span class="n">recording_drawn</span><span class="p">(</span><span class="n">char_dir</span><span class="p">):</span>
+</span><span id="line-226">        <span class="n">written</span> <span class="o">=</span> <span class="n">write_default_mouths</span><span class="p">(</span>
+</span><span id="line-227">            <span class="n">target</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette_dict</span><span class="p">,</span> <span class="n">variants</span><span class="o">=</span><span class="n">variant_map</span>
+</span><span id="line-228">        <span class="p">)</span>
+</span><span id="line-229">        <span class="n">_stamp_mouths</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">written</span><span class="p">,</span> <span class="n">variant_map</span><span class="p">)</span>
+</span><span id="line-230">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s2"> mouth shapes to </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span></div>
 
+</span><span id="line-231">
 </span><span id="line-232">
-</span><span id="line-233">
-</span><span id="line-234"><span class="k">def</span><span class="w"> </span><span class="nf">_stamp_mouths</span><span class="p">(</span><span class="n">char_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">variant_map</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-235"><span class="w">    </span><span class="sd">"""Size, declare and stamp the mouths just drawn for the character at ``char_dir``."""</span>
-</span><span id="line-236">    <span class="k">if</span> <span class="n">descriptor_path</span><span class="p">(</span><span class="n">char_dir</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span id="line-237">        <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-</span><span id="line-238">            <span class="n">declare_mouth_variants</span><span class="p">,</span>
-</span><span id="line-239">            <span class="n">scale_part_files</span><span class="p">,</span>
-</span><span id="line-240">            <span class="n">stamp_factory_parts</span><span class="p">,</span>
-</span><span id="line-241">        <span class="p">)</span>
+</span><span id="line-233"><span class="k">def</span><span class="w"> </span><span class="nf">_stamp_mouths</span><span class="p">(</span><span class="n">char_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">variant_map</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-234"><span class="w">    </span><span class="sd">"""Size, declare and stamp the mouths just drawn for the character at ``char_dir``."""</span>
+</span><span id="line-235">    <span class="k">if</span> <span class="n">descriptor_path</span><span class="p">(</span><span class="n">char_dir</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span id="line-236">        <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-237">            <span class="n">declare_mouth_variants</span><span class="p">,</span>
+</span><span id="line-238">            <span class="n">scale_part_files</span><span class="p">,</span>
+</span><span id="line-239">            <span class="n">stamp_factory_parts</span><span class="p">,</span>
+</span><span id="line-240">        <span class="p">)</span>
+</span><span id="line-241">
 </span><span id="line-242">        <span class="n">desc</span> <span class="o">=</span> <span class="n">load_descriptor</span><span class="p">(</span><span class="n">char_dir</span><span class="p">)</span>
 </span><span id="line-243">        <span class="c1"># A rig drawn with a head scale gets its mouths at the face's size.</span>
 </span><span id="line-244">        <span class="n">scale_part_files</span><span class="p">(</span><span class="n">written</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">desc</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"head_scale"</span><span class="p">)</span> <span class="ow">or</span> <span class="mf">1.0</span><span class="p">))</span>
@@ -1114,7 +1114,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=ae06b2e5"></script>
+    <script src="../../../_static/documentation_options.js?v=5c6fbccc"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

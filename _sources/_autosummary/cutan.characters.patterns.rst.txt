@@ -9,6 +9,7 @@ cutan.characters.patterns
    .. autosummary::
    
       PATTERN_KINDS
+      MAX_TILE_BYTES
       PATTERN_ID
    
    .. rubric:: Functions
@@ -20,6 +21,8 @@ cutan.characters.patterns
       pattern_overlay
       painted_fill
       distinct_pattern
+      read_tile
+      resolve_tile_paths
    
    .. rubric:: Classes
 

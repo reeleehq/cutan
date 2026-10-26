@@ -89,7 +89,7 @@
 - [cutan.verify.cadence](_autosummary/cutan.verify.cadence.html.md): Pre-render cadence lint: the scene’s timing against its style spec (catalogue B6, an#519 rank 5).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 16:43 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 17:12 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 
