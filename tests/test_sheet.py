@@ -327,6 +327,227 @@ def test_moving_parts_are_split_off_one_carving_at_their_pivots(char, torso_shee
     assert not [f for f in validate_character(char).findings if f.severity == "error"]
 
 
+# --- placing a split part (cutan#140), checked against an's own rig builder ---
+
+
+def _edit(char_dir, change):
+    raw = json.loads((char_dir / "character.json").read_text())
+    change(raw)
+    (char_dir / "character.json").write_text(json.dumps(raw))
+
+
+def _bone(raw, name):
+    return next(b for b in raw["bones"] if b["name"] == name)
+
+
+def _built(char_dir):
+    """``{slot: (x, y)}``: where an's builder draws each slot's node, view_box
+    units from the rig's origin (scene px / k), composing the nodes' transforms."""
+    from an.ir.schema import AssetRef
+    from an.stage.rig import SCENE_PX_PER_VIEW_BOX, build_rig_subtree
+
+    from cutan.characters.schema import CHARACTER_DOCUMENT_KIND
+
+    raw = json.loads((char_dir / "character.json").read_text())
+    root = build_rig_subtree(
+        AssetRef(kind="character", id="c", store="characters", ref="c"),
+        raw,
+        textures={},
+        descriptor_model=CharacterDescriptor,
+        document_kind=CHARACTER_DOCUMENT_KIND,
+        skip_slots=(),
+    )
+    k = SCENE_PX_PER_VIEW_BOX / raw["view_box"][3]
+    out = {}
+
+    def walk(node, at, m):
+        t = node.transform
+        here = at + m @ np.array([t.x, t.y])
+        out[node.name] = tuple(here / k)
+        r, sx, sy = t.rotation or 0.0, t.scale_x or 1.0, t.scale_y or 1.0
+        c, s = np.cos(r), np.sin(r)
+        own = np.array([[c * sx, -s * sy], [s * sx, c * sy]])
+        for kid in node.children or []:
+            walk(kid, here, m @ own)
+
+    for kid in root.children:
+        walk(kid, np.zeros(2), np.eye(2))
+    return out
+
+
+def _pivot_offset(char_dir, base, part):
+    """The part's pivot from the base's anchor in SHEET px, from what was written:
+    the part's split origin and anchor, the base's anchor, and the carving's scale
+    (carved px per sheet px, from a picture's px against its declared width)."""
+    atts = _atts(char_dir)
+    b, p = atts[base], atts[part]
+    bw, bh = Image.open(char_dir / b.path).size
+    pw, ph = Image.open(char_dir / p.path).size
+    ox, oy = p.source.extra["carve"]["split"]["origin"]
+    pivot = (ox + p.anchor[0] * pw, oy + p.anchor[1] * ph)
+    anchor = (b.anchor[0] * bw, b.anchor[1] * bh)
+    return pivot, anchor
+
+
+def _assert_placed(char_dir, base_slot, base, parts, *, unit):
+    nodes = _built(char_dir)
+    for slot, name in parts:
+        pivot, anchor = _pivot_offset(char_dir, base, name)
+        pw = Image.open(char_dir / _atts(char_dir)[name].path).size[0]
+        scale = pw * unit / _atts(char_dir)[name].width
+        want = tuple(
+            nodes[base_slot][i] + (pivot[i] - anchor[i]) / scale * unit for i in (0, 1)
+        )
+        assert nodes[slot] == pytest.approx(want, abs=1e-6), name
+
+
+TORSO = [SheetPart("torso", (0, 0, 200, 140), {"point": (100, 119)}, split=SPLIT)]
+ARMS = [("arm_l", "arm_l"), ("arm_r", "arm_r")]
+
+
+def test_a_unit_places_a_split_part_at_its_pivot_from_the_base_anchor(
+    char, torso_sheet
+):
+    report = sheet_to_package(torso_sheet, TORSO, char, source=SOURCE, unit=0.5)
+    _assert_placed(char, "torso", "torso", ARMS, unit=0.5)
+    atts = _atts(char)
+    assert (atts["torso"].x, atts["torso"].y) == (0, 0)  # the base is not moved
+    assert not report.warnings
+
+
+def test_a_part_nested_flat_under_its_base_is_placed_from_the_base_s_offset(
+    char, torso_sheet
+):
+    def head_offset(raw):
+        for att in raw["skins"]["default"]["slots"]["head"].values():
+            att["x"] = 20.0
+
+    _edit(char, head_offset)
+    recipe = [
+        SheetPart(
+            "head",
+            (0, 0, 200, 140),
+            {"point": (100, 119)},
+            split={"pupil_l": SPLIT["arm_l"]},
+        )
+    ]
+    report = sheet_to_package(torso_sheet, recipe, char, source=SOURCE, unit=0.5)
+    _assert_placed(char, "head", "head", [("left_pupil", "pupil_l")], unit=0.5)
+    assert _atts(char)["sclera_l"].x == -41.6  # another slot is left alone
+    assert not report.warnings
+
+
+def test_bones_nesting_is_placed_by_its_own_rule(char, torso_sheet):
+    def bones(raw):
+        raw["nesting"] = "bones"
+        for att in raw["skins"]["default"]["slots"]["torso"].values():
+            att["x"], att["y"] = 15.0, -5.0  # a chain does not inherit it
+
+    _edit(char, bones)
+    sheet_to_package(torso_sheet, TORSO, char, source=SOURCE, unit=0.5)
+    _assert_placed(char, "torso", "torso", ARMS, unit=0.5)
+
+
+def test_a_superresolved_carving_is_placed_in_sheet_pixels(char, torso_sheet):
+    carve_args = {
+        "point": (100, 119),
+        "superres": {"superres": "resample", "factor": 2},
+    }
+    recipe = [SheetPart("torso", (0, 0, 200, 140), carve_args, split=SPLIT)]
+    sheet_to_package(torso_sheet, recipe, char, source=SOURCE, unit=1.0)
+    _assert_placed(char, "torso", "torso", ARMS, unit=1.0)
+    a = _atts(char)
+    assert a["arm_l"].x == pytest.approx(-a["arm_r"].x, abs=3)  # the arms are mirrored
+
+
+def test_a_character_with_two_skins_is_split_and_placed(char, torso_sheet):
+    _edit(char, lambda raw: raw["skins"].update(alt=raw["skins"]["default"]))
+    report = sheet_to_package(torso_sheet, TORSO, char, source=SOURCE)
+    assert any("arm_l" in w and "`unit`" in w for w in report.warnings)
+    sheet_to_package(torso_sheet, TORSO, char, source=SOURCE, unit=0.5)
+    _assert_placed(char, "torso", "torso", ARMS, unit=0.5)
+
+
+def test_without_a_unit_the_report_gives_the_pivot_offset(char, torso_sheet):
+    report = sheet_to_package(torso_sheet, TORSO, char, source=SOURCE)
+    atts = _atts(char)
+    assert (atts["arm_l"].x, atts["arm_l"].y) == (0, 0)  # the factory's, untouched
+    (note,) = [w for w in report.warnings if w.startswith("arm_l:")]
+    assert "sheet px from the anchor of 'torso'" in note and "`unit`" in note
+    (dx, dy) = (
+        float(v) for v in note.split("its pivot is ")[1].split(" sheet")[0].split(",")
+    )
+    pivot, anchor = _pivot_offset(char, "torso", "arm_l")
+    assert (dx, dy) == pytest.approx(
+        (pivot[0] - anchor[0], pivot[1] - anchor[1]), abs=0.06
+    )
+    assert (dx, dy) == pytest.approx(
+        (-45, -89), abs=1.5
+    )  # the sheet's (55, 30) - (100, 119)
+
+
+def test_a_turned_base_is_reported_not_guessed_and_a_turned_part_is_placed(
+    char, torso_sheet
+):
+    _edit(char, lambda raw: _bone(raw, "torso").update(rotation_deg=10.0))
+    report = sheet_to_package(torso_sheet, TORSO, char, source=SOURCE, unit=0.5)
+    (note,) = [w for w in report.warnings if w.startswith("arm_l:")]
+    assert "not placed: 'torso' is drawn turned or scaled at rest" in note
+    assert _atts(char)["arm_l"].x == 0
+
+    _edit(char, lambda raw: _bone(raw, "torso").update(rotation_deg=0.0))
+    _edit(char, lambda raw: _bone(raw, "arm_l").update(rotation_deg=25.0))
+    report = sheet_to_package(torso_sheet, TORSO, char, source=SOURCE, unit=0.5)
+    assert not report.warnings
+    _assert_placed(char, "torso", "torso", ARMS, unit=0.5)
+
+
+def test_a_bone_cycle_is_refused_not_walked_forever(char, tmp_path):
+    import threading
+
+    from cutan.characters.placement import place_attachment, rest_anchor
+    from cutan.characters.set_part import SetPartError
+
+    _edit(char, lambda raw: _bone(raw, "root").update(parent="torso"))
+    errors = []
+
+    def attempt():
+        for call in (
+            lambda: rest_anchor(char, "arm_l"),
+            lambda: place_attachment(char, "arm_l", world=(0.0, 0.0)),
+        ):
+            try:
+                call()
+            except Exception as e:  # noqa: BLE001 — the type is the assertion
+                errors.append(e)
+
+    worker = threading.Thread(target=attempt, daemon=True)
+    worker.start()
+    worker.join(timeout=10)
+    assert not worker.is_alive(), "the walk did not stop on a bone cycle"
+    assert len(errors) == 2 and all(isinstance(e, SetPartError) for e in errors)
+    assert "cycle" in str(errors[0])
+
+
+def test_an_unknown_or_ambiguous_attachment_is_a_set_part_error(char):
+    from cutan.characters.placement import place_attachment
+    from cutan.characters.set_part import SetPartError
+
+    with pytest.raises(SetPartError, match="no attachment"):
+        place_attachment(char, "nope", world=(0.0, 0.0))
+    with pytest.raises(SetPartError, match="several slots"):
+        place_attachment(char, "open", world=(0.0, 0.0))  # both eyes
+    _edit(char, lambda raw: raw["slots"].append({"name": "x", "bone": "nope"}))
+    _edit(
+        char,
+        lambda raw: raw["skins"]["default"]["slots"].update(
+            x={"x": {"path": "parts/head.svg"}}
+        ),
+    )
+    with pytest.raises(SetPartError, match="bone 'nope'"):
+        place_attachment(char, "x/x", world=(0.0, 0.0))
+
+
 def test_a_split_that_shares_a_file_or_takes_everything_changes_nothing(
     char, torso_sheet
 ):
