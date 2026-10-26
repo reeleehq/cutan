@@ -30,7 +30,13 @@ from cutan.characters.descriptor_io import (
     write_descriptor,
 )
 
-__all__ = ["PartReplacement", "SetPartError", "part_path", "replace_part_art", "set_part"]
+__all__ = [
+    "PartReplacement",
+    "SetPartError",
+    "part_path",
+    "replace_part_art",
+    "set_part",
+]
 
 
 class SetPartError(ValueError):
