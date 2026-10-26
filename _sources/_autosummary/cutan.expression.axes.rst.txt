@@ -13,11 +13,14 @@ cutan.expression.axes
       INTENSITY_AXIS
       LID_WIDE_ABOVE
       LID_KEY_WIDE
+      BROW_FURROW_BELOW
+      BROW_KEY_ANGRY
    
    .. rubric:: Functions
 
    .. autosummary::
    
+      brow_key
       clamp_axes
       lid_key
    

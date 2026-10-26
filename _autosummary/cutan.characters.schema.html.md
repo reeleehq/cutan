@@ -56,6 +56,7 @@ several slots.
 | [`DEFAULT_VISEME_MAP`](#cutan.characters.schema.DEFAULT_VISEME_MAP)         | Default Rhubarb-letter → mouth-attachment-name mapping.                                                                                                                                                                                               |
 | [`VISEME_CHANNEL`](#cutan.characters.schema.VISEME_CHANNEL)             | The swap channel lip-sync drives.                                                                                                                                                                                                                     |
 | [`EYELID_CHANNEL`](#cutan.characters.schema.EYELID_CHANNEL)             | The swap channel blinks drive.                                                                                                                                                                                                                        |
+| [`BROW_CHANNEL`](#cutan.characters.schema.BROW_CHANNEL)               | keys `ANGRY`, `RAISED` and `NONE`, read off the brow axes the way `eyelid` is off `lid_open`.                                                                                                                                                         |
 | [`DEFAULT_EYELID_MAP`](#cutan.characters.schema.DEFAULT_EYELID_MAP)         | Default eyelid-state → attachment-name mapping, shared by both eye slots.                                                                                                                                                                             |
 | [`VIEW_CHANNEL`](#cutan.characters.schema.VIEW_CHANNEL)               | one KEY per drawn view, projected onto the slots whose art changes with the view (the factory draws the head and the torso), each slot carrying attachments NAMED after the keys.                                                                     |
 | [`VIEWS`](#cutan.characters.schema.VIEWS)                      | The views the factory draws, in turnaround order.                                                                                                                                                                                                     |
@@ -109,6 +110,15 @@ list of `[time_s, value]` pairs evaluated in order.
 #### model_config *: [ClassVar](https://docs.python.org/3/library/typing.html#typing.ClassVar)[ConfigDict]* *= {'extra': 'allow', 'populate_by_name': True}*
 
 Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+### cutan.characters.schema.BROW_CHANNEL *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'brow'*
+
+keys `ANGRY`,
+`RAISED` and `NONE`, read off the brow axes the way `eyelid` is off
+`lid_open`.
+
+* **Type:**
+  The swap set that draws a carved face’s brows (cutan#114)
 
 ### cutan.characters.schema.CHARACTER_DOCUMENT_KIND *: DocumentKind* *= DocumentKind(name='CharacterDescriptor', version_field='schema_version', current_version='0.4.0')*
 

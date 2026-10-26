@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-26T06:14:54Z",
+  "built_at": "2026-10-26T10:46:55Z",
   "package": {
     "name": "cutan",
-    "version": "0.0.69",
+    "version": "0.0.70",
     "display_name": "cutan",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "7c8e4c8bc900c48cb6c81325915d0b41692cc245",
-    "short_commit": "7c8e4c8",
+    "commit": "56c4982d97f9acb19edb97e0b5b6bfc670d1e6c4",
+    "short_commit": "56c4982",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/cutan",
-    "commit_url": "https://github.com/reeleehq/cutan/commit/7c8e4c8bc900c48cb6c81325915d0b41692cc245",
+    "commit_url": "https://github.com/reeleehq/cutan/commit/56c4982d97f9acb19edb97e0b5b6bfc670d1e6c4",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/cutan",
-    "sha": "7c8e4c8bc900c48cb6c81325915d0b41692cc245",
+    "sha": "56c4982d97f9acb19edb97e0b5b6bfc670d1e6c4",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "40278191970",
-    "run_url": "https://github.com/reeleehq/cutan/actions/runs/40278191970",
+    "run_id": "40309324757",
+    "run_url": "https://github.com/reeleehq/cutan/actions/runs/40309324757",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -56,20 +56,20 @@
   },
   "site": {
     "modules_documented": 77,
-    "objects_documented": 891
+    "objects_documented": 895
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.70",
+    "latest": "0.0.71",
     "relation": "behind",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 7c8e4c8bc900c48cb6c81325915d0b41692cc245\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 56c4982d97f9acb19edb97e0b5b6bfc670d1e6c4\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": false,
     "notes": [
-      "The documented version (0.0.69) is behind the latest release on PyPI (0.0.70): `pip install cutan` gives newer code than these docs describe."
+      "The documented version (0.0.70) is behind the latest release on PyPI (0.0.71): `pip install cutan` gives newer code than these docs describe."
     ]
   }
 }

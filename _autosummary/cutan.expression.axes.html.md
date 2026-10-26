@@ -26,18 +26,21 @@ opens monotonically `X → A → B → C → D`).
 
 ### Module Attributes
 
-| [`AXES`](#cutan.expression.axes.AXES)            |                                                                                    |
-|------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| [`MOUTH_FORM_AXIS`](#cutan.expression.axes.MOUTH_FORM_AXIS) | which `viseme@<form>` set the mouth's key indexes.                                 |
-| [`INTENSITY_AXIS`](#cutan.expression.axes.INTENSITY_AXIS)  | The scalar on every offset (MPEG-4 "excitation"); the blend ramp is a curve on it. |
-| [`LID_WIDE_ABOVE`](#cutan.expression.axes.LID_WIDE_ABOVE)  | The eyelid ladder — one rule, stated once (research §6).                           |
-| [`LID_KEY_WIDE`](#cutan.expression.axes.LID_KEY_WIDE)    | Eyelid set keys the ladder can name, by openness.                                  |
+| [`AXES`](#cutan.expression.axes.AXES)              |                                                                                                                                                                                                              |
+|--------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`MOUTH_FORM_AXIS`](#cutan.expression.axes.MOUTH_FORM_AXIS)   | which `viseme@<form>` set the mouth's key indexes.                                                                                                                                                           |
+| [`INTENSITY_AXIS`](#cutan.expression.axes.INTENSITY_AXIS)    | The scalar on every offset (MPEG-4 "excitation"); the blend ramp is a curve on it.                                                                                                                           |
+| [`LID_WIDE_ABOVE`](#cutan.expression.axes.LID_WIDE_ABOVE)    | The eyelid ladder — one rule, stated once (research §6).                                                                                                                                                     |
+| [`LID_KEY_WIDE`](#cutan.expression.axes.LID_KEY_WIDE)      | Eyelid set keys the ladder can name, by openness.                                                                                                                                                            |
+| [`BROW_FURROW_BELOW`](#cutan.expression.axes.BROW_FURROW_BELOW) | The brow ladder (cutan#114), for a rig that draws its brows as a swap set: a furrow (`brow_angle` below the first) draws `ANGRY`, else a raise (`brow_height` above the second) draws `RAISED`, else `NONE`. |
+| [`BROW_KEY_ANGRY`](#cutan.expression.axes.BROW_KEY_ANGRY)    | Brow set keys the ladder can name.                                                                                                                                                                           |
 
 ### Functions
 
-| [`clamp_axes`](#cutan.expression.axes.clamp_axes)(values)            | Clamp every numeric axis to its range; an unknown axis is an error.       |
-|--------------------------------------------------------------------------------|---------------------------------------------------------------------------|
-| [`lid_key`](#cutan.expression.axes.lid_key)(value, \*, available) | The eyelid key a lid state selects, degraded to the art the rig declares. |
+| [`brow_key`](#cutan.expression.axes.brow_key)(height, angle, \*, available)   | The brow key one side's height and angle select, degraded to the art declared.   |
+|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| [`clamp_axes`](#cutan.expression.axes.clamp_axes)(values)                       | Clamp every numeric axis to its range; an unknown axis is an error.              |
+| [`lid_key`](#cutan.expression.axes.lid_key)(value, \*, available)            | The eyelid key a lid state selects, degraded to the art the rig declares.        |
 
 ### Classes
 
@@ -62,6 +65,16 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 One numeric axis: its range and its rest (neutral) value.
 
+### cutan.expression.axes.BROW_FURROW_BELOW *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= -0.25*
+
+The brow ladder (cutan#114), for a rig that draws its brows as a swap set:
+a furrow (`brow_angle` below the first) draws `ANGRY`, else a raise
+(`brow_height` above the second) draws `RAISED`, else `NONE`.
+
+### cutan.expression.axes.BROW_KEY_ANGRY *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'ANGRY'*
+
+Brow set keys the ladder can name.
+
 ### cutan.expression.axes.INTENSITY_AXIS *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'intensity'*
 
 The scalar on every offset (MPEG-4 “excitation”); the blend ramp is a curve on it.
@@ -82,6 +95,27 @@ which `viseme@<form>` set the mouth’s key indexes.
 
 * **Type:**
   The selection axis
+
+### cutan.expression.axes.brow_key(height, angle, , available)
+
+The brow key one side’s height and angle select, degraded to the art declared.
+
+A furrow draws `ANGRY`, else a raise `RAISED`, else `NONE` — and a
+state the set has no drawing for is `NONE`, never a blend.
+
+```pycon
+>>> brow_key(-0.6, -0.48, available={"ANGRY", "RAISED", "NONE"})
+'ANGRY'
+>>> brow_key(0.6, 0.0, available={"ANGRY", "RAISED", "NONE"})
+'RAISED'
+>>> brow_key(0.6, 0.0, available={"ANGRY", "NONE"})
+'NONE'
+>>> brow_key(0.1, -0.1, available={"ANGRY", "RAISED", "NONE"})
+'NONE'
+```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.expression.axes.clamp_axes(values)
 

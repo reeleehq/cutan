@@ -174,15 +174,24 @@ opens monotonically <code class="docutils literal notranslate"><span class="pre"
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.axes.LID_KEY_WIDE" title="cutan.expression.axes.LID_KEY_WIDE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LID_KEY_WIDE</span></code></a></p></td>
 <td><p>Eyelid set keys the ladder can name, by openness.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.expression.axes.BROW_FURROW_BELOW" title="cutan.expression.axes.BROW_FURROW_BELOW"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BROW_FURROW_BELOW</span></code></a></p></td>
+<td><p>The brow ladder (cutan#114), for a rig that draws its brows as a swap set: a furrow (<code class="docutils literal notranslate"><span class="pre">brow_angle</span></code> below the first) draws <code class="docutils literal notranslate"><span class="pre">ANGRY</span></code>, else a raise (<code class="docutils literal notranslate"><span class="pre">brow_height</span></code> above the second) draws <code class="docutils literal notranslate"><span class="pre">RAISED</span></code>, else <code class="docutils literal notranslate"><span class="pre">NONE</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.axes.BROW_KEY_ANGRY" title="cutan.expression.axes.BROW_KEY_ANGRY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BROW_KEY_ANGRY</span></code></a></p></td>
+<td><p>Brow set keys the ladder can name.</p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.axes.clamp_axes" title="cutan.expression.axes.clamp_axes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clamp_axes</span></code></a>(values)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.axes.brow_key" title="cutan.expression.axes.brow_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">brow_key</span></code></a>(height, angle, *, available)</p></td>
+<td><p>The brow key one side's height and angle select, degraded to the art declared.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.expression.axes.clamp_axes" title="cutan.expression.axes.clamp_axes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clamp_axes</span></code></a>(values)</p></td>
 <td><p>Clamp every numeric axis to its range; an unknown axis is an error.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.expression.axes.lid_key" title="cutan.expression.axes.lid_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lid_key</span></code></a>(value, *, available)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.expression.axes.lid_key" title="cutan.expression.axes.lid_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lid_key</span></code></a>(value, *, available)</p></td>
 <td><p>The eyelid key a lid state selects, degraded to the art the rig declares.</p></td>
 </tr>
 </tbody>
@@ -220,6 +229,18 @@ Gaze: pupil travel inside the eye, clamped by the rig’s declared travel.</p>
 </dl>
 </dd></dl>
 <dl class="py data">
+<dt class="sig sig-object py" id="cutan.expression.axes.BROW_FURROW_BELOW">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.axes.</span></span><span class="sig-name descname"><span class="pre">BROW_FURROW_BELOW</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-0.25</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.axes.BROW_FURROW_BELOW" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.axes.BROW_FURROW_BELOW'">¶</a></dt>
+<dd><p>The brow ladder (cutan#114), for a rig that draws its brows as a swap set:
+a furrow (<code class="docutils literal notranslate"><span class="pre">brow_angle</span></code> below the first) draws <code class="docutils literal notranslate"><span class="pre">ANGRY</span></code>, else a raise
+(<code class="docutils literal notranslate"><span class="pre">brow_height</span></code> above the second) draws <code class="docutils literal notranslate"><span class="pre">RAISED</span></code>, else <code class="docutils literal notranslate"><span class="pre">NONE</span></code>.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.expression.axes.BROW_KEY_ANGRY">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.axes.</span></span><span class="sig-name descname"><span class="pre">BROW_KEY_ANGRY</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ANGRY'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.axes.BROW_KEY_ANGRY" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.axes.BROW_KEY_ANGRY'">¶</a></dt>
+<dd><p>Brow set keys the ladder can name.</p>
+</dd></dl>
+<dl class="py data">
 <dt class="sig sig-object py" id="cutan.expression.axes.INTENSITY_AXIS">
 <span class="sig-prename descclassname"><span class="pre">cutan.expression.axes.</span></span><span class="sig-name descname"><span class="pre">INTENSITY_AXIS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'intensity'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.axes.INTENSITY_AXIS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.axes.INTENSITY_AXIS'">¶</a></dt>
 <dd><p>The scalar on every offset (MPEG-4 “excitation”); the blend ramp is a curve on it.</p>
@@ -243,6 +264,28 @@ intermediate art degrades to the key it has.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The selection axis</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.expression.axes.brow_key">
+<span class="sig-prename descclassname"><span class="pre">cutan.expression.axes.</span></span><span class="sig-name descname"><span class="pre">brow_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">available</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/expression/axes.html#brow_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.expression.axes.brow_key" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.expression.axes.brow_key'">¶</a></dt>
+<dd><p>The brow key one side’s height and angle select, degraded to the art declared.</p>
+<p>A furrow draws <code class="docutils literal notranslate"><span class="pre">ANGRY</span></code>, else a raise <code class="docutils literal notranslate"><span class="pre">RAISED</span></code>, else <code class="docutils literal notranslate"><span class="pre">NONE</span></code> — and a
+state the set has no drawing for is <code class="docutils literal notranslate"><span class="pre">NONE</span></code>, never a blend.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">brow_key</span><span class="p">(</span><span class="o">-</span><span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.48</span><span class="p">,</span> <span class="n">available</span><span class="o">=</span><span class="p">{</span><span class="s2">"ANGRY"</span><span class="p">,</span> <span class="s2">"RAISED"</span><span class="p">,</span> <span class="s2">"NONE"</span><span class="p">})</span>
+</span><span id="line-2"><span class="go">'ANGRY'</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">brow_key</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">available</span><span class="o">=</span><span class="p">{</span><span class="s2">"ANGRY"</span><span class="p">,</span> <span class="s2">"RAISED"</span><span class="p">,</span> <span class="s2">"NONE"</span><span class="p">})</span>
+</span><span id="line-4"><span class="go">'RAISED'</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="n">brow_key</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">available</span><span class="o">=</span><span class="p">{</span><span class="s2">"ANGRY"</span><span class="p">,</span> <span class="s2">"NONE"</span><span class="p">})</span>
+</span><span id="line-6"><span class="go">'NONE'</span>
+</span><span id="line-7"><span class="gp">&gt;&gt;&gt; </span><span class="n">brow_key</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">available</span><span class="o">=</span><span class="p">{</span><span class="s2">"ANGRY"</span><span class="p">,</span> <span class="s2">"RAISED"</span><span class="p">,</span> <span class="s2">"NONE"</span><span class="p">})</span>
+</span><span id="line-8"><span class="go">'NONE'</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -283,10 +326,13 @@ a rig without <code class="docutils literal notranslate"><span class="pre">half<
 <ul>
 <li><a :data-current="activeSection === '#cutan.expression.axes.AXES'" class="reference internal" href="#cutan.expression.axes.AXES"><code class="docutils literal notranslate"><span class="pre">AXES</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.expression.axes.Axis'" class="reference internal" href="#cutan.expression.axes.Axis"><code class="docutils literal notranslate"><span class="pre">Axis</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.axes.BROW_FURROW_BELOW'" class="reference internal" href="#cutan.expression.axes.BROW_FURROW_BELOW"><code class="docutils literal notranslate"><span class="pre">BROW_FURROW_BELOW</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.axes.BROW_KEY_ANGRY'" class="reference internal" href="#cutan.expression.axes.BROW_KEY_ANGRY"><code class="docutils literal notranslate"><span class="pre">BROW_KEY_ANGRY</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.expression.axes.INTENSITY_AXIS'" class="reference internal" href="#cutan.expression.axes.INTENSITY_AXIS"><code class="docutils literal notranslate"><span class="pre">INTENSITY_AXIS</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.expression.axes.LID_KEY_WIDE'" class="reference internal" href="#cutan.expression.axes.LID_KEY_WIDE"><code class="docutils literal notranslate"><span class="pre">LID_KEY_WIDE</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.expression.axes.LID_WIDE_ABOVE'" class="reference internal" href="#cutan.expression.axes.LID_WIDE_ABOVE"><code class="docutils literal notranslate"><span class="pre">LID_WIDE_ABOVE</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.expression.axes.MOUTH_FORM_AXIS'" class="reference internal" href="#cutan.expression.axes.MOUTH_FORM_AXIS"><code class="docutils literal notranslate"><span class="pre">MOUTH_FORM_AXIS</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.expression.axes.brow_key'" class="reference internal" href="#cutan.expression.axes.brow_key"><code class="docutils literal notranslate"><span class="pre">brow_key()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.expression.axes.clamp_axes'" class="reference internal" href="#cutan.expression.axes.clamp_axes"><code class="docutils literal notranslate"><span class="pre">clamp_axes()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.expression.axes.lid_key'" class="reference internal" href="#cutan.expression.axes.lid_key"><code class="docutils literal notranslate"><span class="pre">lid_key()</span></code></a></li>
 </ul>
@@ -302,7 +348,7 @@ a rig without <code class="docutils literal notranslate"><span class="pre">half<
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=cac962a1"></script>
+<script src="../_static/documentation_options.js?v=29ed05f3"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

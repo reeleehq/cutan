@@ -14,6 +14,7 @@ cutan.characters.schema
       DEFAULT_VISEME_MAP
       VISEME_CHANNEL
       EYELID_CHANNEL
+      BROW_CHANNEL
       DEFAULT_EYELID_MAP
       VIEW_CHANNEL
       VIEWS
