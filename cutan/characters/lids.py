@@ -25,11 +25,12 @@ guessed.
 from __future__ import annotations
 
 import hashlib
-import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from an.stores._common import ASSET_REF_RULE, inside_folder
+
+from cutan.characters.descriptor_io import descriptor_path, read_raw, save_raw
 
 __all__ = [
     "DFLT_HALF_LID_FRACTION",
@@ -140,8 +141,7 @@ def add_half_lid(
     unless ``overwrite``: that drawing is an illustrator's.
     """
     char_dir = Path(char_dir)
-    desc_path = char_dir / "character.json"
-    raw = json.loads(desc_path.read_text(encoding="utf-8"))
+    raw = read_raw(char_dir)
     eyelid = (raw.get("asset_sets") or {}).get(_EYELID_SET) or {}
     keys = {str(k).upper(): v for k, v in eyelid.items()}
     if "OPEN" not in keys or "CLOSED" not in keys:
@@ -198,10 +198,5 @@ def add_half_lid(
             f"{open_name!r} and the {closed_name!r} lid drawings"
         )
     raw["asset_sets"][_EYELID_SET] = {**eyelid, "HALF": HALF_ATTACHMENT}
-    from an.ir.migrate import migrate
-
-    from cutan.characters.schema import CharacterDescriptor
-
-    desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
-    desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
-    return desc_path
+    save_raw(char_dir, raw)
+    return descriptor_path(char_dir)

@@ -21,14 +21,18 @@ Subcommands (used as ``an character <verb> ...``):
 from __future__ import annotations
 
 import json
-import os
 import shutil
 import tempfile
 import textwrap
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from an.cli_status import failed
+from cutan.characters.descriptor_io import (
+    descriptor_path,
+    load_descriptor,
+    write_descriptor,
+)
 from cutan.characters.factory import DFLT_HAIR_LENGTH, DFLT_HAIR_STYLE
 from cutan.characters.factory import new_character as _new_character
 from cutan.characters.validate import format_report as _format_report
@@ -203,9 +207,6 @@ def mouths(
     palette: optional JSON string to override colors, e.g. '{"lip":"#a44"}'
     variants: comma-separated mouth forms (see `an character new`); "" = none
     """
-    from cutan.characters.factory import declare_mouth_variants, scale_part_files
-    from cutan.characters.schema import CharacterDescriptor
-    from an.ir.migrate import migrate
 
     char_dir = _resolve_target(out_dir) / name
     target = char_dir / "parts" / "mouth"
@@ -231,25 +232,18 @@ def mouths(
 
 def _stamp_mouths(char_dir: Path, written: list, variant_map) -> None:
     """Size, declare and stamp the mouths just drawn for the character at ``char_dir``."""
-    desc_path = char_dir / "character.json"
-    if desc_path.is_file():
+    if descriptor_path(char_dir).is_file():
         from cutan.characters.factory import (
             declare_mouth_variants,
             scale_part_files,
             stamp_factory_parts,
         )
-        from cutan.characters.schema import CharacterDescriptor
-        from an.ir.migrate import migrate
-
-        raw = json.loads(desc_path.read_text(encoding="utf-8"))
-        desc = CharacterDescriptor.model_validate(
-            migrate(raw, kind="CharacterDescriptor")
-        )
+        desc = load_descriptor(char_dir)
         # A rig drawn with a head scale gets its mouths at the face's size.
         scale_part_files(written, float(desc.metadata.get("head_scale") or 1.0))
         if variant_map:
             declare_mouth_variants(desc, variant_map)
-            desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+            write_descriptor(char_dir, desc)
         # The factory drew these bytes just now: stamp them, so they stay the
         # factory's cc0 work in the asset library and in `an credits` (an#249).
         stamp_factory_parts(
