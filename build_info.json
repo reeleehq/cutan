@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-26T19:20:31Z",
+  "built_at": "2026-10-26T21:19:02Z",
   "package": {
     "name": "cutan",
-    "version": "0.0.82",
+    "version": "0.0.83",
     "display_name": "cutan",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "57f7d64f05e22622544d01229f860cd243128535",
-    "short_commit": "57f7d64",
+    "commit": "2f6ade1745eabce43e6982ebe8067794e7ca6cc4",
+    "short_commit": "2f6ade1",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/cutan",
-    "commit_url": "https://github.com/reeleehq/cutan/commit/57f7d64f05e22622544d01229f860cd243128535",
+    "commit_url": "https://github.com/reeleehq/cutan/commit/2f6ade1745eabce43e6982ebe8067794e7ca6cc4",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/cutan",
-    "sha": "57f7d64f05e22622544d01229f860cd243128535",
+    "sha": "2f6ade1745eabce43e6982ebe8067794e7ca6cc4",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "40384843749",
-    "run_url": "https://github.com/reeleehq/cutan/actions/runs/40384843749",
+    "run_id": "40402445107",
+    "run_url": "https://github.com/reeleehq/cutan/actions/runs/40402445107",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -60,11 +60,11 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.82",
+    "latest": "0.0.83",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 57f7d64f05e22622544d01229f860cd243128535\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 2f6ade1745eabce43e6982ebe8067794e7ca6cc4\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

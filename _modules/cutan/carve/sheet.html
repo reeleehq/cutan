@@ -573,85 +573,97 @@
 </span><span id="line-372">    <span class="k">return</span> <span class="p">[]</span>
 </span><span id="line-373">
 </span><span id="line-374">
+</span><span id="line-375"><span class="k">def</span><span class="w"> </span><span class="nf">_resolved_later</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">SheetPart</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-376"><span class="w">    </span><span class="sd">"""The attachment names ``sheet_to_package`` resolves to a slot after its first</span>
+</span><span id="line-377"><span class="sd">    write: a split's base (its kept anchor, or the origin of its parts' placement)</span>
+</span><span id="line-378"><span class="sd">    and, with a ``unit``, its parts."""</span>
+</span><span id="line-379">    <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">:</span>
+</span><span id="line-380">        <span class="k">return</span> <span class="p">[]</span>
+</span><span id="line-381">    <span class="n">base</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">attachment</span><span class="p">]</span> <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">anchored</span> <span class="k">else</span> <span class="p">[]</span>
+</span><span id="line-382">    <span class="k">return</span> <span class="n">base</span> <span class="o">+</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">)</span> <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[])</span>
+</span><span id="line-383">
+</span><span id="line-384">
 <div class="viewcode-block" id="sheet_to_package">
 <a class="viewcode-back" href="../../../_autosummary/cutan.carve.sheet.html#cutan.carve.sheet.sheet_to_package">[docs]</a>
-</span><span id="line-375"><span class="k">def</span><span class="w"> </span><span class="nf">sheet_to_package</span><span class="p">(</span>
-</span><span id="line-376">    <span class="n">sheet</span><span class="p">:</span> <span class="n">ImageLike</span><span class="p">,</span>
-</span><span id="line-377">    <span class="n">parts</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">SheetPart</span> <span class="o">|</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
-</span><span id="line-378">    <span class="n">char_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
-</span><span id="line-379">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-380">    <span class="n">source</span><span class="p">:</span> <span class="n">AssetSource</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-381">    <span class="n">ours</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-382">    <span class="n">unit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-383">    <span class="n">work_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-384"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SheetReport</span><span class="p">:</span>
-</span><span id="line-385"><span class="w">    </span><span class="sd">"""Carve ``parts`` out of ``sheet`` and draw them on the factory character at ``char_dir``.</span>
-</span><span id="line-386">
-</span><span id="line-387"><span class="sd">    sheet: a path, a PIL image or an array (the whole reference sheet)</span>
-</span><span id="line-388"><span class="sd">    parts: the recipe, :class:`SheetPart` or their dicts; each file the rig</span>
-</span><span id="line-389"><span class="sd">        draws from is replaced once (two attachments of one file are one part)</span>
-</span><span id="line-390"><span class="sd">    source: the sheet's provenance (``frame_source``); required unless ``ours``</span>
-</span><span id="line-391"><span class="sd">    ours: the sheet's pixels are the caller's own art (no source is recorded)</span>
-</span><span id="line-392"><span class="sd">    unit: view-box units per SHEET pixel (``write_prop``'s is per carved pixel;</span>
-</span><span id="line-393"><span class="sd">        they differ under super-resolution); each picture is declared that many</span>
-</span><span id="line-394"><span class="sd">        units wide per carved pixel (default: the factory drawing's width)</span>
-</span><span id="line-395"><span class="sd">    work_dir: where the carved pictures are first written (default: a temporary</span>
-</span><span id="line-396"><span class="sd">        folder, gone afterwards; the rig keeps its own copy beside it either way)</span>
-</span><span id="line-397">
-</span><span id="line-398"><span class="sd">    Raises ``ValueError`` before anything is written when provenance is</span>
-</span><span id="line-399"><span class="sd">    missing, an attachment is unknown, ambiguous or shares its file with another</span>
-</span><span id="line-400"><span class="sd">    part; if setting a part fails, the character is restored.</span>
-</span><span id="line-401"><span class="sd">    """</span>
-</span><span id="line-402">    <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ours</span><span class="p">:</span>
-</span><span id="line-403">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="line-404">            <span class="s2">"a sheet with no provenance reads as art you made: pass "</span>
-</span><span id="line-405">            <span class="s2">"source=frame_source(url, license=...), or ours=True if the pixels are yours"</span>
-</span><span id="line-406">        <span class="p">)</span>
-</span><span id="line-407">    <span class="n">unit</span> <span class="o">=</span> <span class="n">_check_unit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
-</span><span id="line-408">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">char_dir</span><span class="p">)</span>
-</span><span id="line-409">    <span class="n">recipe</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">SheetPart</span><span class="p">)</span> <span class="k">else</span> <span class="n">SheetPart</span><span class="p">(</span><span class="o">**</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">]</span>
-</span><span id="line-410">    <span class="n">files</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span id="line-411">    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">recipe</span><span class="p">:</span>  <span class="c1"># fails on an unknown or ambiguous attachment, writes nothing</span>
-</span><span id="line-412">        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">attachment</span><span class="p">,</span> <span class="o">*</span><span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">):</span>
-</span><span id="line-413">            <span class="n">rel</span> <span class="o">=</span> <span class="n">part_path</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-</span><span id="line-414">            <span class="k">if</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-</span><span id="line-415">                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> and </span><span class="si">{</span><span class="n">files</span><span class="p">[</span><span class="n">rel</span><span class="p">]</span><span class="si">!r}</span><span class="s2"> are both drawn by </span><span class="si">{</span><span class="n">rel</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-416">            <span class="n">files</span><span class="p">[</span><span class="n">rel</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
-</span><span id="line-417">    <span class="n">image</span> <span class="o">=</span> <span class="n">load_rgb</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
-</span><span id="line-418">    <span class="n">desc</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">cache</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">load_descriptor</span><span class="p">(</span><span class="n">char_dir</span><span class="p">))</span>
-</span><span id="line-419">    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"cutan-sheet-"</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
-</span><span id="line-420">        <span class="n">folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">work_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">work_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
-</span><span id="line-421">        <span class="n">folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-422">        <span class="n">drawings</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-423">        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">recipe</span><span class="p">):</span>
-</span><span id="line-424">            <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">carve</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">)</span>
-</span><span id="line-425">            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">crop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-426">                <span class="n">kwargs</span><span class="p">[</span><span class="s2">"crop"</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">crop</span>
-</span><span id="line-427">            <span class="n">carving</span> <span class="o">=</span> <span class="n">_CARVERS</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">mode</span><span class="p">](</span><span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span id="line-428">            <span class="n">base_anchor</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-429">            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">split</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">anchored</span><span class="p">:</span>  <span class="c1"># the factory's, kept</span>
-</span><span id="line-430">                <span class="n">base_anchor</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">find_attachment</span><span class="p">(</span><span class="n">desc</span><span class="p">(),</span> <span class="n">p</span><span class="o">.</span><span class="n">attachment</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">anchor</span><span class="p">)</span>
-</span><span id="line-431">            <span class="n">drawings</span> <span class="o">+=</span> <span class="n">_drawings</span><span class="p">(</span>
-</span><span id="line-432">                <span class="n">p</span><span class="p">,</span> <span class="n">carving</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span> <span class="n">base_anchor</span><span class="o">=</span><span class="n">base_anchor</span>
-</span><span id="line-433">            <span class="p">)</span>
-</span><span id="line-434">        <span class="n">snapshot</span> <span class="o">=</span> <span class="n">_snapshot</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
-</span><span id="line-435">        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-436">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-437">            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">drawings</span><span class="p">:</span>
-</span><span id="line-438">                <span class="n">done</span> <span class="o">=</span> <span class="n">set_part</span><span class="p">(</span>
-</span><span id="line-439">                    <span class="n">char_dir</span><span class="p">,</span>
-</span><span id="line-440">                    <span class="n">d</span><span class="o">.</span><span class="n">attachment</span><span class="p">,</span>
-</span><span id="line-441">                    <span class="n">d</span><span class="o">.</span><span class="n">picture</span><span class="p">,</span>
-</span><span id="line-442">                    <span class="n">anchor</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">anchor</span><span class="p">,</span>
-</span><span id="line-443">                    <span class="n">source</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">provenance</span><span class="p">,</span>
-</span><span id="line-444">                    <span class="n">width</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-</span><span id="line-445">                <span class="p">)</span>
-</span><span id="line-446">                <span class="n">notes</span> <span class="o">=</span> <span class="n">_place_joint</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
-</span><span id="line-447">                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PartResult</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">attachment</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">warnings</span> <span class="o">+</span> <span class="n">notes</span><span class="p">,</span> <span class="n">done</span><span class="p">))</span>
-</span><span id="line-448">        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-</span><span id="line-449">            <span class="n">_restore</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">char_dir</span><span class="p">)</span>
-</span><span id="line-450">            <span class="k">raise</span>
-</span><span id="line-451">    <span class="k">return</span> <span class="n">SheetReport</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
+</span><span id="line-385"><span class="k">def</span><span class="w"> </span><span class="nf">sheet_to_package</span><span class="p">(</span>
+</span><span id="line-386">    <span class="n">sheet</span><span class="p">:</span> <span class="n">ImageLike</span><span class="p">,</span>
+</span><span id="line-387">    <span class="n">parts</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">SheetPart</span> <span class="o">|</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+</span><span id="line-388">    <span class="n">char_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+</span><span id="line-389">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-390">    <span class="n">source</span><span class="p">:</span> <span class="n">AssetSource</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-391">    <span class="n">ours</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-392">    <span class="n">unit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-393">    <span class="n">work_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-394"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SheetReport</span><span class="p">:</span>
+</span><span id="line-395"><span class="w">    </span><span class="sd">"""Carve ``parts`` out of ``sheet`` and draw them on the factory character at ``char_dir``.</span>
+</span><span id="line-396">
+</span><span id="line-397"><span class="sd">    sheet: a path, a PIL image or an array (the whole reference sheet)</span>
+</span><span id="line-398"><span class="sd">    parts: the recipe, :class:`SheetPart` or their dicts; each file the rig</span>
+</span><span id="line-399"><span class="sd">        draws from is replaced once (two attachments of one file are one part)</span>
+</span><span id="line-400"><span class="sd">    source: the sheet's provenance (``frame_source``); required unless ``ours``</span>
+</span><span id="line-401"><span class="sd">    ours: the sheet's pixels are the caller's own art (no source is recorded)</span>
+</span><span id="line-402"><span class="sd">    unit: view-box units per SHEET pixel (``write_prop``'s is per carved pixel;</span>
+</span><span id="line-403"><span class="sd">        they differ under super-resolution); each picture is declared that many</span>
+</span><span id="line-404"><span class="sd">        units wide per carved pixel (default: the factory drawing's width)</span>
+</span><span id="line-405"><span class="sd">    work_dir: where the carved pictures are first written (default: a temporary</span>
+</span><span id="line-406"><span class="sd">        folder, gone afterwards; the rig keeps its own copy beside it either way)</span>
+</span><span id="line-407">
+</span><span id="line-408"><span class="sd">    Raises ``ValueError`` before anything is written when provenance is</span>
+</span><span id="line-409"><span class="sd">    missing, an attachment is unknown, ambiguous or shares its file with another</span>
+</span><span id="line-410"><span class="sd">    part; if setting a part fails, the character is restored.</span>
+</span><span id="line-411"><span class="sd">    """</span>
+</span><span id="line-412">    <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ours</span><span class="p">:</span>
+</span><span id="line-413">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="line-414">            <span class="s2">"a sheet with no provenance reads as art you made: pass "</span>
+</span><span id="line-415">            <span class="s2">"source=frame_source(url, license=...), or ours=True if the pixels are yours"</span>
+</span><span id="line-416">        <span class="p">)</span>
+</span><span id="line-417">    <span class="n">unit</span> <span class="o">=</span> <span class="n">_check_unit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+</span><span id="line-418">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">char_dir</span><span class="p">)</span>
+</span><span id="line-419">    <span class="n">recipe</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">SheetPart</span><span class="p">)</span> <span class="k">else</span> <span class="n">SheetPart</span><span class="p">(</span><span class="o">**</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">]</span>
+</span><span id="line-420">    <span class="n">desc</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">cache</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">load_descriptor</span><span class="p">(</span><span class="n">char_dir</span><span class="p">))</span>
+</span><span id="line-421">    <span class="n">files</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-422">    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">recipe</span><span class="p">:</span>  <span class="c1"># fails on an unknown or ambiguous attachment, writes nothing</span>
+</span><span id="line-423">        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">attachment</span><span class="p">,</span> <span class="o">*</span><span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">):</span>
+</span><span id="line-424">            <span class="n">rel</span> <span class="o">=</span> <span class="n">part_path</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+</span><span id="line-425">            <span class="k">if</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+</span><span id="line-426">                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> and </span><span class="si">{</span><span class="n">files</span><span class="p">[</span><span class="n">rel</span><span class="p">]</span><span class="si">!r}</span><span class="s2"> are both drawn by </span><span class="si">{</span><span class="n">rel</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-427">            <span class="n">files</span><span class="p">[</span><span class="n">rel</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+</span><span id="line-428">        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">_resolved_later</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+</span><span id="line-429">            <span class="n">find_attachment</span><span class="p">(</span><span class="n">desc</span><span class="p">(),</span> <span class="n">name</span><span class="p">)</span>  <span class="c1"># the one-slot rule, before any write</span>
+</span><span id="line-430">    <span class="n">image</span> <span class="o">=</span> <span class="n">load_rgb</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+</span><span id="line-431">    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"cutan-sheet-"</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+</span><span id="line-432">        <span class="n">folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">work_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">work_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+</span><span id="line-433">        <span class="n">folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-434">        <span class="n">drawings</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-435">        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">recipe</span><span class="p">):</span>
+</span><span id="line-436">            <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">carve</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">)</span>
+</span><span id="line-437">            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">crop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-438">                <span class="n">kwargs</span><span class="p">[</span><span class="s2">"crop"</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">crop</span>
+</span><span id="line-439">            <span class="n">carving</span> <span class="o">=</span> <span class="n">_CARVERS</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">mode</span><span class="p">](</span><span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="line-440">            <span class="n">base_anchor</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-441">            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">split</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">anchored</span><span class="p">:</span>  <span class="c1"># the factory's, kept</span>
+</span><span id="line-442">                <span class="n">base_anchor</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">find_attachment</span><span class="p">(</span><span class="n">desc</span><span class="p">(),</span> <span class="n">p</span><span class="o">.</span><span class="n">attachment</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">anchor</span><span class="p">)</span>
+</span><span id="line-443">            <span class="n">drawings</span> <span class="o">+=</span> <span class="n">_drawings</span><span class="p">(</span>
+</span><span id="line-444">                <span class="n">p</span><span class="p">,</span> <span class="n">carving</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span> <span class="n">base_anchor</span><span class="o">=</span><span class="n">base_anchor</span>
+</span><span id="line-445">            <span class="p">)</span>
+</span><span id="line-446">        <span class="n">snapshot</span> <span class="o">=</span> <span class="n">_snapshot</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
+</span><span id="line-447">        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-448">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-449">            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">drawings</span><span class="p">:</span>
+</span><span id="line-450">                <span class="n">done</span> <span class="o">=</span> <span class="n">set_part</span><span class="p">(</span>
+</span><span id="line-451">                    <span class="n">char_dir</span><span class="p">,</span>
+</span><span id="line-452">                    <span class="n">d</span><span class="o">.</span><span class="n">attachment</span><span class="p">,</span>
+</span><span id="line-453">                    <span class="n">d</span><span class="o">.</span><span class="n">picture</span><span class="p">,</span>
+</span><span id="line-454">                    <span class="n">anchor</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">anchor</span><span class="p">,</span>
+</span><span id="line-455">                    <span class="n">source</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">provenance</span><span class="p">,</span>
+</span><span id="line-456">                    <span class="n">width</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+</span><span id="line-457">                <span class="p">)</span>
+</span><span id="line-458">                <span class="n">notes</span> <span class="o">=</span> <span class="n">_place_joint</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+</span><span id="line-459">                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PartResult</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">attachment</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">warnings</span> <span class="o">+</span> <span class="n">notes</span><span class="p">,</span> <span class="n">done</span><span class="p">))</span>
+</span><span id="line-460">        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+</span><span id="line-461">            <span class="n">_restore</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">char_dir</span><span class="p">)</span>
+</span><span id="line-462">            <span class="k">raise</span>
+</span><span id="line-463">    <span class="k">return</span> <span class="n">SheetReport</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -666,7 +678,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=cfefb2bf"></script>
+    <script src="../../../_static/documentation_options.js?v=6b9736a6"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
