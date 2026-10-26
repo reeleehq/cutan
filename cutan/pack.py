@@ -86,6 +86,7 @@ CAST_OPTIONS = {
         "--hair-length": True,
         "--sash": False,
         "--palette": True,
+        "--clothing-pattern": True,
         "--mouth-variants": True,
         "--no-views": False,
         "--voice-ref": True,

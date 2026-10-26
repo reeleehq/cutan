@@ -27,6 +27,7 @@ Always write `--offline` (the deterministic, fully rigged factory). The options:
 | `--hair-length` | `short` (default), `medium` (to the jaw), `long` (past the chin) | `bald` takes `short` |
 | `--sash` | flag | a diagonal band across the torso, `accessory` colour |
 | `--palette` | `"skin=#..,hair=#..,clothing=#..,leg=#..,accessory=#.."` | any subset; quote the whole value. Unset roles take a seeded colour |
+| `--clothing-pattern` | `stripes`, `check` or `floral`, with `:base=#..,motif=#..,leaf=#..,scale=1` (quote the whole value) | a print on the clothing, torso and sleeves, in every view; `base` is the clothing colour (give it here OR in `--palette`, not both) |
 | `--mouth-variants` | comma list of `happy`, `sad`, `angry`, `surprised`, `afraid`, `disgusted` | the mouth shapes the character's emotions use; default `happy,sad`. Include every mood its lines carry |
 | `--voice-ref` | a key of `assets/voices/` | the voice document the character speaks with (`voices-and-looks.md`) |
 | `--no-views` | flag | leaves out the turnaround (rarely wanted) |

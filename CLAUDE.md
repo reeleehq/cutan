@@ -11,7 +11,7 @@
 
 ```
 cutan/genre.py        CUTOUT, the Genre object (entry point cutout_animation = "cutan.genre:CUTOUT"); nw.py: the nw declaration
-cutan/characters/     descriptor schema (CharacterDescriptor), factory, play resolution, methods, vocabulary, checks, CLI
+cutan/characters/     descriptor schema (CharacterDescriptor), factory (patterns.py: the clothing prints, cutan#94), play resolution, methods, vocabulary, checks, CLI
 cutan/expression/     expression presets, axes, bindings, the face provider
 cutan/compile/        passes.py (the cut-out passes over an.stage.compile), body.py (body-attached props placed by their character), lowering.py (play/expression lowering, swap declaration), coarticulate.py, gaze.py
 cutan/audio/          lip-sync providers (offline, rhubarb, whisper, word timings)

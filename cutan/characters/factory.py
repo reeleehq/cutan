@@ -75,6 +75,12 @@ from cutan.characters.brows import (
 )
 from an.stores._common import inside_folder
 from cutan.characters.colour_roles import distinct_literal, normalise_hex
+from cutan.characters.patterns import (
+    ClothingPattern,
+    distinct_pattern,
+    parse_clothing_pattern,
+    painted_fill,
+)
 from cutan.characters.lids import add_half_lid as _add_half_lid
 from cutan.characters.schema import (
     CHARACTER_DOCUMENT_KIND,
@@ -603,6 +609,8 @@ class _Looks:
     leg: str
     brow: str
     accessory: str
+    #: The clothing print (cutan#94), its literals clear of the roles above.
+    pattern: ClothingPattern | None = None
 
 
 def _resolve_looks(
@@ -613,6 +621,7 @@ def _resolve_looks(
     hat_seat: str | None = None,
     hair_style: str = DFLT_HAIR_STYLE,
     hair_length: str = DFLT_HAIR_LENGTH,
+    clothing_pattern: ClothingPattern | None = None,
 ) -> _Looks:
     h = _stable_hash(seed)
     ink = OUTLINE_COLOUR
@@ -634,9 +643,17 @@ def _resolve_looks(
     if hat != DFLT_HAT:
         head_roles[head_acc] = "accessory"
 
-    clothing = distinct_literal(palette.get("clothing") or seed_clothing, {ink})
+    # A print's `base` is the clothing colour, said in the same breath.
+    base = clothing_pattern.base if clothing_pattern is not None else None
+    clothing = distinct_literal(base or palette.get("clothing") or seed_clothing, {ink})
     accent = distinct_literal(palette.get("hair") or seed_accent, {clothing, ink})
     hand = distinct_literal(palette.get("skin") or DFLT_HAND_COLOUR, {clothing, ink})
+    accessory = distinct_literal(acc, {clothing, accent, ink})
+    pattern = (
+        distinct_pattern(clothing_pattern, {clothing, accent, hand, accessory, ink})
+        if clothing_pattern is not None
+        else None
+    )
     return _Looks(
         head_svg=_fallback_face_svg(
             seed,
@@ -654,7 +671,8 @@ def _resolve_looks(
         hand=hand,
         leg=distinct_literal(palette.get("leg") or DFLT_LEG_COLOUR, {SHOE_COLOUR}),
         brow=normalise_hex(palette.get("hair") or DFLT_BROW_COLOUR),
-        accessory=distinct_literal(acc, {clothing, accent, ink}),
+        accessory=accessory,
+        pattern=pattern,
     )
 
 
@@ -960,6 +978,7 @@ def new_character(
     hair_style: str = DFLT_HAIR_STYLE,
     hair_length: str = DFLT_HAIR_LENGTH,
     feet_origin: bool = False,
+    clothing_pattern: str | Mapping | None = None,
 ) -> Path:
     """Build a complete character on disk.
 
@@ -986,6 +1005,14 @@ def new_character(
       (the default), ``medium``, ``long`` (offline head only). Drawn in the
       ``hair`` role (the palette's ``hair`` colours them), in every view.
     - ``sash`` — a diagonal band across the torso, in ``accessory``.
+    - ``clothing_pattern`` (cutan#94) — a print on the clothing: ``stripes``,
+      ``check`` or ``floral`` (``none`` is the flat default), with its colours
+      and scale as ``floral:base=#e8735a,motif=#ffffff,leaf=#2f6b3a,scale=1``
+      (or the same as a mapping; :mod:`cutan.characters.patterns`). Drawn as an
+      SVG ``<pattern>`` over the clothing fill of the torso, in every view, and
+      the sleeves, under the outline; ``base`` is the clothing colour. The fill
+      keeps its ``clothing`` role, so a style pack still recolours it; the
+      print's literals carry no role. On any head, DiceBear included.
     - ``views`` (an#197) — draw the turnaround: ``back``, ``side`` (a profile
       facing the viewer's right) and ``three_quarter`` beside the front, as a
       ``view`` swap set with a pose per view (:func:`add_views`), so
@@ -1036,6 +1063,13 @@ def new_character(
     ``overwrite=False``.
     """
     palette_ = _check_palette(palette)
+    pattern = parse_clothing_pattern(clothing_pattern)
+    if pattern is not None and pattern.base and palette_.get("clothing"):
+        if normalise_hex(palette_["clothing"]) != pattern.base:
+            raise ValueError(
+                f"the print's base={pattern.base} and the palette's clothing="
+                f"{palette_['clothing']} are two clothing colours: give one"
+            )
     body = _check_build(build)
     if not (isinstance(head_scale, (int, float)) and 0 < head_scale <= MAX_HEAD_SCALE):
         raise ValueError(
@@ -1073,6 +1107,7 @@ def new_character(
         hat_seat=seat.transform,
         hair_style=hair_style,
         hair_length=hair_length,
+        clothing_pattern=pattern,
     )
     metadata: dict[str, object] = {"art_provenance": "fallback_geometric"}
     source: AssetSource | None = None
@@ -1117,6 +1152,7 @@ def new_character(
         accent=looks.accent,
         body=body,
         sash=looks.accessory if sash else None,
+        pattern=looks.pattern,
     )
     for side in ("l", "r"):
         roles[f"parts/arm_{side}.svg"] = _write_arm_part(
@@ -1125,6 +1161,7 @@ def new_character(
             color=looks.clothing,
             hand=looks.hand,
             body=body,
+            pattern=looks.pattern,
         )
         roles[f"parts/leg_{side}.svg"] = _write_leg_part(
             parts_dir / f"leg_{side}.svg", side=side, color=looks.leg, body=body
@@ -1198,6 +1235,7 @@ def new_character(
         ("hair_length", hair_length, DFLT_HAIR_LENGTH),
         ("sash", sash, False),
         ("palette", dict(palette_), {}),
+        ("clothing_pattern", pattern.as_dict() if pattern is not None else None, None),
     ):
         if value != default:
             descriptor.metadata[key] = value
@@ -1951,10 +1989,12 @@ def _write_torso_part(
     accent: str,
     body: BodyBuild = BUILDS[DFLT_BUILD],
     sash: str | None = None,
+    pattern: ClothingPattern | None = None,
 ) -> dict[str, str]:
     """The torso SVG: a rounded rect with a slight collar accent, inset 20 in
     its ``body.torso_size`` canvas. ``sash`` draws a diagonal band across it in
-    that colour. Returns the part's colour roles."""
+    that colour; ``pattern`` paints a print over the fill, under the band and
+    the outline (cutan#94). Returns the part's colour roles."""
     w, h = body.torso_size
     r = body.torso_radius
     hb = h - 20 - body.torso_inset_bottom
@@ -1964,24 +2004,30 @@ def _write_torso_part(
         f'stroke-width="6" fill="none"/>'
     )
     roles = {clothing: "clothing", accent: "hair"}
-    if sash is None:
+    if sash is None and pattern is None:
         inner = (
             f'<rect {rect} fill="{clothing}" stroke="#222" stroke-width="6"/>' + collar
         )
     else:
-        # Fill, then the band clipped to the body, then the outline on top, so
-        # the band never covers the ink.
-        band = 0.16 * min(w, hb)
+        # Fill, then the print, then the band clipped to the body, then the
+        # outline on top, so neither the print nor the band covers the ink.
+        clip = band = ""
+        if sash is not None:
+            width = 0.16 * min(w, hb)
+            clip = f'<clipPath id="torso_body"><rect {rect}/></clipPath>'
+            band = (
+                f'<path d="M 20 {20 + 0.12 * hb:g} L {w - 20:g} {20 + 0.88 * hb:g}" '
+                f'stroke="{sash}" stroke-width="{width:g}" fill="none" '
+                'clip-path="url(#torso_body)"/>'
+            )
+            roles[sash] = "accessory"
         inner = (
-            f'<clipPath id="torso_body"><rect {rect}/></clipPath>'
-            f'<rect {rect} fill="{clothing}"/>'
-            f'<path d="M 20 {20 + 0.12 * hb:g} L {w - 20:g} {20 + 0.88 * hb:g}" '
-            f'stroke="{sash}" stroke-width="{band:g}" fill="none" '
-            'clip-path="url(#torso_body)"/>'
+            clip
+            + painted_fill(rect, fill=clothing, pattern=pattern)
+            + band
             + collar
             + f'<rect {rect} fill="none" stroke="#222" stroke-width="6"/>'
         )
-        roles[sash] = "accessory"
     svg = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<svg xmlns="{SVG_NS}" viewBox="0 0 {w:g} {h:g}" width="{w:g}" height="{h:g}">'
@@ -1997,18 +2043,29 @@ def _arm_svg(
     color: str,
     hand: str = DFLT_HAND_COLOUR,
     body: BodyBuild = BUILDS[DFLT_BUILD],
+    pattern: ClothingPattern | None = None,
 ) -> str:
-    """The one-piece arm's SVG text: 64 wide, ``body.arm_length`` long, hand at the bottom."""
+    """The one-piece arm's SVG text: 64 wide, ``body.arm_length`` long, hand at the
+    bottom; the sleeve takes the clothing ``pattern`` (cutan#94)."""
     L, aw, hr, sw = body.arm_length, body.arm_width, body.hand_radius, body.limb_stroke
     cy = L - 4 - hr
+    rect = (
+        f'x="{(64 - aw) / 2:g}" y="0" width="{aw:g}" height="{cy - 16:g}" '
+        f'rx="{aw / 2:g}" ry="{aw / 2:g}"'
+    )
+    if pattern is None:
+        sleeve = f'<rect {rect} fill="{color}" stroke="#222" stroke-width="{sw:g}"/>'
+    else:
+        sleeve = (
+            painted_fill(rect, fill=color, pattern=pattern)
+            + f'<rect {rect} fill="none" stroke="#222" stroke-width="{sw:g}"/>'
+        )
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<svg xmlns="{SVG_NS}" viewBox="0 0 64 {L:g}" width="64" height="{L:g}">'
         f'<g id="arm_{side}">'
-        f'<rect x="{(64 - aw) / 2:g}" y="0" width="{aw:g}" height="{cy - 16:g}" '
-        f'rx="{aw / 2:g}" ry="{aw / 2:g}" '
-        f'fill="{color}" stroke="#222" stroke-width="{sw:g}"/>'
-        f'<circle cx="32" cy="{cy:g}" r="{hr:g}" fill="{hand}" stroke="#222" '
+        + sleeve
+        + f'<circle cx="32" cy="{cy:g}" r="{hr:g}" fill="{hand}" stroke="#222" '
         f'stroke-width="{sw:g}"/>'
         "</g></svg>"
     )
@@ -2021,11 +2078,14 @@ def _write_arm_part(
     color: str,
     hand: str = DFLT_HAND_COLOUR,
     body: BodyBuild = BUILDS[DFLT_BUILD],
+    pattern: ClothingPattern | None = None,
 ) -> dict[str, str]:
-    """A 64-wide arm SVG, ``body.arm_length`` long, hand at the bottom.
-    Returns the part's colour roles."""
+    """A 64-wide arm SVG, ``body.arm_length`` long, hand at the bottom; the sleeve
+    takes the clothing ``pattern`` (cutan#94). Returns the part's colour roles."""
     _drawn.write_text(
-        path, _arm_svg(side=side, color=color, hand=hand, body=body), encoding="utf-8"
+        path,
+        _arm_svg(side=side, color=color, hand=hand, body=body, pattern=pattern),
+        encoding="utf-8",
     )
     return {color: "clothing", hand: "skin"}
 
@@ -2191,6 +2251,7 @@ def _write_view_torso_part(
     accent: str,
     body: BodyBuild,
     sash: str | None = None,
+    pattern: ClothingPattern | None = None,
 ) -> dict[str, str]:
     """The torso of ``view`` on the front torso's canvas (the swap is fitted
     into the front's box): narrower as it turns, the collar swinging toward the
@@ -2217,16 +2278,17 @@ def _write_view_torso_part(
         )
     roles = {clothing: "clothing", accent: "hair"}
     ink = f'<rect {rect} fill="none" stroke="{OUTLINE_COLOUR}" stroke-width="6"/>'
+    paint = painted_fill(rect, fill=clothing, pattern=pattern)
     if sash is None:
-        inner = f'<rect {rect} fill="{clothing}"/>' + collar + ink
+        inner = paint + collar + ink
     else:
         band = 0.16 * min(w - 40, hb)
         # From behind the band runs the other diagonal.
         y_a, y_b = (0.88, 0.12) if view == "back" else (0.12, 0.88)
         inner = (
             f'<clipPath id="torso_body"><rect {rect}/></clipPath>'
-            f'<rect {rect} fill="{clothing}"/>'
-            f'<path d="M {x0:g} {20 + y_a * hb:g} L {x0 + bw:g} {20 + y_b * hb:g}" '
+            + paint
+            + f'<path d="M {x0:g} {20 + y_a * hb:g} L {x0 + bw:g} {20 + y_b * hb:g}" '
             f'stroke="{sash}" stroke-width="{band:g}" fill="none" '
             'clip-path="url(#torso_body)"/>' + collar + ink
         )
@@ -2421,6 +2483,7 @@ def add_views(char_dir: str | Path) -> Path:
     body = _check_build(str(meta.get("build") or DFLT_BUILD))
     head_scale = float(meta.get("head_scale") or 1.0)
     height = REFERENCE_HEAD_HEIGHT * head_scale
+    pattern = parse_clothing_pattern(meta.get("clothing_pattern"))
     head_path = parts / "head.svg"
     head_text = head_path.read_text(encoding="utf-8") if head_path.is_file() else None
     # The hat as this factory wears it now, else where it was drawn before
@@ -2439,6 +2502,7 @@ def add_views(char_dir: str | Path) -> Path:
             hat_seat=hat_seat,
             hair_style=hair_style,
             hair_length=hair_length,
+            clothing_pattern=pattern,
         )
         if head_text == _head_part_text(candidate.head_svg, height=height):
             looks = candidate
@@ -2492,6 +2556,7 @@ def add_views(char_dir: str | Path) -> Path:
             accent=looks.accent,
             body=body,
             sash=sash,
+            pattern=looks.pattern,
         )
     by_slot = {s.name: s for s in desc.slots}
     for slot_name in ("head", "torso"):
@@ -2552,8 +2617,31 @@ def _elbow_bounds(body: BodyBuild) -> tuple[float, float]:
     return lo, hi
 
 
+def _recorded_pattern(desc: CharacterDescriptor) -> ClothingPattern | None:
+    """The print as the factory drew it on this character (nudged clear of its
+    other colours), re-derived from the recorded knobs, or ``None`` without one."""
+    meta = desc.metadata
+    spec = parse_clothing_pattern(meta.get("clothing_pattern"))
+    if spec is None:
+        return None
+    return _resolve_looks(
+        str(meta.get("seed") or desc.name),
+        _check_palette(meta.get("palette")),
+        hat=str(meta.get("hat") or DFLT_HAT),
+        hair_style=str(meta.get("hair_style") or DFLT_HAIR_STYLE),
+        hair_length=str(meta.get("hair_length") or DFLT_HAIR_LENGTH),
+        clothing_pattern=spec,
+    ).pattern
+
+
 def _split_arm_svgs(
-    *, side: str, color: str, hand: str, body: BodyBuild, elbow_at: float
+    *,
+    side: str,
+    color: str,
+    hand: str,
+    body: BodyBuild,
+    elbow_at: float,
+    pattern: ClothingPattern | None = None,
 ) -> tuple[dict[str, str], dict[str, float]]:
     """``({part: svg text}, geometry)`` of the one-piece arm cut at the elbow.
 
@@ -2573,13 +2661,20 @@ def _split_arm_svgs(
     hand_d = 2 * hr + 2 * sw
 
     def sleeve(name: str, h: float) -> str:
+        rect = (
+            f'x="{(64 - aw) / 2:g}" y="0" width="{aw:g}" height="{h:g}" '
+            f'rx="{aw / 2:g}" ry="{aw / 2:g}"'
+        )
+        paint = (
+            f'<rect {rect} fill="{color}" stroke="#222" stroke-width="{sw:g}"/>'
+            if pattern is None
+            else painted_fill(rect, fill=color, pattern=pattern)
+            + f'<rect {rect} fill="none" stroke="#222" stroke-width="{sw:g}"/>'
+        )
         return (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             f'<svg xmlns="{SVG_NS}" viewBox="0 0 64 {h:g}" width="64" height="{h:g}">'
-            f'<g id="{name}_{side}">'
-            f'<rect x="{(64 - aw) / 2:g}" y="0" width="{aw:g}" height="{h:g}" '
-            f'rx="{aw / 2:g}" ry="{aw / 2:g}" fill="{color}" stroke="#222" '
-            f'stroke-width="{sw:g}"/></g></svg>'
+            f'<g id="{name}_{side}">{paint}</g></svg>'
         )
 
     hand_svg = (
@@ -2648,6 +2743,7 @@ def add_forearms(char_dir: str | Path, *, elbow_at: float = ELBOW_AT) -> Path:
     elif any(f"forearm_{s}" in bones or f"hand_{s}" in bones for s in ARM_SIDES):
         problem = "has a forearm or a hand bone already"
     written: dict[str, dict[str, str]] = {}
+    pattern = _recorded_pattern(desc)
     if problem is None:
         for side in ARM_SIDES:
             arm_path = f"parts/arm_{side}.svg"
@@ -2661,7 +2757,9 @@ def add_forearms(char_dir: str | Path, *, elbow_at: float = ELBOW_AT) -> Path:
                 or not hand
                 or not drawn.is_file()
                 or drawn.read_text(encoding="utf-8")
-                != _arm_svg(side=side, color=color, hand=hand, body=body)
+                != _arm_svg(
+                    side=side, color=color, hand=hand, body=body, pattern=pattern
+                )
             ):
                 problem = (
                     f"{arm_path} is not the factory's drawing for its recorded knobs"
@@ -2692,6 +2790,7 @@ def add_forearms(char_dir: str | Path, *, elbow_at: float = ELBOW_AT) -> Path:
             hand=written[side]["hand"],
             body=body,
             elbow_at=elbow_at,
+            pattern=pattern,
         )
         for name, text in svgs.items():
             rel = f"parts/{name}.svg"
