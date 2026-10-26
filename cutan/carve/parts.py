@@ -135,7 +135,9 @@ def split_parts(
     seam at rest); where a part was enclosed by the base, ``paint_out``
     re-paints the base under it (``cv2.inpaint``) so it stays whole when the
     part moves. A part's ``origin`` and ``pivot`` are in the carving's pixels
-    (where :func:`~cutan.carve.write_prop` places it).
+    (where :func:`~cutan.carve.write_prop` places it). ``inpaint_radius``,
+    ``pad`` and a spec's ``grow`` count the carving's pixels too: on a
+    super-resolved carving (``carving.scale`` 4) scale them by it.
     """
     cv2 = _cv2()
     rgba = np.asarray(carving.image.convert("RGBA"))

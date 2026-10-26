@@ -29,6 +29,8 @@ import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from an.stores._common import ASSET_REF_RULE, inside_folder
+
 __all__ = [
     "DFLT_HALF_LID_FRACTION",
     "HALF_ATTACHMENT",
@@ -167,13 +169,21 @@ def add_half_lid(
                 f"{raw.get('name')!r}'s lid art is not SVG ({o_path}, {c_path}): draw "
                 "the HALF lid by hand and map it in the eyelid set"
             )
+        h_path = _half_path(o_path)
+        o_file, c_file, h_file = (
+            inside_folder(char_dir, rel) for rel in (o_path, c_path, h_path)
+        )
+        if None in (o_file, c_file, h_file):
+            raise HalfLidError(
+                f"{raw.get('name')!r}'s lid art ({o_path}, {c_path}) leaves the "
+                f"character's folder: {ASSET_REF_RULE}"
+            )
         svg = half_lid_svg(
-            (char_dir / o_path).read_text(encoding="utf-8"),
-            (char_dir / c_path).read_text(encoding="utf-8"),
+            o_file.read_text(encoding="utf-8"),
+            c_file.read_text(encoding="utf-8"),
             fraction=fraction,
         )
-        h_path = _half_path(o_path)
-        (char_dir / h_path).write_text(svg, encoding="utf-8")
+        h_file.write_text(svg, encoding="utf-8")
         digest = hashlib.sha256(svg.encode("utf-8")).hexdigest()
         half = {k: v for k, v in open_att.items() if k != "source"}
         half["path"] = h_path

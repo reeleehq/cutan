@@ -23,9 +23,8 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from an.audio.lipsync import Viseme, VisemeTrack
+from an.audio.lipsync import Viseme, VisemeTrack, word_timings_to_visemes
 from an.audio.tts import AudioClip
-
 
 # Map a single ASCII character (lowercased) to a Rhubarb viseme letter.
 # A=closed (P/B/M, rest), B=tight open (D/S/T/Z/N/L), C=eh, D=ah/wide,
@@ -67,6 +66,20 @@ _CHAR_TO_VISEME: dict[str, str] = {
 _REST_VISEME: str = "X"
 
 
+def clip_words(audio: AudioClip) -> list[tuple[str, float, float]] | None:
+    """The word timings ``audio`` carries (``AudioClip.words``, a recorded take
+    imported with a timed transcript — an#490), as a list; ``None`` when it has
+    none or when the core predates the field.
+
+    >>> clip_words(AudioClip(duration=1.0)) is None
+    True
+    """
+    words = getattr(audio, "words", None)
+    if not words:
+        return None
+    return [(str(w[0]), float(w[1]), float(w[2])) for w in words]
+
+
 class OfflineLipSync:
     """Default lip-sync provider: deterministic char-to-viseme mapping.
 
@@ -86,6 +99,22 @@ class OfflineLipSync:
         )
 
     def align(self, audio: AudioClip, transcript: str) -> VisemeTrack:
+        words = clip_words(audio)
+        if words:
+            # The clip knows when its words were spoken (a recorded take imported
+            # with a timed transcript, an#490): the mouth follows them, as the
+            # whisper provider's does, instead of an even spread over the clip.
+            return VisemeTrack(
+                visemes=word_timings_to_visemes(
+                    words,
+                    total_duration=audio.duration,
+                    char_to_viseme=self._mapping,
+                    rest_viseme=_REST_VISEME,
+                ),
+                convention=self.convention,
+                duration=audio.duration,
+                words=words,
+            )
         codes = list(self._codes_for(transcript))
         if not codes:
             # Empty transcript → just rest at start, rest at end.

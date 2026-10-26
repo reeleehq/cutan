@@ -39,9 +39,15 @@ from collections.abc import Collection, Iterable, Mapping
 from dataclasses import dataclass
 from typing import Union
 
-from cutan.characters.schema import EYELID_CHANNEL, VISEME_CHANNEL, CharacterDescriptor
+from cutan.characters.schema import (
+    BROW_CHANNEL,
+    EYELID_CHANNEL,
+    VISEME_CHANNEL,
+    CharacterDescriptor,
+)
 from cutan.expression.axes import (
     AXES,
+    BROW_AXES,
     GAZE_AXES,
     LID_AXES,
     LID_CLOSED_BELOW,
@@ -106,6 +112,13 @@ class SetBinding:
 
 Binding = Union[ChannelBinding, SetBinding]
 
+#: The swap-set families a `SetBinding` can key, and the axes each reads: the
+#: one table the solver dispatches on and `binding_for` validates against.
+SET_FAMILY_AXES: dict[str, tuple[str, ...]] = {
+    EYELID_CHANNEL: LID_AXES,
+    BROW_CHANNEL: BROW_AXES,
+}
+
 
 def default_binding(desc: CharacterDescriptor) -> list[Binding]:
     """The binding the default rig implies, from the slots it actually has.
@@ -133,6 +146,14 @@ def default_binding(desc: CharacterDescriptor) -> list[Binding]:
     ):
         if slot in slots:
             out.append(ChannelBinding(axis, slot, "rotation", sign * BROW_ANGLE_TRAVEL))
+    if BROW_CHANNEL in desc.asset_sets:
+        # A carved face draws its brows as a swap set (cutan#114): the set is
+        # keyed from the same axes that move the nodes.
+        out += [
+            SetBinding(b.axis, b.slot, BROW_CHANNEL)
+            for b in list(out)
+            if isinstance(b, ChannelBinding) and b.axis in BROW_AXES
+        ]
     for axis, slot in (("lid_open_l", LEFT_EYE_SLOT), ("lid_open_r", RIGHT_EYE_SLOT)):
         if slot in slots:
             out.append(SetBinding(axis, slot, EYELID_CHANNEL))
@@ -176,6 +197,19 @@ def binding_for(desc: CharacterDescriptor) -> list[Binding]:
                 ],
             )
         if "set_family" in raw:
+            family = str(raw["set_family"])
+            if family not in SET_FAMILY_AXES or axis not in SET_FAMILY_AXES[family]:
+                raise ExpressionResolutionError(
+                    desc.name,
+                    [
+                        f"expression_binding keys the {family!r} set from {axis!r}; "
+                        "known: "
+                        + "; ".join(
+                            f"{f} from {', '.join(a)}"
+                            for f, a in SET_FAMILY_AXES.items()
+                        )
+                    ],
+                )
             out.append(SetBinding(axis, str(raw["slot"]), str(raw["set_family"])))
         else:
             out.append(

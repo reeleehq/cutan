@@ -33,6 +33,7 @@ from cutan.carve import (  # noqa: E402
     carve_head,
     frame_source,
     split_parts,
+    PropState,
     write_prop,
 )
 from cutan.carve.head import HEAD_CANVAS, HEAD_CENTRE, HEAD_FACE_H  # noqa: E402
@@ -244,6 +245,32 @@ def test_a_split_prop_is_one_bone_per_part_at_its_pivot(tmp_path):
         assert (tmp_path / "wall-clock" / att.path).is_file()
     # the file is a valid PropDescriptor as written
     again = PropDescriptor.model_validate_json((tmp_path / "wall-clock" / "prop.json").read_text())
+    assert again == doc
+
+
+def test_a_prop_with_states_is_one_swap_set_on_its_base(tmp_path):
+    """A book closed and open: two drawings of one object, swapped by a scene, each with its own credit."""
+    shut = carve(_img("cartoon"), point=(160, 150), detach=3,
+                 source=frame_source("https://www.youtube.com/watch?v=abcdefghijk", t=3, license="all-rights-reserved"))
+    other = frame_source("https://www.youtube.com/watch?v=bcdefghijkl", t=9, license="all-rights-reserved")
+    opened = carve(_img("busy"), matte=GrabCut(box=(60, 30, 180, 185)), point=(120, 120), source=other)
+    with pytest.raises(ValueError, match="distinct"):
+        write_prop(shut, tmp_path / "x", states={"default": opened})
+    with pytest.raises(ValueError, match="no provenance"):
+        write_prop(shut, tmp_path / "y", states={"open": carve(_img("busy"), point=(120, 120))})
+    assert not (tmp_path / "x").exists() and not (tmp_path / "y").exists()
+    doc = write_prop(shut, tmp_path / "book", states={"open": opened, "big": PropState(opened, unit=2.0)},
+                     state="closed")
+    assert doc.asset_sets == {"state": {"closed": "body", "open": "body_open", "big": "body_big"}}
+    atts = doc.skins["default"].slots["body"]
+    assert atts["body_open"].anchor == pytest.approx(opened.anchor)
+    assert atts["body_open"].width == pytest.approx(opened.size[0])  # same unit: same scale as the base
+    assert atts["body_big"].width == pytest.approx(2 * opened.size[0])
+    assert atts["body_open"].source.url.startswith("https://www.youtube.com/watch?v=bcdefghijkl")
+    assert atts["body"].source is None  # the base is the descriptor's own source
+    for a in atts.values():
+        assert (tmp_path / "book" / a.path).is_file()
+    again = PropDescriptor.model_validate_json((tmp_path / "book" / "prop.json").read_text())
     assert again == doc
 
 
@@ -561,3 +588,36 @@ def test_rights_and_privacy_holes_found_in_round_two(tmp_path):
     assert "pw" not in json.dumps(signed.model_dump()) and "Amz" not in json.dumps(signed.model_dump())
     with pytest.raises(ValueError, match="data: URI"):
         frame_source("data:image/png;base64,AAAA", license=None)
+
+
+def test_write_prop_landmarks_are_the_rigs_named_points(tmp_path):
+    """A landmark is a slotless bone on the root, and an reads it where it was
+    given: ``rig_structure``'s anchor of that name sits at the source point."""
+    from an.stage.rig import SCENE_PX_PER_VIEW_BOX, rig_structure
+
+    src = frame_source("https://www.youtube.com/watch?v=abcdefghijk", t=3,
+                       license="all-rights-reserved")
+    part = carve(_img("cartoon"), point=(160, 150), detach=3, source=src)
+    grip, tip = (150, 160), (170, 120)
+    doc = write_prop(part, tmp_path / "sabre", max_side=100, landmarks={"grip": grip, "tip": tip})
+    assert [b.name for b in doc.bones] == ["root", "grip", "tip"]
+    assert all(b.parent == "root" for b in doc.bones[1:])
+    assert {s.bone for s in doc.slots} == {"root"}  # landmarks draw nothing
+    on_disk = PropDescriptor.model_validate_json((tmp_path / "sabre" / "prop.json").read_text())
+    anchors = rig_structure(on_disk).anchors
+    k = SCENE_PX_PER_VIEW_BOX / doc.view_box[3]
+    unit = doc.view_box[3] / part.size[1]
+    for name, at in (("grip", grip), ("tip", tip)):
+        (px, py), (ax, ay) = part.to_part([at])[0], (part.anchor[0] * part.size[0], part.anchor[1] * part.size[1])
+        want = ((px - ax) * unit * k, (py - ay) * unit * k)
+        assert np.allclose(anchors[name].offset, want, atol=0.05 * k), (name, anchors[name].offset, want)
+    # a landmark never moves where the prop stands: the root (its anchor) is the origin
+    assert anchors["root"].offset == (0.0, 0.0) and tuple(doc.origin) == (0.0, 0.0)
+    with pytest.warns(UserWarning, match="far outside the part"):
+        write_prop(part, tmp_path / "slip", landmarks={"grip": (5000, -900)})
+    for bad, match in (({"a@b": grip}, "after '@'"), ({"a:b": grip}, "after '@'"),
+                       ({"root": grip}, "already a bone"), ({"grip": (1,)}, "a point is"),
+                       ({"grip": (float("nan"), 1)}, "finite")):
+        with pytest.raises(ValueError, match=match):
+            write_prop(part, tmp_path / "x", landmarks=bad, overwrite=True)
+    assert [b.name for b in write_prop(part, tmp_path / "plain").bones] == ["root"]

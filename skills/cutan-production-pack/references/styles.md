@@ -100,6 +100,44 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
 }
 ```
 
+### `marionette`: Marionette (puppet on strings, hanging under gravity)
+
+- **Cost:** `medium`, a dynamic solve per shot (gravity and strings), baked to keys; the strings are not drawn yet (a `string` visual between two points is a follow-up).
+- **meta:** fps: 24; default_easing: ease_in_out; step_hz: 12; style_pack: marionette
+- **camera:** default: hold; allowed: hold, push_in
+- **shots:** mean_s: 8; range_s: 4, 14
+- **transitions:** default: kind: cut
+- **characters:** generate: offline; build: regular
+- **easing:** ease_in_out
+- **motion_presets:** turn
+- **tween_duration_s:** 0.5, 2.0
+- *construction:* one jointed figure (the factory's, `an character add-limits <name> --style marionette`; `add-forearms` first if the hands should be pinned), a control bar per figure (`cutan.marionette.write_control_bar`), the joints from `cutan.marionette.marionette_joints`; the bar is what the author drives (tween its x, y and rotation), the figure follows on its strings and settles
+- *how:* put the figure's joints and the bar in the shot (`joints:` on the shot), give the character `overrides: {free: true}` so its parts hang from the strings, and tween the bar; the pack's gravity makes the shot dynamic
+- *strings:* not drawn yet. A string is a distance held at most between two points (the solver's `string` joint), so it may go slack; draw it as an overlay line from the bar to the part if the look needs it (a follow-up)
+- *other_puppets:* not built, with the joints they would declare. A rod puppet is the same figure with rigid `rod` joints from a stick to the head and the hands and no gravity; a shadow puppet is hinge-only planar figures, each piece a silhouette, moved by rods held out of frame; a bunraku puppet is hinges plus puppeteers' hands pinned at the shoulders and the head, visible
+
+`assets/styles/marionette.json`:
+
+```json
+{
+  "schema_version": "0.1.0",
+  "kind": "StylePack",
+  "name": "marionette",
+  "roles": {},
+  "entities": {},
+  "metadata": {
+    "style_spec": {
+      "name": "marionette",
+      "sha256": "646912d47922360d74b287156a2392f936c3867150b48b52d07b1ba88c0f84c7"
+    }
+  },
+  "entity_surfaces": {},
+  "gradients": {},
+  "gravity": "down 600",
+  "damping": 0.03
+}
+```
+
 ### `norstein`: Yuri Norstein (multiplane painted cut-out)
 
 - **Cost:** `very_high`, painted, textured art on every plane; the engine has the planes, the art is the cost.

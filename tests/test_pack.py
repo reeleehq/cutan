@@ -8,7 +8,9 @@ from pathlib import Path
 
 import pytest
 
-from cutan.pack import PackCheck, PackReport, check_pack
+from cutan.pack import PackCheck, PackReport, _lint_svgs, check_pack
+
+EVIL = '<svg xmlns="http://www.w3.org/2000/svg"><script>x()</script><rect/></svg>'
 
 EXAMPLE = Path(__file__).resolve().parents[1] / "skills" / "cutan-production-pack" / "examples" / "the-umbrella"
 
@@ -206,14 +208,35 @@ def test_a_pack_with_pictures_passes(tmp_path, monkeypatch):
     assert report.notes == []
 
 
-def test_a_redrawn_factory_part_cannot_be_a_picture_yet(tmp_path):
+def test_a_redrawn_factory_part_may_be_a_picture_named_like_the_factory_s_svg(tmp_path):
     from cutan.pack import _redrawn_problem
 
-    factory = tmp_path / "head.svg"
-    factory.write_text("<svg/>")
     picture = tmp_path / "head.png"
     _png(picture, (8, 8))
-    assert "cutan#92" in _redrawn_problem(picture, tmp_path / "head.png")
+    assert "no head.svg" in _redrawn_problem(picture, tmp_path / "head.png")
+    (tmp_path / "head.svg").write_text("<svg/>")
+    assert _redrawn_problem(picture, tmp_path / "head.png") is None
+
+
+def test_a_pack_with_a_painted_head_passes_and_the_head_is_the_picture(tmp_path, monkeypatch):
+    _with_this_checkout(monkeypatch)
+    pack = _example_copy(tmp_path)
+    head = pack / "assets" / "characters" / "mara" / "parts" / "head.png"
+    _png(head, (200, 200))
+    report = check_pack(pack)
+    assert report.ok, report.format()
+    # the overlay ran (a no-op would be silent): it says what stays the factory's
+    assert any("redrawn mara/parts/head.png" in w and "head_side" in w for w in report.warnings), report.warnings
+
+
+def test_a_picture_and_an_svg_for_the_same_part_are_refused_by_name(tmp_path, monkeypatch):
+    _with_this_checkout(monkeypatch)
+    pack = _example_copy(tmp_path)
+    parts = pack / "assets" / "characters" / "mara" / "parts"
+    _png(parts / "head.png", (200, 200))
+    (parts / "head.svg").write_text("<svg xmlns='http://www.w3.org/2000/svg'/>")
+    report = check_pack(pack)
+    assert not report.ok and any("two drawings for parts/head" in e for e in report.errors), report.errors
 
 
 def test_a_picture_s_declared_pixels_are_capped(tmp_path):
@@ -262,3 +285,53 @@ def test_a_moving_window_plate_holds_only_what_is_at_infinity():
     assert "roadside" in ART_KINDS and "an#484" in ART_KINDS["roadside"].status
     assert "looking back at the driver" in VIEWPOINT_RULE
     assert art_guidance()["viewpoint"] == VIEWPOINT_RULE
+
+
+def test_the_pack_lint_reads_every_file_a_descriptor_names_by_content(tmp_path):
+    """A part under `.txt` holding a <script> is SVG to `an`, so the pack lint fails it."""
+    prop = tmp_path / "pack" / "assets" / "props" / "umbrella"
+    (prop / "parts").mkdir(parents=True)
+    (prop / "parts" / "umbrella.txt").write_text(EVIL, encoding="utf-8")
+    (prop / "prop.json").write_text(
+        json.dumps({"skins": {"default": {"slots": {"body": {"body": {"path": "parts/umbrella.txt"}}}}}}),
+        encoding="utf-8",
+    )
+    report = PackReport()
+    _lint_svgs(tmp_path / "pack", report)
+    (check,) = report.checks
+    assert check.label == "svg assets/props/umbrella/parts/umbrella.txt"
+    assert not check.ok and "script" in check.output
+
+
+def test_the_pack_lint_does_not_follow_a_reference_out_of_the_asset(tmp_path):
+    prop = tmp_path / "pack" / "assets" / "props" / "umbrella"
+    prop.mkdir(parents=True)
+    (prop.parent / "evil.txt").write_text(EVIL, encoding="utf-8")
+    (prop / "prop.json").write_text(
+        json.dumps({"skins": {"default": {"slots": {"body": {"body": {"path": "../evil.txt"}}}}}}),
+        encoding="utf-8",
+    )
+    report = PackReport()
+    _lint_svgs(tmp_path / "pack", report)
+    assert report.checks == []
+
+
+def test_the_pack_lint_reads_nothing_behind_a_link(tmp_path):
+    host = tmp_path / "host"
+    host.mkdir()
+    secret = '<svg xmlns="http://www.w3.org/2000/svg"><rect fill="url(SECRET)"/></svg>'
+    (host / "x.svg").write_text(secret, encoding="utf-8")
+    (host / "prop.json").write_text(
+        json.dumps({"skins": {"default": {"slots": {"b": {"b": {"path": "x.svg"}}}}}}),
+        encoding="utf-8",
+    )
+    pack = tmp_path / "pack"
+    (pack / "assets" / "props").mkdir(parents=True)
+    try:
+        (pack / "assets" / "props" / "u").symlink_to(host, target_is_directory=True)
+        (pack / "linked.svg").symlink_to(host / "x.svg")
+    except OSError:
+        pytest.skip("no symlinks here")
+    report = PackReport()
+    _lint_svgs(pack, report)
+    assert "SECRET" not in report.format() and report.checks == []

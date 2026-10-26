@@ -527,9 +527,11 @@ def brow_slots(desc: Any) -> list[str]:
     ['left_brow', 'right_brow']
     """
     from cutan.expression.axes import BROW_AXES
+    from cutan.characters.schema import BROW_CHANNEL
     from cutan.expression.binding import (
         ChannelBinding,
         ExpressionResolutionError,
+        SetBinding,
         binding_for,
     )
 
@@ -541,7 +543,12 @@ def brow_slots(desc: Any) -> list[str]:
         {
             b.slot
             for b in bindings
-            if isinstance(b, ChannelBinding) and b.axis in BROW_AXES
+            if b.axis in BROW_AXES
+            # a brow moved by a transform, or drawn by a swap set (cutan#122)
+            and (
+                isinstance(b, ChannelBinding)
+                or (isinstance(b, SetBinding) and b.set_family == BROW_CHANNEL)
+            )
         }
     )
 

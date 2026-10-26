@@ -86,6 +86,7 @@ __all__ = [
     "body_attachment_of",
     "bound_character",
     "start_state",
+    "view_changes",
     "entity_pose",
     "character_view",
     "rig_point_on_stage",
@@ -248,6 +249,39 @@ def start_state(shot: Any) -> dict[str, dict[str, Any]]:
             if "/" not in target:
                 out.setdefault(target, {})[a.property] = a.value
     return out
+
+
+def view_changes(events: Any) -> dict[str, list[tuple[float, str]]]:
+    """``{entity id: [(time, view), ...]}``, in time then authoring order, for every
+    ``view`` set AFTER the start on an entity's own node, over a flat timeline
+    whose turns are expanded (:attr:`cutan.characters.play.TurnResolution.events`):
+    a played ``turn`` is its ``set view`` at the midpoint the compiler gives it
+    (cutan#98).
+
+    >>> from an.ir.compose import flatten
+    >>> from an.ir.schema import SetAction
+    >>> flats = flatten(SetAction(target="p", property="view", value="side", at=2.0))
+    >>> view_changes(flats)
+    {'p': [(2.0, 'side')]}
+    >>> view_changes(flatten(SetAction(target="p", property="view", value="front")))
+    {}
+    """
+    from cutan.characters.schema import VIEW_CHANNEL
+
+    out: dict[str, list[tuple[float, str]]] = {}
+    for flat in events:
+        a = flat.action
+        target = str(getattr(a, "target", ""))
+        if (
+            getattr(a, "kind", None) == "set"
+            and a.property == VIEW_CHANNEL
+            and flat.start > _START_EPS
+            and "/" not in target
+        ):
+            out.setdefault(target, []).append((float(flat.start), str(a.value)))
+    return {
+        k: sorted(v, key=lambda e: e[0]) for k, v in out.items()
+    }  # stable: ties keep authoring order
 
 
 def entity_pose(
@@ -692,7 +726,11 @@ def derive_placement(
         )
         if got["scale"] <= 1e-4:
             return None, "the derived scale is degenerate"
-        return {"at": got["at"], "scale": got["scale"]}, ""
+        return {
+            "at": got["at"],
+            "scale": got["scale"],
+            "residual_px": got["residual_px"],
+        }, ""
     except CrossedLimbs:
         return None, "its limbs are crossed relative to the character's bones"
     except Exception as e:  # noqa: BLE001 - not derivable; say why

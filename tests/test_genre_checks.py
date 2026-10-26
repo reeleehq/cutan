@@ -21,6 +21,7 @@ DECLARED = {
     "cutout.declared_speech",
     "cutout.shot_policy",
     "cutout.style_copies",
+    "cutout.cadence",
     "cutout.view_continuity",
     "cutout.body_attachment",
     "cutout.body_attachment_consistency",

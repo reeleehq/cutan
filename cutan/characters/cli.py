@@ -8,6 +8,7 @@ Subcommands (used as ``an character <verb> ...``):
 
 - ``new``       — generate a fresh character from DiceBear or fallback art.
 - ``add-views`` — give an offline character its turnaround (an#197).
+- ``set-part`` — one attachment drawn by a picture instead of the factory's SVG (cutan#92).
 - ``add-half-lid`` — a HALF eyelid drawing from the rig's own lid art (cutan#65).
 - ``mouths``    — regenerate the 9-shape default mouth set.
 - ``validate``  — completeness check.
@@ -302,6 +303,35 @@ def add_half_lid(
     return f"added a HALF eyelid drawing to {char_dir}"
 
 
+def set_part(name: str, attachment: str, file: str, out_dir: str = "") -> str:
+    """Draw one attachment of ``name`` with a picture instead of the factory's SVG
+    (cutan#92): a painted or generated part (PNG/WebP/JPEG with alpha) takes the
+    place of ``parts/<attachment>.svg``, in the box the attachment declared. The
+    old drawing, its colour roles and its pinned source are dropped.
+
+    name: character id
+    attachment: the attachment's name (``head``), or ``slot/name`` when several slots share it
+    file: the picture
+    out_dir: parent directory; defaults to ./assets/characters
+    """
+    from cutan.characters.set_part import SetPartError
+    from cutan.characters.set_part import set_part as _set_part
+
+    char_dir = _resolve_target(out_dir) / name
+    if not (char_dir / "character.json").is_file():
+        return f"no character at {char_dir}"
+    try:
+        done = _set_part(char_dir, attachment, file)
+    except (SetPartError, OSError, ValueError) as e:
+        return str(e)
+    note = (
+        f"; still the factory's drawings, derived from it: {', '.join(done.derived)}"
+        if done.derived
+        else ""
+    )
+    return f"{attachment!r} of {name!r} is now drawn by {Path(file).name}{note}"
+
+
 def add_views(name: str, out_dir: str = "") -> str:
     """Give ``name`` its turnaround (an#197): back, side and three-quarter head
     and torso art, a `view` swap set, and a pose per view — so `play: turn`
@@ -322,6 +352,57 @@ def add_views(name: str, out_dir: str = "") -> str:
     except ValueError as e:
         return str(e)
     return f"added the views to {desc.parent} (descriptor: {desc.name})"
+
+
+def add_forearms(name: str, out_dir: str = "", elbow_at: float = 0.5) -> str:
+    """Split ``name``'s arms at the elbow and give them hands (cutan#104): a
+    forearm and a hand on each side, with the bones `forearm_l/r` and `hand_l/r`
+    and `nesting: bones`, so a forearm follows its upper arm and a `pin` or
+    `pull` can drag a hand (`ned/hand_r@hand_r`) to a prop's grip. At rest the
+    arm looks as it did. Opt-in; a character made before keeps its one-piece
+    arms. Only an arm the factory drew is split. Idempotent. Run
+    `an character add-limits` afterwards for the elbow's range.
+
+    name: character id
+    out_dir: parent directory; defaults to ./assets/characters
+    elbow_at: where the elbow sits on the arm, 0.1 (at the shoulder) to 0.9
+    """
+    from cutan.characters.factory import add_forearms as _add_forearms
+
+    char_dir = _resolve_target(out_dir) / name
+    if not (char_dir / "character.json").is_file():
+        return f"no character at {char_dir}"
+    try:
+        desc = _add_forearms(char_dir, elbow_at=elbow_at)
+    except ValueError as e:
+        return str(e)
+    return f"split the arms of {desc.parent} (descriptor: {desc.name})"
+
+
+def add_limits(
+    name: str, out_dir: str = "", style: str = "", overwrite: bool = False
+) -> str:
+    """Give ``name`` hinge limits on its bones, by part type (cutan#104): the
+    neck, the shoulders (and the elbows and wrists of a split arm) turn only
+    through a range, which bounds the solver wherever a shot pins or pulls a
+    part. Opt-in; a character made before keeps its bones as they are. Idempotent.
+
+    name: character id
+    out_dir: parent directory; defaults to ./assets/characters
+    style: a shipped style whose `joints.limits` replace the genre's ranges
+        (`marionette` is loose)
+    overwrite: replace ranges the bones already carry (kept otherwise)
+    """
+    from cutan.characters.factory import add_limits as _add_limits
+
+    char_dir = _resolve_target(out_dir) / name
+    if not (char_dir / "character.json").is_file():
+        return f"no character at {char_dir}"
+    try:
+        desc = _add_limits(char_dir, style=style or None, overwrite=overwrite)
+    except ValueError as e:
+        return str(e)
+    return f"wrote hinge limits on {desc.parent} (descriptor: {desc.name})"
 
 
 def feet_origin(name: str, out_dir: str = "", undo: bool = False) -> str:
@@ -737,7 +818,10 @@ _dispatch_funcs = [
     mouths,
     add_gaze,
     add_half_lid,
+    set_part,
     add_views,
+    add_forearms,
+    add_limits,
     feet_origin,
     validate,
     capabilities,

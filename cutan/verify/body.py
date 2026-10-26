@@ -33,9 +33,15 @@ with any ``set`` at the shot's start applied.
 character is in a view other than its rest view (sockets are declared on the
 rest view's bones; a side view moves and hides arms), a rotated prop or
 character, a socket on a nested slot or a posed bone, art the store cannot
-measure. **Not checked at all:** motion during the shot (cutan#98), and whether
-the declaration is TRUE of the pixels: the sockets are the art author's
-statement (a critic over probe frames is cutan#95).
+measure. **Motion during the shot** (cutan#98) is not measured here: when the
+character moves, the ``body_placement`` pass lowers the sockets to ``pin``
+joints (:func:`cutan.compile.body.body_attachment_pins`) and this check says,
+with the time, when the motion pulls one off its bone (:func:`_follow_findings`). A **view change during the shot** (a ``set view`` or a played ``turn``) while a
+prop drawn from the former view stays on is a warning with the time
+(:func:`view_swap_findings`); the sockets are not followed through the new view.
+**Not checked at all:** whether the
+declaration is TRUE of the pixels: the sockets are the art author's statement
+(a critic over probe frames is cutan#95).
 
 >>> from an.ir.schema import Shot
 >>> body_attachment_findings(Shot(id="s"), {})
@@ -46,6 +52,8 @@ from __future__ import annotations
 
 import math
 from typing import Any, Callable, Mapping
+
+from an.verify.constraints import Constraint
 
 from cutan.body_attachment import (
     BODY_ATTACHMENT_KEY,
@@ -64,13 +72,16 @@ from cutan.body_attachment import (
     rest_view_of,
     solve_placement,
     start_state,
+    view_changes,
 )
 
 __all__ = [
+    "BODY_ATTACHMENT_CONSISTENCY",
     "body_attachment_findings",
     "check_body_attachments",
     "check_body_attachment_consistency",
     "consistency_findings",
+    "view_swap_findings",
 ]
 
 #: Where the per-shot check leaves its measurements for the scene-level one.
@@ -449,6 +460,148 @@ def check_body_attachments(ctx: Any) -> None:
         index=ctx.index,
     ):
         ctx.report.add(severity, where, message)
+    _follow_findings(ctx)
+    for severity, where, message in view_swap_findings(
+        ctx.shot, ctx.stores, path=ctx.path
+    ):
+        ctx.report.add(severity, where, message)
+
+
+def view_swap_findings(
+    shot: Any, stores: Mapping[str, Any], *, path: str = ""
+) -> list[Finding]:
+    """A character that changes view after the shot's start while a prop drawn
+    from its former view stays on (cutan#98): the art no longer shows the body
+    from the side the camera sees it, and the sockets are declared on the rest
+    view. One warning per change, with the time, read off the timeline the
+    compiler resolves (a played ``turn`` swaps at its own midpoint). A prop that
+    changes its own look (alpha, a swap set) by then is the author's answer and
+    is not warned about. Never raises.
+
+    >>> from an.ir.schema import Shot
+    >>> view_swap_findings(Shot(id="s"), {})
+    []
+    """
+    from cutan.characters.checks import _turn_resolution
+    from cutan.characters.play import facing_at
+
+    props, chars = stores.get("props"), stores.get("characters")
+    if props is None or chars is None or not _declaring_props(shot, props):
+        return []
+    try:
+        resolved = _turn_resolution(shot, stores)
+        if resolved is None:
+            return []
+        events = resolved[0].events
+        changes = view_changes(events)
+        out: list[Finding] = []
+        for j, entity, raw in _declaring_props(shot, props):
+            ba = body_attachment_of(raw)
+            who, name = bound_character(shot, entity, ba)
+            if who is None or ba.view == FIRST_PERSON or who.id not in changes:
+                continue
+            char = character_model(chars[who.ref]) if who.ref in chars else None
+            current = character_view(
+                who, char, {"view": facing_at(events, who.id, 0.0).view}
+            )
+            for time, view in changes[who.id]:
+                if (
+                    current == ba.view
+                    and view != ba.view
+                    and not _changes_own_look(events, entity.id, by=time)
+                ):
+                    where = f"{path}/entities/{j}" if path else f"entities/{j}"
+                    out.append(
+                        (
+                            "warning",
+                            where,
+                            f"prop {entity.id!r} (depicts {name!r}'s body, seen {ba.view}): {name!r} "
+                            f"changes to the {view!r} view at {time:.2f} s while the prop stays on, so "
+                            f"from then the art shows the body from another side than the camera does. "
+                            f"Swap the prop's drawing, or hide it (alpha), by then.",
+                        )
+                    )
+                current = view
+        return out
+    except Exception:  # noqa: BLE001 - a broken play or declaration is another check's
+        return []
+
+
+def _changes_own_look(events: Any, prop_id: str, *, by: float) -> bool:
+    """Whether the prop sets its own ``alpha`` or a swap set at or before ``by``."""
+    from an.stage.compile import TRANSFORM_PROPERTIES
+
+    for flat in events:
+        a = flat.action
+        target = str(getattr(a, "target", ""))
+        prop = getattr(a, "property", None)
+        if (
+            target.split("/", 1)[0] == prop_id
+            and flat.start <= by + 1e-6
+            and (
+                prop == "alpha"
+                or (
+                    getattr(a, "kind", None) == "set"
+                    and prop not in TRANSFORM_PROPERTIES
+                )
+            )
+        ):
+            return True
+    return False
+
+
+def _follow_findings(ctx: Any) -> None:
+    """Motion during the shot (cutan#98, on the constraint layer): a prop placed by
+    its body is followed through the shot by pins (:mod:`cutan.compile.body`); say
+    when it cannot be (its sockets do not fit the bones) and when the motion pulls
+    a pin off its bone, with the time. The pins are added at compile, so the core's
+    joint checks do not see them: this reads the compiled shot's solve report."""
+    from cutan.compile.body import why_not_followed
+
+    mall = ctx.stores
+    declaring = False
+    for i, entity in enumerate(ctx.shot.entities):
+        if entity.kind != "prop" or (
+            entity.stage is not None and entity.stage.at is not None
+        ):
+            continue
+        try:
+            raw = mall["props"][entity.ref]
+            if body_attachment_of(raw) is None:
+                continue
+            declaring = True
+            why = why_not_followed(ctx.shot, entity, mall)
+        except Exception:  # noqa: BLE001 - the per-shot check reports a broken declaration
+            continue
+        if why:
+            ctx.report.add(
+                "info" if "own" in why else "warning",
+                f"{ctx.path}/entities/{i}",
+                f"prop {entity.id!r} is placed by its body but not followed through the shot: {why}",
+            )
+    if not declaring:
+        return
+    from an.verify.constraints import compiled_shot
+
+    doc = compiled_shot(ctx)
+    report = ((doc.meta.extensions or {}).get("solve") or {}) if doc is not None else {}
+    joints = report.get("joints") or []
+    authored = len(ctx.shot.actions)
+    for entry in report.get("dropped") or []:
+        row = joints[entry["joint"]] if entry["joint"] < len(joints) else {}
+        where = str(row.get("where", ""))
+        if row.get("source") != "pin" or not where.startswith("actions/"):
+            continue
+        if int(where.split("/")[1]) < authored:
+            continue  # an authored pin: unreachable_pin reports it
+        ctx.report.add(
+            "warning",
+            f"{ctx.path}/{where}",
+            f"a body-attached prop's socket ({row.get('bodies')}) cannot stay on its bone from "
+            f"{entry['from']:.2f} s to {entry['until']:.2f} s (it stays {entry['gap']:.1f} px off): "
+            "the character's motion carries the bone out of the prop's reach. Move less, or "
+            "tween the prop yourself (a prop with motion of its own is not followed).",
+        )
 
 
 def check_body_attachment_consistency(ctx: Any) -> None:
@@ -460,3 +613,20 @@ def check_body_attachment_consistency(ctx: Any) -> None:
         ctx.memo.get(RECORDS_KEY) or []
     ):
         ctx.report.add(severity, where, message)
+
+
+#: The cross-shot check as a constraint on the shared interface (cutan#104,
+#: an#508): size conservation of a body-attached prop against its character.
+#: Lint-only (no solver term): the placement is derived from the character in
+#: every shot, so a drift can only come from a hand placement. The persisted
+#: name is the check's, unchanged.
+BODY_ATTACHMENT_CONSISTENCY = Constraint(
+    "cutout.body_attachment_consistency",
+    check_body_attachment_consistency,
+    stage="finish",
+    order=11,
+    description=(
+        "a body-attached prop keeps its size and place relative to its "
+        "character across shots"
+    ),
+)

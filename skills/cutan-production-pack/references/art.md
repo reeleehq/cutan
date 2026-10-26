@@ -22,7 +22,7 @@ The factory characters (`cast.sh`) are drawn by the pipeline and are not yours t
 | set plates (sky, far, mid, near, the view through a moving window) | `assets/environments/<set>/plates/<layer>.png` (or `.jpg`, `.webp`), named by an `image` plane in `meta.json` | used as they are when the background is transparent (the sky may be opaque); a flat background is cut out by the pipeline owner first |
 | props, vehicles, roadside objects | `assets/props/<prop>/parts/<prop>.png`, named by the prop's skin in `prop.json` | as plates: transparent is ready, a flat background is cut out first |
 | a character reference sheet, a costume | `reference/<name>-sheet.png`, listed in `PRODUCTION.md` | the pipeline owner cuts it into a puppet: it takes their time, so say so |
-| a redrawn part of a factory character | must be SVG for now | a picture goes under `reference/` with a description |
+| a redrawn part of a factory character | `assets/characters/<name>/parts/<part>.png`, named like the factory's SVG (`head.png` for `head.svg`) | replaces that part in the box the factory's drawing had: transparent background, the factory part's aspect |
 
 An image plane is fitted into its `size` box keeping its aspect, so give each plane a `size` with the picture's own aspect (a 2560x1080 picture: `"size": [2560, 1080]`, or `[1707, 720]` to show it frame-high at 720p). A prop picture is sized like an SVG prop: make it 1024x1024 (resize the generator's output to that), and 1024 px of picture shows as 345 px at `stage.scale: 1`; set `origin` in those pixels (the wheels' line, the base of a lamp). A picture's colours are its own: a style pack's colour roles do not recolour it, while outlines and shadows still apply.
 
@@ -159,7 +159,7 @@ A prompt is the subject in the writer's words, then the kind's **prompt words**,
 - **Background:** transparent
 - Head (no eyes or mouth drawn on it), torso, each arm, each leg; eyes open and closed; nine mouth shapes.
 - Each limb with a little extra at the joint so the pieces overlap.
-- A redrawn part of a factory character must be SVG for now (cutan#92).
+- A part that replaces a factory character's own is a PNG with alpha named like the factory's SVG (`assets/characters/<name>/parts/head.png` for `parts/head.svg`).
 - **Then:** the pipeline owner assembles the art package (character.json).
 - **Prompt words** (after the subject): A single body part of a cut-out puppet, isolated on a plain flat white background, flat even lighting, no text. (Midjourney: `--ar 1:1`)
 
@@ -180,6 +180,7 @@ A prompt is the subject in the writer's words, then the kind's **prompt words**,
 |---|---|
 | `gilliam` | Victorian engraving and vintage photograph collage, hand-tinted sepia colours, visible scissor-cut paper edges, surreal and theatrical, lit from above |
 | `kurzgesagt` | flat vector illustration, clean geometric shapes, no outlines, soft gradients, vivid saturated colours with soft glowing highlights, rounded corners, deep blue night tones |
+| `marionette` | wooden marionette puppet on thin strings, jointed limbs, painted wood and cloth, a puppeteer's control bar above, theatre lighting |
 | `norstein` | painted multiplane cut-out, soft gouache and watercolour textures, muted earthy colours, misty translucent tracing-paper layers, soft edges, hushed atmosphere |
 | `oversimplified` | flat 2D vector cartoon, bold simple shapes, muted earthy palette (brick red, sage green, ochre), thin dark outlines, minimal detail, no shading |
 | `reiniger` | black paper silhouette cut-out, intricate lace-like scissor-cut edges, pure flat black shapes with no inner detail, backgrounds of graded pastel or translucent coloured paper |

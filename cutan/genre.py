@@ -26,10 +26,11 @@ instead of being wired into the core. :data:`CUTOUT` lists:
 Its ``name`` is the persisted genre slug ``cutout_animation``, the one
 :mod:`cutan.nw` declares to ``nw`` (ADR 0001 decision 9: persisted identifiers do
 not change). It also offers the core **services** (:func:`an.genres.register_service`):
-the ``an character`` / ``an impacts`` CLI namespaces, the ``offline`` / ``rhubarb`` /
-``whisper`` lip-sync providers, the licence lookup for pre-``source`` descriptors, the
-library's publish warning and the expression labels ``judge_emotion`` uses; and the
-**runtime script** that draws the mouth and the eye.
+the ``an character`` / ``an impacts`` / ``an projects`` CLI namespaces, the ``offline`` /
+``rhubarb`` / ``whisper`` lip-sync providers, the licence lookup for pre-``source``
+descriptors, the library's publish warning, the expression labels ``judge_emotion`` uses
+and where ``an init --id`` creates a cut-out project (``projects.dir.cutan``, cutan#91);
+and the **runtime script** that draws the mouth and the eye.
 
 Importing this module registers nothing: :func:`an.genres.load` (or
 :func:`an.genres.register_genre`) does.
@@ -45,11 +46,12 @@ from dataclasses import replace
 from an.genres import CompilePass, Genre, RuntimeScript, SemanticCheck
 from cutan.styles.copies import check_style_copies
 from cutan.styles.policy import check_shot_policy
+from cutan.verify.cadence import check_cadence
 
 from cutan import GENRE_NAME, LIBRARY_NAME, require_an
 from cutan.characters import checks as _checks
 from cutan.verify.body import (
-    check_body_attachment_consistency,
+    BODY_ATTACHMENT_CONSISTENCY,
     check_body_attachments,
 )
 from cutan.characters.methods import (
@@ -59,6 +61,7 @@ from cutan.characters.methods import (
     check_declared_speech,
     check_walk_gaits,
 )
+from cutan.characters.hands import character_landmarks
 from cutan.characters.registration import CHARACTER, PLAY, character_specimen
 from cutan.characters.vocabulary import CUTOUT_VOCABULARY
 from cutan.expression.registration import EMOTION, EXPRESSION
@@ -143,6 +146,10 @@ CUTOUT_VISUALS = RuntimeScript(
 CUTOUT_SERVICES: dict[str, str] = {
     "cli.character": "cutan.characters.cli:_dispatch_funcs",
     "cli.impacts": "cutan.impacts.cli:_dispatch_funcs",
+    "cli.projects": "cutan.projects_cli:_dispatch_funcs",
+    # Where `an init <id> --id --genre cutout_animation` creates the project
+    # (API level 7, cutan#91): the cache folder when the projects store is S3.
+    "projects.dir.cutan": "cutan.projects_store:new_project_dir",
     "lipsync.offline": "cutan.audio:offline_factory",
     "lipsync.rhubarb": "cutan.audio:rhubarb_factory",
     "lipsync.whisper": "cutan.audio:whisper_factory",
@@ -178,6 +185,7 @@ CUTOUT = Genre(
             placeholder_on_missing=True,
             swap_checks=_checks.CharacterSwapChecks(),
             specimen=character_specimen,
+            landmarks=character_landmarks,
         ),
     ),
     checks=(
@@ -218,6 +226,16 @@ CUTOUT = Genre(
             description=(
                 "a shot's `policy` names aspects the compiler applies and their "
                 "method ids (cutan#9)"
+            ),
+        ),
+        SemanticCheck(
+            "cutout.cadence",
+            check_cadence,
+            stage="scene",
+            order=51,
+            description=(
+                "tween durations, easings and `step_hz` agree with the scene's "
+                "style spec, before any render (catalogue B6)"
             ),
         ),
         SemanticCheck(
@@ -263,16 +281,7 @@ CUTOUT = Genre(
                 "stale against the installed spec (cutan#19)"
             ),
         ),
-        SemanticCheck(
-            "cutout.body_attachment_consistency",
-            check_body_attachment_consistency,
-            stage="finish",
-            order=11,
-            description=(
-                "a body-attached prop keeps its size and place relative to its "
-                "character across shots"
-            ),
-        ),
+        BODY_ATTACHMENT_CONSISTENCY.semantic_check(),
         SemanticCheck(
             "cutout.view_continuity",
             _checks.check_view_continuity,
