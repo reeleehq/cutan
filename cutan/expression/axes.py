@@ -56,12 +56,14 @@ AXES: dict[str, Axis] = {
     "gaze_y": Axis("gaze_y", -1.0, 1.0),
 }
 
-BROW_AXES: tuple[str, ...] = (
-    "brow_height_l",
-    "brow_height_r",
-    "brow_angle_l",
-    "brow_angle_r",
-)
+#: Which brow ladder input each brow axis feeds (either side's).
+BROW_AXIS_KIND: dict[str, str] = {
+    "brow_height_l": "height",
+    "brow_height_r": "height",
+    "brow_angle_l": "angle",
+    "brow_angle_r": "angle",
+}
+BROW_AXES: tuple[str, ...] = tuple(BROW_AXIS_KIND)
 LID_AXES: tuple[str, ...] = ("lid_open_l", "lid_open_r")
 GAZE_AXES: tuple[str, ...] = ("gaze_x", "gaze_y")
 

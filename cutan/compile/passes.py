@@ -14,13 +14,13 @@ from __future__ import annotations
 import dataclasses
 import math
 import warnings
-from collections.abc import Iterable, Mapping
+from collections.abc import Collection, Iterable, Mapping
 from pathlib import Path
 from typing import Any, Callable
 
 from cutan.compile.coarticulate import coarticulate
 from cutan.expression.axes import (
-    BROW_AXES,
+    BROW_AXIS_KIND,
     BROW_KEY_NONE,
     LID_KEY_CLOSED,
     LID_KEY_OPEN,
@@ -1727,26 +1727,30 @@ def _solve_face(
         bindings = binding_for(desc)
     except ExpressionResolutionError as e:
         raise CutoutCompileError(str(e)) from e
+    brow_paths: set[str] = set()  # nodes a brow SetBinding keys, expressed or not
     for b in bindings:
+        path = f"{entity_id}/{slot_node_path(desc, b.slot)}"
+        if path not in vocab.paths:
+            continue  # the rig builder did not build the slot (suppressed / no art)
+        if isinstance(b, SetBinding) and b.set_family == BROW_CHANNEL:
+            brow_paths.add(path)
         samples = curves.get(b.axis)
         if samples is None:
             continue
         samples = (samples + [samples[-1]] * n)[:n]
-        path = f"{entity_id}/{slot_node_path(desc, b.slot)}"
-        if path not in vocab.paths:
-            continue  # the rig builder did not build the slot (suppressed / no art)
         if isinstance(b, ChannelBinding):
-            if b.axis in BROW_AXES:
-                kind = "height" if b.axis.startswith("brow_height") else "angle"
-                acc_k = brow_expr.setdefault(path, {}).setdefault(kind, [0.0] * n)
-                for i in range(n):
-                    acc_k[i] += samples[i]
             gain = b.gain * (k if b.rig_scaled else 1.0)
             acc = offsets.setdefault((path, b.property), [0.0] * n)
             for i in range(n):
                 acc[i] += samples[i] * gain
         elif isinstance(b, SetBinding):
-            acc = lid_expr.setdefault(path, [0.0] * n)
+            # `binding_for` admits only the families of SET_FAMILY_AXES.
+            if b.set_family == BROW_CHANNEL:
+                acc = brow_expr.setdefault(path, {}).setdefault(
+                    BROW_AXIS_KIND[b.axis], [0.0] * n
+                )
+            else:
+                acc = lid_expr.setdefault(path, [0.0] * n)
             for i in range(n):
                 acc[i] += samples[i]
 
@@ -1779,7 +1783,7 @@ def _solve_face(
             )
         )
     # Lids: every eye node, expression or not — a blink is a lid contributor.
-    placed_lids: list[PlacedClipJSON] = []
+    placed_face_sets: list[PlacedClipJSON] = []
     for path in _eye_paths(vocab, entity_id):
         expr = lid_expr.get(path, [0.0] * n)
         eyelid = vocab.node_sets.get(path, {}).get(EYELID_CHANNEL) or {}
@@ -1788,7 +1792,14 @@ def _solve_face(
         if has_art and rest_key not in (None, LID_KEY_OPEN):
             continue  # rests closed: the author's call, not a blink's
         if has_art:
-            per_view = _lid_view_spans(vocab, entity_id, path, view_spans)
+            per_view = _face_view_spans(
+                vocab,
+                entity_id,
+                path,
+                base=EYELID_CHANNEL,
+                view_spans=view_spans,
+                drawn=_lid_drawn,
+            )
             lid_sets = {EYELID_CHANNEL} | {v for _, _, v in per_view or ()}
             lid_authored = any((path, lid) in authored for lid in lid_sets)
             if lid_authored and not per_view:
@@ -1799,8 +1810,8 @@ def _solve_face(
                 # but then carry no auto-blink (an#88: authored overrides the
                 # blinks), and the authored clips still win where they play.
                 blink_windows = [] if lid_authored else windows
-                placed_lids.extend(
-                    _lid_span_clips(
+                placed_face_sets.extend(
+                    _keyed_set_clips(
                         shot,
                         entity_id,
                         path,
@@ -1808,8 +1819,9 @@ def _solve_face(
                         animations,
                         vocab=vocab,
                         times=times,
-                        lid_at=lambda i, t, bw=blink_windows: min(
-                            expr[i], _lid_blink_at(t, bw)
+                        tag="lid",
+                        key_at=lambda i, t, available, bw=blink_windows: lid_key(
+                            min(expr[i], _lid_blink_at(t, bw)), available=available
                         ),
                     )
                 )
@@ -1818,14 +1830,12 @@ def _solve_face(
                 lid_key(min(expr[i], _lid_blink_at(t, windows)), available=eyelid)
                 for i, t in enumerate(times)
             ]
-            kfs = [KeyframeJSON(time=times[0], value=keys[0], easing="step")]
-            for i in range(1, n):
-                if keys[i] != keys[i - 1]:
-                    kfs.append(
-                        KeyframeJSON(time=times[i], value=keys[i], easing="step")
-                    )
             channels.append(
-                ChannelJSON(target=path, property=EYELID_CHANNEL, keyframes=kfs)
+                ChannelJSON(
+                    target=path,
+                    property=EYELID_CHANNEL,
+                    keyframes=_step_keyframes(times, keys),
+                )
             )
         else:
             if (path, "scale_y") in authored:
@@ -1849,32 +1859,56 @@ def _solve_face(
                 )
             )
 
-    # Brows drawn as a swap set (cutan#114): keyed off the brow axes, as the
-    # lid is off lid_open; an authored `brow` channel wins, a rig without the
-    # set is untouched.
-    for path, axes_ in sorted(brow_expr.items()):
-        node_sets = vocab.node_sets.get(path, {})
-        brow_set = node_sets.get(BROW_CHANNEL) or {}
-        if (path, BROW_CHANNEL) in authored or BROW_KEY_NONE not in brow_set:
+    # Brows drawn as a swap set (cutan#114, #122): a `SetBinding` of the `brow`
+    # family keys the set off the brow axes, as the lid is off lid_open, per
+    # view where the rig declares `brow@<view>`. An authored `brow` channel
+    # wins; a rig without the set (or resting on other art) is untouched.
+    zeros = [0.0] * n
+    for path in sorted(brow_paths):
+        axes_ = brow_expr.get(path, {})
+        brow_set = vocab.node_sets.get(path, {}).get(BROW_CHANNEL) or {}
+        if BROW_KEY_NONE not in brow_set:
             continue
         if vocab.rest_key(path, BROW_CHANNEL) != BROW_KEY_NONE:
             continue  # rests on other art: the swap would replace it and never restore it
-        if any(name.startswith(f"{BROW_CHANNEL}@") for name in node_sets):
-            continue  # per-view brow sets are not followed yet (cutan follow-up)
-        zeros = [0.0] * n
-        keys = [
-            brow_key(h, a, available=brow_set)
-            for h, a in zip(axes_.get("height", zeros), axes_.get("angle", zeros))
-        ]
-        if set(keys) == {BROW_KEY_NONE}:
+        per_view = _face_view_spans(
+            vocab,
+            entity_id,
+            path,
+            base=BROW_CHANNEL,
+            view_spans=view_spans,
+            drawn=_brow_drawn,
+        )
+        brow_sets = {BROW_CHANNEL} | {v for _, _, v in per_view or ()}
+        if any((path, name) in authored for name in brow_sets):
             continue
-        kfs = [KeyframeJSON(time=times[0], value=keys[0], easing="step")]
-        kfs += [
-            KeyframeJSON(time=times[i], value=keys[i], easing="step")
-            for i in range(1, n)
-            if keys[i] != keys[i - 1]
-        ]
-        channels.append(ChannelJSON(target=path, property=BROW_CHANNEL, keyframes=kfs))
+        height, angle = axes_.get("height", zeros), axes_.get("angle", zeros)
+        if per_view:
+            placed_face_sets.extend(
+                _keyed_set_clips(
+                    shot,
+                    entity_id,
+                    path,
+                    per_view,
+                    animations,
+                    vocab=vocab,
+                    times=times,
+                    tag="brow",
+                    key_at=lambda i, t, available, h=height, a=angle: brow_key(
+                        h[i], a[i], available=available
+                    ),
+                )
+            )
+            continue
+        keys = [brow_key(h, a, available=brow_set) for h, a in zip(height, angle)]
+        if set(keys) != {BROW_KEY_NONE}:
+            channels.append(
+                ChannelJSON(
+                    target=path,
+                    property=BROW_CHANNEL,
+                    keyframes=_step_keyframes(times, keys),
+                )
+            )
 
     # The pose's own curves, where no contributor above drives the property:
     # held steps, keyed where each whole-character swap lands.
@@ -1890,7 +1924,7 @@ def _solve_face(
         placed.append(
             PlacedClipJSON(animation_id=anim_id, start_time=0.0, duration=duration)
         )
-    placed.extend(placed_lids)
+    placed.extend(placed_face_sets)
 
     # The silent mouth form: hold the variant's rest key over each expression
     # span, outside this entity's dialogue lines — and, whenever any variant is
@@ -2068,29 +2102,53 @@ def _solve_face(
     return placed
 
 
-def _lid_view_spans(
+def _lid_drawn(keys: Collection[str]) -> bool:
+    """Whether a lid set can blink: it draws both ``OPEN`` and ``CLOSED``."""
+    return LID_KEY_OPEN in keys and LID_KEY_CLOSED in keys
+
+
+def _brow_drawn(keys: Collection[str]) -> bool:
+    """Whether a brow set can rest: it draws ``NONE``."""
+    return BROW_KEY_NONE in keys
+
+
+def _face_view_spans(
     vocab: _SwapVocabulary,
     entity_id: str,
     path: str,
+    *,
+    base: str,
     view_spans: list[_ViewSpan] | None,
+    drawn: Callable[[Collection[str]], bool],
 ) -> list[tuple[float, float, str]] | None:
-    """``[(start, end, eyelid set)]`` over the shot for one eye, or ``None``
-    when every span keys on the plain ``eyelid`` set (then the lid is the one
-    channel it always was). A per-view set without ``OPEN`` and ``CLOSED`` art
-    cannot blink, so that view's lid stays on the plain set (an#220)."""
+    """``[(start, end, set)]`` over the shot for one face node's ``base`` set
+    (``eyelid``, ``brow``), or ``None`` when every span keys on the plain
+    ``base`` set (then it is the one channel it always was). A per-view set
+    that is not ``drawn`` (a lid set without ``OPEN``/``CLOSED``, a brow set
+    without ``NONE``) cannot act, so that view stays on the plain set (an#220)."""
     out: list[tuple[float, float, str]] = []
     for a, b, view in view_spans or ():
-        set_name = _face_set_for(vocab, entity_id, path, EYELID_CHANNEL, view)
-        keys = vocab.node_sets.get(path, {}).get(set_name) or {}
-        if LID_KEY_OPEN not in keys or LID_KEY_CLOSED not in keys:
-            set_name = EYELID_CHANNEL
+        set_name = _face_set_for(vocab, entity_id, path, base, view)
+        if not drawn(vocab.node_sets.get(path, {}).get(set_name) or {}):
+            set_name = base
         out.append((a, b, set_name))
-    if not any(set_name != EYELID_CHANNEL for _, _, set_name in out):
+    if not any(set_name != base for _, _, set_name in out):
         return None
     return out
 
 
-def _lid_span_clips(
+def _step_keyframes(times: list[float], keys: list[str]) -> list[KeyframeJSON]:
+    """Step keyframes of ``keys`` sampled at ``times``: the first, then each change."""
+    kfs = [KeyframeJSON(time=times[0], value=keys[0], easing="step")]
+    kfs += [
+        KeyframeJSON(time=times[i], value=keys[i], easing="step")
+        for i in range(1, len(keys))
+        if keys[i] != keys[i - 1]
+    ]
+    return kfs
+
+
+def _keyed_set_clips(
     shot: Shot,
     entity_id: str,
     path: str,
@@ -2099,12 +2157,14 @@ def _lid_span_clips(
     *,
     vocab: _SwapVocabulary,
     times: list[float],
-    lid_at: Callable[[int, float], float],
+    tag: str,
+    key_at: Callable[[int, float, Collection[str]], str],
 ) -> list[PlacedClipJSON]:
-    """One lid clip per view span (an#220): the solver's lid value, read off
-    the ladder of THAT span's set, keyed from the span's start. Each clip but
-    the last ends :data:`_VIEW_SPAN_EDGE_S` before the next span, so at every
-    instant exactly one lid set is playing and the latest-written one shows."""
+    """One clip per view span (an#220) for a face set (``tag``: ``lid``, ``brow``):
+    ``key_at(frame, time, the span set's keys)`` read off the ladder of THAT
+    span's set, keyed from the span's start. Each clip but the last ends
+    :data:`_VIEW_SPAN_EDGE_S` before the next span, so at every instant exactly
+    one set is playing and the latest-written one shows."""
     placed: list[PlacedClipJSON] = []
     for j, (a, b, set_name) in enumerate(per_view):
         last = j == len(per_view) - 1
@@ -2113,19 +2173,18 @@ def _lid_span_clips(
             continue
         available = vocab.node_sets[path][set_name]
         frames = [
-            (t, lid_key(lid_at(i, t), available=available))
+            (t, key_at(i, t, available))
             for i, t in enumerate(times)
             if a - 1e-9 <= t <= end + 1e-9
         ]
-        if not frames:  # a span shorter than a frame: the nearest frame's lid
+        if not frames:  # a span shorter than a frame: the nearest frame's key
             i = min(range(len(times)), key=lambda i: abs(times[i] - a))
-            frames = [(a, lid_key(lid_at(i, times[i]), available=available))]
-        # Keyed from the span's start with its first frame's lid.
-        kfs = [KeyframeJSON(time=0.0, value=frames[0][1], easing="step")]
-        for (t, key), (_, prev) in zip(frames[1:], frames):
-            if key != prev:
-                kfs.append(KeyframeJSON(time=t - a, value=key, easing="step"))
-        anim_id = f"__face_lid__{shot.id}_{entity_id}_{j}_{path.replace('/', '.')}"
+            frames = [(a, key_at(i, times[i], available))]
+        # Keyed from the span's start with its first frame's key.
+        kfs = _step_keyframes(
+            [0.0] + [t - a for t, _ in frames[1:]], [key for _, key in frames]
+        )
+        anim_id = f"__face_{tag}__{shot.id}_{entity_id}_{j}_{path.replace('/', '.')}"
         duration = max(0.001, end - a)
         animations[anim_id] = AnimationClipJSON(
             name=anim_id,
