@@ -50,7 +50,7 @@ import subprocess
 import sys
 import tempfile
 import xml.etree.ElementTree as ET
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -694,7 +694,12 @@ class _Runner:
     step timeout and what is left of the deadline) and records it in the report."""
 
     def __init__(
-        self, report: PackReport, *, timeout: float, deadline: float | None
+        self,
+        report: PackReport,
+        *,
+        timeout: float,
+        deadline: float | None,
+        child_limits: Callable[[], None] | None = None,
     ) -> None:
         import time
 
@@ -702,6 +707,7 @@ class _Runner:
         self._clock = time.monotonic
         self._end = None if deadline is None else self._clock() + deadline
         self._env = _child_env()
+        self._child_limits = child_limits
 
     def __call__(
         self, cmd: list[str], *, cwd: Path, label: str, expect: str | None = None
@@ -722,6 +728,7 @@ class _Runner:
                 text=True,
                 timeout=timeout,
                 env=self._env,
+                preexec_fn=self._child_limits,
             )
         except subprocess.TimeoutExpired:
             return self.report.add(
@@ -745,6 +752,7 @@ def _build_and_check(
     python: str,
     timeout: float,
     deadline: float | None,
+    child_limits: Callable[[], None] | None = None,
 ) -> None:
     cast = cast_commands(pack)  # refuse a bad cast.sh before running anything
     if len(cast) > MAX_CAST_LINES:
@@ -761,7 +769,9 @@ def _build_and_check(
     _note_svg_only_art(pack, report)
     _lint_svgs(pack, report)
     _lint_voices(pack, report)
-    run = _Runner(report, timeout=timeout, deadline=deadline)
+    run = _Runner(
+        report, timeout=timeout, deadline=deadline, child_limits=child_limits
+    )
     workdir = project.parent
     if not run(
         an + ["init", str(project)], cwd=workdir, label="an init", expect="initialized"
@@ -879,6 +889,7 @@ def check_pack(
     python: str | None = None,
     timeout: float = DFLT_STEP_TIMEOUT,
     deadline: float | None = DFLT_DEADLINE,
+    child_limits: Callable[[], None] | None = None,
 ) -> PackReport:
     """Check the production pack at ``pack_dir``; return a :class:`PackReport`.
 
@@ -890,6 +901,10 @@ def check_pack(
         ``an_command`` when it starts with one, else this one)
     timeout: seconds one step may run before it counts as failed
     deadline: seconds the whole check may run (``None``: no limit)
+    child_limits: called in every child process (each ``an`` step and the voice
+        check) just before it runs, as ``subprocess.run``'s ``preexec_fn``: a
+        host caps memory or CPU once (``resource.setrlimit``) instead of
+        wrapping one command. POSIX only; ``None``: no limit
 
     The pack is untrusted: only :data:`PACK_SUFFIXES` files are copied, the
     ``an`` children run without the working directory on their import path
@@ -920,6 +935,7 @@ def check_pack(
             python=python,
             timeout=timeout,
             deadline=deadline,
+            child_limits=child_limits,
         )
     except PackError as e:
         report.add("pack", False, f"{ERROR_MARKER} {e}")
