@@ -32,7 +32,7 @@ LIVE_KEYS = {
     "transitions", "sound", "voice", "glow_template",
 }
 TOP_KEYS = {
-    "style", "schema_version", "title", "cost_class", "cost_note", "live", "policy", "targets", "prosody_targets", "guidance"
+    "style", "schema_version", "title", "cost_class", "cost_note", "live", "policy", "targets", "prosody_targets", "guidance", "joints"
 }
 COST_CLASSES = {"low", "low_to_medium", "medium", "high", "very_high"}
 GENERATORS = {"offline", "promote"}

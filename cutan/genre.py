@@ -50,7 +50,7 @@ from cutan.styles.policy import check_shot_policy
 from cutan import GENRE_NAME, LIBRARY_NAME, require_an
 from cutan.characters import checks as _checks
 from cutan.verify.body import (
-    check_body_attachment_consistency,
+    BODY_ATTACHMENT_CONSISTENCY,
     check_body_attachments,
 )
 from cutan.characters.methods import (
@@ -270,16 +270,7 @@ CUTOUT = Genre(
                 "stale against the installed spec (cutan#19)"
             ),
         ),
-        SemanticCheck(
-            "cutout.body_attachment_consistency",
-            check_body_attachment_consistency,
-            stage="finish",
-            order=11,
-            description=(
-                "a body-attached prop keeps its size and place relative to its "
-                "character across shots"
-            ),
-        ),
+        BODY_ATTACHMENT_CONSISTENCY.semantic_check(),
         SemanticCheck(
             "cutout.view_continuity",
             _checks.check_view_continuity,

@@ -33,9 +33,13 @@ with any ``set`` at the shot's start applied.
 character is in a view other than its rest view (sockets are declared on the
 rest view's bones; a side view moves and hides arms), a rotated prop or
 character, a socket on a nested slot or a posed bone, art the store cannot
-measure. **Not checked at all:** motion during the shot (cutan#98), and whether
-the declaration is TRUE of the pixels: the sockets are the art author's
-statement (a critic over probe frames is cutan#95).
+measure. **Motion during the shot** (cutan#98) is not measured here: when the
+character moves, the ``body_placement`` pass lowers the sockets to ``pin``
+joints (:func:`cutan.compile.body.body_attachment_pins`) and the core's
+``unreachable_pin`` and ``joint_violation`` checks say, with the time, when
+the motion pulls one off its bone. **Not checked at all:** whether the
+declaration is TRUE of the pixels: the sockets are the art author's statement
+(a critic over probe frames is cutan#95).
 
 >>> from an.ir.schema import Shot
 >>> body_attachment_findings(Shot(id="s"), {})
@@ -46,6 +50,8 @@ from __future__ import annotations
 
 import math
 from typing import Any, Callable, Mapping
+
+from an.verify.constraints import Constraint
 
 from cutan.body_attachment import (
     BODY_ATTACHMENT_KEY,
@@ -67,6 +73,7 @@ from cutan.body_attachment import (
 )
 
 __all__ = [
+    "BODY_ATTACHMENT_CONSISTENCY",
     "body_attachment_findings",
     "check_body_attachments",
     "check_body_attachment_consistency",
@@ -460,3 +467,20 @@ def check_body_attachment_consistency(ctx: Any) -> None:
         ctx.memo.get(RECORDS_KEY) or []
     ):
         ctx.report.add(severity, where, message)
+
+
+#: The cross-shot check as a constraint on the shared interface (cutan#104,
+#: an#508): size conservation of a body-attached prop against its character.
+#: Lint-only (no solver term): the placement is derived from the character in
+#: every shot, so a drift can only come from a hand placement. The persisted
+#: name is the check's, unchanged.
+BODY_ATTACHMENT_CONSISTENCY = Constraint(
+    "cutout.body_attachment_consistency",
+    check_body_attachment_consistency,
+    stage="finish",
+    order=11,
+    description=(
+        "a body-attached prop keeps its size and place relative to its "
+        "character across shots"
+    ),
+)

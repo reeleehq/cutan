@@ -1,0 +1,62 @@
+# Marionette: a puppet on strings from a control bar (cutan#104). See the header of south_park.yaml
+# for how to read this file; the `joints` block is this style's own and is read by
+# `cutan.marionette` (the builder) and `cutan.characters.limits` (`add-limits --style marionette`).
+# Nothing here is MEASURED from a production: the targets and numbers are estimates, kept loose.
+style: marionette
+schema_version: "0.1.0"
+title: Marionette (puppet on strings, hanging under gravity)
+cost_class: medium
+cost_note: a dynamic solve per shot (gravity and strings), baked to keys; the strings are not drawn yet (a `string` visual between two points is a follow-up)
+
+live:
+  meta:
+    fps: 24
+    default_easing: ease_in_out      # a puppeteer's hand is slow and rounded
+    step_hz: 12                      # an estimate: puppet films are shot on twos
+    style_pack: marionette
+  style_pack:
+    name: marionette
+    gravity: down 600                # scene px/s^2: what makes a limb hang and swing, and the shot `dynamic` (the solve's mode)
+    damping: 0.03                    # how fast a swing dies; the solver's default is 0.02
+  camera:
+    default: hold
+    allowed: [hold, push_in]
+  easing: [ease_in_out]
+  tween_duration_s: [0.5, 2.0]       # the bar is moved slowly; the figure follows and settles
+  motion_presets: [turn]
+  shots:
+    mean_s: 8                        # an estimate
+    range_s: [4, 14]
+  characters:
+    generate: offline
+    build: regular
+  transitions:
+    default: {kind: cut}
+
+joints:
+  limits:                            # part type -> [lo, hi] degrees about the rest pose, for the RIGHT side (the left mirrors): loose, a puppet's joints hardly resist (cutan.characters.limits)
+    neck: [-90, 90]
+    shoulder: [-180, 180]
+    elbow: [-170, 170]
+    wrist: [-120, 120]
+    hip: [-120, 120]
+    knee: [-170, 170]
+    ankle: [-80, 80]
+  hips: true                         # a hinge from each leg to the torso at the hip (the factory's legs hang from the root, not the torso), within the hip's range
+  give: 0.0                          # a string's softness (compliance); 0 is taut
+  strings:                           # name -> the part and point a string is tied to, and where on the bar; a point is [u, v] of the part's art, or a bone name
+    head:   {part: head,  at: [0.5, 0.0],  bar: [0.5, 0.5]}
+    hand_l: {part: arm_l, at: [0.5, 0.95], bar: [0.1, 0.5], with_hands: {part: hand_l, at: hand_l}}
+    hand_r: {part: arm_r, at: [0.5, 0.95], bar: [0.9, 0.5], with_hands: {part: hand_r, at: hand_r}}
+    knee_l: {part: leg_l, at: [0.5, 0.5],  bar: [0.3, 0.5]}
+    knee_r: {part: leg_r, at: [0.5, 0.5],  bar: [0.7, 0.5]}
+
+targets:
+  cuts_per_min: [3, 8]               # an estimate, not measured
+
+guidance:
+  image_prompt: wooden marionette puppet on thin strings, jointed limbs, painted wood and cloth, a puppeteer's control bar above, theatre lighting   # the look in words, for an image generator (cutan.art_brief); never a show's name
+  construction: "one jointed figure (the factory's, `an character add-limits <name> --style marionette`; `add-forearms` first if the hands should be pinned), a control bar per figure (`cutan.marionette.write_control_bar`), the joints from `cutan.marionette.marionette_joints`; the bar is what the author drives (tween its x, y and rotation), the figure follows on its strings and settles"
+  how: "put the figure's joints and the bar in the shot (`joints:` on the shot), give the character `overrides: {free: true}` so its parts hang from the strings, and tween the bar; the pack's gravity makes the shot dynamic"
+  strings: "not drawn yet. A string is a distance held at most between two points (the solver's `string` joint), so it may go slack; draw it as an overlay line from the bar to the part if the look needs it (a follow-up)"
+  other_puppets: "not built, with the joints they would declare. A rod puppet is the same figure with rigid `rod` joints from a stick to the head and the hands and no gravity; a shadow puppet is hinge-only planar figures, each piece a silhouette, moved by rods held out of frame; a bunraku puppet is hinges plus puppeteers' hands pinned at the shoulders and the head, visible"

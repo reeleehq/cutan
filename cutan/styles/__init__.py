@@ -28,7 +28,7 @@ An unknown name is refused with the names there are (a ``KeyError``):
 ...     style_spec('pixar')
 ... except KeyError as e:
 ...     print(e)
-no style spec named 'pixar'; the specs are: gilliam, kurzgesagt, norstein, oversimplified, reiniger, south_park
+no style spec named 'pixar'; the specs are: gilliam, kurzgesagt, marionette, norstein, oversimplified, reiniger, south_park
 
 **A spec changes between releases** (targets re-measured, roles re-cast), and
 whatever a production copied out of one (a StylePack, a voice document with
