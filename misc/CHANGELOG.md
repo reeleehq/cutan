@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-10-26
+- **Hinge limits per part type** (cutan#104, P3 of the constraint layer an#497): `cutan.characters.limits` states the ranges of a neck, shoulder, elbow, wrist, hip, knee and ankle once (`GENRE_LIMITS`, written for the right side, mirrored for the left; a style spec's `joints.limits` overrides by part type), and `add_limits(char_dir, style=None)` / `an character add-limits <name>` writes them onto a character's bones (opt-in, idempotent, a recipe step; a new character carries none, so its contract hashes do not move). `bones_from_pivots(..., limits=)` writes them as an illustrator's joints are placed. A range acts only where a shot declares a joint: a head pinned to a point beyond the neck's 45° is refused, a scene with no joint compiles as before.
+
 ## 2026-10-25
 - **A character's hands are named points** (an#502, cutan#104; an API level 8): `cutan.characters.hands.character_landmarks`, registered as the character kind's `EntityKind.landmarks`, names `hand_l` / `hand_r` (the far end of the arm's chain: the arm, or the forearm under `nesting: bones`; a drawn `hand_r` part's middle; a `hand_r` bone wins), so the core's hold verbs say `{kind: grasp, by: stu@hand_r, item: musket}` on any character rig. The `cutan` skill's new section *Holding things* (pick up, carry, put down, hand over, swap; what a one-piece arm can reach, the figurine socket recipe, measured leans) and the `holds` demo (a factory character takes a cup off a crate, hands it over halfway, the other tosses it onto the floor).
 
