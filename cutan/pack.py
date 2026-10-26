@@ -769,9 +769,7 @@ def _build_and_check(
     _note_svg_only_art(pack, report)
     _lint_svgs(pack, report)
     _lint_voices(pack, report)
-    run = _Runner(
-        report, timeout=timeout, deadline=deadline, child_limits=child_limits
-    )
+    run = _Runner(report, timeout=timeout, deadline=deadline, child_limits=child_limits)
     workdir = project.parent
     if not run(
         an + ["init", str(project)], cwd=workdir, label="an init", expect="initialized"
