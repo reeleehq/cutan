@@ -29,8 +29,9 @@ A style spec overrides by part type; the other types keep the genre's:
 
 Nothing here changes a character until :func:`apply_limits` (or the factory's
 ``add_limits``) writes the ranges onto its bones, and a bone's range only acts
-when a shot declares a joint (a ``pin``, a ``pull``, a ``join``): a scene that
-declares none compiles byte for byte as it did.
+when a shot declares a joint, a verb (``pin``, ``pull``, ``join``) or a hold: a
+scene that declares none of them compiles byte for byte as it did. A bone added
+later (a split arm's) has none until ``add_limits`` runs again.
 """
 
 from __future__ import annotations

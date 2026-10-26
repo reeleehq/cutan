@@ -2536,8 +2536,9 @@ def add_limits(
     desc_path = Path(char_dir) / "character.json"
     raw = json.loads(desc_path.read_text(encoding="utf-8"))
     desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
-    apply_limits(desc.bones, table=limits_table(style), overwrite=overwrite)
-    desc.metadata["limits"] = style or "genre"
+    written = apply_limits(desc.bones, table=limits_table(style), overwrite=overwrite)
+    if written:  # the label names ranges that are on the bones, never ones that were kept out
+        desc.metadata["limits"] = style or "genre"
     desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
     return desc_path
 

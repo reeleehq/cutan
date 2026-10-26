@@ -148,6 +148,17 @@ def test_add_limits_is_a_replayable_step_of_the_recipe(tmp_path):
     assert steps is not None and [c for c, _ in steps][-1] == "add_limits"
 
 
+def test_the_label_names_only_ranges_that_were_written(tmp_path):
+    root = _character(tmp_path / "p", limits=True)
+    path = root / "assets/characters/ned"
+    add_limits(path, style="gilliam")  # every bone already has a range: nothing written
+    desc = json.loads((path / "character.json").read_text(encoding="utf-8"))
+    assert desc["metadata"]["limits"] == "genre"
+    add_limits(path, style="gilliam", overwrite=True)
+    desc = json.loads((path / "character.json").read_text(encoding="utf-8"))
+    assert desc["metadata"]["limits"] == "gilliam"
+
+
 def test_add_limits_refuses_a_style_that_does_not_ship(tmp_path):
     root = _character(tmp_path / "p", limits=False)
     with pytest.raises(ValueError, match="no style spec named 'pixar'"):
