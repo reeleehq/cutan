@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 from pathlib import Path
 
 import pytest
@@ -335,3 +336,30 @@ def test_the_pack_lint_reads_nothing_behind_a_link(tmp_path):
     report = PackReport()
     _lint_svgs(pack, report)
     assert "SECRET" not in report.format() and report.checks == []
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="preexec_fn is POSIX only")
+def test_child_limits_reach_every_child_including_the_voice_check(tmp_path, monkeypatch):
+    """The host's limit runs in each child: every `an` step and the voice-check child."""
+    _with_this_checkout(monkeypatch)
+    pack = _example_copy(tmp_path)
+    voices = pack / "assets" / "voices"
+    voices.mkdir(parents=True, exist_ok=True)
+    (voices / "ok.json").write_text(json.dumps({"provider": "elevenlabs", "notes": "warm, slow, a Yorkshire burr", "sample_text": "Hello there. " * 10}))
+    marker = tmp_path / "limited"
+
+    def limit_writes_marker():
+        with open(marker, "a") as f:
+            f.write("x")
+
+    report = check_pack(pack, an_command=(sys.executable, "-m", "an"), child_limits=limit_writes_marker)
+    assert report.ok, report.format()
+    steps = [c for c in report.checks if c.label.split()[0] not in {"file", "svg", "voice"}]
+    assert any(c.label == "voices (engine checks)" for c in steps)
+    assert len(marker.read_text()) == len(steps)
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="the refusal is Windows-only")
+def test_child_limits_refused_on_windows(tmp_path):
+    with pytest.raises(ValueError, match="POSIX"):
+        check_pack(tmp_path, child_limits=lambda: None)
