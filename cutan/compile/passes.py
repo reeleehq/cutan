@@ -19,7 +19,14 @@ from pathlib import Path
 from typing import Any, Callable
 
 from cutan.compile.coarticulate import coarticulate
-from cutan.expression.axes import LID_KEY_CLOSED, LID_KEY_OPEN, lid_key
+from cutan.expression.axes import (
+    BROW_AXES,
+    BROW_KEY_NONE,
+    LID_KEY_CLOSED,
+    LID_KEY_OPEN,
+    brow_key,
+    lid_key,
+)
 from cutan.expression.binding import (
     LID_SQUASH_GAIN,
     ChannelBinding,
@@ -77,6 +84,7 @@ from an.stage.serialize import (
 )
 from cutan.characters.schema import (
     CHARACTER_DOCUMENT_KIND,
+    BROW_CHANNEL,
     VIEW_CHANNEL,
     view_variant_sets,
     EYELID_CHANNEL,
@@ -1711,6 +1719,7 @@ def _solve_face(
 
     offsets: dict[tuple[str, str], list[float]] = {}
     lid_expr: dict[str, list[float]] = {}
+    brow_expr: dict[str, dict[str, list[float]]] = {}  # path -> {"height"|"angle": samples}
     try:
         bindings = binding_for(desc)
     except ExpressionResolutionError as e:
@@ -1724,6 +1733,8 @@ def _solve_face(
         if path not in vocab.paths:
             continue  # the rig builder did not build the slot (suppressed / no art)
         if isinstance(b, ChannelBinding):
+            if b.axis in BROW_AXES:
+                brow_expr.setdefault(path, {})[b.axis.split("_")[1]] = samples
             gain = b.gain * (k if b.rig_scaled else 1.0)
             acc = offsets.setdefault((path, b.property), [0.0] * n)
             for i in range(n):
@@ -1831,6 +1842,30 @@ def _solve_face(
                     keyframes=_compress_linear(times, values),
                 )
             )
+
+    # Brows drawn as a swap set (cutan#114): keyed off the brow axes, as the
+    # lid is off lid_open; an authored `brow` channel wins, a rig without the
+    # set is untouched.
+    for path, axes_ in sorted(brow_expr.items()):
+        brow_set = vocab.node_sets.get(path, {}).get(BROW_CHANNEL) or {}
+        if (path, BROW_CHANNEL) in authored or not brow_set:
+            continue
+        if vocab.rest_key(path, BROW_CHANNEL) not in (None, BROW_KEY_NONE):
+            continue  # rests drawn: the author's call, as a lid that rests closed
+        zeros = [0.0] * n
+        keys = [
+            brow_key(h, a, available=brow_set)
+            for h, a in zip(axes_.get("height", zeros), axes_.get("angle", zeros))
+        ]
+        if set(keys) == {BROW_KEY_NONE}:
+            continue
+        kfs = [KeyframeJSON(time=times[0], value=keys[0], easing="step")]
+        kfs += [
+            KeyframeJSON(time=times[i], value=keys[i], easing="step")
+            for i in range(1, n)
+            if keys[i] != keys[i - 1]
+        ]
+        channels.append(ChannelJSON(target=path, property=BROW_CHANNEL, keyframes=kfs))
 
     # The pose's own curves, where no contributor above drives the property:
     # held steps, keyed where each whole-character swap lands.

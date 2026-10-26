@@ -103,6 +103,11 @@ VISEME_CHANNEL: str = "viseme"
 #: channel must drive together need attachment names in common.
 EYELID_CHANNEL: str = "eyelid"
 
+#: The swap set that draws a carved face's brows (cutan#114): keys ``ANGRY``,
+#: ``RAISED`` and ``NONE``, read off the brow axes the way ``eyelid`` is off
+#: ``lid_open``.
+BROW_CHANNEL: str = "brow"
+
 #: Default eyelid-state → attachment-name mapping, shared by both eye slots.
 DEFAULT_EYELID_MAP: dict[str, str] = {"OPEN": "open", "CLOSED": "closed"}
 
