@@ -904,7 +904,10 @@ def check_pack(
     child_limits: called in every child process (each ``an`` step and the voice
         check) just before it runs, as ``subprocess.run``'s ``preexec_fn``: a
         host caps memory or CPU once (``resource.setrlimit``) instead of
-        wrapping one command. POSIX only; ``None``: no limit
+        wrapping one command. POSIX only (``ValueError`` elsewhere); ``None``: no
+        limit. Keep it to ``resource.setrlimit`` with ``resource`` imported
+        beforehand: ``preexec_fn`` can deadlock when it imports, logs or takes
+        locks while the host runs threads. ``RLIMIT_AS`` is not enforced on macOS
 
     The pack is untrusted: only :data:`PACK_SUFFIXES` files are copied, the
     ``an`` children run without the working directory on their import path
@@ -915,6 +918,8 @@ def check_pack(
     A pack that cannot be checked at all gives a report with one failed
     ``pack`` check; nothing here raises on a bad pack.
     """
+    if child_limits is not None and os.name == "nt":
+        raise ValueError("child_limits needs a POSIX system (subprocess preexec_fn)")
     pack = Path(pack_dir).resolve()
     report = PackReport()
     an = list(an_command)

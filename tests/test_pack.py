@@ -357,3 +357,9 @@ def test_child_limits_reach_every_child_including_the_voice_check(tmp_path, monk
     steps = [c for c in report.checks if c.label.split()[0] not in {"file", "svg", "voice"}]
     assert any(c.label == "voices (engine checks)" for c in steps)
     assert len(marker.read_text()) == len(steps)
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="the refusal is Windows-only")
+def test_child_limits_refused_on_windows(tmp_path):
+    with pytest.raises(ValueError, match="POSIX"):
+        check_pack(tmp_path, child_limits=lambda: None)
