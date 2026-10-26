@@ -48,6 +48,7 @@ cutan.carve
       Rembg
       Resample
       SuperRes
+      PropState
    
    .. rubric:: Exceptions
 

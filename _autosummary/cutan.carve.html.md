@@ -87,6 +87,7 @@ what is installed). Nothing here is imported by `import cutan`.
 | [`Rembg`](#cutan.carve.Rembg)([model, post_process])                      | `rembg`'s neural background removal (`pip install "cutan[rembg]"`).                                                         |
 | [`Resample`](#cutan.carve.Resample)([factor, method])                        | Interpolate `factor``x (``cubic`, `linear` or `lanczos`): no new detail, but the matte's resolution is what the part keeps. |
 | [`SuperRes`](#cutan.carve.SuperRes)()                                        | Base of the shipped strategies: a `name`, a whole `factor` and a `recipe()`.                                                |
+| [`PropState`](#cutan.carve.PropState)(art[, unit])                            | One more drawing of a prop's base, for [`write_prop()`](#cutan.carve.write_prop)'s `states=`.           |
 
 ### Exceptions
 
@@ -344,6 +345,19 @@ edge).
 Bases: [`Matte`](cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
 
 A hand-given outline, `[(x, y), ...]` in the SOURCE image, anti-aliased.
+
+### *class* cutan.carve.PropState(art, unit=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One more drawing of a prop’s base, for [`write_prop()`](#cutan.carve.write_prop)’s `states=`.
+
+`art`: the carving (its `anchor` lands on the prop’s root bone).
+`unit`: view_box units per pixel of `art`. Default: the prop’s unit,
+corrected for a different super-resolution factor (`carving.scale`), so a
+drawing carved at the same source resolution draws at the same size; give
+it when the state was carved from a frame at another resolution or zoom.
+A bare [`Carving`](#cutan.carve.Carving) in `states=` is `PropState(art)`.
 
 ### *class* cutan.carve.RealESRGAN(model='realesr-animevideov3', , path=None, overlap=16, session=None, providers=('CPUExecutionProvider',), download=True, sha256=None)
 
@@ -718,7 +732,7 @@ super-resolved carving (`carving.scale` 4) scale them by it.
 * **Return type:**
   [`PartSet`](cutan.carve.parts.html.md#cutan.carve.parts.PartSet)
 
-### cutan.carve.write_prop(carved, folder, , name=None, unit=None, max_side=None, display_name=None, source=None, ours=False, relicense=None, landmarks=None, overwrite=False)
+### cutan.carve.write_prop(carved, folder, , name=None, unit=None, max_side=None, display_name=None, source=None, ours=False, relicense=None, landmarks=None, states=None, state='default', state_set='state', overwrite=False)
 
 Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.
 
@@ -742,6 +756,10 @@ landmarks: named points of the prop in the source’s pixels, each written
   (`grip`, `GRIP`, is where a hand takes it). See the module
   docstring. They are points of the prop as a whole: on a split prop a
   landmark does not follow a part that turns (a grip on a moving lid).
+
+states: more drawings of the base, `{name: carving or PropState}`,
+: written as the swap set `state_set` on the base slot, with the
+  carving itself as its `state` key (see the module docstring)
 
 A [`PartSet`](#cutan.carve.PartSet) is written with its carving’s provenance:
 build one with [`split_parts()`](#cutan.carve.split_parts) (its parts are cut from

@@ -11,10 +11,17 @@ cutan.carve.prop
       ROOT_BONE
       BASE_SLOT
       GRIP
+      STATE_SET
    
    .. rubric:: Functions
 
    .. autosummary::
    
       write_prop
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      PropState
    

@@ -1,4 +1,4 @@
-> built 2026-10-25 09:12 UTC from 3dd408c (main) · cutan 0.0.65. Details: build_info.json
+> built 2026-10-26 04:22 UTC from 63a578d (main) · cutan 0.0.66. Details: build_info.json
 
 # index.html.md
 
@@ -42,7 +42,7 @@ write_prop(lamp, "assets/props/lamp")                             # prop.json + 
 head = carve_head(frame, face=(830, 170, 930, 305), matte="rembg")  # neck cut, 512² canvas, face centre as origin
 ```
 
-The matte is a strategy: `flat_colour` (the default), `chroma`, `grabcut`, `polygon`, `focus`, `rembg`, or any `(rgb, hint) -> alpha` callable. Two combine with `&` and `|`: `Polygon(outline) & FlatColour()` is a hand outline cleaned by a colour key. `split_parts` lifts moving parts off a carving, each with a pivot (clock hands off the face), and `write_prop` gives each part its own bone. A held prop names its points: `write_prop(sabre, folder, landmarks={"grip": (x, y), "tip": (x, y)})` writes each as a slotless bone on the root, which `an` reads as the rig’s named point (`sabre@tip` in a scene; `grip` is where the hold verbs take it by default). Publishing the folder (`an library publish <folder> prop.<name> --package cutan --origin carved`) records the rights from the descriptor’s own `source`; `write_prop` refuses a carving with no provenance (unless the pixels are yours: `ours=True`) and a `source=` that would loosen its licence without `relicense=`. Every coordinate is in the source’s pixels, and a carving’s `recipe` is its arguments by name, so `carve(frame, **part.recipe)` replays it: a batch of carves is a list of recipes.
+The matte is a strategy: `flat_colour` (the default), `chroma`, `grabcut`, `polygon`, `focus`, `rembg`, or any `(rgb, hint) -> alpha` callable. Two combine with `&` and `|`: `Polygon(outline) & FlatColour()` is a hand outline cleaned by a colour key. `split_parts` lifts moving parts off a carving, each with a pivot (clock hands off the face), and `write_prop` gives each part its own bone. A held prop names its points: `write_prop(sabre, folder, landmarks={"grip": (x, y), "tip": (x, y)})` writes each as a slotless bone on the root, which `an` reads as the rig’s named point (`sabre@tip` in a scene; `grip` is where the hold verbs take it by default). An object with states (a book closed, open, a page mid-turn; a lamp off and on) is one prop: `write_prop(closed, folder, state="closed", states={"open": opened})` writes the drawings as the swap set `state` on the base slot, each anchored at its own carving’s `point` (carve every state with `point=` at the same physical place: the hand, the hinge) and credited with its own source, and a scene swaps it with `{kind: set, target: book/body, property: state, value: open}`. Publishing the folder (`an library publish <folder> prop.<name> --package cutan --origin carved`) records the rights from the descriptor’s own `source`; `write_prop` refuses a carving with no provenance (unless the pixels are yours: `ours=True`) and a `source=` that would loosen its licence without `relicense=`. Every coordinate is in the source’s pixels, and a carving’s `recipe` is its arguments by name, so `carve(frame, **part.recipe)` replays it: a batch of carves is a list of recipes.
 
 A part carved from a low-resolution frame (a 360p scan, where a sabre’s blade is 3 px wide) gets new pixels with `superres=`: `carve(frame, crop=..., matte=..., superres="realesr-animevideov3")` runs Real-ESRGAN for anime video (BSD-3, x4, `cutan[superres]`; its 2.5 MB ONNX model is downloaded once into `~/.cache/cutan/models`, `CUTAN_MODELS_DIR` moves it, and checked by hash) on the crop in overlapping tiles before the matte, and the part keeps the 4x resolution. `upscale=` is different: it only mattes at a higher resolution and comes back to the source’s. Coordinates (and `detach`, `feather`, `pad`) stay in the source’s pixels, `part.scale` is the factor, and the recipe records the strategy with the model’s sha256. `superres="resample"` interpolates instead (no new detail); any `rgb -> rgb` callable a whole factor larger is a strategy too.
 
@@ -733,7 +733,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect', 'mouth', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'eye', 'rect', 'ellipse', 'mouth'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -1642,6 +1642,7 @@ what is installed). Nothing here is imported by `import cutan`.
 | [`Rembg`](_autosummary/cutan.carve.html.md#cutan.carve.Rembg)([model, post_process])                      | `rembg`'s neural background removal (`pip install "cutan[rembg]"`).                                                         |
 | [`Resample`](_autosummary/cutan.carve.html.md#cutan.carve.Resample)([factor, method])                        | Interpolate `factor``x (``cubic`, `linear` or `lanczos`): no new detail, but the matte's resolution is what the part keeps. |
 | [`SuperRes`](_autosummary/cutan.carve.html.md#cutan.carve.SuperRes)()                                        | Base of the shipped strategies: a `name`, a whole `factor` and a `recipe()`.                                                |
+| [`PropState`](_autosummary/cutan.carve.html.md#cutan.carve.PropState)(art[, unit])                            | One more drawing of a prop's base, for [`write_prop()`](_autosummary/cutan.carve.html.md#cutan.carve.write_prop)'s `states=`.           |
 
 ### Exceptions
 
@@ -1899,6 +1900,19 @@ edge).
 Bases: [`Matte`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.Matte)
 
 A hand-given outline, `[(x, y), ...]` in the SOURCE image, anti-aliased.
+
+### *class* cutan.carve.PropState(art, unit=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One more drawing of a prop’s base, for [`write_prop()`](_autosummary/cutan.carve.html.md#cutan.carve.write_prop)’s `states=`.
+
+`art`: the carving (its `anchor` lands on the prop’s root bone).
+`unit`: view_box units per pixel of `art`. Default: the prop’s unit,
+corrected for a different super-resolution factor (`carving.scale`), so a
+drawing carved at the same source resolution draws at the same size; give
+it when the state was carved from a frame at another resolution or zoom.
+A bare [`Carving`](_autosummary/cutan.carve.html.md#cutan.carve.Carving) in `states=` is `PropState(art)`.
 
 ### *class* cutan.carve.RealESRGAN(model='realesr-animevideov3', , path=None, overlap=16, session=None, providers=('CPUExecutionProvider',), download=True, sha256=None)
 
@@ -2273,7 +2287,7 @@ super-resolved carving (`carving.scale` 4) scale them by it.
 * **Return type:**
   [`PartSet`](_autosummary/cutan.carve.parts.html.md#cutan.carve.parts.PartSet)
 
-### cutan.carve.write_prop(carved, folder, , name=None, unit=None, max_side=None, display_name=None, source=None, ours=False, relicense=None, landmarks=None, overwrite=False)
+### cutan.carve.write_prop(carved, folder, , name=None, unit=None, max_side=None, display_name=None, source=None, ours=False, relicense=None, landmarks=None, states=None, state='default', state_set='state', overwrite=False)
 
 Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.
 
@@ -2297,6 +2311,10 @@ landmarks: named points of the prop in the source’s pixels, each written
   (`grip`, `GRIP`, is where a hand takes it). See the module
   docstring. They are points of the prop as a whole: on a split prop a
   landmark does not follow a part that turns (a grip on a moving lid).
+
+states: more drawings of the base, `{name: carving or PropState}`,
+: written as the swap set `state_set` on the base slot, with the
+  carving itself as its `state` key (see the module docstring)
 
 A [`PartSet`](_autosummary/cutan.carve.html.md#cutan.carve.PartSet) is written with its carving’s provenance:
 build one with [`split_parts()`](_autosummary/cutan.carve.html.md#cutan.carve.split_parts) (its parts are cut from
@@ -2701,6 +2719,18 @@ grip and its tip, a mug’s handle) in the source’s pixels, the same frame as
 the prop by default (an#502). Two landmarks give an axis: `grip` and `tip`
 say which way the blade points from the hand.
 
+**A prop with states.** `states=` gives the base more drawings of the same
+object, one per state (a book `closed`, `open`, a page mid-turn; a lamp
+`off` and `on`), written as a swap set (`state_set`, default `"state"`)
+on the base slot, the carving itself being the `state` key (default
+`"default"`). A scene changes it with `{kind: set, target: book/body,
+property: state, value: open}`. Each drawing is anchored at its own carving’s
+anchor, which lands on the root bone: carve every state with `point=` at the
+same physical point (where a hand holds it, the hinge it opens about) and the
+object stays put while its drawing changes. Each drawing keeps its own
+provenance on its attachment, so a state carved from another frame, or another
+video, is credited as such.
+
 **Rights are never loosened by accident.** A descriptor with no `source`
 means “we made this” to `an`, so a carving with no provenance is refused
 unless the caller says the art is its own (`ours=True`). A `source=` that
@@ -2714,11 +2744,17 @@ carving’s source is kept beside it as `extra.carved_from` either way.
 |--------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | [`BASE_SLOT`](_autosummary/cutan.carve.prop.html.md#cutan.carve.prop.BASE_SLOT)   | The slot of the base art (a single-part prop's only slot).                                                          |
 | [`GRIP`](_autosummary/cutan.carve.prop.html.md#cutan.carve.prop.GRIP)        | The landmark a hand takes a prop by when a scene names no other (an's hold verbs read a bone of this name; an#502). |
+| [`STATE_SET`](_autosummary/cutan.carve.prop.html.md#cutan.carve.prop.STATE_SET)   | The swap set a prop's `states=` are written as (`property: state` in a scene).                                      |
 
 ### Functions
 
 | [`write_prop`](_autosummary/cutan.carve.prop.html.md#cutan.carve.prop.write_prop)(carved, folder, \*[, name, unit, ...])   | Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.   |
 |------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+
+### Classes
+
+| [`PropState`](_autosummary/cutan.carve.prop.html.md#cutan.carve.prop.PropState)(art[, unit])   | One more drawing of a prop's base, for [`write_prop()`](_autosummary/cutan.carve.prop.html.md#cutan.carve.prop.write_prop)'s `states=`.   |
+|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 
 ### cutan.carve.prop.BASE_SLOT *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'body'*
 
@@ -2729,11 +2765,28 @@ The slot of the base art (a single-part prop’s only slot).
 The landmark a hand takes a prop by when a scene names no other (an’s hold
 verbs read a bone of this name; an#502).
 
+### *class* cutan.carve.prop.PropState(art, unit=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One more drawing of a prop’s base, for [`write_prop()`](_autosummary/cutan.carve.prop.html.md#cutan.carve.prop.write_prop)’s `states=`.
+
+`art`: the carving (its `anchor` lands on the prop’s root bone).
+`unit`: view_box units per pixel of `art`. Default: the prop’s unit,
+corrected for a different super-resolution factor (`carving.scale`), so a
+drawing carved at the same source resolution draws at the same size; give
+it when the state was carved from a frame at another resolution or zoom.
+A bare [`Carving`](_autosummary/cutan.carve.html.md#cutan.carve.Carving) in `states=` is `PropState(art)`.
+
 ### cutan.carve.prop.ROOT_BONE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'root'*
 
 The bone every carved prop hangs from, at the carving’s anchor.
 
-### cutan.carve.prop.write_prop(carved, folder, , name=None, unit=None, max_side=None, display_name=None, source=None, ours=False, relicense=None, landmarks=None, overwrite=False)
+### cutan.carve.prop.STATE_SET *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'state'*
+
+The swap set a prop’s `states=` are written as (`property: state` in a scene).
+
+### cutan.carve.prop.write_prop(carved, folder, , name=None, unit=None, max_side=None, display_name=None, source=None, ours=False, relicense=None, landmarks=None, states=None, state='default', state_set='state', overwrite=False)
 
 Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.
 
@@ -2757,6 +2810,10 @@ landmarks: named points of the prop in the source’s pixels, each written
   (`grip`, [`GRIP`](_autosummary/cutan.carve.prop.html.md#cutan.carve.prop.GRIP), is where a hand takes it). See the module
   docstring. They are points of the prop as a whole: on a split prop a
   landmark does not follow a part that turns (a grip on a moving lid).
+
+states: more drawings of the base, `{name: carving or PropState}`,
+: written as the swap set `state_set` on the base slot, with the
+  carving itself as its `state` key (see the module docstring)
 
 A [`PartSet`](_autosummary/cutan.carve.html.md#cutan.carve.PartSet) is written with its carving’s provenance:
 build one with [`split_parts()`](_autosummary/cutan.carve.html.md#cutan.carve.split_parts) (its parts are cut from
@@ -13650,7 +13707,7 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-25 09:12 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/3dd408ceacc1111a8e107706d5c8867d476c51c1"><code>3dd408c</code></a> on branch <code>main</code>, for **cutan 0.0.65** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 04:22 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/63a578db5bd5387ba8e514486cb71e90e508a06a"><code>63a578d</code></a> on branch <code>main</code>, for **cutan 0.0.66** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -13659,9 +13716,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/3dd408ceacc1111a8e107706d5c8867d476c51c1"><code>3dd408ceacc1111a8e107706d5c8867d476c51c1</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/63a578db5bd5387ba8e514486cb71e90e508a06a"><code>63a578db5bd5387ba8e514486cb71e90e508a06a</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.65</code>                                                                                                                                   |
+| Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/cutan</code>                                                                                                        |
 
@@ -13670,9 +13727,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/40179308921">40179308921</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/40268242716">40268242716</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>f41c07cfaf8d66526c1165fc793791c12a3fbf0e</code> (in the history of the built commit) |
+| Event commit | <code>63a578db5bd5387ba8e514486cb71e90e508a06a</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -13697,13 +13754,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.65/">0.0.65</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.66/">0.0.66</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 3dd408ceacc1111a8e107706d5c8867d476c51c1
+git checkout 63a578db5bd5387ba8e514486cb71e90e508a06a
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
