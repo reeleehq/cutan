@@ -378,3 +378,26 @@ def test_a_hand_takes_a_cup_by_its_hand_bone(tmp_path):
     at_hand = screen_position(doc, hand, pose=pose, point=_pivot(nodes[hand]))
     grip = screen_position(doc, "cup", pose=pose, point=(30.0 * 345.0 / 400.0, 0.0))
     assert math.dist(at_hand, grip) < 1.0  # the hold converges to its own 0.5 px gap
+
+
+def test_a_preset_drives_the_joined_rig_and_is_unchanged_without_joints(tmp_path):
+    """`nod` is a driver (cutan#104): with the hands pinned the solver keeps them
+    on the grips while the head nods, and the preset's own keys are the same
+    whether or not joints are declared."""
+    root = _project(tmp_path / "p")
+    nod = {"kind": "play", "target": "ned", "animation": "nod", "start": 0.2}
+    free = _wheel_shot(1.0, 20.0, pins=False)
+    pinned = _wheel_shot(1.0, 20.0)
+    with_nod = [*free.actions, nod.copy()]
+    free = free.model_copy(update={"actions": Shot.model_validate({**free.model_dump(), "actions": with_nod}).actions})
+    pinned = pinned.model_copy(
+        update={"actions": Shot.model_validate({**pinned.model_dump(), "actions": [*pinned.actions, nod]}).actions}
+    )
+    bare, joined = _compile(root, free), _compile(root, pinned)
+    assert "solve" not in (bare.meta.extensions or {})
+    assert joined.meta.extensions["solve"]["dropped"] == []
+    puppet, times, gaps, _ = joint_residuals(joined, pinned, load(root).mall)
+    pins = [j for j, row in enumerate(puppet.rows) if "pin" in str(row.id)]
+    assert max(gaps[k][j] for k in range(len(times)) for j in pins) < 0.25
+    keep = {k: v.model_dump() for k, v in bare.animations.items()}
+    assert keep and all(joined.animations[k].model_dump() == v for k, v in keep.items())
