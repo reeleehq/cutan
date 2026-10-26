@@ -567,9 +567,9 @@ def test_in_pixels_a_declared_width_draws_the_part_that_wide(tmp_path):
 # --- a brow drawn as a swap set follows the expression (cutan#114) ------------
 
 
-def _browed(root: Path) -> dict:
+def _browed(root: Path, *, views: bool = False) -> dict:
     """``_character`` plus a ``brow`` set (NONE / ANGRY / RAISED) on both brows."""
-    doc = _character(root, views=False)
+    doc = _character(root, views=views)
     skin = doc["skins"]["default"]["slots"]
     for slot in ("left_brow", "right_brow"):
         base = skin[slot][next(iter(skin[slot]))]
@@ -644,3 +644,76 @@ def test_a_brow_resting_on_art_outside_the_set_is_left_alone(tmp_path):
         _store(tmp_path, doc),
     )
     assert not any(c.property == "brow" for a in scene.animations.values() for c in a.channels)
+
+
+def _set_brows_rest_on_none(doc):
+    for slot in doc["slots"]:
+        if slot["name"].endswith("_brow"):
+            slot["attachment"] = "none"
+
+
+def _brow_props(scene, side="left"):
+    return {
+        ch.property
+        for a in scene.animations.values()
+        for ch in a.channels
+        if ch.target == f"rae/head/{side}_brow"
+    }
+
+
+ANGRY = dict(kind="expression", target="rae", preset="angry", duration=2.0)
+
+
+def test_a_binding_chooses_swap_only_transform_only_or_both(tmp_path):
+    from cutan.expression.registration import ExpressionAction
+
+    both = _browed(tmp_path / "both" / "chars")
+    _set_brows_rest_on_none(both)
+    scene = _compile(_shot(ExpressionAction(**ANGRY)), _store(tmp_path / "both", both))
+    assert {"brow", "rotation", "y"} <= _brow_props(scene)
+
+    swap = _browed(tmp_path / "swap" / "chars")
+    _set_brows_rest_on_none(swap)
+    swap["expression_binding"] = [
+        {"axis": f"brow_{kind}_{side}", "slot": f"{name}_brow", "set_family": "brow"}
+        for kind in ("height", "angle")
+        for side, name in (("l", "left"), ("r", "right"))
+    ]
+    scene = _compile(_shot(ExpressionAction(**ANGRY)), _store(tmp_path / "swap", swap))
+    assert _brow_props(scene) == {"brow"}
+
+    move = _browed(tmp_path / "move" / "chars")
+    _set_brows_rest_on_none(move)
+    move["expression_binding"] = [
+        {"axis": "brow_angle_l", "slot": "left_brow", "property": "rotation", "gain": -0.35}
+    ]
+    scene = _compile(_shot(ExpressionAction(**ANGRY)), _store(tmp_path / "move", move))
+    assert _brow_props(scene) == {"rotation"}
+
+
+def test_the_brows_follow_the_view_s_own_set(tmp_path):
+    from cutan.expression.registration import ExpressionAction
+
+    doc = _browed(tmp_path / "chars", views=True)
+    _set_brows_rest_on_none(doc)
+    for slot in ("left_brow", "right_brow"):
+        skin = doc["skins"]["default"]["slots"][slot]
+        skin["angry_side"] = {**skin["angry"], "path": f"parts/{slot}_angry_side.png"}
+        skin["none_side"] = {**skin["none"], "path": f"parts/{slot}_none_side.png"}
+        for name in ("angry_side", "none_side"):
+            _png(tmp_path / "chars" / "rae" / skin[name]["path"], (40, 40), (5, 5, 5, 255))
+    doc["asset_sets"]["brow@side"] = {"NONE": "none_side", "ANGRY": "angry_side"}
+    doc["swap_poses"]["view"]["side"] = {}  # the profile keeps both brows
+    scene = _compile(
+        _shot(
+            ExpressionAction(**ANGRY),
+            SetAction(kind="set", target="rae", property="view", value="side", at=1.0),
+            duration=3.0,
+        ),
+        _store(tmp_path, doc),
+    )
+    pose = lambda t: _pose(scene, t)  # noqa: E731
+    brow = "rae/head/right_brow"
+    assert pose(0.5).get((brow, "brow")) == "ANGRY"
+    assert pose(1.5).get((brow, "brow@side")) == "ANGRY"
+    assert pose(2.5).get((brow, "brow@side")) == "NONE"  # the expression has ended

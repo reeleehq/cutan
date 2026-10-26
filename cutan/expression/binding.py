@@ -39,7 +39,12 @@ from collections.abc import Collection, Iterable, Mapping
 from dataclasses import dataclass
 from typing import Union
 
-from cutan.characters.schema import EYELID_CHANNEL, VISEME_CHANNEL, CharacterDescriptor
+from cutan.characters.schema import (
+    BROW_CHANNEL,
+    EYELID_CHANNEL,
+    VISEME_CHANNEL,
+    CharacterDescriptor,
+)
 from cutan.expression.axes import (
     AXES,
     GAZE_AXES,
@@ -133,6 +138,17 @@ def default_binding(desc: CharacterDescriptor) -> list[Binding]:
     ):
         if slot in slots:
             out.append(ChannelBinding(axis, slot, "rotation", sign * BROW_ANGLE_TRAVEL))
+    if BROW_CHANNEL in desc.asset_sets:
+        # A carved face draws its brows as a swap set (cutan#114): the set is
+        # keyed from the same axes that move the nodes.
+        for axis, slot in (
+            ("brow_height_l", LEFT_BROW_SLOT),
+            ("brow_height_r", RIGHT_BROW_SLOT),
+            ("brow_angle_l", LEFT_BROW_SLOT),
+            ("brow_angle_r", RIGHT_BROW_SLOT),
+        ):
+            if slot in slots:
+                out.append(SetBinding(axis, slot, BROW_CHANNEL))
     for axis, slot in (("lid_open_l", LEFT_EYE_SLOT), ("lid_open_r", RIGHT_EYE_SLOT)):
         if slot in slots:
             out.append(SetBinding(axis, slot, EYELID_CHANNEL))
