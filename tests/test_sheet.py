@@ -327,6 +327,58 @@ def test_moving_parts_are_split_off_one_carving_at_their_pivots(char, torso_shee
     assert not [f for f in validate_character(char).findings if f.severity == "error"]
 
 
+def _world(char_dir, bone):
+    raw = json.loads((char_dir / "character.json").read_text())
+    bones = {b["name"]: b for b in raw["bones"]}
+    x = y = 0.0
+    while bone:
+        x, y, bone = x + bones[bone]["x"], y + bones[bone]["y"], bones[bone]["parent"]
+    return x, y
+
+
+def test_a_unit_places_a_split_part_at_its_pivot_from_the_base_anchor(
+    char, torso_sheet
+):
+    recipe = [SheetPart("torso", (0, 0, 200, 140), {"point": (100, 119)}, split=SPLIT)]
+    report = sheet_to_package(torso_sheet, recipe, char, source=SOURCE, unit=0.5)
+    atts = _atts(char)
+    base_at = _world(char, "torso")  # the base's offset is the factory's: 0, 0
+    for name, bone, pivot in (
+        ("arm_l", "arm_l", (55, 30)),
+        ("arm_r", "arm_r", (145, 30)),
+    ):
+        bx, by = _world(char, bone)
+        want = (
+            base_at[0] + (pivot[0] - 100) * 0.5 - bx,
+            base_at[1] + (pivot[1] - 119) * 0.5 - by,
+        )
+        assert (atts[name].x, atts[name].y) == pytest.approx(want, abs=1.5)
+    assert (atts["torso"].x, atts["torso"].y) == (0, 0)
+    assert not report.warnings
+
+
+def test_without_a_unit_the_report_gives_the_pivot_offset(char, torso_sheet):
+    recipe = [SheetPart("torso", (0, 0, 200, 140), {"point": (100, 119)}, split=SPLIT)]
+    report = sheet_to_package(torso_sheet, recipe, char, source=SOURCE)
+    atts = _atts(char)
+    assert (atts["arm_l"].x, atts["arm_l"].y) == (0, 0)  # the factory's, untouched
+    assert any(
+        "arm_l" in w and "-45.0, -89.0 sheet px" in w and "`unit`" in w
+        for w in report.warnings
+    )
+
+
+def test_a_rotated_bone_at_rest_is_reported_not_guessed(char, torso_sheet):
+    raw = json.loads((char / "character.json").read_text())
+    next(b for b in raw["bones"] if b["name"] == "arm_l")["rotation_deg"] = 10.0
+    (char / "character.json").write_text(json.dumps(raw))
+    recipe = [SheetPart("torso", (0, 0, 200, 140), {"point": (100, 119)}, split=SPLIT)]
+    report = sheet_to_package(torso_sheet, recipe, char, source=SOURCE, unit=0.5)
+    assert any("arm_l" in w and "rotated or scaled" in w for w in report.warnings)
+    assert _atts(char)["arm_l"].x == 0
+    assert not any("arm_r" in w for w in report.warnings)
+
+
 def test_a_split_that_shares_a_file_or_takes_everything_changes_nothing(
     char, torso_sheet
 ):
