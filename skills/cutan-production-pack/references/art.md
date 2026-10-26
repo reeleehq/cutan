@@ -180,6 +180,7 @@ A prompt is the subject in the writer's words, then the kind's **prompt words**,
 |---|---|
 | `gilliam` | Victorian engraving and vintage photograph collage, hand-tinted sepia colours, visible scissor-cut paper edges, surreal and theatrical, lit from above |
 | `kurzgesagt` | flat vector illustration, clean geometric shapes, no outlines, soft gradients, vivid saturated colours with soft glowing highlights, rounded corners, deep blue night tones |
+| `marionette` | wooden marionette puppet on thin strings, jointed limbs, painted wood and cloth, a puppeteer's control bar above, theatre lighting |
 | `norstein` | painted multiplane cut-out, soft gouache and watercolour textures, muted earthy colours, misty translucent tracing-paper layers, soft edges, hushed atmosphere |
 | `oversimplified` | flat 2D vector cartoon, bold simple shapes, muted earthy palette (brick red, sage green, ochre), thin dark outlines, minimal detail, no shading |
 | `reiniger` | black paper silhouette cut-out, intricate lace-like scissor-cut edges, pure flat black shapes with no inner detail, backgrounds of graded pastel or translucent coloured paper |

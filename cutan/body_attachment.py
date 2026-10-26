@@ -692,7 +692,11 @@ def derive_placement(
         )
         if got["scale"] <= 1e-4:
             return None, "the derived scale is degenerate"
-        return {"at": got["at"], "scale": got["scale"]}, ""
+        return {
+            "at": got["at"],
+            "scale": got["scale"],
+            "residual_px": got["residual_px"],
+        }, ""
     except CrossedLimbs:
         return None, "its limbs are crossed relative to the character's bones"
     except Exception as e:  # noqa: BLE001 - not derivable; say why
