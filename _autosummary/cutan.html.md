@@ -86,7 +86,7 @@ cutan#91). Pushed with the project, so it is a key of the store too.
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
-### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 9*
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 10*
 
 The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
 it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
@@ -104,6 +104,7 @@ Level 8: `EntityKind.landmarks` (an#502), through which a character’s hands ar
 named points (`stu@hand_r`) for the core’s hold verbs.
 Level 9: `an.cli_status.failed` (an#480), which `an character` commands return
 to exit non-zero on a failure.
+Level 10: `an.stores._common.asset_references` and `asset_ref_problems` (an#552).
 
 ### cutan.require_an()
 
