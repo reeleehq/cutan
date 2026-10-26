@@ -46,6 +46,7 @@ from dataclasses import replace
 from an.genres import CompilePass, Genre, RuntimeScript, SemanticCheck
 from cutan.styles.copies import check_style_copies
 from cutan.styles.policy import check_shot_policy
+from cutan.verify.cadence import check_cadence
 
 from cutan import GENRE_NAME, LIBRARY_NAME, require_an
 from cutan.characters import checks as _checks
@@ -225,6 +226,16 @@ CUTOUT = Genre(
             description=(
                 "a shot's `policy` names aspects the compiler applies and their "
                 "method ids (cutan#9)"
+            ),
+        ),
+        SemanticCheck(
+            "cutout.cadence",
+            check_cadence,
+            stage="scene",
+            order=51,
+            description=(
+                "tween durations, easings and `step_hz` agree with the scene's "
+                "style spec, before any render (catalogue B6)"
             ),
         ),
         SemanticCheck(
