@@ -30,13 +30,19 @@ cutan.characters.factory
       SIDE_EYE_SHIFT
       SIDE_LEG_OFFSET
       THREE_QUARTER_FACE_SHIFT
+      ELBOW_AT
+      ARM_CHAIN_SHIFT
+      MIN_SLEEVE_WIDTHS
+      ARM_SIDES
       MAX_RECIPE_STEPS
    
    .. rubric:: Functions
 
    .. autosummary::
    
+      add_forearms
       add_gaze
+      add_limits
       add_views
       brow_cover_unknowable
       declare_mouth_variants

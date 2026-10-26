@@ -161,11 +161,17 @@ and returns a string for terminal display.</p>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.add_gaze" title="cutan.characters.cli.add_gaze"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_gaze</span></code></a>(name[, out_dir, overwrite_eyes])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.add_forearms" title="cutan.characters.cli.add_forearms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_forearms</span></code></a>(name[, out_dir, elbow_at])</p></td>
+<td><p>Split <code class="docutils literal notranslate"><span class="pre">name</span></code>'s arms at the elbow and give them hands (cutan#104): a forearm and a hand on each side, with the bones <code class="code docutils literal notranslate"><span class="pre">forearm_l/r</span></code> and <code class="code docutils literal notranslate"><span class="pre">hand_l/r</span></code> and <code class="code docutils literal notranslate"><span class="pre">nesting:</span> <span class="pre">bones</span></code>, so a forearm follows its upper arm and a <code class="code docutils literal notranslate"><span class="pre">pin</span></code> or <code class="code docutils literal notranslate"><span class="pre">pull</span></code> can drag a hand (<code class="code docutils literal notranslate"><span class="pre">ned/hand_r@hand_r</span></code>) to a prop's grip.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.add_gaze" title="cutan.characters.cli.add_gaze"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_gaze</span></code></a>(name[, out_dir, overwrite_eyes])</p></td>
 <td><p>Give <code class="docutils literal notranslate"><span class="pre">name</span></code> the eye stack (an#99): sclera and pupil slots under each lid, a filled closed lid, and the <code class="docutils literal notranslate"><span class="pre">gaze_travel</span></code> clamp — so <code class="code docutils literal notranslate"><span class="pre">gaze_x</span></code> / <code class="code docutils literal notranslate"><span class="pre">gaze_y</span></code> and the ambient saccades move its pupils.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.add_half_lid" title="cutan.characters.cli.add_half_lid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_half_lid</span></code></a>(name[, out_dir, fraction, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.add_half_lid" title="cutan.characters.cli.add_half_lid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_half_lid</span></code></a>(name[, out_dir, fraction, ...])</p></td>
 <td><p>Give <code class="docutils literal notranslate"><span class="pre">name</span></code> a HALF eyelid drawing (cutan#65), made from its own OPEN and CLOSED lid art: the closed lid cut to its top <code class="docutils literal notranslate"><span class="pre">fraction</span></code>, under the open eye's outline.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.add_limits" title="cutan.characters.cli.add_limits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_limits</span></code></a>(name[, out_dir, style, overwrite])</p></td>
+<td><p>Give <code class="docutils literal notranslate"><span class="pre">name</span></code> hinge limits on its bones, by part type (cutan#104): the neck, the shoulders (and the elbows and wrists of a split arm) turn only through a range, which bounds the solver wherever a shot pins or pulls a part.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.add_views" title="cutan.characters.cli.add_views"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_views</span></code></a>(name[, out_dir])</p></td>
 <td><p>Give <code class="docutils literal notranslate"><span class="pre">name</span></code> its turnaround (an#197): back, side and three-quarter head and torso art, a <code class="code docutils literal notranslate"><span class="pre">view</span></code> swap set, and a pose per view — so <code class="code docutils literal notranslate"><span class="pre">play:</span> <span class="pre">turn</span></code> and <code class="code docutils literal notranslate"><span class="pre">set</span> <span class="pre">&lt;name&gt;</span> <span class="pre">view</span> <span class="pre">&lt;key&gt;</span></code> turn it.</p></td>
@@ -206,6 +212,25 @@ and returns a string for terminal display.</p>
 character’s own folder: that folder is the published asset, an#272).</p>
 </dd></dl>
 <dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.cli.add_forearms">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.cli.</span></span><span class="sig-name descname"><span class="pre">add_forearms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elbow_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/cli.html#add_forearms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.cli.add_forearms" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.cli.add_forearms'">¶</a></dt>
+<dd><p>Split <code class="docutils literal notranslate"><span class="pre">name</span></code>’s arms at the elbow and give them hands (cutan#104): a
+forearm and a hand on each side, with the bones <code class="code docutils literal notranslate"><span class="pre">forearm_l/r</span></code> and <code class="code docutils literal notranslate"><span class="pre">hand_l/r</span></code>
+and <code class="code docutils literal notranslate"><span class="pre">nesting:</span> <span class="pre">bones</span></code>, so a forearm follows its upper arm and a <code class="code docutils literal notranslate"><span class="pre">pin</span></code> or
+<code class="code docutils literal notranslate"><span class="pre">pull</span></code> can drag a hand (<code class="code docutils literal notranslate"><span class="pre">ned/hand_r@hand_r</span></code>) to a prop’s grip. At rest the
+arm looks as it did. Opt-in; a character made before keeps its one-piece
+arms. Only an arm the factory drew is split. Idempotent. Run
+<code class="code docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span> <span class="pre">add-limits</span></code> afterwards for the elbow’s range.</p>
+<p>name: character id
+out_dir: parent directory; defaults to ./assets/characters
+elbow_at: where the elbow sits on the arm, 0.1 (at the shoulder) to 0.9</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
 <dt class="sig sig-object py" id="cutan.characters.cli.add_gaze">
 <span class="sig-prename descclassname"><span class="pre">cutan.characters.cli.</span></span><span class="sig-name descname"><span class="pre">add_gaze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite_eyes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/cli.html#add_gaze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.cli.add_gaze" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.cli.add_gaze'">¶</a></dt>
 <dd><p>Give <code class="docutils literal notranslate"><span class="pre">name</span></code> the eye stack (an#99): sclera and pupil slots under each
@@ -236,6 +261,26 @@ suspicion, annoyance) then narrows the eyes instead of showing them open.</p>
 out_dir: parent directory; defaults to ./assets/characters
 fraction: how much of the eye the half lid covers, from the top
 overwrite: replace a HALF lid someone drew (refused otherwise)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.cli.add_limits">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.cli.</span></span><span class="sig-name descname"><span class="pre">add_limits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/cli.html#add_limits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.cli.add_limits" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.cli.add_limits'">¶</a></dt>
+<dd><p>Give <code class="docutils literal notranslate"><span class="pre">name</span></code> hinge limits on its bones, by part type (cutan#104): the
+neck, the shoulders (and the elbows and wrists of a split arm) turn only
+through a range, which bounds the solver wherever a shot pins or pulls a
+part. Opt-in; a character made before keeps its bones as they are. Idempotent.</p>
+<p>name: character id
+out_dir: parent directory; defaults to ./assets/characters
+style: a shipped style whose <code class="code docutils literal notranslate"><span class="pre">joints.limits</span></code> replace the genre’s ranges</p>
+<blockquote>
+<div><p>(<code class="code docutils literal notranslate"><span class="pre">marionette</span></code> is loose)</p>
+</div></blockquote>
+<p>overwrite: replace ranges the bones already carry (kept otherwise)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
@@ -461,8 +506,10 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
 <li><a :data-current="activeSection === '#cutan.characters.cli.SILHOUETTE_ARTIFACTS'" class="reference internal" href="#cutan.characters.cli.SILHOUETTE_ARTIFACTS"><code class="docutils literal notranslate"><span class="pre">SILHOUETTE_ARTIFACTS</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.cli.add_forearms'" class="reference internal" href="#cutan.characters.cli.add_forearms"><code class="docutils literal notranslate"><span class="pre">add_forearms()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.add_gaze'" class="reference internal" href="#cutan.characters.cli.add_gaze"><code class="docutils literal notranslate"><span class="pre">add_gaze()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.add_half_lid'" class="reference internal" href="#cutan.characters.cli.add_half_lid"><code class="docutils literal notranslate"><span class="pre">add_half_lid()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.cli.add_limits'" class="reference internal" href="#cutan.characters.cli.add_limits"><code class="docutils literal notranslate"><span class="pre">add_limits()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.add_views'" class="reference internal" href="#cutan.characters.cli.add_views"><code class="docutils literal notranslate"><span class="pre">add_views()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.capabilities'" class="reference internal" href="#cutan.characters.cli.capabilities"><code class="docutils literal notranslate"><span class="pre">capabilities()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.contract'" class="reference internal" href="#cutan.characters.cli.contract"><code class="docutils literal notranslate"><span class="pre">contract()</span></code></a></li>
@@ -486,7 +533,7 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=22d3c163"></script>
+<script src="../_static/documentation_options.js?v=86ab457a"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

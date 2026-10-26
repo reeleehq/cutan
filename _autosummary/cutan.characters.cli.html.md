@@ -24,24 +24,43 @@ Subcommands (used as `an character <verb> ...`):
 
 ### Functions
 
-| [`add_gaze`](#cutan.characters.cli.add_gaze)(name[, out_dir, overwrite_eyes])         | Give `name` the eye stack (an#99): sclera and pupil slots under each lid, a filled closed lid, and the `gaze_travel` clamp — so `gaze_x` / `gaze_y` and the ambient saccades move its pupils.   |
-|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`add_half_lid`](#cutan.characters.cli.add_half_lid)(name[, out_dir, fraction, ...])      | Give `name` a HALF eyelid drawing (cutan#65), made from its own OPEN and CLOSED lid art: the closed lid cut to its top `fraction`, under the open eye's outline.                                |
-| [`add_views`](#cutan.characters.cli.add_views)(name[, out_dir])                        | Give `name` its turnaround (an#197): back, side and three-quarter head and torso art, a `view` swap set, and a pose per view — so `play: turn` and `set <name> view <key>` turn it.             |
-| [`capabilities`](#cutan.characters.cli.capabilities)(name[, out_dir, as_json, style])     | What a character affords, and per aspect which methods apply and what the rest lack.                                                                                                            |
-| [`contract`](#cutan.characters.cli.contract)()                                        | Print the art-package contract an illustrator must satisfy.                                                                                                                                     |
-| [`feet_origin`](#cutan.characters.cli.feet_origin)(name[, out_dir, undo])                | Make an existing character stand on its feet (an#285): its stage point (`stage.at`) becomes where its feet are, as for a character `an character new` makes now.                                |
-| [`mouths`](#cutan.characters.cli.mouths)(name[, out_dir, palette, variants])        | Regenerate the default 9-shape mouth set for `name`, plus its `viseme@<form>` variants, and declare them in the descriptor.                                                                     |
-| [`new`](#cutan.characters.cli.new)(name[, out_dir, seed, style, voice_ref, ...]) | Create a new character at `out_dir`/`name`.                                                                                                                                                     |
-| [`preview`](#cutan.characters.cli.preview)(name[, out_dir, open_browser])            | Render a small HTML viewer that previews all visemes + idle animation.                                                                                                                          |
-| [`record`](#cutan.characters.cli.record)(name[, out_dir, output, duration, ...])    | Record a character's preview HTML to mp4.                                                                                                                                                       |
-| [`silhouette`](#cutan.characters.cli.silhouette)(name[, other, out_dir, output, size])  | Render a black silhouette for `name` (and optionally compare to `other`).                                                                                                                       |
-| [`validate`](#cutan.characters.cli.validate)(name[, out_dir])                         | Validate a character's directory structure and descriptor.                                                                                                                                      |
+| [`add_forearms`](#cutan.characters.cli.add_forearms)(name[, out_dir, elbow_at])           | Split `name`'s arms at the elbow and give them hands (cutan#104): a forearm and a hand on each side, with the bones `forearm_l/r` and `hand_l/r` and `nesting: bones`, so a forearm follows its upper arm and a `pin` or `pull` can drag a hand (`ned/hand_r@hand_r`) to a prop's grip.   |
+|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`add_gaze`](#cutan.characters.cli.add_gaze)(name[, out_dir, overwrite_eyes])         | Give `name` the eye stack (an#99): sclera and pupil slots under each lid, a filled closed lid, and the `gaze_travel` clamp — so `gaze_x` / `gaze_y` and the ambient saccades move its pupils.                                                                                             |
+| [`add_half_lid`](#cutan.characters.cli.add_half_lid)(name[, out_dir, fraction, ...])      | Give `name` a HALF eyelid drawing (cutan#65), made from its own OPEN and CLOSED lid art: the closed lid cut to its top `fraction`, under the open eye's outline.                                                                                                                          |
+| [`add_limits`](#cutan.characters.cli.add_limits)(name[, out_dir, style, overwrite])     | Give `name` hinge limits on its bones, by part type (cutan#104): the neck, the shoulders (and the elbows and wrists of a split arm) turn only through a range, which bounds the solver wherever a shot pins or pulls a part.                                                              |
+| [`add_views`](#cutan.characters.cli.add_views)(name[, out_dir])                        | Give `name` its turnaround (an#197): back, side and three-quarter head and torso art, a `view` swap set, and a pose per view — so `play: turn` and `set <name> view <key>` turn it.                                                                                                       |
+| [`capabilities`](#cutan.characters.cli.capabilities)(name[, out_dir, as_json, style])     | What a character affords, and per aspect which methods apply and what the rest lack.                                                                                                                                                                                                      |
+| [`contract`](#cutan.characters.cli.contract)()                                        | Print the art-package contract an illustrator must satisfy.                                                                                                                                                                                                                               |
+| [`feet_origin`](#cutan.characters.cli.feet_origin)(name[, out_dir, undo])                | Make an existing character stand on its feet (an#285): its stage point (`stage.at`) becomes where its feet are, as for a character `an character new` makes now.                                                                                                                          |
+| [`mouths`](#cutan.characters.cli.mouths)(name[, out_dir, palette, variants])        | Regenerate the default 9-shape mouth set for `name`, plus its `viseme@<form>` variants, and declare them in the descriptor.                                                                                                                                                               |
+| [`new`](#cutan.characters.cli.new)(name[, out_dir, seed, style, voice_ref, ...]) | Create a new character at `out_dir`/`name`.                                                                                                                                                                                                                                               |
+| [`preview`](#cutan.characters.cli.preview)(name[, out_dir, open_browser])            | Render a small HTML viewer that previews all visemes + idle animation.                                                                                                                                                                                                                    |
+| [`record`](#cutan.characters.cli.record)(name[, out_dir, output, duration, ...])    | Record a character's preview HTML to mp4.                                                                                                                                                                                                                                                 |
+| [`silhouette`](#cutan.characters.cli.silhouette)(name[, other, out_dir, output, size])  | Render a black silhouette for `name` (and optionally compare to `other`).                                                                                                                                                                                                                 |
+| [`validate`](#cutan.characters.cli.validate)(name[, out_dir])                         | Validate a character's directory structure and descriptor.                                                                                                                                                                                                                                |
 
 ### cutan.characters.cli.SILHOUETTE_ARTIFACTS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('artifacts', 'silhouettes')*
 
 Where silhouettes go, under the project the characters belong to (never a
 character’s own folder: that folder is the published asset, an#272).
+
+### cutan.characters.cli.add_forearms(name, out_dir='', elbow_at=0.5)
+
+Split `name`’s arms at the elbow and give them hands (cutan#104): a
+forearm and a hand on each side, with the bones `forearm_l/r` and `hand_l/r`
+and `nesting: bones`, so a forearm follows its upper arm and a `pin` or
+`pull` can drag a hand (`ned/hand_r@hand_r`) to a prop’s grip. At rest the
+arm looks as it did. Opt-in; a character made before keeps its one-piece
+arms. Only an arm the factory drew is split. Idempotent. Run
+`an character add-limits` afterwards for the elbow’s range.
+
+name: character id
+out_dir: parent directory; defaults to ./assets/characters
+elbow_at: where the elbow sits on the arm, 0.1 (at the shoulder) to 0.9
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### cutan.characters.cli.add_gaze(name, out_dir='', overwrite_eyes=False)
 
@@ -70,6 +89,24 @@ name: character id
 out_dir: parent directory; defaults to ./assets/characters
 fraction: how much of the eye the half lid covers, from the top
 overwrite: replace a HALF lid someone drew (refused otherwise)
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.add_limits(name, out_dir='', style='', overwrite=False)
+
+Give `name` hinge limits on its bones, by part type (cutan#104): the
+neck, the shoulders (and the elbows and wrists of a split arm) turn only
+through a range, which bounds the solver wherever a shot pins or pulls a
+part. Opt-in; a character made before keeps its bones as they are. Idempotent.
+
+name: character id
+out_dir: parent directory; defaults to ./assets/characters
+style: a shipped style whose `joints.limits` replace the genre’s ranges
+
+> (`marionette` is loose)
+
+overwrite: replace ranges the bones already carry (kept otherwise)
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

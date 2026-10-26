@@ -70,11 +70,11 @@ several slots.
 
 ### Functions
 
-| [`bones_from_pivots`](#cutan.characters.schema.bones_from_pivots)(pivots, \*[, bones])   | Re-place a bone rig onto an illustrator's own joint coordinates.                                                                                                                                                           |
-|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`default_asset_sets`](#cutan.characters.schema.default_asset_sets)()                     | `{channel: {key: attachment_name}}` for a freshly-built character.                                                                                                                                                         |
-| [`view_variant_set`](#cutan.characters.schema.view_variant_set)(set_name, view)         | The name of `set_name`'s variant for `view` (an#220).                                                                                                                                                                      |
-| [`view_variant_sets`](#cutan.characters.schema.view_variant_sets)(desc, \*[, view_set])  | `{base set: {view: variant set name}}` — every per-view face set the descriptor declares (an#220): a set named `<base>@<view>` where `<base>` is a declared set and `<view>` a key of its `view` set (or its `rest_view`). |
+| [`bones_from_pivots`](#cutan.characters.schema.bones_from_pivots)(pivots, \*[, bones, limits])   | Re-place a bone rig onto an illustrator's own joint coordinates.                                                                                                                                                           |
+|---------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`default_asset_sets`](#cutan.characters.schema.default_asset_sets)()                             | `{channel: {key: attachment_name}}` for a freshly-built character.                                                                                                                                                         |
+| [`view_variant_set`](#cutan.characters.schema.view_variant_set)(set_name, view)                 | The name of `set_name`'s variant for `view` (an#220).                                                                                                                                                                      |
+| [`view_variant_sets`](#cutan.characters.schema.view_variant_sets)(desc, \*[, view_set])          | `{base set: {view: variant set name}}` — every per-view face set the descriptor declares (an#220): a set named `<base>@<view>` where `<base>` is a declared set and `<view>` a key of its `view` set (or its `rest_view`). |
 
 ### Classes
 
@@ -470,7 +470,7 @@ a special case in control flow (an#87): the compiler projects EVERY
 `asset_sets` channel onto the slots whose attachments its keys name, and
 the runtime applies any projected channel the same way.
 
-### cutan.characters.schema.bones_from_pivots(pivots, , bones=None)
+### cutan.characters.schema.bones_from_pivots(pivots, , bones=None, limits=None)
 
 Re-place a bone rig onto an illustrator’s own joint coordinates.
 
@@ -488,6 +488,11 @@ Positions are stored parent-relative, so an absolute joint is converted
 against its parent’s resolved absolute position — and parents are resolved
 first, which is why this walks in declaration order rather than by index.
 
+`limits` (default: none, so a rig is as it always was) is a table of hinge
+ranges by part type ([`cutan.characters.limits.limits_table()`](cutan.characters.limits.html.md#cutan.characters.limits.limits_table)) written
+onto the typed bones as they are placed: the artist’s joints come with the
+ranges a figure’s joints have (cutan#104).
+
 ```pycon
 >>> bones = bones_from_pivots({"neck": (500.0, 300.0), "root": (500.0, 900.0)})
 >>> head = next(b for b in bones if b.name == "head")
@@ -497,6 +502,9 @@ first, which is why this walks in declaration order rather than by index.
 >>> torso = next(b for b in bones if b.name == "torso")
 >>> round(head.y + torso.y + root.y)          # absolute, back to the neck
 300
+>>> from cutan.characters.limits import GENRE_LIMITS
+>>> [(b.name, b.limits) for b in bones_from_pivots({}, limits=GENRE_LIMITS) if b.limits][:2]
+[('head', (-45.0, 45.0)), ('arm_l', (-60.0, 180.0))]
 ```
 
 * **Return type:**

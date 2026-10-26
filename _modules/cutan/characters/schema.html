@@ -1028,123 +1028,136 @@
 </span><span id="line-817">    <span class="n">pivots</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
 </span><span id="line-818">    <span class="o">*</span><span class="p">,</span>
 </span><span id="line-819">    <span class="n">bones</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Bone</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-820"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Bone</span><span class="p">]:</span>
-</span><span id="line-821"><span class="w">    </span><span class="sd">"""Re-place a bone rig onto an illustrator's own joint coordinates.</span>
-</span><span id="line-822">
-</span><span id="line-823"><span class="sd">    Each :class:`Bone` already declares the joint it stands for</span>
-</span><span id="line-824"><span class="sd">    (``head`` -&gt; ``neck``, ``arm_l`` -&gt; ``shoulder_l``, ...), and</span>
-</span><span id="line-825"><span class="sd">    :func:`~cutan.characters.svg_utils.extract_pivots` already returns those joints</span>
-</span><span id="line-826"><span class="sd">    as ``{name: (cx, cy)}``. Nothing connected the two: `promote` computed the</span>
-</span><span id="line-827"><span class="sd">    pivots and stored **only their names**, so the coordinates an artist drew</span>
-</span><span id="line-828"><span class="sd">    were discarded and every character got the generic rig (an#75).</span>
-</span><span id="line-829">
-</span><span id="line-830"><span class="sd">    Bones a drawing has no joint for keep their default placement, so a partial</span>
-</span><span id="line-831"><span class="sd">    skeleton improves a rig rather than breaking it.</span>
-</span><span id="line-832">
-</span><span id="line-833"><span class="sd">    Positions are stored parent-relative, so an absolute joint is converted</span>
-</span><span id="line-834"><span class="sd">    against its parent's resolved absolute position — and parents are resolved</span>
-</span><span id="line-835"><span class="sd">    first, which is why this walks in declaration order rather than by index.</span>
-</span><span id="line-836">
-</span><span id="line-837"><span class="sd">    &gt;&gt;&gt; bones = bones_from_pivots({"neck": (500.0, 300.0), "root": (500.0, 900.0)})</span>
-</span><span id="line-838"><span class="sd">    &gt;&gt;&gt; head = next(b for b in bones if b.name == "head")</span>
-</span><span id="line-839"><span class="sd">    &gt;&gt;&gt; root = next(b for b in bones if b.name == "root")</span>
-</span><span id="line-840"><span class="sd">    &gt;&gt;&gt; root.x, root.y</span>
-</span><span id="line-841"><span class="sd">    (500.0, 900.0)</span>
-</span><span id="line-842"><span class="sd">    &gt;&gt;&gt; torso = next(b for b in bones if b.name == "torso")</span>
-</span><span id="line-843"><span class="sd">    &gt;&gt;&gt; round(head.y + torso.y + root.y)          # absolute, back to the neck</span>
-</span><span id="line-844"><span class="sd">    300</span>
-</span><span id="line-845"><span class="sd">    """</span>
-</span><span id="line-846">    <span class="n">rig</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="p">(</span><span class="n">bones</span> <span class="ow">or</span> <span class="n">_default_bones</span><span class="p">())]</span>
-</span><span id="line-847">    <span class="n">by_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">b</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">rig</span><span class="p">}</span>
-</span><span id="line-848">
-</span><span id="line-849">    <span class="k">def</span><span class="w"> </span><span class="nf">absolute</span><span class="p">(</span><span class="n">bone</span><span class="p">:</span> <span class="n">Bone</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-</span><span id="line-850">        <span class="n">x</span> <span class="o">=</span> <span class="n">y</span> <span class="o">=</span> <span class="mf">0.0</span>
-</span><span id="line-851">        <span class="n">seen</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-</span><span id="line-852">        <span class="n">cursor</span><span class="p">:</span> <span class="n">Bone</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">bone</span>
-</span><span id="line-853">        <span class="k">while</span> <span class="n">cursor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cursor</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
-</span><span id="line-854">            <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-</span><span id="line-855">            <span class="n">x</span> <span class="o">+=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">x</span>
-</span><span id="line-856">            <span class="n">y</span> <span class="o">+=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">y</span>
-</span><span id="line-857">            <span class="n">cursor</span> <span class="o">=</span> <span class="n">by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="k">if</span> <span class="n">cursor</span><span class="o">.</span><span class="n">parent</span> <span class="k">else</span> <span class="kc">None</span>
-</span><span id="line-858">        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
-</span><span id="line-859">
-</span><span id="line-860">    <span class="k">for</span> <span class="n">bone</span> <span class="ow">in</span> <span class="n">rig</span><span class="p">:</span>  <span class="c1"># declaration order: a parent is always placed first</span>
-</span><span id="line-861">        <span class="n">target</span> <span class="o">=</span> <span class="n">pivots</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bone</span><span class="o">.</span><span class="n">pivot</span><span class="p">)</span> <span class="k">if</span> <span class="n">bone</span><span class="o">.</span><span class="n">pivot</span> <span class="k">else</span> <span class="kc">None</span>
-</span><span id="line-862">        <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-863">            <span class="k">continue</span>
-</span><span id="line-864">        <span class="n">parent</span> <span class="o">=</span> <span class="n">by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bone</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="k">if</span> <span class="n">bone</span><span class="o">.</span><span class="n">parent</span> <span class="k">else</span> <span class="kc">None</span>
-</span><span id="line-865">        <span class="n">base</span> <span class="o">=</span> <span class="n">absolute</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span> <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-</span><span id="line-866">        <span class="n">bone</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">target</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">base</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="line-867">        <span class="n">bone</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">target</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">base</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-</span><span id="line-868">    <span class="k">return</span> <span class="n">rig</span></div>
-
-</span><span id="line-869">
-</span><span id="line-870">
-</span><span id="line-871"><span class="k">def</span><span class="w"> </span><span class="nf">_default_skin</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Skin</span><span class="p">:</span>
-</span><span id="line-872"><span class="w">    </span><span class="sd">"""Default skin wiring slot names → attachment dicts → SVG paths.</span>
-</span><span id="line-873">
-</span><span id="line-874"><span class="sd">    Paths are relative to the descriptor file. Slicing a real source SVG can</span>
-</span><span id="line-875"><span class="sd">    overwrite/extend these; here we declare the canonical inventory so the</span>
-</span><span id="line-876"><span class="sd">    descriptor is internally consistent even before parts exist on disk.</span>
-</span><span id="line-877"><span class="sd">    """</span>
-</span><span id="line-878">    <span class="n">slots</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Attachment</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-820">    <span class="n">limits</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-821"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Bone</span><span class="p">]:</span>
+</span><span id="line-822"><span class="w">    </span><span class="sd">"""Re-place a bone rig onto an illustrator's own joint coordinates.</span>
+</span><span id="line-823">
+</span><span id="line-824"><span class="sd">    Each :class:`Bone` already declares the joint it stands for</span>
+</span><span id="line-825"><span class="sd">    (``head`` -&gt; ``neck``, ``arm_l`` -&gt; ``shoulder_l``, ...), and</span>
+</span><span id="line-826"><span class="sd">    :func:`~cutan.characters.svg_utils.extract_pivots` already returns those joints</span>
+</span><span id="line-827"><span class="sd">    as ``{name: (cx, cy)}``. Nothing connected the two: `promote` computed the</span>
+</span><span id="line-828"><span class="sd">    pivots and stored **only their names**, so the coordinates an artist drew</span>
+</span><span id="line-829"><span class="sd">    were discarded and every character got the generic rig (an#75).</span>
+</span><span id="line-830">
+</span><span id="line-831"><span class="sd">    Bones a drawing has no joint for keep their default placement, so a partial</span>
+</span><span id="line-832"><span class="sd">    skeleton improves a rig rather than breaking it.</span>
+</span><span id="line-833">
+</span><span id="line-834"><span class="sd">    Positions are stored parent-relative, so an absolute joint is converted</span>
+</span><span id="line-835"><span class="sd">    against its parent's resolved absolute position — and parents are resolved</span>
+</span><span id="line-836"><span class="sd">    first, which is why this walks in declaration order rather than by index.</span>
+</span><span id="line-837">
+</span><span id="line-838"><span class="sd">    ``limits`` (default: none, so a rig is as it always was) is a table of hinge</span>
+</span><span id="line-839"><span class="sd">    ranges by part type (:func:`cutan.characters.limits.limits_table`) written</span>
+</span><span id="line-840"><span class="sd">    onto the typed bones as they are placed: the artist's joints come with the</span>
+</span><span id="line-841"><span class="sd">    ranges a figure's joints have (cutan#104).</span>
+</span><span id="line-842">
+</span><span id="line-843"><span class="sd">    &gt;&gt;&gt; bones = bones_from_pivots({"neck": (500.0, 300.0), "root": (500.0, 900.0)})</span>
+</span><span id="line-844"><span class="sd">    &gt;&gt;&gt; head = next(b for b in bones if b.name == "head")</span>
+</span><span id="line-845"><span class="sd">    &gt;&gt;&gt; root = next(b for b in bones if b.name == "root")</span>
+</span><span id="line-846"><span class="sd">    &gt;&gt;&gt; root.x, root.y</span>
+</span><span id="line-847"><span class="sd">    (500.0, 900.0)</span>
+</span><span id="line-848"><span class="sd">    &gt;&gt;&gt; torso = next(b for b in bones if b.name == "torso")</span>
+</span><span id="line-849"><span class="sd">    &gt;&gt;&gt; round(head.y + torso.y + root.y)          # absolute, back to the neck</span>
+</span><span id="line-850"><span class="sd">    300</span>
+</span><span id="line-851"><span class="sd">    &gt;&gt;&gt; from cutan.characters.limits import GENRE_LIMITS</span>
+</span><span id="line-852"><span class="sd">    &gt;&gt;&gt; [(b.name, b.limits) for b in bones_from_pivots({}, limits=GENRE_LIMITS) if b.limits][:2]</span>
+</span><span id="line-853"><span class="sd">    [('head', (-45.0, 45.0)), ('arm_l', (-60.0, 180.0))]</span>
+</span><span id="line-854"><span class="sd">    """</span>
+</span><span id="line-855">    <span class="n">rig</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="p">(</span><span class="n">bones</span> <span class="ow">or</span> <span class="n">_default_bones</span><span class="p">())]</span>
+</span><span id="line-856">    <span class="n">by_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">b</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">rig</span><span class="p">}</span>
+</span><span id="line-857">
+</span><span id="line-858">    <span class="k">def</span><span class="w"> </span><span class="nf">absolute</span><span class="p">(</span><span class="n">bone</span><span class="p">:</span> <span class="n">Bone</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+</span><span id="line-859">        <span class="n">x</span> <span class="o">=</span> <span class="n">y</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="line-860">        <span class="n">seen</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+</span><span id="line-861">        <span class="n">cursor</span><span class="p">:</span> <span class="n">Bone</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">bone</span>
+</span><span id="line-862">        <span class="k">while</span> <span class="n">cursor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cursor</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+</span><span id="line-863">            <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-864">            <span class="n">x</span> <span class="o">+=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">x</span>
+</span><span id="line-865">            <span class="n">y</span> <span class="o">+=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">y</span>
+</span><span id="line-866">            <span class="n">cursor</span> <span class="o">=</span> <span class="n">by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="k">if</span> <span class="n">cursor</span><span class="o">.</span><span class="n">parent</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span id="line-867">        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+</span><span id="line-868">
+</span><span id="line-869">    <span class="k">for</span> <span class="n">bone</span> <span class="ow">in</span> <span class="n">rig</span><span class="p">:</span>  <span class="c1"># declaration order: a parent is always placed first</span>
+</span><span id="line-870">        <span class="n">target</span> <span class="o">=</span> <span class="n">pivots</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bone</span><span class="o">.</span><span class="n">pivot</span><span class="p">)</span> <span class="k">if</span> <span class="n">bone</span><span class="o">.</span><span class="n">pivot</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span id="line-871">        <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-872">            <span class="k">continue</span>
+</span><span id="line-873">        <span class="n">parent</span> <span class="o">=</span> <span class="n">by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bone</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="k">if</span> <span class="n">bone</span><span class="o">.</span><span class="n">parent</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span id="line-874">        <span class="n">base</span> <span class="o">=</span> <span class="n">absolute</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span> <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+</span><span id="line-875">        <span class="n">bone</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">target</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">base</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="line-876">        <span class="n">bone</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">target</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">base</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="line-877">    <span class="k">if</span> <span class="n">limits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-878">        <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.limits</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_limits</span>
 </span><span id="line-879">
-</span><span id="line-880">    <span class="c1"># Single-attachment body slots</span>
-</span><span id="line-881">    <span class="k">for</span> <span class="n">slot_name</span><span class="p">,</span> <span class="n">anchor</span> <span class="ow">in</span> <span class="p">(</span>
-</span><span id="line-882">        <span class="c1"># Anchors are stated relative to each slot's BONE. The torso's bone is</span>
-</span><span id="line-883">        <span class="c1"># the hip, so the torso hangs UPWARD from it (anchor at its bottom</span>
-</span><span id="line-884">        <span class="c1"># edge); the limbs' bones are shoulders and hips, so they hang downward</span>
-</span><span id="line-885">        <span class="c1"># (anchor at their top edge). Before the compiler read any of this the</span>
-</span><span id="line-886">        <span class="c1"># anchors were inert and the torso's read (0.5, 0.0) — which, once the</span>
-</span><span id="line-887">        <span class="c1"># bone became the hip, drew the body below the waist and over the legs.</span>
-</span><span id="line-888">        <span class="p">(</span><span class="s2">"torso"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
-</span><span id="line-889">        <span class="p">(</span><span class="s2">"head"</span><span class="p">,</span> <span class="n">HEAD_ANCHOR</span><span class="p">),</span>
-</span><span id="line-890">        <span class="p">(</span><span class="s2">"arm_l"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)),</span>
-</span><span id="line-891">        <span class="p">(</span><span class="s2">"arm_r"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)),</span>
-</span><span id="line-892">        <span class="p">(</span><span class="s2">"leg_l"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)),</span>
-</span><span id="line-893">        <span class="p">(</span><span class="s2">"leg_r"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)),</span>
-</span><span id="line-894">    <span class="p">):</span>
-</span><span id="line-895">        <span class="n">slots</span><span class="p">[</span><span class="n">slot_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-896">            <span class="n">slot_name</span><span class="p">:</span> <span class="n">Attachment</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="sa">f</span><span class="s2">"parts/</span><span class="si">{</span><span class="n">slot_name</span><span class="si">}</span><span class="s2">.svg"</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">anchor</span><span class="p">)</span>
-</span><span id="line-897">        <span class="p">}</span>
-</span><span id="line-898">
-</span><span id="line-899">    <span class="c1"># Brows: slot name is the node name, attachment name is the file stem.</span>
-</span><span id="line-900">    <span class="k">for</span> <span class="n">slot_name</span><span class="p">,</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"left_brow"</span><span class="p">,</span> <span class="s2">"brow_l"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"right_brow"</span><span class="p">,</span> <span class="s2">"brow_r"</span><span class="p">)):</span>
-</span><span id="line-901">        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">FACE_OFFSETS</span><span class="p">[</span><span class="n">slot_name</span><span class="p">]</span>
-</span><span id="line-902">        <span class="n">slots</span><span class="p">[</span><span class="n">slot_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-903">            <span class="n">attachment</span><span class="p">:</span> <span class="n">Attachment</span><span class="p">(</span>
-</span><span id="line-904">                <span class="n">path</span><span class="o">=</span><span class="sa">f</span><span class="s2">"parts/</span><span class="si">{</span><span class="n">attachment</span><span class="si">}</span><span class="s2">.svg"</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span>
-</span><span id="line-905">            <span class="p">)</span>
-</span><span id="line-906">        <span class="p">}</span>
-</span><span id="line-907">
-</span><span id="line-908">    <span class="c1"># Eye slots have two attachments. Their names are the shared per-slot</span>
-</span><span id="line-909">    <span class="c1"># keys `open`/`closed` (NOT the file stems) so the one `eyelid` set can</span>
-</span><span id="line-910">    <span class="c1"># project onto both slots; the paths keep the file spelling.</span>
-</span><span id="line-911">    <span class="k">for</span> <span class="n">slot_name</span><span class="p">,</span> <span class="n">stem</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"left_eye"</span><span class="p">,</span> <span class="s2">"eye_l"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"right_eye"</span><span class="p">,</span> <span class="s2">"eye_r"</span><span class="p">)):</span>
-</span><span id="line-912">        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">FACE_OFFSETS</span><span class="p">[</span><span class="n">slot_name</span><span class="p">]</span>
-</span><span id="line-913">        <span class="n">slots</span><span class="p">[</span><span class="n">slot_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-914">            <span class="n">state</span><span class="p">:</span> <span class="n">Attachment</span><span class="p">(</span>
-</span><span id="line-915">                <span class="n">path</span><span class="o">=</span><span class="sa">f</span><span class="s2">"parts/</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">.svg"</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span>
-</span><span id="line-916">            <span class="p">)</span>
-</span><span id="line-917">            <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"open"</span><span class="p">,</span> <span class="s2">"closed"</span><span class="p">)</span>
-</span><span id="line-918">        <span class="p">}</span>
-</span><span id="line-919">
-</span><span id="line-920">    <span class="c1"># Mouth slot has 9 attachments (the viseme set).</span>
-</span><span id="line-921">    <span class="n">mouth_x</span><span class="p">,</span> <span class="n">mouth_y</span> <span class="o">=</span> <span class="n">FACE_OFFSETS</span><span class="p">[</span><span class="s2">"mouth"</span><span class="p">]</span>
-</span><span id="line-922">    <span class="n">slots</span><span class="p">[</span><span class="s2">"mouth"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-923">        <span class="sa">f</span><span class="s2">"mouth_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">Attachment</span><span class="p">(</span>
-</span><span id="line-924">            <span class="n">path</span><span class="o">=</span><span class="sa">f</span><span class="s2">"parts/mouth/mouth_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">.svg"</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="n">mouth_x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">mouth_y</span>
-</span><span id="line-925">        <span class="p">)</span>
-</span><span id="line-926">        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">MOUTH_SHAPES</span>
-</span><span id="line-927">    <span class="p">}</span>
-</span><span id="line-928">
-</span><span id="line-929">    <span class="k">return</span> <span class="n">Skin</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="n">slots</span><span class="p">)</span>
-</span><span id="line-930">
-</span><span id="line-931">
-</span><span id="line-932"><span class="c1"># The bones' rest pose is applied from 0.4.0 (an#339): the stage's one</span>
-</span><span id="line-933"><span class="c1"># protective step, which writes `rest_rotation: false` only onto a 0.3.0 rig</span>
-</span><span id="line-934"><span class="c1"># whose bones carry a rotation or scale (none did when it shipped).</span>
-</span><span id="line-935"><span class="n">register_rest_pose_migration</span><span class="p">(</span><span class="n">CHARACTER_DOCUMENT_KIND</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"0.3.0"</span><span class="p">,</span> <span class="s2">"0.4.0"</span><span class="p">)</span>
+</span><span id="line-880">        <span class="n">apply_limits</span><span class="p">(</span><span class="n">rig</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="n">limits</span><span class="p">)</span>
+</span><span id="line-881">    <span class="k">return</span> <span class="n">rig</span></div>
+
+</span><span id="line-882">
+</span><span id="line-883">
+</span><span id="line-884"><span class="k">def</span><span class="w"> </span><span class="nf">_default_skin</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Skin</span><span class="p">:</span>
+</span><span id="line-885"><span class="w">    </span><span class="sd">"""Default skin wiring slot names → attachment dicts → SVG paths.</span>
+</span><span id="line-886">
+</span><span id="line-887"><span class="sd">    Paths are relative to the descriptor file. Slicing a real source SVG can</span>
+</span><span id="line-888"><span class="sd">    overwrite/extend these; here we declare the canonical inventory so the</span>
+</span><span id="line-889"><span class="sd">    descriptor is internally consistent even before parts exist on disk.</span>
+</span><span id="line-890"><span class="sd">    """</span>
+</span><span id="line-891">    <span class="n">slots</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Attachment</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-892">
+</span><span id="line-893">    <span class="c1"># Single-attachment body slots</span>
+</span><span id="line-894">    <span class="k">for</span> <span class="n">slot_name</span><span class="p">,</span> <span class="n">anchor</span> <span class="ow">in</span> <span class="p">(</span>
+</span><span id="line-895">        <span class="c1"># Anchors are stated relative to each slot's BONE. The torso's bone is</span>
+</span><span id="line-896">        <span class="c1"># the hip, so the torso hangs UPWARD from it (anchor at its bottom</span>
+</span><span id="line-897">        <span class="c1"># edge); the limbs' bones are shoulders and hips, so they hang downward</span>
+</span><span id="line-898">        <span class="c1"># (anchor at their top edge). Before the compiler read any of this the</span>
+</span><span id="line-899">        <span class="c1"># anchors were inert and the torso's read (0.5, 0.0) — which, once the</span>
+</span><span id="line-900">        <span class="c1"># bone became the hip, drew the body below the waist and over the legs.</span>
+</span><span id="line-901">        <span class="p">(</span><span class="s2">"torso"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
+</span><span id="line-902">        <span class="p">(</span><span class="s2">"head"</span><span class="p">,</span> <span class="n">HEAD_ANCHOR</span><span class="p">),</span>
+</span><span id="line-903">        <span class="p">(</span><span class="s2">"arm_l"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)),</span>
+</span><span id="line-904">        <span class="p">(</span><span class="s2">"arm_r"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)),</span>
+</span><span id="line-905">        <span class="p">(</span><span class="s2">"leg_l"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)),</span>
+</span><span id="line-906">        <span class="p">(</span><span class="s2">"leg_r"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)),</span>
+</span><span id="line-907">    <span class="p">):</span>
+</span><span id="line-908">        <span class="n">slots</span><span class="p">[</span><span class="n">slot_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-909">            <span class="n">slot_name</span><span class="p">:</span> <span class="n">Attachment</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="sa">f</span><span class="s2">"parts/</span><span class="si">{</span><span class="n">slot_name</span><span class="si">}</span><span class="s2">.svg"</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">anchor</span><span class="p">)</span>
+</span><span id="line-910">        <span class="p">}</span>
+</span><span id="line-911">
+</span><span id="line-912">    <span class="c1"># Brows: slot name is the node name, attachment name is the file stem.</span>
+</span><span id="line-913">    <span class="k">for</span> <span class="n">slot_name</span><span class="p">,</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"left_brow"</span><span class="p">,</span> <span class="s2">"brow_l"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"right_brow"</span><span class="p">,</span> <span class="s2">"brow_r"</span><span class="p">)):</span>
+</span><span id="line-914">        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">FACE_OFFSETS</span><span class="p">[</span><span class="n">slot_name</span><span class="p">]</span>
+</span><span id="line-915">        <span class="n">slots</span><span class="p">[</span><span class="n">slot_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-916">            <span class="n">attachment</span><span class="p">:</span> <span class="n">Attachment</span><span class="p">(</span>
+</span><span id="line-917">                <span class="n">path</span><span class="o">=</span><span class="sa">f</span><span class="s2">"parts/</span><span class="si">{</span><span class="n">attachment</span><span class="si">}</span><span class="s2">.svg"</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span>
+</span><span id="line-918">            <span class="p">)</span>
+</span><span id="line-919">        <span class="p">}</span>
+</span><span id="line-920">
+</span><span id="line-921">    <span class="c1"># Eye slots have two attachments. Their names are the shared per-slot</span>
+</span><span id="line-922">    <span class="c1"># keys `open`/`closed` (NOT the file stems) so the one `eyelid` set can</span>
+</span><span id="line-923">    <span class="c1"># project onto both slots; the paths keep the file spelling.</span>
+</span><span id="line-924">    <span class="k">for</span> <span class="n">slot_name</span><span class="p">,</span> <span class="n">stem</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"left_eye"</span><span class="p">,</span> <span class="s2">"eye_l"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"right_eye"</span><span class="p">,</span> <span class="s2">"eye_r"</span><span class="p">)):</span>
+</span><span id="line-925">        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">FACE_OFFSETS</span><span class="p">[</span><span class="n">slot_name</span><span class="p">]</span>
+</span><span id="line-926">        <span class="n">slots</span><span class="p">[</span><span class="n">slot_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-927">            <span class="n">state</span><span class="p">:</span> <span class="n">Attachment</span><span class="p">(</span>
+</span><span id="line-928">                <span class="n">path</span><span class="o">=</span><span class="sa">f</span><span class="s2">"parts/</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">.svg"</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span>
+</span><span id="line-929">            <span class="p">)</span>
+</span><span id="line-930">            <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"open"</span><span class="p">,</span> <span class="s2">"closed"</span><span class="p">)</span>
+</span><span id="line-931">        <span class="p">}</span>
+</span><span id="line-932">
+</span><span id="line-933">    <span class="c1"># Mouth slot has 9 attachments (the viseme set).</span>
+</span><span id="line-934">    <span class="n">mouth_x</span><span class="p">,</span> <span class="n">mouth_y</span> <span class="o">=</span> <span class="n">FACE_OFFSETS</span><span class="p">[</span><span class="s2">"mouth"</span><span class="p">]</span>
+</span><span id="line-935">    <span class="n">slots</span><span class="p">[</span><span class="s2">"mouth"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-936">        <span class="sa">f</span><span class="s2">"mouth_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">Attachment</span><span class="p">(</span>
+</span><span id="line-937">            <span class="n">path</span><span class="o">=</span><span class="sa">f</span><span class="s2">"parts/mouth/mouth_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">.svg"</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="n">mouth_x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">mouth_y</span>
+</span><span id="line-938">        <span class="p">)</span>
+</span><span id="line-939">        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">MOUTH_SHAPES</span>
+</span><span id="line-940">    <span class="p">}</span>
+</span><span id="line-941">
+</span><span id="line-942">    <span class="k">return</span> <span class="n">Skin</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="n">slots</span><span class="p">)</span>
+</span><span id="line-943">
+</span><span id="line-944">
+</span><span id="line-945"><span class="c1"># The bones' rest pose is applied from 0.4.0 (an#339): the stage's one</span>
+</span><span id="line-946"><span class="c1"># protective step, which writes `rest_rotation: false` only onto a 0.3.0 rig</span>
+</span><span id="line-947"><span class="c1"># whose bones carry a rotation or scale (none did when it shipped).</span>
+</span><span id="line-948"><span class="n">register_rest_pose_migration</span><span class="p">(</span><span class="n">CHARACTER_DOCUMENT_KIND</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"0.3.0"</span><span class="p">,</span> <span class="s2">"0.4.0"</span><span class="p">)</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -1158,7 +1171,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=22d3c163"></script>
+    <script src="../../../_static/documentation_options.js?v=86ab457a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -37,6 +37,7 @@
 - [cutan.characters.idle](_autosummary/cutan.characters.idle.html.md): Idle animation factories: breath, blink, weight-shift.
 - [cutan.characters.licenses](_autosummary/cutan.characters.licenses.html.md): DiceBear per-style licences, as data.
 - [cutan.characters.lids](_autosummary/cutan.characters.lids.html.md): A HALF eyelid drawing, made from a character’s own OPEN and CLOSED lid art (cutan#65).
+- [cutan.characters.limits](_autosummary/cutan.characters.limits.html.md): Hinge limits per part type: how far a cut-out figure’s joints may turn (cutan#104).
 - [cutan.characters.methods](_autosummary/cutan.characters.methods.html.md): The cut-out genre’s methods and aspects, and their compile-time resolution (ADR 0002).
 - [cutan.characters.mouth_set](_autosummary/cutan.characters.mouth_set.html.md): Generate the 9-shape default mouth set as parametric SVGs.
 - [cutan.characters.play](_autosummary/cutan.characters.play.html.md): Resolve a &#96;play&#96; against a character descriptor — the renderer-free half (an#7).
@@ -82,7 +83,7 @@
 - [cutan.verify.body](_autosummary/cutan.verify.body.html.md): Body continuity: a prop that depicts a character’s limbs must meet that character’s body.
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 04:22 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 05:53 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

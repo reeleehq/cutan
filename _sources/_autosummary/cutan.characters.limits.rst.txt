@@ -1,0 +1,23 @@
+cutan.characters.limits
+=======================
+
+.. automodule:: cutan.characters.limits
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      PART_TYPES
+      GENRE_LIMITS
+      LOOSE_LIMITS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      apply_limits
+      limits_for
+      limits_table
+      part_type
+   

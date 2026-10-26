@@ -55,6 +55,7 @@ cutan.characters
    idle
    licenses
    lids
+   limits
    methods
    mouth_set
    play

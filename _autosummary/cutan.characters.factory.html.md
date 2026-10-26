@@ -43,12 +43,18 @@ problem routes the way every other verifier’s does (an#78).
 | [`SIDE_EYE_SHIFT`](#cutan.characters.factory.SIDE_EYE_SHIFT)           | how far the near eye, its stack and brow slide toward the face's edge, and the mouth with them (view_box units at head_scale 1); the mouth is narrowed, seen edge-on.                                                                                                                                                                                       |
 | [`SIDE_LEG_OFFSET`](#cutan.characters.factory.SIDE_LEG_OFFSET)          | both hang from under the body, the near leg (`leg_r`, drawn over the far one) a little forward and the far leg a little back, overlapping at the hip — each hip sits `SIDE_LEG_OFFSET` leg widths off the centre line — and splayed so the FEET part: the shoe centres land `SIDE_FOOT_SPREAD` leg widths apart, on every build (a stubby leg splays more). |
 | [`THREE_QUARTER_FACE_SHIFT`](#cutan.characters.factory.THREE_QUARTER_FACE_SHIFT) | the whole face slides toward the facing side, the far eye narrows, the far arm tucks in toward the body and the legs in.                                                                                                                                                                                                                                    |
+| [`ELBOW_AT`](#cutan.characters.factory.ELBOW_AT)                 | Where a split arm's elbow sits, as a fraction of the way from the shoulder to the wrist.                                                                                                                                                                                                                                                                    |
+| [`ARM_CHAIN_SHIFT`](#cutan.characters.factory.ARM_CHAIN_SHIFT)          | How far the slots drawn over the arms move up when each arm becomes three parts: the left arm's chain, then the right's (arm, forearm, hand each over the part it hangs from: `nesting: bones` refuses a chain drawn against its order, and the validator flags chains whose parts are not together in it).                                                 |
+| [`MIN_SLEEVE_WIDTHS`](#cutan.characters.factory.MIN_SLEEVE_WIDTHS)        | The smallest sleeve left on either side of the elbow, in arm widths.                                                                                                                                                                                                                                                                                        |
+| [`ARM_SIDES`](#cutan.characters.factory.ARM_SIDES)                | The sides of the factory's arms, and the bones a split arm adds on each.                                                                                                                                                                                                                                                                                    |
 | [`MAX_RECIPE_STEPS`](#cutan.characters.factory.MAX_RECIPE_STEPS)         | The most drawing steps a recipe may replay, and the most bytes of JSON its parameters may take: the replay runs on whoever reads the descriptor, so its cost is bounded here, not by the recipe's author (review-292 R3).                                                                                                                                   |
 
 ### Functions
 
-| [`add_gaze`](#cutan.characters.factory.add_gaze)(char_dir, \*[, skin, overwrite_eyes])   | Give a character the eye stack (an#99): three sibling slots per eye under the head — `<side>_sclera` (white fill) below `<side>_pupil` below `<side>_eye` (the existing slot, now the lid, drawn above the pupil) — with synthesized parts, an outline-only open eye, a FILLED closed lid, the `gaze_travel` clamp, and draw orders that put the lid over the pupil.                                  |
+| [`add_forearms`](#cutan.characters.factory.add_forearms)(char_dir, \*[, elbow_at])           | Split a factory character's arms at the elbow, and give them hands (cutan#104).                                                                                                                                                                                                                                                                                                                       |
 |---------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`add_gaze`](#cutan.characters.factory.add_gaze)(char_dir, \*[, skin, overwrite_eyes])   | Give a character the eye stack (an#99): three sibling slots per eye under the head — `<side>_sclera` (white fill) below `<side>_pupil` below `<side>_eye` (the existing slot, now the lid, drawn above the pupil) — with synthesized parts, an outline-only open eye, a FILLED closed lid, the `gaze_travel` clamp, and draw orders that put the lid over the pupil.                                  |
+| [`add_limits`](#cutan.characters.factory.add_limits)(char_dir, \*[, style, overwrite])     | Write hinge limits onto a character's bones, by part type (cutan#104).                                                                                                                                                                                                                                                                                                                                |
 | [`add_views`](#cutan.characters.factory.add_views)(char_dir)                              | Give a factory character its turnaround (an#197): `back`, `side` and `three_quarter` head and torso art beside the front, a `view` swap set projected onto those two slots, and a pose per view (`swap_poses`) — so `{kind: set, target: <entity>, property: view, value: side}` or [`cutan.motion.turn()`](cutan.motion.html.md#cutan.motion.turn) turns the whole character. |
 | [`brow_cover_unknowable`](#cutan.characters.factory.brow_cover_unknowable)(desc)                      | Whether `desc` is a factory head with a hat whose drawing is not the factory's for its recorded knobs (edited by hand), so its brow cover cannot be derived: only a declared `occluded` can say (an#284).                                                                                                                                                                                             |
 | [`declare_mouth_variants`](#cutan.characters.factory.declare_mouth_variants)(descriptor, variants)     | Declare a `viseme@<form>` set per variant on `descriptor` — the set's keys map to `mouth_<shape>_<form>` attachments, which are added to the default skin's `mouth` slot with the neutral mouth's geometry.                                                                                                                                                                                           |
@@ -71,6 +77,17 @@ problem routes the way every other verifier’s does (an#78).
 
 | [`BodyBuild`](#cutan.characters.factory.BodyBuild)([torso_size, torso_radius, ...])   | The proportions of a synthesized body, in view_box units.   |
 |-----------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+
+### cutan.characters.factory.ARM_CHAIN_SHIFT *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 5*
+
+How far the slots drawn over the arms move up when each arm becomes three
+parts: the left arm’s chain, then the right’s (arm, forearm, hand each over
+the part it hangs from: `nesting: bones` refuses a chain drawn against its
+order, and the validator flags chains whose parts are not together in it).
+
+### cutan.characters.factory.ARM_SIDES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('l', 'r')*
+
+The sides of the factory’s arms, and the bones a split arm adds on each.
 
 ### cutan.characters.factory.BUILDS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [BodyBuild](#cutan.characters.factory.BodyBuild)]* *= {'regular': BodyBuild(torso_size=(256, 256), torso_radius=40, torso_inset_bottom=20, arm_width=36, arm_length=256, hand_radius=20, limb_stroke=4, leg_width=40, leg_length=300.0, shoe_size=(32, 18), shoulder=(90, 240), hip_x=50, neck_height=260), 'squat': BodyBuild(torso_size=(300, 220), torso_radius=80, torso_inset_bottom=4, arm_width=36, arm_length=140, hand_radius=18, limb_stroke=4, leg_width=50, leg_length=96, shoe_size=(34, 16), shoulder=(118, 168), hip_x=46, neck_height=214), 'stick': BodyBuild(torso_size=(170, 210), torso_radius=14, torso_inset_bottom=4, arm_width=10, arm_length=200, hand_radius=9, limb_stroke=3, leg_width=10, leg_length=230, shoe_size=(15, 7), shoulder=(82, 188), hip_x=28, neck_height=214), 'tall': BodyBuild(torso_size=(224, 320), torso_radius=36, torso_inset_bottom=4, arm_width=32, arm_length=320, hand_radius=18, limb_stroke=4, leg_width=36, leg_length=380, shoe_size=(30, 16), shoulder=(80, 304), hip_x=44, neck_height=324)}*
 
@@ -118,6 +135,10 @@ bottom sits on the hip.
 ### cutan.characters.factory.DFLT_HAND_COLOUR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '#f1c9a5'*
 
 Default hand, trouser and brow colours — the literals the factory always drew.
+
+### cutan.characters.factory.ELBOW_AT *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+
+Where a split arm’s elbow sits, as a fraction of the way from the shoulder to the wrist.
 
 ### cutan.characters.factory.EYE_CANVAS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]* *= (64, 32)*
 
@@ -192,6 +213,10 @@ The most drawing steps a recipe may replay, and the most bytes of JSON its
 parameters may take: the replay runs on whoever reads the descriptor, so
 its cost is bounded here, not by the recipe’s author (review-292 R3).
 
+### cutan.characters.factory.MIN_SLEEVE_WIDTHS *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+
+The smallest sleeve left on either side of the elbow, in arm widths.
+
 ### cutan.characters.factory.OUTLINE_COLOUR *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= '#222222'*
 
 it is the
@@ -261,6 +286,29 @@ the far eye narrows, the far arm tucks in toward the body and the legs in.
 * **Type:**
   Three-quarter (facing right)
 
+### cutan.characters.factory.add_forearms(char_dir, , elbow_at=0.5)
+
+Split a factory character’s arms at the elbow, and give them hands (cutan#104).
+
+Each one-piece arm becomes an upper arm (`arm_l`/`arm_r`, redrawn
+shorter), a `forearm_*` hanging from it at the elbow and a `hand_*`
+hanging from the forearm at the wrist, with the bones to match (`forearm_l`,
+`hand_l`, …), and the rig turns to `nesting: bones` so a forearm follows
+its upper arm. At rest the arm looks as it did. The hand bone is the point a
+hand holds by (`cutan.characters.hands`), what a `pin` or a `pull`
+drags (`ned/hand_r@hand_r`), and a prop’s grip bone is where it goes.
+
+Opt-in, one character at a time: a character made before is never converted
+implicitly, and the default factory character keeps its one-piece arms, so
+its contract hashes do not move. Only an arm the factory drew is split (a
+promoted or hand-drawn rig’s is an illustrator’s); the character keeps its
+views (a hidden arm hides its forearm and hand). `elbow_at` is the elbow’s
+place on the arm (0..1). Run [`add_limits()`](#cutan.characters.factory.add_limits) afterwards for the elbow’s and
+the wrist’s ranges. Idempotent. Returns the descriptor path.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
 ### cutan.characters.factory.add_gaze(char_dir, , skin=None, overwrite_eyes=False)
 
 Give a character the eye stack (an#99): three sibling slots per eye under
@@ -282,6 +330,24 @@ This is the **expand** step for a pre-Wave-6 descriptor: no migration
 inserts pupil slots, because their art would be absent and absent art is
 fatal under `strict_assets` — every existing character would stop
 rendering on the bench.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### cutan.characters.factory.add_limits(char_dir, , style=None, overwrite=False)
+
+Write hinge limits onto a character’s bones, by part type (cutan#104).
+
+The neck, the shoulders, and (when the arm is split, [`add_forearms()`](#cutan.characters.factory.add_forearms))
+the elbows and wrists get the genre’s ranges ([`cutan.characters.limits.GENRE_LIMITS`](cutan.characters.limits.html.md#cutan.characters.limits.GENRE_LIMITS)),
+or the ones the shipped style `style` declares under `joints.limits`.
+They bound the solver wherever a shot declares a joint (`pin`, `pull`,
+`join`); a scene that declares none compiles as it did. Opt-in, one
+character at a time: a character made before is never converted implicitly,
+and the default factory character does not carry them (its contract hashes
+must not move). A bone that already has a range is the artist’s and is kept
+unless `overwrite`; `style` names a shipped style spec (a recipe replays
+it by name). Idempotent. Returns the descriptor path.
 
 * **Return type:**
   [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
