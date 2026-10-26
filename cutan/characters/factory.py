@@ -29,7 +29,7 @@ import re
 import json
 import shutil
 import textwrap
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping, Optional
 from xml.etree import ElementTree as ET
@@ -46,6 +46,13 @@ def _stable_hash(seed: str) -> int:
 
 
 from cutan.characters import drawn as _drawn
+from cutan.characters.descriptor_io import (
+    descriptor_path,
+    load_descriptor,
+    read_raw,
+    save_raw,
+    write_descriptor,
+)
 from cutan.characters.licenses import (
     DICEBEAR_STYLE_LICENSES,
     attribution_for,
@@ -68,7 +75,6 @@ from cutan.characters.brows import (
     BROW_SLOTS,
     BROW_CANVAS,
     BROW_STROKE,
-    BROWS_FEATURE,
     Seat,
     brow_path_d,
     seat_above_brows,
@@ -91,15 +97,12 @@ from cutan.characters.schema import (
     LEG_LENGTH,
     MOUTH_SHAPES,
     REFERENCE_HEAD_HEIGHT,
-    REQUIRED_PARTS,
     Slot,
 )
 from cutan.characters.svg_utils import (
-    extract_part,
     extract_pivots,
     normalize_svg,
     raster_size,
-    write_svg,
     SVG_NS,
 )
 
@@ -687,11 +690,9 @@ def _scale_face(char_dir: Path, scale: float) -> None:
     as ``metadata.head_scale`` so `add_gaze` and `an character mouths` redraw at
     the same size.
     """
-    from an.ir.migrate import migrate
 
-    desc_path = char_dir / "character.json"
-    raw = json.loads(desc_path.read_text(encoding="utf-8"))
-    desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
+    desc_path = descriptor_path(char_dir)
+    desc = load_descriptor(char_dir)
     face_slots = {s.name for s in desc.slots if s.bone == "head" and s.name != "head"}
     paths: set[str] = set()
     for skin in desc.skins.values():
@@ -706,7 +707,7 @@ def _scale_face(char_dir: Path, scale: float) -> None:
     if desc.gaze_travel:
         desc.gaze_travel = {k: round(v * scale, 3) for k, v in desc.gaze_travel.items()}
     desc.metadata["head_scale"] = scale
-    desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+    write_descriptor(char_dir, desc)
 
 
 def scale_part_files(paths, scale: float) -> None:
@@ -881,9 +882,8 @@ def _record_step(desc_path: Path, func, args, kwargs) -> None:
         )
     except TypeError:
         params = None  # a parameter JSON cannot hold: the recipe cannot replay
-    descriptor = CharacterDescriptor.model_validate_json(
-        Path(desc_path).read_text(encoding="utf-8")
-    )
+    char_dir = Path(desc_path).parent
+    descriptor = load_descriptor(char_dir)
     meta = descriptor.metadata
     recipe = (
         {"version": RECIPE_VERSION, "steps": []}
@@ -914,7 +914,7 @@ def _record_step(desc_path: Path, func, args, kwargs) -> None:
     recipe["steps"] = steps
     meta.pop(RECIPE_KEY, None)  # always last: one descriptor, however it was reached
     meta[RECIPE_KEY] = recipe
-    Path(desc_path).write_text(descriptor.model_dump_json(indent=2), encoding="utf-8")
+    write_descriptor(char_dir, descriptor)
 
 
 def _records_what_it_drew(func):
@@ -1244,8 +1244,7 @@ def new_character(
         # position is its world position, having no parent.
         root = next(b for b in descriptor.bones if b.parent is None)
         descriptor.origin = (root.x, root.y)
-    desc_path = out / "character.json"
-    desc_path.write_text(descriptor.model_dump_json(indent=2), encoding="utf-8")
+    desc_path = write_descriptor(out, descriptor)
     if gaze and descriptor.face_overlay:
         add_gaze(out)  # the lid's fill is read off the head art it just wrote
         _factory_half_lid(out)  # a glare reads (cutan#61)
@@ -1352,18 +1351,15 @@ def stamp_factory_descriptor(char_dir: str | Path) -> Path:
     by :func:`new_character` on what it has just drawn, never on a character
     someone may have edited since.
     """
-    from cutan.characters.schema import CharacterDescriptor
-    from an.ir.migrate import migrate
 
     char_dir = Path(char_dir)
-    desc_path = char_dir / "character.json"
-    raw = json.loads(desc_path.read_text(encoding="utf-8"))
-    desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
+    desc_path = descriptor_path(char_dir)
+    desc = load_descriptor(char_dir)
     drawing = inside_folder(char_dir, desc.source_svg or "")
     if desc.source is not None or drawing is None or not drawing.is_file():
         return desc_path
     desc.source = factory_descriptor_source(drawing.read_bytes())
-    desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+    write_descriptor(char_dir, desc)
     return desc_path
 
 
@@ -1377,13 +1373,10 @@ def stamp_generated_head(char_dir: str | Path, source: AssetSource) -> Path:
     credits`` and ``unknown`` in the asset library. Called by
     :func:`new_character` on what it has just written.
     """
-    from cutan.characters.schema import CharacterDescriptor
-    from an.ir.migrate import migrate
 
     char_dir = Path(char_dir)
-    desc_path = char_dir / "character.json"
-    raw = json.loads(desc_path.read_text(encoding="utf-8"))
-    desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
+    desc_path = descriptor_path(char_dir)
+    desc = load_descriptor(char_dir)
 
     def pinned(path: Path) -> AssetSource:
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -1403,7 +1396,7 @@ def stamp_generated_head(char_dir: str | Path, source: AssetSource) -> Path:
     drawing = inside_folder(char_dir, desc.source_svg or "")
     if drawing is not None and drawing.is_file():
         desc.source = pinned(drawing)
-    desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+    write_descriptor(char_dir, desc)
     return desc_path
 
 
@@ -1442,13 +1435,10 @@ def stamp_factory_parts(
         a part re-carved since as the factory's ``cc0``. A part carrying some
         other provider's source is never re-stamped.
     """
-    from cutan.characters.schema import CharacterDescriptor
-    from an.ir.migrate import migrate
 
     char_dir = Path(char_dir)
-    desc_path = char_dir / "character.json"
-    raw = json.loads(desc_path.read_text(encoding="utf-8"))
-    desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
+    desc_path = descriptor_path(char_dir)
+    desc = load_descriptor(char_dir)
     for skin in desc.skins.values():
         for attachments in skin.slots.values():
             for att in attachments.values():
@@ -1464,7 +1454,7 @@ def stamp_factory_parts(
                 ):
                     continue
                 att.source = factory_source(file.read_bytes())
-    desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+    write_descriptor(char_dir, desc)
     return desc_path
 
 
@@ -1722,17 +1712,14 @@ def add_gaze(
     rendering on the bench.
     """
     from cutan.characters.schema import (
-        CharacterDescriptor,
         FACE_OFFSETS,
         Attachment,
         Slot,
     )
-    from an.ir.migrate import migrate
 
     char_dir = Path(char_dir)
-    desc_path = char_dir / "character.json"
-    raw = json.loads(desc_path.read_text(encoding="utf-8"))
-    desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
+    desc_path = descriptor_path(char_dir)
+    desc = load_descriptor(char_dir)
     if not desc.face_overlay:
         raise ValueError(
             f"{desc.name!r} has its face baked into the head art (face_overlay: false): "
@@ -1853,7 +1840,7 @@ def add_gaze(
         axis: round(v * head_scale, 3) for axis, v in gaze_travel_for().items()
     }
     desc.metadata["gaze_stack"] = "an#99"
-    desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+    write_descriptor(char_dir, desc)
     return stamp_factory_parts(
         char_dir,
         {
@@ -1871,8 +1858,8 @@ def _factory_half_lid(char_dir: Path) -> None:
     recipe replay re-derives it like every other part (an#269, an#292)."""
     from cutan.characters.lids import HALF_ATTACHMENT
 
-    desc_path = _add_half_lid(char_dir)
-    raw = json.loads(desc_path.read_text(encoding="utf-8"))
+    _add_half_lid(char_dir)
+    raw = read_raw(char_dir)
     for slot in (
         ((raw.get("skins") or {}).get("default") or {}).get("slots", {}).values()
     ):
@@ -1881,10 +1868,7 @@ def _factory_half_lid(char_dir: Path) -> None:
             path = char_dir / half["path"]
             _drawn.write_text(path, path.read_text(encoding="utf-8"), encoding="utf-8")
             half.pop("source", None)
-    desc_path.write_text(
-        CharacterDescriptor.model_validate(raw).model_dump_json(indent=2),
-        encoding="utf-8",
-    )
+    save_raw(char_dir, raw)
 
 
 def _hex_or_none(colour: str | None) -> str | None:
@@ -2458,14 +2442,11 @@ def add_views(char_dir: str | Path) -> Path:
         DFLT_VIEW,
         VIEW_CHANNEL,
         VIEWS,
-        CharacterDescriptor,
     )
-    from an.ir.migrate import migrate
 
     char_dir = Path(char_dir)
-    desc_path = char_dir / "character.json"
-    raw = json.loads(desc_path.read_text(encoding="utf-8"))
-    desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
+    desc_path = descriptor_path(char_dir)
+    desc = load_descriptor(char_dir)
     meta = desc.metadata
     parts = char_dir / "parts"
     if not desc.face_overlay or meta.get("art_provenance") != "fallback_geometric":
@@ -2575,7 +2556,7 @@ def add_views(char_dir: str | Path) -> Path:
     if desc.colour_roles:  # tagged like the front — never half-tagged
         desc.colour_roles.update(roles)
     meta["views"] = list(VIEWS)
-    desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+    write_descriptor(char_dir, desc)
     return stamp_factory_parts(
         char_dir,
         {
@@ -2712,12 +2693,10 @@ def add_forearms(char_dir: str | Path, *, elbow_at: float = ELBOW_AT) -> Path:
     place on the arm (0..1). Run :func:`add_limits` afterwards for the elbow's and
     the wrist's ranges. Idempotent. Returns the descriptor path.
     """
-    from an.ir.migrate import migrate
 
     char_dir = Path(char_dir)
-    desc_path = char_dir / "character.json"
-    raw = json.loads(desc_path.read_text(encoding="utf-8"))
-    desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
+    desc_path = descriptor_path(char_dir)
+    desc = load_descriptor(char_dir)
     bones = {b.name: b for b in desc.bones}
     meta = desc.metadata
     body = _check_build(str(meta.get("build") or DFLT_BUILD))
@@ -2825,7 +2804,7 @@ def add_forearms(char_dir: str | Path, *, elbow_at: float = ELBOW_AT) -> Path:
     meta["arms"] = "split"
     if elbow_at != ELBOW_AT:
         meta["elbow_at"] = elbow_at
-    desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+    write_descriptor(char_dir, desc)
     return stamp_factory_parts(char_dir, stamped)
 
 
@@ -2846,7 +2825,6 @@ def add_limits(
     unless ``overwrite``; ``style`` names a shipped style spec (a recipe replays
     it by name). Idempotent. Returns the descriptor path.
     """
-    from an.ir.migrate import migrate
 
     from cutan.characters.limits import apply_limits, limits_table
 
@@ -2857,15 +2835,14 @@ def add_limits(
             raise ValueError(
                 f"no style spec named {style!r}; the specs are: {', '.join(style_specs())}"
             )
-    desc_path = Path(char_dir) / "character.json"
-    raw = json.loads(desc_path.read_text(encoding="utf-8"))
-    desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
+    desc_path = descriptor_path(char_dir)
+    desc = load_descriptor(char_dir)
     written = apply_limits(desc.bones, table=limits_table(style), overwrite=overwrite)
     if (
         written
     ):  # the label names ranges that are on the bones, never ones that were kept out
         desc.metadata["limits"] = style or "genre"
-    desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+    write_descriptor(char_dir, desc)
     return desc_path
 
 

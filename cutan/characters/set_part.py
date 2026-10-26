@@ -16,7 +16,6 @@ so the swap channels and the rig contract are untouched.
 
 from __future__ import annotations
 
-import json
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -24,6 +23,12 @@ from pathlib import Path
 from an.ir.assets import AssetSource
 from an.stage.raster import art_size
 from an.stores._common import ASSET_REF_RULE, inside_folder
+
+from cutan.characters.descriptor_io import (
+    read_raw,
+    validate_raw,
+    write_descriptor,
+)
 
 __all__ = [
     "PartReplacement",
@@ -76,14 +81,10 @@ def replace_part_art(
     draws ``old_rel``, when ``picture`` is not a readable PNG/JPEG/WebP, or when
     a path leaves the character's folder.
     """
-    from an.ir.migrate import migrate
     from an.stage.raster import RASTER_SUFFIXES, image_size
 
-    from cutan.characters.schema import CharacterDescriptor
-
     char_dir, picture = Path(char_dir), Path(picture)
-    desc_path = char_dir / "character.json"
-    raw = json.loads(desc_path.read_text(encoding="utf-8"))
+    raw = read_raw(char_dir)
     users = [a for *_, a in _slot_attachments(raw) if a.get("path") == old_rel]
     if not users:
         raise SetPartError(f"no attachment of {raw.get('name')!r} draws {old_rel!r}")
@@ -124,11 +125,11 @@ def replace_part_art(
     replaced = (raw.setdefault("metadata", {}) or {}).setdefault("replaced_parts", [])
     if new_rel not in replaced:
         replaced.append(new_rel)
-    desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
+    desc = validate_raw(raw)  # the last thing that can fail: nothing is written yet
     new_file.parent.mkdir(parents=True, exist_ok=True)
     if picture.resolve() != new_file.resolve():
         shutil.copyfile(picture, new_file)
-    desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+    desc_path = write_descriptor(char_dir, desc)
     if old_file != new_file:
         old_file.unlink(missing_ok=True)
     stem = Path(old_rel).stem
@@ -148,7 +149,7 @@ def part_path(char_dir: str | Path, attachment: str) -> str:
     """The file ``attachment`` (``name``, or ``slot/name`` when several slots carry
     that name) is drawn by, as the descriptor records it (``parts/head.svg``).
     Raises :class:`SetPartError` when it names no attachment or an ambiguous one."""
-    raw = json.loads((Path(char_dir) / "character.json").read_text(encoding="utf-8"))
+    raw = read_raw(char_dir)
     slot_wanted, _, name_wanted = attachment.rpartition("/")
     found = {
         (slot, name): att.get("path")
