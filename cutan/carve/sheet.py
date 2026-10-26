@@ -372,6 +372,16 @@ def _place_joint(char_dir: Path, d: _Drawing, unit: float | None) -> list[str]:
     return []
 
 
+def _resolved_later(p: SheetPart, unit: float | None) -> list[str]:
+    """The attachment names ``sheet_to_package`` resolves to a slot after its first
+    write: a split's base (its kept anchor, or the origin of its parts' placement)
+    and, with a ``unit``, its parts."""
+    if not p.split:
+        return []
+    base = [p.attachment] if unit is not None or not p.anchored else []
+    return base + (list(p.split) if unit is not None else [])
+
+
 def sheet_to_package(
     sheet: ImageLike,
     parts: Sequence[SheetPart | Mapping[str, Any]],
@@ -411,11 +421,12 @@ def sheet_to_package(
     files: dict[str, str] = {}
     for p in recipe:  # fails on an unknown or ambiguous attachment, writes nothing
         for name in (p.attachment, *p.split):
-            find_attachment(desc(), name)  # the resolver `place_attachment` uses
             rel = part_path(char_dir, name)
             if rel in files:
                 raise ValueError(f"{name!r} and {files[rel]!r} are both drawn by {rel}")
             files[rel] = name
+        for name in _resolved_later(p, unit):
+            find_attachment(desc(), name)  # the one-slot rule, before any write
     image = load_rgb(sheet)
     with tempfile.TemporaryDirectory(prefix="cutan-sheet-") as tmp:
         folder = Path(work_dir) if work_dir is not None else Path(tmp)
