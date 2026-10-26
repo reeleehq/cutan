@@ -1734,7 +1734,10 @@ def _solve_face(
             continue  # the rig builder did not build the slot (suppressed / no art)
         if isinstance(b, ChannelBinding):
             if b.axis in BROW_AXES:
-                brow_expr.setdefault(path, {})[b.axis.split("_")[1]] = samples
+                kind = "height" if b.axis.startswith("brow_height") else "angle"
+                acc_k = brow_expr.setdefault(path, {}).setdefault(kind, [0.0] * n)
+                for i in range(n):
+                    acc_k[i] += samples[i]
             gain = b.gain * (k if b.rig_scaled else 1.0)
             acc = offsets.setdefault((path, b.property), [0.0] * n)
             for i in range(n):
@@ -1847,11 +1850,14 @@ def _solve_face(
     # lid is off lid_open; an authored `brow` channel wins, a rig without the
     # set is untouched.
     for path, axes_ in sorted(brow_expr.items()):
-        brow_set = vocab.node_sets.get(path, {}).get(BROW_CHANNEL) or {}
-        if (path, BROW_CHANNEL) in authored or not brow_set:
+        node_sets = vocab.node_sets.get(path, {})
+        brow_set = node_sets.get(BROW_CHANNEL) or {}
+        if (path, BROW_CHANNEL) in authored or BROW_KEY_NONE not in brow_set:
             continue
-        if vocab.rest_key(path, BROW_CHANNEL) not in (None, BROW_KEY_NONE):
-            continue  # rests drawn: the author's call, as a lid that rests closed
+        if vocab.rest_key(path, BROW_CHANNEL) != BROW_KEY_NONE:
+            continue  # rests on other art: the swap would replace it and never restore it
+        if any(name.startswith(f"{BROW_CHANNEL}@") for name in node_sets):
+            continue  # per-view brow sets are not followed yet (cutan follow-up)
         zeros = [0.0] * n
         keys = [
             brow_key(h, a, available=brow_set)

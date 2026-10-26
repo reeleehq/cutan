@@ -614,7 +614,9 @@ def test_skeptical_raises_one_brow_and_an_authored_brow_wins(tmp_path):
     store = _store(tmp_path, doc)
     scene = _compile(_shot(expr), store)
     assert _brow_pose(scene, 1.0) == "RAISED"
-    assert _brow_pose(scene, 1.0, "right") in (None, "NONE")  # at rest
+    assert _brow_pose(scene, 1.0, "right") is None  # no channel: it never leaves rest
+    face = scene.animations["__face__s_rae"]
+    assert {c.target for c in face.channels if c.property == "brow"} == {"rae/head/left_brow"}
     own = SetAction(kind="set", target="rae/head/left_brow", property="brow",
                     value="ANGRY", at=0.0)
     scene = _compile(_shot(expr, own), store)
@@ -631,3 +633,14 @@ def test_a_rig_without_a_brow_set_is_unchanged(tmp_path):
         _store(tmp_path, doc),
     )
     assert not any(ch.property == "brow" for a in scene.animations.values() for ch in a.channels)
+
+
+def test_a_brow_resting_on_art_outside_the_set_is_left_alone(tmp_path):
+    from cutan.expression.registration import ExpressionAction
+
+    doc = _browed(tmp_path / "chars")  # the brows rest on their base art, not NONE
+    scene = _compile(
+        _shot(ExpressionAction(kind="expression", target="rae", preset="angry", duration=2.0)),
+        _store(tmp_path, doc),
+    )
+    assert not any(c.property == "brow" for a in scene.animations.values() for c in a.channels)
