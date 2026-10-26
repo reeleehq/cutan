@@ -28,6 +28,7 @@ opens monotonically `X → A → B → C → D`).
 
 | [`AXES`](#cutan.expression.axes.AXES)              |                                                                                                                                                                                                              |
 |--------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`BROW_AXIS_KIND`](#cutan.expression.axes.BROW_AXIS_KIND)    | Which brow ladder input each brow axis feeds (either side's).                                                                                                                                                |
 | [`MOUTH_FORM_AXIS`](#cutan.expression.axes.MOUTH_FORM_AXIS)   | which `viseme@<form>` set the mouth's key indexes.                                                                                                                                                           |
 | [`INTENSITY_AXIS`](#cutan.expression.axes.INTENSITY_AXIS)    | The scalar on every offset (MPEG-4 "excitation"); the blend ramp is a curve on it.                                                                                                                           |
 | [`LID_WIDE_ABOVE`](#cutan.expression.axes.LID_WIDE_ABOVE)    | The eyelid ladder — one rule, stated once (research §6).                                                                                                                                                     |
@@ -64,6 +65,10 @@ Gaze: pupil travel inside the eye, clamped by the rig’s declared travel.
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 One numeric axis: its range and its rest (neutral) value.
+
+### cutan.expression.axes.BROW_AXIS_KIND *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'brow_angle_l': 'angle', 'brow_angle_r': 'angle', 'brow_height_l': 'height', 'brow_height_r': 'height'}*
+
+Which brow ladder input each brow axis feeds (either side’s).
 
 ### cutan.expression.axes.BROW_FURROW_BELOW *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= -0.25*
 

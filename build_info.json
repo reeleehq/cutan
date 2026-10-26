@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-26T12:28:37Z",
+  "built_at": "2026-10-26T13:00:58Z",
   "package": {
     "name": "cutan",
     "version": "0.0.73",
@@ -9,26 +9,24 @@
   },
   "git": {
     "available": true,
-    "commit": "5035275513fc326d04e7b1177c58c9cb48f9b7ec",
-    "short_commit": "5035275",
+    "commit": "36306af81956cbda327e8d6414a8a3414651266e",
+    "short_commit": "36306af",
     "branch": "main",
-    "tags": [
-      "0.0.73"
-    ],
+    "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/cutan",
-    "commit_url": "https://github.com/reeleehq/cutan/commit/5035275513fc326d04e7b1177c58c9cb48f9b7ec",
+    "commit_url": "https://github.com/reeleehq/cutan/commit/36306af81956cbda327e8d6414a8a3414651266e",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/cutan",
-    "sha": "499fecf2ddd8eecf05a9066fc4e0f69c0042690b",
+    "sha": "36306af81956cbda327e8d6414a8a3414651266e",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "40321985237",
-    "run_url": "https://github.com/reeleehq/cutan/actions/runs/40321985237",
+    "run_id": "40326328808",
+    "run_url": "https://github.com/reeleehq/cutan/actions/runs/40326328808",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -58,20 +56,18 @@
   },
   "site": {
     "modules_documented": 77,
-    "objects_documented": 897
+    "objects_documented": 898
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.72",
-    "relation": "ahead",
+    "latest": "0.0.73",
+    "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 5035275513fc326d04e7b1177c58c9cb48f9b7ec\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 36306af81956cbda327e8d6414a8a3414651266e\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": false,
-    "notes": [
-      "The documented version (0.0.73) is ahead of the latest release on PyPI (0.0.72): these docs describe unreleased code."
-    ]
+    "aligned": true,
+    "notes": []
   }
 }

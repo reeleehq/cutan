@@ -245,113 +245,115 @@
 </span><span id="line-56">    <span class="s2">"gaze_y"</span><span class="p">:</span> <span class="n">Axis</span><span class="p">(</span><span class="s2">"gaze_y"</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
 </span><span id="line-57"><span class="p">}</span>
 </span><span id="line-58">
-</span><span id="line-59"><span class="n">BROW_AXES</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-60">    <span class="s2">"brow_height_l"</span><span class="p">,</span>
-</span><span id="line-61">    <span class="s2">"brow_height_r"</span><span class="p">,</span>
-</span><span id="line-62">    <span class="s2">"brow_angle_l"</span><span class="p">,</span>
-</span><span id="line-63">    <span class="s2">"brow_angle_r"</span><span class="p">,</span>
-</span><span id="line-64"><span class="p">)</span>
-</span><span id="line-65"><span class="n">LID_AXES</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"lid_open_l"</span><span class="p">,</span> <span class="s2">"lid_open_r"</span><span class="p">)</span>
-</span><span id="line-66"><span class="n">GAZE_AXES</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"gaze_x"</span><span class="p">,</span> <span class="s2">"gaze_y"</span><span class="p">)</span>
-</span><span id="line-67">
-</span><span id="line-68"><span class="c1">#: The selection axis: which `viseme@&lt;form&gt;` set the mouth's key indexes.</span>
-</span><span id="line-69"><span class="n">MOUTH_FORM_AXIS</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"mouth_form"</span>
-</span><span id="line-70"><span class="c1">#: The scalar on every offset (MPEG-4 "excitation"); the blend ramp is a curve on it.</span>
-</span><span id="line-71"><span class="n">INTENSITY_AXIS</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"intensity"</span>
-</span><span id="line-72">
-</span><span id="line-73"><span class="c1">#: The eyelid ladder — one rule, stated once (research §6). A lid state</span>
-</span><span id="line-74"><span class="c1">#: `min(lid_expr, lid_blink)` reads off these thresholds; a rig without the</span>
-</span><span id="line-75"><span class="c1">#: intermediate art degrades to the key it has.</span>
-</span><span id="line-76"><span class="n">LID_WIDE_ABOVE</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span>
-</span><span id="line-77"><span class="n">LID_HALF_BELOW</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.35</span>
-</span><span id="line-78"><span class="n">LID_CLOSED_BELOW</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.85</span>
-</span><span id="line-79">
-</span><span id="line-80"><span class="c1">#: Eyelid set keys the ladder can name, by openness.</span>
-</span><span id="line-81"><span class="n">LID_KEY_WIDE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"WIDE"</span>
-</span><span id="line-82"><span class="n">LID_KEY_OPEN</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"OPEN"</span>
-</span><span id="line-83"><span class="n">LID_KEY_HALF</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"HALF"</span>
-</span><span id="line-84"><span class="n">LID_KEY_CLOSED</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"CLOSED"</span>
-</span><span id="line-85">
-</span><span id="line-86">
-</span><span id="line-87"><span class="c1">#: The brow ladder (cutan#114), for a rig that draws its brows as a swap set:</span>
-</span><span id="line-88"><span class="c1">#: a furrow (``brow_angle`` below the first) draws ``ANGRY``, else a raise</span>
-</span><span id="line-89"><span class="c1">#: (``brow_height`` above the second) draws ``RAISED``, else ``NONE``.</span>
-</span><span id="line-90"><span class="n">BROW_FURROW_BELOW</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.25</span>
-</span><span id="line-91"><span class="n">BROW_RAISED_ABOVE</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span>
-</span><span id="line-92">
-</span><span id="line-93"><span class="c1">#: Brow set keys the ladder can name.</span>
-</span><span id="line-94"><span class="n">BROW_KEY_ANGRY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"ANGRY"</span>
-</span><span id="line-95"><span class="n">BROW_KEY_RAISED</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"RAISED"</span>
-</span><span id="line-96"><span class="n">BROW_KEY_NONE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"NONE"</span>
-</span><span id="line-97">
-</span><span id="line-98">
+</span><span id="line-59"><span class="c1">#: Which brow ladder input each brow axis feeds (either side's).</span>
+</span><span id="line-60"><span class="n">BROW_AXIS_KIND</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-61">    <span class="s2">"brow_height_l"</span><span class="p">:</span> <span class="s2">"height"</span><span class="p">,</span>
+</span><span id="line-62">    <span class="s2">"brow_height_r"</span><span class="p">:</span> <span class="s2">"height"</span><span class="p">,</span>
+</span><span id="line-63">    <span class="s2">"brow_angle_l"</span><span class="p">:</span> <span class="s2">"angle"</span><span class="p">,</span>
+</span><span id="line-64">    <span class="s2">"brow_angle_r"</span><span class="p">:</span> <span class="s2">"angle"</span><span class="p">,</span>
+</span><span id="line-65"><span class="p">}</span>
+</span><span id="line-66"><span class="n">BROW_AXES</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">BROW_AXIS_KIND</span><span class="p">)</span>
+</span><span id="line-67"><span class="n">LID_AXES</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"lid_open_l"</span><span class="p">,</span> <span class="s2">"lid_open_r"</span><span class="p">)</span>
+</span><span id="line-68"><span class="n">GAZE_AXES</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"gaze_x"</span><span class="p">,</span> <span class="s2">"gaze_y"</span><span class="p">)</span>
+</span><span id="line-69">
+</span><span id="line-70"><span class="c1">#: The selection axis: which `viseme@&lt;form&gt;` set the mouth's key indexes.</span>
+</span><span id="line-71"><span class="n">MOUTH_FORM_AXIS</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"mouth_form"</span>
+</span><span id="line-72"><span class="c1">#: The scalar on every offset (MPEG-4 "excitation"); the blend ramp is a curve on it.</span>
+</span><span id="line-73"><span class="n">INTENSITY_AXIS</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"intensity"</span>
+</span><span id="line-74">
+</span><span id="line-75"><span class="c1">#: The eyelid ladder — one rule, stated once (research §6). A lid state</span>
+</span><span id="line-76"><span class="c1">#: `min(lid_expr, lid_blink)` reads off these thresholds; a rig without the</span>
+</span><span id="line-77"><span class="c1">#: intermediate art degrades to the key it has.</span>
+</span><span id="line-78"><span class="n">LID_WIDE_ABOVE</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span>
+</span><span id="line-79"><span class="n">LID_HALF_BELOW</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.35</span>
+</span><span id="line-80"><span class="n">LID_CLOSED_BELOW</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.85</span>
+</span><span id="line-81">
+</span><span id="line-82"><span class="c1">#: Eyelid set keys the ladder can name, by openness.</span>
+</span><span id="line-83"><span class="n">LID_KEY_WIDE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"WIDE"</span>
+</span><span id="line-84"><span class="n">LID_KEY_OPEN</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"OPEN"</span>
+</span><span id="line-85"><span class="n">LID_KEY_HALF</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"HALF"</span>
+</span><span id="line-86"><span class="n">LID_KEY_CLOSED</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"CLOSED"</span>
+</span><span id="line-87">
+</span><span id="line-88">
+</span><span id="line-89"><span class="c1">#: The brow ladder (cutan#114), for a rig that draws its brows as a swap set:</span>
+</span><span id="line-90"><span class="c1">#: a furrow (``brow_angle`` below the first) draws ``ANGRY``, else a raise</span>
+</span><span id="line-91"><span class="c1">#: (``brow_height`` above the second) draws ``RAISED``, else ``NONE``.</span>
+</span><span id="line-92"><span class="n">BROW_FURROW_BELOW</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.25</span>
+</span><span id="line-93"><span class="n">BROW_RAISED_ABOVE</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span>
+</span><span id="line-94">
+</span><span id="line-95"><span class="c1">#: Brow set keys the ladder can name.</span>
+</span><span id="line-96"><span class="n">BROW_KEY_ANGRY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"ANGRY"</span>
+</span><span id="line-97"><span class="n">BROW_KEY_RAISED</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"RAISED"</span>
+</span><span id="line-98"><span class="n">BROW_KEY_NONE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"NONE"</span>
+</span><span id="line-99">
+</span><span id="line-100">
 <div class="viewcode-block" id="clamp_axes">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.axes.html#cutan.expression.clamp_axes">[docs]</a>
-</span><span id="line-99"><span class="k">def</span><span class="w"> </span><span class="nf">clamp_axes</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-</span><span id="line-100"><span class="w">    </span><span class="sd">"""Clamp every numeric axis to its range; an unknown axis is an error.</span>
-</span><span id="line-101">
-</span><span id="line-102"><span class="sd">    &gt;&gt;&gt; clamp_axes({"brow_height_l": 2.0, "lid_open_r": -3.0})</span>
-</span><span id="line-103"><span class="sd">    {'brow_height_l': 1.0, 'lid_open_r': -1.0}</span>
-</span><span id="line-104"><span class="sd">    &gt;&gt;&gt; clamp_axes({"eyebrow": 1.0})</span>
-</span><span id="line-105"><span class="sd">    Traceback (most recent call last):</span>
-</span><span id="line-106"><span class="sd">    ...</span>
-</span><span id="line-107"><span class="sd">    ValueError: unknown expression axis 'eyebrow' (known: brow_angle_l, ...)</span>
-</span><span id="line-108"><span class="sd">    """</span>
-</span><span id="line-109">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span id="line-110">    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="line-111">        <span class="n">axis</span> <span class="o">=</span> <span class="n">AXES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-</span><span id="line-112">        <span class="k">if</span> <span class="n">axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-113">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="line-114">                <span class="sa">f</span><span class="s2">"unknown expression axis </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> (known: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">AXES</span><span class="p">))</span><span class="si">}</span><span class="s2">)"</span>
-</span><span id="line-115">            <span class="p">)</span>
-</span><span id="line-116">        <span class="n">out</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-</span><span id="line-117">    <span class="k">return</span> <span class="n">out</span></div>
+</span><span id="line-101"><span class="k">def</span><span class="w"> </span><span class="nf">clamp_axes</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+</span><span id="line-102"><span class="w">    </span><span class="sd">"""Clamp every numeric axis to its range; an unknown axis is an error.</span>
+</span><span id="line-103">
+</span><span id="line-104"><span class="sd">    &gt;&gt;&gt; clamp_axes({"brow_height_l": 2.0, "lid_open_r": -3.0})</span>
+</span><span id="line-105"><span class="sd">    {'brow_height_l': 1.0, 'lid_open_r': -1.0}</span>
+</span><span id="line-106"><span class="sd">    &gt;&gt;&gt; clamp_axes({"eyebrow": 1.0})</span>
+</span><span id="line-107"><span class="sd">    Traceback (most recent call last):</span>
+</span><span id="line-108"><span class="sd">    ...</span>
+</span><span id="line-109"><span class="sd">    ValueError: unknown expression axis 'eyebrow' (known: brow_angle_l, ...)</span>
+</span><span id="line-110"><span class="sd">    """</span>
+</span><span id="line-111">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-112">    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="line-113">        <span class="n">axis</span> <span class="o">=</span> <span class="n">AXES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-114">        <span class="k">if</span> <span class="n">axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-115">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="line-116">                <span class="sa">f</span><span class="s2">"unknown expression axis </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> (known: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">AXES</span><span class="p">))</span><span class="si">}</span><span class="s2">)"</span>
+</span><span id="line-117">            <span class="p">)</span>
+</span><span id="line-118">        <span class="n">out</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</span><span id="line-119">    <span class="k">return</span> <span class="n">out</span></div>
 
-</span><span id="line-118">
-</span><span id="line-119">
+</span><span id="line-120">
+</span><span id="line-121">
 <div class="viewcode-block" id="lid_key">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.axes.html#cutan.expression.lid_key">[docs]</a>
-</span><span id="line-120"><span class="k">def</span><span class="w"> </span><span class="nf">lid_key</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">available</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-121"><span class="w">    </span><span class="sd">"""The eyelid key a lid state selects, degraded to the art the rig declares.</span>
-</span><span id="line-122">
-</span><span id="line-123"><span class="sd">    ``wide`` above +0.25, ``open``, ``half`` below −0.35, ``closed`` below −0.85;</span>
-</span><span id="line-124"><span class="sd">    a rig without ``half`` stays open until the lower threshold and one without</span>
-</span><span id="line-125"><span class="sd">    ``wide`` stays open above the upper one — never a blend of two drawings.</span>
-</span><span id="line-126"><span class="sd">    """</span>
-</span><span id="line-127">    <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">available</span><span class="p">}</span>
-</span><span id="line-128">    <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">LID_WIDE_ABOVE</span> <span class="ow">and</span> <span class="n">LID_KEY_WIDE</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-</span><span id="line-129">        <span class="k">return</span> <span class="n">LID_KEY_WIDE</span>
-</span><span id="line-130">    <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">LID_CLOSED_BELOW</span> <span class="ow">and</span> <span class="n">LID_KEY_CLOSED</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-</span><span id="line-131">        <span class="k">return</span> <span class="n">LID_KEY_CLOSED</span>
-</span><span id="line-132">    <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">LID_HALF_BELOW</span> <span class="ow">and</span> <span class="n">LID_KEY_HALF</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-</span><span id="line-133">        <span class="k">return</span> <span class="n">LID_KEY_HALF</span>
-</span><span id="line-134">    <span class="k">return</span> <span class="n">LID_KEY_OPEN</span></div>
+</span><span id="line-122"><span class="k">def</span><span class="w"> </span><span class="nf">lid_key</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">available</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-123"><span class="w">    </span><span class="sd">"""The eyelid key a lid state selects, degraded to the art the rig declares.</span>
+</span><span id="line-124">
+</span><span id="line-125"><span class="sd">    ``wide`` above +0.25, ``open``, ``half`` below −0.35, ``closed`` below −0.85;</span>
+</span><span id="line-126"><span class="sd">    a rig without ``half`` stays open until the lower threshold and one without</span>
+</span><span id="line-127"><span class="sd">    ``wide`` stays open above the upper one — never a blend of two drawings.</span>
+</span><span id="line-128"><span class="sd">    """</span>
+</span><span id="line-129">    <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">available</span><span class="p">}</span>
+</span><span id="line-130">    <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">LID_WIDE_ABOVE</span> <span class="ow">and</span> <span class="n">LID_KEY_WIDE</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+</span><span id="line-131">        <span class="k">return</span> <span class="n">LID_KEY_WIDE</span>
+</span><span id="line-132">    <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">LID_CLOSED_BELOW</span> <span class="ow">and</span> <span class="n">LID_KEY_CLOSED</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+</span><span id="line-133">        <span class="k">return</span> <span class="n">LID_KEY_CLOSED</span>
+</span><span id="line-134">    <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">LID_HALF_BELOW</span> <span class="ow">and</span> <span class="n">LID_KEY_HALF</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+</span><span id="line-135">        <span class="k">return</span> <span class="n">LID_KEY_HALF</span>
+</span><span id="line-136">    <span class="k">return</span> <span class="n">LID_KEY_OPEN</span></div>
 
-</span><span id="line-135">
-</span><span id="line-136">
+</span><span id="line-137">
+</span><span id="line-138">
 <div class="viewcode-block" id="brow_key">
 <a class="viewcode-back" href="../../../_autosummary/cutan.expression.axes.html#cutan.expression.brow_key">[docs]</a>
-</span><span id="line-137"><span class="k">def</span><span class="w"> </span><span class="nf">brow_key</span><span class="p">(</span><span class="n">height</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">available</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-138"><span class="w">    </span><span class="sd">"""The brow key one side's height and angle select, degraded to the art declared.</span>
-</span><span id="line-139">
-</span><span id="line-140"><span class="sd">    A furrow draws ``ANGRY``, else a raise ``RAISED``, else ``NONE`` — and a</span>
-</span><span id="line-141"><span class="sd">    state the set has no drawing for is ``NONE``, never a blend.</span>
-</span><span id="line-142">
-</span><span id="line-143"><span class="sd">    &gt;&gt;&gt; brow_key(-0.6, -0.48, available={"ANGRY", "RAISED", "NONE"})</span>
-</span><span id="line-144"><span class="sd">    'ANGRY'</span>
-</span><span id="line-145"><span class="sd">    &gt;&gt;&gt; brow_key(0.6, 0.0, available={"ANGRY", "RAISED", "NONE"})</span>
-</span><span id="line-146"><span class="sd">    'RAISED'</span>
-</span><span id="line-147"><span class="sd">    &gt;&gt;&gt; brow_key(0.6, 0.0, available={"ANGRY", "NONE"})</span>
-</span><span id="line-148"><span class="sd">    'NONE'</span>
-</span><span id="line-149"><span class="sd">    &gt;&gt;&gt; brow_key(0.1, -0.1, available={"ANGRY", "RAISED", "NONE"})</span>
+</span><span id="line-139"><span class="k">def</span><span class="w"> </span><span class="nf">brow_key</span><span class="p">(</span><span class="n">height</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">available</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-140"><span class="w">    </span><span class="sd">"""The brow key one side's height and angle select, degraded to the art declared.</span>
+</span><span id="line-141">
+</span><span id="line-142"><span class="sd">    A furrow draws ``ANGRY``, else a raise ``RAISED``, else ``NONE`` — and a</span>
+</span><span id="line-143"><span class="sd">    state the set has no drawing for is ``NONE``, never a blend.</span>
+</span><span id="line-144">
+</span><span id="line-145"><span class="sd">    &gt;&gt;&gt; brow_key(-0.6, -0.48, available={"ANGRY", "RAISED", "NONE"})</span>
+</span><span id="line-146"><span class="sd">    'ANGRY'</span>
+</span><span id="line-147"><span class="sd">    &gt;&gt;&gt; brow_key(0.6, 0.0, available={"ANGRY", "RAISED", "NONE"})</span>
+</span><span id="line-148"><span class="sd">    'RAISED'</span>
+</span><span id="line-149"><span class="sd">    &gt;&gt;&gt; brow_key(0.6, 0.0, available={"ANGRY", "NONE"})</span>
 </span><span id="line-150"><span class="sd">    'NONE'</span>
-</span><span id="line-151"><span class="sd">    """</span>
-</span><span id="line-152">    <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">available</span><span class="p">}</span>
-</span><span id="line-153">    <span class="k">if</span> <span class="n">angle</span> <span class="o">&lt;</span> <span class="n">BROW_FURROW_BELOW</span> <span class="ow">and</span> <span class="n">BROW_KEY_ANGRY</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-</span><span id="line-154">        <span class="k">return</span> <span class="n">BROW_KEY_ANGRY</span>
-</span><span id="line-155">    <span class="k">if</span> <span class="n">height</span> <span class="o">&gt;</span> <span class="n">BROW_RAISED_ABOVE</span> <span class="ow">and</span> <span class="n">BROW_KEY_RAISED</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-</span><span id="line-156">        <span class="k">return</span> <span class="n">BROW_KEY_RAISED</span>
-</span><span id="line-157">    <span class="k">return</span> <span class="n">BROW_KEY_NONE</span></div>
+</span><span id="line-151"><span class="sd">    &gt;&gt;&gt; brow_key(0.1, -0.1, available={"ANGRY", "RAISED", "NONE"})</span>
+</span><span id="line-152"><span class="sd">    'NONE'</span>
+</span><span id="line-153"><span class="sd">    """</span>
+</span><span id="line-154">    <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">available</span><span class="p">}</span>
+</span><span id="line-155">    <span class="k">if</span> <span class="n">angle</span> <span class="o">&lt;</span> <span class="n">BROW_FURROW_BELOW</span> <span class="ow">and</span> <span class="n">BROW_KEY_ANGRY</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+</span><span id="line-156">        <span class="k">return</span> <span class="n">BROW_KEY_ANGRY</span>
+</span><span id="line-157">    <span class="k">if</span> <span class="n">height</span> <span class="o">&gt;</span> <span class="n">BROW_RAISED_ABOVE</span> <span class="ow">and</span> <span class="n">BROW_KEY_RAISED</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+</span><span id="line-158">        <span class="k">return</span> <span class="n">BROW_KEY_RAISED</span>
+</span><span id="line-159">    <span class="k">return</span> <span class="n">BROW_KEY_NONE</span></div>
 
 </span></code></pre></div>
     </div></div>

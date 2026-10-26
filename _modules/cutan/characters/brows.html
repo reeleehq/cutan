@@ -736,54 +736,61 @@
 </span><span id="line-527"><span class="sd">    ['left_brow', 'right_brow']</span>
 </span><span id="line-528"><span class="sd">    """</span>
 </span><span id="line-529">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.expression.axes</span><span class="w"> </span><span class="kn">import</span> <span class="n">BROW_AXES</span>
-</span><span id="line-530">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.expression.binding</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-</span><span id="line-531">        <span class="n">ChannelBinding</span><span class="p">,</span>
-</span><span id="line-532">        <span class="n">ExpressionResolutionError</span><span class="p">,</span>
-</span><span id="line-533">        <span class="n">binding_for</span><span class="p">,</span>
-</span><span id="line-534">    <span class="p">)</span>
-</span><span id="line-535">
-</span><span id="line-536">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-537">        <span class="n">bindings</span> <span class="o">=</span> <span class="n">binding_for</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
-</span><span id="line-538">    <span class="k">except</span> <span class="p">(</span><span class="n">ExpressionResolutionError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
-</span><span id="line-539">        <span class="k">return</span> <span class="p">[]</span>
-</span><span id="line-540">    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
-</span><span id="line-541">        <span class="p">{</span>
-</span><span id="line-542">            <span class="n">b</span><span class="o">.</span><span class="n">slot</span>
-</span><span id="line-543">            <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bindings</span>
-</span><span id="line-544">            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">ChannelBinding</span><span class="p">)</span> <span class="ow">and</span> <span class="n">b</span><span class="o">.</span><span class="n">axis</span> <span class="ow">in</span> <span class="n">BROW_AXES</span>
-</span><span id="line-545">        <span class="p">}</span>
-</span><span id="line-546">    <span class="p">)</span></div>
+</span><span id="line-530">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">BROW_CHANNEL</span>
+</span><span id="line-531">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.expression.binding</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-532">        <span class="n">ChannelBinding</span><span class="p">,</span>
+</span><span id="line-533">        <span class="n">ExpressionResolutionError</span><span class="p">,</span>
+</span><span id="line-534">        <span class="n">SetBinding</span><span class="p">,</span>
+</span><span id="line-535">        <span class="n">binding_for</span><span class="p">,</span>
+</span><span id="line-536">    <span class="p">)</span>
+</span><span id="line-537">
+</span><span id="line-538">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-539">        <span class="n">bindings</span> <span class="o">=</span> <span class="n">binding_for</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+</span><span id="line-540">    <span class="k">except</span> <span class="p">(</span><span class="n">ExpressionResolutionError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+</span><span id="line-541">        <span class="k">return</span> <span class="p">[]</span>
+</span><span id="line-542">    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
+</span><span id="line-543">        <span class="p">{</span>
+</span><span id="line-544">            <span class="n">b</span><span class="o">.</span><span class="n">slot</span>
+</span><span id="line-545">            <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bindings</span>
+</span><span id="line-546">            <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">axis</span> <span class="ow">in</span> <span class="n">BROW_AXES</span>
+</span><span id="line-547">            <span class="c1"># a brow moved by a transform, or drawn by a swap set (cutan#122)</span>
+</span><span id="line-548">            <span class="ow">and</span> <span class="p">(</span>
+</span><span id="line-549">                <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">ChannelBinding</span><span class="p">)</span>
+</span><span id="line-550">                <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">SetBinding</span><span class="p">)</span> <span class="ow">and</span> <span class="n">b</span><span class="o">.</span><span class="n">set_family</span> <span class="o">==</span> <span class="n">BROW_CHANNEL</span><span class="p">)</span>
+</span><span id="line-551">            <span class="p">)</span>
+</span><span id="line-552">        <span class="p">}</span>
+</span><span id="line-553">    <span class="p">)</span></div>
 
-</span><span id="line-547">
-</span><span id="line-548">
+</span><span id="line-554">
+</span><span id="line-555">
 <div class="viewcode-block" id="brow_affordance">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.brows.html#cutan.characters.brows.brow_affordance">[docs]</a>
-</span><span id="line-549"><span class="k">def</span><span class="w"> </span><span class="nf">brow_affordance</span><span class="p">(</span><span class="n">desc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">drawn</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-550"><span class="w">    </span><span class="sd">"""``face.brows``'s params for a descriptor whose drawn slots are ``drawn``, or ``None``.</span>
-</span><span id="line-551">
-</span><span id="line-552"><span class="sd">    Afforded when the face is an overlay (``face_overlay``), the binding moves</span>
-</span><span id="line-553"><span class="sd">    a brow (:func:`brow_slots`) and every slot it moves on a brow axis has</span>
-</span><span id="line-554"><span class="sd">    art, and nothing covers them (:func:`brow_cover`: a declared ``occluded``,</span>
-</span><span id="line-555"><span class="sd">    or a factory hat measured over them, an#284).</span>
-</span><span id="line-556"><span class="sd">    The slots are the solver's own binding's, so the capability and the solver</span>
-</span><span id="line-557"><span class="sd">    cannot disagree about which slots act.</span>
+</span><span id="line-556"><span class="k">def</span><span class="w"> </span><span class="nf">brow_affordance</span><span class="p">(</span><span class="n">desc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">drawn</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-557"><span class="w">    </span><span class="sd">"""``face.brows``'s params for a descriptor whose drawn slots are ``drawn``, or ``None``.</span>
 </span><span id="line-558">
-</span><span id="line-559"><span class="sd">    &gt;&gt;&gt; from cutan.characters.schema import CharacterDescriptor</span>
-</span><span id="line-560"><span class="sd">    &gt;&gt;&gt; d = CharacterDescriptor(name="c")</span>
-</span><span id="line-561"><span class="sd">    &gt;&gt;&gt; brow_affordance(d, {"left_brow": {"brow_l"}, "right_brow": {"brow_r"}})</span>
-</span><span id="line-562"><span class="sd">    {'slots': ['left_brow', 'right_brow']}</span>
-</span><span id="line-563"><span class="sd">    &gt;&gt;&gt; d.occluded = {"brows": "a helmet"}</span>
-</span><span id="line-564"><span class="sd">    &gt;&gt;&gt; brow_affordance(d, {"left_brow": {"brow_l"}, "right_brow": {"brow_r"}}) is None</span>
-</span><span id="line-565"><span class="sd">    True</span>
-</span><span id="line-566"><span class="sd">    """</span>
-</span><span id="line-567">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="s2">"face_overlay"</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
-</span><span id="line-568">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-569">    <span class="n">slots</span> <span class="o">=</span> <span class="n">brow_slots</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
-</span><span id="line-570">    <span class="k">if</span> <span class="ow">not</span> <span class="n">slots</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">s</span> <span class="ow">in</span> <span class="n">drawn</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">):</span>
-</span><span id="line-571">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-572">    <span class="k">if</span> <span class="n">brow_cover</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-573">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-574">    <span class="k">return</span> <span class="p">{</span><span class="s2">"slots"</span><span class="p">:</span> <span class="n">slots</span><span class="p">}</span></div>
+</span><span id="line-559"><span class="sd">    Afforded when the face is an overlay (``face_overlay``), the binding moves</span>
+</span><span id="line-560"><span class="sd">    a brow (:func:`brow_slots`) and every slot it moves on a brow axis has</span>
+</span><span id="line-561"><span class="sd">    art, and nothing covers them (:func:`brow_cover`: a declared ``occluded``,</span>
+</span><span id="line-562"><span class="sd">    or a factory hat measured over them, an#284).</span>
+</span><span id="line-563"><span class="sd">    The slots are the solver's own binding's, so the capability and the solver</span>
+</span><span id="line-564"><span class="sd">    cannot disagree about which slots act.</span>
+</span><span id="line-565">
+</span><span id="line-566"><span class="sd">    &gt;&gt;&gt; from cutan.characters.schema import CharacterDescriptor</span>
+</span><span id="line-567"><span class="sd">    &gt;&gt;&gt; d = CharacterDescriptor(name="c")</span>
+</span><span id="line-568"><span class="sd">    &gt;&gt;&gt; brow_affordance(d, {"left_brow": {"brow_l"}, "right_brow": {"brow_r"}})</span>
+</span><span id="line-569"><span class="sd">    {'slots': ['left_brow', 'right_brow']}</span>
+</span><span id="line-570"><span class="sd">    &gt;&gt;&gt; d.occluded = {"brows": "a helmet"}</span>
+</span><span id="line-571"><span class="sd">    &gt;&gt;&gt; brow_affordance(d, {"left_brow": {"brow_l"}, "right_brow": {"brow_r"}}) is None</span>
+</span><span id="line-572"><span class="sd">    True</span>
+</span><span id="line-573"><span class="sd">    """</span>
+</span><span id="line-574">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="s2">"face_overlay"</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+</span><span id="line-575">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-576">    <span class="n">slots</span> <span class="o">=</span> <span class="n">brow_slots</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+</span><span id="line-577">    <span class="k">if</span> <span class="ow">not</span> <span class="n">slots</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">s</span> <span class="ow">in</span> <span class="n">drawn</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">):</span>
+</span><span id="line-578">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-579">    <span class="k">if</span> <span class="n">brow_cover</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-580">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-581">    <span class="k">return</span> <span class="p">{</span><span class="s2">"slots"</span><span class="p">:</span> <span class="n">slots</span><span class="p">}</span></div>
 
 </span></code></pre></div>
     </div></div>

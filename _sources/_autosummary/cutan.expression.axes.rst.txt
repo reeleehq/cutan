@@ -9,6 +9,7 @@ cutan.expression.axes
    .. autosummary::
    
       AXES
+      BROW_AXIS_KIND
       MOUTH_FORM_AXIS
       INTENSITY_AXIS
       LID_WIDE_ABOVE
