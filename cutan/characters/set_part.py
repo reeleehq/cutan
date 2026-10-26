@@ -16,6 +16,7 @@ so the swap channels and the rig contract are untouched.
 
 from __future__ import annotations
 
+import math
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -70,6 +71,7 @@ def replace_part_art(
     *,
     anchor: tuple[float, float] | None = None,
     source: AssetSource | None = None,
+    width: float | None = None,
 ) -> PartReplacement:
     """Draw every attachment that used ``old_rel`` (``parts/head.svg``) with ``picture``.
 
@@ -77,7 +79,9 @@ def replace_part_art(
     declared only when it declared none: the picture's height follows its own
     aspect, so a differently shaped picture is not squashed). ``anchor`` (``(u, v)``
     in 0..1 of the picture) replaces the attachments' anchor (default: keep it);
-    ``source`` is pinned to them as the picture's provenance. Raises :class:`SetPartError` when no attachment
+    ``source`` is pinned to them as the picture's provenance. ``width`` declares the
+    attachments' width outright (replacing any they declared: a part carved at a
+    known scale keeps it); raises :class:`SetPartError` when no attachment
     draws ``old_rel``, when ``picture`` is not a readable PNG/JPEG/WebP, or when
     a path leaves the character's folder.
     """
@@ -105,12 +109,17 @@ def replace_part_art(
         raise SetPartError(
             f"{old_rel!r} leaves the character's folder: {ASSET_REF_RULE}"
         )
-    width = None
+    declared = None
+    if width is not None:
+        if isinstance(width, bool) or not (math.isfinite(width) and width > 0):
+            raise SetPartError(f"width {width!r}: a width is a finite positive number")
+        declared = float(width)
+    old_width = None
     if old_file.is_file():
         try:
-            width = float(art_size(old_file)[0])
+            old_width = float(art_size(old_file)[0])
         except (OSError, ValueError):
-            width = None
+            old_width = None
     # Everything that can fail runs before anything is written.
     for att in users:
         att["path"] = new_rel
@@ -119,8 +128,11 @@ def replace_part_art(
             att["source"] = source.model_dump(mode="json", exclude_none=True)
         if anchor is not None:
             att["anchor"] = list(anchor)
-        if width and not att.get("width"):
-            att["width"] = width
+        if declared is not None:
+            att["width"] = declared
+            att.pop("height", None)  # the picture's own aspect gives it, not a box
+        elif old_width and not att.get("width"):
+            att["width"] = old_width
     (raw.get("colour_roles") or {}).pop(old_rel, None)
     replaced = (raw.setdefault("metadata", {}) or {}).setdefault("replaced_parts", [])
     if new_rel not in replaced:
@@ -174,9 +186,15 @@ def set_part(
     *,
     anchor: tuple[float, float] | None = None,
     source: AssetSource | None = None,
+    width: float | None = None,
 ) -> PartReplacement:
     """Replace the drawing of ``attachment`` (see :func:`part_path`) with
-    ``picture``; ``anchor`` and ``source`` as :func:`replace_part_art`."""
+    ``picture``; ``anchor``, ``source`` and ``width`` as :func:`replace_part_art`."""
     return replace_part_art(
-        char_dir, part_path(char_dir, attachment), picture, anchor=anchor, source=source
+        char_dir,
+        part_path(char_dir, attachment),
+        picture,
+        anchor=anchor,
+        source=source,
+        width=width,
     )
