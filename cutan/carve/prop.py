@@ -22,6 +22,18 @@ grip and its tip, a mug's handle) in the source's pixels, the same frame as
 the prop by default (an#502). Two landmarks give an axis: ``grip`` and ``tip``
 say which way the blade points from the hand.
 
+**A prop with states.** ``states=`` gives the base more drawings of the same
+object, one per state (a book ``closed``, ``open``, a page mid-turn; a lamp
+``off`` and ``on``), written as a swap set (``state_set``, default ``"state"``)
+on the base slot, the carving itself being the ``state`` key (default
+``"default"``). A scene changes it with ``{kind: set, target: book/body,
+property: state, value: open}``. Each drawing is anchored at its own carving's
+anchor, which lands on the root bone: carve every state with ``point=`` at the
+same physical point (where a hand holds it, the hinge it opens about) and the
+object stays put while its drawing changes. Each drawing keeps its own
+provenance on its attachment, so a state carved from another frame, or another
+video, is credited as such.
+
 **Rights are never loosened by accident.** A descriptor with no ``source``
 means "we made this" to ``an``, so a carving with no provenance is refused
 unless the caller says the art is its own (``ours=True``). A ``source=`` that
@@ -37,6 +49,7 @@ import math
 import re
 import warnings
 from collections.abc import Mapping
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -45,7 +58,7 @@ from an.stage.props import PropDescriptor
 from cutan.carve.core import Carving
 from cutan.carve.parts import PartSet
 
-__all__ = ["BASE_SLOT", "GRIP", "ROOT_BONE", "write_prop"]
+__all__ = ["BASE_SLOT", "GRIP", "ROOT_BONE", "STATE_SET", "PropState", "write_prop"]
 
 #: The bone every carved prop hangs from, at the carving's anchor.
 ROOT_BONE: str = "root"
@@ -54,6 +67,8 @@ BASE_SLOT: str = "body"
 #: The landmark a hand takes a prop by when a scene names no other (an's hold
 #: verbs read a bone of this name; an#502).
 GRIP: str = "grip"
+#: The swap set a prop's ``states=`` are written as (``property: state`` in a scene).
+STATE_SET: str = "state"
 #: What a landmark's name may be: what a scene writes after ``@``
 #: (``sabre@grip``), where ``u,v`` would be a fraction of the drawing instead.
 _LANDMARK_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_.-]*")
@@ -62,6 +77,22 @@ _LANDMARK_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_.-]*")
 LANDMARK_MARGIN: float = 0.5
 
 Point = tuple[float, float]
+
+
+@dataclass(frozen=True)
+class PropState:
+    """One more drawing of a prop's base, for :func:`write_prop`'s ``states=``.
+
+    ``art``: the carving (its ``anchor`` lands on the prop's root bone).
+    ``unit``: view_box units per pixel of ``art``. Default: the prop's unit,
+    corrected for a different super-resolution factor (``carving.scale``), so a
+    drawing carved at the same source resolution draws at the same size; give
+    it when the state was carved from a frame at another resolution or zoom.
+    A bare :class:`~cutan.carve.Carving` in ``states=`` is ``PropState(art)``.
+    """
+
+    art: Carving
+    unit: float | None = None
 
 
 def _looser(new: AssetSource, old: AssetSource) -> bool:
@@ -183,6 +214,9 @@ def write_prop(
     ours: bool = False,
     relicense: Mapping[str, str] | None = None,
     landmarks: Mapping[str, Point] | None = None,
+    states: Mapping[str, Carving | PropState] | None = None,
+    state: str = "default",
+    state_set: str = STATE_SET,
     overwrite: bool = False,
 ) -> PropDescriptor:
     """Write ``carved`` to ``folder`` as ``prop.json`` + ``parts/*.png``; return the descriptor.
@@ -202,6 +236,9 @@ def write_prop(
         (``grip``, :data:`GRIP`, is where a hand takes it). See the module
         docstring. They are points of the prop as a whole: on a split prop a
         landmark does not follow a part that turns (a grip on a moving lid).
+    states: more drawings of the base, ``{name: carving or PropState}``,
+        written as the swap set ``state_set`` on the base slot, with the
+        carving itself as its ``state`` key (see the module docstring)
 
     A :class:`~cutan.carve.PartSet` is written with its carving's provenance:
     build one with :func:`~cutan.carve.split_parts` (its parts are cut from
@@ -270,6 +307,50 @@ def write_prop(
             attach(part.name, part.name, part.image, part.anchor, part.draw_order)
     else:
         attach(BASE_SLOT, ROOT_BONE, carving.image, carving.anchor, 0)
+    asset_sets: dict[str, dict[str, str]] = {}
+    if states:
+        if BASE_SLOT not in attachments:
+            raise ValueError(
+                "states= are drawings of the base, and this part set has no base "
+                "(every pixel went to a part)"
+            )
+        names = [state, *states]
+        bad = [n for n in names if not _LANDMARK_NAME.fullmatch(n)]
+        if bad or state in states:
+            raise ValueError(
+                f"state names must be identifiers and distinct from state={state!r}: "
+                f"{bad or [state]}"
+            )
+        own = carving.provenance()
+        keys = {state: BASE_SLOT}
+        for sname, value in states.items():
+            st = value if isinstance(value, PropState) else PropState(value)
+            art = st.art
+            sunit = st.unit if st.unit is not None else unit * carving.scale / art.scale
+            if sunit <= 0:
+                raise ValueError(f"state {sname!r}: unit must be positive, not {sunit}")
+            sprov = art.provenance()
+            if sprov is None and not ours:
+                raise ValueError(
+                    f"state {sname!r} has no provenance: carve it with source=..., "
+                    "or pass ours=True if the pixels are yours"
+                )
+            key = f"{BASE_SLOT}_{sname}"
+            path = f"parts/{key}.png"
+            images[path] = art.image
+            att: dict[str, Any] = {
+                "path": path,
+                "anchor": [float(art.anchor[0]), float(art.anchor[1])],
+                "width": round(art.image.width * sunit, 3),
+                "height": round(art.image.height * sunit, 3),
+                "x": 0.0,
+                "y": 0.0,
+            }
+            if sprov is not None and sprov != own:
+                att["source"] = sprov.model_dump(mode="json", exclude_none=True)
+            attachments[BASE_SLOT][key] = att
+            keys[sname] = key
+        asset_sets[state_set] = keys
     if landmarks:
         bones += _landmark_bones(
             carving, landmarks, unit=unit, taken={b["name"] for b in bones}
@@ -286,6 +367,7 @@ def write_prop(
             "bones": bones,
             "slots": slots,
             "skins": {"default": {"name": "default", "slots": attachments}},
+            "asset_sets": asset_sets,
             "source": prov.model_dump(mode="json", exclude_none=True) if prov else None,
             "metadata": {
                 "carve": {
