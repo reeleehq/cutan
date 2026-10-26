@@ -166,9 +166,7 @@ def new(
     from cutan.characters.schema import CharacterDescriptor
     from an.ir.migrate import migrate
 
-    ext = stage_extent(
-        validate_raw(doc)
-    )
+    ext = stage_extent(validate_raw(doc))
     note += (
         f"; stands {ext['height']:g} px tall at stage.scale 1 — its top "
         f"{ext['top']:g} px above its stage point, its feet {ext['feet']:g} px below"
@@ -177,9 +175,7 @@ def new(
 
     # derived from the knobs and the recorded seat (an#284), plus any override
     covers = dict(doc.get("occluded") or {})
-    derived = brow_cover(
-        validate_raw(doc)
-    )
+    derived = brow_cover(validate_raw(doc))
     if derived:
         covers.setdefault(BROWS_FEATURE, derived)
     for feature, cover in covers.items():
@@ -239,6 +235,7 @@ def _stamp_mouths(char_dir: Path, written: list, variant_map) -> None:
             scale_part_files,
             stamp_factory_parts,
         )
+
         desc = load_descriptor(char_dir)
         # A rig drawn with a head scale gets its mouths at the face's size.
         scale_part_files(written, float(desc.metadata.get("head_scale") or 1.0))
