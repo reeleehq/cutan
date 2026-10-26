@@ -70,7 +70,10 @@ def load_descriptor(char_dir: str | Path):
 
 
 def write_descriptor(char_dir: str | Path, desc) -> Path:
-    """Write ``desc`` as the character's ``character.json``; return its path."""
+    """Write ``desc`` as the character's ``character.json``; return its path.
+    A model changed in place is validated again first (the schema does not
+    validate assignments), so an invalid edit writes nothing."""
+    desc = type(desc).model_validate(desc.model_dump())
     path = descriptor_path(char_dir)
     path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
     return path

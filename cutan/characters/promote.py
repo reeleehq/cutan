@@ -12,6 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Optional
 
+from cutan.characters.descriptor_io import write_descriptor
 from cutan.characters.factory import (
     new_character,
     _synthesize_brow,
@@ -165,9 +166,7 @@ def promote(
             "pivots_detected": sorted(pivots),
         },
     )
-    desc_path = target / "character.json"
-    desc_path.write_text(descriptor.model_dump_json(indent=2), encoding="utf-8")
-    return desc_path
+    return write_descriptor(target, descriptor)
 
 
 def _resolve_source(

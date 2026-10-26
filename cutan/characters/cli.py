@@ -31,6 +31,7 @@ from an.cli_status import failed
 from cutan.characters.descriptor_io import (
     descriptor_path,
     load_descriptor,
+    validate_raw,
     write_descriptor,
 )
 from cutan.characters.factory import DFLT_HAIR_LENGTH, DFLT_HAIR_STYLE
@@ -166,7 +167,7 @@ def new(
     from an.ir.migrate import migrate
 
     ext = stage_extent(
-        CharacterDescriptor.model_validate(migrate(doc, kind="CharacterDescriptor"))
+        validate_raw(doc)
     )
     note += (
         f"; stands {ext['height']:g} px tall at stage.scale 1 — its top "
@@ -177,7 +178,7 @@ def new(
     # derived from the knobs and the recorded seat (an#284), plus any override
     covers = dict(doc.get("occluded") or {})
     derived = brow_cover(
-        CharacterDescriptor.model_validate(migrate(doc, kind="CharacterDescriptor"))
+        validate_raw(doc)
     )
     if derived:
         covers.setdefault(BROWS_FEATURE, derived)

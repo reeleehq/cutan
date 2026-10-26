@@ -30,7 +30,7 @@ from pathlib import Path
 
 from an.stores._common import ASSET_REF_RULE, inside_folder
 
-from cutan.characters.descriptor_io import descriptor_path, read_raw, save_raw
+from cutan.characters.descriptor_io import read_raw, validate_raw, write_descriptor
 
 __all__ = [
     "DFLT_HALF_LID_FRACTION",
@@ -159,6 +159,7 @@ def add_half_lid(
     open_name, closed_name = keys["OPEN"], keys["CLOSED"]
     slots = ((raw.get("skins") or {}).get("default") or {}).get("slots") or {}
     done = 0
+    pending: list[tuple[Path, str]] = []  # written only once the descriptor validates
     for attachments in slots.values():
         if open_name not in attachments or closed_name not in attachments:
             continue
@@ -183,7 +184,7 @@ def add_half_lid(
             c_file.read_text(encoding="utf-8"),
             fraction=fraction,
         )
-        h_file.write_text(svg, encoding="utf-8")
+        pending.append((h_file, svg))
         digest = hashlib.sha256(svg.encode("utf-8")).hexdigest()
         half = {k: v for k, v in open_att.items() if k != "source"}
         half["path"] = h_path
@@ -198,5 +199,7 @@ def add_half_lid(
             f"{open_name!r} and the {closed_name!r} lid drawings"
         )
     raw["asset_sets"][_EYELID_SET] = {**eyelid, "HALF": HALF_ATTACHMENT}
-    save_raw(char_dir, raw)
-    return descriptor_path(char_dir)
+    desc = validate_raw(raw)  # the last thing that can fail: nothing is written yet
+    for file, svg in pending:
+        file.write_text(svg, encoding="utf-8")
+    return write_descriptor(char_dir, desc)

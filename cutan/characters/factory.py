@@ -1858,7 +1858,7 @@ def _factory_half_lid(char_dir: Path) -> None:
     recipe replay re-derives it like every other part (an#269, an#292)."""
     from cutan.characters.lids import HALF_ATTACHMENT
 
-    desc_path = _add_half_lid(char_dir)
+    _add_half_lid(char_dir)
     raw = read_raw(char_dir)
     for slot in (
         ((raw.get("skins") or {}).get("default") or {}).get("slots", {}).values()
