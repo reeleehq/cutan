@@ -318,6 +318,31 @@ def add_views(name: str, out_dir: str = "") -> str:
     return f"added the views to {desc.parent} (descriptor: {desc.name})"
 
 
+def add_forearms(name: str, out_dir: str = "", elbow_at: float = 0.5) -> str:
+    """Split ``name``'s arms at the elbow and give them hands (cutan#104): a
+    forearm and a hand on each side, with the bones `forearm_l/r` and `hand_l/r`
+    and `nesting: bones`, so a forearm follows its upper arm and a `pin` or
+    `pull` can drag a hand (`ned/hand_r@hand_r`) to a prop's grip. At rest the
+    arm looks as it did. Opt-in; a character made before keeps its one-piece
+    arms. Only an arm the factory drew is split. Idempotent. Run
+    `an character add-limits` afterwards for the elbow's range.
+
+    name: character id
+    out_dir: parent directory; defaults to ./assets/characters
+    elbow_at: where the elbow sits on the arm, 0.1 (at the shoulder) to 0.9
+    """
+    from cutan.characters.factory import add_forearms as _add_forearms
+
+    char_dir = _resolve_target(out_dir) / name
+    if not (char_dir / "character.json").is_file():
+        return f"no character at {char_dir}"
+    try:
+        desc = _add_forearms(char_dir, elbow_at=elbow_at)
+    except ValueError as e:
+        return str(e)
+    return f"split the arms of {desc.parent} (descriptor: {desc.name})"
+
+
 def add_limits(
     name: str, out_dir: str = "", style: str = "", overwrite: bool = False
 ) -> str:
@@ -758,6 +783,7 @@ _dispatch_funcs = [
     add_gaze,
     add_half_lid,
     add_views,
+    add_forearms,
     add_limits,
     feet_origin,
     validate,
