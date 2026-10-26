@@ -43,6 +43,7 @@ get fixed.
 |---|---|---|
 | `brow_height_l`, `brow_height_r` | [−1, 1] / 0 | `head/<brow>:y`, scaled by eye height |
 | `brow_angle_l`, `brow_angle_r` | [−1, 1] / 0 | `head/<brow>:rotation`; + inner end up (worry), − down (furrow). **The binding's per-side `gain` carries the sign** — the two sides rotate opposite ways on screen for one axis sign |
+| *(same brow axes)* | | on a rig that declares a `brow` swap set (`ANGRY` / `RAISED` / `NONE`, a carved face), the set is keyed per side by a second ladder (cutan#114): `ANGRY` when `brow_angle` < −0.25, else `RAISED` when `brow_height` > +0.25, else `NONE`; an authored `brow` channel wins; a rig without the set is unchanged |
 | `lid_open_l`, `lid_open_r` | [−1, 0.5] / 0 | the `eyelid` swap set, quantised by one ladder: `wide` > +0.25 · `open` · `half` < −0.35 · `closed` < −0.85 |
 | `gaze_x`, `gaze_y` | [−1, 1] / 0 | `head/<pupil>:x`/`:y`, scaled by the eye's declared travel and the summed (x, y) clamped to 0.95 of the unit circle (the sclera's inner ellipse — a per-axis box pokes the pupil out at the diagonal); **never reads a head axis** |
 | `mouth_form` | selection | which `viseme@<preset>` set the mouth's key indexes |

@@ -84,6 +84,18 @@ LID_KEY_HALF: str = "HALF"
 LID_KEY_CLOSED: str = "CLOSED"
 
 
+#: The brow ladder (cutan#114), for a rig that draws its brows as a swap set:
+#: a furrow (``brow_angle`` below the first) draws ``ANGRY``, else a raise
+#: (``brow_height`` above the second) draws ``RAISED``, else ``NONE``.
+BROW_FURROW_BELOW: float = -0.25
+BROW_RAISED_ABOVE: float = 0.25
+
+#: Brow set keys the ladder can name.
+BROW_KEY_ANGRY: str = "ANGRY"
+BROW_KEY_RAISED: str = "RAISED"
+BROW_KEY_NONE: str = "NONE"
+
+
 def clamp_axes(values: Mapping[str, float]) -> dict[str, float]:
     """Clamp every numeric axis to its range; an unknown axis is an error.
 
@@ -120,3 +132,26 @@ def lid_key(value: float, *, available: Collection[str]) -> str:
     if value < LID_HALF_BELOW and LID_KEY_HALF in keys:
         return LID_KEY_HALF
     return LID_KEY_OPEN
+
+
+def brow_key(height: float, angle: float, *, available: Collection[str]) -> str:
+    """The brow key one side's height and angle select, degraded to the art declared.
+
+    A furrow draws ``ANGRY``, else a raise ``RAISED``, else ``NONE`` — and a
+    state the set has no drawing for is ``NONE``, never a blend.
+
+    >>> brow_key(-0.6, -0.48, available={"ANGRY", "RAISED", "NONE"})
+    'ANGRY'
+    >>> brow_key(0.6, 0.0, available={"ANGRY", "RAISED", "NONE"})
+    'RAISED'
+    >>> brow_key(0.6, 0.0, available={"ANGRY", "NONE"})
+    'NONE'
+    >>> brow_key(0.1, -0.1, available={"ANGRY", "RAISED", "NONE"})
+    'NONE'
+    """
+    keys = {str(k).upper() for k in available}
+    if angle < BROW_FURROW_BELOW and BROW_KEY_ANGRY in keys:
+        return BROW_KEY_ANGRY
+    if height > BROW_RAISED_ABOVE and BROW_KEY_RAISED in keys:
+        return BROW_KEY_RAISED
+    return BROW_KEY_NONE
