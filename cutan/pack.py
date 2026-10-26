@@ -631,10 +631,12 @@ def _copy(src: Path, dst: Path) -> None:
 def _redrawn_problem(new: Path, factory: Path) -> str | None:
     """Why a redrawn part cannot replace the factory's (None when it can)."""
     if new.suffix in IMAGE_SIGNATURES:
-        return (
-            "a redrawn factory part must be an SVG for now (cutan#92); put the "
-            "picture under reference/ and describe it in PRODUCTION.md"
-        )
+        if not factory.with_suffix(".svg").exists():
+            return (
+                f"the factory made no {factory.with_suffix('.svg').name} for this "
+                "picture to replace (check the name in cast.sh and the file name)"
+            )
+        return None
     if not factory.exists():
         return (
             f"the factory made no {factory.name} for this character "
@@ -653,6 +655,19 @@ def _redrawn_problem(new: Path, factory: Path) -> str | None:
                 "keep the factory's root tag"
             )
     return None
+
+
+def _replace_with_picture(
+    report: PackReport, name: str, char_dir: Path, rel: Path, picture: Path
+) -> None:
+    """A redrawn part that is a picture takes the place of the factory's SVG of
+    the same name (``an character set-part``, cutan#92)."""
+    from cutan.characters.set_part import SetPartError, replace_part_art
+
+    try:
+        replace_part_art(char_dir, rel.with_suffix(".svg").as_posix(), picture)
+    except (SetPartError, OSError, ValueError) as e:
+        report.add(f"redrawn {name}/{rel.as_posix()}", False, f"  {ERROR_MARKER} {e}")
 
 
 def _subdirs(path: Path) -> list[Path]:
@@ -780,6 +795,8 @@ def _build_and_check(
                         False,
                         f"  {ERROR_MARKER} {problem}",
                     )
+                elif src.suffix in IMAGE_SIGNATURES:
+                    _replace_with_picture(report, d.name, chars / d.name, rel, src)
                 else:
                     _copy(src, chars / d.name / rel)
     if (project / "assets" / "voices").is_dir():

@@ -208,14 +208,24 @@ def test_a_pack_with_pictures_passes(tmp_path, monkeypatch):
     assert report.notes == []
 
 
-def test_a_redrawn_factory_part_cannot_be_a_picture_yet(tmp_path):
+def test_a_redrawn_factory_part_may_be_a_picture_named_like_the_factory_s_svg(tmp_path):
     from cutan.pack import _redrawn_problem
 
-    factory = tmp_path / "head.svg"
-    factory.write_text("<svg/>")
     picture = tmp_path / "head.png"
     _png(picture, (8, 8))
-    assert "cutan#92" in _redrawn_problem(picture, tmp_path / "head.png")
+    assert "no head.svg" in _redrawn_problem(picture, tmp_path / "head.png")
+    (tmp_path / "head.svg").write_text("<svg/>")
+    assert _redrawn_problem(picture, tmp_path / "head.png") is None
+
+
+def test_a_pack_with_a_painted_head_passes_and_the_head_is_the_picture(tmp_path, monkeypatch):
+    _with_this_checkout(monkeypatch)
+    pack = _example_copy(tmp_path)
+    head = pack / "assets" / "characters" / "mara" / "parts" / "head.png"
+    _png(head, (200, 200))
+    report = check_pack(pack)
+    assert report.ok, report.format()
+    assert not [c for c in report.checks if c.label.startswith("redrawn")]
 
 
 def test_a_picture_s_declared_pixels_are_capped(tmp_path):
