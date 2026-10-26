@@ -301,109 +301,124 @@
 </span><span id="line-112">            <span class="n">target</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"target"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
 </span><span id="line-113">            <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MOTION_KINDS</span> <span class="ow">or</span> <span class="n">target</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">entity_id</span><span class="p">:</span>
 </span><span id="line-114">                <span class="k">continue</span>
-</span><span id="line-115">            <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"tween"</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"property"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MOTION_PROPERTIES</span><span class="p">:</span>
-</span><span id="line-116">                <span class="k">continue</span>
-</span><span id="line-117">            <span class="k">return</span> <span class="kc">True</span>
-</span><span id="line-118">    <span class="k">return</span> <span class="kc">False</span>
-</span><span id="line-119">
-</span><span id="line-120">
+</span><span id="line-115">            <span class="k">if</span> <span class="p">(</span>
+</span><span id="line-116">                <span class="n">kind</span> <span class="o">==</span> <span class="s2">"tween"</span>
+</span><span id="line-117">                <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"property"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MOTION_PROPERTIES</span>
+</span><span id="line-118">            <span class="p">):</span>
+</span><span id="line-119">                <span class="k">continue</span>
+</span><span id="line-120">            <span class="k">return</span> <span class="kc">True</span>
+</span><span id="line-121">    <span class="k">return</span> <span class="kc">False</span>
+</span><span id="line-122">
+</span><span id="line-123">
 <div class="viewcode-block" id="why_not_followed">
 <a class="viewcode-back" href="../../../_autosummary/cutan.compile.body.html#cutan.compile.body.why_not_followed">[docs]</a>
-</span><span id="line-121"><span class="k">def</span><span class="w"> </span><span class="nf">why_not_followed</span><span class="p">(</span>
-</span><span id="line-122">    <span class="n">shot</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">mall</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">placed</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-123"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-124"><span class="w">    </span><span class="sd">"""Why a body-attached prop that moves with its character is NOT given pins</span>
-</span><span id="line-125"><span class="sd">    ('' when it is followed, or when there is nothing to follow). For ``an</span>
-</span><span id="line-126"><span class="sd">    validate``: the prop would be placed once and left behind by the motion."""</span>
-</span><span id="line-127">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.solve</span><span class="w"> </span><span class="kn">import</span> <span class="n">shot_declares_solve</span>
-</span><span id="line-128">
-</span><span id="line-129">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.body_attachment</span><span class="w"> </span><span class="kn">import</span> <span class="n">body_attachment_of</span><span class="p">,</span> <span class="n">bound_character</span><span class="p">,</span> <span class="n">derive_placement</span>
-</span><span id="line-130">
-</span><span id="line-131">    <span class="n">ba</span> <span class="o">=</span> <span class="n">body_attachment_of</span><span class="p">(</span><span class="n">mall</span><span class="p">[</span><span class="s2">"props"</span><span class="p">][</span><span class="n">prop_entity</span><span class="o">.</span><span class="n">ref</span><span class="p">])</span>
-</span><span id="line-132">    <span class="n">who</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bound_character</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">,</span> <span class="n">ba</span><span class="p">)</span>
-</span><span id="line-133">    <span class="k">if</span> <span class="n">ba</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">who</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ba</span><span class="o">.</span><span class="n">sockets</span><span class="p">:</span>
-</span><span id="line-134">        <span class="k">return</span> <span class="s2">""</span>
-</span><span id="line-135">    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">_moves</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">who</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="ow">or</span> <span class="n">shot_declares_solve</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">mall</span><span class="p">)):</span>
-</span><span id="line-136">        <span class="k">return</span> <span class="s2">""</span>
-</span><span id="line-137">    <span class="k">if</span> <span class="n">_moves</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">prop_entity</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
-</span><span id="line-138">        <span class="k">return</span> <span class="s2">"the prop has motion of its own, which wins"</span>
-</span><span id="line-139">    <span class="k">if</span> <span class="n">placed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-140">        <span class="n">placed</span><span class="p">,</span> <span class="n">why</span> <span class="o">=</span> <span class="n">derive_placement</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">,</span> <span class="n">mall</span><span class="p">)</span>
-</span><span id="line-141">        <span class="k">if</span> <span class="n">placed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-142">            <span class="k">return</span> <span class="n">why</span>
-</span><span id="line-143">    <span class="n">residual</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">placed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"residual_px"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
-</span><span id="line-144">    <span class="k">if</span> <span class="n">residual</span> <span class="o">&gt;</span> <span class="n">PIN_RESIDUAL_PX</span><span class="p">:</span>
-</span><span id="line-145">        <span class="k">return</span> <span class="p">(</span>
-</span><span id="line-146">            <span class="sa">f</span><span class="s2">"its sockets sit </span><span class="si">{</span><span class="n">residual</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> px from the bones they name even at the best "</span>
-</span><span id="line-147">            <span class="s2">"placement (the art's sockets do not match the body's proportions): "</span>
-</span><span id="line-148">            <span class="s2">"fix the declared `at` points"</span>
-</span><span id="line-149">        <span class="p">)</span>
-</span><span id="line-150">    <span class="k">return</span> <span class="s2">""</span></div>
+</span><span id="line-124"><span class="k">def</span><span class="w"> </span><span class="nf">why_not_followed</span><span class="p">(</span>
+</span><span id="line-125">    <span class="n">shot</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="line-126">    <span class="n">prop_entity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="line-127">    <span class="n">mall</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+</span><span id="line-128">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-129">    <span class="n">placed</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-130"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-131"><span class="w">    </span><span class="sd">"""Why a body-attached prop that moves with its character is NOT given pins</span>
+</span><span id="line-132"><span class="sd">    ('' when it is followed, or when there is nothing to follow). For ``an</span>
+</span><span id="line-133"><span class="sd">    validate``: the prop would be placed once and left behind by the motion."""</span>
+</span><span id="line-134">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.solve</span><span class="w"> </span><span class="kn">import</span> <span class="n">shot_declares_solve</span>
+</span><span id="line-135">
+</span><span id="line-136">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.body_attachment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-137">        <span class="n">body_attachment_of</span><span class="p">,</span>
+</span><span id="line-138">        <span class="n">bound_character</span><span class="p">,</span>
+</span><span id="line-139">        <span class="n">derive_placement</span><span class="p">,</span>
+</span><span id="line-140">    <span class="p">)</span>
+</span><span id="line-141">
+</span><span id="line-142">    <span class="n">ba</span> <span class="o">=</span> <span class="n">body_attachment_of</span><span class="p">(</span><span class="n">mall</span><span class="p">[</span><span class="s2">"props"</span><span class="p">][</span><span class="n">prop_entity</span><span class="o">.</span><span class="n">ref</span><span class="p">])</span>
+</span><span id="line-143">    <span class="n">who</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bound_character</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">,</span> <span class="n">ba</span><span class="p">)</span>
+</span><span id="line-144">    <span class="k">if</span> <span class="n">ba</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">who</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ba</span><span class="o">.</span><span class="n">sockets</span><span class="p">:</span>
+</span><span id="line-145">        <span class="k">return</span> <span class="s2">""</span>
+</span><span id="line-146">    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">_moves</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">who</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="ow">or</span> <span class="n">shot_declares_solve</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">mall</span><span class="p">)):</span>
+</span><span id="line-147">        <span class="k">return</span> <span class="s2">""</span>
+</span><span id="line-148">    <span class="k">if</span> <span class="n">_moves</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">prop_entity</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
+</span><span id="line-149">        <span class="k">return</span> <span class="s2">"the prop has motion of its own, which wins"</span>
+</span><span id="line-150">    <span class="k">if</span> <span class="n">placed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-151">        <span class="n">placed</span><span class="p">,</span> <span class="n">why</span> <span class="o">=</span> <span class="n">derive_placement</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">,</span> <span class="n">mall</span><span class="p">)</span>
+</span><span id="line-152">        <span class="k">if</span> <span class="n">placed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-153">            <span class="k">return</span> <span class="n">why</span>
+</span><span id="line-154">    <span class="n">residual</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">placed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"residual_px"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+</span><span id="line-155">    <span class="k">if</span> <span class="n">residual</span> <span class="o">&gt;</span> <span class="n">PIN_RESIDUAL_PX</span><span class="p">:</span>
+</span><span id="line-156">        <span class="k">return</span> <span class="p">(</span>
+</span><span id="line-157">            <span class="sa">f</span><span class="s2">"its sockets sit </span><span class="si">{</span><span class="n">residual</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> px from the bones they name even at the best "</span>
+</span><span id="line-158">            <span class="s2">"placement (the art's sockets do not match the body's proportions): "</span>
+</span><span id="line-159">            <span class="s2">"fix the declared `at` points"</span>
+</span><span id="line-160">        <span class="p">)</span>
+</span><span id="line-161">    <span class="k">return</span> <span class="s2">""</span></div>
 
-</span><span id="line-151">
-</span><span id="line-152">
+</span><span id="line-162">
+</span><span id="line-163">
 <div class="viewcode-block" id="body_attachment_pins">
 <a class="viewcode-back" href="../../../_autosummary/cutan.compile.body.html#cutan.compile.body.body_attachment_pins">[docs]</a>
-</span><span id="line-153"><span class="k">def</span><span class="w"> </span><span class="nf">body_attachment_pins</span><span class="p">(</span>
-</span><span id="line-154">    <span class="n">shot</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">mall</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">placed</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-155"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-</span><span id="line-156"><span class="w">    </span><span class="sd">"""The ``pin`` actions that keep a body-attached prop's sockets on its character's bones.</span>
-</span><span id="line-157">
-</span><span id="line-158"><span class="sd">    One per socket, from the socket's point on the prop's art</span>
-</span><span id="line-159"><span class="sd">    (``&lt;prop&gt;/&lt;slot&gt;@u,v``) to the bone, on the part of the character that sits</span>
-</span><span id="line-160"><span class="sd">    on it (``&lt;character&gt;/&lt;slot&gt;@&lt;bone&gt;``), for the whole shot. Empty unless the</span>
-</span><span id="line-161"><span class="sd">    character moves (:func:`_moves`, or the shot already solves: a joint, a</span>
-</span><span id="line-162"><span class="sd">    verb or a hold), the prop has no motion of its own, and every socket's bone</span>
-</span><span id="line-163"><span class="sd">    carries a part, and the derived placement leaves every socket within</span>
-</span><span id="line-164"><span class="sd">    :data:`PIN_RESIDUAL_PX` of its bone (``placed``: the derivation, else made</span>
-</span><span id="line-165"><span class="sd">    here). Never raises: a prop that cannot be followed is placed once, as it</span>
-</span><span id="line-166"><span class="sd">    always was (:func:`why_not_followed` says why, for ``an validate``).</span>
-</span><span id="line-167"><span class="sd">    """</span>
-</span><span id="line-168">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-169">        <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.joints</span><span class="w"> </span><span class="kn">import</span> <span class="n">PinAction</span>
-</span><span id="line-170">        <span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.solve</span><span class="w"> </span><span class="kn">import</span> <span class="n">shot_declares_solve</span>
-</span><span id="line-171">
-</span><span id="line-172">        <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.body_attachment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-</span><span id="line-173">            <span class="n">body_attachment_of</span><span class="p">,</span>
-</span><span id="line-174">            <span class="n">bound_character</span><span class="p">,</span>
-</span><span id="line-175">            <span class="n">character_model</span><span class="p">,</span>
-</span><span id="line-176">            <span class="n">prop_model</span><span class="p">,</span>
-</span><span id="line-177">        <span class="p">)</span>
-</span><span id="line-178">
-</span><span id="line-179">        <span class="n">raw</span> <span class="o">=</span> <span class="n">mall</span><span class="p">[</span><span class="s2">"props"</span><span class="p">][</span><span class="n">prop_entity</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span>
-</span><span id="line-180">        <span class="n">ba</span> <span class="o">=</span> <span class="n">body_attachment_of</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
-</span><span id="line-181">        <span class="n">who</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bound_character</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">,</span> <span class="n">ba</span><span class="p">)</span>
-</span><span id="line-182">        <span class="k">if</span> <span class="n">ba</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">who</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ba</span><span class="o">.</span><span class="n">sockets</span><span class="p">:</span>
-</span><span id="line-183">            <span class="k">return</span> <span class="p">[]</span>
-</span><span id="line-184">        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">_moves</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">who</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="ow">or</span> <span class="n">shot_declares_solve</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">mall</span><span class="p">)):</span>
-</span><span id="line-185">            <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># nothing to follow</span>
-</span><span id="line-186">        <span class="k">if</span> <span class="n">why_not_followed</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">,</span> <span class="n">mall</span><span class="p">,</span> <span class="n">placed</span><span class="o">=</span><span class="n">placed</span><span class="p">):</span>
-</span><span id="line-187">            <span class="k">return</span> <span class="p">[]</span>
-</span><span id="line-188">        <span class="n">prop</span><span class="p">,</span> <span class="n">char</span> <span class="o">=</span> <span class="n">prop_model</span><span class="p">(</span><span class="n">raw</span><span class="p">),</span> <span class="n">character_model</span><span class="p">(</span><span class="n">mall</span><span class="p">[</span><span class="s2">"characters"</span><span class="p">][</span><span class="n">who</span><span class="o">.</span><span class="n">ref</span><span class="p">])</span>
-</span><span id="line-189">        <span class="n">first</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">slots</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">draw_order</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="line-190">        <span class="n">by_draw</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">char</span><span class="o">.</span><span class="n">slots</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">draw_order</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-</span><span id="line-191">        <span class="n">pins</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-192">        <span class="k">for</span> <span class="n">socket</span> <span class="ow">in</span> <span class="n">ba</span><span class="o">.</span><span class="n">sockets</span><span class="p">:</span>
-</span><span id="line-193">            <span class="n">on_bone</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">by_draw</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">bone</span> <span class="o">==</span> <span class="n">socket</span><span class="o">.</span><span class="n">bone</span><span class="p">]</span>
-</span><span id="line-194">            <span class="k">if</span> <span class="ow">not</span> <span class="n">on_bone</span><span class="p">:</span>
-</span><span id="line-195">                <span class="k">return</span> <span class="p">[]</span>
-</span><span id="line-196">            <span class="n">carrier</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">bone</span> <span class="k">if</span> <span class="n">socket</span><span class="o">.</span><span class="n">bone</span> <span class="ow">in</span> <span class="n">on_bone</span> <span class="k">else</span> <span class="n">on_bone</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="line-197">            <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">at</span>
-</span><span id="line-198">            <span class="n">pins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-199">                <span class="n">PinAction</span><span class="p">(</span>
-</span><span id="line-200">                    <span class="n">point</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prop_entity</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">socket</span><span class="o">.</span><span class="n">slot</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">first</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="si">!r}</span><span class="s2">,</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-201">                    <span class="n">to</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">carrier</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">socket</span><span class="o">.</span><span class="n">bone</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-202">                <span class="p">)</span>
-</span><span id="line-203">            <span class="p">)</span>
-</span><span id="line-204">        <span class="k">return</span> <span class="n">pins</span>
-</span><span id="line-205">    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - not followable; the placement stands</span>
-</span><span id="line-206">        <span class="k">return</span> <span class="p">[]</span></div>
+</span><span id="line-164"><span class="k">def</span><span class="w"> </span><span class="nf">body_attachment_pins</span><span class="p">(</span>
+</span><span id="line-165">    <span class="n">shot</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="line-166">    <span class="n">prop_entity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="line-167">    <span class="n">mall</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+</span><span id="line-168">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-169">    <span class="n">placed</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-170"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+</span><span id="line-171"><span class="w">    </span><span class="sd">"""The ``pin`` actions that keep a body-attached prop's sockets on its character's bones.</span>
+</span><span id="line-172">
+</span><span id="line-173"><span class="sd">    One per socket, from the socket's point on the prop's art</span>
+</span><span id="line-174"><span class="sd">    (``&lt;prop&gt;/&lt;slot&gt;@u,v``) to the bone, on the part of the character that sits</span>
+</span><span id="line-175"><span class="sd">    on it (``&lt;character&gt;/&lt;slot&gt;@&lt;bone&gt;``), for the whole shot. Empty unless the</span>
+</span><span id="line-176"><span class="sd">    character moves (:func:`_moves`, or the shot already solves: a joint, a</span>
+</span><span id="line-177"><span class="sd">    verb or a hold), the prop has no motion of its own, and every socket's bone</span>
+</span><span id="line-178"><span class="sd">    carries a part, and the derived placement leaves every socket within</span>
+</span><span id="line-179"><span class="sd">    :data:`PIN_RESIDUAL_PX` of its bone (``placed``: the derivation, else made</span>
+</span><span id="line-180"><span class="sd">    here). Never raises: a prop that cannot be followed is placed once, as it</span>
+</span><span id="line-181"><span class="sd">    always was (:func:`why_not_followed` says why, for ``an validate``).</span>
+</span><span id="line-182"><span class="sd">    """</span>
+</span><span id="line-183">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-184">        <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.joints</span><span class="w"> </span><span class="kn">import</span> <span class="n">PinAction</span>
+</span><span id="line-185">        <span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.solve</span><span class="w"> </span><span class="kn">import</span> <span class="n">shot_declares_solve</span>
+</span><span id="line-186">
+</span><span id="line-187">        <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.body_attachment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-188">            <span class="n">body_attachment_of</span><span class="p">,</span>
+</span><span id="line-189">            <span class="n">bound_character</span><span class="p">,</span>
+</span><span id="line-190">            <span class="n">character_model</span><span class="p">,</span>
+</span><span id="line-191">            <span class="n">prop_model</span><span class="p">,</span>
+</span><span id="line-192">        <span class="p">)</span>
+</span><span id="line-193">
+</span><span id="line-194">        <span class="n">raw</span> <span class="o">=</span> <span class="n">mall</span><span class="p">[</span><span class="s2">"props"</span><span class="p">][</span><span class="n">prop_entity</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span>
+</span><span id="line-195">        <span class="n">ba</span> <span class="o">=</span> <span class="n">body_attachment_of</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+</span><span id="line-196">        <span class="n">who</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bound_character</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">,</span> <span class="n">ba</span><span class="p">)</span>
+</span><span id="line-197">        <span class="k">if</span> <span class="n">ba</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">who</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ba</span><span class="o">.</span><span class="n">sockets</span><span class="p">:</span>
+</span><span id="line-198">            <span class="k">return</span> <span class="p">[]</span>
+</span><span id="line-199">        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">_moves</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">who</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="ow">or</span> <span class="n">shot_declares_solve</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">mall</span><span class="p">)):</span>
+</span><span id="line-200">            <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># nothing to follow</span>
+</span><span id="line-201">        <span class="k">if</span> <span class="n">why_not_followed</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">,</span> <span class="n">mall</span><span class="p">,</span> <span class="n">placed</span><span class="o">=</span><span class="n">placed</span><span class="p">):</span>
+</span><span id="line-202">            <span class="k">return</span> <span class="p">[]</span>
+</span><span id="line-203">        <span class="n">prop</span><span class="p">,</span> <span class="n">char</span> <span class="o">=</span> <span class="n">prop_model</span><span class="p">(</span><span class="n">raw</span><span class="p">),</span> <span class="n">character_model</span><span class="p">(</span><span class="n">mall</span><span class="p">[</span><span class="s2">"characters"</span><span class="p">][</span><span class="n">who</span><span class="o">.</span><span class="n">ref</span><span class="p">])</span>
+</span><span id="line-204">        <span class="n">first</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">slots</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">draw_order</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="line-205">        <span class="n">by_draw</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">char</span><span class="o">.</span><span class="n">slots</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">draw_order</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+</span><span id="line-206">        <span class="n">pins</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-207">        <span class="k">for</span> <span class="n">socket</span> <span class="ow">in</span> <span class="n">ba</span><span class="o">.</span><span class="n">sockets</span><span class="p">:</span>
+</span><span id="line-208">            <span class="n">on_bone</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">by_draw</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">bone</span> <span class="o">==</span> <span class="n">socket</span><span class="o">.</span><span class="n">bone</span><span class="p">]</span>
+</span><span id="line-209">            <span class="k">if</span> <span class="ow">not</span> <span class="n">on_bone</span><span class="p">:</span>
+</span><span id="line-210">                <span class="k">return</span> <span class="p">[]</span>
+</span><span id="line-211">            <span class="n">carrier</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">bone</span> <span class="k">if</span> <span class="n">socket</span><span class="o">.</span><span class="n">bone</span> <span class="ow">in</span> <span class="n">on_bone</span> <span class="k">else</span> <span class="n">on_bone</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="line-212">            <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">at</span>
+</span><span id="line-213">            <span class="n">pins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-214">                <span class="n">PinAction</span><span class="p">(</span>
+</span><span id="line-215">                    <span class="n">point</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prop_entity</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">socket</span><span class="o">.</span><span class="n">slot</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">first</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="si">!r}</span><span class="s2">,</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-216">                    <span class="n">to</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">who</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">carrier</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">socket</span><span class="o">.</span><span class="n">bone</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-217">                <span class="p">)</span>
+</span><span id="line-218">            <span class="p">)</span>
+</span><span id="line-219">        <span class="k">return</span> <span class="n">pins</span>
+</span><span id="line-220">    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - not followable; the placement stands</span>
+</span><span id="line-221">        <span class="k">return</span> <span class="p">[]</span></div>
 
-</span><span id="line-207">
-</span><span id="line-208">
-</span><span id="line-209"><span class="k">def</span><span class="w"> </span><span class="nf">_body_placement_pass</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-210"><span class="w">    </span><span class="sd">"""Cut-out: body-attached props placed by their body, before the scene is built."""</span>
-</span><span id="line-211">    <span class="n">state</span><span class="o">.</span><span class="n">shot</span> <span class="o">=</span> <span class="n">derive_body_placements</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">mall</span><span class="p">)</span>
+</span><span id="line-222">
+</span><span id="line-223">
+</span><span id="line-224"><span class="k">def</span><span class="w"> </span><span class="nf">_body_placement_pass</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-225"><span class="w">    </span><span class="sd">"""Cut-out: body-attached props placed by their body, before the scene is built."""</span>
+</span><span id="line-226">    <span class="n">state</span><span class="o">.</span><span class="n">shot</span> <span class="o">=</span> <span class="n">derive_body_placements</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">mall</span><span class="p">)</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -417,7 +432,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=6eb1e6b8"></script>
+    <script src="../../../_static/documentation_options.js?v=cac962a1"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

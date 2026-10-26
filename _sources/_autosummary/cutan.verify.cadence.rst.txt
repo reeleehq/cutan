@@ -1,0 +1,14 @@
+cutan.verify.cadence
+====================
+
+.. automodule:: cutan.verify.cadence
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      check_cadence
+      cadence_faults
+      spec_for_pack
+   

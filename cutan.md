@@ -1,4 +1,4 @@
-> built 2026-10-26 06:07 UTC from 2859f1f (main) · cutan 0.0.68. Details: build_info.json
+> built 2026-10-26 06:14 UTC from 7c8e4c8 (main) · cutan 0.0.69. Details: build_info.json
 
 # index.html.md
 
@@ -733,7 +733,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'mouth', 'rect', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'eye', 'rect', 'mouth'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -13819,6 +13819,70 @@ tolerances.
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
 
 
+# _autosummary/cutan.verify.cadence.html.md
+
+# cutan.verify.cadence
+
+Pre-render cadence lint: the scene’s timing against its style spec (catalogue B6, an#519 rank 5).
+
+The styles were measured on timing (`cutan.verify.style` measures a render); the
+spec’s `live` block already declares what the IR should say: `tween_duration_s`,
+`easing` and `meta.step_hz`. `an validate` reads those from the style spec the
+scene’s style pack was copied from (or the pack’s own name, when it is a shipped
+style) and warns, before any render, on:
+
+- `duration`: tweens lasting outside `tween_duration_s` (a South Park scene that
+  glides, an OverSimplified scene of snaps);
+- `easing`: tweens whose resolved easing is not in the spec’s `easing` list;
+- `step_hz`: a scene whose `meta.step_hz` is not the style’s (a stepped style on
+  ones, or a smooth one stepped).
+
+Silent when the scene names no style, the name is not a shipped spec, or the spec
+declares none of these. One finding per shot and kind, with a count and the first
+offender. The hold-gap half of catalogue B6 (no changes closer than a minimum hold)
+needs a per-style hold declaration the specs do not carry yet: not built.
+[`cadence_faults()`](_autosummary/cutan.verify.cadence.html.md#cutan.verify.cadence.cadence_faults) is the pure function under the check.
+
+### Functions
+
+| [`check_cadence`](_autosummary/cutan.verify.cadence.html.md#cutan.verify.cadence.check_cadence)(ctx)           | The genre's `cutout.cadence` check, once per scene (catalogue B6, pre-render tier).                |
+|-------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| [`cadence_faults`](_autosummary/cutan.verify.cadence.html.md#cutan.verify.cadence.cadence_faults)(tweens, live) | `{fault: [what, ...]}` for `tweens` (`(label, duration_s, easing)`) against a spec's `live` block. |
+| [`spec_for_pack`](_autosummary/cutan.verify.cadence.html.md#cutan.verify.cadence.spec_for_pack)(ctx)           | The shipped style spec the scene's style pack comes from, or `None`.                               |
+
+### cutan.verify.cadence.cadence_faults(tweens, live)
+
+`{fault: [what, ...]}` for `tweens` (`(label, duration_s, easing)`) against a spec’s `live` block.
+
+```pycon
+>>> live = {"tween_duration_s": [0.12, 0.25], "easing": ["linear", "step"]}
+>>> cadence_faults([("a.x", 0.2, "linear"), ("b.x", 1.0, "ease_in")], live)
+{'duration': ['b.x lasts 1 s'], 'easing': ['b.x eases with ease_in']}
+>>> cadence_faults([("a.x", 0.2, "step")], live)
+{}
+```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
+
+### cutan.verify.cadence.check_cadence(ctx)
+
+The genre’s `cutout.cadence` check, once per scene (catalogue B6, pre-render tier).
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.verify.cadence.spec_for_pack(ctx)
+
+The shipped style spec the scene’s style pack comes from, or `None`.
+
+The pack’s recorded origin (`metadata.style_spec.name`) wins; else the pack
+name when it is itself a shipped style.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+
 # _autosummary/cutan.verify.html.md
 
 # cutan.verify
@@ -13827,9 +13891,10 @@ The cut-out style lint: measures a render against a named style spec.
 
 ### Modules
 
-| [`body`](_autosummary/cutan.verify.body.html.md#module-cutan.verify.body)   | Body continuity: a prop that depicts a character's limbs must meet that character's body.            |
-|----------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| [`style`](_autosummary/cutan.verify.style.html.md#module-cutan.verify.style) | Style lint: measure a render's cadence, cut rate and palette, and compare them to a style's targets. |
+| [`body`](_autosummary/cutan.verify.body.html.md#module-cutan.verify.body)       | Body continuity: a prop that depicts a character's limbs must meet that character's body.            |
+|--------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| [`cadence`](_autosummary/cutan.verify.cadence.html.md#module-cutan.verify.cadence) | Pre-render cadence lint: the scene's timing against its style spec (catalogue B6, an#519 rank 5).    |
+| [`style`](_autosummary/cutan.verify.style.html.md#module-cutan.verify.style)     | Style lint: measure a render's cadence, cut rate and palette, and compare them to a style's targets. |
 
 
 # _autosummary/cutan.verify.style.html.md
@@ -14153,18 +14218,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-26 06:07 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/2859f1fa1cd0aa1510797e6042988bc18d8fbce0"><code>2859f1f</code></a> on branch <code>main</code>, for **cutan 0.0.68** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 06:14 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/7c8e4c8bc900c48cb6c81325915d0b41692cc245"><code>7c8e4c8</code></a> on branch <code>main</code>, for **cutan 0.0.69** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.68) is behind the latest release on PyPI (0.0.69): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.69) is behind the latest release on PyPI (0.0.70): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/2859f1fa1cd0aa1510797e6042988bc18d8fbce0"><code>2859f1fa1cd0aa1510797e6042988bc18d8fbce0</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/7c8e4c8bc900c48cb6c81325915d0b41692cc245"><code>7c8e4c8bc900c48cb6c81325915d0b41692cc245</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -14175,9 +14240,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/40277462512">40277462512</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/40278191970">40278191970</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>2859f1fa1cd0aa1510797e6042988bc18d8fbce0</code> (in the history of the built commit) |
+| Event commit | <code>7c8e4c8bc900c48cb6c81325915d0b41692cc245</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -14202,13 +14267,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.69/">0.0.69</a>, newer than the documented version (0.0.68).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.70/">0.0.70</a>, newer than the documented version (0.0.69).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 2859f1fa1cd0aa1510797e6042988bc18d8fbce0
+git checkout 7c8e4c8bc900c48cb6c81325915d0b41692cc245
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -82,9 +82,10 @@
 - [cutan.styles.policy](_autosummary/cutan.styles.policy.html.md): A style’s policy: per-aspect method orders the compiler applies (ADR 0002 decision 4, cutan#9).
 - [cutan.verify](_autosummary/cutan.verify.html.md): The cut-out style lint: measures a render against a named style spec.
 - [cutan.verify.body](_autosummary/cutan.verify.body.html.md): Body continuity: a prop that depicts a character’s limbs must meet that character’s body.
+- [cutan.verify.cadence](_autosummary/cutan.verify.cadence.html.md): Pre-render cadence lint: the scene’s timing against its style spec (catalogue B6, an#519 rank 5).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 06:07 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 06:14 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

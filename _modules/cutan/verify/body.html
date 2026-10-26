@@ -664,76 +664,78 @@
 </span><span id="line-469">    <span class="n">mall</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">stores</span>
 </span><span id="line-470">    <span class="n">declaring</span> <span class="o">=</span> <span class="kc">False</span>
 </span><span id="line-471">    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">entity</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="o">.</span><span class="n">entities</span><span class="p">):</span>
-</span><span id="line-472">        <span class="k">if</span> <span class="n">entity</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s2">"prop"</span> <span class="ow">or</span> <span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">stage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">entity</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">at</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="line-473">            <span class="k">continue</span>
-</span><span id="line-474">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-475">            <span class="n">raw</span> <span class="o">=</span> <span class="n">mall</span><span class="p">[</span><span class="s2">"props"</span><span class="p">][</span><span class="n">entity</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span>
-</span><span id="line-476">            <span class="k">if</span> <span class="n">body_attachment_of</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-477">                <span class="k">continue</span>
-</span><span id="line-478">            <span class="n">declaring</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="line-479">            <span class="n">why</span> <span class="o">=</span> <span class="n">why_not_followed</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span> <span class="n">entity</span><span class="p">,</span> <span class="n">mall</span><span class="p">)</span>
-</span><span id="line-480">        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - the per-shot check reports a broken declaration</span>
-</span><span id="line-481">            <span class="k">continue</span>
-</span><span id="line-482">        <span class="k">if</span> <span class="n">why</span><span class="p">:</span>
-</span><span id="line-483">            <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-</span><span id="line-484">                <span class="s2">"info"</span> <span class="k">if</span> <span class="s2">"own"</span> <span class="ow">in</span> <span class="n">why</span> <span class="k">else</span> <span class="s2">"warning"</span><span class="p">,</span>
-</span><span id="line-485">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ctx</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">/entities/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-486">                <span class="sa">f</span><span class="s2">"prop </span><span class="si">{</span><span class="n">entity</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> is placed by its body but not followed through the shot: </span><span class="si">{</span><span class="n">why</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-487">            <span class="p">)</span>
-</span><span id="line-488">    <span class="k">if</span> <span class="ow">not</span> <span class="n">declaring</span><span class="p">:</span>
-</span><span id="line-489">        <span class="k">return</span>
-</span><span id="line-490">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.verify.constraints</span><span class="w"> </span><span class="kn">import</span> <span class="n">compiled_shot</span>
-</span><span id="line-491">
-</span><span id="line-492">    <span class="n">doc</span> <span class="o">=</span> <span class="n">compiled_shot</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
-</span><span id="line-493">    <span class="n">report</span> <span class="o">=</span> <span class="p">((</span><span class="n">doc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">extensions</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"solve"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span> <span class="k">if</span> <span class="n">doc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
-</span><span id="line-494">    <span class="n">joints</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"joints"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
-</span><span id="line-495">    <span class="n">authored</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="o">.</span><span class="n">actions</span><span class="p">)</span>
-</span><span id="line-496">    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dropped"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]:</span>
-</span><span id="line-497">        <span class="n">row</span> <span class="o">=</span> <span class="n">joints</span><span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="s2">"joint"</span><span class="p">]]</span> <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s2">"joint"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">joints</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
-</span><span id="line-498">        <span class="n">where</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"where"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
-</span><span id="line-499">        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"pin"</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">where</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"actions/"</span><span class="p">):</span>
-</span><span id="line-500">            <span class="k">continue</span>
-</span><span id="line-501">        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">where</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">authored</span><span class="p">:</span>
-</span><span id="line-502">            <span class="k">continue</span>  <span class="c1"># an authored pin: unreachable_pin reports it</span>
-</span><span id="line-503">        <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-</span><span id="line-504">            <span class="s2">"warning"</span><span class="p">,</span>
-</span><span id="line-505">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ctx</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-506">            <span class="sa">f</span><span class="s2">"a body-attached prop's socket (</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'bodies'</span><span class="p">)</span><span class="si">}</span><span class="s2">) cannot stay on its bone from "</span>
-</span><span id="line-507">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'from'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> s to </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'until'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> s (it stays </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'gap'</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> px off): "</span>
-</span><span id="line-508">            <span class="s2">"the character's motion carries the bone out of the prop's reach. Move less, or "</span>
-</span><span id="line-509">            <span class="s2">"tween the prop yourself (a prop with motion of its own is not followed)."</span><span class="p">,</span>
-</span><span id="line-510">        <span class="p">)</span>
-</span><span id="line-511">
-</span><span id="line-512">
+</span><span id="line-472">        <span class="k">if</span> <span class="n">entity</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s2">"prop"</span> <span class="ow">or</span> <span class="p">(</span>
+</span><span id="line-473">            <span class="n">entity</span><span class="o">.</span><span class="n">stage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">entity</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">at</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="line-474">        <span class="p">):</span>
+</span><span id="line-475">            <span class="k">continue</span>
+</span><span id="line-476">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-477">            <span class="n">raw</span> <span class="o">=</span> <span class="n">mall</span><span class="p">[</span><span class="s2">"props"</span><span class="p">][</span><span class="n">entity</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span>
+</span><span id="line-478">            <span class="k">if</span> <span class="n">body_attachment_of</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-479">                <span class="k">continue</span>
+</span><span id="line-480">            <span class="n">declaring</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="line-481">            <span class="n">why</span> <span class="o">=</span> <span class="n">why_not_followed</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span> <span class="n">entity</span><span class="p">,</span> <span class="n">mall</span><span class="p">)</span>
+</span><span id="line-482">        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - the per-shot check reports a broken declaration</span>
+</span><span id="line-483">            <span class="k">continue</span>
+</span><span id="line-484">        <span class="k">if</span> <span class="n">why</span><span class="p">:</span>
+</span><span id="line-485">            <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+</span><span id="line-486">                <span class="s2">"info"</span> <span class="k">if</span> <span class="s2">"own"</span> <span class="ow">in</span> <span class="n">why</span> <span class="k">else</span> <span class="s2">"warning"</span><span class="p">,</span>
+</span><span id="line-487">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ctx</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">/entities/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-488">                <span class="sa">f</span><span class="s2">"prop </span><span class="si">{</span><span class="n">entity</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> is placed by its body but not followed through the shot: </span><span class="si">{</span><span class="n">why</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-489">            <span class="p">)</span>
+</span><span id="line-490">    <span class="k">if</span> <span class="ow">not</span> <span class="n">declaring</span><span class="p">:</span>
+</span><span id="line-491">        <span class="k">return</span>
+</span><span id="line-492">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.verify.constraints</span><span class="w"> </span><span class="kn">import</span> <span class="n">compiled_shot</span>
+</span><span id="line-493">
+</span><span id="line-494">    <span class="n">doc</span> <span class="o">=</span> <span class="n">compiled_shot</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
+</span><span id="line-495">    <span class="n">report</span> <span class="o">=</span> <span class="p">((</span><span class="n">doc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">extensions</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"solve"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span> <span class="k">if</span> <span class="n">doc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
+</span><span id="line-496">    <span class="n">joints</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"joints"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+</span><span id="line-497">    <span class="n">authored</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="o">.</span><span class="n">actions</span><span class="p">)</span>
+</span><span id="line-498">    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dropped"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]:</span>
+</span><span id="line-499">        <span class="n">row</span> <span class="o">=</span> <span class="n">joints</span><span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="s2">"joint"</span><span class="p">]]</span> <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s2">"joint"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">joints</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
+</span><span id="line-500">        <span class="n">where</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"where"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
+</span><span id="line-501">        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"pin"</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">where</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"actions/"</span><span class="p">):</span>
+</span><span id="line-502">            <span class="k">continue</span>
+</span><span id="line-503">        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">where</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">authored</span><span class="p">:</span>
+</span><span id="line-504">            <span class="k">continue</span>  <span class="c1"># an authored pin: unreachable_pin reports it</span>
+</span><span id="line-505">        <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+</span><span id="line-506">            <span class="s2">"warning"</span><span class="p">,</span>
+</span><span id="line-507">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ctx</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-508">            <span class="sa">f</span><span class="s2">"a body-attached prop's socket (</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'bodies'</span><span class="p">)</span><span class="si">}</span><span class="s2">) cannot stay on its bone from "</span>
+</span><span id="line-509">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'from'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> s to </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'until'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> s (it stays </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'gap'</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> px off): "</span>
+</span><span id="line-510">            <span class="s2">"the character's motion carries the bone out of the prop's reach. Move less, or "</span>
+</span><span id="line-511">            <span class="s2">"tween the prop yourself (a prop with motion of its own is not followed)."</span><span class="p">,</span>
+</span><span id="line-512">        <span class="p">)</span>
+</span><span id="line-513">
+</span><span id="line-514">
 <div class="viewcode-block" id="check_body_attachment_consistency">
 <a class="viewcode-back" href="../../../_autosummary/cutan.verify.body.html#cutan.verify.body.check_body_attachment_consistency">[docs]</a>
-</span><span id="line-513"><span class="k">def</span><span class="w"> </span><span class="nf">check_body_attachment_consistency</span><span class="p">(</span><span class="n">ctx</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-514"><span class="w">    </span><span class="sd">"""The cut-out genre's cross-shot body-continuity check (:func:`consistency_findings`).</span>
-</span><span id="line-515">
-</span><span id="line-516"><span class="sd">    It reads the measurements ``cutout.body_attachment`` leaves in the</span>
-</span><span id="line-517"><span class="sd">    validation's memo, so the two must be selected together (``only=``)."""</span>
-</span><span id="line-518">    <span class="k">for</span> <span class="n">severity</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">consistency_findings</span><span class="p">(</span>
-</span><span id="line-519">        <span class="n">ctx</span><span class="o">.</span><span class="n">memo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RECORDS_KEY</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
-</span><span id="line-520">    <span class="p">):</span>
-</span><span id="line-521">        <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">severity</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div>
+</span><span id="line-515"><span class="k">def</span><span class="w"> </span><span class="nf">check_body_attachment_consistency</span><span class="p">(</span><span class="n">ctx</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-516"><span class="w">    </span><span class="sd">"""The cut-out genre's cross-shot body-continuity check (:func:`consistency_findings`).</span>
+</span><span id="line-517">
+</span><span id="line-518"><span class="sd">    It reads the measurements ``cutout.body_attachment`` leaves in the</span>
+</span><span id="line-519"><span class="sd">    validation's memo, so the two must be selected together (``only=``)."""</span>
+</span><span id="line-520">    <span class="k">for</span> <span class="n">severity</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">consistency_findings</span><span class="p">(</span>
+</span><span id="line-521">        <span class="n">ctx</span><span class="o">.</span><span class="n">memo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RECORDS_KEY</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+</span><span id="line-522">    <span class="p">):</span>
+</span><span id="line-523">        <span class="n">ctx</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">severity</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div>
 
-</span><span id="line-522">
-</span><span id="line-523">
-</span><span id="line-524"><span class="c1">#: The cross-shot check as a constraint on the shared interface (cutan#104,</span>
-</span><span id="line-525"><span class="c1">#: an#508): size conservation of a body-attached prop against its character.</span>
-</span><span id="line-526"><span class="c1">#: Lint-only (no solver term): the placement is derived from the character in</span>
-</span><span id="line-527"><span class="c1">#: every shot, so a drift can only come from a hand placement. The persisted</span>
-</span><span id="line-528"><span class="c1">#: name is the check's, unchanged.</span>
-</span><span id="line-529"><span class="n">BODY_ATTACHMENT_CONSISTENCY</span> <span class="o">=</span> <span class="n">Constraint</span><span class="p">(</span>
-</span><span id="line-530">    <span class="s2">"cutout.body_attachment_consistency"</span><span class="p">,</span>
-</span><span id="line-531">    <span class="n">check_body_attachment_consistency</span><span class="p">,</span>
-</span><span id="line-532">    <span class="n">stage</span><span class="o">=</span><span class="s2">"finish"</span><span class="p">,</span>
-</span><span id="line-533">    <span class="n">order</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span>
-</span><span id="line-534">    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-535">        <span class="s2">"a body-attached prop keeps its size and place relative to its "</span>
-</span><span id="line-536">        <span class="s2">"character across shots"</span>
-</span><span id="line-537">    <span class="p">),</span>
-</span><span id="line-538"><span class="p">)</span>
+</span><span id="line-524">
+</span><span id="line-525">
+</span><span id="line-526"><span class="c1">#: The cross-shot check as a constraint on the shared interface (cutan#104,</span>
+</span><span id="line-527"><span class="c1">#: an#508): size conservation of a body-attached prop against its character.</span>
+</span><span id="line-528"><span class="c1">#: Lint-only (no solver term): the placement is derived from the character in</span>
+</span><span id="line-529"><span class="c1">#: every shot, so a drift can only come from a hand placement. The persisted</span>
+</span><span id="line-530"><span class="c1">#: name is the check's, unchanged.</span>
+</span><span id="line-531"><span class="n">BODY_ATTACHMENT_CONSISTENCY</span> <span class="o">=</span> <span class="n">Constraint</span><span class="p">(</span>
+</span><span id="line-532">    <span class="s2">"cutout.body_attachment_consistency"</span><span class="p">,</span>
+</span><span id="line-533">    <span class="n">check_body_attachment_consistency</span><span class="p">,</span>
+</span><span id="line-534">    <span class="n">stage</span><span class="o">=</span><span class="s2">"finish"</span><span class="p">,</span>
+</span><span id="line-535">    <span class="n">order</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span>
+</span><span id="line-536">    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-537">        <span class="s2">"a body-attached prop keeps its size and place relative to its "</span>
+</span><span id="line-538">        <span class="s2">"character across shots"</span>
+</span><span id="line-539">    <span class="p">),</span>
+</span><span id="line-540"><span class="p">)</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -747,7 +749,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=6eb1e6b8"></script>
+    <script src="../../../_static/documentation_options.js?v=cac962a1"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

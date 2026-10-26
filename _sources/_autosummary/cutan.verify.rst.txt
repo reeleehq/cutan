@@ -11,4 +11,5 @@ cutan.verify
    :recursive:
 
    body
+   cadence
    style
