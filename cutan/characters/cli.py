@@ -338,8 +338,9 @@ def from_sheet(name: str, sheet: str, recipe: str, out_dir: str = "") -> str:
 
     name: character id (a factory character: ``an character new``)
     sheet: the reference sheet picture
-    recipe: a JSON file (``cutan.carve.sheet.load_recipe``) ``{"source": {"url": ..., "license": ...} | null, "ours": false,
-        "parts": [{"attachment": "head", "crop": [x0, y0, x1, y1], "carve": {"matte": ..., "point": [x, y]}}]}``;
+    recipe: a JSON file (``cutan.carve.sheet.load_recipe``) ``{"source": {"url": ..., "license": ...} | null, "ours": false, "unit": null,
+        "parts": [{"attachment": "head", "crop": [x0, y0, x1, y1], "carve": {"matte": ..., "point": [x, y]}, "split": {"arm": {"mask": [[x, y], ...], "pivot": [x, y]}}}]}``;
+        ``unit`` is view-box units per sheet pixel (parts keep their relative scale); ``split`` lifts moving parts off the carving;
         ``source`` is ``frame_source``'s arguments; a sheet with neither a source nor ``"ours": true`` is refused
     out_dir: parent directory; defaults to ./assets/characters
     """
@@ -351,10 +352,8 @@ def from_sheet(name: str, sheet: str, recipe: str, out_dir: str = "") -> str:
     if not (char_dir / "character.json").is_file():
         return f"no character at {char_dir}"
     try:
-        parts, source, ours = load_recipe(
-            json.loads(Path(recipe).read_text(encoding="utf-8"))
-        )
-        report = sheet_to_package(sheet, parts, char_dir, source=source, ours=ours)
+        loaded = load_recipe(json.loads(Path(recipe).read_text(encoding="utf-8")))
+        report = sheet_to_package(sheet, char_dir=char_dir, **loaded._asdict())
     except (
         SetPartError,
         MissingDependencyError,

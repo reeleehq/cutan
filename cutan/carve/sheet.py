@@ -27,12 +27,17 @@ was, so a bad recipe changes nothing. Provenance is required, as for
 ``ours=True`` for pixels that are the caller's. The report carries each part's
 quality warnings in words, for the writer to read before anything renders.
 
-Not covered: lifting several moving parts off ONE carving with pivots
-(:func:`~cutan.carve.split_parts`); a limb is a polygon-matte region of its own.
-A picture is drawn at the width of the factory drawing it replaces, so parts
-from one sheet do not keep their relative scale: size them with ``carve`` or
-declare a width. A part with no ``point`` keeps the factory's anchor, which
-belongs to a different picture's framing (the report says so).
+Moving parts that share one carving (a torso and its arms, a clock face and its
+hands) are one :class:`SheetPart` with a ``split``: the region is carved once,
+:func:`~cutan.carve.split_parts` lifts each named part at its mask with its pivot
+as the attachment's anchor, and the part's own attachment draws what is left.
+
+A picture is drawn at the width of the factory drawing it replaces, so parts from
+one sheet would lose their relative scale. The recipe's ``unit`` (view-box units
+per sheet pixel) declares each picture's width from its carved size instead: one
+unit for the whole sheet, so a hand stays as long next to a body as on the sheet.
+A part with no ``point`` keeps the factory's anchor, which belongs to a different
+picture's framing (the report says so).
 
 The recipe as a document is :func:`load_recipe` (``schema_version`` 1).
 
@@ -41,17 +46,18 @@ Needs OpenCV: ``pip install "cutan[carve]"``.
 
 from __future__ import annotations
 
-import json
+import math
 import shutil
 import tempfile
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 from an.ir.assets import AssetSource
 
-from cutan.carve.core import Box, ImageLike, carve, carve_head, load_rgb
+from cutan.carve.core import Box, Carving, ImageLike, carve, carve_head, load_rgb
+from cutan.carve.parts import PartSpec, split_parts
 from cutan.carve.provenance import frame_source
 from cutan.characters.set_part import PartReplacement, part_path, set_part
 
@@ -59,6 +65,7 @@ __all__ = [
     "RECIPE_SCHEMA_VERSION",
     "PartResult",
     "SheetPart",
+    "Recipe",
     "SheetReport",
     "load_recipe",
     "sheet_to_package",
@@ -68,6 +75,8 @@ __all__ = [
 RECIPE_SCHEMA_VERSION = 1
 #: How a part is carved: ``carve`` (a region) or ``carve_head`` (a head on its fixed canvas).
 _CARVERS = {"part": carve, "head": carve_head}
+#: ``split_parts``' pad and inpaint radius, in carving px at scale 1 (it counts the carving's px).
+_SPLIT_PAD, _SPLIT_INPAINT_RADIUS = 2, 4
 #: carve arguments the function owns.
 _OWNED = frozenset({"crop", "source"})
 _NO_ANCHOR = (
@@ -87,12 +96,17 @@ class SheetPart:
         ``superres``...), JSON-able; a ``point`` anchors the part
     mode: ``"part"`` (:func:`~cutan.carve.carve`) or ``"head"``
         (:func:`~cutan.carve.carve_head`: neck cut, fixed canvas, face centre as anchor)
+    split: ``{attachment: PartSpec or its dict}``: moving parts lifted off this
+        carving (:func:`~cutan.carve.split_parts`; masks and pivots in the
+        sheet's pixels). Each is drawn by its own attachment, anchored at its
+        pivot; ``attachment`` above draws the base, what is left
     """
 
     attachment: str
     crop: Box | None = None
     carve: Mapping[str, Any] = field(default_factory=dict)
     mode: str = "part"
+    split: Mapping[str, PartSpec | Mapping[str, Any]] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.mode not in _CARVERS:
@@ -106,6 +120,18 @@ class SheetPart:
         if self.mode == "head" and "face" not in self.carve:
             raise ValueError(
                 f"{self.attachment!r}: a head needs carve['face'] (a sheet has several faces)"
+            )
+        object.__setattr__(  # a typo in a spec fails here, before anything is carved
+            self,
+            "split",
+            {
+                n: sp if isinstance(sp, PartSpec) else PartSpec(**sp)
+                for n, sp in self.split.items()
+            },
+        )
+        if self.attachment in self.split:
+            raise ValueError(
+                f"{self.attachment!r}: the base and a split part cannot share a name"
             )
         if clash := _OWNED & set(self.carve):
             raise ValueError(
@@ -155,13 +181,33 @@ class SheetReport:
         return "\n".join(lines)
 
 
-def load_recipe(
-    doc: Mapping[str, Any],
-) -> tuple[list[SheetPart], AssetSource | None, bool]:
-    """``(parts, source, ours)`` from a recipe document.
+class Recipe(NamedTuple):
+    """A recipe document read: ``sheet_to_package(sheet, **recipe._asdict(), ...)``."""
+
+    parts: list[SheetPart]
+    source: AssetSource | None
+    ours: bool
+    unit: float | None
+
+
+def _check_unit(unit: Any) -> float | None:
+    if unit is None:
+        return None
+    if isinstance(unit, bool) or not isinstance(unit, (int, float)):
+        raise ValueError(f"unit {unit!r}: a number (view-box units per sheet pixel)")
+    if not (math.isfinite(unit) and unit > 0):
+        raise ValueError(
+            f"unit {unit!r}: view-box units per sheet pixel, finite and positive"
+        )
+    return float(unit)
+
+
+def load_recipe(doc: Mapping[str, Any]) -> Recipe:
+    """The :class:`Recipe` of a recipe document.
 
     ``{"schema_version": 1, "source": {frame_source's arguments} | null,
-    "ours": false, "parts": [{"attachment", "crop", "carve", "mode"}]}``
+    "ours": false, "unit": null, "parts": [{"attachment", "crop", "carve",
+    "mode", "split"}]}``
     """
     if not isinstance(doc, Mapping) or "parts" not in doc:
         raise ValueError('a recipe is a JSON object with a "parts" list')
@@ -174,7 +220,7 @@ def load_recipe(
         )
     source = frame_source(**doc["source"]) if doc.get("source") else None
     parts = [SheetPart(**p) for p in doc["parts"]]
-    return parts, source, bool(doc.get("ours"))
+    return Recipe(parts, source, bool(doc.get("ours")), _check_unit(doc.get("unit")))
 
 
 def _snapshot(char_dir: Path, into: Path) -> Path:
@@ -190,6 +236,82 @@ def _restore(snapshot: Path, char_dir: Path) -> None:
     beside.rename(char_dir)
 
 
+@dataclass(frozen=True)
+class _Drawing:
+    """One picture to set: the attachment, its file, anchor, width and provenance."""
+
+    attachment: str
+    picture: Path
+    anchor: tuple[float, float] | None
+    width: float | None
+    warnings: list[str]
+    provenance: AssetSource | None
+
+
+def _part_provenance(carving: Carving, name: str, origin: tuple[float, float]):
+    """The carving's provenance for a part lifted off it at ``origin`` (carving px)."""
+    source = carving.provenance()
+    if source is None:
+        return None
+    carve_info = dict(source.extra["carve"])
+    if matrix := carve_info.get("source_to_part"):
+        carve_info["source_to_part"] = [
+            [*row[:2], row[2] - o] for row, o in zip(matrix, origin)
+        ]
+    carve_info["split"] = {"part": name, "origin": list(origin)}
+    return source.model_copy(update={"extra": {**source.extra, "carve": carve_info}})
+
+
+def _drawings(
+    p: SheetPart,
+    carving: Carving,
+    folder: Path,
+    *,
+    index: int,
+    unit: float | None,
+) -> list[_Drawing]:
+    """The pictures ``p`` gives: itself, or its base and each split part."""
+
+    def drawing(name, image, anchor, warnings, provenance):
+        picture = folder / f"{index:03d}-{len(taken):02d}.png"
+        taken.append(picture)
+        image.save(picture)
+        width = None if unit is None else image.width / carving.scale * unit
+        return _Drawing(name, picture, anchor, width, warnings, provenance)
+
+    taken: list[Path] = []
+    warnings = carving.quality.warnings() + ([] if p.anchored else [_NO_ANCHOR])
+    own_anchor = carving.anchor if p.anchored else None
+    if not p.split:
+        return [
+            drawing(
+                p.attachment, carving.image, own_anchor, warnings, carving.provenance()
+            )
+        ]
+    k = max(round(carving.scale), 1)  # split_parts counts the carving's pixels
+    specs = {n: replace(sp, grow=sp.grow * k) for n, sp in p.split.items()}
+    lifted = split_parts(
+        carving, specs, pad=_SPLIT_PAD * k, inpaint_radius=_SPLIT_INPAINT_RADIUS * k
+    )
+    if lifted.base is None:
+        raise ValueError(
+            f"{p.attachment!r}: the split parts took every pixel, nothing is left "
+            "for the attachment to draw"
+        )
+    return [
+        drawing(p.attachment, lifted.base, own_anchor, warnings, carving.provenance())
+    ] + [
+        drawing(
+            part.name,
+            part.image,
+            part.anchor,
+            [],
+            _part_provenance(carving, part.name, part.origin),
+        )
+        for part in lifted.parts
+    ]
+
+
 def sheet_to_package(
     sheet: ImageLike,
     parts: Sequence[SheetPart | Mapping[str, Any]],
@@ -197,6 +319,7 @@ def sheet_to_package(
     *,
     source: AssetSource | None = None,
     ours: bool = False,
+    unit: float | None = None,
     work_dir: str | Path | None = None,
 ) -> SheetReport:
     """Carve ``parts`` out of ``sheet`` and draw them on the factory character at ``char_dir``.
@@ -206,6 +329,9 @@ def sheet_to_package(
         draws from is replaced once (two attachments of one file are one part)
     source: the sheet's provenance (``frame_source``); required unless ``ours``
     ours: the sheet's pixels are the caller's own art (no source is recorded)
+    unit: view-box units per SHEET pixel (``write_prop``'s is per carved pixel;
+        they differ under super-resolution); each picture is declared that many
+        units wide per carved pixel (default: the factory drawing's width)
     work_dir: where the carved pictures are first written (default: a temporary
         folder, gone afterwards; the rig keeps its own copy beside it either way)
 
@@ -218,44 +344,40 @@ def sheet_to_package(
             "a sheet with no provenance reads as art you made: pass "
             "source=frame_source(url, license=...), or ours=True if the pixels are yours"
         )
+    unit = _check_unit(unit)
     char_dir = Path(char_dir)
     recipe = [p if isinstance(p, SheetPart) else SheetPart(**p) for p in parts]
     files: dict[str, str] = {}
     for p in recipe:  # fails on an unknown or ambiguous attachment, writes nothing
-        rel = part_path(char_dir, p.attachment)
-        if rel in files:
-            raise ValueError(
-                f"{p.attachment!r} and {files[rel]!r} are both drawn by {rel}"
-            )
-        files[rel] = p.attachment
+        for name in (p.attachment, *p.split):
+            rel = part_path(char_dir, name)
+            if rel in files:
+                raise ValueError(f"{name!r} and {files[rel]!r} are both drawn by {rel}")
+            files[rel] = name
     image = load_rgb(sheet)
     with tempfile.TemporaryDirectory(prefix="cutan-sheet-") as tmp:
         folder = Path(work_dir) if work_dir is not None else Path(tmp)
         folder.mkdir(parents=True, exist_ok=True)
-        carved = []
+        drawings = []
         for i, p in enumerate(recipe):
             kwargs = dict(p.carve, source=source)
             if p.crop is not None:
                 kwargs["crop"] = p.crop
             carving = _CARVERS[p.mode](image, **kwargs)
-            picture = folder / f"{i:03d}.png"
-            carving.image.save(picture)
-            carved.append((p, carving, picture))
+            drawings += _drawings(p, carving, folder, index=i, unit=unit)
         snapshot = _snapshot(char_dir, Path(tmp))
         results = []
         try:
-            for p, carving, picture in carved:
+            for d in drawings:
                 done = set_part(
                     char_dir,
-                    p.attachment,
-                    picture,
-                    anchor=carving.anchor if p.anchored else None,
-                    source=carving.provenance(),
+                    d.attachment,
+                    d.picture,
+                    anchor=d.anchor,
+                    source=d.provenance,
+                    width=d.width,
                 )
-                warnings = carving.quality.warnings() + (
-                    [] if p.anchored else [_NO_ANCHOR]
-                )
-                results.append(PartResult(p.attachment, warnings, done))
+                results.append(PartResult(d.attachment, d.warnings, done))
         except BaseException:
             _restore(snapshot, char_dir)
             raise
