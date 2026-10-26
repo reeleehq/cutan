@@ -170,8 +170,33 @@ def test_add_forearms_refuses_an_arm_it_did_not_draw(tmp_path):
     arm.write_text(arm.read_text(encoding="utf-8").replace("<g ", "<g data-x='1' "))
     with pytest.raises(ValueError, match="not the factory's drawing"):
         add_forearms(root / "assets/characters/ned")
-    with pytest.raises(ValueError, match="elbow_at"):
+    with pytest.raises(ValueError, match="leaves no sleeve"):
         add_forearms(root / "assets/characters/ned", elbow_at=1.5)
+
+
+@pytest.mark.parametrize("build", ["regular", "squat", "stick", "tall"])
+def test_the_elbow_can_be_cut_anywhere_the_build_leaves_a_sleeve(tmp_path, build):
+    from cutan.characters.factory import BUILDS, _elbow_bounds
+
+    lo, hi = _elbow_bounds(BUILDS[build])
+    for at in (lo, hi):
+        root = tmp_path / f"{build}-{at:.2f}"
+        init(root)
+        chars = root / "assets" / "characters"
+        new_character(chars, name="ned", seed="ned", use_dicebear=False, build=build)
+        add_forearms(chars / "ned", elbow_at=at)
+        assert validate_character(chars / "ned", name="ned").findings == []
+    again = tmp_path / f"{build}-past"
+    init(again)
+    new_character(again / "assets/characters", name="ned", seed="ned", use_dicebear=False, build=build)
+    with pytest.raises(ValueError, match="leaves no sleeve"):
+        add_forearms(again / "assets/characters/ned", elbow_at=hi + 0.05)
+
+
+def test_a_second_cut_at_another_place_is_refused_not_ignored(tmp_path):
+    root = _project(tmp_path / "p")
+    with pytest.raises(ValueError, match="already split"):
+        add_forearms(root / "assets/characters/ned", elbow_at=0.3)
 
 
 def test_a_split_character_validates_and_takes_its_limits_and_views(tmp_path):
@@ -180,7 +205,7 @@ def test_a_split_character_validates_and_takes_its_limits_and_views(tmp_path):
     add_limits(path)
     add_views(path)  # views after the split: the hidden arm hides its hand
     report = validate_character(path, name="ned")
-    assert report.passed, [f.description for f in report.findings]
+    assert report.passed and report.findings == [], [f.description for f in report.findings]
     bones = {b["name"]: b.get("limits") for b in _desc(root)["bones"]}
     assert bones["forearm_r"] == [-10.0, 150.0] and bones["forearm_l"] == [-150.0, 10.0]
     assert bones["hand_r"] == [-70.0, 70.0]

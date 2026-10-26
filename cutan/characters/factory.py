@@ -2522,13 +2522,32 @@ def add_views(char_dir: str | Path) -> Path:
 
 #: Where a split arm's elbow sits, as a fraction of the way from the shoulder to the wrist.
 ELBOW_AT: float = 0.5
-#: Draw orders of a split arm's forearm and hand: each over the part it hangs
-#: from (`nesting: bones` draws a nested part over its parent, and refuses a
-#: chain drawn against its order).
-FOREARM_DRAW_ORDER: int = 3
-HAND_DRAW_ORDER: int = 4
+#: How far the slots drawn over the arms move up when each arm becomes three
+#: parts: the left arm's chain, then the right's (arm, forearm, hand each over
+#: the part it hangs from: `nesting: bones` refuses a chain drawn against its
+#: order, and the validator flags chains whose parts are not together in it).
+ARM_CHAIN_SHIFT: int = 5
+#: The smallest sleeve left on either side of the elbow, in arm widths.
+MIN_SLEEVE_WIDTHS: float = 0.5
 #: The sides of the factory's arms, and the bones a split arm adds on each.
 ARM_SIDES: tuple[str, ...] = ("l", "r")
+
+
+def _elbow_bounds(body: BodyBuild) -> tuple[float, float]:
+    """The ``elbow_at`` range this build's arm can be cut in: each side of the
+    elbow keeps at least :data:`MIN_SLEEVE_WIDTHS` arm widths of sleeve, and the
+    upper arm's round cap ends where the one-piece sleeve did.
+
+    >>> tuple(round(v, 2) for v in _elbow_bounds(BUILDS["regular"]))
+    (0.1, 0.85)
+    >>> tuple(round(v, 2) for v in _elbow_bounds(BUILDS["squat"]))
+    (0.15, 0.71)
+    """
+    aw = body.arm_width
+    wrist = body.arm_length - 4 - body.hand_radius
+    lo = max(0.1, aw * MIN_SLEEVE_WIDTHS / wrist)
+    hi = (wrist - 16 - aw / 2) / wrist
+    return lo, hi
 
 
 def _split_arm_svgs(
@@ -2600,17 +2619,27 @@ def add_forearms(
     """
     from an.ir.migrate import migrate
 
-    if not 0.1 <= elbow_at <= 0.9:
-        raise ValueError(f"elbow_at is a fraction of the arm in 0.1..0.9, got {elbow_at}")
     char_dir = Path(char_dir)
     desc_path = char_dir / "character.json"
     raw = json.loads(desc_path.read_text(encoding="utf-8"))
     desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
     bones = {b.name: b for b in desc.bones}
-    if all(f"forearm_{s}" in bones for s in ARM_SIDES):
-        return desc_path
     meta = desc.metadata
     body = _check_build(str(meta.get("build") or DFLT_BUILD))
+    lo, hi = _elbow_bounds(body)
+    if not lo <= elbow_at <= hi:
+        raise ValueError(
+            f"elbow_at {elbow_at} leaves no sleeve on one side of the elbow for this "
+            f"build: use {lo:.2f} to {hi:.2f}"
+        )
+    if all(f"forearm_{s}" in bones for s in ARM_SIDES):
+        if abs(float(meta.get("elbow_at", ELBOW_AT)) - elbow_at) > 1e-9:
+            raise ValueError(
+                f"{desc.name!r}'s arms are already split, at "
+                f"{meta.get('elbow_at', ELBOW_AT)}: make the character again to cut "
+                f"them at {elbow_at}"
+            )
+        return desc_path
     problem = None
     if not all(f"arm_{s}" in bones for s in ARM_SIDES):
         problem = "has no arm_l/arm_r bones"
@@ -2643,6 +2672,15 @@ def add_forearms(
         )
     skin = desc.skins["default"]
     stamped: set[str] = set()
+    # Each arm's chain contiguous in the draw order: left, then right, and what
+    # was drawn over the arms (the head, the face) over both.
+    arm_order = {s.name: s.draw_order for s in desc.slots}
+    base = min(arm_order[f"arm_{side}"] for side in ARM_SIDES)
+    for slot in desc.slots:
+        if slot.draw_order > base:
+            slot.draw_order += ARM_CHAIN_SHIFT
+    for i, side in enumerate(ARM_SIDES):
+        next(s for s in desc.slots if s.name == f"arm_{side}").draw_order = base + 3 * i
     for side in ARM_SIDES:
         svgs, g = _split_arm_svgs(
             side=side,
@@ -2669,9 +2707,10 @@ def add_forearms(
                 y=round(g["wrist"] - g["elbow"], 3),
             ),
         ]
+        first = base + 3 * ARM_SIDES.index(side)
         for name, order, anchor in (
-            (f"forearm_{side}", FOREARM_DRAW_ORDER, (0.5, round(g["anchor_v"], 6))),
-            (f"hand_{side}", HAND_DRAW_ORDER, (0.5, 0.5)),
+            (f"forearm_{side}", first + 1, (0.5, round(g["anchor_v"], 6))),
+            (f"hand_{side}", first + 2, (0.5, 0.5)),
         ):
             desc.slots.append(Slot(name=name, bone=name, draw_order=order, attachment=name))
             skin.slots[name] = {
