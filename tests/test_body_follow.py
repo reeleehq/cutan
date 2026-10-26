@@ -167,3 +167,61 @@ def test_the_consistency_check_is_a_constraint_with_the_name_it_had():
     assert BODY_ATTACHMENT_CONSISTENCY.term is None  # lint-only: placement is derived
     registered = {c.name: c for c in CUTOUT.checks}["cutout.body_attachment_consistency"]
     assert (registered.stage, registered.order) == ("finish", 11)
+
+
+#: Sockets whose spacing does not match the shoulders': no placement fits both.
+SKEWED = [{"bone": "arm_l", "at": [0.25, -0.6]}, {"bone": "arm_r", "at": [0.75, -0.1]}]
+
+
+def _validate(project, shot, only):
+    scene = project.scene.model_copy(update={"timeline": [shot]})
+    return validate_semantic(
+        scene,
+        available_characters=project.mall["characters"],
+        available_props=project.mall["props"],
+        available_environments=project.mall["environments"],
+        only=only,
+    )
+
+
+def test_sockets_that_do_not_fit_the_bones_are_placed_once_and_validate_says_so(tmp_path):
+    root = init(tmp_path / "p")
+    new_character(root / "assets" / "characters", name="paul", seed="paul", use_dicebear=False)
+    _prop(root, "wheel_skew", {"character": "paul", "view": "front", "sockets": SKEWED})
+    project = load(root)
+    shot = _shot([NOD], prop="wheel_skew")
+    assert _pins(derive_body_placements(shot, project.mall)) == []
+    report = _validate(project, shot, {"cutout.body_attachment"})
+    messages = [(f.severity, f.description) for f in report.findings]
+    assert any(
+        sev == "warning" and "not followed through the shot" in text and "px from the bones" in text
+        for sev, text in messages
+    ), messages
+
+
+def test_a_prop_with_motion_of_its_own_is_noted_not_warned(project):
+    own = {"kind": "tween", "target": "w", "property": "rotation", "from_value": 0.0, "to_value": 0.3, "duration": 1.0}
+    report = _validate(project, _shot([NOD, own]), {"cutout.body_attachment"})
+    assert [f.severity for f in report.findings if "not followed" in f.description] == ["info"]
+
+
+def test_validate_says_when_the_motion_pulls_a_followed_socket_off_its_bone(project):
+    """The lowered pins are added at compile, so the core joint checks never see
+    them: `cutout.body_attachment` reads the compiled shot's solve report. A
+    character stretched sideways while it wears a rigid prop pulls a socket off."""
+    stretch = {
+        "kind": "tween",
+        "target": "paul",
+        "property": "scale_x",
+        "from_value": PAUL_SCALE,
+        "to_value": PAUL_SCALE * 1.4,
+        "duration": 1.0,
+    }
+    shot = _shot([stretch])
+    assert _compile(project, shot).meta.extensions["solve"]["dropped"]
+    report = _validate(project, shot, {"cutout.body_attachment"})
+    said = [f.description for f in report.findings if "cannot stay on its bone" in f.description]
+    assert said and "px off" in said[0] and " s to " in said[0], [f.description for f in report.findings]
+    # and a nod it can follow is silent
+    quiet = _validate(project, _shot([NOD]), {"cutout.body_attachment"})
+    assert [f for f in quiet.findings if "bone" in f.description and "socket" in f.description] == []
