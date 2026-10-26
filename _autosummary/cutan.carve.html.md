@@ -29,6 +29,9 @@ a neural matte wins on photos, GrabCut on a single prop in a rough box.
   or found by a locator (`insightface`, `pip install "cutan[faces]"`).
 - **Moving parts:** [`split_parts()`](#cutan.carve.split_parts) lifts parts off a carving, each with a
   pivot (clock hands off the face), painting the base in under them.
+- **A reference sheet:** [`sheet_to_package()`](cutan.carve.sheet.html.md#cutan.carve.sheet.sheet_to_package) carves
+  regions of a sheet onto a factory character’s attachments (`an character
+  from-sheet`), with every part’s quality warnings in the report.
 - **Provenance:** [`frame_source()`](#cutan.carve.frame_source) (a licence is required, a YouTube URL
   gets its `&t=` deep link); [`write_prop()`](#cutan.carve.write_prop) writes `prop.json` +
   `parts/` with the source in the descriptor, recipe and quality included,
@@ -801,4 +804,5 @@ The video id of a YouTube URL, else `None`.
 | [`prop`](cutan.carve.prop.html.md#module-cutan.carve.prop)             | Write a carving (or a carving split into parts) as a library-ready prop folder.                        |
 | [`provenance`](cutan.carve.provenance.html.md#module-cutan.carve.provenance) | Where carved pixels came from: an `AssetSource` for a frame of a video or an image.                    |
 | [`refine`](cutan.carve.refine.html.md#module-cutan.carve.refine)         | Clean a raw matte into a cut-out's alpha: keep the subject, close it, edge it, de-spill it.            |
+| [`sheet`](cutan.carve.sheet.html.md#module-cutan.carve.sheet)           | A reference sheet becomes an art package: carve each region, set it on the rig (cutan#128).            |
 | [`superres`](cutan.carve.superres.html.md#module-cutan.carve.superres)     | Super-resolution strategies: more pixels for a part carved from a low-resolution frame (cutan#110).    |

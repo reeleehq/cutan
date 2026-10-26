@@ -22,6 +22,7 @@ cutan.characters.cli
       capabilities
       contract
       feet_origin
+      from_sheet
       mouths
       new
       preview

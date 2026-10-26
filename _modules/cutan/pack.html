@@ -985,227 +985,225 @@
 </span><span id="line-769">    <span class="n">_note_svg_only_art</span><span class="p">(</span><span class="n">pack</span><span class="p">,</span> <span class="n">report</span><span class="p">)</span>
 </span><span id="line-770">    <span class="n">_lint_svgs</span><span class="p">(</span><span class="n">pack</span><span class="p">,</span> <span class="n">report</span><span class="p">)</span>
 </span><span id="line-771">    <span class="n">_lint_voices</span><span class="p">(</span><span class="n">pack</span><span class="p">,</span> <span class="n">report</span><span class="p">)</span>
-</span><span id="line-772">    <span class="n">run</span> <span class="o">=</span> <span class="n">_Runner</span><span class="p">(</span>
-</span><span id="line-773">        <span class="n">report</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">deadline</span><span class="o">=</span><span class="n">deadline</span><span class="p">,</span> <span class="n">child_limits</span><span class="o">=</span><span class="n">child_limits</span>
-</span><span id="line-774">    <span class="p">)</span>
-</span><span id="line-775">    <span class="n">workdir</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">parent</span>
-</span><span id="line-776">    <span class="k">if</span> <span class="ow">not</span> <span class="n">run</span><span class="p">(</span>
-</span><span id="line-777">        <span class="n">an</span> <span class="o">+</span> <span class="p">[</span><span class="s2">"init"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project</span><span class="p">)],</span> <span class="n">cwd</span><span class="o">=</span><span class="n">workdir</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"an init"</span><span class="p">,</span> <span class="n">expect</span><span class="o">=</span><span class="s2">"initialized"</span>
-</span><span id="line-778">    <span class="p">):</span>
-</span><span id="line-779">        <span class="k">return</span>
-</span><span id="line-780">    <span class="n">pack_chars</span> <span class="o">=</span> <span class="n">pack</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"characters"</span>
-</span><span id="line-781">    <span class="n">redrawn</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">_subdirs</span><span class="p">(</span><span class="n">pack_chars</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">d</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
-</span><span id="line-782">    <span class="k">for</span> <span class="n">src</span> <span class="ow">in</span> <span class="n">pack</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">):</span>
-</span><span id="line-783">        <span class="n">rel</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">pack</span><span class="p">)</span>
-</span><span id="line-784">        <span class="k">if</span> <span class="p">(</span>
-</span><span id="line-785">            <span class="n">src</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span>
-</span><span id="line-786">            <span class="ow">or</span> <span class="n">src</span><span class="o">.</span><span class="n">is_symlink</span><span class="p">()</span>
-</span><span id="line-787">            <span class="ow">or</span> <span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PACK_SUFFIXES</span>
-</span><span id="line-788">            <span class="ow">or</span> <span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">IMAGE_SIGNATURES</span> <span class="ow">and</span> <span class="n">_image_problem</span><span class="p">(</span><span class="n">src</span><span class="p">))</span>
-</span><span id="line-789">            <span class="ow">or</span> <span class="n">rel</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span> <span class="ow">in</span> <span class="n">PACK_ONLY_FILES</span>
-</span><span id="line-790">            <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">d</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">parents</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">redrawn</span><span class="p">)</span>
-</span><span id="line-791">        <span class="p">):</span>
-</span><span id="line-792">            <span class="k">continue</span>
-</span><span id="line-793">        <span class="n">_copy</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">project</span> <span class="o">/</span> <span class="n">rel</span><span class="p">)</span>
-</span><span id="line-794">    <span class="c1"># `an` syncs scene.md and ir/scene.json by age: make the pack's scene the newer.</span>
-</span><span id="line-795">    <span class="n">later</span> <span class="o">=</span> <span class="p">(</span><span class="n">project</span> <span class="o">/</span> <span class="s2">"ir"</span> <span class="o">/</span> <span class="s2">"scene.json"</span><span class="p">)</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span> <span class="o">+</span> <span class="mi">2</span>
-</span><span id="line-796">    <span class="n">os</span><span class="o">.</span><span class="n">utime</span><span class="p">(</span><span class="n">project</span> <span class="o">/</span> <span class="s2">"scene.md"</span><span class="p">,</span> <span class="p">(</span><span class="n">later</span><span class="p">,</span> <span class="n">later</span><span class="p">))</span>
-</span><span id="line-797">
-</span><span id="line-798">    <span class="k">for</span> <span class="n">argv</span> <span class="ow">in</span> <span class="n">cast</span><span class="p">:</span>
-</span><span id="line-799">        <span class="n">run</span><span class="p">(</span>
-</span><span id="line-800">            <span class="n">an</span> <span class="o">+</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
-</span><span id="line-801">            <span class="n">cwd</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
-</span><span id="line-802">            <span class="n">label</span><span class="o">=</span><span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">argv</span><span class="p">[:</span><span class="mi">4</span><span class="p">]),</span>
-</span><span id="line-803">            <span class="n">expect</span><span class="o">=</span><span class="n">CAST_SUCCESS</span><span class="p">[</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span>
-</span><span id="line-804">        <span class="p">)</span>
-</span><span id="line-805">    <span class="n">chars</span> <span class="o">=</span> <span class="n">project</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"characters"</span>
-</span><span id="line-806">    <span class="k">for</span> <span class="p">(</span>
-</span><span id="line-807">        <span class="n">d</span>
-</span><span id="line-808">    <span class="p">)</span> <span class="ow">in</span> <span class="n">redrawn</span><span class="p">:</span>  <span class="c1"># redrawn parts go over the factory's own, on the factory's canvas</span>
-</span><span id="line-809">        <span class="k">for</span> <span class="n">src</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">)):</span>
-</span><span id="line-810">            <span class="k">if</span> <span class="p">(</span>
-</span><span id="line-811">                <span class="n">src</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
-</span><span id="line-812">                <span class="ow">and</span> <span class="ow">not</span> <span class="n">src</span><span class="o">.</span><span class="n">is_symlink</span><span class="p">()</span>
-</span><span id="line-813">                <span class="ow">and</span> <span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">PACK_SUFFIXES</span>
-</span><span id="line-814">                <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">IMAGE_SIGNATURES</span> <span class="ow">and</span> <span class="n">_image_problem</span><span class="p">(</span><span class="n">src</span><span class="p">))</span>
-</span><span id="line-815">            <span class="p">):</span>
-</span><span id="line-816">                <span class="n">rel</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-</span><span id="line-817">                <span class="n">problem</span> <span class="o">=</span> <span class="n">_redrawn_problem</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">chars</span> <span class="o">/</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span> <span class="o">/</span> <span class="n">rel</span><span class="p">)</span>
-</span><span id="line-818">                <span class="k">if</span> <span class="n">problem</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
-</span><span id="line-819">                    <span class="p">(</span>
-</span><span id="line-820">                        <span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">".svg"</span>
-</span><span id="line-821">                        <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">IMAGE_SIGNATURES</span><span class="p">)</span>
-</span><span id="line-822">                    <span class="p">)</span>
-</span><span id="line-823">                    <span class="ow">or</span> <span class="p">(</span>
-</span><span id="line-824">                        <span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">IMAGE_SIGNATURES</span>
-</span><span id="line-825">                        <span class="ow">and</span> <span class="n">src</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">".svg"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
-</span><span id="line-826">                    <span class="p">)</span>
-</span><span id="line-827">                <span class="p">):</span>
-</span><span id="line-828">                    <span class="n">problem</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-829">                        <span class="sa">f</span><span class="s2">"two drawings for </span><span class="si">{</span><span class="n">rel</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s2">: keep "</span>
-</span><span id="line-830">                        <span class="s2">"the SVG or the picture, not both"</span>
-</span><span id="line-831">                    <span class="p">)</span>
-</span><span id="line-832">                <span class="k">if</span> <span class="n">problem</span><span class="p">:</span>
-</span><span id="line-833">                    <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-</span><span id="line-834">                        <span class="sa">f</span><span class="s2">"redrawn </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">rel</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-835">                        <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-836">                        <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">ERROR_MARKER</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-837">                    <span class="p">)</span>
-</span><span id="line-838">                <span class="k">elif</span> <span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">IMAGE_SIGNATURES</span><span class="p">:</span>
-</span><span id="line-839">                    <span class="n">_replace_with_picture</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">chars</span> <span class="o">/</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">rel</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
-</span><span id="line-840">                <span class="k">else</span><span class="p">:</span>
-</span><span id="line-841">                    <span class="n">_copy</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">chars</span> <span class="o">/</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span> <span class="o">/</span> <span class="n">rel</span><span class="p">)</span>
-</span><span id="line-842">    <span class="k">if</span> <span class="p">(</span><span class="n">project</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"voices"</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-</span><span id="line-843">        <span class="n">run</span><span class="p">(</span>
-</span><span id="line-844">            <span class="p">[</span>
-</span><span id="line-845">                <span class="n">python</span><span class="p">,</span>
-</span><span id="line-846">                <span class="o">*</span><span class="n">_NO_CWD_PATH</span><span class="p">,</span>
-</span><span id="line-847">                <span class="s2">"-c"</span><span class="p">,</span>
-</span><span id="line-848">                <span class="n">VOICE_CHECK</span><span class="p">,</span>
-</span><span id="line-849">                <span class="nb">str</span><span class="p">(</span><span class="n">project</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"voices"</span><span class="p">),</span>
-</span><span id="line-850">            <span class="p">],</span>
-</span><span id="line-851">            <span class="n">cwd</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
-</span><span id="line-852">            <span class="n">label</span><span class="o">=</span><span class="s2">"voices (engine checks)"</span><span class="p">,</span>
-</span><span id="line-853">        <span class="p">)</span>
-</span><span id="line-854">    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">_subdirs</span><span class="p">(</span><span class="n">chars</span><span class="p">):</span>
-</span><span id="line-855">        <span class="n">run</span><span class="p">(</span>
-</span><span id="line-856">            <span class="n">an</span> <span class="o">+</span> <span class="p">[</span><span class="s2">"character"</span><span class="p">,</span> <span class="s2">"validate"</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"--out-dir"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">chars</span><span class="p">)],</span>
-</span><span id="line-857">            <span class="n">cwd</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
-</span><span id="line-858">            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"character </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-859">        <span class="p">)</span>
-</span><span id="line-860">    <span class="n">props</span> <span class="o">=</span> <span class="n">project</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"props"</span>
-</span><span id="line-861">    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">_subdirs</span><span class="p">(</span><span class="n">props</span><span class="p">):</span>
-</span><span id="line-862">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-863">            <span class="n">doc</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">d</span> <span class="o">/</span> <span class="s2">"prop.json"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
-</span><span id="line-864">            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="line-865">                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"prop.json must hold a JSON object"</span><span class="p">)</span>
-</span><span id="line-866">            <span class="n">kind</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">,</span> <span class="s2">"PropDescriptor"</span><span class="p">)</span>
-</span><span id="line-867">        <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-868">            <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s2">"prop </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">ERROR_MARKER</span><span class="si">}</span><span class="s2"> prop.json: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-869">            <span class="k">continue</span>
-</span><span id="line-870">        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"PropDescriptor"</span><span class="p">:</span>
-</span><span id="line-871">            <span class="n">run</span><span class="p">(</span>
-</span><span id="line-872">                <span class="n">an</span> <span class="o">+</span> <span class="p">[</span><span class="s2">"props"</span><span class="p">,</span> <span class="s2">"validate"</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"--out-dir"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">props</span><span class="p">)],</span>
-</span><span id="line-873">                <span class="n">cwd</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
-</span><span id="line-874">                <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"prop </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-875">            <span class="p">)</span>
-</span><span id="line-876">    <span class="n">run</span><span class="p">(</span>
-</span><span id="line-877">        <span class="n">an</span> <span class="o">+</span> <span class="p">[</span><span class="s2">"validate"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project</span><span class="p">),</span> <span class="s2">"--strict-assets"</span><span class="p">],</span>
-</span><span id="line-878">        <span class="n">cwd</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
-</span><span id="line-879">        <span class="n">label</span><span class="o">=</span><span class="s2">"scene"</span><span class="p">,</span>
-</span><span id="line-880">        <span class="n">expect</span><span class="o">=</span><span class="s2">"validation: passed"</span><span class="p">,</span>
-</span><span id="line-881">    <span class="p">)</span>
-</span><span id="line-882">
-</span><span id="line-883">
+</span><span id="line-772">    <span class="n">run</span> <span class="o">=</span> <span class="n">_Runner</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">deadline</span><span class="o">=</span><span class="n">deadline</span><span class="p">,</span> <span class="n">child_limits</span><span class="o">=</span><span class="n">child_limits</span><span class="p">)</span>
+</span><span id="line-773">    <span class="n">workdir</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">parent</span>
+</span><span id="line-774">    <span class="k">if</span> <span class="ow">not</span> <span class="n">run</span><span class="p">(</span>
+</span><span id="line-775">        <span class="n">an</span> <span class="o">+</span> <span class="p">[</span><span class="s2">"init"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project</span><span class="p">)],</span> <span class="n">cwd</span><span class="o">=</span><span class="n">workdir</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"an init"</span><span class="p">,</span> <span class="n">expect</span><span class="o">=</span><span class="s2">"initialized"</span>
+</span><span id="line-776">    <span class="p">):</span>
+</span><span id="line-777">        <span class="k">return</span>
+</span><span id="line-778">    <span class="n">pack_chars</span> <span class="o">=</span> <span class="n">pack</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"characters"</span>
+</span><span id="line-779">    <span class="n">redrawn</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">_subdirs</span><span class="p">(</span><span class="n">pack_chars</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">d</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
+</span><span id="line-780">    <span class="k">for</span> <span class="n">src</span> <span class="ow">in</span> <span class="n">pack</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">):</span>
+</span><span id="line-781">        <span class="n">rel</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">pack</span><span class="p">)</span>
+</span><span id="line-782">        <span class="k">if</span> <span class="p">(</span>
+</span><span id="line-783">            <span class="n">src</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span>
+</span><span id="line-784">            <span class="ow">or</span> <span class="n">src</span><span class="o">.</span><span class="n">is_symlink</span><span class="p">()</span>
+</span><span id="line-785">            <span class="ow">or</span> <span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PACK_SUFFIXES</span>
+</span><span id="line-786">            <span class="ow">or</span> <span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">IMAGE_SIGNATURES</span> <span class="ow">and</span> <span class="n">_image_problem</span><span class="p">(</span><span class="n">src</span><span class="p">))</span>
+</span><span id="line-787">            <span class="ow">or</span> <span class="n">rel</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span> <span class="ow">in</span> <span class="n">PACK_ONLY_FILES</span>
+</span><span id="line-788">            <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">d</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">parents</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">redrawn</span><span class="p">)</span>
+</span><span id="line-789">        <span class="p">):</span>
+</span><span id="line-790">            <span class="k">continue</span>
+</span><span id="line-791">        <span class="n">_copy</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">project</span> <span class="o">/</span> <span class="n">rel</span><span class="p">)</span>
+</span><span id="line-792">    <span class="c1"># `an` syncs scene.md and ir/scene.json by age: make the pack's scene the newer.</span>
+</span><span id="line-793">    <span class="n">later</span> <span class="o">=</span> <span class="p">(</span><span class="n">project</span> <span class="o">/</span> <span class="s2">"ir"</span> <span class="o">/</span> <span class="s2">"scene.json"</span><span class="p">)</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span> <span class="o">+</span> <span class="mi">2</span>
+</span><span id="line-794">    <span class="n">os</span><span class="o">.</span><span class="n">utime</span><span class="p">(</span><span class="n">project</span> <span class="o">/</span> <span class="s2">"scene.md"</span><span class="p">,</span> <span class="p">(</span><span class="n">later</span><span class="p">,</span> <span class="n">later</span><span class="p">))</span>
+</span><span id="line-795">
+</span><span id="line-796">    <span class="k">for</span> <span class="n">argv</span> <span class="ow">in</span> <span class="n">cast</span><span class="p">:</span>
+</span><span id="line-797">        <span class="n">run</span><span class="p">(</span>
+</span><span id="line-798">            <span class="n">an</span> <span class="o">+</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+</span><span id="line-799">            <span class="n">cwd</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+</span><span id="line-800">            <span class="n">label</span><span class="o">=</span><span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">argv</span><span class="p">[:</span><span class="mi">4</span><span class="p">]),</span>
+</span><span id="line-801">            <span class="n">expect</span><span class="o">=</span><span class="n">CAST_SUCCESS</span><span class="p">[</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span>
+</span><span id="line-802">        <span class="p">)</span>
+</span><span id="line-803">    <span class="n">chars</span> <span class="o">=</span> <span class="n">project</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"characters"</span>
+</span><span id="line-804">    <span class="k">for</span> <span class="p">(</span>
+</span><span id="line-805">        <span class="n">d</span>
+</span><span id="line-806">    <span class="p">)</span> <span class="ow">in</span> <span class="n">redrawn</span><span class="p">:</span>  <span class="c1"># redrawn parts go over the factory's own, on the factory's canvas</span>
+</span><span id="line-807">        <span class="k">for</span> <span class="n">src</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">)):</span>
+</span><span id="line-808">            <span class="k">if</span> <span class="p">(</span>
+</span><span id="line-809">                <span class="n">src</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
+</span><span id="line-810">                <span class="ow">and</span> <span class="ow">not</span> <span class="n">src</span><span class="o">.</span><span class="n">is_symlink</span><span class="p">()</span>
+</span><span id="line-811">                <span class="ow">and</span> <span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">PACK_SUFFIXES</span>
+</span><span id="line-812">                <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">IMAGE_SIGNATURES</span> <span class="ow">and</span> <span class="n">_image_problem</span><span class="p">(</span><span class="n">src</span><span class="p">))</span>
+</span><span id="line-813">            <span class="p">):</span>
+</span><span id="line-814">                <span class="n">rel</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+</span><span id="line-815">                <span class="n">problem</span> <span class="o">=</span> <span class="n">_redrawn_problem</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">chars</span> <span class="o">/</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span> <span class="o">/</span> <span class="n">rel</span><span class="p">)</span>
+</span><span id="line-816">                <span class="k">if</span> <span class="n">problem</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
+</span><span id="line-817">                    <span class="p">(</span>
+</span><span id="line-818">                        <span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">".svg"</span>
+</span><span id="line-819">                        <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">IMAGE_SIGNATURES</span><span class="p">)</span>
+</span><span id="line-820">                    <span class="p">)</span>
+</span><span id="line-821">                    <span class="ow">or</span> <span class="p">(</span>
+</span><span id="line-822">                        <span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">IMAGE_SIGNATURES</span>
+</span><span id="line-823">                        <span class="ow">and</span> <span class="n">src</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">".svg"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
+</span><span id="line-824">                    <span class="p">)</span>
+</span><span id="line-825">                <span class="p">):</span>
+</span><span id="line-826">                    <span class="n">problem</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-827">                        <span class="sa">f</span><span class="s2">"two drawings for </span><span class="si">{</span><span class="n">rel</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s2">: keep "</span>
+</span><span id="line-828">                        <span class="s2">"the SVG or the picture, not both"</span>
+</span><span id="line-829">                    <span class="p">)</span>
+</span><span id="line-830">                <span class="k">if</span> <span class="n">problem</span><span class="p">:</span>
+</span><span id="line-831">                    <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+</span><span id="line-832">                        <span class="sa">f</span><span class="s2">"redrawn </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">rel</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-833">                        <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-834">                        <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">ERROR_MARKER</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-835">                    <span class="p">)</span>
+</span><span id="line-836">                <span class="k">elif</span> <span class="n">src</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">IMAGE_SIGNATURES</span><span class="p">:</span>
+</span><span id="line-837">                    <span class="n">_replace_with_picture</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">chars</span> <span class="o">/</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">rel</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
+</span><span id="line-838">                <span class="k">else</span><span class="p">:</span>
+</span><span id="line-839">                    <span class="n">_copy</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">chars</span> <span class="o">/</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span> <span class="o">/</span> <span class="n">rel</span><span class="p">)</span>
+</span><span id="line-840">    <span class="k">if</span> <span class="p">(</span><span class="n">project</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"voices"</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+</span><span id="line-841">        <span class="n">run</span><span class="p">(</span>
+</span><span id="line-842">            <span class="p">[</span>
+</span><span id="line-843">                <span class="n">python</span><span class="p">,</span>
+</span><span id="line-844">                <span class="o">*</span><span class="n">_NO_CWD_PATH</span><span class="p">,</span>
+</span><span id="line-845">                <span class="s2">"-c"</span><span class="p">,</span>
+</span><span id="line-846">                <span class="n">VOICE_CHECK</span><span class="p">,</span>
+</span><span id="line-847">                <span class="nb">str</span><span class="p">(</span><span class="n">project</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"voices"</span><span class="p">),</span>
+</span><span id="line-848">            <span class="p">],</span>
+</span><span id="line-849">            <span class="n">cwd</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+</span><span id="line-850">            <span class="n">label</span><span class="o">=</span><span class="s2">"voices (engine checks)"</span><span class="p">,</span>
+</span><span id="line-851">        <span class="p">)</span>
+</span><span id="line-852">    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">_subdirs</span><span class="p">(</span><span class="n">chars</span><span class="p">):</span>
+</span><span id="line-853">        <span class="n">run</span><span class="p">(</span>
+</span><span id="line-854">            <span class="n">an</span> <span class="o">+</span> <span class="p">[</span><span class="s2">"character"</span><span class="p">,</span> <span class="s2">"validate"</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"--out-dir"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">chars</span><span class="p">)],</span>
+</span><span id="line-855">            <span class="n">cwd</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+</span><span id="line-856">            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"character </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-857">        <span class="p">)</span>
+</span><span id="line-858">    <span class="n">props</span> <span class="o">=</span> <span class="n">project</span> <span class="o">/</span> <span class="s2">"assets"</span> <span class="o">/</span> <span class="s2">"props"</span>
+</span><span id="line-859">    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">_subdirs</span><span class="p">(</span><span class="n">props</span><span class="p">):</span>
+</span><span id="line-860">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-861">            <span class="n">doc</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">d</span> <span class="o">/</span> <span class="s2">"prop.json"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-862">            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="line-863">                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"prop.json must hold a JSON object"</span><span class="p">)</span>
+</span><span id="line-864">            <span class="n">kind</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">,</span> <span class="s2">"PropDescriptor"</span><span class="p">)</span>
+</span><span id="line-865">        <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-866">            <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s2">"prop </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">ERROR_MARKER</span><span class="si">}</span><span class="s2"> prop.json: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-867">            <span class="k">continue</span>
+</span><span id="line-868">        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"PropDescriptor"</span><span class="p">:</span>
+</span><span id="line-869">            <span class="n">run</span><span class="p">(</span>
+</span><span id="line-870">                <span class="n">an</span> <span class="o">+</span> <span class="p">[</span><span class="s2">"props"</span><span class="p">,</span> <span class="s2">"validate"</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"--out-dir"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">props</span><span class="p">)],</span>
+</span><span id="line-871">                <span class="n">cwd</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+</span><span id="line-872">                <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"prop </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-873">            <span class="p">)</span>
+</span><span id="line-874">    <span class="n">run</span><span class="p">(</span>
+</span><span id="line-875">        <span class="n">an</span> <span class="o">+</span> <span class="p">[</span><span class="s2">"validate"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project</span><span class="p">),</span> <span class="s2">"--strict-assets"</span><span class="p">],</span>
+</span><span id="line-876">        <span class="n">cwd</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+</span><span id="line-877">        <span class="n">label</span><span class="o">=</span><span class="s2">"scene"</span><span class="p">,</span>
+</span><span id="line-878">        <span class="n">expect</span><span class="o">=</span><span class="s2">"validation: passed"</span><span class="p">,</span>
+</span><span id="line-879">    <span class="p">)</span>
+</span><span id="line-880">
+</span><span id="line-881">
 <div class="viewcode-block" id="check_pack">
 <a class="viewcode-back" href="../../_autosummary/cutan.pack.html#cutan.pack.check_pack">[docs]</a>
-</span><span id="line-884"><span class="k">def</span><span class="w"> </span><span class="nf">check_pack</span><span class="p">(</span>
-</span><span id="line-885">    <span class="n">pack_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">,</span>
-</span><span id="line-886">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-887">    <span class="n">workdir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-888">    <span class="n">an_command</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DFLT_AN_COMMAND</span><span class="p">,</span>
-</span><span id="line-889">    <span class="n">python</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-890">    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_STEP_TIMEOUT</span><span class="p">,</span>
-</span><span id="line-891">    <span class="n">deadline</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">DFLT_DEADLINE</span><span class="p">,</span>
-</span><span id="line-892">    <span class="n">child_limits</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-893"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PackReport</span><span class="p">:</span>
-</span><span id="line-894"><span class="w">    </span><span class="sd">"""Check the production pack at ``pack_dir``; return a :class:`PackReport`.</span>
-</span><span id="line-895">
-</span><span id="line-896"><span class="sd">    pack_dir: the pack folder (``scene.md``, ``cast.sh``, ``assets/``, ``PRODUCTION.md``)</span>
-</span><span id="line-897"><span class="sd">    workdir: where the scratch project is built (default: a temporary folder,</span>
-</span><span id="line-898"><span class="sd">        deleted afterwards; given, it is kept, and the project is ``&lt;workdir&gt;/project``)</span>
-</span><span id="line-899"><span class="sd">    an_command: how to run ``an`` (default: ``python -m an`` with this interpreter)</span>
-</span><span id="line-900"><span class="sd">    python: the interpreter for the engine's voice checks (default: the one in</span>
-</span><span id="line-901"><span class="sd">        ``an_command`` when it starts with one, else this one)</span>
-</span><span id="line-902"><span class="sd">    timeout: seconds one step may run before it counts as failed</span>
-</span><span id="line-903"><span class="sd">    deadline: seconds the whole check may run (``None``: no limit)</span>
-</span><span id="line-904"><span class="sd">    child_limits: called in every child process (each ``an`` step and the voice</span>
-</span><span id="line-905"><span class="sd">        check) just before it runs, as ``subprocess.run``'s ``preexec_fn``: a</span>
-</span><span id="line-906"><span class="sd">        host caps memory or CPU once (``resource.setrlimit``) instead of</span>
-</span><span id="line-907"><span class="sd">        wrapping one command. POSIX only (``ValueError`` elsewhere); ``None``: no</span>
-</span><span id="line-908"><span class="sd">        limit. Keep it to ``resource.setrlimit`` with ``resource`` imported</span>
-</span><span id="line-909"><span class="sd">        beforehand: ``preexec_fn`` can deadlock when it imports, logs or takes</span>
-</span><span id="line-910"><span class="sd">        locks while the host runs threads. ``RLIMIT_AS`` is not enforced on macOS</span>
-</span><span id="line-911">
-</span><span id="line-912"><span class="sd">    The pack is untrusted: only :data:`PACK_SUFFIXES` files are copied, the</span>
-</span><span id="line-913"><span class="sd">    ``an`` children run without the working directory on their import path</span>
-</span><span id="line-914"><span class="sd">    and without any secret-looking environment variable, the work is capped</span>
-</span><span id="line-915"><span class="sd">    (:data:`MAX_CAST_LINES`, :data:`MAX_ASSET_FOLDERS`, ``deadline``), and the</span>
-</span><span id="line-916"><span class="sd">    report names no server path (the scratch project is ``&lt;project&gt;``).</span>
-</span><span id="line-917">
-</span><span id="line-918"><span class="sd">    A pack that cannot be checked at all gives a report with one failed</span>
-</span><span id="line-919"><span class="sd">    ``pack`` check; nothing here raises on a bad pack.</span>
-</span><span id="line-920"><span class="sd">    """</span>
-</span><span id="line-921">    <span class="k">if</span> <span class="n">child_limits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"nt"</span><span class="p">:</span>
-</span><span id="line-922">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"child_limits needs a POSIX system (subprocess preexec_fn)"</span><span class="p">)</span>
-</span><span id="line-923">    <span class="n">pack</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">pack_dir</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-</span><span id="line-924">    <span class="n">report</span> <span class="o">=</span> <span class="n">PackReport</span><span class="p">()</span>
-</span><span id="line-925">    <span class="n">an</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">an_command</span><span class="p">)</span>
-</span><span id="line-926">    <span class="n">python</span> <span class="o">=</span> <span class="n">python</span> <span class="ow">or</span> <span class="p">(</span><span class="n">an</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="s2">"python"</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="n">an</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">)</span>
-</span><span id="line-927">    <span class="n">owned</span> <span class="o">=</span> <span class="n">workdir</span> <span class="ow">is</span> <span class="kc">None</span>
-</span><span id="line-928">    <span class="n">work</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"cutan-pack-"</span><span class="p">))</span> <span class="k">if</span> <span class="n">owned</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">workdir</span><span class="p">)</span>
-</span><span id="line-929">    <span class="n">work</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-930">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-931">        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">pack</span> <span class="o">/</span> <span class="s2">"scene.md"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span id="line-932">            <span class="k">raise</span> <span class="n">PackError</span><span class="p">(</span>
-</span><span id="line-933">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pack</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">pack</span><span class="si">}</span><span class="s2"> has no scene.md: is it a production pack?"</span>
-</span><span id="line-934">            <span class="p">)</span>
-</span><span id="line-935">        <span class="n">_build_and_check</span><span class="p">(</span>
-</span><span id="line-936">            <span class="n">pack</span><span class="p">,</span>
-</span><span id="line-937">            <span class="n">work</span> <span class="o">/</span> <span class="s2">"project"</span><span class="p">,</span>
-</span><span id="line-938">            <span class="n">report</span><span class="p">,</span>
-</span><span id="line-939">            <span class="n">an</span><span class="o">=</span><span class="n">an</span><span class="p">,</span>
-</span><span id="line-940">            <span class="n">python</span><span class="o">=</span><span class="n">python</span><span class="p">,</span>
-</span><span id="line-941">            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
-</span><span id="line-942">            <span class="n">deadline</span><span class="o">=</span><span class="n">deadline</span><span class="p">,</span>
-</span><span id="line-943">            <span class="n">child_limits</span><span class="o">=</span><span class="n">child_limits</span><span class="p">,</span>
-</span><span id="line-944">        <span class="p">)</span>
-</span><span id="line-945">    <span class="k">except</span> <span class="n">PackError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-946">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"pack"</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ERROR_MARKER</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-947">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - a malformed pack ends in a failed check, not a traceback</span>
-</span><span id="line-948">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-</span><span id="line-949">            <span class="s2">"pack"</span><span class="p">,</span>
-</span><span id="line-950">            <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-951">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ERROR_MARKER</span><span class="si">}</span><span class="s2"> the pack could not be checked: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-952">        <span class="p">)</span>
-</span><span id="line-953">    <span class="k">finally</span><span class="p">:</span>
-</span><span id="line-954">        <span class="k">if</span> <span class="n">owned</span><span class="p">:</span>
-</span><span id="line-955">            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">work</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-956">    <span class="n">places</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-957">        <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">work</span> <span class="o">/</span> <span class="s2">"project"</span><span class="p">),</span> <span class="s2">"&lt;project&gt;"</span><span class="p">),</span>
-</span><span id="line-958">        <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">work</span><span class="p">),</span> <span class="s2">"&lt;scratch&gt;"</span><span class="p">),</span>
-</span><span id="line-959">        <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pack</span><span class="p">),</span> <span class="s2">"&lt;pack&gt;"</span><span class="p">),</span>
-</span><span id="line-960">    <span class="p">]</span>
-</span><span id="line-961">    <span class="n">report</span><span class="o">.</span><span class="n">checks</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-962">        <span class="n">PackCheck</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">ok</span><span class="p">,</span> <span class="n">_redact</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">places</span><span class="o">=</span><span class="n">places</span><span class="p">))</span>
-</span><span id="line-963">        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">checks</span>
-</span><span id="line-964">    <span class="p">]</span>
-</span><span id="line-965">    <span class="k">return</span> <span class="n">report</span></div>
+</span><span id="line-882"><span class="k">def</span><span class="w"> </span><span class="nf">check_pack</span><span class="p">(</span>
+</span><span id="line-883">    <span class="n">pack_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">,</span>
+</span><span id="line-884">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-885">    <span class="n">workdir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-886">    <span class="n">an_command</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DFLT_AN_COMMAND</span><span class="p">,</span>
+</span><span id="line-887">    <span class="n">python</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-888">    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_STEP_TIMEOUT</span><span class="p">,</span>
+</span><span id="line-889">    <span class="n">deadline</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">DFLT_DEADLINE</span><span class="p">,</span>
+</span><span id="line-890">    <span class="n">child_limits</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-891"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PackReport</span><span class="p">:</span>
+</span><span id="line-892"><span class="w">    </span><span class="sd">"""Check the production pack at ``pack_dir``; return a :class:`PackReport`.</span>
+</span><span id="line-893">
+</span><span id="line-894"><span class="sd">    pack_dir: the pack folder (``scene.md``, ``cast.sh``, ``assets/``, ``PRODUCTION.md``)</span>
+</span><span id="line-895"><span class="sd">    workdir: where the scratch project is built (default: a temporary folder,</span>
+</span><span id="line-896"><span class="sd">        deleted afterwards; given, it is kept, and the project is ``&lt;workdir&gt;/project``)</span>
+</span><span id="line-897"><span class="sd">    an_command: how to run ``an`` (default: ``python -m an`` with this interpreter)</span>
+</span><span id="line-898"><span class="sd">    python: the interpreter for the engine's voice checks (default: the one in</span>
+</span><span id="line-899"><span class="sd">        ``an_command`` when it starts with one, else this one)</span>
+</span><span id="line-900"><span class="sd">    timeout: seconds one step may run before it counts as failed</span>
+</span><span id="line-901"><span class="sd">    deadline: seconds the whole check may run (``None``: no limit)</span>
+</span><span id="line-902"><span class="sd">    child_limits: called in every child process (each ``an`` step and the voice</span>
+</span><span id="line-903"><span class="sd">        check) just before it runs, as ``subprocess.run``'s ``preexec_fn``: a</span>
+</span><span id="line-904"><span class="sd">        host caps memory or CPU once (``resource.setrlimit``) instead of</span>
+</span><span id="line-905"><span class="sd">        wrapping one command. POSIX only (``ValueError`` elsewhere); ``None``: no</span>
+</span><span id="line-906"><span class="sd">        limit. Keep it to ``resource.setrlimit`` with ``resource`` imported</span>
+</span><span id="line-907"><span class="sd">        beforehand: ``preexec_fn`` can deadlock when it imports, logs or takes</span>
+</span><span id="line-908"><span class="sd">        locks while the host runs threads. ``RLIMIT_AS`` is not enforced on macOS</span>
+</span><span id="line-909">
+</span><span id="line-910"><span class="sd">    The pack is untrusted: only :data:`PACK_SUFFIXES` files are copied, the</span>
+</span><span id="line-911"><span class="sd">    ``an`` children run without the working directory on their import path</span>
+</span><span id="line-912"><span class="sd">    and without any secret-looking environment variable, the work is capped</span>
+</span><span id="line-913"><span class="sd">    (:data:`MAX_CAST_LINES`, :data:`MAX_ASSET_FOLDERS`, ``deadline``), and the</span>
+</span><span id="line-914"><span class="sd">    report names no server path (the scratch project is ``&lt;project&gt;``).</span>
+</span><span id="line-915">
+</span><span id="line-916"><span class="sd">    A pack that cannot be checked at all gives a report with one failed</span>
+</span><span id="line-917"><span class="sd">    ``pack`` check; nothing here raises on a bad pack.</span>
+</span><span id="line-918"><span class="sd">    """</span>
+</span><span id="line-919">    <span class="k">if</span> <span class="n">child_limits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"nt"</span><span class="p">:</span>
+</span><span id="line-920">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"child_limits needs a POSIX system (subprocess preexec_fn)"</span><span class="p">)</span>
+</span><span id="line-921">    <span class="n">pack</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">pack_dir</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+</span><span id="line-922">    <span class="n">report</span> <span class="o">=</span> <span class="n">PackReport</span><span class="p">()</span>
+</span><span id="line-923">    <span class="n">an</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">an_command</span><span class="p">)</span>
+</span><span id="line-924">    <span class="n">python</span> <span class="o">=</span> <span class="n">python</span> <span class="ow">or</span> <span class="p">(</span><span class="n">an</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="s2">"python"</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="n">an</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">)</span>
+</span><span id="line-925">    <span class="n">owned</span> <span class="o">=</span> <span class="n">workdir</span> <span class="ow">is</span> <span class="kc">None</span>
+</span><span id="line-926">    <span class="n">work</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"cutan-pack-"</span><span class="p">))</span> <span class="k">if</span> <span class="n">owned</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">workdir</span><span class="p">)</span>
+</span><span id="line-927">    <span class="n">work</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-928">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-929">        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">pack</span> <span class="o">/</span> <span class="s2">"scene.md"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span id="line-930">            <span class="k">raise</span> <span class="n">PackError</span><span class="p">(</span>
+</span><span id="line-931">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pack</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">pack</span><span class="si">}</span><span class="s2"> has no scene.md: is it a production pack?"</span>
+</span><span id="line-932">            <span class="p">)</span>
+</span><span id="line-933">        <span class="n">_build_and_check</span><span class="p">(</span>
+</span><span id="line-934">            <span class="n">pack</span><span class="p">,</span>
+</span><span id="line-935">            <span class="n">work</span> <span class="o">/</span> <span class="s2">"project"</span><span class="p">,</span>
+</span><span id="line-936">            <span class="n">report</span><span class="p">,</span>
+</span><span id="line-937">            <span class="n">an</span><span class="o">=</span><span class="n">an</span><span class="p">,</span>
+</span><span id="line-938">            <span class="n">python</span><span class="o">=</span><span class="n">python</span><span class="p">,</span>
+</span><span id="line-939">            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+</span><span id="line-940">            <span class="n">deadline</span><span class="o">=</span><span class="n">deadline</span><span class="p">,</span>
+</span><span id="line-941">            <span class="n">child_limits</span><span class="o">=</span><span class="n">child_limits</span><span class="p">,</span>
+</span><span id="line-942">        <span class="p">)</span>
+</span><span id="line-943">    <span class="k">except</span> <span class="n">PackError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-944">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"pack"</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ERROR_MARKER</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-945">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - a malformed pack ends in a failed check, not a traceback</span>
+</span><span id="line-946">        <span class="n">report</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+</span><span id="line-947">            <span class="s2">"pack"</span><span class="p">,</span>
+</span><span id="line-948">            <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-949">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ERROR_MARKER</span><span class="si">}</span><span class="s2"> the pack could not be checked: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-950">        <span class="p">)</span>
+</span><span id="line-951">    <span class="k">finally</span><span class="p">:</span>
+</span><span id="line-952">        <span class="k">if</span> <span class="n">owned</span><span class="p">:</span>
+</span><span id="line-953">            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">work</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-954">    <span class="n">places</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-955">        <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">work</span> <span class="o">/</span> <span class="s2">"project"</span><span class="p">),</span> <span class="s2">"&lt;project&gt;"</span><span class="p">),</span>
+</span><span id="line-956">        <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">work</span><span class="p">),</span> <span class="s2">"&lt;scratch&gt;"</span><span class="p">),</span>
+</span><span id="line-957">        <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pack</span><span class="p">),</span> <span class="s2">"&lt;pack&gt;"</span><span class="p">),</span>
+</span><span id="line-958">    <span class="p">]</span>
+</span><span id="line-959">    <span class="n">report</span><span class="o">.</span><span class="n">checks</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-960">        <span class="n">PackCheck</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">ok</span><span class="p">,</span> <span class="n">_redact</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">places</span><span class="o">=</span><span class="n">places</span><span class="p">))</span>
+</span><span id="line-961">        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">checks</span>
+</span><span id="line-962">    <span class="p">]</span>
+</span><span id="line-963">    <span class="k">return</span> <span class="n">report</span></div>
 
-</span><span id="line-966">
-</span><span id="line-967">
+</span><span id="line-964">
+</span><span id="line-965">
 <div class="viewcode-block" id="main">
 <a class="viewcode-back" href="../../_autosummary/cutan.pack.html#cutan.pack.main">[docs]</a>
-</span><span id="line-968"><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span><span id="line-969"><span class="w">    </span><span class="sd">"""``python -m cutan.pack &lt;pack&gt; [--keep] [--json]``: check a pack; exit 1 on a failure."""</span>
-</span><span id="line-970">    <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
-</span><span id="line-971">
-</span><span id="line-972">    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Check a cut-out production pack."</span><span class="p">)</span>
-</span><span id="line-973">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"pack"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"the production pack folder"</span><span class="p">)</span>
-</span><span id="line-974">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--keep"</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"keep the scratch project"</span><span class="p">)</span>
-</span><span id="line-975">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--json"</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"print the report as JSON"</span><span class="p">)</span>
-</span><span id="line-976">    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
-</span><span id="line-977">    <span class="n">workdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"cutan-pack-"</span><span class="p">))</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">keep</span> <span class="k">else</span> <span class="kc">None</span>
-</span><span id="line-978">    <span class="n">report</span> <span class="o">=</span> <span class="n">check_pack</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">pack</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="n">workdir</span><span class="p">)</span>
-</span><span id="line-979">    <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">json</span> <span class="k">else</span> <span class="n">report</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
-</span><span id="line-980">    <span class="k">if</span> <span class="n">workdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-981">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Scratch project kept at </span><span class="si">{</span><span class="n">workdir</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'project'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-982">    <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">report</span><span class="o">.</span><span class="n">ok</span> <span class="k">else</span> <span class="mi">1</span></div>
+</span><span id="line-966"><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="line-967"><span class="w">    </span><span class="sd">"""``python -m cutan.pack &lt;pack&gt; [--keep] [--json]``: check a pack; exit 1 on a failure."""</span>
+</span><span id="line-968">    <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+</span><span id="line-969">
+</span><span id="line-970">    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Check a cut-out production pack."</span><span class="p">)</span>
+</span><span id="line-971">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"pack"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"the production pack folder"</span><span class="p">)</span>
+</span><span id="line-972">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--keep"</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"keep the scratch project"</span><span class="p">)</span>
+</span><span id="line-973">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--json"</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"print the report as JSON"</span><span class="p">)</span>
+</span><span id="line-974">    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+</span><span id="line-975">    <span class="n">workdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"cutan-pack-"</span><span class="p">))</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">keep</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span id="line-976">    <span class="n">report</span> <span class="o">=</span> <span class="n">check_pack</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">pack</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="n">workdir</span><span class="p">)</span>
+</span><span id="line-977">    <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">json</span> <span class="k">else</span> <span class="n">report</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
+</span><span id="line-978">    <span class="k">if</span> <span class="n">workdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-979">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Scratch project kept at </span><span class="si">{</span><span class="n">workdir</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'project'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-980">    <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">report</span><span class="o">.</span><span class="n">ok</span> <span class="k">else</span> <span class="mi">1</span></div>
 
-</span><span id="line-983">
-</span><span id="line-984">
-</span><span id="line-985"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-</span><span id="line-986">    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</span><span id="line-981">
+</span><span id="line-982">
+</span><span id="line-983"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+</span><span id="line-984">    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -1219,7 +1217,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=e264953e"></script>
+    <script src="../../_static/documentation_options.js?v=0a7e36fc"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

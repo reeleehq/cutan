@@ -11,6 +11,7 @@ Subcommands (used as `an character <verb> ...`):
 - `new`       — generate a fresh character from DiceBear or fallback art.
 - `add-views` — give an offline character its turnaround (an#197).
 - `set-part` — one attachment drawn by a picture instead of the factory’s SVG (cutan#92).
+- `from-sheet` — a reference sheet carved onto a character’s attachments (cutan#128).
 - `add-half-lid` — a HALF eyelid drawing from the rig’s own lid art (cutan#65).
 - `mouths`    — regenerate the 9-shape default mouth set.
 - `validate`  — completeness check.
@@ -34,6 +35,7 @@ Subcommands (used as `an character <verb> ...`):
 | [`capabilities`](#cutan.characters.cli.capabilities)(name[, out_dir, as_json, style])     | What a character affords, and per aspect which methods apply and what the rest lack.                                                                                                                                                                                                      |
 | [`contract`](#cutan.characters.cli.contract)()                                        | Print the art-package contract an illustrator must satisfy.                                                                                                                                                                                                                               |
 | [`feet_origin`](#cutan.characters.cli.feet_origin)(name[, out_dir, undo])                | Make an existing character stand on its feet (an#285): its stage point (`stage.at`) becomes where its feet are, as for a character `an character new` makes now.                                                                                                                          |
+| [`from_sheet`](#cutan.characters.cli.from_sheet)(name, sheet, recipe[, out_dir])        | Draw attachments of `name` from regions of a reference sheet (cutan#128): each region is carved (`cutan.carve`) and set like `set-part`; the quality warnings of every part are printed.                                                                                                  |
 | [`mouths`](#cutan.characters.cli.mouths)(name[, out_dir, palette, variants])        | Regenerate the default 9-shape mouth set for `name`, plus its `viseme@<form>` variants, and declare them in the descriptor.                                                                                                                                                               |
 | [`new`](#cutan.characters.cli.new)(name[, out_dir, seed, style, voice_ref, ...]) | Create a new character at `out_dir`/`name`.                                                                                                                                                                                                                                               |
 | [`preview`](#cutan.characters.cli.preview)(name[, out_dir, open_browser])            | Render a small HTML viewer that previews all visemes + idle animation.                                                                                                                                                                                                                    |
@@ -169,6 +171,30 @@ moves the character in scenes made before, and prints by how much.
 name: character id
 out_dir: parent directory; defaults to ./assets/characters
 undo: go back to placing it by the middle of its bones
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.from_sheet(name, sheet, recipe, out_dir='')
+
+Draw attachments of `name` from regions of a reference sheet (cutan#128):
+each region is carved (`cutan.carve`) and set like `set-part`; the quality
+warnings of every part are printed. Needs `pip install "cutan[carve]"`.
+
+name: character id (a factory character: `an character new`)
+sheet: the reference sheet picture
+recipe: a JSON file (`cutan.carve.sheet.load_recipe`) 
+
+```
+``
+```
+
+{“source”: {“url”: …, “license”: …} | null, “ours”: false,
+
+> “parts”: [{“attachment”: “head”, “crop”: [x0, y0, x1, y1], “carve”: {“matte”: …, “point”: [x, y]}}]}\`\`;
+> `source` is `frame_source`’s arguments; a sheet with neither a source nor `"ours": true` is refused
+
+out_dir: parent directory; defaults to ./assets/characters
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

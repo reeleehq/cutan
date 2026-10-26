@@ -24,6 +24,7 @@
 - [cutan.carve.prop](_autosummary/cutan.carve.prop.html.md): Write a carving (or a carving split into parts) as a library-ready prop folder.
 - [cutan.carve.provenance](_autosummary/cutan.carve.provenance.html.md): Where carved pixels came from: an &#96;AssetSource&#96; for a frame of a video or an image.
 - [cutan.carve.refine](_autosummary/cutan.carve.refine.html.md): Clean a raw matte into a cut-out’s alpha: keep the subject, close it, edge it, de-spill it.
+- [cutan.carve.sheet](_autosummary/cutan.carve.sheet.html.md): A reference sheet becomes an art package: carve each region, set it on the rig (cutan#128).
 - [cutan.carve.superres](_autosummary/cutan.carve.superres.html.md): Super-resolution strategies: more pixels for a part carved from a low-resolution frame (cutan#110).
 - [cutan.characters](_autosummary/cutan.characters.html.md): Character art system: Spine-shaped descriptor + SVG sidecars.
 - [cutan.characters.brows](_autosummary/cutan.characters.brows.html.md): Brow acting: where the brows can go, what may not draw there, and the &#96;face.brows&#96; capability.
@@ -87,7 +88,7 @@
 - [cutan.verify.cadence](_autosummary/cutan.verify.cadence.html.md): Pre-render cadence lint: the scene’s timing against its style spec (catalogue B6, an#519 rank 5).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 15:32 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 15:58 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

@@ -165,6 +165,9 @@ on a fixed canvas (512², the face centre as origin); the face is a hand box
 or found by a locator (<code class="docutils literal notranslate"><span class="pre">insightface</span></code>, <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">"cutan[faces]"</span></code>).</p></li>
 <li><p><strong>Moving parts:</strong> <a class="reference internal" href="#cutan.carve.split_parts" title="cutan.carve.split_parts"><code class="xref py py-func docutils literal notranslate"><span class="pre">split_parts()</span></code></a> lifts parts off a carving, each with a
 pivot (clock hands off the face), painting the base in under them.</p></li>
+<li><p><strong>A reference sheet:</strong> <a class="reference internal" href="cutan.carve.sheet.html#cutan.carve.sheet.sheet_to_package" title="cutan.carve.sheet.sheet_to_package"><code class="xref py py-func docutils literal notranslate"><span class="pre">sheet_to_package()</span></code></a> carves
+regions of a sheet onto a factory character’s attachments (<code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span>
+<span class="pre">from-sheet</span></code>), with every part’s quality warnings in the report.</p></li>
 <li><p><strong>Provenance:</strong> <a class="reference internal" href="#cutan.carve.frame_source" title="cutan.carve.frame_source"><code class="xref py py-func docutils literal notranslate"><span class="pre">frame_source()</span></code></a> (a licence is required, a YouTube URL
 gets its <code class="docutils literal notranslate"><span class="pre">&amp;t=</span></code> deep link); <a class="reference internal" href="#cutan.carve.write_prop" title="cutan.carve.write_prop"><code class="xref py py-func docutils literal notranslate"><span class="pre">write_prop()</span></code></a> writes <code class="docutils literal notranslate"><span class="pre">prop.json</span></code> +
 <code class="docutils literal notranslate"><span class="pre">parts/</span></code> with the source in the descriptor, recipe and quality included,
@@ -1099,7 +1102,10 @@ whole descriptor is valid.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="cutan.carve.refine.html#module-cutan.carve.refine" title="cutan.carve.refine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refine</span></code></a></p></td>
 <td><p>Clean a raw matte into a cut-out's alpha: keep the subject, close it, edge it, de-spill it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cutan.carve.superres.html#module-cutan.carve.superres" title="cutan.carve.superres"><code class="xref py py-obj docutils literal notranslate"><span class="pre">superres</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.carve.sheet.html#module-cutan.carve.sheet" title="cutan.carve.sheet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sheet</span></code></a></p></td>
+<td><p>A reference sheet becomes an art package: carve each region, set it on the rig (cutan#128).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.carve.superres.html#module-cutan.carve.superres" title="cutan.carve.superres"><code class="xref py py-obj docutils literal notranslate"><span class="pre">superres</span></code></a></p></td>
 <td><p>Super-resolution strategies: more pixels for a part carved from a low-resolution frame (cutan#110).</p></td>
 </tr>
 </tbody>
@@ -1187,7 +1193,7 @@ whole descriptor is valid.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=e264953e"></script>
+<script src="../_static/documentation_options.js?v=0a7e36fc"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
