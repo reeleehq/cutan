@@ -9,6 +9,7 @@ Subcommands (used as ``an character <verb> ...``):
 - ``new``       — generate a fresh character from DiceBear or fallback art.
 - ``add-views`` — give an offline character its turnaround (an#197).
 - ``set-part`` — one attachment drawn by a picture instead of the factory's SVG (cutan#92).
+- ``from-sheet`` — a reference sheet carved onto a character's attachments (cutan#128).
 - ``add-half-lid`` — a HALF eyelid drawing from the rig's own lid art (cutan#65).
 - ``mouths``    — regenerate the 9-shape default mouth set.
 - ``validate``  — completeness check.
@@ -333,6 +334,36 @@ def set_part(name: str, attachment: str, file: str, out_dir: str = "") -> str:
         else ""
     )
     return f"{attachment!r} of {name!r} is now drawn by {Path(file).name}{note}"
+
+
+def from_sheet(name: str, sheet: str, recipe: str, out_dir: str = "") -> str:
+    """Draw attachments of ``name`` from regions of a reference sheet (cutan#128):
+    each region is carved (``cutan.carve``) and set like ``set-part``; the quality
+    warnings of every part are printed. Needs ``pip install "cutan[carve]"``.
+
+    name: character id (a factory character: ``an character new``)
+    sheet: the reference sheet picture
+    recipe: a JSON file ``{"source": {"url": ..., "license": ...} | null, "ours": false,
+        "parts": [{"attachment": "head", "crop": [x0, y0, x1, y1], "carve": {"matte": ..., "point": [x, y]}}]}``;
+        ``source`` is ``frame_source``'s arguments; a sheet with neither a source nor ``"ours": true`` is refused
+    out_dir: parent directory; defaults to ./assets/characters
+    """
+    from cutan.carve import MissingDependencyError, frame_source
+    from cutan.carve.sheet import sheet_to_package
+    from cutan.characters.set_part import SetPartError
+
+    char_dir = _resolve_target(out_dir) / name
+    if not (char_dir / "character.json").is_file():
+        return f"no character at {char_dir}"
+    try:
+        doc = json.loads(Path(recipe).read_text(encoding="utf-8"))
+        source = frame_source(**doc["source"]) if doc.get("source") else None
+        report = sheet_to_package(
+            sheet, doc["parts"], char_dir, source=source, ours=bool(doc.get("ours"))
+        )
+    except (SetPartError, MissingDependencyError, OSError, ValueError, KeyError, TypeError) as e:
+        return failed(f"{type(e).__name__}: {e}")
+    return report.format()
 
 
 def add_views(name: str, out_dir: str = "") -> str:
@@ -823,6 +854,7 @@ _dispatch_funcs = [
     add_gaze,
     add_half_lid,
     set_part,
+    from_sheet,
     add_views,
     add_forearms,
     add_limits,

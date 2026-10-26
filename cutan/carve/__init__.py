@@ -25,6 +25,9 @@ a neural matte wins on photos, GrabCut on a single prop in a rough box.
   or found by a locator (``insightface``, ``pip install "cutan[faces]"``).
 - **Moving parts:** :func:`split_parts` lifts parts off a carving, each with a
   pivot (clock hands off the face), painting the base in under them.
+- **A reference sheet:** :func:`~cutan.carve.sheet.sheet_to_package` carves
+  regions of a sheet onto a factory character's attachments (``an character
+  from-sheet``), with every part's quality warnings in the report.
 - **Provenance:** :func:`frame_source` (a licence is required, a YouTube URL
   gets its ``&t=`` deep link); :func:`write_prop` writes ``prop.json`` +
   ``parts/`` with the source in the descriptor, recipe and quality included,
