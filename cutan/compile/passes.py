@@ -1727,27 +1727,30 @@ def _solve_face(
         bindings = binding_for(desc)
     except ExpressionResolutionError as e:
         raise CutoutCompileError(str(e)) from e
+    brow_paths: set[str] = set()  # nodes a brow SetBinding keys, expressed or not
     for b in bindings:
+        path = f"{entity_id}/{slot_node_path(desc, b.slot)}"
+        if path not in vocab.paths:
+            continue  # the rig builder did not build the slot (suppressed / no art)
+        if isinstance(b, SetBinding) and b.set_family == BROW_CHANNEL:
+            brow_paths.add(path)
         samples = curves.get(b.axis)
         if samples is None:
             continue
         samples = (samples + [samples[-1]] * n)[:n]
-        path = f"{entity_id}/{slot_node_path(desc, b.slot)}"
-        if path not in vocab.paths:
-            continue  # the rig builder did not build the slot (suppressed / no art)
         if isinstance(b, ChannelBinding):
             gain = b.gain * (k if b.rig_scaled else 1.0)
             acc = offsets.setdefault((path, b.property), [0.0] * n)
             for i in range(n):
                 acc[i] += samples[i] * gain
-        elif isinstance(b, SetBinding) and b.set_family == BROW_CHANNEL:
-            kind = BROW_AXIS_KIND.get(b.axis)
-            if kind is not None:
-                acc = brow_expr.setdefault(path, {}).setdefault(kind, [0.0] * n)
-                for i in range(n):
-                    acc[i] += samples[i]
         elif isinstance(b, SetBinding):
-            acc = lid_expr.setdefault(path, [0.0] * n)
+            # `binding_for` admits only the families of SET_FAMILY_AXES.
+            if b.set_family == BROW_CHANNEL:
+                acc = brow_expr.setdefault(path, {}).setdefault(
+                    BROW_AXIS_KIND[b.axis], [0.0] * n
+                )
+            else:
+                acc = lid_expr.setdefault(path, [0.0] * n)
             for i in range(n):
                 acc[i] += samples[i]
 
@@ -1780,7 +1783,7 @@ def _solve_face(
             )
         )
     # Lids: every eye node, expression or not — a blink is a lid contributor.
-    placed_lids: list[PlacedClipJSON] = []
+    placed_face_sets: list[PlacedClipJSON] = []
     for path in _eye_paths(vocab, entity_id):
         expr = lid_expr.get(path, [0.0] * n)
         eyelid = vocab.node_sets.get(path, {}).get(EYELID_CHANNEL) or {}
@@ -1790,7 +1793,12 @@ def _solve_face(
             continue  # rests closed: the author's call, not a blink's
         if has_art:
             per_view = _face_view_spans(
-                vocab, entity_id, path, EYELID_CHANNEL, view_spans, drawn=_lid_drawn
+                vocab,
+                entity_id,
+                path,
+                base=EYELID_CHANNEL,
+                view_spans=view_spans,
+                drawn=_lid_drawn,
             )
             lid_sets = {EYELID_CHANNEL} | {v for _, _, v in per_view or ()}
             lid_authored = any((path, lid) in authored for lid in lid_sets)
@@ -1802,7 +1810,7 @@ def _solve_face(
                 # but then carry no auto-blink (an#88: authored overrides the
                 # blinks), and the authored clips still win where they play.
                 blink_windows = [] if lid_authored else windows
-                placed_lids.extend(
+                placed_face_sets.extend(
                     _keyed_set_clips(
                         shot,
                         entity_id,
@@ -1856,21 +1864,27 @@ def _solve_face(
     # view where the rig declares `brow@<view>`. An authored `brow` channel
     # wins; a rig without the set (or resting on other art) is untouched.
     zeros = [0.0] * n
-    for path, axes_ in sorted(brow_expr.items()):
+    for path in sorted(brow_paths):
+        axes_ = brow_expr.get(path, {})
         brow_set = vocab.node_sets.get(path, {}).get(BROW_CHANNEL) or {}
         if BROW_KEY_NONE not in brow_set:
             continue
         if vocab.rest_key(path, BROW_CHANNEL) != BROW_KEY_NONE:
             continue  # rests on other art: the swap would replace it and never restore it
         per_view = _face_view_spans(
-            vocab, entity_id, path, BROW_CHANNEL, view_spans, drawn=_brow_drawn
+            vocab,
+            entity_id,
+            path,
+            base=BROW_CHANNEL,
+            view_spans=view_spans,
+            drawn=_brow_drawn,
         )
         brow_sets = {BROW_CHANNEL} | {v for _, _, v in per_view or ()}
         if any((path, name) in authored for name in brow_sets):
             continue
         height, angle = axes_.get("height", zeros), axes_.get("angle", zeros)
         if per_view:
-            placed_lids.extend(
+            placed_face_sets.extend(
                 _keyed_set_clips(
                     shot,
                     entity_id,
@@ -1910,7 +1924,7 @@ def _solve_face(
         placed.append(
             PlacedClipJSON(animation_id=anim_id, start_time=0.0, duration=duration)
         )
-    placed.extend(placed_lids)
+    placed.extend(placed_face_sets)
 
     # The silent mouth form: hold the variant's rest key over each expression
     # span, outside this entity's dialogue lines — and, whenever any variant is
@@ -2102,9 +2116,9 @@ def _face_view_spans(
     vocab: _SwapVocabulary,
     entity_id: str,
     path: str,
+    *,
     base: str,
     view_spans: list[_ViewSpan] | None,
-    *,
     drawn: Callable[[Collection[str]], bool],
 ) -> list[tuple[float, float, str]] | None:
     """``[(start, end, set)]`` over the shot for one face node's ``base`` set

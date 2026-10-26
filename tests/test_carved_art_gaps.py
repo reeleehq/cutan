@@ -717,3 +717,50 @@ def test_the_brows_follow_the_view_s_own_set(tmp_path):
     assert pose(0.5).get((brow, "brow")) == "ANGRY"
     assert pose(1.5).get((brow, "brow@side")) == "ANGRY"
     assert pose(2.5).get((brow, "brow@side")) == "NONE"  # the expression has ended
+
+
+def _side_browed(tmp_path):
+    doc = _browed(tmp_path / "chars", views=True)
+    _set_brows_rest_on_none(doc)
+    for slot in ("left_brow", "right_brow"):
+        skin = doc["skins"]["default"]["slots"][slot]
+        skin["none_side"] = {**skin["none"], "path": f"parts/{slot}_none_side.png"}
+        _png(tmp_path / "chars" / "rae" / skin["none_side"]["path"], (40, 40), (5, 5, 5, 255))
+    doc["asset_sets"]["brow@side"] = {"NONE": "none_side"}
+    return doc
+
+
+def test_the_profile_s_brows_show_without_any_expression(tmp_path):
+    doc = _side_browed(tmp_path)
+    scene = _compile(
+        _shot(SetAction(kind="set", target="rae", property="view", value="side", at=1.0)),
+        _store(tmp_path, doc),
+    )
+    assert _pose(scene, 2.0).get(("rae/head/right_brow", "brow@side")) == "NONE"
+
+
+def test_a_swap_only_binding_still_counts_as_brows_that_act(tmp_path):
+    from cutan.characters.brows import brow_slots
+
+    doc = _browed(tmp_path / "chars")
+    doc["expression_binding"] = [
+        {"axis": "brow_angle_l", "slot": "left_brow", "set_family": "brow"}
+    ]
+    assert brow_slots(CharacterDescriptor.model_validate(doc)) == ["left_brow"]
+
+
+@pytest.mark.parametrize(
+    "entry",
+    [
+        {"axis": "lid_open_l", "slot": "left_brow", "set_family": "brow"},
+        {"axis": "brow_angle_l", "slot": "left_brow", "set_family": "brwo"},
+        {"axis": "brow_angle_l", "slot": "left_eye", "set_family": "eyelid"},
+    ],
+)
+def test_a_set_binding_must_name_a_family_and_an_axis_it_reads(tmp_path, entry):
+    from cutan.expression.binding import ExpressionResolutionError, binding_for
+
+    doc = _browed(tmp_path / "chars")
+    doc["expression_binding"] = [entry]
+    with pytest.raises(ExpressionResolutionError, match="expression_binding keys"):
+        binding_for(CharacterDescriptor.model_validate(doc))
