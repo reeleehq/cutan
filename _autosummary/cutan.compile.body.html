@@ -96,6 +96,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cutan.genre.html">cutan.genre</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.impacts.html">cutan.impacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.library.html">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.marionette.html">cutan.marionette</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.pack.html">cutan.pack</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.projects_cli.html">cutan.projects_cli</a></li>
@@ -146,6 +147,18 @@ a close-up) derives the same relation: the prop’s size relative to the
 character and its anchor on the body cannot drift between shots.</p>
 <p>A prop placed WITH <code class="docutils literal notranslate"><span class="pre">stage.at</span></code> keeps the author’s placement, and
 <code class="docutils literal notranslate"><span class="pre">cutout.body_attachment</span></code> checks it against the same derivation.</p>
+<p><strong>The prop follows the body through the shot</strong> (cutan#104, the constraint
+layer): a prop placed by its body whose character moves in the shot (an
+authored tween or play on it or its parts, or a joint, a verb or a hold that
+makes the shot solve) gets one <code class="docutils literal notranslate"><span class="pre">pin</span></code> per socket, from the socket’s point on
+its art to the character’s bone, held for the whole shot. The <code class="docutils literal notranslate"><span class="pre">solve</span></code> pass
+then keeps the sockets on the bones as the torso nods or the shoulders move,
+and <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code> (<code class="docutils literal notranslate"><span class="pre">cutout.body_attachment</span></code>, which reads the compiled
+shot’s solve report: the pins are added at compile, after the core’s joint
+checks look) reports a pin the motion pulls off its bone, with the time, and a
+prop whose sockets do not fit the bones, which is placed once. A prop with authored motion of its own is
+left to that motion. A shot where the character holds still gets none, and
+compiles as it always did.</p>
 <p>Nothing changes for a stored scene: no prop declared a body attachment before
 this existed, and a prop that declares none is never touched.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">Shot</span>
@@ -153,14 +166,71 @@ this existed, and a prop that declares none is never touched.</p>
 </span><span id="line-3"><span class="go">'s'</span>
 </span></code></pre></div>
 </div>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.body.PIN_RESIDUAL_PX" title="cutan.compile.body.PIN_RESIDUAL_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PIN_RESIDUAL_PX</span></code></a></p></td>
+<td><p>How far (px) the derived placement may leave a socket from its bone and still be followed by a pin: a hard pin holds the point exactly, so a mismatch beyond this would drag the prop off its derived place (and, with several sockets, fight the others and be given up).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.compile.body.MOTION_KINDS" title="cutan.compile.body.MOTION_KINDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MOTION_KINDS</span></code></a></p></td>
+<td><p>The action kinds that move the parts of the entity they name.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.body.MOTION_PROPERTIES" title="cutan.compile.body.MOTION_PROPERTIES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MOTION_PROPERTIES</span></code></a></p></td>
+<td><p>The properties of a <code class="docutils literal notranslate"><span class="pre">tween</span></code> that move a part (not its look).</p></td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.body.body_attachment_pins" title="cutan.compile.body.body_attachment_pins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">body_attachment_pins</span></code></a>(shot, prop_entity, mall, *)</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">pin</span></code> actions that keep a body-attached prop's sockets on its character's bones.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.compile.body.why_not_followed" title="cutan.compile.body.why_not_followed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">why_not_followed</span></code></a>(shot, prop_entity, mall, *)</p></td>
+<td><p>Why a body-attached prop that moves with its character is NOT given pins ('' when it is followed, or when there is nothing to follow).</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.compile.body.derive_body_placements" title="cutan.compile.body.derive_body_placements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">derive_body_placements</span></code></a>(shot, mall)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">shot</span></code> with every body-attached prop that has no <code class="docutils literal notranslate"><span class="pre">stage.at</span></code> placed by its body.</p></td>
 </tr>
 </tbody>
 </table>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.compile.body.MOTION_KINDS">
+<span class="sig-prename descclassname"><span class="pre">cutan.compile.body.</span></span><span class="sig-name descname"><span class="pre">MOTION_KINDS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">frozenset</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'play',</span> <span class="pre">'tween'})</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.body.MOTION_KINDS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.body.MOTION_KINDS'">¶</a></dt>
+<dd><p>The action kinds that move the parts of the entity they name.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.compile.body.MOTION_PROPERTIES">
+<span class="sig-prename descclassname"><span class="pre">cutan.compile.body.</span></span><span class="sig-name descname"><span class="pre">MOTION_PROPERTIES</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">frozenset</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'rotation',</span> <span class="pre">'rotation_rad',</span> <span class="pre">'scale_x',</span> <span class="pre">'scale_y',</span> <span class="pre">'x',</span> <span class="pre">'y'})</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.body.MOTION_PROPERTIES" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.body.MOTION_PROPERTIES'">¶</a></dt>
+<dd><p>The properties of a <code class="docutils literal notranslate"><span class="pre">tween</span></code> that move a part (not its look).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="cutan.compile.body.PIN_RESIDUAL_PX">
+<span class="sig-prename descclassname"><span class="pre">cutan.compile.body.</span></span><span class="sig-name descname"><span class="pre">PIN_RESIDUAL_PX</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.body.PIN_RESIDUAL_PX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.body.PIN_RESIDUAL_PX'">¶</a></dt>
+<dd><p>How far (px) the derived placement may leave a socket from its bone and still
+be followed by a pin: a hard pin holds the point exactly, so a mismatch beyond
+this would drag the prop off its derived place (and, with several sockets,
+fight the others and be given up). Such a prop is placed once, as before.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.compile.body.body_attachment_pins">
+<span class="sig-prename descclassname"><span class="pre">cutan.compile.body.</span></span><span class="sig-name descname"><span class="pre">body_attachment_pins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_entity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mall</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">placed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/compile/body.html#body_attachment_pins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.body.body_attachment_pins" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.body.body_attachment_pins'">¶</a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">pin</span></code> actions that keep a body-attached prop’s sockets on its character’s bones.</p>
+<p>One per socket, from the socket’s point on the prop’s art
+(<code class="docutils literal notranslate"><span class="pre">&lt;prop&gt;/&lt;slot&gt;@u,v</span></code>) to the bone, on the part of the character that sits
+on it (<code class="docutils literal notranslate"><span class="pre">&lt;character&gt;/&lt;slot&gt;@&lt;bone&gt;</span></code>), for the whole shot. Empty unless the
+character moves (<code class="xref py py-func docutils literal notranslate"><span class="pre">_moves()</span></code>, or the shot already solves: a joint, a
+verb or a hold), the prop has no motion of its own, and every socket’s bone
+carries a part, and the derived placement leaves every socket within
+<a class="reference internal" href="#cutan.compile.body.PIN_RESIDUAL_PX" title="cutan.compile.body.PIN_RESIDUAL_PX"><code class="xref py py-data docutils literal notranslate"><span class="pre">PIN_RESIDUAL_PX</span></code></a> of its bone (<code class="docutils literal notranslate"><span class="pre">placed</span></code>: the derivation, else made
+here). Never raises: a prop that cannot be followed is placed once, as it
+always was (<a class="reference internal" href="#cutan.compile.body.why_not_followed" title="cutan.compile.body.why_not_followed"><code class="xref py py-func docutils literal notranslate"><span class="pre">why_not_followed()</span></code></a> says why, for <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.compile.body.derive_body_placements">
 <span class="sig-prename descclassname"><span class="pre">cutan.compile.body.</span></span><span class="sig-name descname"><span class="pre">derive_body_placements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mall</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/compile/body.html#derive_body_placements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.body.derive_body_placements" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.body.derive_body_placements'">¶</a></dt>
@@ -175,11 +245,28 @@ art, crossed limbs) is left as it is: <code class="docutils literal notranslate"
 </dd>
 </dl>
 </dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.compile.body.why_not_followed">
+<span class="sig-prename descclassname"><span class="pre">cutan.compile.body.</span></span><span class="sig-name descname"><span class="pre">why_not_followed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_entity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mall</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">placed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/compile/body.html#why_not_followed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.compile.body.why_not_followed" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.compile.body.why_not_followed'">¶</a></dt>
+<dd><p>Why a body-attached prop that moves with its character is NOT given pins
+(’’ when it is followed, or when there is nothing to follow). For <code class="docutils literal notranslate"><span class="pre">an</span>
+<span class="pre">validate</span></code>: the prop would be placed once and left behind by the motion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
+<li><a :data-current="activeSection === '#cutan.compile.body.MOTION_KINDS'" class="reference internal" href="#cutan.compile.body.MOTION_KINDS"><code class="docutils literal notranslate"><span class="pre">MOTION_KINDS</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.compile.body.MOTION_PROPERTIES'" class="reference internal" href="#cutan.compile.body.MOTION_PROPERTIES"><code class="docutils literal notranslate"><span class="pre">MOTION_PROPERTIES</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.compile.body.PIN_RESIDUAL_PX'" class="reference internal" href="#cutan.compile.body.PIN_RESIDUAL_PX"><code class="docutils literal notranslate"><span class="pre">PIN_RESIDUAL_PX</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.compile.body.body_attachment_pins'" class="reference internal" href="#cutan.compile.body.body_attachment_pins"><code class="docutils literal notranslate"><span class="pre">body_attachment_pins()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.compile.body.derive_body_placements'" class="reference internal" href="#cutan.compile.body.derive_body_placements"><code class="docutils literal notranslate"><span class="pre">derive_body_placements()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.compile.body.why_not_followed'" class="reference internal" href="#cutan.compile.body.why_not_followed"><code class="docutils literal notranslate"><span class="pre">why_not_followed()</span></code></a></li>
 </ul>
 </div>
 </aside>
@@ -193,7 +280,7 @@ art, crossed limbs) is left as it is: <code class="docutils literal notranslate"
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=86ab457a"></script>
+<script src="../_static/documentation_options.js?v=6eb1e6b8"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

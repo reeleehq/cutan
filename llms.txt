@@ -71,6 +71,7 @@
 - [cutan.impacts.stroke](_autosummary/cutan.impacts.stroke.html.md): The stroke: impact events -&gt; one continuous height curve &#96;h(t)&#96;.
 - [cutan.impacts.truth](_autosummary/cutan.impacts.truth.html.md): Ground truth: what was intended, what was executed, and what each frame shows.
 - [cutan.library](_autosummary/cutan.library.html.md): The character analyser: legs, arms, views and mouth chart, derived from the rig.
+- [cutan.marionette](_autosummary/cutan.marionette.html.md): The marionette style’s joints: a control bar, strings, hips (cutan#104).
 - [cutan.motion](_autosummary/cutan.motion.html.md): The cut-out genre’s motion presets: moves that name a rig’s parts or swap its views.
 - [cutan.pack](_autosummary/cutan.pack.html.md): Check a cut-out production pack with cutan’s own validators (cutan#87).
 - [cutan.projects_cli](_autosummary/cutan.projects_cli.html.md): &#96;an projects ...&#96; — a store-backed project from the shell (cutan#91).
@@ -83,7 +84,7 @@
 - [cutan.verify.body](_autosummary/cutan.verify.body.html.md): Body continuity: a prop that depicts a character’s limbs must meet that character’s body.
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 05:53 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 06:07 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

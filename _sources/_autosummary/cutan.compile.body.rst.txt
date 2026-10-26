@@ -4,9 +4,19 @@ cutan.compile.body
 .. automodule:: cutan.compile.body
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      PIN_RESIDUAL_PX
+      MOTION_KINDS
+      MOTION_PROPERTIES
+   
    .. rubric:: Functions
 
    .. autosummary::
    
+      body_attachment_pins
+      why_not_followed
       derive_body_placements
    

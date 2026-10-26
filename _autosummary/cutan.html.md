@@ -143,6 +143,7 @@ The names of the style specs that ship with `cutan`, sorted.
 | [`genre`](cutan.genre.html.md#module-cutan.genre)                     | The cut-out animation genre, declared as one object.                                                       |
 | [`impacts`](cutan.impacts.html.md#module-cutan.impacts)                 | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                              |
 | [`library`](cutan.library.html.md#module-cutan.library)                 | The character analyser: legs, arms, views and mouth chart, derived from the rig.                           |
+| [`marionette`](cutan.marionette.html.md#module-cutan.marionette)           | The marionette style's joints: a control bar, strings, hips (cutan#104).                                   |
 | [`motion`](cutan.motion.html.md#module-cutan.motion)                   | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.                       |
 | [`pack`](cutan.pack.html.md#module-cutan.pack)                       | Check a cut-out production pack with cutan's own validators (cutan#87).                                    |
 | [`projects_cli`](cutan.projects_cli.html.md#module-cutan.projects_cli)       | `an projects ...` — a store-backed project from the shell (cutan#91).                                      |

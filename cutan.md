@@ -1,4 +1,4 @@
-> built 2026-10-26 05:53 UTC from fdb443f (main) · cutan 0.0.67. Details: build_info.json
+> built 2026-10-26 06:07 UTC from 2859f1f (main) · cutan 0.0.68. Details: build_info.json
 
 # index.html.md
 
@@ -733,7 +733,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'rect', 'eye', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'mouth', 'rect', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -8658,6 +8658,19 @@ character and its anchor on the body cannot drift between shots.
 A prop placed WITH `stage.at` keeps the author’s placement, and
 `cutout.body_attachment` checks it against the same derivation.
 
+**The prop follows the body through the shot** (cutan#104, the constraint
+layer): a prop placed by its body whose character moves in the shot (an
+authored tween or play on it or its parts, or a joint, a verb or a hold that
+makes the shot solve) gets one `pin` per socket, from the socket’s point on
+its art to the character’s bone, held for the whole shot. The `solve` pass
+then keeps the sockets on the bones as the torso nods or the shoulders move,
+and `an validate` (`cutout.body_attachment`, which reads the compiled
+shot’s solve report: the pins are added at compile, after the core’s joint
+checks look) reports a pin the motion pulls off its bone, with the time, and a
+prop whose sockets do not fit the bones, which is placed once. A prop with authored motion of its own is
+left to that motion. A shot where the character holds still gets none, and
+compiles as it always did.
+
 Nothing changes for a stored scene: no prop declared a body attachment before
 this existed, and a prop that declares none is never touched.
 
@@ -8667,10 +8680,51 @@ this existed, and a prop that declares none is never touched.
 's'
 ```
 
+### Module Attributes
+
+| [`PIN_RESIDUAL_PX`](_autosummary/cutan.compile.body.html.md#cutan.compile.body.PIN_RESIDUAL_PX)   | How far (px) the derived placement may leave a socket from its bone and still be followed by a pin: a hard pin holds the point exactly, so a mismatch beyond this would drag the prop off its derived place (and, with several sockets, fight the others and be given up).   |
+|--------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`MOTION_KINDS`](_autosummary/cutan.compile.body.html.md#cutan.compile.body.MOTION_KINDS)      | The action kinds that move the parts of the entity they name.                                                                                                                                                                                                                |
+| [`MOTION_PROPERTIES`](_autosummary/cutan.compile.body.html.md#cutan.compile.body.MOTION_PROPERTIES) | The properties of a `tween` that move a part (not its look).                                                                                                                                                                                                                 |
+
 ### Functions
 
-| [`derive_body_placements`](_autosummary/cutan.compile.body.html.md#cutan.compile.body.derive_body_placements)(shot, mall)   | `shot` with every body-attached prop that has no `stage.at` placed by its body.   |
-|---------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| [`body_attachment_pins`](_autosummary/cutan.compile.body.html.md#cutan.compile.body.body_attachment_pins)(shot, prop_entity, mall, \*)   | The `pin` actions that keep a body-attached prop's sockets on its character's bones.                                                   |
+|------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| [`why_not_followed`](_autosummary/cutan.compile.body.html.md#cutan.compile.body.why_not_followed)(shot, prop_entity, mall, \*)       | Why a body-attached prop that moves with its character is NOT given pins ('' when it is followed, or when there is nothing to follow). |
+| [`derive_body_placements`](_autosummary/cutan.compile.body.html.md#cutan.compile.body.derive_body_placements)(shot, mall)                  | `shot` with every body-attached prop that has no `stage.at` placed by its body.                                                        |
+
+### cutan.compile.body.MOTION_KINDS *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'play', 'tween'})*
+
+The action kinds that move the parts of the entity they name.
+
+### cutan.compile.body.MOTION_PROPERTIES *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'rotation', 'rotation_rad', 'scale_x', 'scale_y', 'x', 'y'})*
+
+The properties of a `tween` that move a part (not its look).
+
+### cutan.compile.body.PIN_RESIDUAL_PX *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+
+How far (px) the derived placement may leave a socket from its bone and still
+be followed by a pin: a hard pin holds the point exactly, so a mismatch beyond
+this would drag the prop off its derived place (and, with several sockets,
+fight the others and be given up). Such a prop is placed once, as before.
+
+### cutan.compile.body.body_attachment_pins(shot, prop_entity, mall, , placed=None)
+
+The `pin` actions that keep a body-attached prop’s sockets on its character’s bones.
+
+One per socket, from the socket’s point on the prop’s art
+(`<prop>/<slot>@u,v`) to the bone, on the part of the character that sits
+on it (`<character>/<slot>@<bone>`), for the whole shot. Empty unless the
+character moves (`_moves()`, or the shot already solves: a joint, a
+verb or a hold), the prop has no motion of its own, and every socket’s bone
+carries a part, and the derived placement leaves every socket within
+[`PIN_RESIDUAL_PX`](_autosummary/cutan.compile.body.html.md#cutan.compile.body.PIN_RESIDUAL_PX) of its bone (`placed`: the derivation, else made
+here). Never raises: a prop that cannot be followed is placed once, as it
+always was ([`why_not_followed()`](_autosummary/cutan.compile.body.html.md#cutan.compile.body.why_not_followed) says why, for `an validate`).
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 ### cutan.compile.body.derive_body_placements(shot, mall)
 
@@ -8682,6 +8736,15 @@ art, crossed limbs) is left as it is: `cutout.body_attachment` says why.
 
 * **Return type:**
   [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+### cutan.compile.body.why_not_followed(shot, prop_entity, mall, , placed=None)
+
+Why a body-attached prop that moves with its character is NOT given pins
+(’’ when it is followed, or when there is nothing to follow). For `an
+validate`: the prop would be placed once and left behind by the motion.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 
 # _autosummary/cutan.compile.coarticulate.html.md
@@ -10661,6 +10724,7 @@ The names of the style specs that ship with `cutan`, sorted.
 | [`genre`](_autosummary/cutan.genre.html.md#module-cutan.genre)                     | The cut-out animation genre, declared as one object.                                                       |
 | [`impacts`](_autosummary/cutan.impacts.html.md#module-cutan.impacts)                 | Synthetic impact clips with exact ground truth, for scoring sub-frame timing.                              |
 | [`library`](_autosummary/cutan.library.html.md#module-cutan.library)                 | The character analyser: legs, arms, views and mouth chart, derived from the rig.                           |
+| [`marionette`](_autosummary/cutan.marionette.html.md#module-cutan.marionette)           | The marionette style's joints: a control bar, strings, hips (cutan#104).                                   |
 | [`motion`](_autosummary/cutan.motion.html.md#module-cutan.motion)                   | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.                       |
 | [`pack`](_autosummary/cutan.pack.html.md#module-cutan.pack)                       | Check a cut-out production pack with cutan's own validators (cutan#87).                                    |
 | [`projects_cli`](_autosummary/cutan.projects_cli.html.md#module-cutan.projects_cli)       | `an projects ...` — a store-backed project from the shell (cutan#91).                                      |
@@ -12165,6 +12229,102 @@ Whether the compiler would draw this character only as its placeholder stand-in.
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 
+# _autosummary/cutan.marionette.html.md
+
+# cutan.marionette
+
+The marionette style’s joints: a control bar, strings, hips (cutan#104).
+
+A marionette is a cut-out figure hung from strings: the figure’s parts are
+free bodies under gravity, the strings are the solver’s `string` joints (a
+distance held at most, so one may go slack), and the **control bar** is a prop
+the author moves (`tween` its `x`, `y`, `rotation`): the figure follows
+on its strings, swings, and settles. This is the first puppet style on the
+constraint layer (an#497, ADR 0008); the table of what is tied where is the
+style spec’s `joints` block ([`cutan.styles`](_autosummary/cutan.styles.html.md#module-cutan.styles), `marionette.yaml`), and
+this module turns it into the joints of one shot.
+
+- [`write_control_bar()`](_autosummary/cutan.marionette.html.md#cutan.marionette.write_control_bar) writes the bar prop, sized in scene pixels.
+- [`marionette_joints()`](_autosummary/cutan.marionette.html.md#cutan.marionette.marionette_joints) returns the shot’s `joints:`: one `string` per
+  tied part and a hip hinge from each leg to the torso (the factory’s legs hang
+  from the root, not the torso, so nothing else joins them).
+
+A shot then has the character with `overrides: {free: true}` (its parts hang
+from the strings instead of staying where they were staged), the bar, those
+joints, and the style pack’s gravity (`meta.style_pack: marionette`):
+
+```yaml
+entities:
+  - {kind: character, id: ned, store: characters, ref: ned, overrides: {free: true}}
+  - {kind: prop, id: bar, store: props, ref: control_bar, stage: {at: [0, -120], after: ned}}
+joints: <marionette_joints("ned", "bar")>
+actions:
+  - {kind: tween, target: bar, property: x, from: 0, to: 150, duration: 1.5}
+```
+
+```pycon
+>>> [j["name"] for j in marionette_joints("ned", "bar")]
+['ned.hip_l', 'ned.hip_r', 'ned.head', 'ned.hand_l', 'ned.hand_r', 'ned.knee_l', 'ned.knee_r']
+>>> marionette_joints("ned", "bar")[2]
+{'type': 'string', 'a': 'ned/head@0.5,0.0', 'b': 'bar@0.5,0.5', 'name': 'ned.head'}
+```
+
+### Module Attributes
+
+| [`STYLE`](_autosummary/cutan.marionette.html.md#cutan.marionette.STYLE)   | The style whose `joints` block holds the tables.   |
+|----------------------------------------------------------|----------------------------------------------------|
+
+### Functions
+
+| [`marionette_joints`](_autosummary/cutan.marionette.html.md#cutan.marionette.marionette_joints)(character, bar, \*[, rig, ...])   | The `joints:` of a shot that hangs `character` from `bar`.                        |
+|------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| [`write_control_bar`](_autosummary/cutan.marionette.html.md#cutan.marionette.write_control_bar)(props_dir[, name, ...])           | Write a control bar prop `width_px` wide at `stage.scale: 1`; returns its folder. |
+
+### cutan.marionette.STYLE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'marionette'*
+
+The style whose `joints` block holds the tables.
+
+### cutan.marionette.marionette_joints(character, bar, , rig=None, style='marionette', strings=None)
+
+The `joints:` of a shot that hangs `character` from `bar`.
+
+`rig` is the character’s descriptor (a model or its document): a rig with
+`hand_l`/`hand_r` bones (`add_forearms`) is tied by its hands, else by
+the end of its arms. `style` is a spec (a shipped name or a mapping) whose
+`joints` block says what is tied where, so another puppet style reuses
+this builder with its own table; `strings` keeps only the named ones (a
+puppet with its knees untied). Each joint is a plain mapping a shot’s
+`joints` accepts, named `<character>.<string>`.
+
+```pycon
+>>> sorted({j["type"] for j in marionette_joints("ned", "bar")})
+['hinge', 'string']
+>>> [j["a"] for j in marionette_joints("ned", "bar", strings=["hand_l"], rig={"bones": [{"name": "hand_l"}]})][-1]
+'ned/hand_l@hand_l'
+```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
+
+### cutan.marionette.write_control_bar(props_dir, name='control_bar', , width_px=140.0, colour='#6b4e2e')
+
+Write a control bar prop `width_px` wide at `stage.scale: 1`; returns its folder.
+
+A plain horizontal bar, a drawing to replace with an illustrator’s. The strings are tied to fractions of the bar’s width
+(`bar: [u, v]` in the style table), so a wider bar spreads them.
+
+```pycon
+>>> import tempfile
+>>> with tempfile.TemporaryDirectory() as d:
+...     folder = write_control_bar(d, width_px=100)
+...     sorted(p.name for p in folder.iterdir())
+['parts', 'prop.json']
+```
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+
 # _autosummary/cutan.motion.html.md
 
 # cutan.motion
@@ -13120,7 +13280,7 @@ An unknown name is refused with the names there are (a `KeyError`):
 ...     style_spec('pixar')
 ... except KeyError as e:
 ...     print(e)
-no style spec named 'pixar'; the specs are: gilliam, kurzgesagt, norstein, oversimplified, reiniger, south_park
+no style spec named 'pixar'; the specs are: gilliam, kurzgesagt, marionette, norstein, oversimplified, reiniger, south_park
 ```
 
 **A spec changes between releases** (targets re-measured, roles re-cast), and
@@ -13572,15 +13732,23 @@ with any `set` at the shot’s start applied.
 character is in a view other than its rest view (sockets are declared on the
 rest view’s bones; a side view moves and hides arms), a rotated prop or
 character, a socket on a nested slot or a posed bone, art the store cannot
-measure. **Not checked at all:** motion during the shot (cutan#98), and whether
-the declaration is TRUE of the pixels: the sockets are the art author’s
-statement (a critic over probe frames is cutan#95).
+measure. **Motion during the shot** (cutan#98) is not measured here: when the
+character moves, the `body_placement` pass lowers the sockets to `pin`
+joints ([`cutan.compile.body.body_attachment_pins()`](_autosummary/cutan.compile.body.html.md#cutan.compile.body.body_attachment_pins)) and this check says,
+with the time, when the motion pulls one off its bone (`_follow_findings()`). **Not checked at all:** whether the
+declaration is TRUE of the pixels: the sockets are the art author’s statement
+(a critic over probe frames is cutan#95).
 
 ```pycon
 >>> from an.ir.schema import Shot
 >>> body_attachment_findings(Shot(id="s"), {})
 []
 ```
+
+### Module Attributes
+
+| [`BODY_ATTACHMENT_CONSISTENCY`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.BODY_ATTACHMENT_CONSISTENCY)   | The cross-shot check as a constraint on the shared interface (cutan#104, an#508): size conservation of a body-attached prop against its character.   |
+|--------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 ### Functions
 
@@ -13589,6 +13757,14 @@ statement (a critic over probe frames is cutan#95).
 | [`check_body_attachments`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.check_body_attachments)(ctx)                         | The cut-out genre's per-shot body-continuity check ([`body_attachment_findings()`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.body_attachment_findings)).                                                                                         |
 | [`check_body_attachment_consistency`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.check_body_attachment_consistency)(ctx)              | The cut-out genre's cross-shot body-continuity check ([`consistency_findings()`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.consistency_findings)).                                                                                           |
 | [`consistency_findings`](_autosummary/cutan.verify.body.html.md#cutan.verify.body.consistency_findings)(records)                       | The same prop on the same character across shots: one finding per pair whose size relative to the character, or anchor on the body (in the character's units), differs between shots beyond the declaration's tolerances. |
+
+### cutan.verify.body.BODY_ATTACHMENT_CONSISTENCY *= Constraint(name='cutout.body_attachment_consistency', check=<function check_body_attachment_consistency>, stage='finish', order=11, description='a body-attached prop keeps its size and place relative to its character across shots', term=None)*
+
+The cross-shot check as a constraint on the shared interface (cutan#104,
+an#508): size conservation of a body-attached prop against its character.
+Lint-only (no solver term): the placement is derived from the character in
+every shot, so a drift can only come from a hand placement. The persisted
+name is the check’s, unchanged.
 
 ### cutan.verify.body.body_attachment_findings(shot, stores, , poses=None, path='', records=None, index=None)
 
@@ -13977,18 +14153,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-26 05:53 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/fdb443fd39bc7991526a077445f63d00cd36058e"><code>fdb443f</code></a> on branch <code>main</code>, for **cutan 0.0.67** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 06:07 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/2859f1fa1cd0aa1510797e6042988bc18d8fbce0"><code>2859f1f</code></a> on branch <code>main</code>, for **cutan 0.0.68** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.67) is behind the latest release on PyPI (0.0.68): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.68) is behind the latest release on PyPI (0.0.69): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/fdb443fd39bc7991526a077445f63d00cd36058e"><code>fdb443fd39bc7991526a077445f63d00cd36058e</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/2859f1fa1cd0aa1510797e6042988bc18d8fbce0"><code>2859f1fa1cd0aa1510797e6042988bc18d8fbce0</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -13999,9 +14175,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/40276141713">40276141713</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/40277462512">40277462512</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>fdb443fd39bc7991526a077445f63d00cd36058e</code> (in the history of the built commit) |
+| Event commit | <code>2859f1fa1cd0aa1510797e6042988bc18d8fbce0</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -14026,13 +14202,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.68/">0.0.68</a>, newer than the documented version (0.0.67).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.69/">0.0.69</a>, newer than the documented version (0.0.68).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout fdb443fd39bc7991526a077445f63d00cd36058e
+git checkout 2859f1fa1cd0aa1510797e6042988bc18d8fbce0
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

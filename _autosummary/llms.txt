@@ -69,6 +69,7 @@
 - [cutan.impacts.stroke](cutan.impacts.stroke.html.md): The stroke: impact events -&gt; one continuous height curve &#96;h(t)&#96;.
 - [cutan.impacts.truth](cutan.impacts.truth.html.md): Ground truth: what was intended, what was executed, and what each frame shows.
 - [cutan.library](cutan.library.html.md): The character analyser: legs, arms, views and mouth chart, derived from the rig.
+- [cutan.marionette](cutan.marionette.html.md): The marionette style’s joints: a control bar, strings, hips (cutan#104).
 - [cutan.motion](cutan.motion.html.md): The cut-out genre’s motion presets: moves that name a rig’s parts or swap its views.
 - [cutan.pack](cutan.pack.html.md): Check a cut-out production pack with cutan’s own validators (cutan#87).
 - [cutan.projects_cli](cutan.projects_cli.html.md): &#96;an projects ...&#96; — a store-backed project from the shell (cutan#91).

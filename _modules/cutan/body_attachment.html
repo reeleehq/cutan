@@ -126,6 +126,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.genre.html">cutan.genre</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.impacts.html">cutan.impacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.library.html">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.marionette.html">cutan.marionette</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.pack.html">cutan.pack</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/cutan.projects_cli.html">cutan.projects_cli</a></li>
@@ -927,22 +928,26 @@
 </span><span id="line-692">        <span class="p">)</span>
 </span><span id="line-693">        <span class="k">if</span> <span class="n">got</span><span class="p">[</span><span class="s2">"scale"</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">1e-4</span><span class="p">:</span>
 </span><span id="line-694">            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"the derived scale is degenerate"</span>
-</span><span id="line-695">        <span class="k">return</span> <span class="p">{</span><span class="s2">"at"</span><span class="p">:</span> <span class="n">got</span><span class="p">[</span><span class="s2">"at"</span><span class="p">],</span> <span class="s2">"scale"</span><span class="p">:</span> <span class="n">got</span><span class="p">[</span><span class="s2">"scale"</span><span class="p">]},</span> <span class="s2">""</span>
-</span><span id="line-696">    <span class="k">except</span> <span class="n">CrossedLimbs</span><span class="p">:</span>
-</span><span id="line-697">        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"its limbs are crossed relative to the character's bones"</span>
-</span><span id="line-698">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - not derivable; say why</span>
-</span><span id="line-699">        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span></div>
+</span><span id="line-695">        <span class="k">return</span> <span class="p">{</span>
+</span><span id="line-696">            <span class="s2">"at"</span><span class="p">:</span> <span class="n">got</span><span class="p">[</span><span class="s2">"at"</span><span class="p">],</span>
+</span><span id="line-697">            <span class="s2">"scale"</span><span class="p">:</span> <span class="n">got</span><span class="p">[</span><span class="s2">"scale"</span><span class="p">],</span>
+</span><span id="line-698">            <span class="s2">"residual_px"</span><span class="p">:</span> <span class="n">got</span><span class="p">[</span><span class="s2">"residual_px"</span><span class="p">],</span>
+</span><span id="line-699">        <span class="p">},</span> <span class="s2">""</span>
+</span><span id="line-700">    <span class="k">except</span> <span class="n">CrossedLimbs</span><span class="p">:</span>
+</span><span id="line-701">        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"its limbs are crossed relative to the character's bones"</span>
+</span><span id="line-702">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - not derivable; say why</span>
+</span><span id="line-703">        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span></div>
 
-</span><span id="line-700">
-</span><span id="line-701">
+</span><span id="line-704">
+</span><span id="line-705">
 <div class="viewcode-block" id="derivable_placement">
 <a class="viewcode-back" href="../../_autosummary/cutan.body_attachment.html#cutan.body_attachment.derivable_placement">[docs]</a>
-</span><span id="line-702"><span class="k">def</span><span class="w"> </span><span class="nf">derivable_placement</span><span class="p">(</span>
-</span><span id="line-703">    <span class="n">shot</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">mall</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-</span><span id="line-704"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-705"><span class="w">    </span><span class="sd">"""The derived placement of ``prop_entity`` in ``shot``, or ``None``</span>
-</span><span id="line-706"><span class="sd">    (:func:`derive_placement` says why). Never raises."""</span>
-</span><span id="line-707">    <span class="k">return</span> <span class="n">derive_placement</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">,</span> <span class="n">mall</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+</span><span id="line-706"><span class="k">def</span><span class="w"> </span><span class="nf">derivable_placement</span><span class="p">(</span>
+</span><span id="line-707">    <span class="n">shot</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">mall</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</span><span id="line-708"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-709"><span class="w">    </span><span class="sd">"""The derived placement of ``prop_entity`` in ``shot``, or ``None``</span>
+</span><span id="line-710"><span class="sd">    (:func:`derive_placement` says why). Never raises."""</span>
+</span><span id="line-711">    <span class="k">return</span> <span class="n">derive_placement</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">prop_entity</span><span class="p">,</span> <span class="n">mall</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -957,7 +962,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=86ab457a"></script>
+    <script src="../../_static/documentation_options.js?v=6eb1e6b8"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

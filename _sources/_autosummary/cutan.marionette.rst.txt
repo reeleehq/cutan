@@ -1,0 +1,19 @@
+cutan.marionette
+================
+
+.. automodule:: cutan.marionette
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      STYLE
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      marionette_joints
+      write_control_bar
+   

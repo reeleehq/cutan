@@ -96,6 +96,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cutan.genre.html">cutan.genre</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.impacts.html">cutan.impacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.library.html">cutan.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cutan.marionette.html">cutan.marionette</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.pack.html">cutan.pack</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cutan.projects_cli.html">cutan.projects_cli</a></li>
@@ -339,25 +340,28 @@ named points (<code class="docutils literal notranslate"><span class="pre">stu@h
 <tr class="row-even"><td><p><a class="reference internal" href="cutan.library.html#module-cutan.library" title="cutan.library"><code class="xref py py-obj docutils literal notranslate"><span class="pre">library</span></code></a></p></td>
 <td><p>The character analyser: legs, arms, views and mouth chart, derived from the rig.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.motion.html#module-cutan.motion" title="cutan.motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">motion</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.marionette.html#module-cutan.marionette" title="cutan.marionette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">marionette</span></code></a></p></td>
+<td><p>The marionette style's joints: a control bar, strings, hips (cutan#104).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.motion.html#module-cutan.motion" title="cutan.motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">motion</span></code></a></p></td>
 <td><p>The cut-out genre's motion presets: moves that name a rig's parts or swap its views.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cutan.pack.html#module-cutan.pack" title="cutan.pack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pack</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.pack.html#module-cutan.pack" title="cutan.pack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pack</span></code></a></p></td>
 <td><p>Check a cut-out production pack with cutan's own validators (cutan#87).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.projects_cli.html#module-cutan.projects_cli" title="cutan.projects_cli"><code class="xref py py-obj docutils literal notranslate"><span class="pre">projects_cli</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.projects_cli.html#module-cutan.projects_cli" title="cutan.projects_cli"><code class="xref py py-obj docutils literal notranslate"><span class="pre">projects_cli</span></code></a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">projects</span> <span class="pre">...</span></code> — a store-backed project from the shell (cutan#91).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cutan.projects_store.html#module-cutan.projects_store" title="cutan.projects_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">projects_store</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.projects_store.html#module-cutan.projects_store" title="cutan.projects_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">projects_store</span></code></a></p></td>
 <td><p>Where a cutan project's files are read from and written to: a disk folder or S3, by configuration.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.runtime.html#module-cutan.runtime" title="cutan.runtime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.runtime.html#module-cutan.runtime" title="cutan.runtime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime</span></code></a></p></td>
 <td><p>JavaScript the cut-out genre adds to the stage runtime (<code class="docutils literal notranslate"><span class="pre">visuals.js</span></code>: the mouth and eye).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cutan.styles.html#module-cutan.styles" title="cutan.styles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">styles</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cutan.styles.html#module-cutan.styles" title="cutan.styles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">styles</span></code></a></p></td>
 <td><p>The named cut-out style specs, shipped as package data (cutan#4).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cutan.verify.html#module-cutan.verify" title="cutan.verify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cutan.verify.html#module-cutan.verify" title="cutan.verify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify</span></code></a></p></td>
 <td><p>The cut-out style lint: measures a render against a named style spec.</p></td>
 </tr>
 </tbody>
@@ -390,7 +394,7 @@ named points (<code class="docutils literal notranslate"><span class="pre">stu@h
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=86ab457a"></script>
+<script src="../_static/documentation_options.js?v=6eb1e6b8"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

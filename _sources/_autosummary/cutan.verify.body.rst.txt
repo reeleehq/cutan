@@ -4,6 +4,12 @@ cutan.verify.body
 .. automodule:: cutan.verify.body
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      BODY_ATTACHMENT_CONSISTENCY
+   
    .. rubric:: Functions
 
    .. autosummary::
