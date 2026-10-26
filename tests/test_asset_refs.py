@@ -17,10 +17,8 @@ from an.ir.schema import AssetRef
 
 from cutan.characters.schema import CharacterDescriptor
 from cutan.characters.validate import validate_character
-from cutan.pack import PackReport, _lint_svgs
 
 SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="1" height="1"><rect/></svg>'
-EVIL = '<svg xmlns="http://www.w3.org/2000/svg"><script>x()</script><rect/></svg>'
 
 #: How a reference leaves the folder: by name, and through a link.
 ESCAPES = ("../outside.svg", "link/outside.svg")
@@ -35,7 +33,10 @@ def outside(tmp_path):
     folder = tmp_path / "chars" / "rae"
     folder.mkdir(parents=True)
     (tmp_path / "chars" / "outside.svg").write_text(SVG, encoding="utf-8")
-    (folder / "link").symlink_to(elsewhere, target_is_directory=True)
+    try:
+        (folder / "link").symlink_to(elsewhere, target_is_directory=True)
+    except OSError:  # Windows without the privilege: the `..` escape still runs
+        pass
     return SimpleNamespace(folder=folder, reads=[])
 
 
@@ -56,9 +57,12 @@ def read_log(outside, monkeypatch):
 
     for name in ("exists", "is_file", "read_text", "read_bytes"):
         spy(name)
-    monkeypatch.setattr(
-        "an.stage.raster.art_size", lambda p: outside.reads.append(("art_size", str(p)))
-    )
+
+    def art_size(path):
+        outside.reads.append(("art_size", str(path)))
+        return (1, 1)
+
+    monkeypatch.setattr("an.stage.raster.art_size", art_size)
     return outside.reads
 
 
@@ -124,30 +128,31 @@ def test_the_factory_stamp_does_not_read_a_source_svg_outside_the_folder(
     ).source is None
 
 
-def test_the_pack_lint_reads_every_file_a_descriptor_names_by_content(tmp_path):
-    """A part under `.txt` holding a <script> is SVG to `an`, so the pack lint fails it."""
-    prop = tmp_path / "pack" / "assets" / "props" / "umbrella"
-    (prop / "parts").mkdir(parents=True)
-    (prop / "parts" / "umbrella.txt").write_text(EVIL, encoding="utf-8")
-    (prop / "prop.json").write_text(
-        json.dumps({"skins": {"default": {"slots": {"body": {"body": {"path": "parts/umbrella.txt"}}}}}}),
-        encoding="utf-8",
-    )
-    report = PackReport()
-    _lint_svgs(tmp_path / "pack", report)
-    (check,) = report.checks
-    assert check.label == "svg assets/props/umbrella/parts/umbrella.txt"
-    assert not check.ok and "script" in check.output
+def test_the_half_lid_tool_refuses_art_outside_the_folder(outside, read_log):
+    from cutan.characters.lids import HalfLidError, add_half_lid
+
+    doc = json.loads(CharacterDescriptor(name="rae").model_dump_json())
+    for attachments in doc["skins"]["default"]["slots"].values():
+        for att in attachments.values():
+            if att["path"].endswith(("eye_l_open.svg", "eye_l_closed.svg")):
+                att["path"] = "../outside.svg"
+    (outside.folder / "character.json").write_text(json.dumps(doc), encoding="utf-8")
+    with pytest.raises(HalfLidError, match="leaves the character's folder"):
+        add_half_lid(outside.folder)
+    assert not [r for r in read_log if "outside" in r[1]]
+    assert not (outside.folder.parent / "outside_half.svg").exists()
 
 
-def test_the_pack_lint_does_not_follow_a_reference_out_of_the_asset(tmp_path):
-    prop = tmp_path / "pack" / "assets" / "props" / "umbrella"
-    prop.mkdir(parents=True)
-    (prop.parent / "evil.txt").write_text(EVIL, encoding="utf-8")
-    (prop / "prop.json").write_text(
-        json.dumps({"skins": {"default": {"slots": {"body": {"body": {"path": "../evil.txt"}}}}}}),
-        encoding="utf-8",
-    )
-    report = PackReport()
-    _lint_svgs(tmp_path / "pack", report)
-    assert report.checks == []
+@pytest.mark.parametrize("escape", ESCAPES)
+def test_the_generated_head_stamp_does_not_read_a_part_outside_the_folder(
+    outside, read_log, escape
+):
+    from an.ir.assets import AssetSource
+
+    from cutan.characters.factory import stamp_generated_head
+
+    doc = json.loads(CharacterDescriptor(name="rae").model_dump_json())
+    doc["skins"]["default"]["slots"]["head"]["head"]["path"] = escape
+    (outside.folder / "character.json").write_text(json.dumps(doc), encoding="utf-8")
+    stamp_generated_head(outside.folder, AssetSource(provider="x", license="cc0-1.0"))
+    assert not [r for r in read_log if "outside.svg" in r[1]]

@@ -400,7 +400,7 @@ def lint_svg(path: Path, *, exact_size: bool) -> list[str]:
     if not tags & SVG_SHAPES:
         problems.append("draws nothing (no shape element)")
     # Forbidden elements and links out of the file: the core's rule, so the two never drift.
-    problems += svg_problems(path)
+    problems += svg_problems(root)
     return problems
 
 
@@ -538,6 +538,12 @@ ASSET_DOCUMENTS: tuple[tuple[str, str], ...] = (
 )
 
 
+def _in_pack(pack: Path, path: Path) -> Path | None:
+    """``path`` when it stays inside ``pack`` once links are resolved, else ``None``
+    (``_lint_files`` fails the link; nothing behind it is read)."""
+    return inside_folder(pack, path.relative_to(pack).as_posix())
+
+
 def _referenced_svgs(pack: Path) -> list[Path]:
     """Every file an asset document in the pack names that IS an SVG by content,
     whatever its suffix (``an`` reads it as one) and that stays inside the asset's
@@ -545,6 +551,8 @@ def _referenced_svgs(pack: Path) -> list[Path]:
     out: list[Path] = []
     for kind, doc_name in ASSET_DOCUMENTS:
         for doc_path in sorted((pack / "assets" / kind).glob(f"*/{doc_name}")):
+            if _in_pack(pack, doc_path) is None:
+                continue
             try:
                 doc = json.loads(doc_path.read_text(encoding="utf-8"))
             except (OSError, ValueError):
@@ -553,14 +561,21 @@ def _referenced_svgs(pack: Path) -> list[Path]:
                 continue
             for _what, rel in _asset_references(doc):
                 file = inside_folder(doc_path.parent, rel)
-                if file is not None and file.is_file() and is_svg_content(file):
+                if (
+                    file is not None
+                    and _in_pack(pack, file) is not None
+                    and file.is_file()
+                    and is_svg_content(file)
+                ):
                     out.append(file)
     return out
 
 
 def _lint_svgs(pack: Path, report: PackReport) -> None:
     chars = pack / "assets" / "characters"
-    svgs = {*pack.rglob("*.svg"), *_referenced_svgs(pack)}
+    svgs = {
+        f for f in (*pack.rglob("*.svg"), *_referenced_svgs(pack)) if _in_pack(pack, f)
+    }
     for svg in sorted(svgs):
         rel = svg.relative_to(pack)
         # A character part keeps its factory root tag, whose size may differ from its box.
