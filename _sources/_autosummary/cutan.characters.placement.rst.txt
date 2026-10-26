@@ -1,0 +1,20 @@
+cutan.characters.placement
+==========================
+
+.. automodule:: cutan.characters.placement
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      find_attachment
+      place_attachment
+      rest_anchor
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      RestAnchor
+   

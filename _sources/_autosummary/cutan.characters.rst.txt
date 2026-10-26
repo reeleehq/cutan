@@ -60,6 +60,7 @@ cutan.characters
    methods
    mouth_set
    patterns
+   placement
    play
    record
    registration

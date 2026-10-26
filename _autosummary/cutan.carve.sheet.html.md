@@ -41,7 +41,13 @@ one sheet would lose their relative scale. The recipe’s `unit` (view-box units
 per sheet pixel) declares each picture’s width from its carved size instead: one
 unit for the whole sheet, so a hand stays as long next to a body as on the sheet.
 A part with no `point` keeps the factory’s anchor, which belongs to a different
-picture’s framing (the report says so).
+picture’s framing (the report says so). With a `unit` a split part is also
+placed: its attachment’s offset is set so its pivot is drawn where the sheet has it
+from the base’s anchor, as the rig builder draws both
+([`cutan.characters.placement.place_attachment()`](cutan.characters.placement.html.md#cutan.characters.placement.place_attachment)); the attachments of that
+slot drawn by the same file move with it, while view keys drawn by other files
+keep their own offset. Without a `unit`, or when the base is drawn turned or
+scaled at rest, the report gives the offset in sheet pixels instead.
 
 The recipe as a document is [`load_recipe()`](#cutan.carve.sheet.load_recipe) (`schema_version` 1).
 

@@ -786,6 +786,7 @@ namespace as the default, so the output is a valid standalone SVG.
 | [`methods`](cutan.characters.methods.html.md#module-cutan.characters.methods)             | The cut-out genre's methods and aspects, and their compile-time resolution (ADR 0002).                |
 | [`mouth_set`](cutan.characters.mouth_set.html.md#module-cutan.characters.mouth_set)         | Generate the 9-shape default mouth set as parametric SVGs.                                            |
 | [`patterns`](cutan.characters.patterns.html.md#module-cutan.characters.patterns)           | Clothing prints for the factory's figures (cutan#94): an SVG `<pattern>` over the clothing fill.      |
+| [`placement`](cutan.characters.placement.html.md#module-cutan.characters.placement)         | Where an attachment's anchor is drawn at rest, and placing it somewhere else.                         |
 | [`play`](cutan.characters.play.html.md#module-cutan.characters.play)                   | Resolve a `play` against a character descriptor — the renderer-free half (an#7).                      |
 | [`record`](cutan.characters.record.html.md#module-cutan.characters.record)               | Record a character's preview HTML to an mp4.                                                          |
 | [`registration`](cutan.characters.registration.html.md#module-cutan.characters.registration)   | The character side of the cut-out genre, as declarations: `play` and `character`.                     |

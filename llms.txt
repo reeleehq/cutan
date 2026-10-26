@@ -43,6 +43,7 @@
 - [cutan.characters.methods](_autosummary/cutan.characters.methods.html.md): The cut-out genre’s methods and aspects, and their compile-time resolution (ADR 0002).
 - [cutan.characters.mouth_set](_autosummary/cutan.characters.mouth_set.html.md): Generate the 9-shape default mouth set as parametric SVGs.
 - [cutan.characters.patterns](_autosummary/cutan.characters.patterns.html.md): Clothing prints for the factory’s figures (cutan#94): an SVG &#96;&lt;pattern&gt;&#96; over the clothing fill.
+- [cutan.characters.placement](_autosummary/cutan.characters.placement.html.md): Where an attachment’s anchor is drawn at rest, and placing it somewhere else.
 - [cutan.characters.play](_autosummary/cutan.characters.play.html.md): Resolve a &#96;play&#96; against a character descriptor — the renderer-free half (an#7).
 - [cutan.characters.record](_autosummary/cutan.characters.record.html.md): Record a character’s preview HTML to an mp4.
 - [cutan.characters.registration](_autosummary/cutan.characters.registration.html.md): The character side of the cut-out genre, as declarations: &#96;play&#96; and &#96;character&#96;.
@@ -89,7 +90,7 @@
 - [cutan.verify.cadence](_autosummary/cutan.verify.cadence.html.md): Pre-render cadence lint: the scene’s timing against its style spec (catalogue B6, an#519 rank 5).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 18:23 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 19:20 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 
