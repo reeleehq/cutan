@@ -77,6 +77,7 @@ from cutan.characters.colour_roles import distinct_literal, normalise_hex
 from cutan.characters.lids import add_half_lid as _add_half_lid
 from cutan.characters.schema import (
     CHARACTER_DOCUMENT_KIND,
+    Attachment,
     Bone,
     CharacterDescriptor,
     HEAD_ANCHOR,
@@ -84,6 +85,7 @@ from cutan.characters.schema import (
     MOUTH_SHAPES,
     REFERENCE_HEAD_HEIGHT,
     REQUIRED_PARTS,
+    Slot,
 )
 from cutan.characters.svg_utils import (
     extract_part,
@@ -834,6 +836,7 @@ _REPLAYABLE: tuple[str, ...] = (
     "new_character",
     "add_gaze",
     "add_views",
+    "add_forearms",
     "add_limits",
 )
 #: Parameters a recipe never records: where the folder is, and whether to overwrite it.
@@ -1986,19 +1989,17 @@ def _write_torso_part(
     return roles
 
 
-def _write_arm_part(
-    path: Path,
+def _arm_svg(
     *,
     side: str,
     color: str,
     hand: str = DFLT_HAND_COLOUR,
     body: BodyBuild = BUILDS[DFLT_BUILD],
-) -> dict[str, str]:
-    """A 64-wide arm SVG, ``body.arm_length`` long, hand at the bottom.
-    Returns the part's colour roles."""
+) -> str:
+    """The one-piece arm's SVG text: 64 wide, ``body.arm_length`` long, hand at the bottom."""
     L, aw, hr, sw = body.arm_length, body.arm_width, body.hand_radius, body.limb_stroke
     cy = L - 4 - hr
-    svg = (
+    return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<svg xmlns="{SVG_NS}" viewBox="0 0 64 {L:g}" width="64" height="{L:g}">'
         f'<g id="arm_{side}">'
@@ -2009,7 +2010,21 @@ def _write_arm_part(
         f'stroke-width="{sw:g}"/>'
         "</g></svg>"
     )
-    _drawn.write_text(path, svg, encoding="utf-8")
+
+
+def _write_arm_part(
+    path: Path,
+    *,
+    side: str,
+    color: str,
+    hand: str = DFLT_HAND_COLOUR,
+    body: BodyBuild = BUILDS[DFLT_BUILD],
+) -> dict[str, str]:
+    """A 64-wide arm SVG, ``body.arm_length`` long, hand at the bottom.
+    Returns the part's colour roles."""
+    _drawn.write_text(
+        path, _arm_svg(side=side, color=color, hand=hand, body=body), encoding="utf-8"
+    )
     return {color: "clothing", hand: "skin"}
 
 
@@ -2505,6 +2520,171 @@ def add_views(char_dir: str | Path) -> Path:
     )
 
 
+#: Where a split arm's elbow sits, as a fraction of the way from the shoulder to the wrist.
+ELBOW_AT: float = 0.5
+#: Draw orders of a split arm's forearm and hand: each over the part it hangs
+#: from (`nesting: bones` draws a nested part over its parent, and refuses a
+#: chain drawn against its order).
+FOREARM_DRAW_ORDER: int = 3
+HAND_DRAW_ORDER: int = 4
+#: The sides of the factory's arms, and the bones a split arm adds on each.
+ARM_SIDES: tuple[str, ...] = ("l", "r")
+
+
+def _split_arm_svgs(
+    *, side: str, color: str, hand: str, body: BodyBuild, elbow_at: float
+) -> tuple[dict[str, str], dict[str, float]]:
+    """``({part: svg text}, geometry)`` of the one-piece arm cut at the elbow.
+
+    The upper arm keeps the shoulder end of the sleeve and ends in a round cap
+    on the elbow; the forearm starts with a cap on the elbow and ends where the
+    sleeve did; the hand is the circle of the one-piece arm, centred on the
+    wrist, which is the hand bone and where a hand holds. Together at rest they
+    are the one-piece arm's drawing. ``geometry`` is where the bones go
+    (``elbow``, ``wrist``: down the arm from the shoulder, view-box units) and
+    the forearm's ``anchor_v``.
+    """
+    aw, hr, sw = body.arm_width, body.hand_radius, body.limb_stroke
+    wrist = body.arm_length - 4 - hr
+    elbow = round(wrist * elbow_at, 3)
+    upper_h = elbow + aw / 2
+    fore_h = (wrist - 16 - elbow) + aw / 2
+    hand_d = 2 * hr + 2 * sw
+
+    def sleeve(name: str, h: float) -> str:
+        return (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            f'<svg xmlns="{SVG_NS}" viewBox="0 0 64 {h:g}" width="64" height="{h:g}">'
+            f'<g id="{name}_{side}">'
+            f'<rect x="{(64 - aw) / 2:g}" y="0" width="{aw:g}" height="{h:g}" '
+            f'rx="{aw / 2:g}" ry="{aw / 2:g}" fill="{color}" stroke="#222" '
+            f'stroke-width="{sw:g}"/></g></svg>'
+        )
+
+    hand_svg = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        f'<svg xmlns="{SVG_NS}" viewBox="0 0 {hand_d:g} {hand_d:g}" '
+        f'width="{hand_d:g}" height="{hand_d:g}"><g id="hand_{side}">'
+        f'<circle cx="{hand_d / 2:g}" cy="{hand_d / 2:g}" r="{hr:g}" fill="{hand}" '
+        f'stroke="#222" stroke-width="{sw:g}"/></g></svg>'
+    )
+    svgs = {
+        f"arm_{side}": sleeve("arm", upper_h),
+        f"forearm_{side}": sleeve("forearm", fore_h),
+        f"hand_{side}": hand_svg,
+    }
+    return svgs, {"elbow": elbow, "wrist": wrist, "anchor_v": (aw / 2) / fore_h}
+
+
+@_records_what_it_drew
+def add_forearms(
+    char_dir: str | Path, *, elbow_at: float = ELBOW_AT
+) -> Path:
+    """Split a factory character's arms at the elbow, and give them hands (cutan#104).
+
+    Each one-piece arm becomes an upper arm (``arm_l``/``arm_r``, redrawn
+    shorter), a ``forearm_*`` hanging from it at the elbow and a ``hand_*``
+    hanging from the forearm at the wrist, with the bones to match (``forearm_l``,
+    ``hand_l``, ...), and the rig turns to ``nesting: bones`` so a forearm follows
+    its upper arm. At rest the arm looks as it did. The hand bone is the point a
+    hand holds by (``cutan.characters.hands``), what a ``pin`` or a ``pull``
+    drags (``ned/hand_r@hand_r``), and a prop's grip bone is where it goes.
+
+    Opt-in, one character at a time: a character made before is never converted
+    implicitly, and the default factory character keeps its one-piece arms, so
+    its contract hashes do not move. Only an arm the factory drew is split (a
+    promoted or hand-drawn rig's is an illustrator's); the character keeps its
+    views (a hidden arm hides its forearm and hand). ``elbow_at`` is the elbow's
+    place on the arm (0..1). Run :func:`add_limits` afterwards for the elbow's and
+    the wrist's ranges. Idempotent. Returns the descriptor path.
+    """
+    from an.ir.migrate import migrate
+
+    if not 0.1 <= elbow_at <= 0.9:
+        raise ValueError(f"elbow_at is a fraction of the arm in 0.1..0.9, got {elbow_at}")
+    char_dir = Path(char_dir)
+    desc_path = char_dir / "character.json"
+    raw = json.loads(desc_path.read_text(encoding="utf-8"))
+    desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
+    bones = {b.name: b for b in desc.bones}
+    if all(f"forearm_{s}" in bones for s in ARM_SIDES):
+        return desc_path
+    meta = desc.metadata
+    body = _check_build(str(meta.get("build") or DFLT_BUILD))
+    problem = None
+    if not all(f"arm_{s}" in bones for s in ARM_SIDES):
+        problem = "has no arm_l/arm_r bones"
+    elif desc.nesting not in (None, "flat"):
+        problem = f"is already nested by {desc.nesting!r}"
+    elif any(f"forearm_{s}" in bones or f"hand_{s}" in bones for s in ARM_SIDES):
+        problem = "has a forearm or a hand bone already"
+    written: dict[str, dict[str, str]] = {}
+    if problem is None:
+        for side in ARM_SIDES:
+            arm_path = f"parts/arm_{side}.svg"
+            roles = {r: lit for lit, r in (desc.colour_roles.get(arm_path) or {}).items()}
+            color, hand = roles.get("clothing"), roles.get("skin")
+            drawn = char_dir / arm_path
+            if (
+                not color
+                or not hand
+                or not drawn.is_file()
+                or drawn.read_text(encoding="utf-8")
+                != _arm_svg(side=side, color=color, hand=hand, body=body)
+            ):
+                problem = f"{arm_path} is not the factory's drawing for its recorded knobs"
+                break
+            written[side] = {"color": color, "hand": hand}
+    if problem is not None:
+        raise ValueError(
+            f"{desc.name!r} {problem}, so its arms cannot be split by the factory. "
+            "Draw the forearm and hand, add their bones and slots, and set "
+            "`nesting: bones` (the cutan skill has the recipe)."
+        )
+    skin = desc.skins["default"]
+    stamped: set[str] = set()
+    for side in ARM_SIDES:
+        svgs, g = _split_arm_svgs(
+            side=side,
+            color=written[side]["color"],
+            hand=written[side]["hand"],
+            body=body,
+            elbow_at=elbow_at,
+        )
+        for name, text in svgs.items():
+            rel = f"parts/{name}.svg"
+            _drawn.write_text(char_dir / rel, text, encoding="utf-8")
+            stamped.add(rel)
+            desc.colour_roles[rel] = (
+                {written[side]["hand"]: "skin"}
+                if name.startswith("hand")
+                else {written[side]["color"]: "clothing"}
+            )
+        desc.bones += [
+            Bone(name=f"forearm_{side}", parent=f"arm_{side}", x=0.0, y=g["elbow"]),
+            Bone(
+                name=f"hand_{side}",
+                parent=f"forearm_{side}",
+                x=0.0,
+                y=round(g["wrist"] - g["elbow"], 3),
+            ),
+        ]
+        for name, order, anchor in (
+            (f"forearm_{side}", FOREARM_DRAW_ORDER, (0.5, round(g["anchor_v"], 6))),
+            (f"hand_{side}", HAND_DRAW_ORDER, (0.5, 0.5)),
+        ):
+            desc.slots.append(Slot(name=name, bone=name, draw_order=order, attachment=name))
+            skin.slots[name] = {
+                name: Attachment(path=f"parts/{name}.svg", anchor=anchor)
+            }
+    desc.nesting = "bones"
+    meta["arms"] = "split"
+    if elbow_at != ELBOW_AT:
+        meta["elbow_at"] = elbow_at
+    desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+    return stamp_factory_parts(char_dir, stamped)
+
+
 @_records_what_it_drew
 def add_limits(
     char_dir: str | Path, *, style: str | None = None, overwrite: bool = False
@@ -2552,7 +2732,12 @@ MAX_RECIPE_BYTES: int = 16_384
 _SAFE_NAME = re.compile(r"[A-Za-z0-9_][A-Za-z0-9._-]{0,63}")
 #: The calls a recipe may replay AFTER its first step (never a second
 #: `new_character`: one drawing per recipe, review-292 R2).
-_LATER_STEPS: tuple[str, ...] = ("add_gaze", "add_views", "add_limits")
+_LATER_STEPS: tuple[str, ...] = (
+    "add_gaze",
+    "add_views",
+    "add_forearms",
+    "add_limits",
+)
 
 
 def _replay_params(call: str, params) -> dict | None:
@@ -2610,6 +2795,7 @@ def _code_identity() -> tuple[int, ...]:
             "new_character",
             "add_gaze",
             "add_views",
+            "add_forearms",
             "add_limits",
             "stamp_factory_parts",
         )
