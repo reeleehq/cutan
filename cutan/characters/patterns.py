@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import base64
 import binascii
+import functools
 import io
 from dataclasses import dataclass, field, replace
 from pathlib import Path
@@ -69,6 +70,8 @@ MAX_TILE_BYTES: int = 3_072
 MAX_TILE_SIDE: int = 32
 #: The first characters of any base64 PNG: how a path is told from inline bytes.
 _PNG_B64 = "iVBORw0KGgo"
+#: The 8-bit modes a tile may be in (a 16-bit one converts differently across Pillow versions).
+_TILE_MODES = ("1", "L", "LA", "P", "RGB", "RGBA")
 #: The id of the ``<pattern>`` element in a part, referenced by its overlay.
 PATTERN_ID: str = "clothing_print"
 #: The tile's side in a part's own units at ``scale`` 1: about seven across the
@@ -133,13 +136,22 @@ def _tile_png(data: bytes):
         img = Image.open(io.BytesIO(data))
         if img.format != "PNG":
             raise ValueError("not a PNG")
-        img.load()
+        size, mode = img.size, img.mode
     except Exception as e:  # noqa: BLE001 - any decoder failure is "not a usable tile"
         raise ValueError(f"a clothing tile must be a PNG: {e}") from None
-    if max(img.size) > MAX_TILE_SIDE:
+    if max(size) > MAX_TILE_SIDE:  # before the pixels are decoded
         raise ValueError(
-            f"a clothing tile is at most {MAX_TILE_SIDE} px a side; this is {img.size[0]}x{img.size[1]}"
+            f"a clothing tile is at most {MAX_TILE_SIDE} px a side; this is {size[0]}x{size[1]}"
         )
+    if mode not in _TILE_MODES or getattr(img, "n_frames", 1) > 1:
+        raise ValueError(
+            f"a clothing tile is one 8-bit PNG frame ({', '.join(_TILE_MODES)}); this is {mode}"
+            + (" with several frames" if mode in _TILE_MODES else "")
+        )
+    try:
+        img.load()
+    except Exception as e:  # noqa: BLE001
+        raise ValueError(f"a clothing tile must be a PNG: {e}") from None
     return img.convert("RGBA")
 
 
@@ -176,10 +188,13 @@ def resolve_tile_paths(spec: Union[str, Mapping, None]) -> Union[str, Mapping, N
         return value if text.startswith(_PNG_B64) else read_tile(text)
 
     if isinstance(spec, Mapping):
-        return {**spec, "image": one(spec["image"])} if "image" in spec else spec
+        wanted = spec.get("kind") == TILE_KIND and "image" in spec
+        return {**spec, "image": one(spec["image"])} if wanted else spec
     if not isinstance(spec, str) or "image=" not in spec:
         return spec
     kind, sep, rest = spec.partition(":")
+    if kind.strip() != TILE_KIND:  # the parser says what is wrong with it
+        return spec
     items = []
     for item in rest.split(","):
         key, eq, value = item.partition("=")
@@ -279,11 +294,14 @@ def parse_clothing_pattern(
     )
 
 
-def _tile_runs(pattern: ClothingPattern):
-    """``(x, y, run, hex, alpha)`` for each horizontal run of one colour in the tile."""
-    img = _tile_png(base64.b64decode(pattern.image))
+@functools.lru_cache(maxsize=32)
+def _decode_tile(image: str) -> tuple[tuple[int, int], tuple[tuple[int, int, int, str, int], ...]]:
+    """``((w, h), runs)`` of a base64 tile: ``(x, y, run, hex, alpha)`` for each
+    horizontal run of one colour (transparent pixels draw nothing)."""
+    img = _tile_png(base64.b64decode(image))
     w, h = img.size
     px = img.load()
+    runs = []
     for y in range(h):
         x = 0
         while x < w:
@@ -292,8 +310,9 @@ def _tile_runs(pattern: ClothingPattern):
             while x + run < w and px[x + run, y] == (r, g, b, a):
                 run += 1
             if a:
-                yield x, y, run, f"#{r:02x}{g:02x}{b:02x}", a
+                runs.append((x, y, run, f"#{r:02x}{g:02x}{b:02x}", a))
             x += run
+    return (w, h), tuple(runs)
 
 
 def distinct_pattern(pattern: ClothingPattern, taken: set[str]) -> ClothingPattern:
@@ -306,7 +325,7 @@ def distinct_pattern(pattern: ClothingPattern, taken: set[str]) -> ClothingPatte
     if pattern.kind == TILE_KIND:
         used = set(taken)
         palette = {}
-        for colour in sorted({c for *_, c, _ in _tile_runs(pattern)}):
+        for colour in sorted({c for *_, c, _ in _decode_tile(pattern.image)[1]}):
             palette[colour] = distinct_literal(colour, used)
             used.add(palette[colour])
         return replace(pattern, palette=tuple(sorted(palette.items())))
@@ -319,15 +338,19 @@ def _tile_content(pattern: ClothingPattern) -> str:
     t = pattern.tile
     m = pattern.motif
     if pattern.kind == TILE_KIND:
-        w, h = _tile_png(base64.b64decode(pattern.image)).size
+        (w, h), runs = _decode_tile(pattern.image)
         k = t / max(w, h)
         colours = dict(pattern.palette)
+        by_paint: dict[tuple[str, int], list[str]] = {}
+        for x, y, run, c, a in runs:
+            by_paint.setdefault((colours.get(c, c), a), []).append(
+                f"M{x * k:g} {y * k:g}h{run * k:g}v{k:g}h{-run * k:g}z"
+            )
         return "".join(
-            f'<rect x="{x * k:g}" y="{y * k:g}" width="{run * k:g}" height="{k:g}" '
-            f'fill="{colours.get(c, c)}"'
+            f'<path d="{"".join(d)}" fill="{c}"'
             + (f' fill-opacity="{a / 255:.3f}"' if a < 255 else "")
             + ' shape-rendering="crispEdges"/>'
-            for x, y, run, c, a in _tile_runs(pattern)
+            for (c, a), d in by_paint.items()
         )
     if pattern.kind == "stripes":
         return f'<rect x="0" y="0" width="{t:g}" height="{t / 2:g}" fill="{m}"/>'
@@ -365,9 +388,13 @@ def pattern_defs(pattern: ClothingPattern) -> str:
     True
     """
     t = pattern.tile
+    cw = ch = t
+    if pattern.kind == TILE_KIND:  # a tile that is not square repeats on its own cell
+        (w, h), _ = _decode_tile(pattern.image)
+        cw, ch = t * w / max(w, h), t * h / max(w, h)
     return (
         f'<defs><pattern id="{PATTERN_ID}" patternUnits="userSpaceOnUse" '
-        f'x="0" y="0" width="{t:g}" height="{t:g}">{_tile_content(pattern)}</pattern></defs>'
+        f'x="0" y="0" width="{cw:g}" height="{ch:g}">{_tile_content(pattern)}</pattern></defs>'
     )
 
 

@@ -319,8 +319,8 @@ def test_a_pack_may_ask_for_a_print_and_two_clothing_colours_are_refused(tmp_pat
 def test_a_tile_is_drawn_as_rects_in_the_pattern_and_never_as_an_image(tmp_path):
     char = _make(tmp_path, clothing_pattern={"kind": "tile", "image": _tile_png_b64()})
     svg = _part(char, "torso")
-    assert "<image" not in svg and "data:image" not in svg
-    assert 'fill-opacity="0.502"' in svg  # the translucent pixels keep their alpha
+    assert "<path d=" in svg and "<image" not in svg and "data:image" not in svg
+    assert 'fill-opacity="0.502"' in svg and "<rect x=" in svg  # the translucent pixels keep their alpha
     from cutan.characters.validate import validate_character
 
     assert not [f for f in validate_character(char).findings if f.severity == "error"]
@@ -388,3 +388,61 @@ def test_the_cli_reads_a_tile_file_and_records_its_bytes_not_its_path(tmp_path):
     assert str(tmp_path) not in recorded and _tile_png_b64() in recorded
     gone = cli_new("u", out_dir=str(tmp_path), offline=True, clothing_pattern="tile:image=/nope.png")
     assert "cannot be read" in gone
+
+
+def test_a_tile_that_is_not_square_repeats_on_its_own_cell(tmp_path):
+    import xml.etree.ElementTree as ET
+
+    char = _make(tmp_path, clothing_pattern={"kind": "tile", "image": _tile_png_b64((16, 4)), "scale": 1})
+    pat = next(e for e in ET.fromstring(_part(char, "torso")).iter() if e.tag.endswith("pattern"))
+    assert float(pat.get("width")) == pytest.approx(4 * float(pat.get("height")))
+
+
+@pytest.mark.parametrize("mode", ["I;16"])
+def test_only_8_bit_png_modes_are_a_tile(mode):
+    import base64
+    import io
+
+    from PIL import Image
+
+    buf = io.BytesIO()
+    Image.new(mode, (4, 4)).save(buf, "PNG")
+    with pytest.raises(ValueError, match="8-bit"):
+        parse_clothing_pattern({"kind": "tile", "image": base64.b64encode(buf.getvalue()).decode()})
+
+
+def test_a_palette_png_is_a_tile_and_its_colour_is_kept():
+    import base64
+    import io
+
+    from PIL import Image
+
+    img = Image.new("P", (2, 2), 0)
+    img.putpalette([10, 200, 30] + [0] * 765)
+    buf = io.BytesIO()
+    img.save(buf, "PNG")
+    p = parse_clothing_pattern({"kind": "tile", "image": base64.b64encode(buf.getvalue()).decode()})
+    from cutan.characters.patterns import pattern_defs
+
+    assert "#0ac81e" in pattern_defs(p)
+
+
+def test_the_cli_string_form_of_a_tile_replays(tmp_path):
+    import base64
+    import hashlib
+
+    png = tmp_path / "tile.png"
+    png.write_bytes(base64.b64decode(_tile_png_b64()))
+    cli_new("t", out_dir=str(tmp_path), offline=True, clothing_pattern=f"tile:image={png}")
+    char = tmp_path / "t"
+    desc = json.loads((char / "character.json").read_text("utf-8"))
+    assert redraw_digests(desc) == {
+        p.relative_to(char).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in char.rglob("*")
+        if p.is_file() and p.name != "character.json"
+    }
+
+
+def test_a_stray_image_key_on_another_print_is_the_parser_s_error_not_a_file_error(tmp_path):
+    out = cli_new("w", out_dir=str(tmp_path), offline=True, clothing_pattern="stripes:image=/nope.png")
+    assert "takes base, motif, scale" in out
