@@ -73,6 +73,7 @@ from cutan.characters.brows import (
     brow_path_d,
     seat_above_brows,
 )
+from an.stores._common import inside_folder
 from cutan.characters.colour_roles import distinct_literal, normalise_hex
 from cutan.characters.lids import add_half_lid as _add_half_lid
 from cutan.characters.schema import (
@@ -1320,8 +1321,8 @@ def stamp_factory_descriptor(char_dir: str | Path) -> Path:
     desc_path = char_dir / "character.json"
     raw = json.loads(desc_path.read_text(encoding="utf-8"))
     desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
-    drawing = char_dir / (desc.source_svg or "")
-    if desc.source is not None or not desc.source_svg or not drawing.is_file():
+    drawing = inside_folder(char_dir, desc.source_svg or "")
+    if desc.source is not None or drawing is None or not drawing.is_file():
         return desc_path
     desc.source = factory_descriptor_source(drawing.read_bytes())
     desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
@@ -1353,15 +1354,16 @@ def stamp_generated_head(char_dir: str | Path, source: AssetSource) -> Path:
     for skin in desc.skins.values():
         for attachments in skin.slots.values():
             for att in attachments.values():
-                file = char_dir / att.path
+                file = inside_folder(char_dir, att.path)
                 if (
-                    att.path == "parts/head.svg"
+                    file is not None
+                    and att.path == "parts/head.svg"
                     and att.source is None
                     and file.is_file()
                 ):
                     att.source = pinned(file)
-    drawing = char_dir / (desc.source_svg or "")
-    if desc.source_svg and drawing.is_file():
+    drawing = inside_folder(char_dir, desc.source_svg or "")
+    if drawing is not None and drawing.is_file():
         desc.source = pinned(drawing)
     desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
     return desc_path

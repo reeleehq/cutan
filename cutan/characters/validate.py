@@ -26,6 +26,8 @@ from typing import Iterator
 
 from an.base import swap_set_name_problem
 from an.ir.migrate import migrate
+from an.ir.validate import _asset_references
+from an.stores._common import ASSET_REF_RULE, asset_ref_problem, inside_folder
 from cutan.characters.schema import (
     EYELID_CHANNEL,
     VISEME_CHANNEL,
@@ -339,6 +341,7 @@ def validate_character(
     for rel, path in _iter_parts(parts_dir.parent):
         _check_part(rel, path, report)
 
+    _check_asset_refs(directory, descriptor, report, who=who)
     _check_asset_sets(directory, descriptor, report, who=who)
     _check_raster_colour_roles(descriptor, report, who=who)
     _check_declared_boxes(directory, descriptor, report, who=who)
@@ -444,7 +447,10 @@ def _check_asset_sets(
                 continue
             for slot_name in holding_slots:
                 att = skin.slots[slot_name][attachment_name]
-                if not (directory / att.path).exists():
+                ref = inside_folder(directory, att.path)
+                if ref is None:
+                    continue  # leaves the folder: `_check_asset_refs` says so, nothing is read
+                if not ref.exists():
                     # BLOCKING when this is the slot's default (or only)
                     # art — the slot then draws NOTHING and the compiler
                     # records a fallback; ADVISORY for a spare key, the
@@ -473,6 +479,35 @@ def _check_asset_sets(
                         ),
                         "Draw the file, or drop the key from the set.",
                     )
+
+
+def _check_asset_refs(
+    directory: Path,
+    descriptor: CharacterDescriptor | None,
+    report: VerificationReport,
+    *,
+    who: str,
+) -> None:
+    """A file the descriptor names must stay inside the character's folder
+    (an#483, cutan#107) — BLOCKING, and never read: by name (absolute, ``..``,
+    URL) or once symlinks are resolved. Covers parts' paths, ``source_svg`` and
+    the ``colour_roles`` keys, the references the compiler and the factory read."""
+    if descriptor is None:
+        return
+    doc = json.loads(descriptor.model_dump_json())
+    for what, rel in _asset_references(doc):
+        problem = asset_ref_problem(rel) or (
+            "resolves outside the folder (a link)"
+            if inside_folder(directory, rel) is None
+            else None
+        )
+        if problem is not None:
+            report.add(
+                BLOCKING,
+                f"character.json#{what}",
+                f"{who}: {what} names {rel!r}, which {problem}: {ASSET_REF_RULE}",
+                "Name a file inside the character's own folder.",
+            )
 
 
 def _check_raster_colour_roles(
@@ -527,7 +562,10 @@ def _check_declared_boxes(
                     continue
                 seen.add(att.path)
                 try:
-                    art = art_size(directory / att.path)
+                    ref = inside_folder(directory, att.path)
+                    if ref is None:
+                        continue  # `_check_asset_refs` says so
+                    art = art_size(ref)
                 except Exception:  # noqa: BLE001 — unreadable art is reported elsewhere
                     continue
                 if not (art[0] > 0 and art[1] > 0):
