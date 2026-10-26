@@ -10,6 +10,7 @@ Subcommands (used as `an character <verb> ...`):
 
 - `new`       — generate a fresh character from DiceBear or fallback art.
 - `add-views` — give an offline character its turnaround (an#197).
+- `set-part` — one attachment drawn by a picture instead of the factory’s SVG (cutan#92).
 - `add-half-lid` — a HALF eyelid drawing from the rig’s own lid art (cutan#65).
 - `mouths`    — regenerate the 9-shape default mouth set.
 - `validate`  — completeness check.
@@ -37,6 +38,7 @@ Subcommands (used as `an character <verb> ...`):
 | [`new`](#cutan.characters.cli.new)(name[, out_dir, seed, style, voice_ref, ...]) | Create a new character at `out_dir`/`name`.                                                                                                                                                                                                                                               |
 | [`preview`](#cutan.characters.cli.preview)(name[, out_dir, open_browser])            | Render a small HTML viewer that previews all visemes + idle animation.                                                                                                                                                                                                                    |
 | [`record`](#cutan.characters.cli.record)(name[, out_dir, output, duration, ...])    | Record a character's preview HTML to mp4.                                                                                                                                                                                                                                                 |
+| [`set_part`](#cutan.characters.cli.set_part)(name, attachment, file[, out_dir])       | Draw one attachment of `name` with a picture instead of the factory's SVG (cutan#92): a painted or generated part (PNG/WebP/JPEG with alpha) takes the place of `parts/<attachment>.svg`, in the box the attachment declared.                                                             |
 | [`silhouette`](#cutan.characters.cli.silhouette)(name[, other, out_dir, output, size])  | Render a black silhouette for `name` (and optionally compare to `other`).                                                                                                                                                                                                                 |
 | [`validate`](#cutan.characters.cli.validate)(name[, out_dir])                         | Validate a character's directory structure and descriptor.                                                                                                                                                                                                                                |
 
@@ -272,6 +274,21 @@ out_dir: parent directory; defaults to ./assets/characters
 output: output mp4 path; defaults to <character_dir>/preview.mp4
 duration: recording length in seconds (default 8)
 width / height: video resolution (default 640x480)
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.set_part(name, attachment, file, out_dir='')
+
+Draw one attachment of `name` with a picture instead of the factory’s SVG
+(cutan#92): a painted or generated part (PNG/WebP/JPEG with alpha) takes the
+place of `parts/<attachment>.svg`, in the box the attachment declared. The
+old drawing, its colour roles and its pinned source are dropped.
+
+name: character id
+attachment: the attachment’s name (`head`), or `slot/name` when several slots share it
+file: the picture
+out_dir: parent directory; defaults to ./assets/characters
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

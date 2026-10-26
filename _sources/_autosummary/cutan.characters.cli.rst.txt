@@ -26,6 +26,7 @@ cutan.characters.cli
       new
       preview
       record
+      set_part
       silhouette
       validate
    

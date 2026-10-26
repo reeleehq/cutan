@@ -780,6 +780,7 @@ namespace as the default, so the output is a valid standalone SVG.
 | [`record`](cutan.characters.record.html.md#module-cutan.characters.record)             | Record a character's preview HTML to an mp4.                                                          |
 | [`registration`](cutan.characters.registration.html.md#module-cutan.characters.registration) | The character side of the cut-out genre, as declarations: `play` and `character`.                     |
 | [`schema`](cutan.characters.schema.html.md#module-cutan.characters.schema)             | Character descriptor schema (Spine-shaped, Pydantic v2).                                              |
+| [`set_part`](cutan.characters.set_part.html.md#module-cutan.characters.set_part)         | Replace a factory part's drawing with a picture (cutan#92).                                           |
 | [`silhouette`](cutan.characters.silhouette.html.md#module-cutan.characters.silhouette)     | Silhouette rendering and comparison for the silhouette test.                                          |
 | [`svg_utils`](cutan.characters.svg_utils.html.md#module-cutan.characters.svg_utils)       | SVG manipulation: namespace-aware DOM helpers using stdlib `xml.etree`.                               |
 | [`validate`](cutan.characters.validate.html.md#module-cutan.characters.validate)         | Whether an art package is one the compiler can actually render.                                       |

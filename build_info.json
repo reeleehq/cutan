@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-26T13:00:58Z",
+  "built_at": "2026-10-26T13:44:44Z",
   "package": {
     "name": "cutan",
-    "version": "0.0.73",
+    "version": "0.0.74",
     "display_name": "cutan",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "36306af81956cbda327e8d6414a8a3414651266e",
-    "short_commit": "36306af",
+    "commit": "5c602fdd5b676dc407f0957ce4087fdb686acfe8",
+    "short_commit": "5c602fd",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/cutan",
-    "commit_url": "https://github.com/reeleehq/cutan/commit/36306af81956cbda327e8d6414a8a3414651266e",
+    "commit_url": "https://github.com/reeleehq/cutan/commit/5c602fdd5b676dc407f0957ce4087fdb686acfe8",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/cutan",
-    "sha": "36306af81956cbda327e8d6414a8a3414651266e",
+    "sha": "5c602fdd5b676dc407f0957ce4087fdb686acfe8",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "40326328808",
-    "run_url": "https://github.com/reeleehq/cutan/actions/runs/40326328808",
+    "run_id": "40332285492",
+    "run_url": "https://github.com/reeleehq/cutan/actions/runs/40332285492",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -55,19 +55,21 @@
     "docs_dir": "docsrc"
   },
   "site": {
-    "modules_documented": 77,
-    "objects_documented": 898
+    "modules_documented": 78,
+    "objects_documented": 903
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.73",
-    "relation": "same",
+    "latest": "0.0.75",
+    "relation": "behind",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 36306af81956cbda327e8d6414a8a3414651266e\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 5c602fdd5b676dc407f0957ce4087fdb686acfe8\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": true,
-    "notes": []
+    "aligned": false,
+    "notes": [
+      "The documented version (0.0.74) is behind the latest release on PyPI (0.0.75): `pip install cutan` gives newer code than these docs describe."
+    ]
   }
 }

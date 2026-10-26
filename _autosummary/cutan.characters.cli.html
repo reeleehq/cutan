@@ -144,6 +144,7 @@ and returns a string for terminal display.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">new</span></code>       — generate a fresh character from DiceBear or fallback art.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">add-views</span></code> — give an offline character its turnaround (an#197).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set-part</span></code> — one attachment drawn by a picture instead of the factory’s SVG (cutan#92).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">add-half-lid</span></code> — a HALF eyelid drawing from the rig’s own lid art (cutan#65).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mouths</span></code>    — regenerate the 9-shape default mouth set.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">validate</span></code>  — completeness check.</p></li>
@@ -198,10 +199,13 @@ and returns a string for terminal display.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.record" title="cutan.characters.cli.record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record</span></code></a>(name[, out_dir, output, duration, ...])</p></td>
 <td><p>Record a character's preview HTML to mp4.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.silhouette" title="cutan.characters.cli.silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">silhouette</span></code></a>(name[, other, out_dir, output, size])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.set_part" title="cutan.characters.cli.set_part"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_part</span></code></a>(name, attachment, file[, out_dir])</p></td>
+<td><p>Draw one attachment of <code class="docutils literal notranslate"><span class="pre">name</span></code> with a picture instead of the factory's SVG (cutan#92): a painted or generated part (PNG/WebP/JPEG with alpha) takes the place of <code class="docutils literal notranslate"><span class="pre">parts/&lt;attachment&gt;.svg</span></code>, in the box the attachment declared.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.silhouette" title="cutan.characters.cli.silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">silhouette</span></code></a>(name[, other, out_dir, output, size])</p></td>
 <td><p>Render a black silhouette for <code class="docutils literal notranslate"><span class="pre">name</span></code> (and optionally compare to <code class="docutils literal notranslate"><span class="pre">other</span></code>).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.validate" title="cutan.characters.cli.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(name[, out_dir])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.validate" title="cutan.characters.cli.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(name[, out_dir])</p></td>
 <td><p>Validate a character's directory structure and descriptor.</p></td>
 </tr>
 </tbody>
@@ -468,6 +472,23 @@ width / height: video resolution (default 640x480)</p>
 </dl>
 </dd></dl>
 <dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.cli.set_part">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.cli.</span></span><span class="sig-name descname"><span class="pre">set_part</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attachment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/cli.html#set_part"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.cli.set_part" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.cli.set_part'">¶</a></dt>
+<dd><p>Draw one attachment of <code class="docutils literal notranslate"><span class="pre">name</span></code> with a picture instead of the factory’s SVG
+(cutan#92): a painted or generated part (PNG/WebP/JPEG with alpha) takes the
+place of <code class="docutils literal notranslate"><span class="pre">parts/&lt;attachment&gt;.svg</span></code>, in the box the attachment declared. The
+old drawing, its colour roles and its pinned source are dropped.</p>
+<p>name: character id
+attachment: the attachment’s name (<code class="docutils literal notranslate"><span class="pre">head</span></code>), or <code class="docutils literal notranslate"><span class="pre">slot/name</span></code> when several slots share it
+file: the picture
+out_dir: parent directory; defaults to ./assets/characters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
 <dt class="sig sig-object py" id="cutan.characters.cli.silhouette">
 <span class="sig-prename descclassname"><span class="pre">cutan.characters.cli.</span></span><span class="sig-name descname"><span class="pre">silhouette</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/cli.html#silhouette"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.cli.silhouette" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.cli.silhouette'">¶</a></dt>
 <dd><p>Render a black silhouette for <code class="docutils literal notranslate"><span class="pre">name</span></code> (and optionally compare to <code class="docutils literal notranslate"><span class="pre">other</span></code>).</p>
@@ -519,6 +540,7 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 <li><a :data-current="activeSection === '#cutan.characters.cli.new'" class="reference internal" href="#cutan.characters.cli.new"><code class="docutils literal notranslate"><span class="pre">new()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.preview'" class="reference internal" href="#cutan.characters.cli.preview"><code class="docutils literal notranslate"><span class="pre">preview()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.record'" class="reference internal" href="#cutan.characters.cli.record"><code class="docutils literal notranslate"><span class="pre">record()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.cli.set_part'" class="reference internal" href="#cutan.characters.cli.set_part"><code class="docutils literal notranslate"><span class="pre">set_part()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.silhouette'" class="reference internal" href="#cutan.characters.cli.silhouette"><code class="docutils literal notranslate"><span class="pre">silhouette()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.validate'" class="reference internal" href="#cutan.characters.cli.validate"><code class="docutils literal notranslate"><span class="pre">validate()</span></code></a></li>
 </ul>
@@ -534,7 +556,7 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=1e158f99"></script>
+<script src="../_static/documentation_options.js?v=d59c1f54"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

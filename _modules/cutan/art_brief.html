@@ -540,136 +540,137 @@
 </span><span id="line-351">                <span class="s2">"head (no eyes or mouth drawn on it), torso, each arm, each leg; eyes "</span>
 </span><span id="line-352">                <span class="s2">"open and closed; nine mouth shapes"</span><span class="p">,</span>
 </span><span id="line-353">                <span class="s2">"each limb with a little extra at the joint so the pieces overlap"</span><span class="p">,</span>
-</span><span id="line-354">                <span class="s2">"a redrawn part of a factory character must be SVG for now (cutan#92)"</span><span class="p">,</span>
-</span><span id="line-355">            <span class="p">),</span>
-</span><span id="line-356">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A single body part of a cut-out puppet, isolated on a plain flat "</span>
-</span><span id="line-357">            <span class="s2">"white background, flat even lighting, no text"</span><span class="p">,</span>
-</span><span id="line-358">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
-</span><span id="line-359">            <span class="n">status</span><span class="o">=</span><span class="s2">"the pipeline owner assembles the art package (character.json)"</span><span class="p">,</span>
-</span><span id="line-360">            <span class="n">has_figures</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="line-361">        <span class="p">),</span>
-</span><span id="line-362">        <span class="n">ArtKind</span><span class="p">(</span>
-</span><span id="line-363">            <span class="n">key</span><span class="o">=</span><span class="s2">"costume"</span><span class="p">,</span>
-</span><span id="line-364">            <span class="n">title</span><span class="o">=</span><span class="s2">"A costume"</span><span class="p">,</span>
-</span><span id="line-365">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"reference/&lt;name&gt;-costume.png, or on the reference sheet; colours in PRODUCTION.md"</span><span class="p">,</span>
-</span><span id="line-366">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"as the reference sheet, or close-ups at 1024x1024"</span><span class="p">,</span>
-</span><span id="line-367">            <span class="n">background</span><span class="o">=</span><span class="s2">"plain flat white"</span><span class="p">,</span>
-</span><span id="line-368">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-369">                <span class="s2">"for a factory character: the colours by name or hex for the "</span>
-</span><span id="line-370">                <span class="s2">"clothing, accessory and legs (the cast line's --palette)"</span><span class="p">,</span>
-</span><span id="line-371">                <span class="s2">"for a drawn character: the costume on the reference sheet, with "</span>
-</span><span id="line-372">                <span class="s2">"close-ups of a hat, a pattern or a badge"</span><span class="p">,</span>
-</span><span id="line-373">                <span class="s2">"a costume change is a second reference sheet"</span><span class="p">,</span>
-</span><span id="line-374">            <span class="p">),</span>
-</span><span id="line-375">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A costume design sheet: the outfit laid out flat from the front, "</span>
-</span><span id="line-376">            <span class="s2">"with close-ups of its details, plain flat white background, no text"</span><span class="p">,</span>
-</span><span id="line-377">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
-</span><span id="line-378">            <span class="n">status</span><span class="o">=</span><span class="s2">"the pipeline owner applies it"</span><span class="p">,</span>
-</span><span id="line-379">        <span class="p">),</span>
-</span><span id="line-380">    <span class="p">)</span>
-</span><span id="line-381"><span class="p">}</span>
-</span><span id="line-382">
+</span><span id="line-354">                <span class="s2">"a part that replaces a factory character's own is a PNG with alpha named like the "</span>
+</span><span id="line-355">                <span class="s2">"factory's SVG (`assets/characters/&lt;name&gt;/parts/head.png` for `parts/head.svg`)"</span><span class="p">,</span>
+</span><span id="line-356">            <span class="p">),</span>
+</span><span id="line-357">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A single body part of a cut-out puppet, isolated on a plain flat "</span>
+</span><span id="line-358">            <span class="s2">"white background, flat even lighting, no text"</span><span class="p">,</span>
+</span><span id="line-359">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
+</span><span id="line-360">            <span class="n">status</span><span class="o">=</span><span class="s2">"the pipeline owner assembles the art package (character.json)"</span><span class="p">,</span>
+</span><span id="line-361">            <span class="n">has_figures</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="line-362">        <span class="p">),</span>
+</span><span id="line-363">        <span class="n">ArtKind</span><span class="p">(</span>
+</span><span id="line-364">            <span class="n">key</span><span class="o">=</span><span class="s2">"costume"</span><span class="p">,</span>
+</span><span id="line-365">            <span class="n">title</span><span class="o">=</span><span class="s2">"A costume"</span><span class="p">,</span>
+</span><span id="line-366">            <span class="n">goes_to</span><span class="o">=</span><span class="s2">"reference/&lt;name&gt;-costume.png, or on the reference sheet; colours in PRODUCTION.md"</span><span class="p">,</span>
+</span><span id="line-367">            <span class="n">canvas</span><span class="o">=</span><span class="s2">"as the reference sheet, or close-ups at 1024x1024"</span><span class="p">,</span>
+</span><span id="line-368">            <span class="n">background</span><span class="o">=</span><span class="s2">"plain flat white"</span><span class="p">,</span>
+</span><span id="line-369">            <span class="n">content</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-370">                <span class="s2">"for a factory character: the colours by name or hex for the "</span>
+</span><span id="line-371">                <span class="s2">"clothing, accessory and legs (the cast line's --palette)"</span><span class="p">,</span>
+</span><span id="line-372">                <span class="s2">"for a drawn character: the costume on the reference sheet, with "</span>
+</span><span id="line-373">                <span class="s2">"close-ups of a hat, a pattern or a badge"</span><span class="p">,</span>
+</span><span id="line-374">                <span class="s2">"a costume change is a second reference sheet"</span><span class="p">,</span>
+</span><span id="line-375">            <span class="p">),</span>
+</span><span id="line-376">            <span class="n">framing</span><span class="o">=</span><span class="s2">"A costume design sheet: the outfit laid out flat from the front, "</span>
+</span><span id="line-377">            <span class="s2">"with close-ups of its details, plain flat white background, no text"</span><span class="p">,</span>
+</span><span id="line-378">            <span class="n">aspect</span><span class="o">=</span><span class="s2">"1:1"</span><span class="p">,</span>
+</span><span id="line-379">            <span class="n">status</span><span class="o">=</span><span class="s2">"the pipeline owner applies it"</span><span class="p">,</span>
+</span><span id="line-380">        <span class="p">),</span>
+</span><span id="line-381">    <span class="p">)</span>
+</span><span id="line-382"><span class="p">}</span>
 </span><span id="line-383">
+</span><span id="line-384">
 <div class="viewcode-block" id="style_look">
 <a class="viewcode-back" href="../../_autosummary/cutan.art_brief.html#cutan.art_brief.style_look">[docs]</a>
-</span><span id="line-384"><span class="k">def</span><span class="w"> </span><span class="nf">style_look</span><span class="p">(</span><span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-385"><span class="w">    </span><span class="sd">"""A style's look in words, for a prompt (``guidance.image_prompt`` of its spec).</span>
-</span><span id="line-386">
-</span><span id="line-387"><span class="sd">    ``style`` is a style's name, a spec mapping, or ``None`` (the writer's own look).</span>
-</span><span id="line-388">
-</span><span id="line-389"><span class="sd">    &gt;&gt;&gt; style_look("reiniger").startswith("black paper silhouette")</span>
-</span><span id="line-390"><span class="sd">    True</span>
-</span><span id="line-391"><span class="sd">    &gt;&gt;&gt; style_look(None)</span>
-</span><span id="line-392"><span class="sd">    '&lt;your look in words: medium, colours, line, texture&gt;'</span>
-</span><span id="line-393"><span class="sd">    """</span>
-</span><span id="line-394">    <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-395">        <span class="k">return</span> <span class="s2">"&lt;your look in words: medium, colours, line, texture&gt;"</span>
-</span><span id="line-396">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_style_spec</span>
-</span><span id="line-397">
-</span><span id="line-398">    <span class="n">spec</span> <span class="o">=</span> <span class="n">resolve_style_spec</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
-</span><span id="line-399">    <span class="n">look</span> <span class="o">=</span> <span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"guidance"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"image_prompt"</span><span class="p">)</span>
-</span><span id="line-400">    <span class="k">if</span> <span class="ow">not</span> <span class="n">look</span><span class="p">:</span>
-</span><span id="line-401">        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"style </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'style'</span><span class="p">)</span><span class="si">!r}</span><span class="s2"> has no guidance.image_prompt"</span><span class="p">)</span>
-</span><span id="line-402">    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">look</span><span class="p">)</span></div>
+</span><span id="line-385"><span class="k">def</span><span class="w"> </span><span class="nf">style_look</span><span class="p">(</span><span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-386"><span class="w">    </span><span class="sd">"""A style's look in words, for a prompt (``guidance.image_prompt`` of its spec).</span>
+</span><span id="line-387">
+</span><span id="line-388"><span class="sd">    ``style`` is a style's name, a spec mapping, or ``None`` (the writer's own look).</span>
+</span><span id="line-389">
+</span><span id="line-390"><span class="sd">    &gt;&gt;&gt; style_look("reiniger").startswith("black paper silhouette")</span>
+</span><span id="line-391"><span class="sd">    True</span>
+</span><span id="line-392"><span class="sd">    &gt;&gt;&gt; style_look(None)</span>
+</span><span id="line-393"><span class="sd">    '&lt;your look in words: medium, colours, line, texture&gt;'</span>
+</span><span id="line-394"><span class="sd">    """</span>
+</span><span id="line-395">    <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-396">        <span class="k">return</span> <span class="s2">"&lt;your look in words: medium, colours, line, texture&gt;"</span>
+</span><span id="line-397">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_style_spec</span>
+</span><span id="line-398">
+</span><span id="line-399">    <span class="n">spec</span> <span class="o">=</span> <span class="n">resolve_style_spec</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+</span><span id="line-400">    <span class="n">look</span> <span class="o">=</span> <span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"guidance"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"image_prompt"</span><span class="p">)</span>
+</span><span id="line-401">    <span class="k">if</span> <span class="ow">not</span> <span class="n">look</span><span class="p">:</span>
+</span><span id="line-402">        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"style </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'style'</span><span class="p">)</span><span class="si">!r}</span><span class="s2"> has no guidance.image_prompt"</span><span class="p">)</span>
+</span><span id="line-403">    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">look</span><span class="p">)</span></div>
 
-</span><span id="line-403">
 </span><span id="line-404">
+</span><span id="line-405">
 <div class="viewcode-block" id="image_prompt">
 <a class="viewcode-back" href="../../_autosummary/cutan.art_brief.html#cutan.art_brief.image_prompt">[docs]</a>
-</span><span id="line-405"><span class="k">def</span><span class="w"> </span><span class="nf">image_prompt</span><span class="p">(</span>
-</span><span id="line-406">    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-407">    <span class="n">subject</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-408">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-409">    <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-410">    <span class="n">tool</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-411"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-412"><span class="w">    </span><span class="sd">"""A prompt to paste into an image generator for one piece of art.</span>
-</span><span id="line-413">
-</span><span id="line-414"><span class="sd">    kind: a key of :data:`ART_KINDS`</span>
-</span><span id="line-415"><span class="sd">    subject: what the picture is of, in the writer's words</span>
-</span><span id="line-416"><span class="sd">    style: a style name or spec (its look in words), or ``None`` for a placeholder</span>
-</span><span id="line-417"><span class="sd">    tool: ``"midjourney"`` appends its ``--ar`` and ``--no`` flags; ``"flux"``</span>
-</span><span id="line-418"><span class="sd">        drops the ``no ...`` words; any other tool takes the plain prompt (see</span>
-</span><span id="line-419"><span class="sd">        :data:`GENERATOR_TIPS`)</span>
-</span><span id="line-420"><span class="sd">    """</span>
-</span><span id="line-421">    <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ART_KINDS</span><span class="p">:</span>
-</span><span id="line-422">        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no art kind </span><span class="si">{</span><span class="n">kind</span><span class="si">!r}</span><span class="s2">; the kinds are: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ART_KINDS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-423">    <span class="n">k</span> <span class="o">=</span> <span class="n">ART_KINDS</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span>
-</span><span id="line-424">    <span class="n">framing</span><span class="p">,</span> <span class="n">look</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">framing</span><span class="p">,</span> <span class="n">style_look</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
-</span><span id="line-425">    <span class="k">if</span> <span class="n">tool</span> <span class="o">==</span> <span class="s2">"flux"</span><span class="p">:</span>  <span class="c1"># naming what is unwanted tends to add it</span>
-</span><span id="line-426">        <span class="n">framing</span><span class="p">,</span> <span class="n">look</span> <span class="o">=</span> <span class="n">_positive</span><span class="p">(</span><span class="n">framing</span><span class="p">),</span> <span class="n">_positive</span><span class="p">(</span><span class="n">look</span><span class="p">)</span>
-</span><span id="line-427">    <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">subject</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">framing</span><span class="si">}</span><span class="s2">. Look: </span><span class="si">{</span><span class="n">look</span><span class="si">}</span><span class="s2">."</span>
-</span><span id="line-428">    <span class="k">if</span> <span class="n">tool</span> <span class="o">==</span> <span class="s2">"midjourney"</span><span class="p">:</span>
-</span><span id="line-429">        <span class="n">no</span> <span class="o">=</span> <span class="n">_NO</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">has_figures</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_NO</span><span class="si">}</span><span class="s2">, people"</span>
-</span><span id="line-430">        <span class="n">text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">" --ar </span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">aspect</span><span class="si">}</span><span class="s2"> --no </span><span class="si">{</span><span class="n">no</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-431">    <span class="k">return</span> <span class="n">text</span></div>
+</span><span id="line-406"><span class="k">def</span><span class="w"> </span><span class="nf">image_prompt</span><span class="p">(</span>
+</span><span id="line-407">    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-408">    <span class="n">subject</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-409">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-410">    <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-411">    <span class="n">tool</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-412"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-413"><span class="w">    </span><span class="sd">"""A prompt to paste into an image generator for one piece of art.</span>
+</span><span id="line-414">
+</span><span id="line-415"><span class="sd">    kind: a key of :data:`ART_KINDS`</span>
+</span><span id="line-416"><span class="sd">    subject: what the picture is of, in the writer's words</span>
+</span><span id="line-417"><span class="sd">    style: a style name or spec (its look in words), or ``None`` for a placeholder</span>
+</span><span id="line-418"><span class="sd">    tool: ``"midjourney"`` appends its ``--ar`` and ``--no`` flags; ``"flux"``</span>
+</span><span id="line-419"><span class="sd">        drops the ``no ...`` words; any other tool takes the plain prompt (see</span>
+</span><span id="line-420"><span class="sd">        :data:`GENERATOR_TIPS`)</span>
+</span><span id="line-421"><span class="sd">    """</span>
+</span><span id="line-422">    <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ART_KINDS</span><span class="p">:</span>
+</span><span id="line-423">        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no art kind </span><span class="si">{</span><span class="n">kind</span><span class="si">!r}</span><span class="s2">; the kinds are: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ART_KINDS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-424">    <span class="n">k</span> <span class="o">=</span> <span class="n">ART_KINDS</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span>
+</span><span id="line-425">    <span class="n">framing</span><span class="p">,</span> <span class="n">look</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">framing</span><span class="p">,</span> <span class="n">style_look</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+</span><span id="line-426">    <span class="k">if</span> <span class="n">tool</span> <span class="o">==</span> <span class="s2">"flux"</span><span class="p">:</span>  <span class="c1"># naming what is unwanted tends to add it</span>
+</span><span id="line-427">        <span class="n">framing</span><span class="p">,</span> <span class="n">look</span> <span class="o">=</span> <span class="n">_positive</span><span class="p">(</span><span class="n">framing</span><span class="p">),</span> <span class="n">_positive</span><span class="p">(</span><span class="n">look</span><span class="p">)</span>
+</span><span id="line-428">    <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">subject</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">framing</span><span class="si">}</span><span class="s2">. Look: </span><span class="si">{</span><span class="n">look</span><span class="si">}</span><span class="s2">."</span>
+</span><span id="line-429">    <span class="k">if</span> <span class="n">tool</span> <span class="o">==</span> <span class="s2">"midjourney"</span><span class="p">:</span>
+</span><span id="line-430">        <span class="n">no</span> <span class="o">=</span> <span class="n">_NO</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">has_figures</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_NO</span><span class="si">}</span><span class="s2">, people"</span>
+</span><span id="line-431">        <span class="n">text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">" --ar </span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">aspect</span><span class="si">}</span><span class="s2"> --no </span><span class="si">{</span><span class="n">no</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-432">    <span class="k">return</span> <span class="n">text</span></div>
 
-</span><span id="line-432">
 </span><span id="line-433">
-</span><span id="line-434"><span class="k">def</span><span class="w"> </span><span class="nf">_positive</span><span class="p">(</span><span class="n">words</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-435"><span class="w">    </span><span class="sd">"""``words`` without its ``no ...`` clauses.</span>
-</span><span id="line-436">
-</span><span id="line-437"><span class="sd">    &gt;&gt;&gt; _positive("a sky, no ground, no text, soft light")</span>
-</span><span id="line-438"><span class="sd">    'a sky, soft light'</span>
-</span><span id="line-439"><span class="sd">    """</span>
-</span><span id="line-440">    <span class="k">return</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span><span id="line-441">        <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">words</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">", "</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">"no "</span><span class="p">,</span> <span class="s2">"nothing "</span><span class="p">))</span>
-</span><span id="line-442">    <span class="p">)</span>
-</span><span id="line-443">
+</span><span id="line-434">
+</span><span id="line-435"><span class="k">def</span><span class="w"> </span><span class="nf">_positive</span><span class="p">(</span><span class="n">words</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-436"><span class="w">    </span><span class="sd">"""``words`` without its ``no ...`` clauses.</span>
+</span><span id="line-437">
+</span><span id="line-438"><span class="sd">    &gt;&gt;&gt; _positive("a sky, no ground, no text, soft light")</span>
+</span><span id="line-439"><span class="sd">    'a sky, soft light'</span>
+</span><span id="line-440"><span class="sd">    """</span>
+</span><span id="line-441">    <span class="k">return</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span><span id="line-442">        <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">words</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">", "</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">"no "</span><span class="p">,</span> <span class="s2">"nothing "</span><span class="p">))</span>
+</span><span id="line-443">    <span class="p">)</span>
 </span><span id="line-444">
+</span><span id="line-445">
 <div class="viewcode-block" id="art_guidance">
 <a class="viewcode-back" href="../../_autosummary/cutan.art_brief.html#cutan.art_brief.art_guidance">[docs]</a>
-</span><span id="line-445"><span class="k">def</span><span class="w"> </span><span class="nf">art_guidance</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span id="line-446"><span class="w">    </span><span class="sd">"""Everything a writer's Claude needs to ask for real art, as JSON-ready data.</span>
-</span><span id="line-447">
-</span><span id="line-448"><span class="sd">    A prompt is ``prompt_recipe``: the subject, the kind's ``framing``, the ``look``.</span>
-</span><span id="line-449">
-</span><span id="line-450"><span class="sd">    &gt;&gt;&gt; g = art_guidance(style="norstein")</span>
-</span><span id="line-451"><span class="sd">    &gt;&gt;&gt; sorted(g)</span>
-</span><span id="line-452"><span class="sd">    ['claude_svg', 'formats', 'generators', 'kinds', 'look', 'paper_drawings', 'prompt_recipe', 'viewpoint']</span>
-</span><span id="line-453"><span class="sd">    &gt;&gt;&gt; g["kinds"][0]["key"], g["look"].startswith("painted multiplane")</span>
-</span><span id="line-454"><span class="sd">    ('sky', True)</span>
-</span><span id="line-455"><span class="sd">    """</span>
-</span><span id="line-456">    <span class="n">look</span> <span class="o">=</span> <span class="n">style_look</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
-</span><span id="line-457">    <span class="n">kinds</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-458">    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ART_KINDS</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-</span><span id="line-459">        <span class="n">row</span> <span class="o">=</span> <span class="n">asdict</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-</span><span id="line-460">        <span class="n">row</span><span class="p">[</span><span class="s2">"content"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-</span><span id="line-461">        <span class="n">kinds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-</span><span id="line-462">    <span class="k">return</span> <span class="p">{</span>
-</span><span id="line-463">        <span class="s2">"claude_svg"</span><span class="p">:</span> <span class="n">CLAUDE_SVG_NOTE</span><span class="p">,</span>
-</span><span id="line-464">        <span class="s2">"look"</span><span class="p">:</span> <span class="n">look</span><span class="p">,</span>
-</span><span id="line-465">        <span class="s2">"prompt_recipe"</span><span class="p">:</span> <span class="s2">"&lt;subject in the writer's words&gt;. &lt;the kind's framing&gt;. Look: "</span>
-</span><span id="line-466">        <span class="s2">"&lt;look&gt;. Never a show's, studio's or artist's name. Midjourney: add --ar "</span>
-</span><span id="line-467">        <span class="s2">"&lt;the kind's aspect&gt; --no text, letters, watermark."</span><span class="p">,</span>
-</span><span id="line-468">        <span class="s2">"formats"</span><span class="p">:</span> <span class="s2">"PNG (transparent background where a kind says so), JPEG or WebP "</span>
-</span><span id="line-469">        <span class="s2">"for an opaque plate; SVG from a vector tool if it follows the pack's SVG "</span>
-</span><span id="line-470">        <span class="s2">"rules. Not PSD, HEIC, PDF or AI. Original files, not screenshots."</span><span class="p">,</span>
-</span><span id="line-471">        <span class="s2">"kinds"</span><span class="p">:</span> <span class="n">kinds</span><span class="p">,</span>
-</span><span id="line-472">        <span class="s2">"viewpoint"</span><span class="p">:</span> <span class="n">VIEWPOINT_RULE</span><span class="p">,</span>
-</span><span id="line-473">        <span class="s2">"paper_drawings"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">PAPER_DRAWINGS</span><span class="p">),</span>
-</span><span id="line-474">        <span class="s2">"generators"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">GENERATOR_TIPS</span><span class="p">),</span>
-</span><span id="line-475">    <span class="p">}</span></div>
+</span><span id="line-446"><span class="k">def</span><span class="w"> </span><span class="nf">art_guidance</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+</span><span id="line-447"><span class="w">    </span><span class="sd">"""Everything a writer's Claude needs to ask for real art, as JSON-ready data.</span>
+</span><span id="line-448">
+</span><span id="line-449"><span class="sd">    A prompt is ``prompt_recipe``: the subject, the kind's ``framing``, the ``look``.</span>
+</span><span id="line-450">
+</span><span id="line-451"><span class="sd">    &gt;&gt;&gt; g = art_guidance(style="norstein")</span>
+</span><span id="line-452"><span class="sd">    &gt;&gt;&gt; sorted(g)</span>
+</span><span id="line-453"><span class="sd">    ['claude_svg', 'formats', 'generators', 'kinds', 'look', 'paper_drawings', 'prompt_recipe', 'viewpoint']</span>
+</span><span id="line-454"><span class="sd">    &gt;&gt;&gt; g["kinds"][0]["key"], g["look"].startswith("painted multiplane")</span>
+</span><span id="line-455"><span class="sd">    ('sky', True)</span>
+</span><span id="line-456"><span class="sd">    """</span>
+</span><span id="line-457">    <span class="n">look</span> <span class="o">=</span> <span class="n">style_look</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+</span><span id="line-458">    <span class="n">kinds</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-459">    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ART_KINDS</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+</span><span id="line-460">        <span class="n">row</span> <span class="o">=</span> <span class="n">asdict</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+</span><span id="line-461">        <span class="n">row</span><span class="p">[</span><span class="s2">"content"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span><span id="line-462">        <span class="n">kinds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</span><span id="line-463">    <span class="k">return</span> <span class="p">{</span>
+</span><span id="line-464">        <span class="s2">"claude_svg"</span><span class="p">:</span> <span class="n">CLAUDE_SVG_NOTE</span><span class="p">,</span>
+</span><span id="line-465">        <span class="s2">"look"</span><span class="p">:</span> <span class="n">look</span><span class="p">,</span>
+</span><span id="line-466">        <span class="s2">"prompt_recipe"</span><span class="p">:</span> <span class="s2">"&lt;subject in the writer's words&gt;. &lt;the kind's framing&gt;. Look: "</span>
+</span><span id="line-467">        <span class="s2">"&lt;look&gt;. Never a show's, studio's or artist's name. Midjourney: add --ar "</span>
+</span><span id="line-468">        <span class="s2">"&lt;the kind's aspect&gt; --no text, letters, watermark."</span><span class="p">,</span>
+</span><span id="line-469">        <span class="s2">"formats"</span><span class="p">:</span> <span class="s2">"PNG (transparent background where a kind says so), JPEG or WebP "</span>
+</span><span id="line-470">        <span class="s2">"for an opaque plate; SVG from a vector tool if it follows the pack's SVG "</span>
+</span><span id="line-471">        <span class="s2">"rules. Not PSD, HEIC, PDF or AI. Original files, not screenshots."</span><span class="p">,</span>
+</span><span id="line-472">        <span class="s2">"kinds"</span><span class="p">:</span> <span class="n">kinds</span><span class="p">,</span>
+</span><span id="line-473">        <span class="s2">"viewpoint"</span><span class="p">:</span> <span class="n">VIEWPOINT_RULE</span><span class="p">,</span>
+</span><span id="line-474">        <span class="s2">"paper_drawings"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">PAPER_DRAWINGS</span><span class="p">),</span>
+</span><span id="line-475">        <span class="s2">"generators"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">GENERATOR_TIPS</span><span class="p">),</span>
+</span><span id="line-476">    <span class="p">}</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -684,7 +685,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=1e158f99"></script>
+    <script src="../../_static/documentation_options.js?v=d59c1f54"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

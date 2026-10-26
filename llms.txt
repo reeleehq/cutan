@@ -44,6 +44,7 @@
 - [cutan.characters.record](_autosummary/cutan.characters.record.html.md): Record a character’s preview HTML to an mp4.
 - [cutan.characters.registration](_autosummary/cutan.characters.registration.html.md): The character side of the cut-out genre, as declarations: &#96;play&#96; and &#96;character&#96;.
 - [cutan.characters.schema](_autosummary/cutan.characters.schema.html.md): Character descriptor schema (Spine-shaped, Pydantic v2).
+- [cutan.characters.set_part](_autosummary/cutan.characters.set_part.html.md): Replace a factory part’s drawing with a picture (cutan#92).
 - [cutan.characters.silhouette](_autosummary/cutan.characters.silhouette.html.md): Silhouette rendering and comparison for the silhouette test.
 - [cutan.characters.svg_utils](_autosummary/cutan.characters.svg_utils.html.md): SVG manipulation: namespace-aware DOM helpers using stdlib &#96;xml.etree&#96;.
 - [cutan.characters.validate](_autosummary/cutan.characters.validate.html.md): Whether an art package is one the compiler can actually render.
@@ -85,7 +86,7 @@
 - [cutan.verify.cadence](_autosummary/cutan.verify.cadence.html.md): Pre-render cadence lint: the scene’s timing against its style spec (catalogue B6, an#519 rank 5).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 13:00 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 13:44 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

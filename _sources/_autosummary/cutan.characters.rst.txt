@@ -62,6 +62,7 @@ cutan.characters
    record
    registration
    schema
+   set_part
    silhouette
    svg_utils
    validate

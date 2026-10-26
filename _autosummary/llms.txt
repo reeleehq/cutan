@@ -42,6 +42,7 @@
 - [cutan.characters.record](cutan.characters.record.html.md): Record a character’s preview HTML to an mp4.
 - [cutan.characters.registration](cutan.characters.registration.html.md): The character side of the cut-out genre, as declarations: &#96;play&#96; and &#96;character&#96;.
 - [cutan.characters.schema](cutan.characters.schema.html.md): Character descriptor schema (Spine-shaped, Pydantic v2).
+- [cutan.characters.set_part](cutan.characters.set_part.html.md): Replace a factory part’s drawing with a picture (cutan#92).
 - [cutan.characters.silhouette](cutan.characters.silhouette.html.md): Silhouette rendering and comparison for the silhouette test.
 - [cutan.characters.svg_utils](cutan.characters.svg_utils.html.md): SVG manipulation: namespace-aware DOM helpers using stdlib &#96;xml.etree&#96;.
 - [cutan.characters.validate](cutan.characters.validate.html.md): Whether an art package is one the compiler can actually render.

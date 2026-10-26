@@ -1,0 +1,25 @@
+cutan.characters.set\_part
+==========================
+
+.. automodule:: cutan.characters.set_part
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      replace_part_art
+      set_part
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      PartReplacement
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      SetPartError
+   
