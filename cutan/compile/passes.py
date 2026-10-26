@@ -1719,7 +1719,9 @@ def _solve_face(
 
     offsets: dict[tuple[str, str], list[float]] = {}
     lid_expr: dict[str, list[float]] = {}
-    brow_expr: dict[str, dict[str, list[float]]] = {}  # path -> {"height"|"angle": samples}
+    brow_expr: dict[
+        str, dict[str, list[float]]
+    ] = {}  # path -> {"height"|"angle": samples}
     try:
         bindings = binding_for(desc)
     except ExpressionResolutionError as e:
