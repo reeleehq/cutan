@@ -67,7 +67,8 @@ PROJECT_STORE_RECORD: str = ".an/projects_store.json"
 #: named points (``stu@hand_r``) for the core's hold verbs.
 #: Level 9: ``an.cli_status.failed`` (an#480), which ``an character`` commands return
 #: to exit non-zero on a failure.
-REQUIRED_AN_API_LEVEL: int = 9
+#: Level 10: ``an.stores._common.asset_references`` and ``asset_ref_problems`` (an#552).
+REQUIRED_AN_API_LEVEL: int = 10
 
 
 def require_an() -> None:
