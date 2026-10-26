@@ -248,3 +248,46 @@ def test_parse_is_total_over_its_vocabulary():
     assert parse_clothing_pattern("none") is None
     p = parse_clothing_pattern("floral")
     assert isinstance(p, ClothingPattern) and p.as_dict() == {"kind": "floral"}
+
+
+# --- review of cutan#94: forearms, packs, one clothing colour ---------------------
+
+
+def test_the_arms_of_a_patterned_character_split_and_keep_the_print(tmp_path):
+    from cutan.characters.factory import add_forearms
+
+    desc_path = new_character(
+        tmp_path, name="ned", seed="ned", use_dicebear=False, clothing_pattern="floral"
+    )
+    add_forearms(desc_path.parent)
+    for part in ("arm_l", "forearm_l", "arm_r", "forearm_r"):
+        text = (desc_path.parent / "parts" / f"{part}.svg").read_text()
+        assert text.count('<pattern id="clothing_print"') == 1, part
+    assert not (desc_path.parent / "parts" / "hand_l.svg").read_text().count("<pattern")
+    digests = redraw_digests(json.loads(desc_path.read_text()))
+    assert digests and digests["parts/forearm_l.svg"]  # the recipe still replays it
+
+
+def test_a_pack_may_ask_for_a_print_and_two_clothing_colours_are_refused(tmp_path):
+    from cutan.pack import _checked_cast_line
+
+    line = 'an character new ned --offline --clothing-pattern "floral:base=#e8735a,motif=#ffffff"'
+    import shlex
+
+    assert _checked_cast_line(shlex.split(line), 1, line)
+    with pytest.raises(ValueError, match="two clothing colours"):
+        new_character(
+            tmp_path,
+            name="ned",
+            use_dicebear=False,
+            clothing_pattern="check:base=#445566",
+            palette={"clothing": "#112233"},
+        )
+    # the same colour said twice is one colour
+    new_character(
+        tmp_path,
+        name="ned2",
+        use_dicebear=False,
+        clothing_pattern="check:base=#445566",
+        palette={"clothing": "#445566"},
+    )

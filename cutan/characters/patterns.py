@@ -40,6 +40,7 @@ __all__ = [
     "parse_clothing_pattern",
     "pattern_defs",
     "pattern_overlay",
+    "painted_fill",
     "distinct_pattern",
 ]
 
@@ -223,6 +224,23 @@ def pattern_defs(pattern: ClothingPattern) -> str:
         f'<defs><pattern id="{PATTERN_ID}" patternUnits="userSpaceOnUse" '
         f'x="0" y="0" width="{t:g}" height="{t:g}">{_tile_content(pattern)}</pattern></defs>'
     )
+
+
+def painted_fill(shape_attrs: str, *, fill: str, pattern: Optional[ClothingPattern]) -> str:
+    """A clothing shape's paint, without its outline: the base ``fill``, then the
+    print over it (the definition, the fill, the overlay), the one order every
+    clothing drawer shares; the caller adds its own ink on top.
+
+    >>> painted_fill('x="0"', fill="#fff", pattern=None)
+    '<rect x="0" fill="#fff"/>'
+    >>> out = painted_fill('x="0"', fill="#fff", pattern=ClothingPattern("check"))
+    >>> out.startswith("<defs>") and out.endswith('<rect x="0" fill="url(#clothing_print)"/>')
+    True
+    """
+    base = f'<rect {shape_attrs} fill="{fill}"/>'
+    if pattern is None:
+        return base
+    return pattern_defs(pattern) + base + pattern_overlay(shape_attrs)
 
 
 def pattern_overlay(shape_attrs: str) -> str:

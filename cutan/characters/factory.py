@@ -79,8 +79,7 @@ from cutan.characters.patterns import (
     ClothingPattern,
     distinct_pattern,
     parse_clothing_pattern,
-    pattern_defs,
-    pattern_overlay,
+    painted_fill,
 )
 from cutan.characters.lids import add_half_lid as _add_half_lid
 from cutan.characters.schema import (
@@ -1065,6 +1064,12 @@ def new_character(
     """
     palette_ = _check_palette(palette)
     pattern = parse_clothing_pattern(clothing_pattern)
+    if pattern is not None and pattern.base and palette_.get("clothing"):
+        if normalise_hex(palette_["clothing"]) != pattern.base:
+            raise ValueError(
+                f"the print's base={pattern.base} and the palette's clothing="
+                f"{palette_['clothing']} are two clothing colours: give one"
+            )
     body = _check_build(build)
     if not (isinstance(head_scale, (int, float)) and 0 < head_scale <= MAX_HEAD_SCALE):
         raise ValueError(
@@ -2018,9 +2023,7 @@ def _write_torso_part(
             roles[sash] = "accessory"
         inner = (
             clip
-            + (pattern_defs(pattern) if pattern is not None else "")
-            + f'<rect {rect} fill="{clothing}"/>'
-            + (pattern_overlay(rect) if pattern is not None else "")
+            + painted_fill(rect, fill=clothing, pattern=pattern)
             + band
             + collar
             + f'<rect {rect} fill="none" stroke="#222" stroke-width="6"/>'
@@ -2054,9 +2057,7 @@ def _arm_svg(
         sleeve = f'<rect {rect} fill="{color}" stroke="#222" stroke-width="{sw:g}"/>'
     else:
         sleeve = (
-            pattern_defs(pattern)
-            + f'<rect {rect} fill="{color}"/>'
-            + pattern_overlay(rect)
+            painted_fill(rect, fill=color, pattern=pattern)
             + f'<rect {rect} fill="none" stroke="#222" stroke-width="{sw:g}"/>'
         )
     return (
@@ -2277,19 +2278,16 @@ def _write_view_torso_part(
         )
     roles = {clothing: "clothing", accent: "hair"}
     ink = f'<rect {rect} fill="none" stroke="{OUTLINE_COLOUR}" stroke-width="6"/>'
-    print_ = pattern_defs(pattern) if pattern is not None else ""
-    overlay = pattern_overlay(rect) if pattern is not None else ""
+    paint = painted_fill(rect, fill=clothing, pattern=pattern)
     if sash is None:
-        inner = print_ + f'<rect {rect} fill="{clothing}"/>' + overlay + collar + ink
+        inner = paint + collar + ink
     else:
         band = 0.16 * min(w - 40, hb)
         # From behind the band runs the other diagonal.
         y_a, y_b = (0.88, 0.12) if view == "back" else (0.12, 0.88)
         inner = (
             f'<clipPath id="torso_body"><rect {rect}/></clipPath>'
-            + print_
-            + f'<rect {rect} fill="{clothing}"/>'
-            + overlay
+            + paint
             + f'<path d="M {x0:g} {20 + y_a * hb:g} L {x0 + bw:g} {20 + y_b * hb:g}" '
             f'stroke="{sash}" stroke-width="{band:g}" fill="none" '
             'clip-path="url(#torso_body)"/>' + collar + ink
@@ -2619,8 +2617,31 @@ def _elbow_bounds(body: BodyBuild) -> tuple[float, float]:
     return lo, hi
 
 
+def _recorded_pattern(desc: CharacterDescriptor) -> ClothingPattern | None:
+    """The print as the factory drew it on this character (nudged clear of its
+    other colours), re-derived from the recorded knobs, or ``None`` without one."""
+    meta = desc.metadata
+    spec = parse_clothing_pattern(meta.get("clothing_pattern"))
+    if spec is None:
+        return None
+    return _resolve_looks(
+        str(meta.get("seed") or desc.name),
+        _check_palette(meta.get("palette")),
+        hat=str(meta.get("hat") or DFLT_HAT),
+        hair_style=str(meta.get("hair_style") or DFLT_HAIR_STYLE),
+        hair_length=str(meta.get("hair_length") or DFLT_HAIR_LENGTH),
+        clothing_pattern=spec,
+    ).pattern
+
+
 def _split_arm_svgs(
-    *, side: str, color: str, hand: str, body: BodyBuild, elbow_at: float
+    *,
+    side: str,
+    color: str,
+    hand: str,
+    body: BodyBuild,
+    elbow_at: float,
+    pattern: ClothingPattern | None = None,
 ) -> tuple[dict[str, str], dict[str, float]]:
     """``({part: svg text}, geometry)`` of the one-piece arm cut at the elbow.
 
@@ -2640,13 +2661,20 @@ def _split_arm_svgs(
     hand_d = 2 * hr + 2 * sw
 
     def sleeve(name: str, h: float) -> str:
+        rect = (
+            f'x="{(64 - aw) / 2:g}" y="0" width="{aw:g}" height="{h:g}" '
+            f'rx="{aw / 2:g}" ry="{aw / 2:g}"'
+        )
+        paint = (
+            f'<rect {rect} fill="{color}" stroke="#222" stroke-width="{sw:g}"/>'
+            if pattern is None
+            else painted_fill(rect, fill=color, pattern=pattern)
+            + f'<rect {rect} fill="none" stroke="#222" stroke-width="{sw:g}"/>'
+        )
         return (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             f'<svg xmlns="{SVG_NS}" viewBox="0 0 64 {h:g}" width="64" height="{h:g}">'
-            f'<g id="{name}_{side}">'
-            f'<rect x="{(64 - aw) / 2:g}" y="0" width="{aw:g}" height="{h:g}" '
-            f'rx="{aw / 2:g}" ry="{aw / 2:g}" fill="{color}" stroke="#222" '
-            f'stroke-width="{sw:g}"/></g></svg>'
+            f'<g id="{name}_{side}">{paint}</g></svg>'
         )
 
     hand_svg = (
@@ -2715,6 +2743,7 @@ def add_forearms(char_dir: str | Path, *, elbow_at: float = ELBOW_AT) -> Path:
     elif any(f"forearm_{s}" in bones or f"hand_{s}" in bones for s in ARM_SIDES):
         problem = "has a forearm or a hand bone already"
     written: dict[str, dict[str, str]] = {}
+    pattern = _recorded_pattern(desc)
     if problem is None:
         for side in ARM_SIDES:
             arm_path = f"parts/arm_{side}.svg"
@@ -2728,7 +2757,9 @@ def add_forearms(char_dir: str | Path, *, elbow_at: float = ELBOW_AT) -> Path:
                 or not hand
                 or not drawn.is_file()
                 or drawn.read_text(encoding="utf-8")
-                != _arm_svg(side=side, color=color, hand=hand, body=body)
+                != _arm_svg(
+                    side=side, color=color, hand=hand, body=body, pattern=pattern
+                )
             ):
                 problem = (
                     f"{arm_path} is not the factory's drawing for its recorded knobs"
@@ -2759,6 +2790,7 @@ def add_forearms(char_dir: str | Path, *, elbow_at: float = ELBOW_AT) -> Path:
             hand=written[side]["hand"],
             body=body,
             elbow_at=elbow_at,
+            pattern=pattern,
         )
         for name, text in svgs.items():
             rel = f"parts/{name}.svg"
