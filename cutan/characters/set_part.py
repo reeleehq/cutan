@@ -20,7 +20,6 @@ import math
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import NamedTuple
 
 from an.ir.assets import AssetSource
 from an.stage.raster import art_size
@@ -34,11 +33,9 @@ from cutan.characters.descriptor_io import (
 
 __all__ = [
     "PartReplacement",
-    "Placement",
     "SetPartError",
     "part_path",
     "replace_part_art",
-    "rest_placement",
     "set_part",
 ]
 
@@ -75,7 +72,6 @@ def replace_part_art(
     anchor: tuple[float, float] | None = None,
     source: AssetSource | None = None,
     width: float | None = None,
-    at: tuple[float, float] | None = None,
 ) -> PartReplacement:
     """Draw every attachment that used ``old_rel`` (``parts/head.svg``) with ``picture``.
 
@@ -85,8 +81,7 @@ def replace_part_art(
     in 0..1 of the picture) replaces the attachments' anchor (default: keep it);
     ``source`` is pinned to them as the picture's provenance. ``width`` declares the
     attachments' width outright (replacing any they declared: a part carved at a
-    known scale keeps it); ``at`` (``(x, y)``, view_box units from the slot's
-    bone) replaces their offset, where the anchor is drawn; raises :class:`SetPartError` when no attachment
+    known scale keeps it); raises :class:`SetPartError` when no attachment
     draws ``old_rel``, when ``picture`` is not a readable PNG/JPEG/WebP, or when
     a path leaves the character's folder.
     """
@@ -133,8 +128,6 @@ def replace_part_art(
             att["source"] = source.model_dump(mode="json", exclude_none=True)
         if anchor is not None:
             att["anchor"] = list(anchor)
-        if at is not None:
-            att["x"], att["y"] = (float(v) for v in at)
         if declared is not None:
             att["width"] = declared
             att.pop("height", None)  # the picture's own aspect gives it, not a box
@@ -164,21 +157,18 @@ def replace_part_art(
     return PartReplacement(desc_path, new_rel, derived)
 
 
-def _locate(raw: dict, attachment: str) -> list[tuple[str, dict]]:
-    """``[(slot, attachment dict)]`` for ``name`` or ``slot/name``."""
-    slot_wanted, _, name_wanted = attachment.rpartition("/")
-    return [
-        (slot, att)
-        for _skin, slot, name, att in _slot_attachments(raw)
-        if name == name_wanted and slot_wanted in ("", slot)
-    ]
-
-
 def part_path(char_dir: str | Path, attachment: str) -> str:
     """The file ``attachment`` (``name``, or ``slot/name`` when several slots carry
     that name) is drawn by, as the descriptor records it (``parts/head.svg``).
     Raises :class:`SetPartError` when it names no attachment or an ambiguous one."""
-    paths = {att.get("path") for _slot, att in _locate(read_raw(char_dir), attachment)}
+    raw = read_raw(char_dir)
+    slot_wanted, _, name_wanted = attachment.rpartition("/")
+    found = {
+        (slot, name): att.get("path")
+        for _skin, slot, name, att in _slot_attachments(raw)
+        if name == name_wanted and slot_wanted in ("", slot)
+    }
+    paths = set(found.values())
     if not paths:
         raise SetPartError(f"no attachment {attachment!r} (try slot/name)")
     if len(paths) > 1:
@@ -189,47 +179,6 @@ def part_path(char_dir: str | Path, attachment: str) -> str:
     return paths.pop()
 
 
-class Placement(NamedTuple):
-    """Where an attachment sits at rest, in view_box units from the rig's origin:
-    its ``bone``'s position, its own ``offset`` from the bone, and its ``anchor``
-    (0..1 of its picture)."""
-
-    bone: tuple[float, float]
-    offset: tuple[float, float]
-    anchor: tuple[float, float]
-
-    @property
-    def at(self) -> tuple[float, float]:
-        """Where the anchor is drawn."""
-        return (self.bone[0] + self.offset[0], self.bone[1] + self.offset[1])
-
-
-def rest_placement(char_dir: str | Path, attachment: str) -> Placement | None:
-    """Where ``attachment`` sits at rest, or ``None`` when offsets do not tell (a
-    bone on the way is rotated or scaled at rest). Raises :class:`SetPartError`
-    as :func:`part_path` does."""
-    raw = read_raw(char_dir)
-    part_path(char_dir, attachment)  # says why when it is unknown or ambiguous
-    found = _locate(raw, attachment)
-    if len(found) != 1:
-        raise SetPartError(f"{attachment!r} is in several slots (try slot/name)")
-    ((slot, att),) = found
-    bones = {b["name"]: b for b in raw.get("bones") or []}
-    name = next(s["bone"] for s in raw.get("slots") or [] if s["name"] == slot)
-    x = y = 0.0
-    while name is not None:
-        b = bones[name]
-        if (
-            b.get("rotation_deg")
-            or b.get("scale_x", 1) != 1
-            or b.get("scale_y", 1) != 1
-        ):
-            return None
-        x, y, name = x + b.get("x", 0.0), y + b.get("y", 0.0), b.get("parent")
-    offset = (float(att.get("x") or 0), float(att.get("y") or 0))
-    return Placement((x, y), offset, tuple(att.get("anchor") or (0.5, 0.5)))
-
-
 def set_part(
     char_dir: str | Path,
     attachment: str,
@@ -238,10 +187,9 @@ def set_part(
     anchor: tuple[float, float] | None = None,
     source: AssetSource | None = None,
     width: float | None = None,
-    at: tuple[float, float] | None = None,
 ) -> PartReplacement:
     """Replace the drawing of ``attachment`` (see :func:`part_path`) with
-    ``picture``; ``anchor``, ``source``, ``width`` and ``at`` as :func:`replace_part_art`."""
+    ``picture``; ``anchor``, ``source`` and ``width`` as :func:`replace_part_art`."""
     return replace_part_art(
         char_dir,
         part_path(char_dir, attachment),
@@ -249,5 +197,4 @@ def set_part(
         anchor=anchor,
         source=source,
         width=width,
-        at=at,
     )

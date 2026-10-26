@@ -39,7 +39,11 @@ unit for the whole sheet, so a hand stays as long next to a body as on the sheet
 A part with no ``point`` keeps the factory's anchor, which belongs to a different
 picture's framing (the report says so). With a ``unit`` a split part is also
 placed: its attachment's offset is set so its pivot is drawn where the sheet has it
-from the base's anchor (without one the report gives the offset in sheet pixels).
+from the base's anchor, as the rig builder draws both
+(:func:`cutan.characters.placement.place_attachment`); the attachments of that
+slot drawn by the same file move with it, while view keys drawn by other files
+keep their own offset. Without a ``unit``, or when the base is drawn turned or
+scaled at rest, the report gives the offset in sheet pixels instead.
 
 The recipe as a document is :func:`load_recipe` (``schema_version`` 1).
 
@@ -48,6 +52,7 @@ Needs OpenCV: ``pip install "cutan[carve]"``.
 
 from __future__ import annotations
 
+import functools
 import math
 import shutil
 import tempfile
@@ -61,12 +66,9 @@ from an.ir.assets import AssetSource
 from cutan.carve.core import Box, Carving, ImageLike, carve, carve_head, load_rgb
 from cutan.carve.parts import PartSpec, split_parts
 from cutan.carve.provenance import frame_source
-from cutan.characters.set_part import (
-    PartReplacement,
-    part_path,
-    rest_placement,
-    set_part,
-)
+from cutan.characters.descriptor_io import load_descriptor
+from cutan.characters.placement import find_attachment, place_attachment, rest_anchor
+from cutan.characters.set_part import PartReplacement, part_path, set_part
 
 __all__ = [
     "RECIPE_SCHEMA_VERSION",
@@ -258,18 +260,11 @@ class _Drawing:
 
 @dataclass(frozen=True)
 class _Joint:
-    """Where a split part's pivot is on the sheet, relative to its base's picture.
-
-    base: the base's attachment (its anchor is the origin the pivot is placed from)
-    pivot: the pivot in sheet px from the base picture's top-left
-    base_size: the base picture's size in sheet px
-    base_anchor: the anchor the base is drawn with (None: the factory's, kept)
-    """
+    """A split part's pivot on the sheet: ``offset`` (sheet px) from the anchor
+    of its ``base``'s picture."""
 
     base: str
-    pivot: tuple[float, float]
-    base_size: tuple[float, float]
-    base_anchor: tuple[float, float] | None
+    offset: tuple[float, float]
 
 
 def _part_provenance(carving: Carving, name: str, origin: tuple[float, float]):
@@ -293,8 +288,12 @@ def _drawings(
     *,
     index: int,
     unit: float | None,
+    base_anchor: tuple[float, float] | None = None,
 ) -> list[_Drawing]:
-    """The pictures ``p`` gives: itself, or its base and each split part."""
+    """The pictures ``p`` gives: itself, or its base and each split part.
+
+    ``base_anchor`` is the anchor the base attachment is drawn with when ``p``
+    gives it none (0..1 of its picture: the factory's, which it keeps)."""
 
     def drawing(name, image, anchor, warnings, provenance, joint=None):
         picture = folder / f"{index:03d}-{len(taken):02d}.png"
@@ -322,15 +321,17 @@ def _drawings(
             f"{p.attachment!r}: the split parts took every pixel, nothing is left "
             "for the attachment to draw"
         )
-    base_size = (lifted.base.width / carving.scale, lifted.base.height / carving.scale)
+    u, v = own_anchor or base_anchor or (0.5, 0.5)
+    anchor_px = (u * lifted.base.width, v * lifted.base.height)  # carving px
 
     def joint(part) -> _Joint:
         pivot = (part.origin[0] + part.pivot[0], part.origin[1] + part.pivot[1])
         return _Joint(
             p.attachment,
-            (pivot[0] / carving.scale, pivot[1] / carving.scale),
-            base_size,
-            own_anchor,
+            (
+                (pivot[0] - anchor_px[0]) / carving.scale,
+                (pivot[1] - anchor_px[1]) / carving.scale,
+            ),
         )
 
     return [
@@ -348,33 +349,27 @@ def _drawings(
     ]
 
 
-def _joint_at(
-    char_dir: Path, d: _Drawing, unit: float | None
-) -> tuple[tuple[float, float] | None, list[str]]:
-    """``(at, notes)``: where a split part's attachment goes so that its pivot is
-    drawn where the sheet has it, relative to its base's anchor (``at`` is ``None``
-    to keep the factory's offset, and ``notes`` says why or by how much it is off)."""
+def _place_joint(char_dir: Path, d: _Drawing, unit: float | None) -> list[str]:
+    """Place a split part's attachment so its pivot is drawn where the sheet has it
+    from its base's anchor (only with a ``unit``); the notes say why not, or by
+    how much it is off when it is not placed."""
     if d.joint is None:
-        return None, []
-    j = d.joint
-    base = rest_placement(char_dir, j.base)
-    part = rest_placement(char_dir, d.attachment)
-    u, v = j.base_anchor or (base.anchor if base else (0.5, 0.5))
-    off = (j.pivot[0] - u * j.base_size[0], j.pivot[1] - v * j.base_size[1])
-    where = f"{off[0]:.1f}, {off[1]:.1f} sheet px from {j.base!r}'s anchor"
+        return []
+    base, (dx, dy) = d.joint.base, d.joint.offset
+    where = f"{dx:.1f}, {dy:.1f} sheet px from the anchor of {base!r}"
     if unit is None:
-        return None, [f"its pivot is {where}; give the recipe a `unit` to place it"]
-    if base is None or part is None:
-        return None, [
-            f"its pivot is {where}, not placed: a bone is rotated or scaled at rest"
+        return [f"its pivot is {where}; give the recipe a `unit` to place it"]
+    at = rest_anchor(char_dir, base)
+    if at.posed:
+        return [
+            f"its pivot is {where}, not placed: {base!r} is drawn turned or scaled "
+            "at rest (its bone's rest pose, or a part it nests under), which moves "
+            "the pivot off that offset"
         ]
-    return (
-        (
-            base.at[0] + off[0] * unit - part.bone[0],
-            base.at[1] + off[1] * unit - part.bone[1],
-        ),
-        [],
+    place_attachment(
+        char_dir, d.attachment, world=(at.world[0] + dx * unit, at.world[1] + dy * unit)
     )
+    return []
 
 
 def sheet_to_package(
@@ -420,6 +415,7 @@ def sheet_to_package(
                 raise ValueError(f"{name!r} and {files[rel]!r} are both drawn by {rel}")
             files[rel] = name
     image = load_rgb(sheet)
+    desc = functools.cache(lambda: load_descriptor(char_dir))
     with tempfile.TemporaryDirectory(prefix="cutan-sheet-") as tmp:
         folder = Path(work_dir) if work_dir is not None else Path(tmp)
         folder.mkdir(parents=True, exist_ok=True)
@@ -429,12 +425,16 @@ def sheet_to_package(
             if p.crop is not None:
                 kwargs["crop"] = p.crop
             carving = _CARVERS[p.mode](image, **kwargs)
-            drawings += _drawings(p, carving, folder, index=i, unit=unit)
+            base_anchor = None
+            if p.split and not p.anchored:  # the factory's, kept
+                base_anchor = tuple(find_attachment(desc(), p.attachment)[3].anchor)
+            drawings += _drawings(
+                p, carving, folder, index=i, unit=unit, base_anchor=base_anchor
+            )
         snapshot = _snapshot(char_dir, Path(tmp))
         results = []
         try:
             for d in drawings:
-                at, notes = _joint_at(char_dir, d, unit)
                 done = set_part(
                     char_dir,
                     d.attachment,
@@ -442,8 +442,8 @@ def sheet_to_package(
                     anchor=d.anchor,
                     source=d.provenance,
                     width=d.width,
-                    at=at,
                 )
+                notes = _place_joint(char_dir, d, unit)
                 results.append(PartResult(d.attachment, d.warnings + notes, done))
         except BaseException:
             _restore(snapshot, char_dir)
