@@ -429,36 +429,38 @@
 </span><span id="line-228">
 <div class="viewcode-block" id="painted_fill">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.patterns.html#cutan.characters.patterns.painted_fill">[docs]</a>
-</span><span id="line-229"><span class="k">def</span><span class="w"> </span><span class="nf">painted_fill</span><span class="p">(</span><span class="n">shape_attrs</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fill</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClothingPattern</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-230"><span class="w">    </span><span class="sd">"""A clothing shape's paint, without its outline: the base ``fill``, then the</span>
-</span><span id="line-231"><span class="sd">    print over it (the definition, the fill, the overlay), the one order every</span>
-</span><span id="line-232"><span class="sd">    clothing drawer shares; the caller adds its own ink on top.</span>
-</span><span id="line-233">
-</span><span id="line-234"><span class="sd">    &gt;&gt;&gt; painted_fill('x="0"', fill="#fff", pattern=None)</span>
-</span><span id="line-235"><span class="sd">    '&lt;rect x="0" fill="#fff"/&gt;'</span>
-</span><span id="line-236"><span class="sd">    &gt;&gt;&gt; out = painted_fill('x="0"', fill="#fff", pattern=ClothingPattern("check"))</span>
-</span><span id="line-237"><span class="sd">    &gt;&gt;&gt; out.startswith("&lt;defs&gt;") and out.endswith('&lt;rect x="0" fill="url(#clothing_print)"/&gt;')</span>
-</span><span id="line-238"><span class="sd">    True</span>
-</span><span id="line-239"><span class="sd">    """</span>
-</span><span id="line-240">    <span class="n">base</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'&lt;rect </span><span class="si">{</span><span class="n">shape_attrs</span><span class="si">}</span><span class="s1"> fill="</span><span class="si">{</span><span class="n">fill</span><span class="si">}</span><span class="s1">"/&gt;'</span>
-</span><span id="line-241">    <span class="k">if</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-242">        <span class="k">return</span> <span class="n">base</span>
-</span><span id="line-243">    <span class="k">return</span> <span class="n">pattern_defs</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="o">+</span> <span class="n">base</span> <span class="o">+</span> <span class="n">pattern_overlay</span><span class="p">(</span><span class="n">shape_attrs</span><span class="p">)</span></div>
+</span><span id="line-229"><span class="k">def</span><span class="w"> </span><span class="nf">painted_fill</span><span class="p">(</span>
+</span><span id="line-230">    <span class="n">shape_attrs</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fill</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClothingPattern</span><span class="p">]</span>
+</span><span id="line-231"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-232"><span class="w">    </span><span class="sd">"""A clothing shape's paint, without its outline: the base ``fill``, then the</span>
+</span><span id="line-233"><span class="sd">    print over it (the definition, the fill, the overlay), the one order every</span>
+</span><span id="line-234"><span class="sd">    clothing drawer shares; the caller adds its own ink on top.</span>
+</span><span id="line-235">
+</span><span id="line-236"><span class="sd">    &gt;&gt;&gt; painted_fill('x="0"', fill="#fff", pattern=None)</span>
+</span><span id="line-237"><span class="sd">    '&lt;rect x="0" fill="#fff"/&gt;'</span>
+</span><span id="line-238"><span class="sd">    &gt;&gt;&gt; out = painted_fill('x="0"', fill="#fff", pattern=ClothingPattern("check"))</span>
+</span><span id="line-239"><span class="sd">    &gt;&gt;&gt; out.startswith("&lt;defs&gt;") and out.endswith('&lt;rect x="0" fill="url(#clothing_print)"/&gt;')</span>
+</span><span id="line-240"><span class="sd">    True</span>
+</span><span id="line-241"><span class="sd">    """</span>
+</span><span id="line-242">    <span class="n">base</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'&lt;rect </span><span class="si">{</span><span class="n">shape_attrs</span><span class="si">}</span><span class="s1"> fill="</span><span class="si">{</span><span class="n">fill</span><span class="si">}</span><span class="s1">"/&gt;'</span>
+</span><span id="line-243">    <span class="k">if</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-244">        <span class="k">return</span> <span class="n">base</span>
+</span><span id="line-245">    <span class="k">return</span> <span class="n">pattern_defs</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="o">+</span> <span class="n">base</span> <span class="o">+</span> <span class="n">pattern_overlay</span><span class="p">(</span><span class="n">shape_attrs</span><span class="p">)</span></div>
 
-</span><span id="line-244">
-</span><span id="line-245">
+</span><span id="line-246">
+</span><span id="line-247">
 <div class="viewcode-block" id="pattern_overlay">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.patterns.html#cutan.characters.patterns.pattern_overlay">[docs]</a>
-</span><span id="line-246"><span class="k">def</span><span class="w"> </span><span class="nf">pattern_overlay</span><span class="p">(</span><span class="n">shape_attrs</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-247"><span class="w">    </span><span class="sd">"""The overlay that paints the print over a clothing shape's base fill.</span>
-</span><span id="line-248">
-</span><span id="line-249"><span class="sd">    ``shape_attrs`` is the shape's own geometry (a rect's ``x y width height rx ry``),</span>
-</span><span id="line-250"><span class="sd">    so the print is clipped to the clothing exactly as the fill is.</span>
-</span><span id="line-251">
-</span><span id="line-252"><span class="sd">    &gt;&gt;&gt; pattern_overlay('x="0" y="0" width="4" height="4"')</span>
-</span><span id="line-253"><span class="sd">    '&lt;rect x="0" y="0" width="4" height="4" fill="url(#clothing_print)"/&gt;'</span>
-</span><span id="line-254"><span class="sd">    """</span>
-</span><span id="line-255">    <span class="k">return</span> <span class="sa">f</span><span class="s1">'&lt;rect </span><span class="si">{</span><span class="n">shape_attrs</span><span class="si">}</span><span class="s1"> fill="url(#</span><span class="si">{</span><span class="n">PATTERN_ID</span><span class="si">}</span><span class="s1">)"/&gt;'</span></div>
+</span><span id="line-248"><span class="k">def</span><span class="w"> </span><span class="nf">pattern_overlay</span><span class="p">(</span><span class="n">shape_attrs</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-249"><span class="w">    </span><span class="sd">"""The overlay that paints the print over a clothing shape's base fill.</span>
+</span><span id="line-250">
+</span><span id="line-251"><span class="sd">    ``shape_attrs`` is the shape's own geometry (a rect's ``x y width height rx ry``),</span>
+</span><span id="line-252"><span class="sd">    so the print is clipped to the clothing exactly as the fill is.</span>
+</span><span id="line-253">
+</span><span id="line-254"><span class="sd">    &gt;&gt;&gt; pattern_overlay('x="0" y="0" width="4" height="4"')</span>
+</span><span id="line-255"><span class="sd">    '&lt;rect x="0" y="0" width="4" height="4" fill="url(#clothing_print)"/&gt;'</span>
+</span><span id="line-256"><span class="sd">    """</span>
+</span><span id="line-257">    <span class="k">return</span> <span class="sa">f</span><span class="s1">'&lt;rect </span><span class="si">{</span><span class="n">shape_attrs</span><span class="si">}</span><span class="s1"> fill="url(#</span><span class="si">{</span><span class="n">PATTERN_ID</span><span class="si">}</span><span class="s1">)"/&gt;'</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -473,7 +475,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=461c1127"></script>
+    <script src="../../../_static/documentation_options.js?v=e264953e"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

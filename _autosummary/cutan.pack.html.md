@@ -140,7 +140,7 @@ a line.
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
 
-### cutan.pack.check_pack(pack_dir, , workdir=None, an_command=('/opt/hostedtoolcache/Python/3.12.15/x64/bin/python', '-P', '-m', 'an'), python=None, timeout=300.0, deadline=900.0)
+### cutan.pack.check_pack(pack_dir, , workdir=None, an_command=('/opt/hostedtoolcache/Python/3.12.15/x64/bin/python', '-P', '-m', 'an'), python=None, timeout=300.0, deadline=900.0, child_limits=None)
 
 Check the production pack at `pack_dir`; return a [`PackReport`](#cutan.pack.PackReport).
 
@@ -156,6 +156,14 @@ python: the interpreter for the engine’s voice checks (default: the one in
 
 timeout: seconds one step may run before it counts as failed
 deadline: seconds the whole check may run (`None`: no limit)
+child_limits: called in every child process (each `an` step and the voice
+
+> check) just before it runs, as `subprocess.run`’s `preexec_fn`: a
+> host caps memory or CPU once (`resource.setrlimit`) instead of
+> wrapping one command. POSIX only (`ValueError` elsewhere); `None`: no
+> limit. Keep it to `resource.setrlimit` with `resource` imported
+> beforehand: `preexec_fn` can deadlock when it imports, logs or takes
+> locks while the host runs threads. `RLIMIT_AS` is not enforced on macOS
 
 The pack is untrusted: only `PACK_SUFFIXES` files are copied, the
 `an` children run without the working directory on their import path
