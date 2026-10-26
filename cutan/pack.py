@@ -54,6 +54,10 @@ from collections.abc import Sequence
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+from an.ir.validate import _asset_references
+from an.stage.raster import is_svg_content, svg_problems
+from an.stores._common import inside_folder
+
 __all__ = [
     "PackCheck",
     "PackError",
@@ -159,7 +163,6 @@ SVG_NS = "{http://www.w3.org/2000/svg}"
 SVG_SHAPES = frozenset(
     {"path", "rect", "circle", "ellipse", "polygon", "polyline", "line", "text", "use"}
 )
-SVG_FORBIDDEN = frozenset({"image", "script", "foreignObject"})
 #: Seconds one step (one `an` command) may run before it counts as failed.
 DFLT_STEP_TIMEOUT = 300.0
 #: Seconds the whole check may run; past it, the remaining steps are not run.
@@ -394,33 +397,11 @@ def lint_svg(path: Path, *, exact_size: bool) -> list[str]:
         except ValueError:
             problems.append("width/height are not plain numbers")
     tags = {el.tag.replace(SVG_NS, "") for el in root.iter()}
-    if tags & SVG_FORBIDDEN:
-        problems.append(
-            f"forbidden element(s): {', '.join(sorted(tags & SVG_FORBIDDEN))}"
-        )
     if not tags & SVG_SHAPES:
         problems.append("draws nothing (no shape element)")
-    if _outside_links(root):
-        problems.append(
-            "links to an outside file, address or embedded data (only `#id` links are allowed)"
-        )
+    # Forbidden elements and links out of the file: the core's rule, so the two never drift.
+    problems += svg_problems(path)
     return problems
-
-
-def _outside_links(root: ET.Element) -> bool:
-    for el in root.iter():
-        for name, value in el.attrib.items():
-            if name.endswith("href") and not value.startswith("#"):
-                return True
-            if re.search(r"url\(\s*['\"]?(?!#)", value) or value.strip().startswith(
-                ("data:", "//", "http:", "https:", "file:")
-            ):
-                return True
-        if el.tag.replace(SVG_NS, "") == "style" and re.search(
-            r"@import|url\(\s*['\"]?(?!#)", el.text or ""
-        ):
-            return True
-    return False
 
 
 def _child_env() -> dict[str, str]:
@@ -549,9 +530,38 @@ def _note_svg_only_art(pack: Path, report: PackReport) -> None:
                 )
 
 
+#: The documents that name an asset's files, by asset kind folder.
+ASSET_DOCUMENTS: tuple[tuple[str, str], ...] = (
+    ("characters", "character.json"),
+    ("props", "prop.json"),
+    ("environments", "meta.json"),
+)
+
+
+def _referenced_svgs(pack: Path) -> list[Path]:
+    """Every file an asset document in the pack names that IS an SVG by content,
+    whatever its suffix (``an`` reads it as one) and that stays inside the asset's
+    folder; one that leaves it is ``an validate``'s finding, never read here."""
+    out: list[Path] = []
+    for kind, doc_name in ASSET_DOCUMENTS:
+        for doc_path in sorted((pack / "assets" / kind).glob(f"*/{doc_name}")):
+            try:
+                doc = json.loads(doc_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            if not isinstance(doc, dict):
+                continue
+            for _what, rel in _asset_references(doc):
+                file = inside_folder(doc_path.parent, rel)
+                if file is not None and file.is_file() and is_svg_content(file):
+                    out.append(file)
+    return out
+
+
 def _lint_svgs(pack: Path, report: PackReport) -> None:
     chars = pack / "assets" / "characters"
-    for svg in sorted(pack.rglob("*.svg")):
+    svgs = {*pack.rglob("*.svg"), *_referenced_svgs(pack)}
+    for svg in sorted(svgs):
         rel = svg.relative_to(pack)
         # A character part keeps its factory root tag, whose size may differ from its box.
         problems = lint_svg(svg, exact_size=chars not in svg.parents)

@@ -96,6 +96,7 @@ from cutan.characters.schema import (
     CharacterDescriptor,
 )
 from an.stage.raster import is_raster
+from an.stores._common import inside_folder
 from an.ir.migrate import migrate
 from an.stage.text_layout import svg_data_uri
 from cutan.characters.colour_roles import recolour_svg, role_recolouring
@@ -123,7 +124,6 @@ from an.stage.compile import (  # noqa: E402
 )
 from an.stage.rig import (  # noqa: E402  (the public rig builder, an#338)
     RigError,
-    art_src,
     build_rig_subtree,
     part_probe,
     raster_digest,
@@ -267,10 +267,11 @@ def _recoloured_texture_srcs(
         )
         if not swaps:
             continue
-        src = art_src(entity.ref or entity.id, rel_path, art_prefix=art_prefix)
-        path = Path(root) / src[len(art_prefix) :]
-        if not path.is_file():
-            continue  # a missing part is `_record_missing_parts`' business
+        path = inside_folder(Path(root) / (entity.ref or entity.id), rel_path)
+        if path is None or not path.is_file():
+            # A missing part is `_record_missing_parts`' business; one leaving the
+            # character's folder is never read (cutan#107, `an character validate`).
+            continue
         out[rel_path] = svg_data_uri(
             recolour_svg(path.read_text(encoding="utf-8"), swaps)
         )
