@@ -640,3 +640,39 @@ def test_a_typo_in_a_split_spec_fails_before_anything_is_carved():
             (0, 0, 9, 9),
             split={"arm_l": {"mask": [], "pivot": (1, 1), "typo": 1}},
         )
+
+
+def _share_a_name_across_slots(char):
+    """``arm_l`` drawn twice, in two slots, by one file: one file, two slots."""
+
+    def change(raw):
+        raw["slots"].append({"name": "arm_l2", "bone": "arm_l"})
+        arm = raw["skins"]["default"]["slots"]["arm_l"]["arm_l"]
+        raw["skins"]["default"]["slots"]["arm_l2"] = {"arm_l": dict(arm)}
+
+    _edit(char, change)
+
+
+def _tree(char):
+    return {f: f.read_bytes() for f in char.rglob("*") if f.is_file()}
+
+
+def test_a_split_name_in_two_slots_is_refused_before_anything_is_written(
+    char, torso_sheet, monkeypatch
+):
+    _share_a_name_across_slots(char)
+    before = _tree(char)
+
+    def written(*args, **kwargs):
+        raise AssertionError("a part was written before the recipe was refused")
+
+    monkeypatch.setattr("cutan.carve.sheet.set_part", written)
+    with pytest.raises(ValueError, match="several slots"):
+        sheet_to_package(torso_sheet, TORSO, char, source=SOURCE, unit=0.5)
+    assert _tree(char) == before
+
+
+def test_a_name_in_two_slots_still_serves_a_plain_part(char, sheet):
+    _share_a_name_across_slots(char)  # one file draws both: replacing it is fine
+    recipe = [SheetPart("arm_l", (0, 0, 100, 120))]
+    sheet_to_package(sheet, recipe, char, source=SOURCE)
