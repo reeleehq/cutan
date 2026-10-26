@@ -31,12 +31,17 @@ was, so a bad recipe changes nothing. Provenance is required, as for
 `ours=True` for pixels that are the caller’s. The report carries each part’s
 quality warnings in words, for the writer to read before anything renders.
 
-Not covered: lifting several moving parts off ONE carving with pivots
-([`split_parts()`](cutan.carve.html.md#cutan.carve.split_parts)); a limb is a polygon-matte region of its own.
-A picture is drawn at the width of the factory drawing it replaces, so parts
-from one sheet do not keep their relative scale: size them with `carve` or
-declare a width. A part with no `point` keeps the factory’s anchor, which
-belongs to a different picture’s framing (the report says so).
+Moving parts that share one carving (a torso and its arms, a clock face and its
+hands) are one [`SheetPart`](#cutan.carve.sheet.SheetPart) with a `split`: the region is carved once,
+[`split_parts()`](cutan.carve.html.md#cutan.carve.split_parts) lifts each named part at its mask with its pivot
+as the attachment’s anchor, and the part’s own attachment draws what is left.
+
+A picture is drawn at the width of the factory drawing it replaces, so parts from
+one sheet would lose their relative scale. The recipe’s `unit` (view-box units
+per sheet pixel) declares each picture’s width from its carved size instead: one
+unit for the whole sheet, so a hand stays as long next to a body as on the sheet.
+A part with no `point` keeps the factory’s anchor, which belongs to a different
+picture’s framing (the report says so).
 
 The recipe as a document is [`load_recipe()`](#cutan.carve.sheet.load_recipe) (`schema_version` 1).
 
@@ -49,16 +54,17 @@ Needs OpenCV: `pip install "cutan[carve]"`.
 
 ### Functions
 
-| [`load_recipe`](#cutan.carve.sheet.load_recipe)(doc)                             | `(parts, source, ours)` from a recipe document.                                    |
-|-----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| [`sheet_to_package`](#cutan.carve.sheet.sheet_to_package)(sheet, parts, char_dir, \*) | Carve `parts` out of `sheet` and draw them on the factory character at `char_dir`. |
+| [`load_recipe`](#cutan.carve.sheet.load_recipe)(doc)                             | The [`Recipe`](#cutan.carve.sheet.Recipe) of a recipe document.   |
+|-----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| [`sheet_to_package`](#cutan.carve.sheet.sheet_to_package)(sheet, parts, char_dir, \*) | Carve `parts` out of `sheet` and draw them on the factory character at `char_dir`.  |
 
 ### Classes
 
-| [`PartResult`](#cutan.carve.sheet.PartResult)(attachment, warnings, replacement)   | What became of one part: the descriptor change and the quality warnings.                                      |
-|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| [`SheetPart`](#cutan.carve.sheet.SheetPart)(attachment[, crop, carve, mode])      | One attachment and where on the sheet it is drawn.                                                            |
-| [`SheetReport`](#cutan.carve.sheet.SheetReport)(parts)                              | The package built: one [`PartResult`](#cutan.carve.sheet.PartResult) per part, in recipe order. |
+| [`PartResult`](#cutan.carve.sheet.PartResult)(attachment, warnings, replacement)     | What became of one part: the descriptor change and the quality warnings.                                      |
+|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| [`SheetPart`](#cutan.carve.sheet.SheetPart)(attachment[, crop, carve, mode, split]) | One attachment and where on the sheet it is drawn.                                                            |
+| [`Recipe`](#cutan.carve.sheet.Recipe)(parts, source, ours, unit)                 | A recipe document read: `sheet_to_package(sheet, **recipe._asdict(), ...)`.                                   |
+| [`SheetReport`](#cutan.carve.sheet.SheetReport)(parts)                                | The package built: one [`PartResult`](#cutan.carve.sheet.PartResult) per part, in recipe order. |
 
 ### *class* cutan.carve.sheet.PartResult(attachment, warnings, replacement)
 
@@ -70,7 +76,29 @@ What became of one part: the descriptor change and the quality warnings.
 
 The recipe document’s version, written as `schema_version`.
 
-### *class* cutan.carve.sheet.SheetPart(attachment, crop=None, carve=dict(), mode='part')
+### *class* cutan.carve.sheet.Recipe(parts, source, ours, unit)
+
+Bases: [`NamedTuple`](https://docs.python.org/3/library/typing.html#typing.NamedTuple)
+
+A recipe document read: `sheet_to_package(sheet, **recipe._asdict(), ...)`.
+
+#### ours *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Alias for field number 2
+
+#### parts *: [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[SheetPart](#cutan.carve.sheet.SheetPart)]*
+
+Alias for field number 0
+
+#### source *: AssetSource | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Alias for field number 1
+
+#### unit *: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Alias for field number 3
+
+### *class* cutan.carve.sheet.SheetPart(attachment, crop=None, carve=dict(), mode='part', split=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -86,6 +114,11 @@ carve: the other arguments of the carver (`matte`, `point`, `keep`,
 
 mode: `"part"` ([`carve()`](cutan.carve.html.md#cutan.carve.carve)) or `"head"`
 : ([`carve_head()`](cutan.carve.html.md#cutan.carve.carve_head): neck cut, fixed canvas, face centre as anchor)
+
+split: `{attachment: PartSpec or its dict}`: moving parts lifted off this
+: carving ([`split_parts()`](cutan.carve.html.md#cutan.carve.split_parts); masks and pivots in the
+  sheet’s pixels). Each is drawn by its own attachment, anchored at its
+  pivot; `attachment` above draws the base, what is left
 
 #### *property* anchored *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
@@ -108,15 +141,16 @@ Every part’s warnings, each led by its attachment’s name.
 
 ### cutan.carve.sheet.load_recipe(doc)
 
-`(parts, source, ours)` from a recipe document.
+The [`Recipe`](#cutan.carve.sheet.Recipe) of a recipe document.
 
 `{"schema_version": 1, "source": {frame_source's arguments} | null,
-"ours": false, "parts": [{"attachment", "crop", "carve", "mode"}]}`
+"ours": false, "unit": null, "parts": [{"attachment", "crop", "carve",
+"mode", "split"}]}`
 
 * **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`SheetPart`](#cutan.carve.sheet.SheetPart)], `AssetSource` | [`None`](https://docs.python.org/3/builtins/constants.html#None), [`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
+  [`Recipe`](#cutan.carve.sheet.Recipe)
 
-### cutan.carve.sheet.sheet_to_package(sheet, parts, char_dir, , source=None, ours=False, work_dir=None)
+### cutan.carve.sheet.sheet_to_package(sheet, parts, char_dir, , source=None, ours=False, unit=None, work_dir=None)
 
 Carve `parts` out of `sheet` and draw them on the factory character at `char_dir`.
 
@@ -127,9 +161,13 @@ parts: the recipe, [`SheetPart`](#cutan.carve.sheet.SheetPart) or their dicts; e
 
 source: the sheet’s provenance (`frame_source`); required unless `ours`
 ours: the sheet’s pixels are the caller’s own art (no source is recorded)
-work_dir: where the carved pictures are first written (default: a temporary
+unit: view-box units per SHEET pixel (`write_prop`’s is per carved pixel;
 
-> folder, gone afterwards; the rig keeps its own copy beside it either way)
+> they differ under super-resolution); each picture is declared that many
+> units wide per carved pixel (default: the factory drawing’s width)
+
+work_dir: where the carved pictures are first written (default: a temporary
+: folder, gone afterwards; the rig keeps its own copy beside it either way)
 
 Raises `ValueError` before anything is written when provenance is
 missing, an attachment is unknown, ambiguous or shares its file with another

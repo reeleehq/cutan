@@ -541,566 +541,565 @@
 </span><span id="line-338">
 </span><span id="line-339"><span class="sd">    name: character id (a factory character: ``an character new``)</span>
 </span><span id="line-340"><span class="sd">    sheet: the reference sheet picture</span>
-</span><span id="line-341"><span class="sd">    recipe: a JSON file (``cutan.carve.sheet.load_recipe``) ``{"source": {"url": ..., "license": ...} | null, "ours": false,</span>
-</span><span id="line-342"><span class="sd">        "parts": [{"attachment": "head", "crop": [x0, y0, x1, y1], "carve": {"matte": ..., "point": [x, y]}}]}``;</span>
-</span><span id="line-343"><span class="sd">        ``source`` is ``frame_source``'s arguments; a sheet with neither a source nor ``"ours": true`` is refused</span>
-</span><span id="line-344"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
-</span><span id="line-345"><span class="sd">    """</span>
-</span><span id="line-346">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.carve</span><span class="w"> </span><span class="kn">import</span> <span class="n">MissingDependencyError</span>
-</span><span id="line-347">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.carve.sheet</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_recipe</span><span class="p">,</span> <span class="n">sheet_to_package</span>
-</span><span id="line-348">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.set_part</span><span class="w"> </span><span class="kn">import</span> <span class="n">SetPartError</span>
-</span><span id="line-349">
-</span><span id="line-350">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
-</span><span id="line-351">    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">char_dir</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span id="line-352">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"no character at </span><span class="si">{</span><span class="n">char_dir</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-353">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-354">        <span class="n">parts</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">ours</span> <span class="o">=</span> <span class="n">load_recipe</span><span class="p">(</span>
-</span><span id="line-355">            <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">recipe</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
-</span><span id="line-356">        <span class="p">)</span>
-</span><span id="line-357">        <span class="n">report</span> <span class="o">=</span> <span class="n">sheet_to_package</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">parts</span><span class="p">,</span> <span class="n">char_dir</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">ours</span><span class="o">=</span><span class="n">ours</span><span class="p">)</span>
-</span><span id="line-358">    <span class="k">except</span> <span class="p">(</span>
-</span><span id="line-359">        <span class="n">SetPartError</span><span class="p">,</span>
-</span><span id="line-360">        <span class="n">MissingDependencyError</span><span class="p">,</span>
-</span><span id="line-361">        <span class="ne">OSError</span><span class="p">,</span>
-</span><span id="line-362">        <span class="ne">ValueError</span><span class="p">,</span>
-</span><span id="line-363">        <span class="ne">KeyError</span><span class="p">,</span>
-</span><span id="line-364">        <span class="ne">TypeError</span><span class="p">,</span>
-</span><span id="line-365">    <span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-366">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-367">    <span class="k">return</span> <span class="n">report</span><span class="o">.</span><span class="n">format</span><span class="p">()</span></div>
+</span><span id="line-341"><span class="sd">    recipe: a JSON file (``cutan.carve.sheet.load_recipe``) ``{"source": {"url": ..., "license": ...} | null, "ours": false, "unit": null,</span>
+</span><span id="line-342"><span class="sd">        "parts": [{"attachment": "head", "crop": [x0, y0, x1, y1], "carve": {"matte": ..., "point": [x, y]}, "split": {"arm": {"mask": [[x, y], ...], "pivot": [x, y]}}}]}``;</span>
+</span><span id="line-343"><span class="sd">        ``unit`` is view-box units per sheet pixel (parts keep their relative scale); ``split`` lifts moving parts off the carving;</span>
+</span><span id="line-344"><span class="sd">        ``source`` is ``frame_source``'s arguments; a sheet with neither a source nor ``"ours": true`` is refused</span>
+</span><span id="line-345"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
+</span><span id="line-346"><span class="sd">    """</span>
+</span><span id="line-347">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.carve</span><span class="w"> </span><span class="kn">import</span> <span class="n">MissingDependencyError</span>
+</span><span id="line-348">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.carve.sheet</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_recipe</span><span class="p">,</span> <span class="n">sheet_to_package</span>
+</span><span id="line-349">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.set_part</span><span class="w"> </span><span class="kn">import</span> <span class="n">SetPartError</span>
+</span><span id="line-350">
+</span><span id="line-351">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
+</span><span id="line-352">    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">char_dir</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span id="line-353">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"no character at </span><span class="si">{</span><span class="n">char_dir</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-354">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-355">        <span class="n">loaded</span> <span class="o">=</span> <span class="n">load_recipe</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">recipe</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)))</span>
+</span><span id="line-356">        <span class="n">report</span> <span class="o">=</span> <span class="n">sheet_to_package</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">char_dir</span><span class="o">=</span><span class="n">char_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">loaded</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+</span><span id="line-357">    <span class="k">except</span> <span class="p">(</span>
+</span><span id="line-358">        <span class="n">SetPartError</span><span class="p">,</span>
+</span><span id="line-359">        <span class="n">MissingDependencyError</span><span class="p">,</span>
+</span><span id="line-360">        <span class="ne">OSError</span><span class="p">,</span>
+</span><span id="line-361">        <span class="ne">ValueError</span><span class="p">,</span>
+</span><span id="line-362">        <span class="ne">KeyError</span><span class="p">,</span>
+</span><span id="line-363">        <span class="ne">TypeError</span><span class="p">,</span>
+</span><span id="line-364">    <span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-365">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-366">    <span class="k">return</span> <span class="n">report</span><span class="o">.</span><span class="n">format</span><span class="p">()</span></div>
 
+</span><span id="line-367">
 </span><span id="line-368">
-</span><span id="line-369">
 <div class="viewcode-block" id="add_views">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.cli.html#cutan.characters.cli.add_views">[docs]</a>
-</span><span id="line-370"><span class="k">def</span><span class="w"> </span><span class="nf">add_views</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-371"><span class="w">    </span><span class="sd">"""Give ``name`` its turnaround (an#197): back, side and three-quarter head</span>
-</span><span id="line-372"><span class="sd">    and torso art, a `view` swap set, and a pose per view — so `play: turn`</span>
-</span><span id="line-373"><span class="sd">    and `set &lt;name&gt; view &lt;key&gt;` turn it. The expand step for an offline</span>
-</span><span id="line-374"><span class="sd">    character made before views; idempotent. Refused for a DiceBear head or a</span>
-</span><span id="line-375"><span class="sd">    hand-drawn rig, whose views are an illustrator's to draw.</span>
-</span><span id="line-376">
-</span><span id="line-377"><span class="sd">    name: character id</span>
-</span><span id="line-378"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
-</span><span id="line-379"><span class="sd">    """</span>
-</span><span id="line-380">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_views</span> <span class="k">as</span> <span class="n">_add_views</span>
-</span><span id="line-381">
-</span><span id="line-382">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
-</span><span id="line-383">    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">char_dir</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span id="line-384">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no character at </span><span class="si">{</span><span class="n">char_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-385">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-386">        <span class="n">desc</span> <span class="o">=</span> <span class="n">_add_views</span><span class="p">(</span><span class="n">char_dir</span><span class="p">)</span>
-</span><span id="line-387">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-388">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-</span><span id="line-389">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"added the views to </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2"> (descriptor: </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)"</span></div>
+</span><span id="line-369"><span class="k">def</span><span class="w"> </span><span class="nf">add_views</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-370"><span class="w">    </span><span class="sd">"""Give ``name`` its turnaround (an#197): back, side and three-quarter head</span>
+</span><span id="line-371"><span class="sd">    and torso art, a `view` swap set, and a pose per view — so `play: turn`</span>
+</span><span id="line-372"><span class="sd">    and `set &lt;name&gt; view &lt;key&gt;` turn it. The expand step for an offline</span>
+</span><span id="line-373"><span class="sd">    character made before views; idempotent. Refused for a DiceBear head or a</span>
+</span><span id="line-374"><span class="sd">    hand-drawn rig, whose views are an illustrator's to draw.</span>
+</span><span id="line-375">
+</span><span id="line-376"><span class="sd">    name: character id</span>
+</span><span id="line-377"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
+</span><span id="line-378"><span class="sd">    """</span>
+</span><span id="line-379">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_views</span> <span class="k">as</span> <span class="n">_add_views</span>
+</span><span id="line-380">
+</span><span id="line-381">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
+</span><span id="line-382">    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">char_dir</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span id="line-383">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no character at </span><span class="si">{</span><span class="n">char_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-384">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-385">        <span class="n">desc</span> <span class="o">=</span> <span class="n">_add_views</span><span class="p">(</span><span class="n">char_dir</span><span class="p">)</span>
+</span><span id="line-386">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-387">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span><span id="line-388">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"added the views to </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2"> (descriptor: </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)"</span></div>
 
+</span><span id="line-389">
 </span><span id="line-390">
-</span><span id="line-391">
 <div class="viewcode-block" id="add_forearms">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.cli.html#cutan.characters.cli.add_forearms">[docs]</a>
-</span><span id="line-392"><span class="k">def</span><span class="w"> </span><span class="nf">add_forearms</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">elbow_at</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-393"><span class="w">    </span><span class="sd">"""Split ``name``'s arms at the elbow and give them hands (cutan#104): a</span>
-</span><span id="line-394"><span class="sd">    forearm and a hand on each side, with the bones `forearm_l/r` and `hand_l/r`</span>
-</span><span id="line-395"><span class="sd">    and `nesting: bones`, so a forearm follows its upper arm and a `pin` or</span>
-</span><span id="line-396"><span class="sd">    `pull` can drag a hand (`ned/hand_r@hand_r`) to a prop's grip. At rest the</span>
-</span><span id="line-397"><span class="sd">    arm looks as it did. Opt-in; a character made before keeps its one-piece</span>
-</span><span id="line-398"><span class="sd">    arms. Only an arm the factory drew is split. Idempotent. Run</span>
-</span><span id="line-399"><span class="sd">    `an character add-limits` afterwards for the elbow's range.</span>
-</span><span id="line-400">
-</span><span id="line-401"><span class="sd">    name: character id</span>
-</span><span id="line-402"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
-</span><span id="line-403"><span class="sd">    elbow_at: where the elbow sits on the arm, 0.1 (at the shoulder) to 0.9</span>
-</span><span id="line-404"><span class="sd">    """</span>
-</span><span id="line-405">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_forearms</span> <span class="k">as</span> <span class="n">_add_forearms</span>
-</span><span id="line-406">
-</span><span id="line-407">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
-</span><span id="line-408">    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">char_dir</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span id="line-409">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no character at </span><span class="si">{</span><span class="n">char_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-410">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-411">        <span class="n">desc</span> <span class="o">=</span> <span class="n">_add_forearms</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">elbow_at</span><span class="o">=</span><span class="n">elbow_at</span><span class="p">)</span>
-</span><span id="line-412">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-413">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-</span><span id="line-414">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"split the arms of </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2"> (descriptor: </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)"</span></div>
+</span><span id="line-391"><span class="k">def</span><span class="w"> </span><span class="nf">add_forearms</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">elbow_at</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-392"><span class="w">    </span><span class="sd">"""Split ``name``'s arms at the elbow and give them hands (cutan#104): a</span>
+</span><span id="line-393"><span class="sd">    forearm and a hand on each side, with the bones `forearm_l/r` and `hand_l/r`</span>
+</span><span id="line-394"><span class="sd">    and `nesting: bones`, so a forearm follows its upper arm and a `pin` or</span>
+</span><span id="line-395"><span class="sd">    `pull` can drag a hand (`ned/hand_r@hand_r`) to a prop's grip. At rest the</span>
+</span><span id="line-396"><span class="sd">    arm looks as it did. Opt-in; a character made before keeps its one-piece</span>
+</span><span id="line-397"><span class="sd">    arms. Only an arm the factory drew is split. Idempotent. Run</span>
+</span><span id="line-398"><span class="sd">    `an character add-limits` afterwards for the elbow's range.</span>
+</span><span id="line-399">
+</span><span id="line-400"><span class="sd">    name: character id</span>
+</span><span id="line-401"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
+</span><span id="line-402"><span class="sd">    elbow_at: where the elbow sits on the arm, 0.1 (at the shoulder) to 0.9</span>
+</span><span id="line-403"><span class="sd">    """</span>
+</span><span id="line-404">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_forearms</span> <span class="k">as</span> <span class="n">_add_forearms</span>
+</span><span id="line-405">
+</span><span id="line-406">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
+</span><span id="line-407">    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">char_dir</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span id="line-408">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no character at </span><span class="si">{</span><span class="n">char_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-409">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-410">        <span class="n">desc</span> <span class="o">=</span> <span class="n">_add_forearms</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">elbow_at</span><span class="o">=</span><span class="n">elbow_at</span><span class="p">)</span>
+</span><span id="line-411">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-412">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span><span id="line-413">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"split the arms of </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2"> (descriptor: </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)"</span></div>
 
+</span><span id="line-414">
 </span><span id="line-415">
-</span><span id="line-416">
 <div class="viewcode-block" id="add_limits">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.cli.html#cutan.characters.cli.add_limits">[docs]</a>
-</span><span id="line-417"><span class="k">def</span><span class="w"> </span><span class="nf">add_limits</span><span class="p">(</span>
-</span><span id="line-418">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="line-419"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-420"><span class="w">    </span><span class="sd">"""Give ``name`` hinge limits on its bones, by part type (cutan#104): the</span>
-</span><span id="line-421"><span class="sd">    neck, the shoulders (and the elbows and wrists of a split arm) turn only</span>
-</span><span id="line-422"><span class="sd">    through a range, which bounds the solver wherever a shot pins or pulls a</span>
-</span><span id="line-423"><span class="sd">    part. Opt-in; a character made before keeps its bones as they are. Idempotent.</span>
-</span><span id="line-424">
-</span><span id="line-425"><span class="sd">    name: character id</span>
-</span><span id="line-426"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
-</span><span id="line-427"><span class="sd">    style: a shipped style whose `joints.limits` replace the genre's ranges</span>
-</span><span id="line-428"><span class="sd">        (`marionette` is loose)</span>
-</span><span id="line-429"><span class="sd">    overwrite: replace ranges the bones already carry (kept otherwise)</span>
-</span><span id="line-430"><span class="sd">    """</span>
-</span><span id="line-431">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_limits</span> <span class="k">as</span> <span class="n">_add_limits</span>
-</span><span id="line-432">
-</span><span id="line-433">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
-</span><span id="line-434">    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">char_dir</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span id="line-435">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no character at </span><span class="si">{</span><span class="n">char_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-436">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-437">        <span class="n">desc</span> <span class="o">=</span> <span class="n">_add_limits</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
-</span><span id="line-438">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-439">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-</span><span id="line-440">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"wrote hinge limits on </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2"> (descriptor: </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)"</span></div>
+</span><span id="line-416"><span class="k">def</span><span class="w"> </span><span class="nf">add_limits</span><span class="p">(</span>
+</span><span id="line-417">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="line-418"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-419"><span class="w">    </span><span class="sd">"""Give ``name`` hinge limits on its bones, by part type (cutan#104): the</span>
+</span><span id="line-420"><span class="sd">    neck, the shoulders (and the elbows and wrists of a split arm) turn only</span>
+</span><span id="line-421"><span class="sd">    through a range, which bounds the solver wherever a shot pins or pulls a</span>
+</span><span id="line-422"><span class="sd">    part. Opt-in; a character made before keeps its bones as they are. Idempotent.</span>
+</span><span id="line-423">
+</span><span id="line-424"><span class="sd">    name: character id</span>
+</span><span id="line-425"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
+</span><span id="line-426"><span class="sd">    style: a shipped style whose `joints.limits` replace the genre's ranges</span>
+</span><span id="line-427"><span class="sd">        (`marionette` is loose)</span>
+</span><span id="line-428"><span class="sd">    overwrite: replace ranges the bones already carry (kept otherwise)</span>
+</span><span id="line-429"><span class="sd">    """</span>
+</span><span id="line-430">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_limits</span> <span class="k">as</span> <span class="n">_add_limits</span>
+</span><span id="line-431">
+</span><span id="line-432">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
+</span><span id="line-433">    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">char_dir</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span id="line-434">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no character at </span><span class="si">{</span><span class="n">char_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-435">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-436">        <span class="n">desc</span> <span class="o">=</span> <span class="n">_add_limits</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
+</span><span id="line-437">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-438">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span><span id="line-439">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"wrote hinge limits on </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2"> (descriptor: </span><span class="si">{</span><span class="n">desc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)"</span></div>
 
+</span><span id="line-440">
 </span><span id="line-441">
-</span><span id="line-442">
 <div class="viewcode-block" id="feet_origin">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.cli.html#cutan.characters.cli.feet_origin">[docs]</a>
-</span><span id="line-443"><span class="k">def</span><span class="w"> </span><span class="nf">feet_origin</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">undo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-444"><span class="w">    </span><span class="sd">"""Make an existing character stand on its feet (an#285): its stage point</span>
-</span><span id="line-445"><span class="sd">    (`stage.at`) becomes where its feet are, as for a character `an character</span>
-</span><span id="line-446"><span class="sd">    new` makes now. Existing characters are never converted implicitly; this</span>
-</span><span id="line-447"><span class="sd">    moves the character in scenes made before, and prints by how much.</span>
-</span><span id="line-448">
-</span><span id="line-449"><span class="sd">    name: character id</span>
-</span><span id="line-450"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
-</span><span id="line-451"><span class="sd">    undo: go back to placing it by the middle of its bones</span>
-</span><span id="line-452"><span class="sd">    """</span>
-</span><span id="line-453">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">stand_on_feet</span>
-</span><span id="line-454">
-</span><span id="line-455">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
-</span><span id="line-456">    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">char_dir</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span id="line-457">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no character at </span><span class="si">{</span><span class="n">char_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-458">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-459">        <span class="n">moved</span> <span class="o">=</span> <span class="n">stand_on_feet</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">undo</span><span class="o">=</span><span class="n">undo</span><span class="p">)</span>
-</span><span id="line-460">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-461">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-</span><span id="line-462">    <span class="n">feet</span> <span class="o">=</span> <span class="n">moved</span><span class="p">[</span><span class="s2">"after"</span><span class="p">][</span><span class="s2">"feet"</span><span class="p">]</span>
-</span><span id="line-463">    <span class="n">where</span> <span class="o">=</span> <span class="s2">"its feet"</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">feet</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">feet</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> px above its feet"</span>
-</span><span id="line-464">    <span class="n">shift</span> <span class="o">=</span> <span class="n">moved</span><span class="p">[</span><span class="s2">"shift"</span><span class="p">]</span>
-</span><span id="line-465">    <span class="n">keep</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-466">        <span class="s2">"nothing moved (it already stood there)"</span>
-</span><span id="line-467">        <span class="k">if</span> <span class="ow">not</span> <span class="n">shift</span>
-</span><span id="line-468">        <span class="k">else</span> <span class="sa">f</span><span class="s2">"to keep it where it stood in a scene made before, add </span><span class="si">{</span><span class="n">shift</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> x "</span>
-</span><span id="line-469">        <span class="s2">"its stage.scale to its stage.at y"</span>
-</span><span id="line-470">    <span class="p">)</span>
-</span><span id="line-471">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: its stage point is now </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">; </span><span class="si">{</span><span class="n">keep</span><span class="si">}</span><span class="s2">"</span></div>
+</span><span id="line-442"><span class="k">def</span><span class="w"> </span><span class="nf">feet_origin</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">undo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-443"><span class="w">    </span><span class="sd">"""Make an existing character stand on its feet (an#285): its stage point</span>
+</span><span id="line-444"><span class="sd">    (`stage.at`) becomes where its feet are, as for a character `an character</span>
+</span><span id="line-445"><span class="sd">    new` makes now. Existing characters are never converted implicitly; this</span>
+</span><span id="line-446"><span class="sd">    moves the character in scenes made before, and prints by how much.</span>
+</span><span id="line-447">
+</span><span id="line-448"><span class="sd">    name: character id</span>
+</span><span id="line-449"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
+</span><span id="line-450"><span class="sd">    undo: go back to placing it by the middle of its bones</span>
+</span><span id="line-451"><span class="sd">    """</span>
+</span><span id="line-452">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">stand_on_feet</span>
+</span><span id="line-453">
+</span><span id="line-454">    <span class="n">char_dir</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
+</span><span id="line-455">    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">char_dir</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span id="line-456">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no character at </span><span class="si">{</span><span class="n">char_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-457">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-458">        <span class="n">moved</span> <span class="o">=</span> <span class="n">stand_on_feet</span><span class="p">(</span><span class="n">char_dir</span><span class="p">,</span> <span class="n">undo</span><span class="o">=</span><span class="n">undo</span><span class="p">)</span>
+</span><span id="line-459">    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-460">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span><span id="line-461">    <span class="n">feet</span> <span class="o">=</span> <span class="n">moved</span><span class="p">[</span><span class="s2">"after"</span><span class="p">][</span><span class="s2">"feet"</span><span class="p">]</span>
+</span><span id="line-462">    <span class="n">where</span> <span class="o">=</span> <span class="s2">"its feet"</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">feet</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">feet</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> px above its feet"</span>
+</span><span id="line-463">    <span class="n">shift</span> <span class="o">=</span> <span class="n">moved</span><span class="p">[</span><span class="s2">"shift"</span><span class="p">]</span>
+</span><span id="line-464">    <span class="n">keep</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-465">        <span class="s2">"nothing moved (it already stood there)"</span>
+</span><span id="line-466">        <span class="k">if</span> <span class="ow">not</span> <span class="n">shift</span>
+</span><span id="line-467">        <span class="k">else</span> <span class="sa">f</span><span class="s2">"to keep it where it stood in a scene made before, add </span><span class="si">{</span><span class="n">shift</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> x "</span>
+</span><span id="line-468">        <span class="s2">"its stage.scale to its stage.at y"</span>
+</span><span id="line-469">    <span class="p">)</span>
+</span><span id="line-470">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: its stage point is now </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">; </span><span class="si">{</span><span class="n">keep</span><span class="si">}</span><span class="s2">"</span></div>
 
+</span><span id="line-471">
 </span><span id="line-472">
-</span><span id="line-473">
-</span><span id="line-474"><span class="k">def</span><span class="w"> </span><span class="nf">_parse_palette</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-475"><span class="w">    </span><span class="sd">"""``"skin=#f1c9a5,clothing=#2e7d4f"`` (or a JSON object) → ``{role: colour}``.</span>
-</span><span id="line-476">
-</span><span id="line-477"><span class="sd">    &gt;&gt;&gt; _parse_palette("skin=#f1c9a5, clothing=#2e7d4f")</span>
-</span><span id="line-478"><span class="sd">    {'skin': '#f1c9a5', 'clothing': '#2e7d4f'}</span>
-</span><span id="line-479"><span class="sd">    &gt;&gt;&gt; _parse_palette('{"hair": "#111111"}')</span>
-</span><span id="line-480"><span class="sd">    {'hair': '#111111'}</span>
-</span><span id="line-481"><span class="sd">    """</span>
-</span><span id="line-482">    <span class="n">spec</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-</span><span id="line-483">    <span class="k">if</span> <span class="ow">not</span> <span class="n">spec</span><span class="p">:</span>
-</span><span id="line-484">        <span class="k">return</span> <span class="p">{}</span>
-</span><span id="line-485">    <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"{"</span><span class="p">):</span>
-</span><span id="line-486">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-487">            <span class="n">out</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
-</span><span id="line-488">        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-489">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"invalid palette JSON: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-</span><span id="line-490">        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="line-491">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"a palette is an object of role -&gt; colour"</span><span class="p">)</span>
-</span><span id="line-492">        <span class="k">return</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-</span><span id="line-493">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span id="line-494">    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">):</span>
-</span><span id="line-495">        <span class="n">role</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">"="</span><span class="p">)</span>
-</span><span id="line-496">        <span class="k">if</span> <span class="ow">not</span> <span class="n">sep</span><span class="p">:</span>
-</span><span id="line-497">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"palette entry </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">!r}</span><span class="s2"> is not role=#rrggbb"</span><span class="p">)</span>
-</span><span id="line-498">        <span class="n">out</span><span class="p">[</span><span class="n">role</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="o">=</span> <span class="n">colour</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-</span><span id="line-499">    <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-473"><span class="k">def</span><span class="w"> </span><span class="nf">_parse_palette</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-474"><span class="w">    </span><span class="sd">"""``"skin=#f1c9a5,clothing=#2e7d4f"`` (or a JSON object) → ``{role: colour}``.</span>
+</span><span id="line-475">
+</span><span id="line-476"><span class="sd">    &gt;&gt;&gt; _parse_palette("skin=#f1c9a5, clothing=#2e7d4f")</span>
+</span><span id="line-477"><span class="sd">    {'skin': '#f1c9a5', 'clothing': '#2e7d4f'}</span>
+</span><span id="line-478"><span class="sd">    &gt;&gt;&gt; _parse_palette('{"hair": "#111111"}')</span>
+</span><span id="line-479"><span class="sd">    {'hair': '#111111'}</span>
+</span><span id="line-480"><span class="sd">    """</span>
+</span><span id="line-481">    <span class="n">spec</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span><span id="line-482">    <span class="k">if</span> <span class="ow">not</span> <span class="n">spec</span><span class="p">:</span>
+</span><span id="line-483">        <span class="k">return</span> <span class="p">{}</span>
+</span><span id="line-484">    <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"{"</span><span class="p">):</span>
+</span><span id="line-485">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-486">            <span class="n">out</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+</span><span id="line-487">        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-488">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"invalid palette JSON: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+</span><span id="line-489">        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="line-490">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"a palette is an object of role -&gt; colour"</span><span class="p">)</span>
+</span><span id="line-491">        <span class="k">return</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+</span><span id="line-492">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-493">    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">):</span>
+</span><span id="line-494">        <span class="n">role</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">"="</span><span class="p">)</span>
+</span><span id="line-495">        <span class="k">if</span> <span class="ow">not</span> <span class="n">sep</span><span class="p">:</span>
+</span><span id="line-496">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"palette entry </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">!r}</span><span class="s2"> is not role=#rrggbb"</span><span class="p">)</span>
+</span><span id="line-497">        <span class="n">out</span><span class="p">[</span><span class="n">role</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="o">=</span> <span class="n">colour</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span><span id="line-498">    <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-499">
 </span><span id="line-500">
-</span><span id="line-501">
-</span><span id="line-502"><span class="k">def</span><span class="w"> </span><span class="nf">_parse_variants</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-</span><span id="line-503"><span class="w">    </span><span class="sd">"""``"happy,sad"`` → ``{form: smile offset}``; unknown forms are refused."""</span>
-</span><span id="line-504">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.mouth_set</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_MOUTH_VARIANTS</span>
-</span><span id="line-505">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.expression.presets</span><span class="w"> </span><span class="kn">import</span> <span class="n">PRESETS</span>
-</span><span id="line-506">
-</span><span id="line-507">    <span class="n">forms</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
-</span><span id="line-508">    <span class="n">known</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="o">.</span><span class="n">mouth_form</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">PRESETS</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">mouth_form</span><span class="p">}</span>
-</span><span id="line-509">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span id="line-510">    <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">forms</span><span class="p">:</span>
-</span><span id="line-511">        <span class="k">if</span> <span class="n">form</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">known</span><span class="p">:</span>
-</span><span id="line-512">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="line-513">                <span class="sa">f</span><span class="s2">"unknown mouth form </span><span class="si">{</span><span class="n">form</span><span class="si">!r}</span><span class="s2">; the presets prefer: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">known</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-514">            <span class="p">)</span>
-</span><span id="line-515">        <span class="n">out</span><span class="p">[</span><span class="n">form</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_MOUTH_VARIANTS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">_VARIANT_SMILE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
-</span><span id="line-516">    <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-501"><span class="k">def</span><span class="w"> </span><span class="nf">_parse_variants</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+</span><span id="line-502"><span class="w">    </span><span class="sd">"""``"happy,sad"`` → ``{form: smile offset}``; unknown forms are refused."""</span>
+</span><span id="line-503">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.mouth_set</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_MOUTH_VARIANTS</span>
+</span><span id="line-504">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.expression.presets</span><span class="w"> </span><span class="kn">import</span> <span class="n">PRESETS</span>
+</span><span id="line-505">
+</span><span id="line-506">    <span class="n">forms</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+</span><span id="line-507">    <span class="n">known</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="o">.</span><span class="n">mouth_form</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">PRESETS</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">mouth_form</span><span class="p">}</span>
+</span><span id="line-508">    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-509">    <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">forms</span><span class="p">:</span>
+</span><span id="line-510">        <span class="k">if</span> <span class="n">form</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">known</span><span class="p">:</span>
+</span><span id="line-511">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="line-512">                <span class="sa">f</span><span class="s2">"unknown mouth form </span><span class="si">{</span><span class="n">form</span><span class="si">!r}</span><span class="s2">; the presets prefer: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">known</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-513">            <span class="p">)</span>
+</span><span id="line-514">        <span class="n">out</span><span class="p">[</span><span class="n">form</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_MOUTH_VARIANTS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">_VARIANT_SMILE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+</span><span id="line-515">    <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-516">
 </span><span id="line-517">
-</span><span id="line-518">
-</span><span id="line-519"><span class="c1">#: Corner upturn per mouth form for the forms without a default variant</span>
-</span><span id="line-520"><span class="c1">#: (art direction; the same knob `DEFAULT_MOUTH_VARIANTS` sets for happy, sad and angry).</span>
-</span><span id="line-521"><span class="n">_VARIANT_SMILE</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-522">    <span class="s2">"surprised"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-523">    <span class="s2">"afraid"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.15</span><span class="p">,</span>
-</span><span id="line-524">    <span class="s2">"disgusted"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">,</span>
-</span><span id="line-525"><span class="p">}</span>
+</span><span id="line-518"><span class="c1">#: Corner upturn per mouth form for the forms without a default variant</span>
+</span><span id="line-519"><span class="c1">#: (art direction; the same knob `DEFAULT_MOUTH_VARIANTS` sets for happy, sad and angry).</span>
+</span><span id="line-520"><span class="n">_VARIANT_SMILE</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-521">    <span class="s2">"surprised"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-522">    <span class="s2">"afraid"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.15</span><span class="p">,</span>
+</span><span id="line-523">    <span class="s2">"disgusted"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">,</span>
+</span><span id="line-524"><span class="p">}</span>
+</span><span id="line-525">
 </span><span id="line-526">
-</span><span id="line-527">
 <div class="viewcode-block" id="validate">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.cli.html#cutan.characters.cli.validate">[docs]</a>
-</span><span id="line-528"><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-529"><span class="w">    </span><span class="sd">"""Validate a character's directory structure and descriptor.</span>
-</span><span id="line-530">
-</span><span id="line-531"><span class="sd">    name: character id</span>
-</span><span id="line-532"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
-</span><span id="line-533"><span class="sd">    """</span>
-</span><span id="line-534">    <span class="n">target</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
-</span><span id="line-535">    <span class="n">report</span> <span class="o">=</span> <span class="n">_validate_character</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-</span><span id="line-536">    <span class="n">text</span> <span class="o">=</span> <span class="n">_format_report</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-</span><span id="line-537">    <span class="k">return</span> <span class="n">text</span> <span class="k">if</span> <span class="n">report</span><span class="o">.</span><span class="n">passed</span> <span class="k">else</span> <span class="n">failed</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>  <span class="c1"># exit 1 on FAILED (an#480)</span></div>
+</span><span id="line-527"><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-528"><span class="w">    </span><span class="sd">"""Validate a character's directory structure and descriptor.</span>
+</span><span id="line-529">
+</span><span id="line-530"><span class="sd">    name: character id</span>
+</span><span id="line-531"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
+</span><span id="line-532"><span class="sd">    """</span>
+</span><span id="line-533">    <span class="n">target</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
+</span><span id="line-534">    <span class="n">report</span> <span class="o">=</span> <span class="n">_validate_character</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-535">    <span class="n">text</span> <span class="o">=</span> <span class="n">_format_report</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-536">    <span class="k">return</span> <span class="n">text</span> <span class="k">if</span> <span class="n">report</span><span class="o">.</span><span class="n">passed</span> <span class="k">else</span> <span class="n">failed</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>  <span class="c1"># exit 1 on FAILED (an#480)</span></div>
 
+</span><span id="line-537">
 </span><span id="line-538">
-</span><span id="line-539">
 <div class="viewcode-block" id="capabilities">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.cli.html#cutan.characters.cli.capabilities">[docs]</a>
-</span><span id="line-540"><span class="k">def</span><span class="w"> </span><span class="nf">capabilities</span><span class="p">(</span>
-</span><span id="line-541">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">as_json</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
-</span><span id="line-542"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-543"><span class="w">    </span><span class="sd">"""What a character affords, and per aspect which methods apply and what the rest lack.</span>
-</span><span id="line-544">
-</span><span id="line-545"><span class="sd">    The affordances are derived from ``character.json`` and the art files</span>
-</span><span id="line-546"><span class="sd">    present (ADR 0002 decision 2), with the declared overrides it used; per</span>
-</span><span id="line-547"><span class="sd">    aspect (``locomotion``, ``speech``, …) the method the default chain picks,</span>
-</span><span id="line-548"><span class="sd">    the methods that apply, and for each other method the missing capabilities</span>
-</span><span id="line-549"><span class="sd">    with the remedy that would add them. With ``style``, each aspect also says</span>
-</span><span id="line-550"><span class="sd">    what it resolves to under that style's policy (cutan#9, an#273): a South</span>
-</span><span id="line-551"><span class="sd">    Park character with legs bounces, a Reiniger silhouette mimes.</span>
-</span><span id="line-552">
-</span><span id="line-553"><span class="sd">    name: character id</span>
-</span><span id="line-554"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
-</span><span id="line-555"><span class="sd">    as_json: print the answer as JSON (what the MCP surface returns)</span>
-</span><span id="line-556"><span class="sd">    style: a style spec's name (``python -m cutan.styles`` lists them) or path</span>
-</span><span id="line-557"><span class="sd">    """</span>
-</span><span id="line-558">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.capabilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">art_in_dir</span>
-</span><span id="line-559">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.genres</span><span class="w"> </span><span class="kn">import</span> <span class="n">load</span>
-</span><span id="line-560">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic.describe</span><span class="w"> </span><span class="kn">import</span> <span class="n">describe_asset</span><span class="p">,</span> <span class="n">format_description</span>
-</span><span id="line-561">
-</span><span id="line-562">    <span class="n">load</span><span class="p">()</span>
-</span><span id="line-563">    <span class="n">target</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
-</span><span id="line-564">    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">target</span> <span class="o">/</span> <span class="s2">"character.json"</span>
-</span><span id="line-565">    <span class="k">if</span> <span class="ow">not</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span id="line-566">        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-</span><span id="line-567">            <span class="sa">f</span><span class="s2">"no character.json under </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">; pass out_dir= the folder holding "</span>
-</span><span id="line-568">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> (default ./assets/characters)"</span>
-</span><span id="line-569">        <span class="p">)</span>
-</span><span id="line-570">    <span class="n">doc</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
-</span><span id="line-571">    <span class="n">art</span> <span class="o">=</span> <span class="n">art_in_dir</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">name</span><span class="p">,))</span>
-</span><span id="line-572">    <span class="n">policy</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">_style_policy</span><span class="p">(</span><span class="n">style</span><span class="p">)</span> <span class="k">if</span> <span class="n">style</span> <span class="k">else</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"the policy"</span><span class="p">)</span>
-</span><span id="line-573">    <span class="n">described</span> <span class="o">=</span> <span class="n">describe_asset</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">art</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">)</span>
-</span><span id="line-574">    <span class="k">if</span> <span class="n">style</span><span class="p">:</span>
-</span><span id="line-575">        <span class="n">described</span><span class="p">[</span><span class="s2">"style"</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
-</span><span id="line-576">    <span class="k">if</span> <span class="n">as_json</span><span class="p">:</span>
-</span><span id="line-577">        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">described</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-578">    <span class="k">return</span> <span class="n">format_description</span><span class="p">(</span><span class="n">described</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">policy_label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span></div>
+</span><span id="line-539"><span class="k">def</span><span class="w"> </span><span class="nf">capabilities</span><span class="p">(</span>
+</span><span id="line-540">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">as_json</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+</span><span id="line-541"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-542"><span class="w">    </span><span class="sd">"""What a character affords, and per aspect which methods apply and what the rest lack.</span>
+</span><span id="line-543">
+</span><span id="line-544"><span class="sd">    The affordances are derived from ``character.json`` and the art files</span>
+</span><span id="line-545"><span class="sd">    present (ADR 0002 decision 2), with the declared overrides it used; per</span>
+</span><span id="line-546"><span class="sd">    aspect (``locomotion``, ``speech``, …) the method the default chain picks,</span>
+</span><span id="line-547"><span class="sd">    the methods that apply, and for each other method the missing capabilities</span>
+</span><span id="line-548"><span class="sd">    with the remedy that would add them. With ``style``, each aspect also says</span>
+</span><span id="line-549"><span class="sd">    what it resolves to under that style's policy (cutan#9, an#273): a South</span>
+</span><span id="line-550"><span class="sd">    Park character with legs bounces, a Reiniger silhouette mimes.</span>
+</span><span id="line-551">
+</span><span id="line-552"><span class="sd">    name: character id</span>
+</span><span id="line-553"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
+</span><span id="line-554"><span class="sd">    as_json: print the answer as JSON (what the MCP surface returns)</span>
+</span><span id="line-555"><span class="sd">    style: a style spec's name (``python -m cutan.styles`` lists them) or path</span>
+</span><span id="line-556"><span class="sd">    """</span>
+</span><span id="line-557">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.capabilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">art_in_dir</span>
+</span><span id="line-558">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.genres</span><span class="w"> </span><span class="kn">import</span> <span class="n">load</span>
+</span><span id="line-559">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic.describe</span><span class="w"> </span><span class="kn">import</span> <span class="n">describe_asset</span><span class="p">,</span> <span class="n">format_description</span>
+</span><span id="line-560">
+</span><span id="line-561">    <span class="n">load</span><span class="p">()</span>
+</span><span id="line-562">    <span class="n">target</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
+</span><span id="line-563">    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">target</span> <span class="o">/</span> <span class="s2">"character.json"</span>
+</span><span id="line-564">    <span class="k">if</span> <span class="ow">not</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span id="line-565">        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+</span><span id="line-566">            <span class="sa">f</span><span class="s2">"no character.json under </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">; pass out_dir= the folder holding "</span>
+</span><span id="line-567">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> (default ./assets/characters)"</span>
+</span><span id="line-568">        <span class="p">)</span>
+</span><span id="line-569">    <span class="n">doc</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-570">    <span class="n">art</span> <span class="o">=</span> <span class="n">art_in_dir</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">name</span><span class="p">,))</span>
+</span><span id="line-571">    <span class="n">policy</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">_style_policy</span><span class="p">(</span><span class="n">style</span><span class="p">)</span> <span class="k">if</span> <span class="n">style</span> <span class="k">else</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"the policy"</span><span class="p">)</span>
+</span><span id="line-572">    <span class="n">described</span> <span class="o">=</span> <span class="n">describe_asset</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">art</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">)</span>
+</span><span id="line-573">    <span class="k">if</span> <span class="n">style</span><span class="p">:</span>
+</span><span id="line-574">        <span class="n">described</span><span class="p">[</span><span class="s2">"style"</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+</span><span id="line-575">    <span class="k">if</span> <span class="n">as_json</span><span class="p">:</span>
+</span><span id="line-576">        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">described</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-577">    <span class="k">return</span> <span class="n">format_description</span><span class="p">(</span><span class="n">described</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">policy_label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span></div>
 
+</span><span id="line-578">
 </span><span id="line-579">
-</span><span id="line-580">
-</span><span id="line-581"><span class="k">def</span><span class="w"> </span><span class="nf">_style_policy</span><span class="p">(</span><span class="n">style</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-582"><span class="w">    </span><span class="sd">"""``(policy, label)`` of a style spec (a name, a path): its checked</span>
-</span><span id="line-583"><span class="sd">    ``policy`` block and the name it goes by. The core's ``describe_asset``</span>
-</span><span id="line-584"><span class="sd">    resolves every aspect under it (an#348), by the compiler's precedence."""</span>
-</span><span id="line-585">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_policy</span><span class="p">,</span> <span class="n">resolve_style_spec</span>
-</span><span id="line-586">
-</span><span id="line-587">    <span class="n">spec</span> <span class="o">=</span> <span class="n">resolve_style_spec</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
-</span><span id="line-588">    <span class="n">label</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"style"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">style</span>
-</span><span id="line-589">    <span class="k">return</span> <span class="n">check_policy</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"policy"</span><span class="p">),</span> <span class="n">where</span><span class="o">=</span><span class="sa">f</span><span class="s2">"style </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">),</span> <span class="n">label</span>
+</span><span id="line-580"><span class="k">def</span><span class="w"> </span><span class="nf">_style_policy</span><span class="p">(</span><span class="n">style</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-581"><span class="w">    </span><span class="sd">"""``(policy, label)`` of a style spec (a name, a path): its checked</span>
+</span><span id="line-582"><span class="sd">    ``policy`` block and the name it goes by. The core's ``describe_asset``</span>
+</span><span id="line-583"><span class="sd">    resolves every aspect under it (an#348), by the compiler's precedence."""</span>
+</span><span id="line-584">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_policy</span><span class="p">,</span> <span class="n">resolve_style_spec</span>
+</span><span id="line-585">
+</span><span id="line-586">    <span class="n">spec</span> <span class="o">=</span> <span class="n">resolve_style_spec</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+</span><span id="line-587">    <span class="n">label</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"style"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">style</span>
+</span><span id="line-588">    <span class="k">return</span> <span class="n">check_policy</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"policy"</span><span class="p">),</span> <span class="n">where</span><span class="o">=</span><span class="sa">f</span><span class="s2">"style </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">),</span> <span class="n">label</span>
+</span><span id="line-589">
 </span><span id="line-590">
-</span><span id="line-591">
 <div class="viewcode-block" id="silhouette">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.cli.html#cutan.characters.cli.silhouette">[docs]</a>
-</span><span id="line-592"><span class="k">def</span><span class="w"> </span><span class="nf">silhouette</span><span class="p">(</span>
-</span><span id="line-593">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-594">    <span class="n">other</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-595">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-596">    <span class="n">output</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-597">    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
-</span><span id="line-598"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-599"><span class="w">    </span><span class="sd">"""Render a black silhouette for ``name`` (and optionally compare to ``other``).</span>
-</span><span id="line-600">
-</span><span id="line-601"><span class="sd">    The silhouette is the figure as the stage draws it (build, head scale, hat:</span>
-</span><span id="line-602"><span class="sd">    an#272), tinted black on white. When two names are given, prints both</span>
-</span><span id="line-603"><span class="sd">    silhouettes' paths and an IoU score (0..1; lower means more visually</span>
-</span><span id="line-604"><span class="sd">    distinct). Nothing is written into a character's folder, so a later</span>
-</span><span id="line-605"><span class="sd">    ``an library publish`` never ships a silhouette.</span>
-</span><span id="line-606">
-</span><span id="line-607"><span class="sd">    name: character id</span>
-</span><span id="line-608"><span class="sd">    other: optional second character to compare against</span>
-</span><span id="line-609"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
-</span><span id="line-610"><span class="sd">    output: output PNG path (one name only); defaults to the project's</span>
-</span><span id="line-611"><span class="sd">        artifacts/silhouettes/&lt;name&gt;.png</span>
-</span><span id="line-612"><span class="sd">    size: square output size in pixels (default 512)</span>
-</span><span id="line-613"><span class="sd">    """</span>
-</span><span id="line-614">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.silhouette</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-</span><span id="line-615">        <span class="n">compare_silhouettes</span><span class="p">,</span>
-</span><span id="line-616">        <span class="n">render_character_silhouettes</span><span class="p">,</span>
-</span><span id="line-617">    <span class="p">)</span>
-</span><span id="line-618">
-</span><span id="line-619">    <span class="n">base</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
-</span><span id="line-620">    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">other</span><span class="p">]</span> <span class="k">if</span> <span class="n">other</span> <span class="k">else</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
-</span><span id="line-621">    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-</span><span id="line-622">        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">base</span> <span class="o">/</span> <span class="n">n</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span id="line-623">            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">base</span> <span class="o">/</span> <span class="n">n</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span>
-</span><span id="line-624">    <span class="n">target</span> <span class="o">=</span> <span class="n">_silhouette_dir</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span id="line-625">    <span class="n">paths</span> <span class="o">=</span> <span class="n">render_character_silhouettes</span><span class="p">(</span>
-</span><span id="line-626">        <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="n">base</span> <span class="o">/</span> <span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span><span class="p">},</span> <span class="n">target</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span>
-</span><span id="line-627">    <span class="p">)</span>
-</span><span id="line-628">    <span class="k">if</span> <span class="n">output</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">other</span><span class="p">:</span>
-</span><span id="line-629">        <span class="n">Path</span><span class="p">(</span><span class="n">output</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-630">        <span class="n">paths</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="n">name</span><span class="p">]),</span> <span class="n">output</span><span class="p">))</span>
-</span><span id="line-631">    <span class="k">if</span> <span class="ow">not</span> <span class="n">other</span><span class="p">:</span>
-</span><span id="line-632">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"silhouette: </span><span class="si">{</span><span class="n">paths</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-633">    <span class="n">score</span> <span class="o">=</span> <span class="n">compare_silhouettes</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">paths</span><span class="p">[</span><span class="n">other</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span>
-</span><span id="line-634">    <span class="n">verdict</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-635">        <span class="s2">"very similar (consider redesigning)"</span>
-</span><span id="line-636">        <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="mf">0.75</span>
-</span><span id="line-637">        <span class="k">else</span> <span class="s2">"moderately similar"</span>
-</span><span id="line-638">        <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="mf">0.5</span>
-</span><span id="line-639">        <span class="k">else</span> <span class="s2">"distinct"</span>
-</span><span id="line-640">    <span class="p">)</span>
-</span><span id="line-641">    <span class="k">return</span> <span class="p">(</span>
-</span><span id="line-642">        <span class="sa">f</span><span class="s2">"silhouettes:</span><span class="se">\n</span><span class="s2">"</span>
-</span><span id="line-643">        <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">paths</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
-</span><span id="line-644">        <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">other</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">paths</span><span class="p">[</span><span class="n">other</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
-</span><span id="line-645">        <span class="sa">f</span><span class="s2">"  IoU: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> — </span><span class="si">{</span><span class="n">verdict</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-646">    <span class="p">)</span></div>
+</span><span id="line-591"><span class="k">def</span><span class="w"> </span><span class="nf">silhouette</span><span class="p">(</span>
+</span><span id="line-592">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-593">    <span class="n">other</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-594">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-595">    <span class="n">output</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-596">    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
+</span><span id="line-597"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-598"><span class="w">    </span><span class="sd">"""Render a black silhouette for ``name`` (and optionally compare to ``other``).</span>
+</span><span id="line-599">
+</span><span id="line-600"><span class="sd">    The silhouette is the figure as the stage draws it (build, head scale, hat:</span>
+</span><span id="line-601"><span class="sd">    an#272), tinted black on white. When two names are given, prints both</span>
+</span><span id="line-602"><span class="sd">    silhouettes' paths and an IoU score (0..1; lower means more visually</span>
+</span><span id="line-603"><span class="sd">    distinct). Nothing is written into a character's folder, so a later</span>
+</span><span id="line-604"><span class="sd">    ``an library publish`` never ships a silhouette.</span>
+</span><span id="line-605">
+</span><span id="line-606"><span class="sd">    name: character id</span>
+</span><span id="line-607"><span class="sd">    other: optional second character to compare against</span>
+</span><span id="line-608"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
+</span><span id="line-609"><span class="sd">    output: output PNG path (one name only); defaults to the project's</span>
+</span><span id="line-610"><span class="sd">        artifacts/silhouettes/&lt;name&gt;.png</span>
+</span><span id="line-611"><span class="sd">    size: square output size in pixels (default 512)</span>
+</span><span id="line-612"><span class="sd">    """</span>
+</span><span id="line-613">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.silhouette</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-614">        <span class="n">compare_silhouettes</span><span class="p">,</span>
+</span><span id="line-615">        <span class="n">render_character_silhouettes</span><span class="p">,</span>
+</span><span id="line-616">    <span class="p">)</span>
+</span><span id="line-617">
+</span><span id="line-618">    <span class="n">base</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+</span><span id="line-619">    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">other</span><span class="p">]</span> <span class="k">if</span> <span class="n">other</span> <span class="k">else</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
+</span><span id="line-620">    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+</span><span id="line-621">        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">base</span> <span class="o">/</span> <span class="n">n</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span id="line-622">            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">base</span> <span class="o">/</span> <span class="n">n</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span>
+</span><span id="line-623">    <span class="n">target</span> <span class="o">=</span> <span class="n">_silhouette_dir</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+</span><span id="line-624">    <span class="n">paths</span> <span class="o">=</span> <span class="n">render_character_silhouettes</span><span class="p">(</span>
+</span><span id="line-625">        <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="n">base</span> <span class="o">/</span> <span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span><span class="p">},</span> <span class="n">target</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span>
+</span><span id="line-626">    <span class="p">)</span>
+</span><span id="line-627">    <span class="k">if</span> <span class="n">output</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">other</span><span class="p">:</span>
+</span><span id="line-628">        <span class="n">Path</span><span class="p">(</span><span class="n">output</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-629">        <span class="n">paths</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="n">name</span><span class="p">]),</span> <span class="n">output</span><span class="p">))</span>
+</span><span id="line-630">    <span class="k">if</span> <span class="ow">not</span> <span class="n">other</span><span class="p">:</span>
+</span><span id="line-631">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"silhouette: </span><span class="si">{</span><span class="n">paths</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-632">    <span class="n">score</span> <span class="o">=</span> <span class="n">compare_silhouettes</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">paths</span><span class="p">[</span><span class="n">other</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span>
+</span><span id="line-633">    <span class="n">verdict</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-634">        <span class="s2">"very similar (consider redesigning)"</span>
+</span><span id="line-635">        <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="mf">0.75</span>
+</span><span id="line-636">        <span class="k">else</span> <span class="s2">"moderately similar"</span>
+</span><span id="line-637">        <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="mf">0.5</span>
+</span><span id="line-638">        <span class="k">else</span> <span class="s2">"distinct"</span>
+</span><span id="line-639">    <span class="p">)</span>
+</span><span id="line-640">    <span class="k">return</span> <span class="p">(</span>
+</span><span id="line-641">        <span class="sa">f</span><span class="s2">"silhouettes:</span><span class="se">\n</span><span class="s2">"</span>
+</span><span id="line-642">        <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">paths</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+</span><span id="line-643">        <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">other</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">paths</span><span class="p">[</span><span class="n">other</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+</span><span id="line-644">        <span class="sa">f</span><span class="s2">"  IoU: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> — </span><span class="si">{</span><span class="n">verdict</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-645">    <span class="p">)</span></div>
 
+</span><span id="line-646">
 </span><span id="line-647">
-</span><span id="line-648">
-</span><span id="line-649"><span class="c1">#: Where silhouettes go, under the project the characters belong to (never a</span>
-</span><span id="line-650"><span class="c1">#: character's own folder: that folder is the published asset, an#272).</span>
-</span><span id="line-651"><span class="n">SILHOUETTE_ARTIFACTS</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"artifacts"</span><span class="p">,</span> <span class="s2">"silhouettes"</span><span class="p">)</span>
+</span><span id="line-648"><span class="c1">#: Where silhouettes go, under the project the characters belong to (never a</span>
+</span><span id="line-649"><span class="c1">#: character's own folder: that folder is the published asset, an#272).</span>
+</span><span id="line-650"><span class="n">SILHOUETTE_ARTIFACTS</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"artifacts"</span><span class="p">,</span> <span class="s2">"silhouettes"</span><span class="p">)</span>
+</span><span id="line-651">
 </span><span id="line-652">
-</span><span id="line-653">
-</span><span id="line-654"><span class="k">def</span><span class="w"> </span><span class="nf">_silhouette_dir</span><span class="p">(</span><span class="n">characters_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-655"><span class="w">    </span><span class="sd">"""``&lt;project&gt;/artifacts/silhouettes`` for a project's ``assets/characters``;</span>
-</span><span id="line-656"><span class="sd">    else a folder in the system temp dir."""</span>
-</span><span id="line-657">    <span class="k">if</span> <span class="n">characters_dir</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"characters"</span> <span class="ow">and</span> <span class="n">characters_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"assets"</span><span class="p">:</span>
-</span><span id="line-658">        <span class="k">return</span> <span class="n">characters_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="o">*</span><span class="n">SILHOUETTE_ARTIFACTS</span><span class="p">)</span>
-</span><span id="line-659">    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">())</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">"an"</span><span class="p">,</span> <span class="o">*</span><span class="n">SILHOUETTE_ARTIFACTS</span><span class="p">)</span>
+</span><span id="line-653"><span class="k">def</span><span class="w"> </span><span class="nf">_silhouette_dir</span><span class="p">(</span><span class="n">characters_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-654"><span class="w">    </span><span class="sd">"""``&lt;project&gt;/artifacts/silhouettes`` for a project's ``assets/characters``;</span>
+</span><span id="line-655"><span class="sd">    else a folder in the system temp dir."""</span>
+</span><span id="line-656">    <span class="k">if</span> <span class="n">characters_dir</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"characters"</span> <span class="ow">and</span> <span class="n">characters_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"assets"</span><span class="p">:</span>
+</span><span id="line-657">        <span class="k">return</span> <span class="n">characters_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="o">*</span><span class="n">SILHOUETTE_ARTIFACTS</span><span class="p">)</span>
+</span><span id="line-658">    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">())</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">"an"</span><span class="p">,</span> <span class="o">*</span><span class="n">SILHOUETTE_ARTIFACTS</span><span class="p">)</span>
+</span><span id="line-659">
 </span><span id="line-660">
-</span><span id="line-661">
 <div class="viewcode-block" id="preview">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.cli.html#cutan.characters.cli.preview">[docs]</a>
-</span><span id="line-662"><span class="k">def</span><span class="w"> </span><span class="nf">preview</span><span class="p">(</span>
-</span><span id="line-663">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-664">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-665">    <span class="n">open_browser</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-666"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-667"><span class="w">    </span><span class="sd">"""Render a small HTML viewer that previews all visemes + idle animation.</span>
-</span><span id="line-668">
-</span><span id="line-669"><span class="sd">    The page includes the head SVG, cycles through ``mouth_a … mouth_x``</span>
-</span><span id="line-670"><span class="sd">    once a second, and shows a ±2 px sine-wave breath on the head. Useful</span>
-</span><span id="line-671"><span class="sd">    for eyeballing a character's mouth set before integrating into the</span>
-</span><span id="line-672"><span class="sd">    main runtime.</span>
-</span><span id="line-673">
-</span><span id="line-674"><span class="sd">    name: character id</span>
-</span><span id="line-675"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
-</span><span id="line-676"><span class="sd">    open_browser: also open the file in the default browser</span>
-</span><span id="line-677"><span class="sd">    """</span>
-</span><span id="line-678">    <span class="n">target</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
-</span><span id="line-679">    <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="line-680">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no such character: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-681">    <span class="n">html_path</span> <span class="o">=</span> <span class="n">_write_preview_html</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-</span><span id="line-682">    <span class="k">if</span> <span class="n">open_browser</span><span class="p">:</span>
-</span><span id="line-683">        <span class="kn">import</span><span class="w"> </span><span class="nn">webbrowser</span>
-</span><span id="line-684">
-</span><span id="line-685">        <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">"file://</span><span class="si">{</span><span class="n">html_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-686">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"preview: </span><span class="si">{</span><span class="n">html_path</span><span class="si">}</span><span class="s2">"</span></div>
+</span><span id="line-661"><span class="k">def</span><span class="w"> </span><span class="nf">preview</span><span class="p">(</span>
+</span><span id="line-662">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-663">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-664">    <span class="n">open_browser</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-665"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-666"><span class="w">    </span><span class="sd">"""Render a small HTML viewer that previews all visemes + idle animation.</span>
+</span><span id="line-667">
+</span><span id="line-668"><span class="sd">    The page includes the head SVG, cycles through ``mouth_a … mouth_x``</span>
+</span><span id="line-669"><span class="sd">    once a second, and shows a ±2 px sine-wave breath on the head. Useful</span>
+</span><span id="line-670"><span class="sd">    for eyeballing a character's mouth set before integrating into the</span>
+</span><span id="line-671"><span class="sd">    main runtime.</span>
+</span><span id="line-672">
+</span><span id="line-673"><span class="sd">    name: character id</span>
+</span><span id="line-674"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
+</span><span id="line-675"><span class="sd">    open_browser: also open the file in the default browser</span>
+</span><span id="line-676"><span class="sd">    """</span>
+</span><span id="line-677">    <span class="n">target</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
+</span><span id="line-678">    <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="line-679">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no such character: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-680">    <span class="n">html_path</span> <span class="o">=</span> <span class="n">_write_preview_html</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-681">    <span class="k">if</span> <span class="n">open_browser</span><span class="p">:</span>
+</span><span id="line-682">        <span class="kn">import</span><span class="w"> </span><span class="nn">webbrowser</span>
+</span><span id="line-683">
+</span><span id="line-684">        <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">"file://</span><span class="si">{</span><span class="n">html_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-685">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"preview: </span><span class="si">{</span><span class="n">html_path</span><span class="si">}</span><span class="s2">"</span></div>
 
+</span><span id="line-686">
 </span><span id="line-687">
-</span><span id="line-688">
-</span><span id="line-689"><span class="n">_PREVIEW_TEMPLATE</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
-</span><span id="line-690"><span class="w">    </span><span class="sd">"""\</span>
-</span><span id="line-691"><span class="sd">    &lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset="utf-8"&gt;</span>
-</span><span id="line-692"><span class="sd">    &lt;title&gt;{name} — an character preview&lt;/title&gt;</span>
-</span><span id="line-693"><span class="sd">    &lt;style&gt;</span>
-</span><span id="line-694"><span class="sd">      :root {{ color-scheme: dark; }}</span>
-</span><span id="line-695"><span class="sd">      body {{</span>
-</span><span id="line-696"><span class="sd">        font-family: -apple-system, system-ui, sans-serif;</span>
-</span><span id="line-697"><span class="sd">        background: #1a1d21; color: #d8dae0;</span>
-</span><span id="line-698"><span class="sd">        margin: 0; padding: 24px; display: grid; gap: 24px;</span>
-</span><span id="line-699"><span class="sd">        grid-template-columns: 320px 1fr;</span>
-</span><span id="line-700"><span class="sd">      }}</span>
-</span><span id="line-701"><span class="sd">      h1, h2, h3 {{ font-weight: 500; margin: 0 0 8px; }}</span>
-</span><span id="line-702"><span class="sd">      .panel {{</span>
-</span><span id="line-703"><span class="sd">        background: #23262b; border-radius: 8px; padding: 16px;</span>
-</span><span id="line-704"><span class="sd">        border: 1px solid #2f333a;</span>
-</span><span id="line-705"><span class="sd">      }}</span>
-</span><span id="line-706"><span class="sd">      .stage {{</span>
-</span><span id="line-707"><span class="sd">        background: #0f1115; border-radius: 8px; min-height: 480px;</span>
-</span><span id="line-708"><span class="sd">        display: grid; place-items: center; padding: 24px;</span>
-</span><span id="line-709"><span class="sd">      }}</span>
-</span><span id="line-710"><span class="sd">      .head-wrap {{ width: 320px; height: 320px; position: relative; }}</span>
-</span><span id="line-711"><span class="sd">      .head-wrap img {{ width: 100%; height: 100%; }}</span>
-</span><span id="line-712"><span class="sd">      .mouth-overlay {{</span>
-</span><span id="line-713"><span class="sd">        position: absolute; left: 50%; top: 60%; transform: translate(-50%, -50%);</span>
-</span><span id="line-714"><span class="sd">        width: 96px; height: 48px;</span>
-</span><span id="line-715"><span class="sd">      }}</span>
-</span><span id="line-716"><span class="sd">      .mouth-overlay img {{ width: 100%; height: 100%; }}</span>
-</span><span id="line-717"><span class="sd">      .grid {{</span>
-</span><span id="line-718"><span class="sd">        display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;</span>
-</span><span id="line-719"><span class="sd">      }}</span>
-</span><span id="line-720"><span class="sd">      .swatch {{</span>
-</span><span id="line-721"><span class="sd">        background: #15171a; border: 1px solid #2f333a; border-radius: 6px;</span>
-</span><span id="line-722"><span class="sd">        padding: 8px; text-align: center;</span>
-</span><span id="line-723"><span class="sd">      }}</span>
-</span><span id="line-724"><span class="sd">      .swatch img {{ width: 64px; height: 32px; }}</span>
-</span><span id="line-725"><span class="sd">      code {{ background: #15171a; padding: 1px 6px; border-radius: 4px; }}</span>
-</span><span id="line-726"><span class="sd">      .meta {{ font-size: 12px; color: #8a909a; }}</span>
-</span><span id="line-727"><span class="sd">    &lt;/style&gt;</span>
-</span><span id="line-728"><span class="sd">    &lt;/head&gt;</span>
-</span><span id="line-729"><span class="sd">    &lt;body&gt;</span>
-</span><span id="line-730"><span class="sd">    &lt;div class="panel"&gt;</span>
-</span><span id="line-731"><span class="sd">      &lt;h1&gt;{name}&lt;/h1&gt;</span>
-</span><span id="line-732"><span class="sd">      &lt;p class="meta"&gt;{display_name}&lt;/p&gt;</span>
-</span><span id="line-733"><span class="sd">      &lt;h3&gt;Viseme set&lt;/h3&gt;</span>
-</span><span id="line-734"><span class="sd">      &lt;div class="grid"&gt;</span>
-</span><span id="line-735"><span class="sd">        {viseme_grid}</span>
-</span><span id="line-736"><span class="sd">      &lt;/div&gt;</span>
-</span><span id="line-737"><span class="sd">      &lt;h3 style="margin-top:16px"&gt;Idle animation&lt;/h3&gt;</span>
-</span><span id="line-738"><span class="sd">      &lt;p class="meta"&gt;±2 px breath, 0.5° head tilt at 4 s period.&lt;/p&gt;</span>
-</span><span id="line-739"><span class="sd">      &lt;h3 style="margin-top:16px"&gt;Pivots detected&lt;/h3&gt;</span>
-</span><span id="line-740"><span class="sd">      &lt;ul class="meta"&gt;{pivots_list}&lt;/ul&gt;</span>
-</span><span id="line-741"><span class="sd">      &lt;h3 style="margin-top:16px"&gt;Files&lt;/h3&gt;</span>
-</span><span id="line-742"><span class="sd">      &lt;p class="meta"&gt;Descriptor: &lt;code&gt;character.json&lt;/code&gt;&lt;br&gt;</span>
-</span><span id="line-743"><span class="sd">      Source SVG: &lt;code&gt;{name}.svg&lt;/code&gt;&lt;br&gt;</span>
-</span><span id="line-744"><span class="sd">      Parts: &lt;code&gt;parts/&lt;/code&gt;&lt;/p&gt;</span>
-</span><span id="line-745"><span class="sd">    &lt;/div&gt;</span>
-</span><span id="line-746"><span class="sd">    &lt;div class="stage"&gt;</span>
-</span><span id="line-747"><span class="sd">      &lt;div class="head-wrap" id="stage"&gt;</span>
-</span><span id="line-748"><span class="sd">        &lt;img src="parts/head.svg" id="head"/&gt;</span>
-</span><span id="line-749"><span class="sd">        &lt;div class="mouth-overlay"&gt;&lt;img id="mouth" src="parts/mouth/mouth_x.svg"/&gt;&lt;/div&gt;</span>
-</span><span id="line-750"><span class="sd">      &lt;/div&gt;</span>
-</span><span id="line-751"><span class="sd">    &lt;/div&gt;</span>
-</span><span id="line-752"><span class="sd">    &lt;script&gt;</span>
-</span><span id="line-753"><span class="sd">      // Cycle visemes once per second.</span>
-</span><span id="line-754"><span class="sd">      const shapes = {viseme_letters};</span>
-</span><span id="line-755"><span class="sd">      let i = 0;</span>
-</span><span id="line-756"><span class="sd">      const mouth = document.getElementById('mouth');</span>
-</span><span id="line-757"><span class="sd">      setInterval(() =&gt; {{</span>
-</span><span id="line-758"><span class="sd">        i = (i + 1) % shapes.length;</span>
-</span><span id="line-759"><span class="sd">        mouth.src = `parts/mouth/mouth_${{shapes[i]}}.svg`;</span>
-</span><span id="line-760"><span class="sd">      }}, 700);</span>
-</span><span id="line-761"><span class="sd">      // ±2 px sine breath on head.</span>
-</span><span id="line-762"><span class="sd">      const head = document.getElementById('stage');</span>
-</span><span id="line-763"><span class="sd">      const t0 = performance.now();</span>
-</span><span id="line-764"><span class="sd">      function tick() {{</span>
-</span><span id="line-765"><span class="sd">        const t = (performance.now() - t0) / 1000;</span>
-</span><span id="line-766"><span class="sd">        const dy = 2 * Math.sin(2 * Math.PI * t / 4);</span>
-</span><span id="line-767"><span class="sd">        const rot = 0.5 * Math.sin(2 * Math.PI * (t / 4 + 0.25));</span>
-</span><span id="line-768"><span class="sd">        head.style.transform = `translateY(${{dy.toFixed(2)}}px) rotate(${{rot.toFixed(2)}}deg)`;</span>
-</span><span id="line-769"><span class="sd">        requestAnimationFrame(tick);</span>
-</span><span id="line-770"><span class="sd">      }}</span>
-</span><span id="line-771"><span class="sd">      requestAnimationFrame(tick);</span>
-</span><span id="line-772"><span class="sd">    &lt;/script&gt;</span>
-</span><span id="line-773"><span class="sd">    &lt;/body&gt;&lt;/html&gt;</span>
-</span><span id="line-774"><span class="sd">    """</span>
-</span><span id="line-775"><span class="p">)</span>
+</span><span id="line-688"><span class="n">_PREVIEW_TEMPLATE</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
+</span><span id="line-689"><span class="w">    </span><span class="sd">"""\</span>
+</span><span id="line-690"><span class="sd">    &lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset="utf-8"&gt;</span>
+</span><span id="line-691"><span class="sd">    &lt;title&gt;{name} — an character preview&lt;/title&gt;</span>
+</span><span id="line-692"><span class="sd">    &lt;style&gt;</span>
+</span><span id="line-693"><span class="sd">      :root {{ color-scheme: dark; }}</span>
+</span><span id="line-694"><span class="sd">      body {{</span>
+</span><span id="line-695"><span class="sd">        font-family: -apple-system, system-ui, sans-serif;</span>
+</span><span id="line-696"><span class="sd">        background: #1a1d21; color: #d8dae0;</span>
+</span><span id="line-697"><span class="sd">        margin: 0; padding: 24px; display: grid; gap: 24px;</span>
+</span><span id="line-698"><span class="sd">        grid-template-columns: 320px 1fr;</span>
+</span><span id="line-699"><span class="sd">      }}</span>
+</span><span id="line-700"><span class="sd">      h1, h2, h3 {{ font-weight: 500; margin: 0 0 8px; }}</span>
+</span><span id="line-701"><span class="sd">      .panel {{</span>
+</span><span id="line-702"><span class="sd">        background: #23262b; border-radius: 8px; padding: 16px;</span>
+</span><span id="line-703"><span class="sd">        border: 1px solid #2f333a;</span>
+</span><span id="line-704"><span class="sd">      }}</span>
+</span><span id="line-705"><span class="sd">      .stage {{</span>
+</span><span id="line-706"><span class="sd">        background: #0f1115; border-radius: 8px; min-height: 480px;</span>
+</span><span id="line-707"><span class="sd">        display: grid; place-items: center; padding: 24px;</span>
+</span><span id="line-708"><span class="sd">      }}</span>
+</span><span id="line-709"><span class="sd">      .head-wrap {{ width: 320px; height: 320px; position: relative; }}</span>
+</span><span id="line-710"><span class="sd">      .head-wrap img {{ width: 100%; height: 100%; }}</span>
+</span><span id="line-711"><span class="sd">      .mouth-overlay {{</span>
+</span><span id="line-712"><span class="sd">        position: absolute; left: 50%; top: 60%; transform: translate(-50%, -50%);</span>
+</span><span id="line-713"><span class="sd">        width: 96px; height: 48px;</span>
+</span><span id="line-714"><span class="sd">      }}</span>
+</span><span id="line-715"><span class="sd">      .mouth-overlay img {{ width: 100%; height: 100%; }}</span>
+</span><span id="line-716"><span class="sd">      .grid {{</span>
+</span><span id="line-717"><span class="sd">        display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;</span>
+</span><span id="line-718"><span class="sd">      }}</span>
+</span><span id="line-719"><span class="sd">      .swatch {{</span>
+</span><span id="line-720"><span class="sd">        background: #15171a; border: 1px solid #2f333a; border-radius: 6px;</span>
+</span><span id="line-721"><span class="sd">        padding: 8px; text-align: center;</span>
+</span><span id="line-722"><span class="sd">      }}</span>
+</span><span id="line-723"><span class="sd">      .swatch img {{ width: 64px; height: 32px; }}</span>
+</span><span id="line-724"><span class="sd">      code {{ background: #15171a; padding: 1px 6px; border-radius: 4px; }}</span>
+</span><span id="line-725"><span class="sd">      .meta {{ font-size: 12px; color: #8a909a; }}</span>
+</span><span id="line-726"><span class="sd">    &lt;/style&gt;</span>
+</span><span id="line-727"><span class="sd">    &lt;/head&gt;</span>
+</span><span id="line-728"><span class="sd">    &lt;body&gt;</span>
+</span><span id="line-729"><span class="sd">    &lt;div class="panel"&gt;</span>
+</span><span id="line-730"><span class="sd">      &lt;h1&gt;{name}&lt;/h1&gt;</span>
+</span><span id="line-731"><span class="sd">      &lt;p class="meta"&gt;{display_name}&lt;/p&gt;</span>
+</span><span id="line-732"><span class="sd">      &lt;h3&gt;Viseme set&lt;/h3&gt;</span>
+</span><span id="line-733"><span class="sd">      &lt;div class="grid"&gt;</span>
+</span><span id="line-734"><span class="sd">        {viseme_grid}</span>
+</span><span id="line-735"><span class="sd">      &lt;/div&gt;</span>
+</span><span id="line-736"><span class="sd">      &lt;h3 style="margin-top:16px"&gt;Idle animation&lt;/h3&gt;</span>
+</span><span id="line-737"><span class="sd">      &lt;p class="meta"&gt;±2 px breath, 0.5° head tilt at 4 s period.&lt;/p&gt;</span>
+</span><span id="line-738"><span class="sd">      &lt;h3 style="margin-top:16px"&gt;Pivots detected&lt;/h3&gt;</span>
+</span><span id="line-739"><span class="sd">      &lt;ul class="meta"&gt;{pivots_list}&lt;/ul&gt;</span>
+</span><span id="line-740"><span class="sd">      &lt;h3 style="margin-top:16px"&gt;Files&lt;/h3&gt;</span>
+</span><span id="line-741"><span class="sd">      &lt;p class="meta"&gt;Descriptor: &lt;code&gt;character.json&lt;/code&gt;&lt;br&gt;</span>
+</span><span id="line-742"><span class="sd">      Source SVG: &lt;code&gt;{name}.svg&lt;/code&gt;&lt;br&gt;</span>
+</span><span id="line-743"><span class="sd">      Parts: &lt;code&gt;parts/&lt;/code&gt;&lt;/p&gt;</span>
+</span><span id="line-744"><span class="sd">    &lt;/div&gt;</span>
+</span><span id="line-745"><span class="sd">    &lt;div class="stage"&gt;</span>
+</span><span id="line-746"><span class="sd">      &lt;div class="head-wrap" id="stage"&gt;</span>
+</span><span id="line-747"><span class="sd">        &lt;img src="parts/head.svg" id="head"/&gt;</span>
+</span><span id="line-748"><span class="sd">        &lt;div class="mouth-overlay"&gt;&lt;img id="mouth" src="parts/mouth/mouth_x.svg"/&gt;&lt;/div&gt;</span>
+</span><span id="line-749"><span class="sd">      &lt;/div&gt;</span>
+</span><span id="line-750"><span class="sd">    &lt;/div&gt;</span>
+</span><span id="line-751"><span class="sd">    &lt;script&gt;</span>
+</span><span id="line-752"><span class="sd">      // Cycle visemes once per second.</span>
+</span><span id="line-753"><span class="sd">      const shapes = {viseme_letters};</span>
+</span><span id="line-754"><span class="sd">      let i = 0;</span>
+</span><span id="line-755"><span class="sd">      const mouth = document.getElementById('mouth');</span>
+</span><span id="line-756"><span class="sd">      setInterval(() =&gt; {{</span>
+</span><span id="line-757"><span class="sd">        i = (i + 1) % shapes.length;</span>
+</span><span id="line-758"><span class="sd">        mouth.src = `parts/mouth/mouth_${{shapes[i]}}.svg`;</span>
+</span><span id="line-759"><span class="sd">      }}, 700);</span>
+</span><span id="line-760"><span class="sd">      // ±2 px sine breath on head.</span>
+</span><span id="line-761"><span class="sd">      const head = document.getElementById('stage');</span>
+</span><span id="line-762"><span class="sd">      const t0 = performance.now();</span>
+</span><span id="line-763"><span class="sd">      function tick() {{</span>
+</span><span id="line-764"><span class="sd">        const t = (performance.now() - t0) / 1000;</span>
+</span><span id="line-765"><span class="sd">        const dy = 2 * Math.sin(2 * Math.PI * t / 4);</span>
+</span><span id="line-766"><span class="sd">        const rot = 0.5 * Math.sin(2 * Math.PI * (t / 4 + 0.25));</span>
+</span><span id="line-767"><span class="sd">        head.style.transform = `translateY(${{dy.toFixed(2)}}px) rotate(${{rot.toFixed(2)}}deg)`;</span>
+</span><span id="line-768"><span class="sd">        requestAnimationFrame(tick);</span>
+</span><span id="line-769"><span class="sd">      }}</span>
+</span><span id="line-770"><span class="sd">      requestAnimationFrame(tick);</span>
+</span><span id="line-771"><span class="sd">    &lt;/script&gt;</span>
+</span><span id="line-772"><span class="sd">    &lt;/body&gt;&lt;/html&gt;</span>
+</span><span id="line-773"><span class="sd">    """</span>
+</span><span id="line-774"><span class="p">)</span>
+</span><span id="line-775">
 </span><span id="line-776">
-</span><span id="line-777">
-</span><span id="line-778"><span class="k">def</span><span class="w"> </span><span class="nf">_write_preview_html</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-779">    <span class="n">desc</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">target</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
-</span><span id="line-780">    <span class="n">display_name</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"display_name"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">name</span>
-</span><span id="line-781">    <span class="n">pivots</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"metadata"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pivots_detected"</span><span class="p">,</span> <span class="p">[])</span>
-</span><span id="line-782">    <span class="n">pivots_list</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-783">        <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"&lt;li&gt;</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&lt;/li&gt;"</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pivots</span><span class="p">)</span> <span class="k">if</span> <span class="n">pivots</span> <span class="k">else</span> <span class="s2">"&lt;li&gt;(none)&lt;/li&gt;"</span>
-</span><span id="line-784">    <span class="p">)</span>
-</span><span id="line-785">    <span class="n">viseme_grid</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span><span id="line-786">        <span class="sa">f</span><span class="s1">'&lt;div class="swatch"&gt;&lt;img src="parts/mouth/mouth_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s1">.svg"/&gt;'</span>
-</span><span id="line-787">        <span class="sa">f</span><span class="s1">'&lt;div class="meta"&gt;mouth_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s1">&lt;/div&gt;&lt;/div&gt;'</span>
-</span><span id="line-788">        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">,</span> <span class="s2">"e"</span><span class="p">,</span> <span class="s2">"f"</span><span class="p">,</span> <span class="s2">"g"</span><span class="p">,</span> <span class="s2">"h"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span>
-</span><span id="line-789">    <span class="p">)</span>
-</span><span id="line-790">    <span class="n">viseme_letters</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">,</span> <span class="s2">"e"</span><span class="p">,</span> <span class="s2">"f"</span><span class="p">,</span> <span class="s2">"g"</span><span class="p">,</span> <span class="s2">"h"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">])</span>
-</span><span id="line-791">    <span class="n">html</span> <span class="o">=</span> <span class="n">_PREVIEW_TEMPLATE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-</span><span id="line-792">        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-</span><span id="line-793">        <span class="n">display_name</span><span class="o">=</span><span class="n">display_name</span><span class="p">,</span>
-</span><span id="line-794">        <span class="n">pivots_list</span><span class="o">=</span><span class="n">pivots_list</span><span class="p">,</span>
-</span><span id="line-795">        <span class="n">viseme_grid</span><span class="o">=</span><span class="n">viseme_grid</span><span class="p">,</span>
-</span><span id="line-796">        <span class="n">viseme_letters</span><span class="o">=</span><span class="n">viseme_letters</span><span class="p">,</span>
-</span><span id="line-797">    <span class="p">)</span>
-</span><span id="line-798">    <span class="n">out</span> <span class="o">=</span> <span class="n">target</span> <span class="o">/</span> <span class="s2">"preview.html"</span>
-</span><span id="line-799">    <span class="n">out</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
-</span><span id="line-800">    <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-777"><span class="k">def</span><span class="w"> </span><span class="nf">_write_preview_html</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-778">    <span class="n">desc</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">target</span> <span class="o">/</span> <span class="s2">"character.json"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-779">    <span class="n">display_name</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"display_name"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">name</span>
+</span><span id="line-780">    <span class="n">pivots</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"metadata"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pivots_detected"</span><span class="p">,</span> <span class="p">[])</span>
+</span><span id="line-781">    <span class="n">pivots_list</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-782">        <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"&lt;li&gt;</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&lt;/li&gt;"</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pivots</span><span class="p">)</span> <span class="k">if</span> <span class="n">pivots</span> <span class="k">else</span> <span class="s2">"&lt;li&gt;(none)&lt;/li&gt;"</span>
+</span><span id="line-783">    <span class="p">)</span>
+</span><span id="line-784">    <span class="n">viseme_grid</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span><span id="line-785">        <span class="sa">f</span><span class="s1">'&lt;div class="swatch"&gt;&lt;img src="parts/mouth/mouth_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s1">.svg"/&gt;'</span>
+</span><span id="line-786">        <span class="sa">f</span><span class="s1">'&lt;div class="meta"&gt;mouth_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s1">&lt;/div&gt;&lt;/div&gt;'</span>
+</span><span id="line-787">        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">,</span> <span class="s2">"e"</span><span class="p">,</span> <span class="s2">"f"</span><span class="p">,</span> <span class="s2">"g"</span><span class="p">,</span> <span class="s2">"h"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span>
+</span><span id="line-788">    <span class="p">)</span>
+</span><span id="line-789">    <span class="n">viseme_letters</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">,</span> <span class="s2">"e"</span><span class="p">,</span> <span class="s2">"f"</span><span class="p">,</span> <span class="s2">"g"</span><span class="p">,</span> <span class="s2">"h"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">])</span>
+</span><span id="line-790">    <span class="n">html</span> <span class="o">=</span> <span class="n">_PREVIEW_TEMPLATE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+</span><span id="line-791">        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+</span><span id="line-792">        <span class="n">display_name</span><span class="o">=</span><span class="n">display_name</span><span class="p">,</span>
+</span><span id="line-793">        <span class="n">pivots_list</span><span class="o">=</span><span class="n">pivots_list</span><span class="p">,</span>
+</span><span id="line-794">        <span class="n">viseme_grid</span><span class="o">=</span><span class="n">viseme_grid</span><span class="p">,</span>
+</span><span id="line-795">        <span class="n">viseme_letters</span><span class="o">=</span><span class="n">viseme_letters</span><span class="p">,</span>
+</span><span id="line-796">    <span class="p">)</span>
+</span><span id="line-797">    <span class="n">out</span> <span class="o">=</span> <span class="n">target</span> <span class="o">/</span> <span class="s2">"preview.html"</span>
+</span><span id="line-798">    <span class="n">out</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span><span id="line-799">    <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-800">
 </span><span id="line-801">
-</span><span id="line-802">
 <div class="viewcode-block" id="record">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.cli.html#cutan.characters.cli.record">[docs]</a>
-</span><span id="line-803"><span class="k">def</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span>
-</span><span id="line-804">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-805">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-806">    <span class="n">output</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-807">    <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">8.0</span><span class="p">,</span>
-</span><span id="line-808">    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">640</span><span class="p">,</span>
-</span><span id="line-809">    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">480</span><span class="p">,</span>
-</span><span id="line-810"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-811"><span class="w">    </span><span class="sd">"""Record a character's preview HTML to mp4.</span>
-</span><span id="line-812">
-</span><span id="line-813"><span class="sd">    Real video file showing the new SVG character art animating: cycles</span>
-</span><span id="line-814"><span class="sd">    through all 9 visemes and applies the breath/head-tilt animation.</span>
-</span><span id="line-815">
-</span><span id="line-816"><span class="sd">    name: character id</span>
-</span><span id="line-817"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
-</span><span id="line-818"><span class="sd">    output: output mp4 path; defaults to &lt;character_dir&gt;/preview.mp4</span>
-</span><span id="line-819"><span class="sd">    duration: recording length in seconds (default 8)</span>
-</span><span id="line-820"><span class="sd">    width / height: video resolution (default 640x480)</span>
-</span><span id="line-821"><span class="sd">    """</span>
-</span><span id="line-822">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.record</span><span class="w"> </span><span class="kn">import</span> <span class="n">record_character</span>
-</span><span id="line-823">
-</span><span id="line-824">    <span class="n">target</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
-</span><span id="line-825">    <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="line-826">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no such character: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-827">    <span class="n">out</span> <span class="o">=</span> <span class="n">record_character</span><span class="p">(</span>
-</span><span id="line-828">        <span class="n">target</span><span class="p">,</span>
-</span><span id="line-829">        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-</span><span id="line-830">        <span class="n">out_mp4</span><span class="o">=</span><span class="n">output</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-831">        <span class="n">duration_s</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
-</span><span id="line-832">        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span>
-</span><span id="line-833">    <span class="p">)</span>
-</span><span id="line-834">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"recorded: </span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="s2">"</span></div>
+</span><span id="line-802"><span class="k">def</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span>
+</span><span id="line-803">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-804">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-805">    <span class="n">output</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-806">    <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">8.0</span><span class="p">,</span>
+</span><span id="line-807">    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">640</span><span class="p">,</span>
+</span><span id="line-808">    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">480</span><span class="p">,</span>
+</span><span id="line-809"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-810"><span class="w">    </span><span class="sd">"""Record a character's preview HTML to mp4.</span>
+</span><span id="line-811">
+</span><span id="line-812"><span class="sd">    Real video file showing the new SVG character art animating: cycles</span>
+</span><span id="line-813"><span class="sd">    through all 9 visemes and applies the breath/head-tilt animation.</span>
+</span><span id="line-814">
+</span><span id="line-815"><span class="sd">    name: character id</span>
+</span><span id="line-816"><span class="sd">    out_dir: parent directory; defaults to ./assets/characters</span>
+</span><span id="line-817"><span class="sd">    output: output mp4 path; defaults to &lt;character_dir&gt;/preview.mp4</span>
+</span><span id="line-818"><span class="sd">    duration: recording length in seconds (default 8)</span>
+</span><span id="line-819"><span class="sd">    width / height: video resolution (default 640x480)</span>
+</span><span id="line-820"><span class="sd">    """</span>
+</span><span id="line-821">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.record</span><span class="w"> </span><span class="kn">import</span> <span class="n">record_character</span>
+</span><span id="line-822">
+</span><span id="line-823">    <span class="n">target</span> <span class="o">=</span> <span class="n">_resolve_target</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
+</span><span id="line-824">    <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="line-825">        <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no such character: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-826">    <span class="n">out</span> <span class="o">=</span> <span class="n">record_character</span><span class="p">(</span>
+</span><span id="line-827">        <span class="n">target</span><span class="p">,</span>
+</span><span id="line-828">        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+</span><span id="line-829">        <span class="n">out_mp4</span><span class="o">=</span><span class="n">output</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-830">        <span class="n">duration_s</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+</span><span id="line-831">        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span>
+</span><span id="line-832">    <span class="p">)</span>
+</span><span id="line-833">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"recorded: </span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="s2">"</span></div>
 
+</span><span id="line-834">
 </span><span id="line-835">
-</span><span id="line-836">
-</span><span id="line-837"><span class="c1"># Dispatch list. Mounted as a nested namespace ('character')</span>
-</span><span id="line-838"><span class="c1"># by an/__main__.py so they appear as `an character new`, etc.</span>
+</span><span id="line-836"><span class="c1"># Dispatch list. Mounted as a nested namespace ('character')</span>
+</span><span id="line-837"><span class="c1"># by an/__main__.py so they appear as `an character new`, etc.</span>
+</span><span id="line-838">
 </span><span id="line-839">
-</span><span id="line-840">
 <div class="viewcode-block" id="contract">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.cli.html#cutan.characters.cli.contract">[docs]</a>
-</span><span id="line-841"><span class="k">def</span><span class="w"> </span><span class="nf">contract</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-842"><span class="w">    </span><span class="sd">"""Print the art-package contract an illustrator must satisfy.</span>
-</span><span id="line-843">
-</span><span id="line-844"><span class="sd">    **Derived from the schema and the validator, never hand-written**, so it</span>
-</span><span id="line-845"><span class="sd">    cannot drift from what `an character validate` actually enforces — a</span>
-</span><span id="line-846"><span class="sd">    contract that disagrees with its checker is worse than none, because it</span>
-</span><span id="line-847"><span class="sd">    gets a human paid for work that cannot land.</span>
-</span><span id="line-848"><span class="sd">    """</span>
-</span><span id="line-849">    <span class="k">return</span> <span class="n">_render_contract</span><span class="p">()</span></div>
+</span><span id="line-840"><span class="k">def</span><span class="w"> </span><span class="nf">contract</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-841"><span class="w">    </span><span class="sd">"""Print the art-package contract an illustrator must satisfy.</span>
+</span><span id="line-842">
+</span><span id="line-843"><span class="sd">    **Derived from the schema and the validator, never hand-written**, so it</span>
+</span><span id="line-844"><span class="sd">    cannot drift from what `an character validate` actually enforces — a</span>
+</span><span id="line-845"><span class="sd">    contract that disagrees with its checker is worse than none, because it</span>
+</span><span id="line-846"><span class="sd">    gets a human paid for work that cannot land.</span>
+</span><span id="line-847"><span class="sd">    """</span>
+</span><span id="line-848">    <span class="k">return</span> <span class="n">_render_contract</span><span class="p">()</span></div>
 
+</span><span id="line-849">
 </span><span id="line-850">
-</span><span id="line-851">
-</span><span id="line-852"><span class="n">_dispatch_funcs</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-853">    <span class="n">new</span><span class="p">,</span>
-</span><span id="line-854">    <span class="n">mouths</span><span class="p">,</span>
-</span><span id="line-855">    <span class="n">add_gaze</span><span class="p">,</span>
-</span><span id="line-856">    <span class="n">add_half_lid</span><span class="p">,</span>
-</span><span id="line-857">    <span class="n">set_part</span><span class="p">,</span>
-</span><span id="line-858">    <span class="n">from_sheet</span><span class="p">,</span>
-</span><span id="line-859">    <span class="n">add_views</span><span class="p">,</span>
-</span><span id="line-860">    <span class="n">add_forearms</span><span class="p">,</span>
-</span><span id="line-861">    <span class="n">add_limits</span><span class="p">,</span>
-</span><span id="line-862">    <span class="n">feet_origin</span><span class="p">,</span>
-</span><span id="line-863">    <span class="n">validate</span><span class="p">,</span>
-</span><span id="line-864">    <span class="n">capabilities</span><span class="p">,</span>
-</span><span id="line-865">    <span class="n">contract</span><span class="p">,</span>
-</span><span id="line-866">    <span class="n">silhouette</span><span class="p">,</span>
-</span><span id="line-867">    <span class="n">preview</span><span class="p">,</span>
-</span><span id="line-868">    <span class="n">record</span><span class="p">,</span>
-</span><span id="line-869"><span class="p">]</span>
+</span><span id="line-851"><span class="n">_dispatch_funcs</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-852">    <span class="n">new</span><span class="p">,</span>
+</span><span id="line-853">    <span class="n">mouths</span><span class="p">,</span>
+</span><span id="line-854">    <span class="n">add_gaze</span><span class="p">,</span>
+</span><span id="line-855">    <span class="n">add_half_lid</span><span class="p">,</span>
+</span><span id="line-856">    <span class="n">set_part</span><span class="p">,</span>
+</span><span id="line-857">    <span class="n">from_sheet</span><span class="p">,</span>
+</span><span id="line-858">    <span class="n">add_views</span><span class="p">,</span>
+</span><span id="line-859">    <span class="n">add_forearms</span><span class="p">,</span>
+</span><span id="line-860">    <span class="n">add_limits</span><span class="p">,</span>
+</span><span id="line-861">    <span class="n">feet_origin</span><span class="p">,</span>
+</span><span id="line-862">    <span class="n">validate</span><span class="p">,</span>
+</span><span id="line-863">    <span class="n">capabilities</span><span class="p">,</span>
+</span><span id="line-864">    <span class="n">contract</span><span class="p">,</span>
+</span><span id="line-865">    <span class="n">silhouette</span><span class="p">,</span>
+</span><span id="line-866">    <span class="n">preview</span><span class="p">,</span>
+</span><span id="line-867">    <span class="n">record</span><span class="p">,</span>
+</span><span id="line-868"><span class="p">]</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -1114,7 +1113,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=5c6fbccc"></script>
+    <script src="../../../_static/documentation_options.js?v=f81738d5"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -189,9 +189,10 @@ recipe: a JSON file (`cutan.carve.sheet.load_recipe`)
 ``
 ```
 
-{“source”: {“url”: …, “license”: …} | null, “ours”: false,
+{“source”: {“url”: …, “license”: …} | null, “ours”: false, “unit”: null,
 
-> “parts”: [{“attachment”: “head”, “crop”: [x0, y0, x1, y1], “carve”: {“matte”: …, “point”: [x, y]}}]}\`\`;
+> “parts”: [{“attachment”: “head”, “crop”: [x0, y0, x1, y1], “carve”: {“matte”: …, “point”: [x, y]}, “split”: {“arm”: {“mask”: [[x, y], …], “pivot”: [x, y]}}}]}\`\`;
+> `unit` is view-box units per sheet pixel (parts keep their relative scale); `split` lifts moving parts off the carving;
 > `source` is `frame_source`’s arguments; a sheet with neither a source nor `"ours": true` is refused
 
 out_dir: parent directory; defaults to ./assets/characters

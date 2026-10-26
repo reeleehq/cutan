@@ -23,5 +23,6 @@ cutan.carve.sheet
    
       PartResult
       SheetPart
+      Recipe
       SheetReport
    

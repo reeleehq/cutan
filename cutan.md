@@ -1,4 +1,4 @@
-> built 2026-10-26 17:12 UTC from 730785a (main) · cutan 0.0.80. Details: build_info.json
+> built 2026-10-26 18:23 UTC from c3ccccb (main) · cutan 0.0.81. Details: build_info.json
 
 # index.html.md
 
@@ -733,7 +733,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'eye', 'mouth', 'rect'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'eye', 'rect', 'ellipse', 'mouth'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -3106,12 +3106,17 @@ was, so a bad recipe changes nothing. Provenance is required, as for
 `ours=True` for pixels that are the caller’s. The report carries each part’s
 quality warnings in words, for the writer to read before anything renders.
 
-Not covered: lifting several moving parts off ONE carving with pivots
-([`split_parts()`](_autosummary/cutan.carve.html.md#cutan.carve.split_parts)); a limb is a polygon-matte region of its own.
-A picture is drawn at the width of the factory drawing it replaces, so parts
-from one sheet do not keep their relative scale: size them with `carve` or
-declare a width. A part with no `point` keeps the factory’s anchor, which
-belongs to a different picture’s framing (the report says so).
+Moving parts that share one carving (a torso and its arms, a clock face and its
+hands) are one [`SheetPart`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.SheetPart) with a `split`: the region is carved once,
+[`split_parts()`](_autosummary/cutan.carve.html.md#cutan.carve.split_parts) lifts each named part at its mask with its pivot
+as the attachment’s anchor, and the part’s own attachment draws what is left.
+
+A picture is drawn at the width of the factory drawing it replaces, so parts from
+one sheet would lose their relative scale. The recipe’s `unit` (view-box units
+per sheet pixel) declares each picture’s width from its carved size instead: one
+unit for the whole sheet, so a hand stays as long next to a body as on the sheet.
+A part with no `point` keeps the factory’s anchor, which belongs to a different
+picture’s framing (the report says so).
 
 The recipe as a document is [`load_recipe()`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.load_recipe) (`schema_version` 1).
 
@@ -3124,16 +3129,17 @@ Needs OpenCV: `pip install "cutan[carve]"`.
 
 ### Functions
 
-| [`load_recipe`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.load_recipe)(doc)                             | `(parts, source, ours)` from a recipe document.                                    |
-|-----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| [`sheet_to_package`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.sheet_to_package)(sheet, parts, char_dir, \*) | Carve `parts` out of `sheet` and draw them on the factory character at `char_dir`. |
+| [`load_recipe`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.load_recipe)(doc)                             | The [`Recipe`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.Recipe) of a recipe document.   |
+|-----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| [`sheet_to_package`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.sheet_to_package)(sheet, parts, char_dir, \*) | Carve `parts` out of `sheet` and draw them on the factory character at `char_dir`.  |
 
 ### Classes
 
-| [`PartResult`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.PartResult)(attachment, warnings, replacement)   | What became of one part: the descriptor change and the quality warnings.                                      |
-|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| [`SheetPart`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.SheetPart)(attachment[, crop, carve, mode])      | One attachment and where on the sheet it is drawn.                                                            |
-| [`SheetReport`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.SheetReport)(parts)                              | The package built: one [`PartResult`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.PartResult) per part, in recipe order. |
+| [`PartResult`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.PartResult)(attachment, warnings, replacement)     | What became of one part: the descriptor change and the quality warnings.                                      |
+|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| [`SheetPart`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.SheetPart)(attachment[, crop, carve, mode, split]) | One attachment and where on the sheet it is drawn.                                                            |
+| [`Recipe`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.Recipe)(parts, source, ours, unit)                 | A recipe document read: `sheet_to_package(sheet, **recipe._asdict(), ...)`.                                   |
+| [`SheetReport`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.SheetReport)(parts)                                | The package built: one [`PartResult`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.PartResult) per part, in recipe order. |
 
 ### *class* cutan.carve.sheet.PartResult(attachment, warnings, replacement)
 
@@ -3145,7 +3151,29 @@ What became of one part: the descriptor change and the quality warnings.
 
 The recipe document’s version, written as `schema_version`.
 
-### *class* cutan.carve.sheet.SheetPart(attachment, crop=None, carve=dict(), mode='part')
+### *class* cutan.carve.sheet.Recipe(parts, source, ours, unit)
+
+Bases: [`NamedTuple`](https://docs.python.org/3/library/typing.html#typing.NamedTuple)
+
+A recipe document read: `sheet_to_package(sheet, **recipe._asdict(), ...)`.
+
+#### ours *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Alias for field number 2
+
+#### parts *: [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[SheetPart](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.SheetPart)]*
+
+Alias for field number 0
+
+#### source *: AssetSource | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Alias for field number 1
+
+#### unit *: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Alias for field number 3
+
+### *class* cutan.carve.sheet.SheetPart(attachment, crop=None, carve=dict(), mode='part', split=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -3161,6 +3189,11 @@ carve: the other arguments of the carver (`matte`, `point`, `keep`,
 
 mode: `"part"` ([`carve()`](_autosummary/cutan.carve.html.md#cutan.carve.carve)) or `"head"`
 : ([`carve_head()`](_autosummary/cutan.carve.html.md#cutan.carve.carve_head): neck cut, fixed canvas, face centre as anchor)
+
+split: `{attachment: PartSpec or its dict}`: moving parts lifted off this
+: carving ([`split_parts()`](_autosummary/cutan.carve.html.md#cutan.carve.split_parts); masks and pivots in the
+  sheet’s pixels). Each is drawn by its own attachment, anchored at its
+  pivot; `attachment` above draws the base, what is left
 
 #### *property* anchored *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
@@ -3183,15 +3216,16 @@ Every part’s warnings, each led by its attachment’s name.
 
 ### cutan.carve.sheet.load_recipe(doc)
 
-`(parts, source, ours)` from a recipe document.
+The [`Recipe`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.Recipe) of a recipe document.
 
 `{"schema_version": 1, "source": {frame_source's arguments} | null,
-"ours": false, "parts": [{"attachment", "crop", "carve", "mode"}]}`
+"ours": false, "unit": null, "parts": [{"attachment", "crop", "carve",
+"mode", "split"}]}`
 
 * **Return type:**
-  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`SheetPart`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.SheetPart)], `AssetSource` | [`None`](https://docs.python.org/3/builtins/constants.html#None), [`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
+  [`Recipe`](_autosummary/cutan.carve.sheet.html.md#cutan.carve.sheet.Recipe)
 
-### cutan.carve.sheet.sheet_to_package(sheet, parts, char_dir, , source=None, ours=False, work_dir=None)
+### cutan.carve.sheet.sheet_to_package(sheet, parts, char_dir, , source=None, ours=False, unit=None, work_dir=None)
 
 Carve `parts` out of `sheet` and draw them on the factory character at `char_dir`.
 
@@ -3202,9 +3236,13 @@ parts: the recipe, [`SheetPart`](_autosummary/cutan.carve.sheet.html.md#cutan.ca
 
 source: the sheet’s provenance (`frame_source`); required unless `ours`
 ours: the sheet’s pixels are the caller’s own art (no source is recorded)
-work_dir: where the carved pictures are first written (default: a temporary
+unit: view-box units per SHEET pixel (`write_prop`’s is per carved pixel;
 
-> folder, gone afterwards; the rig keeps its own copy beside it either way)
+> they differ under super-resolution); each picture is declared that many
+> units wide per carved pixel (default: the factory drawing’s width)
+
+work_dir: where the carved pictures are first written (default: a temporary
+: folder, gone afterwards; the rig keeps its own copy beside it either way)
 
 Raises `ValueError` before anything is written when provenance is
 missing, an attachment is unknown, ambiguous or shares its file with another
@@ -3960,9 +3998,10 @@ recipe: a JSON file (`cutan.carve.sheet.load_recipe`)
 ``
 ```
 
-{“source”: {“url”: …, “license”: …} | null, “ours”: false,
+{“source”: {“url”: …, “license”: …} | null, “ours”: false, “unit”: null,
 
-> “parts”: [{“attachment”: “head”, “crop”: [x0, y0, x1, y1], “carve”: {“matte”: …, “point”: [x, y]}}]}\`\`;
+> “parts”: [{“attachment”: “head”, “crop”: [x0, y0, x1, y1], “carve”: {“matte”: …, “point”: [x, y]}, “split”: {“arm”: {“mask”: [[x, y], …], “pivot”: [x, y]}}}]}\`\`;
+> `unit` is view-box units per sheet pixel (parts keep their relative scale); `split` lifts moving parts off the carving;
 > `source` is `frame_source`’s arguments; a sheet with neither a source nor `"ours": true` is refused
 
 out_dir: parent directory; defaults to ./assets/characters
@@ -8822,10 +8861,10 @@ so the swap channels and the rig contract are untouched.
 
 ### Functions
 
-| [`part_path`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.part_path)(char_dir, attachment)                    | The file `attachment` (`name`, or `slot/name` when several slots carry that name) is drawn by, as the descriptor records it (`parts/head.svg`).                                                                      |
-|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`replace_part_art`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.replace_part_art)(char_dir, old_rel, picture, \*)   | Draw every attachment that used `old_rel` (`parts/head.svg`) with `picture`.                                                                                                                                         |
-| [`set_part`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.set_part)(char_dir, attachment, picture, \*[, ...]) | Replace the drawing of `attachment` (see [`part_path()`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.part_path)) with `picture`; `anchor` and `source` as [`replace_part_art()`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.replace_part_art). |
+| [`part_path`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.part_path)(char_dir, attachment)                    | The file `attachment` (`name`, or `slot/name` when several slots carry that name) is drawn by, as the descriptor records it (`parts/head.svg`).                                                                               |
+|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`replace_part_art`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.replace_part_art)(char_dir, old_rel, picture, \*)   | Draw every attachment that used `old_rel` (`parts/head.svg`) with `picture`.                                                                                                                                                  |
+| [`set_part`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.set_part)(char_dir, attachment, picture, \*[, ...]) | Replace the drawing of `attachment` (see [`part_path()`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.part_path)) with `picture`; `anchor`, `source` and `width` as [`replace_part_art()`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.replace_part_art). |
 
 ### Classes
 
@@ -8861,7 +8900,7 @@ Raises [`SetPartError`](_autosummary/cutan.characters.set_part.html.md#cutan.cha
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
-### cutan.characters.set_part.replace_part_art(char_dir, old_rel, picture, , anchor=None, source=None)
+### cutan.characters.set_part.replace_part_art(char_dir, old_rel, picture, , anchor=None, source=None, width=None)
 
 Draw every attachment that used `old_rel` (`parts/head.svg`) with `picture`.
 
@@ -8869,17 +8908,19 @@ The attachment keeps the WIDTH the old drawing rasterised at (`art_size`,
 declared only when it declared none: the picture’s height follows its own
 aspect, so a differently shaped picture is not squashed). `anchor` (`(u, v)`
 in 0..1 of the picture) replaces the attachments’ anchor (default: keep it);
-`source` is pinned to them as the picture’s provenance. Raises [`SetPartError`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.SetPartError) when no attachment
+`source` is pinned to them as the picture’s provenance. `width` declares the
+attachments’ width outright (replacing any they declared: a part carved at a
+known scale keeps it); raises [`SetPartError`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.SetPartError) when no attachment
 draws `old_rel`, when `picture` is not a readable PNG/JPEG/WebP, or when
 a path leaves the character’s folder.
 
 * **Return type:**
   [`PartReplacement`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.PartReplacement)
 
-### cutan.characters.set_part.set_part(char_dir, attachment, picture, , anchor=None, source=None)
+### cutan.characters.set_part.set_part(char_dir, attachment, picture, , anchor=None, source=None, width=None)
 
 Replace the drawing of `attachment` (see [`part_path()`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.part_path)) with
-`picture`; `anchor` and `source` as [`replace_part_art()`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.replace_part_art).
+`picture`; `anchor`, `source` and `width` as [`replace_part_art()`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.replace_part_art).
 
 * **Return type:**
   [`PartReplacement`](_autosummary/cutan.characters.set_part.html.md#cutan.characters.set_part.PartReplacement)
@@ -14926,18 +14967,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-10-26 17:12 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/730785ae8237c84573dcd8ab8b60254501b9a226"><code>730785a</code></a> on branch <code>main</code>, for **cutan 0.0.80** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 18:23 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/c3ccccbff4a9d8aa377892a8647339b7d200220e"><code>c3ccccb</code></a> on branch <code>main</code>, for **cutan 0.0.81** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.80) is behind the latest release on PyPI (0.0.81): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.81) is behind the latest release on PyPI (0.0.82): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/730785ae8237c84573dcd8ab8b60254501b9a226"><code>730785ae8237c84573dcd8ab8b60254501b9a226</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/c3ccccbff4a9d8aa377892a8647339b7d200220e"><code>c3ccccbff4a9d8aa377892a8647339b7d200220e</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -14948,9 +14989,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/40365492425">40365492425</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/40376340542">40376340542</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>730785ae8237c84573dcd8ab8b60254501b9a226</code> (in the history of the built commit) |
+| Event commit | <code>c3ccccbff4a9d8aa377892a8647339b7d200220e</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -14975,13 +15016,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.81/">0.0.81</a>, newer than the documented version (0.0.80).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.82/">0.0.82</a>, newer than the documented version (0.0.81).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 730785ae8237c84573dcd8ab8b60254501b9a226
+git checkout c3ccccbff4a9d8aa377892a8647339b7d200220e
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -17,10 +17,10 @@ so the swap channels and the rig contract are untouched.
 
 ### Functions
 
-| [`part_path`](#cutan.characters.set_part.part_path)(char_dir, attachment)                    | The file `attachment` (`name`, or `slot/name` when several slots carry that name) is drawn by, as the descriptor records it (`parts/head.svg`).                                                                      |
-|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`replace_part_art`](#cutan.characters.set_part.replace_part_art)(char_dir, old_rel, picture, \*)   | Draw every attachment that used `old_rel` (`parts/head.svg`) with `picture`.                                                                                                                                         |
-| [`set_part`](#cutan.characters.set_part.set_part)(char_dir, attachment, picture, \*[, ...]) | Replace the drawing of `attachment` (see [`part_path()`](#cutan.characters.set_part.part_path)) with `picture`; `anchor` and `source` as [`replace_part_art()`](#cutan.characters.set_part.replace_part_art). |
+| [`part_path`](#cutan.characters.set_part.part_path)(char_dir, attachment)                    | The file `attachment` (`name`, or `slot/name` when several slots carry that name) is drawn by, as the descriptor records it (`parts/head.svg`).                                                                               |
+|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`replace_part_art`](#cutan.characters.set_part.replace_part_art)(char_dir, old_rel, picture, \*)   | Draw every attachment that used `old_rel` (`parts/head.svg`) with `picture`.                                                                                                                                                  |
+| [`set_part`](#cutan.characters.set_part.set_part)(char_dir, attachment, picture, \*[, ...]) | Replace the drawing of `attachment` (see [`part_path()`](#cutan.characters.set_part.part_path)) with `picture`; `anchor`, `source` and `width` as [`replace_part_art()`](#cutan.characters.set_part.replace_part_art). |
 
 ### Classes
 
@@ -56,7 +56,7 @@ Raises [`SetPartError`](#cutan.characters.set_part.SetPartError) when it names n
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
-### cutan.characters.set_part.replace_part_art(char_dir, old_rel, picture, , anchor=None, source=None)
+### cutan.characters.set_part.replace_part_art(char_dir, old_rel, picture, , anchor=None, source=None, width=None)
 
 Draw every attachment that used `old_rel` (`parts/head.svg`) with `picture`.
 
@@ -64,17 +64,19 @@ The attachment keeps the WIDTH the old drawing rasterised at (`art_size`,
 declared only when it declared none: the picture’s height follows its own
 aspect, so a differently shaped picture is not squashed). `anchor` (`(u, v)`
 in 0..1 of the picture) replaces the attachments’ anchor (default: keep it);
-`source` is pinned to them as the picture’s provenance. Raises [`SetPartError`](#cutan.characters.set_part.SetPartError) when no attachment
+`source` is pinned to them as the picture’s provenance. `width` declares the
+attachments’ width outright (replacing any they declared: a part carved at a
+known scale keeps it); raises [`SetPartError`](#cutan.characters.set_part.SetPartError) when no attachment
 draws `old_rel`, when `picture` is not a readable PNG/JPEG/WebP, or when
 a path leaves the character’s folder.
 
 * **Return type:**
   [`PartReplacement`](#cutan.characters.set_part.PartReplacement)
 
-### cutan.characters.set_part.set_part(char_dir, attachment, picture, , anchor=None, source=None)
+### cutan.characters.set_part.set_part(char_dir, attachment, picture, , anchor=None, source=None, width=None)
 
 Replace the drawing of `attachment` (see [`part_path()`](#cutan.characters.set_part.part_path)) with
-`picture`; `anchor` and `source` as [`replace_part_art()`](#cutan.characters.set_part.replace_part_art).
+`picture`; `anchor`, `source` and `width` as [`replace_part_art()`](#cutan.characters.set_part.replace_part_art).
 
 * **Return type:**
   [`PartReplacement`](#cutan.characters.set_part.PartReplacement)

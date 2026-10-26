@@ -371,9 +371,10 @@ each region is carved (<code class="docutils literal notranslate"><span class="p
 warnings of every part are printed. Needs <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">"cutan[carve]"</span></code>.</p>
 <p>name: character id (a factory character: <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span> <span class="pre">new</span></code>)
 sheet: the reference sheet picture
-recipe: a JSON file (<code class="docutils literal notranslate"><span class="pre">cutan.carve.sheet.load_recipe</span></code>) <a href="#id1"><span class="problematic" id="id2">``</span></a>{“source”: {“url”: …, “license”: …} | null, “ours”: false,</p>
+recipe: a JSON file (<code class="docutils literal notranslate"><span class="pre">cutan.carve.sheet.load_recipe</span></code>) <a href="#id1"><span class="problematic" id="id2">``</span></a>{“source”: {“url”: …, “license”: …} | null, “ours”: false, “unit”: null,</p>
 <blockquote>
-<div><p>“parts”: [{“attachment”: “head”, “crop”: [x0, y0, x1, y1], “carve”: {“matte”: …, “point”: [x, y]}}]}``;
+<div><p>“parts”: [{“attachment”: “head”, “crop”: [x0, y0, x1, y1], “carve”: {“matte”: …, “point”: [x, y]}, “split”: {“arm”: {“mask”: [[x, y], …], “pivot”: [x, y]}}}]}``;
+<code class="docutils literal notranslate"><span class="pre">unit</span></code> is view-box units per sheet pixel (parts keep their relative scale); <code class="docutils literal notranslate"><span class="pre">split</span></code> lifts moving parts off the carving;
 <code class="docutils literal notranslate"><span class="pre">source</span></code> is <code class="docutils literal notranslate"><span class="pre">frame_source</span></code>’s arguments; a sheet with neither a source nor <code class="docutils literal notranslate"><span class="pre">"ours":</span> <span class="pre">true</span></code> is refused</p>
 </div></blockquote>
 <p>out_dir: parent directory; defaults to ./assets/characters</p>
@@ -587,7 +588,7 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=5c6fbccc"></script>
+<script src="../_static/documentation_options.js?v=f81738d5"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
