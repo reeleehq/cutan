@@ -2596,9 +2596,7 @@ def _split_arm_svgs(
 
 
 @_records_what_it_drew
-def add_forearms(
-    char_dir: str | Path, *, elbow_at: float = ELBOW_AT
-) -> Path:
+def add_forearms(char_dir: str | Path, *, elbow_at: float = ELBOW_AT) -> Path:
     """Split a factory character's arms at the elbow, and give them hands (cutan#104).
 
     Each one-piece arm becomes an upper arm (``arm_l``/``arm_r``, redrawn
@@ -2651,7 +2649,9 @@ def add_forearms(
     if problem is None:
         for side in ARM_SIDES:
             arm_path = f"parts/arm_{side}.svg"
-            roles = {r: lit for lit, r in (desc.colour_roles.get(arm_path) or {}).items()}
+            roles = {
+                r: lit for lit, r in (desc.colour_roles.get(arm_path) or {}).items()
+            }
             color, hand = roles.get("clothing"), roles.get("skin")
             drawn = char_dir / arm_path
             if (
@@ -2661,7 +2661,9 @@ def add_forearms(
                 or drawn.read_text(encoding="utf-8")
                 != _arm_svg(side=side, color=color, hand=hand, body=body)
             ):
-                problem = f"{arm_path} is not the factory's drawing for its recorded knobs"
+                problem = (
+                    f"{arm_path} is not the factory's drawing for its recorded knobs"
+                )
                 break
             written[side] = {"color": color, "hand": hand}
     if problem is not None:
@@ -2712,7 +2714,9 @@ def add_forearms(
             (f"forearm_{side}", first + 1, (0.5, round(g["anchor_v"], 6))),
             (f"hand_{side}", first + 2, (0.5, 0.5)),
         ):
-            desc.slots.append(Slot(name=name, bone=name, draw_order=order, attachment=name))
+            desc.slots.append(
+                Slot(name=name, bone=name, draw_order=order, attachment=name)
+            )
             skin.slots[name] = {
                 name: Attachment(path=f"parts/{name}.svg", anchor=anchor)
             }
@@ -2756,7 +2760,9 @@ def add_limits(
     raw = json.loads(desc_path.read_text(encoding="utf-8"))
     desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
     written = apply_limits(desc.bones, table=limits_table(style), overwrite=overwrite)
-    if written:  # the label names ranges that are on the bones, never ones that were kept out
+    if (
+        written
+    ):  # the label names ranges that are on the bones, never ones that were kept out
         desc.metadata["limits"] = style or "genre"
     desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
     return desc_path

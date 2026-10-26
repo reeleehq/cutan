@@ -130,7 +130,9 @@ def _pair(value: Any, *, where: str) -> tuple[float, float]:
     try:
         lo, hi = (float(v) for v in value)
     except (TypeError, ValueError):
-        raise ValueError(f"{where}: a range is [lo, hi] degrees, got {value!r}") from None
+        raise ValueError(
+            f"{where}: a range is [lo, hi] degrees, got {value!r}"
+        ) from None
     if not -180.0 <= lo <= hi <= 180.0:
         raise ValueError(
             f"{where}: {[lo, hi]} must be [lo, hi] with -180 <= lo <= hi <= 180"
