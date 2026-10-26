@@ -226,7 +226,9 @@ def pattern_defs(pattern: ClothingPattern) -> str:
     )
 
 
-def painted_fill(shape_attrs: str, *, fill: str, pattern: Optional[ClothingPattern]) -> str:
+def painted_fill(
+    shape_attrs: str, *, fill: str, pattern: Optional[ClothingPattern]
+) -> str:
     """A clothing shape's paint, without its outline: the base ``fill``, then the
     print over it (the definition, the fill, the overlay), the one order every
     clothing drawer shares; the caller adds its own ink on top.
