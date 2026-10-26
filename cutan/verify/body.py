@@ -538,7 +538,13 @@ def _changes_own_look(events: Any, prop_id: str, *, by: float) -> bool:
         if (
             target.split("/", 1)[0] == prop_id
             and flat.start <= by + 1e-6
-            and (prop == "alpha" or (getattr(a, "kind", None) == "set" and prop not in TRANSFORM_PROPERTIES))
+            and (
+                prop == "alpha"
+                or (
+                    getattr(a, "kind", None) == "set"
+                    and prop not in TRANSFORM_PROPERTIES
+                )
+            )
         ):
             return True
     return False

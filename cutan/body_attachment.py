@@ -279,7 +279,9 @@ def view_changes(events: Any) -> dict[str, list[tuple[float, str]]]:
             and "/" not in target
         ):
             out.setdefault(target, []).append((float(flat.start), str(a.value)))
-    return {k: sorted(v, key=lambda e: e[0]) for k, v in out.items()}  # stable: ties keep authoring order
+    return {
+        k: sorted(v, key=lambda e: e[0]) for k, v in out.items()
+    }  # stable: ties keep authoring order
 
 
 def entity_pose(
