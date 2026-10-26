@@ -68,7 +68,7 @@ from cutan.carve.mattes import (
     register_matte,
 )
 from cutan.carve.parts import Part, PartSet, PartSpec, split_parts
-from cutan.carve.prop import write_prop
+from cutan.carve.prop import STATE_SET, PropState, write_prop
 from cutan.carve.provenance import frame_source, youtube_id
 from cutan.carve.superres import (
     SUPERRES,
@@ -116,6 +116,8 @@ __all__ = [
     "register_matte",
     "register_superres",
     "split_parts",
+    "PropState",
+    "STATE_SET",
     "write_prop",
     "youtube_id",
 ]
