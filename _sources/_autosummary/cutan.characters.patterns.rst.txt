@@ -1,0 +1,29 @@
+cutan.characters.patterns
+=========================
+
+.. automodule:: cutan.characters.patterns
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      PATTERN_KINDS
+      PATTERN_ID
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      parse_clothing_pattern
+      pattern_defs
+      pattern_overlay
+      painted_fill
+      distinct_pattern
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ClothingPattern
+   

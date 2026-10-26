@@ -58,6 +58,7 @@ cutan.characters
    limits
    methods
    mouth_set
+   patterns
    play
    record
    registration

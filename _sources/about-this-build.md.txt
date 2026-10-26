@@ -5,19 +5,17 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-10-26 14:37 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/d926d17d4b1cb81f796a96bff01728ee3cc28d88"><code>d926d17</code></a> on branch <code>main</code>, for **cutan 0.0.75** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 15:00 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/102869d92751ce5b71fa45bec706db7e86148d7c"><code>102869d</code></a> on branch <code>main</code>, for **cutan 0.0.76** (from <code>pyproject.toml</code>).
 
-:::{warning}
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.75) is behind the latest release on PyPI (0.0.76): `pip install cutan` gives newer code than these docs describe.
+:::{note}
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/reeleehq/cutan/commit/d926d17d4b1cb81f796a96bff01728ee3cc28d88"><code>d926d17d4b1cb81f796a96bff01728ee3cc28d88</code></a> |
+| Commit | <a href="https://github.com/reeleehq/cutan/commit/102869d92751ce5b71fa45bec706db7e86148d7c"><code>102869d92751ce5b71fa45bec706db7e86148d7c</code></a> |
 | Branch | <code>main</code> |
 | Tags at this commit | none |
 | Working tree | clean |
@@ -28,9 +26,9 @@ The documentation and the package may be misaligned:
 | | |
 |---|---|
 | Repository | <code>reeleehq/cutan</code> |
-| Run | <a href="https://github.com/reeleehq/cutan/actions/runs/40340405393">40340405393</a> |
+| Run | <a href="https://github.com/reeleehq/cutan/actions/runs/40343881320">40343881320</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>d926d17d4b1cb81f796a96bff01728ee3cc28d88</code> (in the history of the built commit) |
+| Event commit | <code>102869d92751ce5b71fa45bec706db7e86148d7c</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -55,13 +53,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.76/">0.0.76</a>, newer than the documented version (0.0.75).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.76/">0.0.76</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout d926d17d4b1cb81f796a96bff01728ee3cc28d88
+git checkout 102869d92751ce5b71fa45bec706db7e86148d7c
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

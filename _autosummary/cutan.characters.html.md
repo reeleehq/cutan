@@ -543,7 +543,7 @@ True
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
-### cutan.characters.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False)
+### cutan.characters.new_character(out_dir, , name, seed=None, style='lorelei', voice_ref=None, use_dicebear=True, acknowledge_attribution=False, overwrite=False, mouth_variants=None, gaze=True, palette=None, build='regular', head_scale=1.0, hat='none', sash=False, views=True, hair_style='peak', hair_length='short', feet_origin=False, clothing_pattern=None)
 
 Build a complete character on disk.
 
@@ -570,6 +570,14 @@ byte, which a golden test holds):
   (the default), `medium`, `long` (offline head only). Drawn in the
   `hair` role (the palette’s `hair` colours them), in every view.
 - `sash` — a diagonal band across the torso, in `accessory`.
+- `clothing_pattern` (cutan#94) — a print on the clothing: `stripes`,
+  `check` or `floral` (`none` is the flat default), with its colours
+  and scale as `floral:base=#e8735a,motif=#ffffff,leaf=#2f6b3a,scale=1`
+  (or the same as a mapping; [`cutan.characters.patterns`](cutan.characters.patterns.html.md#module-cutan.characters.patterns)). Drawn as an
+  SVG `<pattern>` over the clothing fill of the torso, in every view, and
+  the sleeves, under the outline; `base` is the clothing colour. The fill
+  keeps its `clothing` role, so a style pack still recolours it; the
+  print’s literals carry no role. On any head, DiceBear included.
 - `views` (an#197) — draw the turnaround: `back`, `side` (a profile
   facing the viewer’s right) and `three_quarter` beside the front, as a
   `view` swap set with a pose per view (`add_views()`), so
@@ -776,6 +784,7 @@ namespace as the default, so the output is a valid standalone SVG.
 | [`limits`](cutan.characters.limits.html.md#module-cutan.characters.limits)             | Hinge limits per part type: how far a cut-out figure's joints may turn (cutan#104).                   |
 | [`methods`](cutan.characters.methods.html.md#module-cutan.characters.methods)           | The cut-out genre's methods and aspects, and their compile-time resolution (ADR 0002).                |
 | [`mouth_set`](cutan.characters.mouth_set.html.md#module-cutan.characters.mouth_set)       | Generate the 9-shape default mouth set as parametric SVGs.                                            |
+| [`patterns`](cutan.characters.patterns.html.md#module-cutan.characters.patterns)         | Clothing prints for the factory's figures (cutan#94): an SVG `<pattern>` over the clothing fill.      |
 | [`play`](cutan.characters.play.html.md#module-cutan.characters.play)                 | Resolve a `play` against a character descriptor — the renderer-free half (an#7).                      |
 | [`record`](cutan.characters.record.html.md#module-cutan.characters.record)             | Record a character's preview HTML to an mp4.                                                          |
 | [`registration`](cutan.characters.registration.html.md#module-cutan.characters.registration) | The character side of the cut-out genre, as declarations: `play` and `character`.                     |

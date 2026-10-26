@@ -38,6 +38,7 @@
 - [cutan.characters.limits](cutan.characters.limits.html.md): Hinge limits per part type: how far a cut-out figure’s joints may turn (cutan#104).
 - [cutan.characters.methods](cutan.characters.methods.html.md): The cut-out genre’s methods and aspects, and their compile-time resolution (ADR 0002).
 - [cutan.characters.mouth_set](cutan.characters.mouth_set.html.md): Generate the 9-shape default mouth set as parametric SVGs.
+- [cutan.characters.patterns](cutan.characters.patterns.html.md): Clothing prints for the factory’s figures (cutan#94): an SVG &#96;&lt;pattern&gt;&#96; over the clothing fill.
 - [cutan.characters.play](cutan.characters.play.html.md): Resolve a &#96;play&#96; against a character descriptor — the renderer-free half (an#7).
 - [cutan.characters.record](cutan.characters.record.html.md): Record a character’s preview HTML to an mp4.
 - [cutan.characters.registration](cutan.characters.registration.html.md): The character side of the cut-out genre, as declarations: &#96;play&#96; and &#96;character&#96;.
