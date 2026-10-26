@@ -658,10 +658,15 @@ def _tree(char):
 
 
 def test_a_split_name_in_two_slots_is_refused_before_anything_is_written(
-    char, torso_sheet
+    char, torso_sheet, monkeypatch
 ):
     _share_a_name_across_slots(char)
     before = _tree(char)
+
+    def written(*args, **kwargs):
+        raise AssertionError("a part was written before the recipe was refused")
+
+    monkeypatch.setattr("cutan.carve.sheet.set_part", written)
     with pytest.raises(ValueError, match="several slots"):
         sheet_to_package(torso_sheet, TORSO, char, source=SOURCE, unit=0.5)
     assert _tree(char) == before
