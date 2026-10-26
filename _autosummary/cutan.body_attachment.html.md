@@ -84,6 +84,7 @@ and a close-up. [`place_body_prop()`](#cutan.body_attachment.place_body_prop) is
 |-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`bound_character`](#cutan.body_attachment.bound_character)(shot, prop_entity, ba)             | `(the character entity, its name)` the prop is bound to in `shot`: the entity's `overrides.body_of` first, else the declaration's `character`; by entity id, else by store ref when exactly one entity has it.                                                                                                                                   |
 | [`start_state`](#cutan.body_attachment.start_state)(shot)                                  | `{entity id: {property: value}}` from the `set` actions at the shot's start, on the entities' own nodes (a part's are ignored).                                                                                                                                                                                                                  |
+| [`view_changes`](#cutan.body_attachment.view_changes)(events)                               | `{entity id: [(time, view), ...]}`, in time then authoring order, for every `view` set AFTER the start on an entity's own node, over a flat timeline whose turns are expanded (`cutan.characters.play.TurnResolution.events`): a played `turn` is its `set view` at the midpoint the compiler gives it (cutan#98).                               |
 | [`entity_pose`](#cutan.body_attachment.entity_pose)(entity[, poses, sets])                 | The entity node's pose at the shot's start: the built pose when `poses` has it, else its `stage` placement, then any `set` at the start.                                                                                                                                                                                                         |
 | [`character_view`](#cutan.body_attachment.character_view)(char_entity, char_desc, sets)       | The character's view at the shot's start: a `view` set at 0, else its `rest_view`, else `front`.                                                                                                                                                                                                                                                 |
 | [`rig_point_on_stage`](#cutan.body_attachment.rig_point_on_stage)(desc, point, pose)              | Where `point` (view_box units of the rig `desc`) lands on the stage when the entity's node has `pose` (`x`, `y`, `scale_x`, `scale_y`, `rotation` in radians, as `an.motion.stage_poses()` reports it).                                                                                                                                          |
@@ -391,3 +392,24 @@ start, on the entities’ own nodes (a part’s are ignored).
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
+
+### cutan.body_attachment.view_changes(events)
+
+`{entity id: [(time, view), ...]}`, in time then authoring order, for every
+`view` set AFTER the start on an entity’s own node, over a flat timeline
+whose turns are expanded (`cutan.characters.play.TurnResolution.events`):
+a played `turn` is its `set view` at the midpoint the compiler gives it
+(cutan#98).
+
+```pycon
+>>> from an.ir.compose import flatten
+>>> from an.ir.schema import SetAction
+>>> flats = flatten(SetAction(target="p", property="view", value="side", at=2.0))
+>>> view_changes(flats)
+{'p': [(2.0, 'side')]}
+>>> view_changes(flatten(SetAction(target="p", property="view", value="front")))
+{}
+```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]]

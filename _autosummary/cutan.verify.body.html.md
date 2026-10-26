@@ -38,7 +38,10 @@ character, a socket on a nested slot or a posed bone, art the store cannot
 measure. **Motion during the shot** (cutan#98) is not measured here: when the
 character moves, the `body_placement` pass lowers the sockets to `pin`
 joints ([`cutan.compile.body.body_attachment_pins()`](cutan.compile.body.html.md#cutan.compile.body.body_attachment_pins)) and this check says,
-with the time, when the motion pulls one off its bone (`_follow_findings()`). **Not checked at all:** whether the
+with the time, when the motion pulls one off its bone (`_follow_findings()`). A **view change during the shot** (a `set view` or a played `turn`) while a
+prop drawn from the former view stays on is a warning with the time
+([`view_swap_findings()`](#cutan.verify.body.view_swap_findings)); the sockets are not followed through the new view.
+**Not checked at all:** whether the
 declaration is TRUE of the pixels: the sockets are the art author’s statement
 (a critic over probe frames is cutan#95).
 
@@ -55,11 +58,12 @@ declaration is TRUE of the pixels: the sockets are the art author’s statement
 
 ### Functions
 
-| [`body_attachment_findings`](#cutan.verify.body.body_attachment_findings)(shot, stores, \*[, ...])   | `[(severity, ir path, message)]` for every body-depicting prop in `shot`.                                                                                                                                                 |
-|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`check_body_attachments`](#cutan.verify.body.check_body_attachments)(ctx)                         | The cut-out genre's per-shot body-continuity check ([`body_attachment_findings()`](#cutan.verify.body.body_attachment_findings)).                                                                                         |
-| [`check_body_attachment_consistency`](#cutan.verify.body.check_body_attachment_consistency)(ctx)              | The cut-out genre's cross-shot body-continuity check ([`consistency_findings()`](#cutan.verify.body.consistency_findings)).                                                                                           |
-| [`consistency_findings`](#cutan.verify.body.consistency_findings)(records)                       | The same prop on the same character across shots: one finding per pair whose size relative to the character, or anchor on the body (in the character's units), differs between shots beyond the declaration's tolerances. |
+| [`body_attachment_findings`](#cutan.verify.body.body_attachment_findings)(shot, stores, \*[, ...])   | `[(severity, ir path, message)]` for every body-depicting prop in `shot`.                                                                                                                                                           |
+|------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`check_body_attachments`](#cutan.verify.body.check_body_attachments)(ctx)                         | The cut-out genre's per-shot body-continuity check ([`body_attachment_findings()`](#cutan.verify.body.body_attachment_findings)).                                                                                                   |
+| [`check_body_attachment_consistency`](#cutan.verify.body.check_body_attachment_consistency)(ctx)              | The cut-out genre's cross-shot body-continuity check ([`consistency_findings()`](#cutan.verify.body.consistency_findings)).                                                                                                     |
+| [`consistency_findings`](#cutan.verify.body.consistency_findings)(records)                       | The same prop on the same character across shots: one finding per pair whose size relative to the character, or anchor on the body (in the character's units), differs between shots beyond the declaration's tolerances.           |
+| [`view_swap_findings`](#cutan.verify.body.view_swap_findings)(shot, stores, \*[, path])        | A character that changes view after the shot's start while a prop drawn from its former view stays on (cutan#98): the art no longer shows the body from the side the camera sees it, and the sockets are declared on the rest view. |
 
 ### cutan.verify.body.BODY_ATTACHMENT_CONSISTENCY *= Constraint(name='cutout.body_attachment_consistency', check=<function check_body_attachment_consistency>, stage='finish', order=11, description='a body-attached prop keeps its size and place relative to its character across shots', term=None)*
 
@@ -116,6 +120,25 @@ tolerances.
 []
 >>> [f[0] for f in consistency_findings([r(0, 0.43, 0.0), r(3, 0.52, 0.0)])]
 ['error']
+```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
+
+### cutan.verify.body.view_swap_findings(shot, stores, , path='')
+
+A character that changes view after the shot’s start while a prop drawn
+from its former view stays on (cutan#98): the art no longer shows the body
+from the side the camera sees it, and the sockets are declared on the rest
+view. One warning per change, with the time, read off the timeline the
+compiler resolves (a played `turn` swaps at its own midpoint). A prop that
+changes its own look (alpha, a swap set) by then is the author’s answer and
+is not warned about. Never raises.
+
+```pycon
+>>> from an.ir.schema import Shot
+>>> view_swap_findings(Shot(id="s"), {})
+[]
 ```
 
 * **Return type:**

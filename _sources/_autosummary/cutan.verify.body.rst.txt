@@ -18,4 +18,5 @@ cutan.verify.body
       check_body_attachments
       check_body_attachment_consistency
       consistency_findings
+      view_swap_findings
    

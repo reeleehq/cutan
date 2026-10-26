@@ -19,6 +19,7 @@ cutan.body\_attachment
       body_attachment_of
       bound_character
       start_state
+      view_changes
       entity_pose
       character_view
       rig_point_on_stage

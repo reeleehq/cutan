@@ -2,20 +2,20 @@
 
 # About this build
 
-This documentation was built on **2026-10-26 11:47 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/443ee8e57e992f8df69ad03eb3658bcf8adf0643"><code>443ee8e</code></a> on branch <code>main</code>, for **cutan 0.0.71** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 12:28 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/5035275513fc326d04e7b1177c58c9cb48f9b7ec"><code>5035275</code></a> on branch <code>main</code>, for **cutan 0.0.73** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.71) is behind the latest release on PyPI (0.0.72): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.73) is ahead of the latest release on PyPI (0.0.72): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/443ee8e57e992f8df69ad03eb3658bcf8adf0643"><code>443ee8e57e992f8df69ad03eb3658bcf8adf0643</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/5035275513fc326d04e7b1177c58c9cb48f9b7ec"><code>5035275513fc326d04e7b1177c58c9cb48f9b7ec</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | none                                                                                                                                                  |
+| Tags at this commit | <code>0.0.73</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/cutan</code>                                                                                                        |
 
@@ -24,9 +24,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/40316867898">40316867898</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/40321985237">40321985237</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>443ee8e57e992f8df69ad03eb3658bcf8adf0643</code> (in the history of the built commit) |
+| Event commit | <code>499fecf2ddd8eecf05a9066fc4e0f69c0042690b</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -51,13 +51,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.72/">0.0.72</a>, newer than the documented version (0.0.71).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.72/">0.0.72</a>, older than the documented version (0.0.73).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 443ee8e57e992f8df69ad03eb3658bcf8adf0643
+git checkout 5035275513fc326d04e7b1177c58c9cb48f9b7ec
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
