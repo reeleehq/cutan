@@ -26,8 +26,7 @@ from typing import Iterator
 
 from an.base import swap_set_name_problem
 from an.ir.migrate import migrate
-from an.ir.validate import _asset_references
-from an.stores._common import ASSET_REF_RULE, asset_ref_problem, inside_folder
+from an.stores._common import asset_ref_problems, inside_folder
 from cutan.characters.schema import (
     EYELID_CHANNEL,
     VISEME_CHANNEL,
@@ -495,19 +494,13 @@ def _check_asset_refs(
     if descriptor is None:
         return
     doc = json.loads(descriptor.model_dump_json())
-    for what, rel in _asset_references(doc):
-        problem = asset_ref_problem(rel) or (
-            "resolves outside the folder (a link)"
-            if inside_folder(directory, rel) is None
-            else None
+    for what, message in asset_ref_problems(doc, directory):
+        report.add(
+            BLOCKING,
+            f"character.json#{what}",
+            f"{who}: {message}",
+            "Name a file inside the character's own folder.",
         )
-        if problem is not None:
-            report.add(
-                BLOCKING,
-                f"character.json#{what}",
-                f"{who}: {what} names {rel!r}, which {problem}: {ASSET_REF_RULE}",
-                "Name a file inside the character's own folder.",
-            )
 
 
 def _check_raster_colour_roles(

@@ -54,9 +54,8 @@ from collections.abc import Callable, Sequence
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-from an.ir.validate import _asset_references
 from an.stage.raster import is_svg_content, svg_problems
-from an.stores._common import inside_folder
+from an.stores._common import asset_references, inside_folder
 
 __all__ = [
     "PackCheck",
@@ -560,7 +559,7 @@ def _referenced_svgs(pack: Path) -> list[Path]:
                 continue
             if not isinstance(doc, dict):
                 continue
-            for _what, rel in _asset_references(doc):
+            for _what, rel in asset_references(doc):
                 file = inside_folder(doc_path.parent, rel)
                 if (
                     file is not None
