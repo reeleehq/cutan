@@ -664,10 +664,20 @@ def _replace_with_picture(
     the same name (``an character set-part``, cutan#92)."""
     from cutan.characters.set_part import SetPartError, replace_part_art
 
+    label = f"redrawn {name}/{rel.as_posix()}"
     try:
-        replace_part_art(char_dir, rel.with_suffix(".svg").as_posix(), picture)
+        done = replace_part_art(char_dir, rel.with_suffix(".svg").as_posix(), picture)
     except (SetPartError, OSError, ValueError) as e:
-        report.add(f"redrawn {name}/{rel.as_posix()}", False, f"  {ERROR_MARKER} {e}")
+        report.add(label, False, f"  {ERROR_MARKER} {e}")
+        return
+    if done.derived:  # the factory drew these from the part just replaced
+        report.add(
+            label,
+            True,
+            f"  {WARNING_MARKER} still the factory's drawings, derived from this part: "
+            f"{', '.join(done.derived)}; paint those too, or the character switches "
+            "styles when it blinks, turns or changes its mouth",
+        )
 
 
 def _subdirs(path: Path) -> list[Path]:
@@ -786,9 +796,22 @@ def _build_and_check(
         d
     ) in redrawn:  # redrawn parts go over the factory's own, on the factory's canvas
         for src in sorted(d.rglob("*")):
-            if src.is_file() and not src.is_symlink() and src.suffix in PACK_SUFFIXES:
+            if (
+                src.is_file()
+                and not src.is_symlink()
+                and src.suffix in PACK_SUFFIXES
+                and not (src.suffix in IMAGE_SIGNATURES and _image_problem(src))
+            ):
                 rel = src.relative_to(d)
                 problem = _redrawn_problem(src, chars / d.name / rel)
+                if problem is None and (
+                    (src.suffix == ".svg" and any(src.with_suffix(x).is_file() for x in IMAGE_SIGNATURES))
+                    or (src.suffix in IMAGE_SIGNATURES and src.with_suffix(".svg").is_file())
+                ):
+                    problem = (
+                        f"two drawings for {rel.with_suffix('').as_posix()}: keep "
+                        "the SVG or the picture, not both"
+                    )
                 if problem:
                     report.add(
                         f"redrawn {d.name}/{rel.as_posix()}",

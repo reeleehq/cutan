@@ -315,10 +315,15 @@ def set_part(name: str, attachment: str, file: str, out_dir: str = "") -> str:
     if not (char_dir / "character.json").is_file():
         return f"no character at {char_dir}"
     try:
-        _set_part(char_dir, attachment, file)
-    except (SetPartError, OSError) as e:
+        done = _set_part(char_dir, attachment, file)
+    except (SetPartError, OSError, ValueError) as e:
         return str(e)
-    return f"{attachment!r} of {name!r} is now drawn by {Path(file).name}"
+    note = (
+        f"; still the factory's drawings, derived from it: {', '.join(done.derived)}"
+        if done.derived
+        else ""
+    )
+    return f"{attachment!r} of {name!r} is now drawn by {Path(file).name}{note}"
 
 
 def add_views(name: str, out_dir: str = "") -> str:

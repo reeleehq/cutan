@@ -18,12 +18,13 @@ from __future__ import annotations
 
 import json
 import shutil
-import xml.etree.ElementTree as ET
+from dataclasses import dataclass, field
 from pathlib import Path
 
+from an.stage.raster import art_size
 from an.stores._common import ASSET_REF_RULE, inside_folder
 
-__all__ = ["SetPartError", "replace_part_art", "set_part"]
+__all__ = ["PartReplacement", "SetPartError", "replace_part_art", "set_part"]
 
 
 class SetPartError(ValueError):
@@ -38,22 +39,26 @@ def _slot_attachments(raw: dict):
                 yield skin, slot, name, att
 
 
-def _root_size(svg: Path) -> tuple[float, float] | None:
-    """The drawing's declared ``width`` and ``height``, else its viewBox's."""
-    try:
-        root = ET.parse(svg).getroot()
-        box = (root.get("viewBox") or "").replace(",", " ").split()
-        w = float(root.get("width") or (box[2] if len(box) == 4 else ""))
-        h = float(root.get("height") or (box[3] if len(box) == 4 else ""))
-    except (OSError, ET.ParseError, ValueError):
-        return None
-    return (w, h) if w > 0 and h > 0 else None
+@dataclass(frozen=True)
+class PartReplacement:
+    """What :func:`replace_part_art` did: the descriptor written, and the factory
+    drawings DERIVED from the old part (``<stem>_*``: its views, lid states,
+    mouth variants) that are still referenced and still the factory's, which a
+    painted part would not match."""
+
+    descriptor: Path
+    new_path: str
+    derived: list[str] = field(default_factory=list)
 
 
-def replace_part_art(char_dir: str | Path, old_rel: str, picture: str | Path) -> Path:
+def replace_part_art(
+    char_dir: str | Path, old_rel: str, picture: str | Path
+) -> PartReplacement:
     """Draw every attachment that used ``old_rel`` (``parts/head.svg``) with ``picture``.
 
-    Returns the descriptor path. Raises :class:`SetPartError` when no attachment
+    The attachment keeps the WIDTH the old drawing rasterised at (``art_size``,
+    declared only when it declared none: the picture's height follows its own
+    aspect, so a differently shaped picture is not squashed). Raises :class:`SetPartError` when no attachment
     draws ``old_rel``, when ``picture`` is not a readable PNG/JPEG/WebP, or when
     a path leaves the character's folder.
     """
@@ -80,23 +85,45 @@ def replace_part_art(char_dir: str | Path, old_rel: str, picture: str | Path) ->
     old_file, new_file = inside_folder(char_dir, old_rel), inside_folder(char_dir, new_rel)
     if old_file is None or new_file is None:
         raise SetPartError(f"{old_rel!r} leaves the character's folder: {ASSET_REF_RULE}")
-    size = _root_size(old_file) if old_file.suffix.lower() == ".svg" else None
-    new_file.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(picture, new_file)
-    if old_file != new_file:
-        old_file.unlink(missing_ok=True)
+    width = None
+    if old_file.is_file():
+        try:
+            width = float(art_size(old_file)[0])
+        except (OSError, ValueError):
+            width = None
+    # Everything that can fail runs before anything is written.
     for att in users:
         att["path"] = new_rel
         att.pop("source", None)  # pinned to the factory's drawing
-        if size and not (att.get("width") and att.get("height")):
-            att["width"], att["height"] = size
+        if width and not att.get("width"):
+            att["width"] = width
     (raw.get("colour_roles") or {}).pop(old_rel, None)
+    replaced = (raw.setdefault("metadata", {}) or {}).setdefault("replaced_parts", [])
+    if new_rel not in replaced:
+        replaced.append(new_rel)
     desc = CharacterDescriptor.model_validate(migrate(raw, kind="CharacterDescriptor"))
+    new_file.parent.mkdir(parents=True, exist_ok=True)
+    if picture.resolve() != new_file.resolve():
+        shutil.copyfile(picture, new_file)
     desc_path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
-    return desc_path
+    if old_file != new_file:
+        old_file.unlink(missing_ok=True)
+    stem = Path(old_rel).stem
+    derived = sorted(
+        {
+            a["path"]
+            for *_, a in _slot_attachments(raw)
+            if Path(a.get("path", "")).parent == Path(old_rel).parent
+            and Path(a["path"]).stem.startswith(f"{stem}_")
+            and a["path"] != new_rel
+        }
+    )
+    return PartReplacement(desc_path, new_rel, derived)
 
 
-def set_part(char_dir: str | Path, attachment: str, picture: str | Path) -> Path:
+def set_part(
+    char_dir: str | Path, attachment: str, picture: str | Path
+) -> PartReplacement:
     """Replace the drawing of ``attachment`` (``name``, or ``slot/name`` when
     several slots carry that name) with ``picture``; see :func:`replace_part_art`."""
     raw = json.loads((Path(char_dir) / "character.json").read_text(encoding="utf-8"))

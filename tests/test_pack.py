@@ -225,7 +225,18 @@ def test_a_pack_with_a_painted_head_passes_and_the_head_is_the_picture(tmp_path,
     _png(head, (200, 200))
     report = check_pack(pack)
     assert report.ok, report.format()
-    assert not [c for c in report.checks if c.label.startswith("redrawn")]
+    # the overlay ran (a no-op would be silent): it says what stays the factory's
+    assert any("redrawn mara/parts/head.png" in w and "head_side" in w for w in report.warnings), report.warnings
+
+
+def test_a_picture_and_an_svg_for_the_same_part_are_refused_by_name(tmp_path, monkeypatch):
+    _with_this_checkout(monkeypatch)
+    pack = _example_copy(tmp_path)
+    parts = pack / "assets" / "characters" / "mara" / "parts"
+    _png(parts / "head.png", (200, 200))
+    (parts / "head.svg").write_text("<svg xmlns='http://www.w3.org/2000/svg'/>")
+    report = check_pack(pack)
+    assert not report.ok and any("two drawings for parts/head" in e for e in report.errors), report.errors
 
 
 def test_a_picture_s_declared_pixels_are_capped(tmp_path):
