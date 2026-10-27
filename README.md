@@ -58,7 +58,7 @@ an validate <project> --strict-assets && an render <project>          # from the
 
 ## Names that never change
 
-Moving the code renamed nothing that is stored. Scenes keep `renderer: cutout`, the genre keeps its slug `cutout_animation`, character descriptors keep their document kind and version, and asset ids keep their `character.` prefix. These names are in `cutan/__init__.py`. The old `an.characters`, `an.expression`, `an.impacts`, `an.audio.offline_lipsync`-style import paths still work in `an`, with a `MovedModuleWarning`.
+Moving the code renamed nothing that is stored. Scenes keep `renderer: cutout`, the genre keeps its slug `cutout_animation`, character descriptors keep their document kind and version, and asset ids keep their `character.` prefix. These names are in `cutan/__init__.py`. The old `an.characters`, `an.expression`, `an.impacts`, `an.audio.offline_lipsync`-style import paths worked in `an` with a `MovedModuleWarning` and are removed there (an#321): import from `cutan`.
 
 ## Where data lives
 
