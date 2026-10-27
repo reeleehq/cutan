@@ -16,7 +16,7 @@ import subprocess
 
 import pytest
 
-from an.audio import rhubarb_lipsync as rl
+from cutan.audio import rhubarb_lipsync as rl
 from an.audio.providers import make_lipsync
 from an.audio.tts import AudioClip
 from tests._fake_subprocess import patch_subprocess_run
@@ -173,7 +173,7 @@ def test_whisper_does_not_select_anything_by_language(monkeypatch):
     weight selection without the allowlist the `an-dev-lipsync` skill demands."""
     import inspect
 
-    from an.audio import whisper_lipsync as wl
+    from cutan.audio import whisper_lipsync as wl
     from an.audio.providers import make_lipsync
 
     assert "language" not in inspect.signature(wl.WhisperLipSync.__init__).parameters
