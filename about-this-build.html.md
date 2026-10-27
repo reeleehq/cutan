@@ -2,16 +2,18 @@
 
 # About this build
 
-This documentation was built on **2026-10-27 03:36 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/82dad646c7bfdc7f92535ad499cea627da203618"><code>82dad64</code></a> on branch <code>main</code>, for **cutan 0.0.85** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-27 03:53 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/8d3deda5ddfbc2494e3de604a2ccf8909599734c"><code>8d3deda</code></a> on branch <code>main</code>, for **cutan 0.0.86** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.86) is behind the latest release on PyPI (0.0.87): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/82dad646c7bfdc7f92535ad499cea627da203618"><code>82dad646c7bfdc7f92535ad499cea627da203618</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/8d3deda5ddfbc2494e3de604a2ccf8909599734c"><code>8d3deda5ddfbc2494e3de604a2ccf8909599734c</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -22,9 +24,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/40444534980">40444534980</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/40446231751">40446231751</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>82dad646c7bfdc7f92535ad499cea627da203618</code> (in the history of the built commit) |
+| Event commit | <code>8d3deda5ddfbc2494e3de604a2ccf8909599734c</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -49,13 +51,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.85/">0.0.85</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.87/">0.0.87</a>, newer than the documented version (0.0.86).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 82dad646c7bfdc7f92535ad499cea627da203618
+git checkout 8d3deda5ddfbc2494e3de604a2ccf8909599734c
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
