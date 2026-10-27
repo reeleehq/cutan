@@ -155,7 +155,7 @@ def test_whisper_puts_its_words_on_the_track(monkeypatch):
     faster-whisper (the real test module skips without a cached model)."""
     from types import SimpleNamespace as NS
 
-    from an.audio import whisper_lipsync as wl
+    from cutan.audio import whisper_lipsync as wl
 
     class _Model:
         def transcribe(self, path, **kw):
