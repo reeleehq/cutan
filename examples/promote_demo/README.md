@@ -55,7 +55,7 @@ The script:
 ## The promote flow in one breath
 
 ```python
-from an.characters import promote
+from cutan.characters import promote
 
 promote(
     project_dir="examples/promote_demo",

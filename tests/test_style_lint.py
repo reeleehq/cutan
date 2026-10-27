@@ -18,9 +18,10 @@ import pytest
 
 from an.adapters._base import RenderResult
 from an.ir.schema import SceneIR, Shot
-from an.verify import StyleLintVerifier, Verifier
+from an.verify import Verifier
 from cutan.verify.style import (
     METRICS,
+    StyleLintVerifier,
     check_targets,
     measure_style,
     style_lint,
