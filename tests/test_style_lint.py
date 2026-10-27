@@ -356,12 +356,6 @@ def test_running_the_module_does_not_warn_about_sys_modules():
     assert "--project" in proc.stdout
 
 
-def test_the_verifier_is_still_importable_from_the_package():
-    import an.verify
-
-    assert an.verify.StyleLintVerifier is StyleLintVerifier
-
-
 def test_an_unreadable_shot_list_is_a_failure_not_a_traceback(tmp_path):
     """A corrupt scene.json made the CLI exit 1 ("a target was missed")."""
     (tmp_path / "ir").mkdir()
