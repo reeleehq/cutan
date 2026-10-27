@@ -20,6 +20,7 @@ Use this only when neither the reelee connector's `reelee_check_production_pack`
 - [ ] It draws something visible inside its viewBox.
 
 **scene.md**
+- [ ] In a travelling view, every member, plate, stream and viewpoint is in a named frame (`world`, `vehicle` or `far`), each plane of the environment is in `plates`, and no `far` plate shows anything nearer than the horizon (near things are streams or members).
 - [ ] One `yaml meta` block; each shot is `## Shot <id> (cutout)` with a `yaml shot` block holding a `duration`; ids unique.
 - [ ] Each shot's environment is the first entity; every entity has `kind`, `id`, `store`, `ref`; characters, drawn props and `world` text or paths have a `stage: {at: [x, y], scale: s}` (an `overlay` title needs none).
 - [ ] Every action's `target` is an entity id of THAT shot, or a part path from `references/characters.md` (`mara/head`, `teo/arm_r`, never `mara/mouth`), or `<environment id>/<plane name>`, or `<text id>/word_N` with N below the number of words.
