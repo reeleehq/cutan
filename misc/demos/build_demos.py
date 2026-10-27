@@ -3045,7 +3045,7 @@ DEMOS: tuple[Demo, ...] = (
             "`an render` — the passes are the product; the left pane flips "
             "`an.adapters.cutout.compile.COARTICULATION_ENABLED` for one render, "
             "the way the bench's levers rebind a module global. The rules live in "
-            "`an/adapters/cutout/coarticulate.py` (doctested)."
+            "`cutan/compile/coarticulate.py` (doctested)."
         ),
         build=_build_lipsync_coarticulation,
     ),
