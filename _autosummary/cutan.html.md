@@ -86,7 +86,7 @@ cutan#91). Pushed with the project, so it is a key of the store too.
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
-### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 11*
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 13*
 
 The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
 it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
@@ -107,6 +107,8 @@ to exit non-zero on a failure.
 Level 10: `an.stores._common.asset_references` and `asset_ref_problems` (an#552).
 Level 11: the first level whose every release ships `an.stage.solve.solve_report`
 (an#570 merged after level 10 was cut), which the body-continuity check reads.
+Level 13: the names cutan’s checks and pack read, public (an#710): `an.ir.validate.rig_scope`,
+`an.semantic.matcher.lookup_method` and `as_choice`, `an.audio.loudness.voice_loudness_offset`.
 
 ### cutan.require_an()
 
@@ -152,6 +154,7 @@ The names of the style specs that ship with `cutan`, sorted.
 | [`marionette`](cutan.marionette.html.md#module-cutan.marionette)           | The marionette style's joints: a control bar, strings, hips (cutan#104).                                   |
 | [`motion`](cutan.motion.html.md#module-cutan.motion)                   | The cut-out genre's motion presets: moves that name a rig's parts or swap its views.                       |
 | [`pack`](cutan.pack.html.md#module-cutan.pack)                       | Check a cut-out production pack with cutan's own validators (cutan#87).                                    |
+| [`pack_cli`](cutan.pack_cli.html.md#module-cutan.pack_cli)               | `an pack ...` — a production pack into a project (cutan#87).                                               |
 | [`projects_cli`](cutan.projects_cli.html.md#module-cutan.projects_cli)       | `an projects ...` — a store-backed project from the shell (cutan#91).                                      |
 | [`projects_store`](cutan.projects_store.html.md#module-cutan.projects_store)   | Where a cutan project's files are read from and written to: a disk folder or S3, by configuration.         |
 | [`runtime`](cutan.runtime.html.md#module-cutan.runtime)                 | JavaScript the cut-out genre adds to the stage runtime (`visuals.js`: the mouth and eye).                  |

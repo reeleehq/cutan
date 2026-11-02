@@ -3,7 +3,7 @@
 Check a cut-out production pack with cutan’s own validators (cutan#87).
 
 A production pack (the `cutan-production-pack` skill, cutan#86) is a folder
-shaped like an `an` project: `scene.md`, `cast.sh` (one `an character
+shaped like an `an` project: `scene.md`, the cast (`cast.yaml`, [`cutan.characters.cast`](cutan.characters.cast.html.md#module-cutan.characters.cast); or an older pack’s `cast.sh`, one `an character
 ...` command per line), `assets/` (environments, props, voices, styles,
 optional redrawn character parts) and `PRODUCTION.md`. [`check_pack()`](#cutan.pack.check_pack)
 builds a throwaway project from it and runs the real checks:
@@ -13,7 +13,7 @@ builds a throwaway project from it and runs the real checks:
    parts, reference sheets) is one, and the keys of every voice document;
 2. `an init` a scratch project and copy the pack over it, except redrawn
    character parts (a character folder with no `character.json`);
-3. run each `cast.sh` line, refusing anything but the factory commands and
+3. run each step of the cast, refusing anything but the factory commands and
    options the skill documents (no shell: the line is split and run directly);
 4. copy the redrawn parts over the factory’s (same file names, same root tag),
    check the voice documents with the engine’s own checks, then `an character
@@ -25,7 +25,7 @@ A step fails on an error in its output, not only on its exit status (the
 one [`PackCheck`](#cutan.pack.PackCheck) per step, each with its errors and warnings, so a caller
 (the skill’s `validate_pack.py`, the reelee connector’s `check this pack`
 tool) can print it or return it as data ([`PackReport.to_dict()`](#cutan.pack.PackReport.to_dict)). A pack
-that cannot be checked at all (no `scene.md`, a refused `cast.sh` line) is
+that cannot be checked at all (no `scene.md`, a refused cast step) is
 a report with one failed `pack` check, never an exception. Its `notes` say
 what is neither an error nor a warning: a pack whose drawings are all
 hand-written SVG gets one, since such art looks computer-made
@@ -44,19 +44,20 @@ Nothing is rendered: no browser, no network (`an character new` must say
 
 ### Functions
 
-| [`cast_commands`](#cutan.pack.cast_commands)(pack)                      | The `an character` commands of `cast.sh`; raise [`PackError`](#cutan.pack.PackError) on any other line.                                                                                                             |
-|-------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`check_pack`](#cutan.pack.check_pack)(pack_dir, \*[, workdir, ...]) | Check the production pack at `pack_dir`; return a [`PackReport`](#cutan.pack.PackReport).                                                                                                                            |
-| [`lint_svg`](#cutan.pack.lint_svg)(path, \*, exact_size)           | What is wrong with one SVG drawing (empty when nothing is).                                                                                                                                                                               |
-| [`main`](#cutan.pack.main)([argv])                             | `python -m cutan.pack <pack> [--keep] [--json]`: check a pack; exit 1 on a failure.                                                                                                                                                       |
-| [`pack_art_guidance`](#cutan.pack.pack_art_guidance)(pack_dir)              | What art to ask the writer for ([`cutan.art_brief.art_guidance()`](cutan.art_brief.html.md#cutan.art_brief.art_guidance)), in the look of the pack's named style if it has one, when every drawing is SVG; else None. |
-| [`svg_only_art`](#cutan.pack.svg_only_art)(pack_dir)                   | How many drawings the pack has when every one is SVG (0 when any is a picture, or there are none): hand-written SVG looks computer-made.                                                                                                  |
+| [`cast_commands`](#cutan.pack.cast_commands)(pack)                       | The `an character` commands of the pack's cast: `cast.yaml` (data, read by [`cutan.characters.cast.cast_steps()`](cutan.characters.cast.html.md#cutan.characters.cast.cast_steps)) or `cast.sh`; raise [`PackError`](#cutan.pack.PackError) on anything the allow-list refuses, or on both files.   |
+|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`check_pack`](#cutan.pack.check_pack)(pack_dir, \*[, workdir, ...])  | Check the production pack at `pack_dir`; return a [`PackReport`](#cutan.pack.PackReport).                                                                                                                                                                                                                          |
+| [`import_pack`](#cutan.pack.import_pack)(pack_dir[, project_dir, ...]) | Turn a production pack into a project: [`check_pack()`](#cutan.pack.check_pack)'s steps on a real project at `project_dir` (default: `<pack name>-project` in the current folder), which is kept and named in the report's `project`.                                                                              |
+| [`lint_svg`](#cutan.pack.lint_svg)(path, \*, exact_size)            | What is wrong with one SVG drawing (empty when nothing is).                                                                                                                                                                                                                                                                             |
+| [`main`](#cutan.pack.main)([argv])                              | `python -m cutan.pack <pack> [--keep] [--json]`: check a pack; exit 1 on a failure.                                                                                                                                                                                                                                                     |
+| [`pack_art_guidance`](#cutan.pack.pack_art_guidance)(pack_dir)               | What art to ask the writer for ([`cutan.art_brief.art_guidance()`](cutan.art_brief.html.md#cutan.art_brief.art_guidance)), in the look of the pack's named style if it has one, when every drawing is SVG; else None.                                                                                               |
+| [`svg_only_art`](#cutan.pack.svg_only_art)(pack_dir)                    | How many drawings the pack has when every one is SVG (0 when any is a picture, or there are none): hand-written SVG looks computer-made.                                                                                                                                                                                                |
 
 ### Classes
 
-| [`PackCheck`](#cutan.pack.PackCheck)(label, ok[, output])   | One step of a pack check: its label, its verdict and what it printed.   |
-|-----------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| [`PackReport`](#cutan.pack.PackReport)([checks, notes])      | Every step of a pack check, in order.                                   |
+| [`PackCheck`](#cutan.pack.PackCheck)(label, ok[, output])       | One step of a pack check: its label, its verdict and what it printed.   |
+|---------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`PackReport`](#cutan.pack.PackReport)([checks, project, notes]) | Every step of a pack check, in order.                                   |
 
 ### Exceptions
 
@@ -90,7 +91,7 @@ Bases: [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exceptio
 
 A pack that cannot be checked at all (a missing file, a refused line).
 
-### *class* cutan.pack.PackReport(checks=list(), notes=list())
+### *class* cutan.pack.PackReport(checks=list(), project=None, notes=list())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -112,6 +113,10 @@ The full report as text: each step’s verdict and output, then the summary.
 Information for the writer that is neither an error nor a warning (it
 never fails a check): e.g. that every drawing is hand-written SVG.
 
+#### project *: [Path](https://docs.python.org/3/library/pathlib.html#pathlib.Path) | [None](https://docs.python.org/3/builtins/constants.html#None)* *= None*
+
+The project an import made ([`import_pack()`](#cutan.pack.import_pack)); `None` for a check.
+
 #### summary()
 
 The one line a writer quotes in `PRODUCTION.md`.
@@ -132,10 +137,12 @@ The report as JSON-ready data (the output of each step on request).
 
 ### cutan.pack.cast_commands(pack)
 
-The `an character` commands of `cast.sh`; raise [`PackError`](#cutan.pack.PackError) on any other line.
+The `an character` commands of the pack’s cast: `cast.yaml` (data, read
+by [`cutan.characters.cast.cast_steps()`](cutan.characters.cast.html.md#cutan.characters.cast.cast_steps)) or `cast.sh`; raise
+[`PackError`](#cutan.pack.PackError) on anything the allow-list refuses, or on both files.
 
-Blank lines and `#` comments are skipped; a trailing backslash continues
-a line.
+In `cast.sh`, blank lines and `#` comments are skipped; a trailing
+backslash continues a line.
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
@@ -144,7 +151,7 @@ a line.
 
 Check the production pack at `pack_dir`; return a [`PackReport`](#cutan.pack.PackReport).
 
-pack_dir: the pack folder (`scene.md`, `cast.sh`, `assets/`, `PRODUCTION.md`)
+pack_dir: the pack folder (`scene.md`, `cast.yaml` or `cast.sh`, `assets/`, `PRODUCTION.md`)
 workdir: where the scratch project is built (default: a temporary folder,
 
 > deleted afterwards; given, it is kept, and the project is `<workdir>/project`)
@@ -173,6 +180,26 @@ report names no server path (the scratch project is `<project>`).
 
 A pack that cannot be checked at all gives a report with one failed
 `pack` check; nothing here raises on a bad pack.
+
+* **Return type:**
+  [`PackReport`](#cutan.pack.PackReport)
+
+### cutan.pack.import_pack(pack_dir, project_dir=None, , dry_run=False, an_command=('/opt/hostedtoolcache/Python/3.12.15/x64/bin/python', '-P', '-m', 'an'), timeout=300.0, deadline=900.0)
+
+Turn a production pack into a project: [`check_pack()`](#cutan.pack.check_pack)’s steps on a
+real project at `project_dir` (default: `<pack name>-project` in the
+current folder), which is kept and named in the report’s `project`.
+
+`dry_run`: build a scratch project instead and delete it (that is
+[`check_pack()`](#cutan.pack.check_pack); `project_dir` is not used). The project folder must
+not exist yet, nor be inside the pack: an import never writes over a
+project. A failed check leaves the project as it got, for the report’s
+errors to be fixed in place.
+
+```pycon
+>>> import_pack("/no/such/pack", "/tmp/never-made").errors
+['pack: pack has no scene.md: is it a production pack?']
+```
 
 * **Return type:**
   [`PackReport`](#cutan.pack.PackReport)

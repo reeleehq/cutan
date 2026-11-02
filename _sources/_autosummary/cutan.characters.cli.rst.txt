@@ -20,6 +20,7 @@ cutan.characters.cli
       add_limits
       add_views
       capabilities
+      cast
       contract
       feet_origin
       from_sheet

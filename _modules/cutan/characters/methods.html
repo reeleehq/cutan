@@ -130,6 +130,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.marionette.html">cutan.marionette</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.motion.html">cutan.motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.pack.html">cutan.pack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.pack_cli.html">cutan.pack_cli</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.projects_cli.html">cutan.projects_cli</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.projects_store.html">cutan.projects_store</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/cutan.runtime.html">cutan.runtime</a></li>
@@ -1010,13 +1011,13 @@
 </span><span id="line-800"><span class="sd">    """</span>
 </span><span id="line-801">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">GAITS</span>
 </span><span id="line-802">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">Choice</span>
-</span><span id="line-803">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic.matcher</span><span class="w"> </span><span class="kn">import</span> <span class="n">_as_choice</span><span class="p">,</span> <span class="n">_method</span>
+</span><span id="line-803">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic.matcher</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_choice</span><span class="p">,</span> <span class="n">lookup_method</span>
 </span><span id="line-804">
 </span><span id="line-805">    <span class="n">gait</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"gait"</span><span class="p">)</span>
 </span><span id="line-806">    <span class="k">if</span> <span class="n">gait</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">gait</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">gait</span> <span class="ow">in</span> <span class="n">GAITS</span><span class="p">):</span>
 </span><span id="line-807">        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-</span><span id="line-808">    <span class="n">choice</span> <span class="o">=</span> <span class="n">_as_choice</span><span class="p">(</span><span class="n">gait</span><span class="p">,</span> <span class="n">LOCOMOTION</span><span class="p">)</span>
-</span><span id="line-809">    <span class="n">method</span> <span class="o">=</span> <span class="n">_method</span><span class="p">(</span><span class="n">choice</span><span class="p">,</span> <span class="n">LOCOMOTION</span><span class="p">)</span>
+</span><span id="line-808">    <span class="n">choice</span> <span class="o">=</span> <span class="n">as_choice</span><span class="p">(</span><span class="n">gait</span><span class="p">,</span> <span class="n">LOCOMOTION</span><span class="p">)</span>
+</span><span id="line-809">    <span class="n">method</span> <span class="o">=</span> <span class="n">lookup_method</span><span class="p">(</span><span class="n">choice</span><span class="p">,</span> <span class="n">LOCOMOTION</span><span class="p">)</span>
 </span><span id="line-810">    <span class="n">rest</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">"gait"</span><span class="p">}</span>
 </span><span id="line-811">    <span class="n">extra</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">choice</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">choice</span><span class="p">,</span> <span class="n">Choice</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
 </span><span id="line-812">    <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">extra</span><span class="p">,</span> <span class="o">**</span><span class="n">rest</span><span class="p">,</span> <span class="s2">"gait"</span><span class="p">:</span> <span class="n">method</span><span class="o">.</span><span class="n">term</span><span class="p">}</span></div>
@@ -1037,12 +1038,12 @@
 </span><span id="line-824"><span class="sd">    True</span>
 </span><span id="line-825"><span class="sd">    """</span>
 </span><span id="line-826">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">VocabularyError</span>
-</span><span id="line-827">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic.matcher</span><span class="w"> </span><span class="kn">import</span> <span class="n">_as_choice</span><span class="p">,</span> <span class="n">_method</span>
+</span><span id="line-827">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic.matcher</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_choice</span><span class="p">,</span> <span class="n">lookup_method</span>
 </span><span id="line-828">
 </span><span id="line-829">    <span class="k">if</span> <span class="n">declared</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="line-830">        <span class="k">return</span> <span class="p">[]</span>
 </span><span id="line-831">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-832">        <span class="n">_method</span><span class="p">(</span><span class="n">_as_choice</span><span class="p">(</span><span class="n">declared</span><span class="p">,</span> <span class="n">SPEECH</span><span class="p">),</span> <span class="n">SPEECH</span><span class="p">)</span>
+</span><span id="line-832">        <span class="n">lookup_method</span><span class="p">(</span><span class="n">as_choice</span><span class="p">(</span><span class="n">declared</span><span class="p">,</span> <span class="n">SPEECH</span><span class="p">),</span> <span class="n">SPEECH</span><span class="p">)</span>
 </span><span id="line-833">    <span class="k">except</span> <span class="n">VocabularyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 </span><span id="line-834">        <span class="n">name</span> <span class="o">=</span> <span class="n">declared</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"method"</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">declared</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="k">else</span> <span class="n">declared</span>
 </span><span id="line-835">        <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"speech </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> cannot be honoured: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
@@ -1332,7 +1333,7 @@
 </span><span id="line-1095">    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
 </span><span id="line-1096">
 </span><span id="line-1097">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten</span>
-</span><span id="line-1098">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">_rig_scope</span>
+</span><span id="line-1098">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">rig_scope</span>
 </span><span id="line-1099">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.semantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">VocabularyError</span>
 </span><span id="line-1100">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stores._common</span><span class="w"> </span><span class="kn">import</span> <span class="n">art_exists_for</span>
 </span><span id="line-1101">
@@ -1341,7 +1342,7 @@
 </span><span id="line-1104">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.styles.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">policy_in_force</span>
 </span><span id="line-1105">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_TURN_SET</span>
 </span><span id="line-1106">
-</span><span id="line-1107">    <span class="n">rigs</span><span class="p">,</span> <span class="n">unchecked</span> <span class="o">=</span> <span class="n">_rig_scope</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">stores</span><span class="p">)</span>
+</span><span id="line-1107">    <span class="n">rigs</span><span class="p">,</span> <span class="n">unchecked</span> <span class="o">=</span> <span class="n">rig_scope</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">stores</span><span class="p">)</span>
 </span><span id="line-1108">    <span class="n">resolved</span> <span class="o">=</span> <span class="n">_turns_of</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">shot</span><span class="p">)</span>
 </span><span id="line-1109">    <span class="k">if</span> <span class="n">resolved</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="line-1110">        <span class="n">resolution</span><span class="p">,</span> <span class="n">origin</span> <span class="o">=</span> <span class="n">resolved</span>
@@ -1631,7 +1632,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=ab2062fb"></script>
+    <script src="../../../_static/documentation_options.js?v=0f58e6e2"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

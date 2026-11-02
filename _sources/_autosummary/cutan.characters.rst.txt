@@ -45,6 +45,7 @@ cutan.characters
    :recursive:
 
    brows
+   cast
    checks
    cli
    colour_roles

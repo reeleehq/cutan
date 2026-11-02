@@ -48,6 +48,7 @@
    motion
    nw
    pack
+   pack_cli
    projects_cli
    projects_store
    runtime

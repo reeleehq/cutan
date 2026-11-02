@@ -33,6 +33,7 @@ Subcommands (used as `an character <verb> ...`):
 | [`add_limits`](#cutan.characters.cli.add_limits)(name[, out_dir, style, overwrite])     | Give `name` hinge limits on its bones, by part type (cutan#104): the neck, the shoulders (and the elbows and wrists of a split arm) turn only through a range, which bounds the solver wherever a shot pins or pulls a part.                                                              |
 | [`add_views`](#cutan.characters.cli.add_views)(name[, out_dir])                        | Give `name` its turnaround (an#197): back, side and three-quarter head and torso art, a `view` swap set, and a pose per view — so `play: turn` and `set <name> view <key>` turn it.                                                                                                       |
 | [`capabilities`](#cutan.characters.cli.capabilities)(name[, out_dir, as_json, style])     | What a character affords, and per aspect which methods apply and what the rest lack.                                                                                                                                                                                                      |
+| [`cast`](#cutan.characters.cli.cast)(file[, out_dir])                             | Make every character of a cast file (cast.yaml): one entry per character, the options of `an character new` plus its follow-up steps.                                                                                                                                                     |
 | [`contract`](#cutan.characters.cli.contract)()                                        | Print the art-package contract an illustrator must satisfy.                                                                                                                                                                                                                               |
 | [`feet_origin`](#cutan.characters.cli.feet_origin)(name[, out_dir, undo])                | Make an existing character stand on its feet (an#285): its stage point (`stage.at`) becomes where its feet are, as for a character `an character new` makes now.                                                                                                                          |
 | [`from_sheet`](#cutan.characters.cli.from_sheet)(name, sheet, recipe[, out_dir])        | Draw attachments of `name` from regions of a reference sheet (cutan#128): each region is carved (`cutan.carve`) and set like `set-part`; the quality warnings of every part are printed.                                                                                                  |
@@ -145,6 +146,16 @@ name: character id
 out_dir: parent directory; defaults to ./assets/characters
 as_json: print the answer as JSON (what the MCP surface returns)
 style: a style spec’s name (`python -m cutan.styles` lists them) or path
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.cast(file, out_dir='')
+
+Make every character of a cast file (cast.yaml): one entry per character, the options of `an character new` plus its follow-up steps.
+
+file: the cast file, e.g. {teo: {build: squat, hat: cap, palette: {skin: “#f1c9a5”}, mouth_variants: [happy, sad], half_lid: 0.5}}
+out_dir: parent directory; defaults to ./assets/characters
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

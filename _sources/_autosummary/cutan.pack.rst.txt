@@ -10,6 +10,7 @@ cutan.pack
    
       cast_commands
       check_pack
+      import_pack
       lint_svg
       main
       pack_art_guidance

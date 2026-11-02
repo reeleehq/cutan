@@ -29,6 +29,7 @@
 - [cutan.carve.superres](cutan.carve.superres.html.md): Super-resolution strategies: more pixels for a part carved from a low-resolution frame (cutan#110).
 - [cutan.characters](cutan.characters.html.md): Character art system: Spine-shaped descriptor + SVG sidecars.
 - [cutan.characters.brows](cutan.characters.brows.html.md): Brow acting: where the brows can go, what may not draw there, and the &#96;face.brows&#96; capability.
+- [cutan.characters.cast](cutan.characters.cast.html.md): A cast as data: &#96;cast.yaml&#96;, one entry per character, read by the factory (cutan#87).
 - [cutan.characters.checks](cutan.characters.checks.html.md): The cut-out genre’s semantic checks: &#96;play&#96;, &#96;expression&#96;, turns, views and character refs.
 - [cutan.characters.cli](cutan.characters.cli.html.md): User-facing character CLI subcommands.
 - [cutan.characters.colour_roles](cutan.characters.colour_roles.html.md): Colour roles: which colour literal in which part is skin, clothing, hair…
@@ -80,6 +81,7 @@
 - [cutan.marionette](cutan.marionette.html.md): The marionette style’s joints: a control bar, strings, hips (cutan#104).
 - [cutan.motion](cutan.motion.html.md): The cut-out genre’s motion presets: moves that name a rig’s parts or swap its views.
 - [cutan.pack](cutan.pack.html.md): Check a cut-out production pack with cutan’s own validators (cutan#87).
+- [cutan.pack_cli](cutan.pack_cli.html.md): &#96;an pack ...&#96; — a production pack into a project (cutan#87).
 - [cutan.projects_cli](cutan.projects_cli.html.md): &#96;an projects ...&#96; — a store-backed project from the shell (cutan#91).
 - [cutan.projects_store](cutan.projects_store.html.md): Where a cutan project’s files are read from and written to: a disk folder or S3, by configuration.
 - [cutan.runtime](cutan.runtime.html.md): JavaScript the cut-out genre adds to the stage runtime (&#96;visuals.js&#96;: the mouth and eye).

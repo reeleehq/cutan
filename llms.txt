@@ -31,6 +31,7 @@
 - [cutan.carve.superres](_autosummary/cutan.carve.superres.html.md): Super-resolution strategies: more pixels for a part carved from a low-resolution frame (cutan#110).
 - [cutan.characters](_autosummary/cutan.characters.html.md): Character art system: Spine-shaped descriptor + SVG sidecars.
 - [cutan.characters.brows](_autosummary/cutan.characters.brows.html.md): Brow acting: where the brows can go, what may not draw there, and the &#96;face.brows&#96; capability.
+- [cutan.characters.cast](_autosummary/cutan.characters.cast.html.md): A cast as data: &#96;cast.yaml&#96;, one entry per character, read by the factory (cutan#87).
 - [cutan.characters.checks](_autosummary/cutan.characters.checks.html.md): The cut-out genre’s semantic checks: &#96;play&#96;, &#96;expression&#96;, turns, views and character refs.
 - [cutan.characters.cli](_autosummary/cutan.characters.cli.html.md): User-facing character CLI subcommands.
 - [cutan.characters.colour_roles](_autosummary/cutan.characters.colour_roles.html.md): Colour roles: which colour literal in which part is skin, clothing, hair…
@@ -82,6 +83,7 @@
 - [cutan.marionette](_autosummary/cutan.marionette.html.md): The marionette style’s joints: a control bar, strings, hips (cutan#104).
 - [cutan.motion](_autosummary/cutan.motion.html.md): The cut-out genre’s motion presets: moves that name a rig’s parts or swap its views.
 - [cutan.pack](_autosummary/cutan.pack.html.md): Check a cut-out production pack with cutan’s own validators (cutan#87).
+- [cutan.pack_cli](_autosummary/cutan.pack_cli.html.md): &#96;an pack ...&#96; — a production pack into a project (cutan#87).
 - [cutan.projects_cli](_autosummary/cutan.projects_cli.html.md): &#96;an projects ...&#96; — a store-backed project from the shell (cutan#91).
 - [cutan.projects_store](_autosummary/cutan.projects_store.html.md): Where a cutan project’s files are read from and written to: a disk folder or S3, by configuration.
 - [cutan.runtime](_autosummary/cutan.runtime.html.md): JavaScript the cut-out genre adds to the stage runtime (&#96;visuals.js&#96;: the mouth and eye).
@@ -93,7 +95,7 @@
 - [cutan.verify.cadence](_autosummary/cutan.verify.cadence.html.md): Pre-render cadence lint: the scene’s timing against its style spec (catalogue B6, an#519 rank 5).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-02 02:34 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-02 03:11 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

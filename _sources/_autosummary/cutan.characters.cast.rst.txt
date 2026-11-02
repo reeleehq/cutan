@@ -1,0 +1,34 @@
+cutan.characters.cast
+=====================
+
+.. automodule:: cutan.characters.cast
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      NAME_RE
+      MAX_CAST_BYTES
+      NEW_OPTIONS
+      FOLLOW_UPS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      cast_steps
+      run_cast
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CastStep
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      CastError
+   
