@@ -16,7 +16,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cutan.projects_store import materialize_project, prune_project, push_project
+from cutan.projects_store import (
+    ProjectsStoreSettings,
+    materialize_project,
+    prune_project,
+    push_project,
+)
 
 __all__ = ["push", "pull", "prune"]
 
@@ -54,11 +59,13 @@ def pull(project_id: str) -> str:
 
 
 def prune(project_id: str, dry_run: bool = False) -> str:
-    """Delete the store's copies of what a push keeps local (pushed before the excludes covered them: the options manifests' file locks), so no pull brings them back.
+    """Delete the store's copies of what an keeps out of git (render reports, probes, the options manifests' file locks: pushed before the excludes covered them), so no pull brings them back.
 
     project_id: the project's id (its folder name)
     dry_run: only list what would be deleted
     """
+    if ProjectsStoreSettings.from_environ().backend == "local":
+        return "local backend: the store is the project folder itself; nothing to prune"
     gone = prune_project(project_id, dry_run=dry_run)
     if not gone:
         return "nothing to prune"

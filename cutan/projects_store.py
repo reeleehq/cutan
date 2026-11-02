@@ -574,21 +574,25 @@ def push_project(
 def prune_project(
     project_id: str,
     *,
-    exclude: Iterable[str] = DEFAULT_PUSH_EXCLUDES,
+    exclude: Iterable[str] = PROJECT_GITIGNORE,
     settings: Optional[ProjectsStoreSettings] = None,
     store: Optional[MutableMapping] = None,
     dry_run: bool = False,
 ) -> tuple[str, ...]:
-    """Delete the store's copies of what ``exclude`` keeps local (cutan#155); return
+    """Delete the store's copies of the files ``exclude`` covers (cutan#155); return
     their project-relative paths, sorted.
 
     A push never writes an excluded file, but copies pushed before the excludes
     covered them stay in the store (the options manifests' file locks, before
     the excludes followed ``an``'s ``.gitignore``), and every pull brings them
     back. A push does not delete them (an excluded file is never a reason to
-    delete: cutan#91), so this is the one explicit step that does. Their entries
-    leave the store's record too. ``dry_run``: only say what would go. On the
-    local backend the store is the project folder itself: nothing is pruned.
+    delete: cutan#91), so this is the one explicit step that does. The default
+    is what ``an`` keeps out of git (``an.project.PROJECT_GITIGNORE``: render
+    reports, probes, the locks), not every push exclude: a shot cache uploaded by
+    hand to share it stays (pass ``exclude=DEFAULT_PUSH_EXCLUDES`` for all).
+    Their entries leave the store's record too. ``dry_run``: only say what
+    would go. On the local backend the store is the project folder itself:
+    nothing is pruned.
 
     >>> store = {"p/scene.md": b"s", "p/artifacts/voice_options/a.json.lock": b""}
     >>> prune_project("p", settings=ProjectsStoreSettings(backend="s3"), store=store)
@@ -609,16 +613,14 @@ def prune_project(
             if key[len(prefix) :] != STORE_RECORD and excluded(key[len(prefix) :])
         )
     )
-    if dry_run or not gone:
+    if dry_run:
         return gone
     for rel in gone:
         del store[prefix + rel]
     record_key = prefix + STORE_RECORD
     record = _store_record(store, record_key)
     files = record.get("files") or {}
-    if any(rel in files for rel in gone):
-        store[record_key] = _record_bytes(
-            {**record, "files": {rel: e for rel, e in files.items() if rel not in gone}}
-        )
+    kept = {rel: e for rel, e in files.items() if not excluded(rel)}
+    if kept != files:  # also entries whose key went some other way
+        store[record_key] = _record_bytes({**record, "files": kept})
     return gone
-
