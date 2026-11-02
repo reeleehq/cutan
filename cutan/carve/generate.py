@@ -27,8 +27,9 @@ stage canvas and written as a PNG beside a record of where it came from.
   (``<name>/prop.json`` + ``parts/``, through :func:`~cutan.carve.carve` and
   :func:`~cutan.carve.write_prop`, with its quality warnings) instead of a plate.
 - **The generator** is the seam: ``generator(prompt, *, size, background,
-  quality, model) -> PIL image``, carrying ``provider``, ``model`` and
-  ``license`` for the provenance. The default, :class:`AixGenerator`, calls
+  quality, model) -> PIL image`` (or a :class:`Generated`: the image and facts
+  about making it, such as the provider's revised prompt), carrying
+  ``provider``, ``model`` and ``license`` for the provenance. The default, :class:`AixGenerator`, calls
   the fleet's :func:`aix.generate_image` (OpenAI's ``gpt-image`` models by
   default; ``pip install "cutan[generate]"``).
 - **The record**: each image's :class:`~an.ir.assets.AssetSource` (provider,
@@ -97,7 +98,8 @@ _SIZE = re.compile(r"^([1-9]\d*x[1-9]\d*|auto)$")
 _NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 Background = Literal["opaque", "transparent"]
-#: ``generator(prompt, *, size, background, quality, model) -> PIL image``, with
+#: ``generator(prompt, *, size, background, quality, model) -> PIL image`` (or a
+#: :class:`Generated`: the image and facts about making it), with
 #: ``provider``, ``model`` and ``license`` attributes for the provenance.
 ImageGenerator = Callable[..., Image.Image]
 
@@ -291,6 +293,22 @@ PROVIDER_LICENSES: dict[str, str] = {"openai": OPENAI_OUTPUT_LICENSE}
 
 
 @dataclass
+class Generated:
+    """What a generator may return instead of a bare image: the image, and facts
+    about making it (``model``: the model the request was resolved to, e.g. aix
+    substituting a configured alias; ``revised_prompt``: the prompt the provider
+    says it actually drew), recorded in the image's source."""
+
+    image: Image.Image
+    facts: Mapping[str, Any] = field(default_factory=dict)
+
+
+def _generated(result: Any) -> Generated:
+    """A generator's return value as :class:`Generated` (a bare image has no facts)."""
+    return result if isinstance(result, Generated) else Generated(result)
+
+
+@dataclass
 class AixGenerator:
     """The default generator: :func:`aix.generate_image`, whose model names its
     provider (OpenAI's ``gpt-image`` by default). :meth:`describe` says which
@@ -320,7 +338,7 @@ class AixGenerator:
         background: Background,
         quality: Optional[str] = None,
         model: Optional[str] = None,
-    ) -> Image.Image:
+    ) -> Generated:
         try:
             import aix
         except ImportError as e:  # pragma: no cover - depends on the install
@@ -336,7 +354,14 @@ class AixGenerator:
             response_format=None,
             **({"quality": q} if (q := quality or self.quality) else {}),
         )
-        return Image.open(io.BytesIO(made.as_bytes()))
+        facts = {
+            "model": getattr(made, "model", None),
+            "revised_prompt": getattr(made, "revised_prompt", None),
+        }
+        return Generated(
+            Image.open(io.BytesIO(made.as_bytes())),
+            {k: v for k, v in facts.items() if v},
+        )
 
 
 def key_backdrop(
@@ -379,15 +404,20 @@ def cover_fit(image: Image.Image, size: tuple[int, int]) -> Image.Image:
     return scaled.crop((left, top, left + w, top + h))
 
 
-def art_source(spec: ArtSpec, generator: ImageGenerator) -> AssetSource:
-    """The provenance of ``spec``'s image as ``generator`` made it.
+def art_source(
+    spec: ArtSpec, generator: ImageGenerator, facts: Optional[Mapping[str, Any]] = None
+) -> AssetSource:
+    """The provenance of ``spec``'s image as ``generator`` made it; ``facts`` are
+    what the provider said about this image (:class:`Generated`): the model it
+    resolved to wins over the one asked for, and a ``revised_prompt`` is kept.
 
     >>> g = AixGenerator()
     >>> s = art_source(ArtSpec(name="road", prompt="a road"), g)
     >>> s.provider, s.id, s.license, s.extra["prompt"]
     ('openai', 'gpt-image-2', 'openai-output-owned', 'a road')
     """
-    model = spec.model or getattr(generator, "model", None)
+    facts = dict(facts or {})
+    model = facts.get("model") or spec.model or getattr(generator, "model", None)
     describe = getattr(generator, "describe", None)
     who = (
         describe(model)
@@ -409,6 +439,7 @@ def art_source(spec: ArtSpec, generator: ImageGenerator) -> AssetSource:
             "background": spec.background,
             **({"quality": quality} if quality else {}),
             **({"key": spec.key} if spec.key else {}),
+            **({"revised_prompt": facts["revised_prompt"]} if facts.get("revised_prompt") else {}),
         },
     )
 
@@ -495,16 +526,19 @@ def generate_art(
             image = Image.open(raw)  # paid for by a run that failed after it
             image.load()
         else:
-            image = generator(
-                s.prompt,
-                size=s.size,
-                background=s.background,
-                quality=s.quality,
-                model=s.model,
+            drawn = _generated(
+                generator(
+                    s.prompt,
+                    size=s.size,
+                    background=s.background,
+                    quality=s.quality,
+                    model=s.model,
+                )
             )
+            image = drawn.image
             _save(image, raw)
             # record it now: the paid image has its provenance even if what follows fails
-            recorded[entry] = art_source(s, generator).model_dump(
+            recorded[entry] = art_source(s, generator, drawn.facts).model_dump(
                 mode="json", exclude_none=True
             )
             _write_sources(out, recorded)

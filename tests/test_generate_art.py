@@ -213,15 +213,18 @@ def test_the_default_generator_asks_aix_for_base64_and_the_background(monkeypatc
         seen.update(kw, prompt=prompt)
         buf = __import__("io").BytesIO()
         Image.new("RGB", (8, 8), MAGENTA).save(buf, "PNG")
-        return types.SimpleNamespace(as_bytes=lambda: buf.getvalue())
+        return types.SimpleNamespace(
+            as_bytes=lambda: buf.getvalue(), model="gpt-image-2", revised_prompt="p, flat"
+        )
 
     monkeypatch.setitem(
         sys.modules, "aix", types.SimpleNamespace(generate_image=generate_image)
     )
-    im = G.AixGenerator()("p", size="1024x1024", background="transparent")
-    assert im.size == (8, 8)
+    made = G.AixGenerator()("p", size="1024x1024", background="transparent")
+    assert made.image.size == (8, 8)
     assert seen["response_format"] is None and seen["background"] == "transparent"
     assert seen["model"] == G.DEFAULT_MODEL and "quality" not in seen, "the provider's default"
+    assert made.facts == {"model": "gpt-image-2", "revised_prompt": "p, flat"}
 
 
 def test_the_cli_writes_and_reports(tmp_path, monkeypatch):
@@ -297,3 +300,17 @@ def test_a_carve_that_finds_nothing_keeps_the_paid_image_for_the_next_run(tmp_pa
     with pytest.raises(ValueError):
         G.generate_art(spec, out_dir=tmp_path, generator=painter)
     assert len(painter.calls) == 1, "the rerun carved the paid image again, it did not pay twice"
+
+
+def test_what_the_provider_said_is_recorded(tmp_path):
+    """A generator returning Generated: the resolved model and the revised prompt
+    land in the image's source (cutan#162, part 2)."""
+
+    class Telling(Painter):
+        def __call__(self, prompt, **kw):
+            return G.Generated(super().__call__(prompt, **kw), {"model": "toy-1.5", "revised_prompt": "a red road"})
+
+    (road,) = G.generate_art(SPEC, out_dir=tmp_path, generator=Telling(), only=["road"])
+    assert road.source.id == "toy-1.5" and road.source.extra["revised_prompt"] == "a red road"
+    record = json.loads((tmp_path / G.SOURCES_FILE).read_text())["road.png"]
+    assert record["extra"]["model"] == "toy-1.5"
