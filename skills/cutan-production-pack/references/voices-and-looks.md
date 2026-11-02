@@ -4,7 +4,7 @@ Both are optional. Without voice documents the film renders with silent, correct
 
 ## Voices: `assets/voices/<key>.json`
 
-A voice document says who speaks a character's lines and how. Bind it to the character in `cast.sh` with `--voice-ref <key>` (`an character new mara --offline ... --voice-ref mara_voice`). Lines whose speaker is not a character in the shot (a narrator, someone off screen) use the voice named **`default`**: write `assets/voices/default.json` for a narrator.
+A voice document says who speaks a character's lines and how. Bind it to the character in `cast.yaml` with `voice_ref: <key>` (`mara: {build: tall, voice_ref: mara_voice}`). Lines whose speaker is not a character in the shot (a narrator, someone off screen) use the voice named **`default`**: write `assets/voices/default.json` for a narrator.
 
 ```json
 {
@@ -50,7 +50,7 @@ A style pack recolours and finishes the whole film. Name it in the meta block: `
 
 | key | meaning |
 |---|---|
-| `roles` | colour by role, `#rrggbb`: `skin`, `hair`, `clothing`, `leg`, `accessory`, `pupil` recolour **every** factory character (so leave them out when each character has its own palette in `cast.sh`); `sky`, `ground` recolour the built-in environments; `stroke` colours path props that set no colour. Never `lip`, `mouth_fill`, `teeth`, `tongue`, `eye_sclera` (refused) |
+| `roles` | colour by role, `#rrggbb`: `skin`, `hair`, `clothing`, `leg`, `accessory`, `pupil` recolour **every** factory character (so leave them out when each character has its own palette in `cast.yaml`); `sky`, `ground` recolour the built-in environments; `stroke` colours path props that set no colour. Never `lip`, `mouth_fill`, `teeth`, `tongue`, `eye_sclera` (refused) |
 | `entities` | per character: `{"mara": {"clothing": "#7a3b69"}}` overrides roles for one |
 | `surface` | finishes on every character and prop: `outline` (`width` in the art's pixels, `color`), `shadow` (`dx`, `dy`, `color`, `alpha`: a paper-cut shadow), `glow` (`color`, `radius`, `intensity`) |
 | `entity_surfaces` | per entity id, overriding `surface` key by key: `{"umbrella": {"glow": {"color": "#ffd27a", "radius": 12, "intensity": 0.8}}}`, or `{"mara": {"outline": false}}` to remove one |

@@ -73,7 +73,7 @@ Everything visible in the shot, back to front: **later entries draw in front.**
 | kind | store | ref | notes |
 |---|---|---|---|
 | `environment` | `environments` | a folder under `assets/environments/`, or a built-in preset: `park`, `indoor`, `night`, `sunset`, `default` | one per shot, first in the list |
-| `character` | `characters` | a name from `cast.sh` or a folder under `assets/characters/` | `stage: {at: [x, y], scale: s}`: `at` is where the feet stand |
+| `character` | `characters` | a name from `cast.yaml` or a folder under `assets/characters/` | `stage: {at: [x, y], scale: s}`: `at` is where the feet stand |
 | `prop` | `props` | a folder under `assets/props/` | drawn props, text (titles, labels) and paths (arrows, lines) |
 
 - `id` is the name actions use; it is usually the same as `ref`. Two entities from one ref need two ids (`label_west`, `label_east`).

@@ -4,7 +4,7 @@
 
 1. **Title and logline**: one or two sentences.
 2. **Length and look**: total length, resolution and frame rate, the named style if any with its cost class, or the palette and mood in words.
-3. **Cast**: a table, one row per character: id (as in `cast.sh`), who they are in a line, how they look (and why: what tells them apart), how they sound (age, accent, pitch, pace, attitude: the same words as the voice document's `notes`, which voices are designed from), the moods their lines use.
+3. **Cast**: a table, one row per character: id (as in `cast.yaml`), who they are in a line, how they look (and why: what tells them apart), how they sound (age, accent, pitch, pace, attitude: the same words as the voice document's `notes`, which voices are designed from), the moods their lines use.
 4. **Sets, props and art**: each environment and prop, what it shows, and where its art came from: the writer's pictures (which generator or artist, which prompt), your own SVG drawings (say so: they are placeholders unless the writer chose the flat look), or not yet made (with the prompt or the brief for it). Reference sheets under `reference/`, and what the pipeline owner must still do with them.
 5. **Shot list**: a table: shot id, length, framing (wide, two-shot, close single), camera, what happens in a line.
 6. **Sound**: music and effects the film wants, described (the pack carries no audio).
