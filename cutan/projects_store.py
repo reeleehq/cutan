@@ -58,8 +58,7 @@ STORE_RECORD: str = PROJECT_STORE_RECORD
 #: scratch; a repository is not project content; and every line ``an init``
 #: keeps out of git (``an.project.PROJECT_GITIGNORE``: render reports, probes, the
 #: options manifests' file locks) is read from ``an``, so a line it adds there is
-#: kept local here too. Each entry is a folder prefix (ending in ``/``), a
-#: pattern (:func:`_excluder`), or a file.
+#: kept local here too. Each entry is a ``.gitignore`` line (:func:`_gitignore_matcher`).
 DEFAULT_PUSH_EXCLUDES: tuple[str, ...] = tuple(
     dict.fromkeys(
         (
@@ -359,11 +358,46 @@ class PushReport:
         return text
 
 
+def _gitignore_matcher(line: str):
+    """``rel -> bool`` for one ``.gitignore`` line, by git's rules: a line with a
+    ``/`` before its end is anchored at the project root, one without matches a
+    name at any depth; a trailing ``/`` matches folders only; wildcards never
+    cross a ``/``; a matched folder covers everything under it. Negation (``!``)
+    and ``**`` are refused rather than misread: a line this cannot honour would
+    push what it should keep.
+
+    >>> _gitignore_matcher("artifacts/v/*.lock")("artifacts/v/a.json.lock")
+    True
+    >>> _gitignore_matcher("*.lock")("deep/in/x.lock"), _gitignore_matcher("probes")("probes/x.png")
+    (True, True)
+    >>> _gitignore_matcher("cache/")("cache"), _gitignore_matcher("a/*/c")("a/b/c/d")
+    (False, True)
+    """
+    if line.startswith("!") or "**" in line:
+        raise ValueError(f"an exclude line cannot use '!' or '**' (got {line!r})")
+    folders_only = line.endswith("/")
+    pattern = line.rstrip("/")
+    anchored = "/" in pattern
+    pattern = pattern.lstrip("/")
+    depth = pattern.count("/")
+
+    def matches(rel: str) -> bool:
+        parts = rel.split("/")
+        # each folder holding ``rel`` (a matched folder covers its contents), then rel
+        for n in range(1, len(parts) + (0 if folders_only else 1)):
+            if anchored:
+                if n - 1 == depth and fnmatchcase("/".join(parts[:n]), pattern):
+                    return True
+            elif fnmatchcase(parts[n - 1], pattern):
+                return True
+        return False
+
+    return matches
+
+
 def _excluder(exclude: Iterable[str]):
-    """``rel -> bool``: whether an entry covers it. An entry is a folder prefix
-    (ending in ``/``), a pattern (holding ``*``, ``?`` or ``[``), or a file. A
-    pattern matches as a ``.gitignore`` line with a slash does: from the project
-    root, its wildcards never crossing a ``/``.
+    """``rel -> bool``: whether any of ``exclude``, each a ``.gitignore`` line
+    (:func:`_gitignore_matcher`), covers the project-relative POSIX path ``rel``.
 
     >>> keep = _excluder(("artifacts/shot_cache/", "notes.txt", "artifacts/v/*.lock"))
     >>> keep("artifacts/shot_cache/blobs/x"), keep("notes.txt"), keep("artifacts/audio/a.wav")
@@ -371,20 +405,10 @@ def _excluder(exclude: Iterable[str]):
     >>> keep("artifacts/v/a.json.lock"), keep("artifacts/v/a.json"), keep("artifacts/v/sub/a.lock")
     (True, False, False)
     """
-    exclude = tuple(exclude)
-    folders = tuple(e for e in exclude if e.endswith("/"))
-    patterns = tuple(e for e in exclude if not e.endswith("/") and any(c in e for c in "*?["))
-    files = frozenset(exclude) - set(folders) - set(patterns)
-
-    def matches(rel: str, pattern: str) -> bool:
-        return rel.count("/") == pattern.count("/") and fnmatchcase(rel, pattern)
+    matchers = tuple(_gitignore_matcher(line) for line in exclude)
 
     def excluded(rel: str) -> bool:
-        return (
-            rel in files
-            or any(rel.startswith(f) for f in folders)
-            or any(matches(rel, p) for p in patterns)
-        )
+        return any(m(rel) for m in matchers)
 
     return excluded
 

@@ -4,13 +4,17 @@ the write half (``push_project``, cutan#91) and where ``an init --id`` puts a pr
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
+from an.project import PROJECT_GITIGNORE
 
 import cutan.projects_store as module
 from cutan import PROJECT_STORE_RECORD
 from cutan.projects_store import (
+    _excluder,
     DEFAULT_PUSH_EXCLUDES,
     STORE_RECORD,
     ProjectsStoreSettings,
@@ -63,10 +67,11 @@ def test_the_record_is_a_persisted_identifier():
 
 
 def test_the_default_excludes_cover_what_an_keeps_out_of_git():
-    from an.project import PROJECT_GITIGNORE
-
     assert set(PROJECT_GITIGNORE) <= set(DEFAULT_PUSH_EXCLUDES)
     assert len(set(DEFAULT_PUSH_EXCLUDES)) == len(DEFAULT_PUSH_EXCLUDES)
+    assert {"artifacts/shot_cache/", ".an/render_work/", ".git/"} <= set(
+        DEFAULT_PUSH_EXCLUDES
+    )
 
 
 def test_a_push_keeps_the_options_locks_local(tmp_path):
@@ -82,9 +87,53 @@ def test_a_push_keeps_the_options_locks_local(tmp_path):
     assert "artifacts/voice_options/narrator.json.lock" in r.excluded
     assert "p1/artifacts/voice_options/narrator.json" in store
     assert "p1/artifacts/voice_options/narrator.json.lock" not in store
-    assert {"artifacts/shot_cache/", ".an/render_work/", ".git/"} <= set(
-        DEFAULT_PUSH_EXCLUDES
+
+
+_GIT_SAMPLE_PATHS = (
+    "scene.md",
+    "artifacts/voice_options/a.json",
+    "artifacts/voice_options/a.json.lock",
+    "artifacts/voice_options/sub/b.lock",
+    "artifacts/render_reports/r.json",
+    "artifacts/probes/deep/p.png",
+    "artifacts/shot_cache/blobs/x",
+    "artifacts/shots/s1.mp4",
+    "artifacts/audio/a.wav",
+    ".an/render_work/runs/r1/.live",
+    ".an/projects_store.json",
+    "deep/x.lock",
+    "deep/probes/x.png",
+    "a/b/c/d",
+)
+_GIT_SAMPLE_LINES = ("*.lock", "probes", "a/*/c", "artifacts/v?ice_options/[ab].json")
+
+
+@pytest.mark.skipif(shutil.which("git") is None, reason="needs git")
+@pytest.mark.parametrize(
+    "lines",
+    [PROJECT_GITIGNORE, DEFAULT_PUSH_EXCLUDES, _GIT_SAMPLE_LINES],
+    ids=["an-gitignore", "push-excludes", "shapes"],
+)
+def test_the_excluder_agrees_with_git_check_ignore(tmp_path, lines):
+    """Each exclude line means what it means to git, for whatever line ``an``
+    adds next (the drift this list once suffered: an#587's lock pattern)."""
+    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+    (tmp_path / ".gitignore").write_text("".join(f"{line}\n" for line in lines))
+    got = subprocess.run(
+        ["git", "-C", str(tmp_path), "check-ignore", "--no-index", "--stdin"],
+        input="\n".join(_GIT_SAMPLE_PATHS),
+        capture_output=True,
+        text=True,
     )
+    ignored = set(got.stdout.split())
+    excluded = _excluder(lines)
+    assert {p for p in _GIT_SAMPLE_PATHS if excluded(p)} == ignored
+
+
+def test_an_exclude_line_it_cannot_honour_is_refused():
+    for line in ("!keep.me", "artifacts/**/x"):
+        with pytest.raises(ValueError, match="cannot use"):
+            _excluder((line,))
 
 
 # ------------------------------------------------------------ the write half
