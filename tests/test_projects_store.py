@@ -126,15 +126,15 @@ def test_the_excluder_agrees_with_git_check_ignore(tmp_path, lines):
     """Each exclude line means what it means to git, for whatever line ``an``
     adds next (the drift this list once suffered: an#587's lock pattern)."""
     subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
-    (tmp_path / ".gitignore").write_text("".join(f"{line}\n" for line in lines))
+    # bytes, NUL-separated: no newline translation on Windows, no path quoting
+    (tmp_path / ".gitignore").write_bytes("".join(f"{line}\n" for line in lines).encode())
     got = subprocess.run(
         ["git", "-C", str(tmp_path), "-c", "core.ignorecase=false"]
-        + ["check-ignore", "--no-index", "--stdin"],
-        input="\n".join(_GIT_SAMPLE_PATHS),
+        + ["check-ignore", "--no-index", "--stdin", "-z"],
+        input="\0".join(_GIT_SAMPLE_PATHS).encode() + b"\0",
         capture_output=True,
-        text=True,
     )
-    ignored = set(got.stdout.split())
+    ignored = {p for p in got.stdout.decode().split("\0") if p}
     excluded = _excluder(lines)
     assert {p for p in _GIT_SAMPLE_PATHS if excluded(p)} == ignored
 
