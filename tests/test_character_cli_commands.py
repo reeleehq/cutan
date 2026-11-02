@@ -33,4 +33,5 @@ def test_the_character_command_set_is_pinned_by_literal():
         "silhouette",
         "preview",
         "record",
+        "critique-props",
     ]
