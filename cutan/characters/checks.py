@@ -45,7 +45,7 @@ from an.ir.validate import (  # noqa: E402
     ValidationReport,
     _built_node_paths,
     _rig_document,
-    _rig_scope,
+    rig_scope,
     _text_ids,
 )
 
@@ -178,7 +178,7 @@ def _check_play_actions(
     """
     if not stores:
         return
-    rigs, unchecked = _rig_scope(shot, stores)
+    rigs, unchecked = rig_scope(shot, stores)
     # `play` (an#7): resolved against the target entity's MIGRATED descriptor
     # by `cutan.characters.play` — the SAME code the compiler resolves with, so
     # validate's verdict is compile's (an unknown bone property, a bone with
@@ -485,7 +485,7 @@ def _turn_resolution(
         except ValidationError:
             return None  # reported by the play check
 
-    all_rigs, unchecked = _rig_scope(shot, stores)
+    all_rigs, unchecked = rig_scope(shot, stores)
     extent = play_extent_for(
         descriptor_of,
         context_of=_preset_context_of(
@@ -722,7 +722,7 @@ def _turns_of(ctx: ValidationContext, index: int, shot: Any):
 def _stage_poses_of(ctx: ValidationContext, index: int, shot: Any):
     """The shot's built stage poses (:func:`_stage_of`), once per shot across
     the checks that read them; ``None`` when the stage does not build."""
-    _, unchecked = _rig_scope(shot, ctx.stores)
+    _, unchecked = rig_scope(shot, ctx.stores)
     return ctx.cached(("stage", index), _stage_of(shot, ctx.stores, unchecked))
 
 
