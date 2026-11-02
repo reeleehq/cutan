@@ -35,6 +35,7 @@ import json
 import re
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Union
 
 from cutan.body_attachment import FIRST_PERSON, body_attachment_of, bound_character
@@ -45,6 +46,8 @@ __all__ = [
     "Question",
     "CritiqueReport",
     "critique_body_props",
+    "critique_far_plates",
+    "FAR_PLATE_CHECKLIST",
     "checklist_for",
     "checklist_prompt",
     "parse_answers",
@@ -209,6 +212,73 @@ def _envelope_judge(model: str | None) -> Callable[..., Mapping[str, Any]]:
     return judge
 
 
+def _checked_default_judge(model: str | None, report: CritiqueReport, label: str):
+    """The default judge, or ``None`` with an error finding when its SDK is missing."""
+    try:
+        import anthropic  # noqa: F401 - the default judge's SDK, checked before paying
+    except ImportError:
+        report.findings.append(
+            ("error", "", f"the {label}'s default judge needs the anthropic SDK: pip install an[vision]")
+        )
+        return None
+    return _envelope_judge(model)
+
+
+def _ask(
+    report: CritiqueReport,
+    *,
+    judge: Callable[..., Union[str, Mapping[str, Any]]],
+    images: Callable[[], Sequence[bytes]],
+    prompt: str,
+    checklist: Sequence[Question],
+    fill: Mapping[str, str],
+    where: str,
+    call: Mapping[str, Any],
+    model: str | None,
+    label: str,
+    subject: str,
+    context: str,
+    advice: str,
+) -> None:
+    """Show ``images()`` to ``judge`` with ``prompt``; record the call and add a
+    finding per answer that differs from ``checklist``'s (a configured judge
+    that fails, or a reply with no answers, is an ``error``)."""
+    try:
+        shown = images()
+        if not shown:
+            raise ValueError("there is no image to show")
+        answer = judge(shown, prompt=prompt)
+    except Exception as e:  # noqa: BLE001 - configured and broken is a failure, said aloud
+        report.findings.append(
+            ("error", where, f"the {label} could not judge {subject}: {type(e).__name__}: {e}")
+        )
+        return
+    reply = str((answer.get("reply") if isinstance(answer, Mapping) else answer) or "")
+    used = answer.get("model") if isinstance(answer, Mapping) else model
+    report.calls.append({**call, "frames": len(shown), "model": used})
+    answers = parse_answers(reply, checklist)
+    if answers is None:
+        report.findings.append(
+            ("error", where, f"the {label}'s reply about {subject} held no answers: {reply[:200]!r}")
+        )
+        return
+    for q, a in zip(checklist, answers):
+        text = q.text.format(**fill)
+        if a["answer"] == "unsure":
+            report.findings.append(("info", where, f"{label}, unsure: {text}"))
+        elif a["answer"] != q.expected:
+            report.findings.append(
+                (
+                    "warning",
+                    where,
+                    f"{label} ({context}, a vision model, not a measurement): "
+                    f"{text} {a['answer']}, expected {q.expected}"
+                    + (f" ({a['why']})" if a["why"] else "")
+                    + f". {advice}",
+                )
+            )
+
+
 def critique_body_props(
     project: Any,
     *,
@@ -268,47 +338,153 @@ def critique_body_props(
             prop = entity.ref or entity.id  # "wheel", not the entity's id
             prompt = checklist_prompt(checklist, prop=prop, character=character or "the character")
             if judge is None:
-                try:
-                    import anthropic  # noqa: F401 - the default judge's SDK, checked before paying
-                except ImportError:
-                    report.findings.append(
-                        ("error", "", "the body critic's default judge needs the anthropic SDK: pip install an[vision]")
-                    )
+                judge = _checked_default_judge(model, report, "body critic")
+                if judge is None:
                     return report
-                judge = _envelope_judge(model)
-            try:
+
+            def probe(shot=shot):
+                nonlocal shown
                 if shown is None:
                     shown = frames(project, shot.id, [f * shot.duration for f in at])
-                if not shown:
-                    raise ValueError(f"the probe of shot {shot.id!r} gave no frames")
-                answer = judge(shown, prompt=prompt)
-            except Exception as e:  # noqa: BLE001 - configured and broken is a failure, said aloud
-                report.findings.append(
-                    ("error", where, f"the body critic could not judge prop {entity.id!r}: {type(e).__name__}: {e}")
-                )
-                continue
-            reply = str((answer.get("reply") if isinstance(answer, Mapping) else answer) or "")
-            used = answer.get("model") if isinstance(answer, Mapping) else (None if custom else model)
-            report.calls.append({"shot": shot.id, "prop": entity.id, "frames": len(shown), "model": used})
-            answers = parse_answers(reply, checklist)
-            if answers is None:
-                report.findings.append(
-                    ("error", where, f"the body critic's reply about prop {entity.id!r} held no answers: {reply[:200]!r}")
-                )
-                continue
-            for q, a in zip(checklist, answers):
-                text = q.text.format(prop=prop, character=character or "the character")
-                if a["answer"] == "unsure":
-                    report.findings.append(("info", where, f"body critic, unsure: {text}"))
-                elif a["answer"] != q.expected:
-                    report.findings.append(
-                        (
-                            "warning",
-                            where,
-                            f"body critic (shot {shot.id!r}, a vision model, not a measurement): "
-                            f"{text} {a['answer']}, expected {q.expected}"
-                            + (f" ({a['why']})" if a["why"] else "")
-                            + ". Check the drawing: the hands may be drawn from another point of view.",
-                        )
-                    )
+                return shown
+
+            _ask(
+                report,
+                judge=judge,
+                images=probe,
+                prompt=prompt,
+                checklist=checklist,
+                fill={"prop": prop, "character": character or "the character"},
+                where=where,
+                call={"shot": shot.id, "prop": entity.id},
+                model=None if custom else model,
+                label="body critic",
+                subject=f"prop {entity.id!r}",
+                context=f"shot {shot.id!r}",
+                advice="Check the drawing: the hands may be drawn from another point of view.",
+            )
     return report
+
+
+#: What a ``far`` plate of a travelling shot must not hold (ADR 0007 of ``an``):
+#: anything nearer than the far range stands still while the streams move.
+FAR_PLATE_CHECKLIST: tuple[Question, ...] = (
+    Question("Does the picture show the ground or a road close to the viewer?", "no"),
+    Question(
+        "Are there trees, poles, fences, signs or buildings near the viewer: large, "
+        "or cut off by the picture's edges?",
+        "no",
+    ),
+    Question("Is everything shown far away: sky, horizon, distant hills or mountains?", "yes"),
+)
+
+_PLATE_PROMPT = """You are checking a background picture for a cut-out animated film. It
+is shown through a moving vehicle's window as the far distance, so it must hold
+only what is very far away; anything near would stand still while the nearby
+scenery streams past. Answer each question from what is visible, "yes", "no"
+or "unsure", with a few words why. Reply with JSON only:
+{{"answers": [{{"n": 1, "answer": "yes", "why": "..."}}, ...]}}
+
+{questions}
+"""
+#: A plate is shown at most this many pixels on its longer side (the judge needs
+#: no more, and an image costs by its pixels).
+PLATE_MAX_SIDE: int = 1024
+
+
+def _plate_png(path: Any, *, max_side: int = PLATE_MAX_SIDE) -> bytes:
+    """A raster plate as PNG bytes, at most ``max_side`` pixels long."""
+    import io
+
+    from PIL import Image
+
+    with Image.open(path) as im:
+        im = im.convert("RGBA")
+        im.thumbnail((max_side, max_side))
+        buf = io.BytesIO()
+        im.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+def _far_plates(project: Any) -> list[tuple[str, str, Any]]:
+    """``(where, "member/plane", plate path or None)`` of each plane a travel
+    lists ``far``; the path is ``None`` when the plane has no image (a fill, a
+    gradient) or its file is outside its environment's folder."""
+    from an.ir.migrate import migrate
+    from an.stage.environments import ENVIRONMENT_DOCUMENT_KIND, EnvironmentDescriptor
+    from an.stores._common import inside_folder
+
+    world = getattr(project.scene, "world", None)
+    travel = getattr(world, "travel", None) if world is not None else None
+    if travel is None:
+        return []
+    env_store = project.mall.get("environments")
+    root = getattr(env_store, "_root", None)
+    members = {m.id: m for m in world.members}
+    out = []
+    for k, name in enumerate(travel.plates.get("far", ())):
+        member_id, _, plane_name = name.partition("/")
+        member = members.get(member_id)
+        where = f"world/travel/plates/far/{k}"
+        path = None
+        try:
+            raw = env_store[member.ref]
+            env = EnvironmentDescriptor.model_validate(
+                migrate(dict(raw), kind=ENVIRONMENT_DOCUMENT_KIND.name)
+            )
+            plane = next(p for p in env.planes if p.name == plane_name)
+            if plane.art.kind == "image" and plane.art.src and root is not None:
+                path = inside_folder(Path(root) / str(member.ref), plane.art.src)
+        except Exception:  # noqa: BLE001 - a missing plane is the travel check's to report
+            path = None
+        out.append((where, name, path))
+    return out
+
+
+def critique_far_plates(
+    project: Any,
+    *,
+    judge: Callable[..., Union[str, Mapping[str, Any]]] | None = None,
+    checklist: Sequence[Question] = FAR_PLATE_CHECKLIST,
+    model: str | None = None,
+) -> CritiqueReport:
+    """Ask whether each ``far`` plate of ``project``'s travel holds anything near
+    (cutan#166): a tree baked into a plate stands still while the streams move.
+
+    The plate's own image is judged, not a render: no probe, one call per plate.
+    An SVG plate (drawn by hand, its content known to its author) and a plane
+    with no image are not judged. Findings and calls as :func:`critique_body_props`.
+    """
+    from an.project import load
+
+    project = load(project) if not hasattr(project, "scene") else project
+    report = CritiqueReport()
+    custom = judge is not None
+    for where, name, path in _far_plates(project):
+        if path is None or Path(path).suffix.lower() == ".svg":
+            continue
+        if judge is None:
+            judge = _checked_default_judge(model, report, "far-plate critic")
+            if judge is None:
+                return report
+        questions = "\n".join(f"{n}. {q.text}" for n, q in enumerate(checklist, 1))
+        _ask(
+            report,
+            judge=judge,
+            images=lambda path=path: [_plate_png(path)],
+            prompt=_PLATE_PROMPT.format(questions=questions),
+            checklist=checklist,
+            fill={},
+            where=where,
+            call={"plate": name},
+            model=None if custom else model,
+            label="far-plate critic",
+            subject=f"plate {name!r}",
+            context=f"plate {name!r}",
+            advice=(
+                "A plate the travel lists `far` must hold only what is at infinity: "
+                "move what is near to a stream, or onto a `vehicle` plate."
+            ),
+        )
+    return report
+
