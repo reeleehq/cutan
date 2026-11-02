@@ -141,11 +141,12 @@ def _checked(name: str, key: str, value: Any, types: tuple[type, ...]) -> Any:
             isinstance(k, str) and _scalar_ok(k) and _scalar_ok(v) for k, v in value.items()
         )
     if not ok:
-        wanted = " or ".join(t.__name__ for t in types)
-        raise CastError(
-            f"{CAST_YAML} {name!r}: {key} must be a {wanted} of short text or numbers, "
-            f"not {value!r}"
-        )
+        wanted = {
+            (int, float): "number",
+            (bool,): "true or false",
+            (str,): f"short text (at most {MAX_VALUE_CHARS} characters, one line)",
+        }.get(types, "short text, or a list or mapping of short text and numbers")
+        raise CastError(f"{CAST_YAML} {name!r}: {key} must be a {wanted}, not {value!r}")
     return value
 
 
@@ -155,7 +156,9 @@ def _load_yaml(path: Path) -> Any:
     tags, and a file over :data:`MAX_CAST_BYTES`."""
     import yaml
 
-    if path.stat().st_size > MAX_CAST_BYTES:
+    with open(path, "rb") as f:  # read at most the cap: a FIFO or /dev/zero has no size
+        data = f.read(MAX_CAST_BYTES + 1)
+    if len(data) > MAX_CAST_BYTES:
         raise CastError(f"{CAST_YAML} is over {MAX_CAST_BYTES} bytes: a cast is a page")
 
     class _NoAliases(yaml.SafeLoader):
@@ -165,9 +168,9 @@ def _load_yaml(path: Path) -> Any:
             return super().compose_node(parent, index)
 
     try:
-        return yaml.load(path.read_text(encoding="utf-8"), Loader=_NoAliases)  # noqa: S506 - a SafeLoader
-    except yaml.YAMLError as e:
-        raise CastError(f"{CAST_YAML} is not YAML: {e}") from None
+        return yaml.load(data.decode("utf-8"), Loader=_NoAliases)  # noqa: S506 - a SafeLoader
+    except (yaml.YAMLError, ValueError) as e:  # ValueError: not UTF-8, an int too long
+        raise CastError(f"{CAST_YAML} is not readable YAML: {e}") from None
 
 
 def cast_steps(cast: Union[str, os.PathLike, Mapping[str, Any]]) -> list[CastStep]:

@@ -294,6 +294,7 @@ class PackReport:
             for c in self.checks
         ]
         return {
+            **({"project": str(self.project)} if self.project is not None else {}),
             "ok": self.ok,
             "summary": self.summary(),
             "errors": self.errors,

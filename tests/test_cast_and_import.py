@@ -75,7 +75,7 @@ def test_a_cast_file_that_is_not_a_mapping_is_named(tmp_path):
     with pytest.raises(CastError, match="mapping"):
         cast_steps(f)
     f.write_text("teo: {build: [\n")
-    with pytest.raises(CastError, match="not YAML"):
+    with pytest.raises(CastError, match="not readable YAML"):
         cast_steps(f)
 
 
