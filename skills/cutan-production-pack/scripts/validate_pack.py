@@ -3,9 +3,12 @@
 A thin front for :func:`cutan.pack.check_pack` (the checker lives in the
 package so the reelee connector's "check this pack" tool and this script run
 the same code). It lints every SVG and voice document, builds a scratch
-project from the pack, runs ``cast.sh`` (only the factory commands the skill
-documents, never a shell), validates every character and prop, and runs
-``an validate --strict-assets`` on the scene. Nothing is rendered.
+project from the pack, builds its cast (``cast.yaml``, or an older pack's
+``cast.sh``: only the factory steps the skill documents, never a shell),
+validates every character and prop, and runs ``an validate --strict-assets``
+on the scene. Nothing is rendered. Where cutan is installed, ``an pack import
+<pack> --dry-run`` is the same check, and ``an pack import <pack>`` makes the
+real project.
 
 It needs ``pip install cutan`` (pure Python, no browser), which brings ``an``.
 Where installing is impossible (Claude.ai's sandbox), use the reelee

@@ -201,26 +201,36 @@ def _validate_pack():
     return cutan.pack
 
 
-def test_factory_commands_in_the_skill_are_accepted(tmp_path):
-    """Every complete `an character new <name> …` line the skill shows passes the
-    pack's allow-list and creates a character."""
+def test_factory_casts_in_the_skill_are_accepted(tmp_path):
+    """Every cast the skill shows (a ```yaml block of `cast.yaml` entries, and any
+    complete `an character new <name> …` line) passes the pack's allow-list and
+    creates its characters."""
+    import yaml
+
+    from cutan.characters.cast import cast_steps
+
     vp = _validate_pack()
-    lines = set()
+    commands = []
     for md in [SKILL / "SKILL.md", *REFS.glob("*.md")]:
-        for line in md.read_text(encoding="utf-8").splitlines():
+        text = md.read_text(encoding="utf-8")
+        for block in re.findall(r"```yaml\n(.*?)\n```", text, re.S):
+            commands += [s.argv() for s in cast_steps(yaml.safe_load(block))]
+        for line in text.splitlines():
             m = re.search(r"(an character new [a-z][^`\n]*)", line)
             if m and "<" not in m.group(1) and "..." not in m.group(1):
-                lines.add(m.group(1).strip())
-    assert lines, "the skill shows no `an character new <name>` command"
-    for i, line in enumerate(sorted(lines)):
-        argv = vp._checked_cast_line(shlex.split(line), i, line)
+                commands.append(shlex.split(m.group(1).strip()))
+    assert any(a[2] == "new" for a in commands), "the skill shows no cast"
+    for i, argv in enumerate(commands):
+        argv = vp._checked_cast_line(argv, i, " ".join(argv))
+        if argv[2] != "new":
+            continue
         argv[3] = f"c{i}"  # each its own name
         proc = subprocess.run(
             argv[:4] + ["--out-dir", str(tmp_path)] + argv[4:],
             capture_output=True, text=True, env=_env_with_an(),
         )
         out = proc.stdout + proc.stderr
-        assert proc.returncode == 0 and "created character" in out, f"{line}\n{out}"
+        assert proc.returncode == 0 and "created character" in out, f"{argv}\n{out}"
 
 
 def test_cast_allow_list_refuses_what_could_escape_the_project():

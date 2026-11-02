@@ -848,8 +848,25 @@ def contract() -> str:
     return _render_contract()
 
 
+def cast(file: str, out_dir: str = "") -> str:
+    """Make every character of a cast file (cast.yaml): one entry per character, the options of `an character new` plus its follow-up steps.
+
+    file: the cast file, e.g. {teo: {build: squat, hat: cap, palette: {skin: "#f1c9a5"}, mouth_variants: [happy, sad], half_lid: 0.5}}
+    out_dir: parent directory; defaults to ./assets/characters
+    """
+    from cutan.characters.cast import CastError, run_cast
+
+    try:
+        ok, messages = run_cast(file, out_dir=out_dir)
+    except (CastError, OSError) as e:
+        return failed(str(e))
+    report = "\n".join(messages) or "the cast is empty"
+    return report if ok else failed(report)
+
+
 _dispatch_funcs = [
     new,
+    cast,
     mouths,
     add_gaze,
     add_half_lid,

@@ -1,0 +1,207 @@
+"""A cast as data: ``cast.yaml``, one entry per character, read by the factory (cutan#87).
+
+A production pack used to carry its cast as ``cast.sh``, one ``an character``
+shell line per step. ``cast.yaml`` says the same as data::
+
+    mara:
+      build: tall
+      hair_style: bun
+      palette: {skin: "#c08a5a", hair: "#2b1d14"}
+      mouth_variants: [happy, sad]
+      voice_ref: mara_voice
+    teo:
+      build: squat
+      head_scale: 1.2
+      hat: cap
+      mouths: [angry]          # more mouth sets after the character is made
+      half_lid: 0.5            # a half eyelid for squints
+
+Each entry is the factory's options (``an character new``, always offline)
+plus three follow-up steps (``mouths``, ``half_lid``, ``gaze``). The keys are
+the ones :data:`cutan.pack.CAST_OPTIONS` allows a pack, so a cast file cannot
+reach an option a ``cast.sh`` line could not.
+
+:func:`cast_steps` reads a file or a mapping into :class:`CastStep`;
+:meth:`CastStep.argv` is the ``an character`` command line (what a pack check
+runs, behind the allow-list), and :func:`run_cast` runs the steps in this
+process through the factory's own commands (``an character cast FILE``).
+
+>>> [s.argv() for s in cast_steps({"teo": {"build": "squat", "hat": "cap", "half_lid": 0.5}})]
+[['an', 'character', 'new', 'teo', '--offline', '--build', 'squat', '--hat', 'cap'], ['an', 'character', 'add-half-lid', 'teo', '--fraction', '0.5']]
+"""
+
+from __future__ import annotations
+
+import os
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Union
+
+CAST_YAML = "cast.yaml"
+
+#: The options of ``an character new`` a cast entry may set, by key, with the
+#: type its value must have (a list joins with commas, a mapping as
+#: ``key=value`` pairs). ``views: false`` is ``--no-views``.
+NEW_OPTIONS: dict[str, tuple[type, ...]] = {
+    "build": (str,),
+    "head_scale": (int, float),
+    "hat": (str,),
+    "hair_style": (str,),
+    "hair_length": (str,),
+    "sash": (bool,),
+    "palette": (str, Mapping),
+    "clothing_pattern": (str,),
+    "mouth_variants": (str, list),
+    "views": (bool,),
+    "voice_ref": (str,),
+}
+#: The follow-up steps an entry may ask for, by key: the ``an character``
+#: subcommand, its option, and the value's type (``True`` for a step that
+#: takes none).
+FOLLOW_UPS: dict[str, tuple[str, str | None, tuple[type, ...]]] = {
+    "mouths": ("mouths", "--variants", (str, list)),
+    "half_lid": ("add-half-lid", "--fraction", (int, float)),
+    "gaze": ("add-gaze", None, (bool,)),
+}
+
+
+class CastError(ValueError):
+    """A cast file that cannot be read as a cast; the message names the entry."""
+
+
+@dataclass(frozen=True)
+class CastStep:
+    """One factory step: ``an character <command> <name> <options>``."""
+
+    command: str
+    name: str
+    options: dict[str, Any] = field(default_factory=dict)
+
+    def argv(self) -> list[str]:
+        """The ``an character`` command line of this step."""
+        args = ["an", "character", self.command, self.name]
+        if self.command == "new":
+            args.append("--offline")
+        for key, value in self.options.items():
+            flag = "--" + key.replace("_", "-")
+            if key == "views":
+                if not value:
+                    args.append("--no-views")
+            elif value is True:
+                args.append(flag)
+            elif value is not False:
+                args += [flag, _text(value)]
+        return args
+
+
+def _text(value: Any) -> str:
+    if isinstance(value, Mapping):
+        return ",".join(f"{k}={v}" for k, v in value.items())
+    if isinstance(value, list):
+        return ",".join(str(v) for v in value)
+    return str(value)
+
+
+def _checked(name: str, key: str, value: Any, types: tuple[type, ...]) -> Any:
+    ok = isinstance(value, types) and not (isinstance(value, bool) and bool not in types)
+    if not ok:
+        wanted = " or ".join(t.__name__ for t in types)
+        raise CastError(f"{CAST_YAML} {name!r}: {key} must be a {wanted}, not {value!r}")
+    return value
+
+
+def cast_steps(cast: Union[str, os.PathLike, Mapping[str, Any]]) -> list[CastStep]:
+    """The factory steps of a cast file (or its mapping), in order: each
+    character's ``new``, then its follow-ups. Raise :class:`CastError` on an
+    unknown key, a wrong type or a name the factory would refuse.
+
+    >>> cast_steps({"Teo": {}})
+    Traceback (most recent call last):
+    ...
+    cutan.characters.cast.CastError: cast.yaml 'Teo': not a character name (lowercase letters, digits, _)
+    """
+    from cutan.pack import NAME_RE
+
+    if not isinstance(cast, Mapping):
+        import yaml
+
+        text = Path(cast).read_text(encoding="utf-8")
+        try:
+            cast = yaml.safe_load(text) or {}
+        except yaml.YAMLError as e:
+            raise CastError(f"{CAST_YAML} is not YAML: {e}") from None
+        if not isinstance(cast, Mapping):
+            raise CastError(f"{CAST_YAML} holds a mapping {{name: options}}, not {type(cast).__name__}")
+    steps: list[CastStep] = []
+    for name, entry in cast.items():
+        if not isinstance(name, str) or not NAME_RE.match(name):
+            raise CastError(
+                f"{CAST_YAML} {name!r}: not a character name (lowercase letters, digits, _)"
+            )
+        entry = {} if entry is None else entry
+        if not isinstance(entry, Mapping):
+            raise CastError(f"{CAST_YAML} {name!r}: an entry is a mapping of options, not {entry!r}")
+        unknown = set(entry) - set(NEW_OPTIONS) - set(FOLLOW_UPS)
+        if unknown:
+            raise CastError(
+                f"{CAST_YAML} {name!r}: unknown key(s) {sorted(unknown)}; allowed: "
+                f"{', '.join([*NEW_OPTIONS, *FOLLOW_UPS])}"
+            )
+        new = {
+            k: _checked(name, k, v, NEW_OPTIONS[k]) for k, v in entry.items() if k in NEW_OPTIONS
+        }
+        steps.append(CastStep("new", name, new))
+        for key, (command, option, types) in FOLLOW_UPS.items():
+            if key not in entry:
+                continue
+            value = _checked(name, key, entry[key], types)
+            if option is None:
+                if value:
+                    steps.append(CastStep(command, name))
+            else:
+                steps.append(CastStep(command, name, {option.lstrip("-"): value}))
+    return steps
+
+
+def run_cast(
+    cast: Union[str, os.PathLike, Mapping[str, Any]], *, out_dir: str = ""
+) -> tuple[bool, list[str]]:
+    """Run a cast's steps through the factory's own commands, in this process;
+    ``(ok, one message per step)``. Stops at the first step that fails, since
+    every later step of a cast builds on the earlier ones.
+    """
+    from cutan.characters import cli
+
+    commands = {
+        "new": cli.new,
+        "mouths": cli.mouths,
+        "add-half-lid": cli.add_half_lid,
+        "add-gaze": cli.add_gaze,
+    }
+    messages = []
+    for step in cast_steps(cast):
+        kwargs = {k: _text(v) if isinstance(v, (list, Mapping)) else v for k, v in step.options.items()}
+        if step.command == "new":
+            kwargs["offline"] = True
+        label = " ".join(step.argv()[2:4])
+        try:
+            result = commands[step.command](step.name, out_dir=out_dir, **kwargs)
+        except (OSError, ValueError) as e:  # the factory raises on some refusals
+            messages.append(f"{label}: [error] {type(e).__name__}: {e}")
+            return False, messages
+        messages.append(f"{label}: {result}")
+        if _is_failure(step, result):
+            return False, messages
+    return True, messages
+
+
+def _is_failure(step: CastStep, result: Any) -> bool:
+    """A failed exit status, or no word of success: some factory commands still
+    return a plain report when they fail (the rule a pack check reads them by,
+    :data:`cutan.pack.CAST_SUCCESS`)."""
+    from an.cli_status import exit_code_of
+
+    from cutan.pack import CAST_SUCCESS
+
+    return exit_code_of(result) != 0 or CAST_SUCCESS[step.command] not in str(result)

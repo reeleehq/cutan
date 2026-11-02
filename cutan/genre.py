@@ -147,6 +147,7 @@ CUTOUT_SERVICES: dict[str, str] = {
     "cli.character": "cutan.characters.cli:_dispatch_funcs",
     "cli.impacts": "cutan.impacts.cli:_dispatch_funcs",
     "cli.projects": "cutan.projects_cli:_dispatch_funcs",
+    "cli.pack": "cutan.pack_cli:_dispatch_funcs",
     # Where `an init <id> --id --genre cutout_animation` creates the project
     # (API level 7, cutan#91): the cache folder when the projects store is S3.
     "projects.dir.cutan": "cutan.projects_store:new_project_dir",

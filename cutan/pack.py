@@ -63,6 +63,7 @@ __all__ = [
     "PackReport",
     "cast_commands",
     "check_pack",
+    "import_pack",
     "lint_svg",
     "main",
     "pack_art_guidance",
@@ -70,7 +71,9 @@ __all__ = [
 ]
 
 CAST_FILE = "cast.sh"
-PACK_ONLY_FILES = (CAST_FILE,)
+#: The cast as data (:mod:`cutan.characters.cast`), what a pack carries instead of ``cast.sh``.
+CAST_YAML = "cast.yaml"
+PACK_ONLY_FILES = (CAST_FILE, CAST_YAML)
 NAME_RE = re.compile(r"^[a-z][a-z0-9_]{0,40}$")
 #: Per `an character` subcommand: the options a pack may pass (value-taking
 #: ones map to True, flags to False). Anything else is refused: `--out-dir`,
@@ -318,12 +321,28 @@ def _strip_marker(line: str, marker: str) -> str:
 
 
 def cast_commands(pack: Path) -> list[list[str]]:
-    """The ``an character`` commands of ``cast.sh``; raise :class:`PackError` on any other line.
+    """The ``an character`` commands of the pack's cast: ``cast.yaml`` (data, read
+    by :func:`cutan.characters.cast.cast_steps`) or ``cast.sh``; raise
+    :class:`PackError` on anything the allow-list refuses, or on both files.
 
-    Blank lines and ``#`` comments are skipped; a trailing backslash continues
-    a line.
+    In ``cast.sh``, blank lines and ``#`` comments are skipped; a trailing
+    backslash continues a line.
     """
     path = Path(pack) / CAST_FILE
+    data = Path(pack) / CAST_YAML
+    if data.exists():
+        if path.exists():
+            raise PackError(f"the pack has both {CAST_YAML} and {CAST_FILE}: keep one")
+        from cutan.characters.cast import CastError, cast_steps
+
+        try:
+            steps = cast_steps(data)
+        except (CastError, OSError, UnicodeDecodeError) as e:
+            raise PackError(str(e)) from None
+        return [
+            _checked_cast_line(argv, n, " ".join(argv), source=CAST_YAML)
+            for n, argv in enumerate((s.argv() for s in steps), 1)
+        ]
     if not path.exists():
         return []
     try:
@@ -343,9 +362,12 @@ def cast_commands(pack: Path) -> list[list[str]]:
     return commands
 
 
-def _checked_cast_line(argv: list[str], n: int, line: str) -> list[str]:
+def _checked_cast_line(
+    argv: list[str], n: int, line: str, *, source: str = CAST_FILE
+) -> list[str]:
     def refuse(why: str) -> PackError:
-        return PackError(f"{CAST_FILE} line {n}: {why}: {line}")
+        where = f"line {n}" if source == CAST_FILE else f"step {n}"
+        return PackError(f"{source} {where}: {why}: {line}")
 
     if argv[:2] != ["an", "character"] or len(argv) < 4 or argv[2] not in CAST_OPTIONS:
         raise refuse(
@@ -756,7 +778,7 @@ def _build_and_check(
     cast = cast_commands(pack)  # refuse a bad cast.sh before running anything
     if len(cast) > MAX_CAST_LINES:
         raise PackError(
-            f"{CAST_FILE} has {len(cast)} commands; a pack checked here has at most {MAX_CAST_LINES}"
+            f"the cast has {len(cast)} commands; a pack checked here has at most {MAX_CAST_LINES}"
         )
     for kind in ("characters", "props", "environments"):
         n = len(_subdirs(pack / "assets" / kind))
@@ -917,13 +939,92 @@ def check_pack(
     """
     if child_limits is not None and os.name == "nt":
         raise ValueError("child_limits needs a POSIX system (subprocess preexec_fn)")
+    owned = workdir is None
+    work = Path(tempfile.mkdtemp(prefix="cutan-pack-")) if owned else Path(workdir)
+    work.mkdir(parents=True, exist_ok=True)
+    try:
+        return _pack_report(
+            pack_dir,
+            work / "project",
+            scratch=work,
+            an_command=an_command,
+            python=python,
+            timeout=timeout,
+            deadline=deadline,
+            child_limits=child_limits,
+        )
+    finally:
+        if owned:
+            shutil.rmtree(work, ignore_errors=True)
+
+
+def import_pack(
+    pack_dir: str | os.PathLike,
+    project_dir: str | os.PathLike | None = None,
+    *,
+    dry_run: bool = False,
+    an_command: Sequence[str] = DFLT_AN_COMMAND,
+    timeout: float = DFLT_STEP_TIMEOUT,
+    deadline: float | None = DFLT_DEADLINE,
+) -> PackReport:
+    """Turn a production pack into a project: :func:`check_pack`'s steps on a
+    real project at ``project_dir`` (default: the pack's name, in the current
+    folder), which is kept, then the same report.
+
+    ``dry_run``: build a scratch project instead and delete it (that is
+    :func:`check_pack`). The project folder must not exist yet: an import never
+    writes over a project. A failed check leaves the project as it got, for
+    the report's errors to be fixed in place.
+
+    >>> import_pack("/no/such/pack", "/tmp/never-made").errors
+    ['pack: pack has no scene.md: is it a production pack?']
+    """
+    if dry_run:
+        return check_pack(
+            pack_dir, an_command=an_command, timeout=timeout, deadline=deadline
+        )
+    pack = Path(pack_dir).resolve()
+    project = Path(project_dir or Path.cwd() / pack.name).resolve()
+    if project.exists():
+        report = PackReport()
+        report.add(
+            "pack",
+            False,
+            f"{ERROR_MARKER} {project.name} exists already: an import makes a new "
+            "project (choose another folder, or --dry-run to only check)",
+        )
+        return report
+    if (pack / "scene.md").is_file():
+        project.parent.mkdir(parents=True, exist_ok=True)
+    return _pack_report(
+        pack,
+        project,
+        scratch=None,
+        an_command=an_command,
+        python=None,
+        timeout=timeout,
+        deadline=deadline,
+        child_limits=None,
+    )
+
+
+def _pack_report(
+    pack_dir: str | os.PathLike,
+    project: Path,
+    *,
+    scratch: Path | None,
+    an_command: Sequence[str],
+    python: str | None,
+    timeout: float,
+    deadline: float | None,
+    child_limits: Callable[[], None] | None,
+) -> PackReport:
+    """Build ``project`` from the pack and check it; the report names no path of
+    this machine (``<project>``, ``<scratch>``, ``<pack>`` instead)."""
     pack = Path(pack_dir).resolve()
     report = PackReport()
     an = list(an_command)
     python = python or (an[0] if "python" in Path(an[0]).name else sys.executable)
-    owned = workdir is None
-    work = Path(tempfile.mkdtemp(prefix="cutan-pack-")) if owned else Path(workdir)
-    work.mkdir(parents=True, exist_ok=True)
     try:
         if not (pack / "scene.md").is_file():
             raise PackError(
@@ -931,7 +1032,7 @@ def check_pack(
             )
         _build_and_check(
             pack,
-            work / "project",
+            project,
             report,
             an=an,
             python=python,
@@ -947,14 +1048,10 @@ def check_pack(
             False,
             f"{ERROR_MARKER} the pack could not be checked: {type(e).__name__}: {e}",
         )
-    finally:
-        if owned:
-            shutil.rmtree(work, ignore_errors=True)
-    places = [
-        (str(work / "project"), "<project>"),
-        (str(work), "<scratch>"),
-        (str(pack), "<pack>"),
-    ]
+    places = [(str(project), "<project>")]
+    if scratch is not None:
+        places.append((str(scratch), "<scratch>"))
+    places.append((str(pack), "<pack>"))
     report.checks = [
         PackCheck(c.label, c.ok, _redact(c.output, places=places))
         for c in report.checks
