@@ -87,8 +87,11 @@ KEYS: dict[str, dict[str, Any]] = {
 #: What an art spec's ``prop`` may say: carve's ``point`` (the anchor: where a
 #: hand holds it), ``keep``, ``detach`` and ``despill``, and ``write_prop``'s
 #: ``landmarks`` (``{"grip": [x, y]}`` in the image's pixels) and ``max_side``.
-PROP_KEYS: tuple[str, ...] = ("point", "keep", "detach", "despill", "landmarks", "max_side")
 _CARVE_KEYS: tuple[str, ...] = ("point", "keep", "detach", "despill")
+_WRITE_KEYS: tuple[str, ...] = ("landmarks", "max_side")
+PROP_KEYS: tuple[str, ...] = _CARVE_KEYS + _WRITE_KEYS
+#: carve's ``keep`` values.
+_KEEPS: tuple[str, ...] = ("point", "largest", "all")
 _SIZE = re.compile(r"^([1-9]\d*x[1-9]\d*|auto)$")
 #: An art name is a file name: no folder, no hidden file.
 _NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
@@ -158,6 +161,8 @@ class ArtSpec:
                     f"art {self.name!r}: a prop is carved from an opaque image by its key; "
                     "`fit` and `background: transparent` are for plates"
                 )
+            if problem := _prop_problem(self.prop, self.size):
+                raise ValueError(f"art {self.name!r}: prop {problem}")
         if self.key is not None:
             from cutan.carve.mattes import as_matte
 
@@ -168,6 +173,55 @@ class ArtSpec:
                     f"art {self.name!r}: key {self.key!r} is neither one of "
                     f"{sorted(KEYS)} nor a matte recipe ({e})"
                 ) from None
+
+
+def _xy(value: Any) -> tuple[float, float] | None:
+    """``value`` as two finite numbers, or ``None``."""
+    if isinstance(value, (str, bytes, Mapping)) or not hasattr(value, "__len__") or len(value) != 2:
+        return None
+    if not all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in value):
+        return None
+    x, y = (float(v) for v in value)
+    return (x, y) if np.isfinite(x) and np.isfinite(y) else None
+
+
+def _prop_problem(prop: Mapping[str, Any], size: str) -> str | None:
+    """Why a spec's ``prop`` would fail after the image is paid for, or ``None``.
+
+    >>> _prop_problem({"point": [40, 48], "landmarks": {"grip": [1, 2]}}, "160x96") is None
+    True
+    >>> _prop_problem({"point": [900, 900]}, "160x96")
+    'point (900.0, 900.0) is outside the 160x96 image'
+    """
+    from cutan.carve.prop import _LANDMARK_NAME
+
+    w, h = (float(v) for v in size.split("x")) if "x" in size else (None, None)
+    points = {}
+    if "point" in prop:
+        points["point"] = prop["point"]
+    landmarks = prop.get("landmarks") or {}
+    if not isinstance(landmarks, Mapping):
+        return f"landmarks is {{name: [x, y]}}, not {landmarks!r}"
+    for name, xy in landmarks.items():
+        if not isinstance(name, str) or not _LANDMARK_NAME.fullmatch(name):
+            return f"landmark name {name!r} is not a name (letters, digits, _ . -)"
+        points[f"landmark {name!r}"] = xy
+    for label, value in points.items():
+        xy = _xy(value)
+        if xy is None:
+            return f"{label} is [x, y] in the image's pixels, not {value!r}"
+        if w is not None and not (0 <= xy[0] <= w and 0 <= xy[1] <= h):
+            return f"{label} {xy} is outside the {size} image"
+    if "keep" in prop and prop["keep"] not in _KEEPS:
+        return f"keep is one of {list(_KEEPS)}, not {prop['keep']!r}"
+    for key in ("detach", "despill", "max_side"):
+        value = prop.get(key)
+        if value is not None and (
+            isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0
+            or (key == "max_side" and value == 0)
+        ):
+            return f"{key} is a number >= 0 (max_side > 0), not {value!r}"
+    return None
 
 
 def _key_recipe(key: Union[str, Mapping[str, Any], Any]) -> Any:
@@ -387,7 +441,8 @@ def generate_art(
     its record, and removed once the PNG and its record are written, unless
     ``keep_raw``: a key or fit that fails leaves the paid-for image, and the
     next run keys that image instead of paying for a new one. Every file is
-    written whole or not at all.
+    written whole or not at all (a prop's files by ``write_prop``, in place: a
+    ``prop.json`` a crash cut off is not taken as made, and is made again).
     """
     specs = art_specs(spec) if isinstance(spec, (str, Path, Mapping)) else list(spec)
     wanted = set(only) if only is not None else None
@@ -416,14 +471,14 @@ def generate_art(
         raw = out / f"{s.name}.raw.png"
         path = out / s.name / "prop.json" if s.prop is not None else out / f"{s.name}.png"
         entry = path.relative_to(out).as_posix()
-        if path.exists() and not overwrite:
+        if _made(path, prop=s.prop is not None) and not overwrite:
             known = recorded.get(entry)
             made.append(
                 GeneratedArt(
                     s.name,
                     path,
                     _source(known),
-                    _image_size(path) if s.prop is None else (0, 0),
+                    _image_size(path) if s.prop is None else _prop_size(path),
                     kept=True,
                 )
             )
@@ -447,7 +502,10 @@ def generate_art(
             _write_sources(out, recorded)
         source = _source(recorded.get(entry)) or art_source(s, generator)
         if s.prop is not None:
-            made.append(_write_generated_prop(s, image, out, source, overwrite=overwrite))
+            made.append(_write_generated_prop(s, image, out, source))
+            source = source.model_copy(
+                update={"sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+            )
             recorded[entry] = source.model_dump(mode="json", exclude_none=True)
             _write_sources(out, recorded)
             if not keep_raw:
@@ -485,10 +543,35 @@ def _source(entry: Any) -> Optional[AssetSource]:
         return None
 
 
+def _made(path: Path, *, prop: bool) -> bool:
+    """Whether ``path`` is a finished image or prop: a ``prop.json`` cut off by a
+    crash (``write_prop`` writes it in place) is not, and is made again."""
+    if not path.exists():
+        return False
+    if not prop:
+        return True
+    try:
+        return json.loads(path.read_text(encoding="utf-8")).get("kind") == "PropDescriptor"
+    except (OSError, ValueError, AttributeError):
+        return False
+
+
+def _prop_size(path: Path) -> tuple[int, int]:
+    """A written prop's size, from its descriptor's ``view_box``."""
+    try:
+        box = json.loads(path.read_text(encoding="utf-8")).get("view_box") or (0, 0, 0, 0)
+        return (int(round(box[2])), int(round(box[3])))
+    except (OSError, ValueError, TypeError, IndexError, AttributeError):
+        return (0, 0)
+
+
 def _write_generated_prop(
-    spec: ArtSpec, image: Image.Image, out: Path, source: AssetSource, *, overwrite: bool
+    spec: ArtSpec, image: Image.Image, out: Path, source: AssetSource
 ) -> GeneratedArt:
-    """Carve ``image`` by the spec's key and write it as a prop (cutan#162)."""
+    """Carve ``image`` by the spec's key and write it as a prop (cutan#162),
+    over a prop a crash left unfinished."""
+    import warnings
+
     from cutan.carve import carve, write_prop
 
     prop = dict(spec.prop or {})
@@ -499,21 +582,22 @@ def _write_generated_prop(
         **{k: (tuple(v) if k == "point" else v) for k, v in prop.items() if k in _CARVE_KEYS},
     )
     folder = out / spec.name
-    write_prop(
-        carving,
-        folder,
-        name=spec.name,
-        source=source,
-        landmarks={k: tuple(v) for k, v in (prop.get("landmarks") or {}).items()} or None,
-        max_side=prop.get("max_side"),
-        overwrite=overwrite,
-    )
+    with warnings.catch_warnings(record=True) as said:  # write_prop warns on a far landmark
+        warnings.simplefilter("always")
+        write_prop(
+            carving,
+            folder,
+            name=spec.name,
+            landmarks={k: tuple(v) for k, v in (prop.get("landmarks") or {}).items()} or None,
+            max_side=prop.get("max_side"),
+            overwrite=True,  # generate_art decided: nothing finished is there
+        )
     return GeneratedArt(
         spec.name,
         folder / "prop.json",
         source,
         carving.size,
-        warnings=tuple(carving.quality.warnings()),
+        warnings=tuple(carving.quality.warnings()) + tuple(str(w.message) for w in said),
     )
 
 
