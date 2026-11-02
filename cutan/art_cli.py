@@ -24,7 +24,7 @@ def generate(
 ) -> str:
     """Generate each image of a spec with an image model, key its backdrop colour to alpha, fit it, and write it with its provenance.
 
-    spec: a JSON file: {name: {prompt, size, background (opaque|transparent), key (magenta|green|a matte recipe), fit [w, h], model, quality}}
+    spec: a JSON file: {name: {prompt, size, background (opaque|transparent), key (magenta|green|a matte recipe), fit [w, h], model, quality, prop {point, landmarks, max_side, keep, detach, despill}: carve it into a prop folder instead of a plate}}
     out: the folder to write <name>.png and art_sources.json into (an environment's plates/, a prop's parts/)
     only: comma-separated names to make (default: all)
     keep_raw: also write the model's own image as <name>.raw.png
@@ -50,6 +50,7 @@ def generate(
         )
         for a in made
     ]
+    lines += [f"  ! {a.name}: {w}" for a in made for w in a.warnings]
     if not made:
         return "nothing made"
     return "\n".join(

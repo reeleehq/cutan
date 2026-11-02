@@ -239,3 +239,32 @@ def test_a_palette_image_is_fitted_smoothly():
     fitted = G.cover_fit(im.convert("P"), (20, 10))
     assert fitted.mode == "RGBA"
     assert len({px[:3] for px in fitted.getdata()}) > 2, "resampled, not nearest"
+
+
+def test_a_prop_is_carved_by_its_key_and_written_with_its_source(tmp_path):
+    """cutan#162: a generated part goes through carve() and write_prop."""
+    spec = {"mug": {"prompt": "a mug on magenta", "size": "160x96", "key": "magenta",
+                    "prop": {"point": [40, 48], "landmarks": {"grip": [30, 40]}}}}  # fmt: skip
+    painter = Painter()
+    (mug,) = G.generate_art(spec, out_dir=tmp_path, generator=painter)
+    assert mug.path == tmp_path / "mug" / "prop.json"
+    doc = json.loads(mug.path.read_text())
+    assert doc["kind"] == "PropDescriptor"
+    assert doc["source"]["provider"] == "stub" and doc["source"]["extra"]["prompt"] == "a mug on magenta"
+    assert any(b["name"] == "grip" for b in doc["bones"]), "the landmark is a bone"
+    assert list((tmp_path / "mug" / "parts").glob("*.png"))
+    assert not (tmp_path / "mug.raw.png").exists()
+    record = json.loads((tmp_path / G.SOURCES_FILE).read_text())
+    assert "mug/prop.json" in record
+    again = G.generate_art(spec, out_dir=tmp_path, generator=painter)
+    assert again[0].kept and len(painter.calls) == 1, "an existing prop is not paid for twice"
+
+
+def test_a_prop_spec_is_checked_before_payment():
+    for entry, match in (
+        ({"prompt": "p", "prop": {"colour": "red"}}, "prop is a mapping"),
+        ({"prompt": "p", "prop": {}, "fit": [10, 10]}, "for plates"),
+        ({"prompt": "p", "prop": {}, "background": "transparent"}, "for plates"),
+    ):
+        with pytest.raises(ValueError, match=match):
+            G.art_specs({"x": entry})
