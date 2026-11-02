@@ -332,6 +332,11 @@ def cast_commands(pack: Path) -> list[list[str]]:
     """
     path = Path(pack) / CAST_FILE
     data = Path(pack) / CAST_YAML
+    for cast_file in (path, data):
+        # a link (or a FIFO) would read, or wait on, something outside the pack,
+        # and a refused line is quoted back in the report
+        if cast_file.is_symlink() or (cast_file.exists() and not cast_file.is_file()):
+            raise PackError(f"{cast_file.name} must be a plain file in the pack, not a link")
     if data.exists():
         if path.exists():
             raise PackError(f"the pack has both {CAST_YAML} and {CAST_FILE}: keep one")
@@ -348,7 +353,7 @@ def cast_commands(pack: Path) -> list[list[str]]:
     if not path.exists():
         return []
     try:
-        with open(path, "rb") as f:  # at most the cap: a FIFO or a link has no honest size
+        with open(path, "rb") as f:  # at most the cap: never trust the size
             data = f.read(MAX_CAST_BYTES + 1)
         if len(data) > MAX_CAST_BYTES:
             raise PackError(f"{CAST_FILE} is over {MAX_CAST_BYTES} bytes: a cast is a page")

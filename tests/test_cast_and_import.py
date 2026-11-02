@@ -204,3 +204,19 @@ def test_cast_sh_is_read_up_to_the_cap(tmp_path):
     (pack / "cast.sh").write_text("# padding\n" * 10_000)
     with pytest.raises(P.PackError, match="bytes"):
         P.cast_commands(pack)
+
+
+@pytest.mark.parametrize("name", ["cast.sh", "cast.yaml"])
+def test_a_cast_file_that_is_a_link_is_refused_unread(tmp_path, name):
+    """A link would quote an outside file back in the report (cutan#164)."""
+    secret = tmp_path / "secret.txt"
+    secret.write_text("root:x:0:0:secretline\n")
+    pack = tmp_path / "pack"
+    pack.mkdir()
+    try:
+        (pack / name).symlink_to(secret)
+    except OSError:  # Windows without the privilege to make links
+        pytest.skip("this machine cannot make a symbolic link")
+    with pytest.raises(P.PackError, match="plain file") as e:
+        P.cast_commands(pack)
+    assert "secretline" not in str(e.value)
