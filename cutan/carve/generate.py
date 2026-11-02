@@ -177,7 +177,11 @@ class ArtSpec:
 
 def _xy(value: Any) -> tuple[float, float] | None:
     """``value`` as two finite numbers, or ``None``."""
-    if isinstance(value, (str, bytes, Mapping)) or not hasattr(value, "__len__") or len(value) != 2:
+    if (
+        isinstance(value, (str, bytes, Mapping))
+        or not hasattr(value, "__len__")
+        or len(value) != 2
+    ):
         return None
     if not all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in value):
         return None
@@ -217,7 +221,9 @@ def _prop_problem(prop: Mapping[str, Any], size: str) -> str | None:
     for key in ("detach", "despill", "max_side"):
         value = prop.get(key)
         if value is not None and (
-            isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or value < 0
             or (key == "max_side" and value == 0)
         ):
             return f"{key} is a number >= 0 (max_side > 0), not {value!r}"
@@ -469,7 +475,9 @@ def generate_art(
     made = []
     for s in specs:
         raw = out / f"{s.name}.raw.png"
-        path = out / s.name / "prop.json" if s.prop is not None else out / f"{s.name}.png"
+        path = (
+            out / s.name / "prop.json" if s.prop is not None else out / f"{s.name}.png"
+        )
         entry = path.relative_to(out).as_posix()
         if _made(path, prop=s.prop is not None) and not overwrite:
             known = recorded.get(entry)
@@ -551,7 +559,9 @@ def _made(path: Path, *, prop: bool) -> bool:
     if not prop:
         return True
     try:
-        return json.loads(path.read_text(encoding="utf-8")).get("kind") == "PropDescriptor"
+        return (
+            json.loads(path.read_text(encoding="utf-8")).get("kind") == "PropDescriptor"
+        )
     except (OSError, ValueError, AttributeError):
         return False
 
@@ -559,7 +569,12 @@ def _made(path: Path, *, prop: bool) -> bool:
 def _prop_size(path: Path) -> tuple[int, int]:
     """A written prop's size, from its descriptor's ``view_box``."""
     try:
-        box = json.loads(path.read_text(encoding="utf-8")).get("view_box") or (0, 0, 0, 0)
+        box = json.loads(path.read_text(encoding="utf-8")).get("view_box") or (
+            0,
+            0,
+            0,
+            0,
+        )
         return (int(round(box[2])), int(round(box[3])))
     except (OSError, ValueError, TypeError, IndexError, AttributeError):
         return (0, 0)
@@ -579,16 +594,23 @@ def _write_generated_prop(
         np.asarray(image.convert("RGB")),
         matte=_key_recipe(spec.key) if spec.key else "flat_colour",
         source=source,
-        **{k: (tuple(v) if k == "point" else v) for k, v in prop.items() if k in _CARVE_KEYS},
+        **{
+            k: (tuple(v) if k == "point" else v)
+            for k, v in prop.items()
+            if k in _CARVE_KEYS
+        },
     )
     folder = out / spec.name
-    with warnings.catch_warnings(record=True) as said:  # write_prop warns on a far landmark
+    with warnings.catch_warnings(
+        record=True
+    ) as said:  # write_prop warns on a far landmark
         warnings.simplefilter("always")
         write_prop(
             carving,
             folder,
             name=spec.name,
-            landmarks={k: tuple(v) for k, v in (prop.get("landmarks") or {}).items()} or None,
+            landmarks={k: tuple(v) for k, v in (prop.get("landmarks") or {}).items()}
+            or None,
             max_side=prop.get("max_side"),
             overwrite=True,  # generate_art decided: nothing finished is there
         )
@@ -597,7 +619,8 @@ def _write_generated_prop(
         folder / "prop.json",
         source,
         carving.size,
-        warnings=tuple(carving.quality.warnings()) + tuple(str(w.message) for w in said),
+        warnings=tuple(carving.quality.warnings())
+        + tuple(str(w.message) for w in said),
     )
 
 
