@@ -28,7 +28,7 @@ def generate(
     out: the folder to write <name>.png and art_sources.json into (an environment's plates/, a prop's parts/)
     only: comma-separated names to make (default: all)
     keep_raw: also write the model's own image as <name>.raw.png
-    overwrite: make an image again when <name>.png exists (each generation is billed)
+    overwrite: make an image again when <name>.png exists (default: keep it; each generation is billed)
     model: the default generator's model, where the spec names none (default: gpt-image-2)
     """
     from cutan.carve.generate import AixGenerator, generate_art
@@ -41,8 +41,20 @@ def generate(
         keep_raw=keep_raw,
         overwrite=overwrite,
     )
-    lines = [f"{a.path}  {a.size[0]}x{a.size[1]}  ({a.source.provider}, {a.source.license})" for a in made]
-    return "\n".join(lines + [f"provenance: {made[0].path.parent / 'art_sources.json'}"] if made else ["nothing made"])
+    lines = [
+        f"{a.path}  {a.size[0]}x{a.size[1]}  "
+        + (
+            "(kept: already there; --overwrite makes it again)"
+            if a.kept
+            else f"({a.source.provider}, {a.source.license or 'licence unknown'})"
+        )
+        for a in made
+    ]
+    if not made:
+        return "nothing made"
+    return "\n".join(
+        [*lines, f"provenance: {made[0].path.parent / 'art_sources.json'}"]
+    )
 
 
 _dispatch_funcs = [generate]
