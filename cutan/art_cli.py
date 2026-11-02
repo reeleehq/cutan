@@ -72,12 +72,15 @@ def critique_plates(project: str = ".", model: str = "") -> str:
     report = critique_far_plates(project, model=model or None)
     lines = [f"[{sev}] {where}: {msg}" for sev, where, msg in report.findings]
     lines.append(
-        f"{len(report.calls)} judge call(s): " + ", ".join(c["plate"] for c in report.calls)
+        f"{len(report.calls)} judge call(s): "
+        + ", ".join(c["plate"] for c in report.calls)
         if report.calls
         else "0 judge calls"
     )
     text = "\n".join(lines)
-    return failed(text) if any(sev == "error" for sev, _, _ in report.findings) else text
+    return (
+        failed(text) if any(sev == "error" for sev, _, _ in report.findings) else text
+    )
 
 
 _dispatch_funcs = [generate, critique_plates]
