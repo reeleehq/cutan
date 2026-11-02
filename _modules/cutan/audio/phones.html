@@ -423,73 +423,75 @@
 </span><span id="line-226">        <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">code</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">stop</span><span class="p">)))</span>
 </span><span id="line-227">    <span class="n">spoken</span> <span class="o">=</span> <span class="p">[(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">phones</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_silence</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))]</span>
 </span><span id="line-228">    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
-</span><span id="line-229">        <span class="k">if</span> <span class="n">word</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">word</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">word</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">word</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">spoken</span><span class="p">):</span>
-</span><span id="line-230">            <span class="n">segments</span> <span class="o">+=</span> <span class="n">_letter_segments</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">char_to_viseme</span> <span class="ow">or</span> <span class="p">{})</span>
-</span><span id="line-231">    <span class="k">return</span> <span class="n">_keyframes</span><span class="p">(</span>
-</span><span id="line-232">        <span class="n">segments</span><span class="p">,</span>
-</span><span id="line-233">        <span class="n">total_duration</span><span class="o">=</span><span class="n">total_duration</span><span class="p">,</span>
-</span><span id="line-234">        <span class="n">rest_viseme</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">,</span>
-</span><span id="line-235">        <span class="n">min_gap_for_rest</span><span class="o">=</span><span class="n">min_gap_for_rest</span><span class="p">,</span>
-</span><span id="line-236">    <span class="p">)</span></div>
+</span><span id="line-229">        <span class="k">if</span> <span class="n">word</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">word</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
+</span><span id="line-230">            <span class="n">word</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">word</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">spoken</span>
+</span><span id="line-231">        <span class="p">):</span>
+</span><span id="line-232">            <span class="n">segments</span> <span class="o">+=</span> <span class="n">_letter_segments</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">char_to_viseme</span> <span class="ow">or</span> <span class="p">{})</span>
+</span><span id="line-233">    <span class="k">return</span> <span class="n">_keyframes</span><span class="p">(</span>
+</span><span id="line-234">        <span class="n">segments</span><span class="p">,</span>
+</span><span id="line-235">        <span class="n">total_duration</span><span class="o">=</span><span class="n">total_duration</span><span class="p">,</span>
+</span><span id="line-236">        <span class="n">rest_viseme</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">,</span>
+</span><span id="line-237">        <span class="n">min_gap_for_rest</span><span class="o">=</span><span class="n">min_gap_for_rest</span><span class="p">,</span>
+</span><span id="line-238">    <span class="p">)</span></div>
 
-</span><span id="line-237">
-</span><span id="line-238">
+</span><span id="line-239">
+</span><span id="line-240">
 <div class="viewcode-block" id="clip_timings">
 <a class="viewcode-back" href="../../../_autosummary/cutan.audio.phones.html#cutan.audio.phones.clip_timings">[docs]</a>
-</span><span id="line-239"><span class="k">def</span><span class="w"> </span><span class="nf">clip_timings</span><span class="p">(</span><span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Timing</span><span class="p">]]:</span>
-</span><span id="line-240"><span class="w">    </span><span class="sd">"""``audio``'s ``words`` or ``phones`` as a list of ``(label, start_s, end_s)``;</span>
-</span><span id="line-241"><span class="sd">    ``None`` when it has none (or its ``an`` predates the field).</span>
-</span><span id="line-242">
-</span><span id="line-243"><span class="sd">    &gt;&gt;&gt; clip_timings(AudioClip(duration=1.0, phones=[("M", 0, 0.1)]), "phones")</span>
-</span><span id="line-244"><span class="sd">    [('M', 0.0, 0.1)]</span>
-</span><span id="line-245"><span class="sd">    &gt;&gt;&gt; clip_timings(AudioClip(duration=1.0), "phones") is None</span>
-</span><span id="line-246"><span class="sd">    True</span>
-</span><span id="line-247"><span class="sd">    """</span>
-</span><span id="line-248">    <span class="n">timings</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-249">    <span class="k">if</span> <span class="ow">not</span> <span class="n">timings</span><span class="p">:</span>
-</span><span id="line-250">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-251">    <span class="k">return</span> <span class="p">[(</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">timings</span><span class="p">]</span></div>
+</span><span id="line-241"><span class="k">def</span><span class="w"> </span><span class="nf">clip_timings</span><span class="p">(</span><span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Timing</span><span class="p">]]:</span>
+</span><span id="line-242"><span class="w">    </span><span class="sd">"""``audio``'s ``words`` or ``phones`` as a list of ``(label, start_s, end_s)``;</span>
+</span><span id="line-243"><span class="sd">    ``None`` when it has none (or its ``an`` predates the field).</span>
+</span><span id="line-244">
+</span><span id="line-245"><span class="sd">    &gt;&gt;&gt; clip_timings(AudioClip(duration=1.0, phones=[("M", 0, 0.1)]), "phones")</span>
+</span><span id="line-246"><span class="sd">    [('M', 0.0, 0.1)]</span>
+</span><span id="line-247"><span class="sd">    &gt;&gt;&gt; clip_timings(AudioClip(duration=1.0), "phones") is None</span>
+</span><span id="line-248"><span class="sd">    True</span>
+</span><span id="line-249"><span class="sd">    """</span>
+</span><span id="line-250">    <span class="n">timings</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-251">    <span class="k">if</span> <span class="ow">not</span> <span class="n">timings</span><span class="p">:</span>
+</span><span id="line-252">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-253">    <span class="k">return</span> <span class="p">[(</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">timings</span><span class="p">]</span></div>
 
-</span><span id="line-252">
-</span><span id="line-253">
+</span><span id="line-254">
+</span><span id="line-255">
 <div class="viewcode-block" id="phones_track">
 <a class="viewcode-back" href="../../../_autosummary/cutan.audio.phones.html#cutan.audio.phones.phones_track">[docs]</a>
-</span><span id="line-254"><span class="k">def</span><span class="w"> </span><span class="nf">phones_track</span><span class="p">(</span>
-</span><span id="line-255">    <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span>
-</span><span id="line-256">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-257">    <span class="n">phone_to_viseme</span><span class="p">:</span> <span class="n">PhoneToViseme</span> <span class="o">=</span> <span class="n">phone_viseme</span><span class="p">,</span>
-</span><span id="line-258">    <span class="n">char_to_viseme</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-259">    <span class="n">rest_viseme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">REST_VISEME</span><span class="p">,</span>
-</span><span id="line-260">    <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span><span class="p">,</span>
-</span><span id="line-261"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VisemeTrack</span><span class="p">]:</span>
-</span><span id="line-262"><span class="w">    </span><span class="sd">"""The mouth track of a clip whose phones are timed (``AudioClip.phones``, a</span>
-</span><span id="line-263"><span class="sd">    take timed by a forced aligner, an#491), carrying the clip's words too;</span>
-</span><span id="line-264"><span class="sd">    ``None`` when it has no phones, or one ``phone_to_viseme`` does not know.</span>
-</span><span id="line-265">
-</span><span id="line-266"><span class="sd">    &gt;&gt;&gt; clip = AudioClip(duration=0.5, phones=[("M", 0.1, 0.2)], words=[("m", 0.1, 0.2)])</span>
-</span><span id="line-267"><span class="sd">    &gt;&gt;&gt; track = phones_track(clip)</span>
-</span><span id="line-268"><span class="sd">    &gt;&gt;&gt; [v.code for v in track.visemes], track.words</span>
-</span><span id="line-269"><span class="sd">    (['X', 'A', 'X', 'X'], [('m', 0.1, 0.2)])</span>
-</span><span id="line-270"><span class="sd">    &gt;&gt;&gt; phones_track(AudioClip(duration=0.5)) is None</span>
-</span><span id="line-271"><span class="sd">    True</span>
-</span><span id="line-272"><span class="sd">    """</span>
-</span><span id="line-273">    <span class="n">phones</span> <span class="o">=</span> <span class="n">clip_timings</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="s2">"phones"</span><span class="p">)</span>
-</span><span id="line-274">    <span class="k">if</span> <span class="ow">not</span> <span class="n">phones</span><span class="p">:</span>
-</span><span id="line-275">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-276">    <span class="n">words</span> <span class="o">=</span> <span class="n">clip_timings</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="s2">"words"</span><span class="p">)</span>
-</span><span id="line-277">    <span class="n">visemes</span> <span class="o">=</span> <span class="n">phones_to_visemes</span><span class="p">(</span>
-</span><span id="line-278">        <span class="n">phones</span><span class="p">,</span>
-</span><span id="line-279">        <span class="n">total_duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
-</span><span id="line-280">        <span class="n">words</span><span class="o">=</span><span class="n">words</span> <span class="ow">or</span> <span class="p">(),</span>
-</span><span id="line-281">        <span class="n">phone_to_viseme</span><span class="o">=</span><span class="n">phone_to_viseme</span><span class="p">,</span>
-</span><span id="line-282">        <span class="n">char_to_viseme</span><span class="o">=</span><span class="n">char_to_viseme</span><span class="p">,</span>
-</span><span id="line-283">        <span class="n">rest_viseme</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">,</span>
-</span><span id="line-284">    <span class="p">)</span>
-</span><span id="line-285">    <span class="k">if</span> <span class="n">visemes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-286">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-287">    <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
-</span><span id="line-288">        <span class="n">visemes</span><span class="o">=</span><span class="n">visemes</span><span class="p">,</span> <span class="n">convention</span><span class="o">=</span><span class="n">convention</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">words</span><span class="o">=</span><span class="n">words</span>
-</span><span id="line-289">    <span class="p">)</span></div>
+</span><span id="line-256"><span class="k">def</span><span class="w"> </span><span class="nf">phones_track</span><span class="p">(</span>
+</span><span id="line-257">    <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span>
+</span><span id="line-258">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-259">    <span class="n">phone_to_viseme</span><span class="p">:</span> <span class="n">PhoneToViseme</span> <span class="o">=</span> <span class="n">phone_viseme</span><span class="p">,</span>
+</span><span id="line-260">    <span class="n">char_to_viseme</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-261">    <span class="n">rest_viseme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">REST_VISEME</span><span class="p">,</span>
+</span><span id="line-262">    <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span><span class="p">,</span>
+</span><span id="line-263"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VisemeTrack</span><span class="p">]:</span>
+</span><span id="line-264"><span class="w">    </span><span class="sd">"""The mouth track of a clip whose phones are timed (``AudioClip.phones``, a</span>
+</span><span id="line-265"><span class="sd">    take timed by a forced aligner, an#491), carrying the clip's words too;</span>
+</span><span id="line-266"><span class="sd">    ``None`` when it has no phones, or one ``phone_to_viseme`` does not know.</span>
+</span><span id="line-267">
+</span><span id="line-268"><span class="sd">    &gt;&gt;&gt; clip = AudioClip(duration=0.5, phones=[("M", 0.1, 0.2)], words=[("m", 0.1, 0.2)])</span>
+</span><span id="line-269"><span class="sd">    &gt;&gt;&gt; track = phones_track(clip)</span>
+</span><span id="line-270"><span class="sd">    &gt;&gt;&gt; [v.code for v in track.visemes], track.words</span>
+</span><span id="line-271"><span class="sd">    (['X', 'A', 'X', 'X'], [('m', 0.1, 0.2)])</span>
+</span><span id="line-272"><span class="sd">    &gt;&gt;&gt; phones_track(AudioClip(duration=0.5)) is None</span>
+</span><span id="line-273"><span class="sd">    True</span>
+</span><span id="line-274"><span class="sd">    """</span>
+</span><span id="line-275">    <span class="n">phones</span> <span class="o">=</span> <span class="n">clip_timings</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="s2">"phones"</span><span class="p">)</span>
+</span><span id="line-276">    <span class="k">if</span> <span class="ow">not</span> <span class="n">phones</span><span class="p">:</span>
+</span><span id="line-277">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-278">    <span class="n">words</span> <span class="o">=</span> <span class="n">clip_timings</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="s2">"words"</span><span class="p">)</span>
+</span><span id="line-279">    <span class="n">visemes</span> <span class="o">=</span> <span class="n">phones_to_visemes</span><span class="p">(</span>
+</span><span id="line-280">        <span class="n">phones</span><span class="p">,</span>
+</span><span id="line-281">        <span class="n">total_duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+</span><span id="line-282">        <span class="n">words</span><span class="o">=</span><span class="n">words</span> <span class="ow">or</span> <span class="p">(),</span>
+</span><span id="line-283">        <span class="n">phone_to_viseme</span><span class="o">=</span><span class="n">phone_to_viseme</span><span class="p">,</span>
+</span><span id="line-284">        <span class="n">char_to_viseme</span><span class="o">=</span><span class="n">char_to_viseme</span><span class="p">,</span>
+</span><span id="line-285">        <span class="n">rest_viseme</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">,</span>
+</span><span id="line-286">    <span class="p">)</span>
+</span><span id="line-287">    <span class="k">if</span> <span class="n">visemes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-288">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-289">    <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
+</span><span id="line-290">        <span class="n">visemes</span><span class="o">=</span><span class="n">visemes</span><span class="p">,</span> <span class="n">convention</span><span class="o">=</span><span class="n">convention</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">words</span><span class="o">=</span><span class="n">words</span>
+</span><span id="line-291">    <span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -504,7 +506,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=38a06c88"></script>
+    <script src="../../../_static/documentation_options.js?v=9cd8e891"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
