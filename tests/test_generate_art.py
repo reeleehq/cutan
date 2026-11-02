@@ -101,22 +101,44 @@ def test_an_existing_image_is_kept_not_paid_for_twice(tmp_path):
     assert (tmp_path / "car.raw.png").exists() and len(painter.calls) == 3
 
 
-def test_a_failure_after_the_generation_keeps_the_paid_image(tmp_path, monkeypatch):
-    def broken_key(image, key):
-        raise RuntimeError("the key broke")
+def test_a_failure_after_the_generation_keeps_the_paid_image_and_a_rerun_uses_it(
+    tmp_path, monkeypatch
+):
+    real_key = G.key_backdrop
+    calls = {"n": 0}
 
-    monkeypatch.setattr(G, "key_backdrop", broken_key)
-    with pytest.raises(RuntimeError):
-        G.generate_art(SPEC, out_dir=tmp_path, generator=Painter(), only=["car"])
-    assert (tmp_path / "car.raw.png").exists() and not (tmp_path / "car.png").exists()
+    def key_that_breaks_after_the_probe(image, key):
+        calls["n"] += 1
+        if image.size != (2, 2):  # the pre-payment probe passes; the real key fails
+            raise RuntimeError("the key broke")
+        return real_key(image, key)
 
-
-def test_a_misspelt_key_fails_before_anything_is_paid_for(tmp_path):
+    monkeypatch.setattr(G, "key_backdrop", key_that_breaks_after_the_probe)
     painter = Painter()
-    with pytest.raises(ValueError, match="magneta"):
-        G.generate_art(
-            {"car": {**SPEC["car"], "key": "magneta"}}, out_dir=tmp_path, generator=painter
-        )
+    with pytest.raises(RuntimeError):
+        G.generate_art(SPEC, out_dir=tmp_path, generator=painter, only=["car"])
+    assert (tmp_path / "car.raw.png").exists() and not (tmp_path / "car.png").exists()
+    record = json.loads((tmp_path / G.SOURCES_FILE).read_text())
+    assert record["car.png"]["extra"]["prompt"] == SPEC["car"]["prompt"], "recorded at once"
+    monkeypatch.setattr(G, "key_backdrop", real_key)
+    (car,) = G.generate_art(SPEC, out_dir=tmp_path, generator=painter, only=["car"])
+    assert len(painter.calls) == 1, "the rerun keyed the paid image, not a new one"
+    assert car.source.sha256 and not (tmp_path / "car.raw.png").exists()
+
+
+def test_a_broken_record_is_named_not_a_traceback(tmp_path):
+    (tmp_path / G.SOURCES_FILE).write_text("{ cut off")
+    with pytest.raises(ValueError, match="art_sources.json"):
+        G.generate_art(SPEC, out_dir=tmp_path, generator=Painter(), only=["road"])
+
+
+def test_a_misspelt_or_malformed_key_fails_before_anything_is_paid_for(tmp_path):
+    painter = Painter()
+    for key in ("magneta", {"matte": "chroma", "hue": "pink"}):
+        with pytest.raises(ValueError, match="key"):
+            G.generate_art(
+                {"car": {**SPEC["car"], "key": key}}, out_dir=tmp_path, generator=painter
+            )
     assert painter.calls == []
 
 
@@ -162,6 +184,10 @@ def test_the_spec_is_checked_before_anything_is_generated(tmp_path):
         ({"x": {"prompt": "p", "size": "huge"}}, "size"),
         ({"x": "a prompt"}, "'x'"),
         ([{"prompt": "p"}], "mapping"),
+        ({"x": {"prompt": 3}}, "not text"),
+        ({"x": {"prompt": "p", "fit": [1.7, 2.2]}}, "whole numbers"),
+        ({"x": {"prompt": "p", "size": "0x0"}}, "size"),
+        ({"../x": {"prompt": "p"}}, "file name"),
     ):
         with pytest.raises(ValueError, match=match):
             G.art_specs(bad)

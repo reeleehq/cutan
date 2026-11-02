@@ -43,6 +43,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import os
 import re
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
@@ -81,7 +82,9 @@ KEYS: dict[str, dict[str, Any]] = {
     },
     "green": {"matte": "chroma", "hue": [90.0, 150.0], "min_sat": 0.5, "min_val": 0.4},
 }
-_SIZE = re.compile(r"^(\d+x\d+|auto)$")
+_SIZE = re.compile(r"^([1-9]\d*x[1-9]\d*|auto)$")
+#: An art name is a file name: no folder, no hidden file.
+_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 Background = Literal["opaque", "transparent"]
 #: ``generator(prompt, *, size, background, quality, model) -> PIL image``, with
@@ -103,8 +106,10 @@ class ArtSpec:
     quality: Optional[str] = None
 
     def __post_init__(self):
-        if not self.prompt or not self.prompt.strip():
-            raise ValueError(f"art {self.name!r}: the prompt is empty")
+        if not isinstance(self.name, str) or not _NAME.match(self.name):
+            raise ValueError(f"art {self.name!r}: a name is a file name (letters, digits, . _ -)")
+        if not isinstance(self.prompt, str) or not self.prompt.strip():
+            raise ValueError(f"art {self.name!r}: the prompt is empty (or not text)")
         if self.background not in ("opaque", "transparent"):
             raise ValueError(
                 f"art {self.name!r}: background is 'opaque' or 'transparent', "
@@ -117,7 +122,9 @@ class ArtSpec:
         if self.fit is not None:
             if isinstance(self.fit, str) or len(self.fit) != 2:
                 raise ValueError(f"art {self.name!r}: fit is [w, h], not {self.fit!r}")
-            w, h = (int(x) for x in self.fit)
+            if not all(isinstance(x, int) and not isinstance(x, bool) for x in self.fit):
+                raise ValueError(f"art {self.name!r}: fit is two whole numbers, not {self.fit!r}")
+            w, h = self.fit
             if w <= 0 or h <= 0:
                 raise ValueError(
                     f"art {self.name!r}: fit must be positive, got {self.fit}"
@@ -346,9 +353,11 @@ def generate_art(
     the folder holds and written after every image. ``only``: the names to make
     (default all). An existing ``<name>.png`` is kept, not paid for again,
     unless ``overwrite``, so a batch that failed half way is resumed by running
-    it again. The model's own image is written first as ``<name>.raw.png`` and
-    removed once the PNG is written, unless ``keep_raw``: a key or fit that
-    fails leaves the paid-for image on disk.
+    it again. The model's own image is written first as ``<name>.raw.png``, with
+    its record, and removed once the PNG and its record are written, unless
+    ``keep_raw``: a key or fit that fails leaves the paid-for image, and the
+    next run keys that image instead of paying for a new one. Every file is
+    written whole or not at all.
     """
     specs = art_specs(spec) if isinstance(spec, (str, Path, Mapping)) else list(spec)
     wanted = set(only) if only is not None else None
@@ -359,48 +368,64 @@ def generate_art(
         from cutan.carve._deps import cv2
 
         cv2()  # the key needs OpenCV: say so before anything is paid for
+        probe = Image.new("RGB", (2, 2), (246, 3, 242))
+        for s in specs:
+            if s.key:
+                try:  # a malformed recipe fails here, not after the payment
+                    key_backdrop(probe, s.key)
+                except Exception as e:  # noqa: BLE001 - any failure of the key is the spec's
+                    raise ValueError(f"art {s.name!r}: key {s.key!r} does not key: {e}") from None
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     generator = generator or AixGenerator()
     recorded = _read_sources(out)
     made = []
     for s in specs:
-        path = out / f"{s.name}.png"
+        path, raw = out / f"{s.name}.png", out / f"{s.name}.raw.png"
         if path.exists() and not overwrite:
             known = recorded.get(path.name)
-            made.append(
-                GeneratedArt(
-                    s.name,
-                    path,
-                    AssetSource.model_validate(known) if known else None,
-                    _image_size(path),
-                    kept=True,
-                )
-            )
+            made.append(GeneratedArt(s.name, path, _source(known), _image_size(path), kept=True))
             continue
-        image = generator(
-            s.prompt,
-            size=s.size,
-            background=s.background,
-            quality=s.quality,
-            model=s.model,
-        )
-        raw = out / f"{s.name}.raw.png"
-        image.save(raw)
+        if raw.exists() and not overwrite:
+            image = Image.open(raw)  # paid for by a run that failed after it
+            image.load()
+        else:
+            image = generator(
+                s.prompt, size=s.size, background=s.background, quality=s.quality, model=s.model
+            )
+            _save(image, raw)
+            # record it now: the paid image has its provenance even if what follows fails
+            recorded[path.name] = art_source(s, generator).model_dump(mode="json", exclude_none=True)
+            _write_sources(out, recorded)
+        source = _source(recorded.get(path.name)) or art_source(s, generator)
         if s.key:
             image = key_backdrop(image, s.key)
         if s.fit:
             image = cover_fit(image, s.fit)
-        image.save(path)
+        _save(image, path)
+        source = source.model_copy(update={"sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+        recorded[path.name] = source.model_dump(mode="json", exclude_none=True)
+        _write_sources(out, recorded)  # the record first, then the raw goes
         if not keep_raw:
             raw.unlink()
-        source = art_source(s, generator).model_copy(
-            update={"sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
-        )
         made.append(GeneratedArt(s.name, path, source, image.size))
-        recorded[path.name] = source.model_dump(mode="json", exclude_none=True)
-        _write_sources(out, recorded)  # each image is billed: record it at once
     return made
+
+
+def _save(image: Image.Image, path: Path) -> None:
+    """Write ``path`` whole or not at all: a crash never leaves half a PNG to be kept."""
+    tmp = path.with_name(path.name + ".part")
+    image.save(tmp, format="PNG")
+    os.replace(tmp, path)
+
+
+def _source(entry: Any) -> Optional[AssetSource]:
+    if not isinstance(entry, Mapping):
+        return None
+    try:
+        return AssetSource.model_validate(entry)
+    except ValueError:
+        return None
 
 
 def _image_size(path: Path) -> tuple[int, int]:
@@ -410,10 +435,19 @@ def _image_size(path: Path) -> tuple[int, int]:
 
 def _read_sources(out: Path) -> dict[str, Any]:
     record = out / SOURCES_FILE
-    return json.loads(record.read_text(encoding="utf-8")) if record.exists() else {}
+    if not record.exists():
+        return {}
+    try:
+        sources = json.loads(record.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        raise ValueError(f"{record} cannot be read as JSON ({e}): fix or move it") from None
+    if not isinstance(sources, dict):
+        raise ValueError(f"{record} holds {type(sources).__name__}, not {{file: source}}")
+    return sources
 
 
 def _write_sources(out: Path, sources: Mapping[str, Any]) -> None:
-    (out / SOURCES_FILE).write_text(
-        json.dumps(sources, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    record = out / SOURCES_FILE
+    tmp = record.with_name(record.name + ".part")
+    tmp.write_text(json.dumps(sources, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    os.replace(tmp, record)
