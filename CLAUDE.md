@@ -22,7 +22,7 @@ cutan/body_attachment.py  a prop that depicts a character's limbs: its `metadata
 cutan/motion.py       the rig presets (nod, point, turn, walk, waddle, speech_pulse; an#322) and PRESETS, the table a `play` resolves in
 cutan/runtime/        visuals.js: the procedural mouth and eye, registered through the stage runtime's anRegisterVisual
 cutan/pack.py         check_pack(): the production-pack checker (cutan#87), run by the skill's validate_pack.py and the reelee connector; import_pack(): the pack into a real project (`an pack import`, pack_cli.py)
-cutan/projects_store.py  the projects kind over disk or S3 (ADR-0024; cutan#88, #91): projects_store(), materialize_project(), push_project(), new_project_dir(); projects_cli.py: `an projects push/pull`
+cutan/projects_store.py  the projects kind over disk or S3 (ADR-0024; cutan#88, #91): projects_store(), materialize_project(), push_project(), prune_project(), new_project_dir(); projects_cli.py: `an projects push/pull/prune`
 cutan/bench.py        CUTOUT_FIXTURES and run_bench() over this repo's misc/bench/ corpus
 tests/  examples/  misc/bench/{corpus,golden}/  misc/demos/  misc/docs/ (design notes: locomotion_gaits.md)  .claude/skills/
 skills/cutan-production-pack/  a Claude.ai skill for writers (not loaded by Claude Code here): production packs; its tables are generated and checked by tests/test_production_pack_skill.py
