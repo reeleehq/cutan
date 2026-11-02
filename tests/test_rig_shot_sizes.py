@@ -14,14 +14,15 @@ from an.stage.world import native_box
 from cutan.characters import new_character
 from an.ir.world import WorldMember
 from an.verify.constraints import JUMP_CUT_SIZE_RATIO
-from cutan.characters.framing import MIN_SIZE_RATIO, _part_boxes, character_shot_sizes
+from cutan.characters.framing import _part_boxes, character_shot_sizes
 
 
 @pytest.fixture(scope="module")
 def project():
     with tempfile.TemporaryDirectory() as d:
         root = init(Path(d) / "p")
-        for name, build, head in (("reg", "regular", 1.0), ("tall", "tall", 1.0), ("squat", "squat", 1.4)):
+        for name, build, head in (("reg", "regular", 1.0), ("tall", "tall", 1.0), ("squat", "squat", 1.4),
+                                  ("capped", "squat", 1.8)):
             new_character(root / "assets" / "characters", name=name, seed=name,
                           use_dicebear=False, build=build, head_scale=head)  # fmt: skip
         yield load(root)
@@ -47,14 +48,22 @@ def test_a_close_up_ends_at_the_chin_and_a_medium_shot_at_the_hips(project, name
     assert sizes["medium"] == (0.0, pytest.approx(hips))
     top, bottom = sizes["close_up"]
     assert top == 0.0 and bottom <= chin + 1e-9
-    assert bottom == pytest.approx(chin) or hips / bottom == pytest.approx(MIN_SIZE_RATIO)
+    assert bottom == pytest.approx(chin) or hips / bottom == pytest.approx(JUMP_CUT_SIZE_RATIO)
     assert set(sizes) <= set(SHOT_SIZES)
 
 
-@pytest.mark.parametrize("name", ["reg", "tall", "squat"])
+@pytest.mark.parametrize("name", ["reg", "tall", "squat", "capped"])
 def test_a_cut_from_medium_to_close_up_is_never_a_jump_cut(project, name):
     sizes = _sizes(project, name)[2]
-    assert sizes["medium"][1] / sizes["close_up"][1] >= JUMP_CUT_SIZE_RATIO - 1e-9
+    assert sizes["medium"][1] / sizes["close_up"][1] >= JUMP_CUT_SIZE_RATIO  # strictly, as an checks
+
+
+def test_a_big_head_hits_the_cap(project):
+    sizes = _sizes(project, "capped")[2]
+    ref, box, _ = _sizes(project, "capped")
+    parts = _part_boxes(ref, project.mall)
+    chin = (max(b[3] for p, b in parts.items() if p == "head" or p.startswith("head/")) - box[1]) / (box[3] - box[1])
+    assert sizes["close_up"][1] < chin, "the chin would make a jump cut: the cap holds it higher"
 
 
 def test_a_squat_build_is_framed_by_its_own_big_head_not_the_human_table(project):

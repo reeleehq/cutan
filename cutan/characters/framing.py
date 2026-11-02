@@ -14,8 +14,11 @@ path ``an`` measures its box by) and reading where its parts are drawn:
 - ``close_up``: from the top to the chin, the lowest point of the ``head`` and
   everything drawn under it (a mouth below a small head box counts), but no
   lower than keeps a cut from medium to close-up a change of size an's
-  jump-cut check accepts (:data:`MIN_SIZE_RATIO`): a squat build's big head
-  would otherwise make the two sizes nearly the same frame.
+  jump-cut check accepts (``an.verify.constraints.JUMP_CUT_SIZE_RATIO``): a
+  squat build's big head would otherwise make the two sizes nearly the same
+  frame. (That holds where the frame is limited by height; a portrait frame
+  limited by the subject's width gives every size one distance, in an:
+  reeleehq/an#732.)
 
 ``wide`` and ``full`` stay the table's (the whole figure). A rig with no part
 named ``head`` or ``torso`` (the art-package contract's names) gives no band for
@@ -35,10 +38,9 @@ from typing import Any
 SPECIMEN_SIZE: tuple[int, int] = (1280, 720)
 HEAD_PART: str = "head"
 TORSO_PART: str = "torso"
-#: The least ratio of a medium band to a close-up band: an's jump-cut check
-#: (``an.verify.constraints.JUMP_CUT_SIZE_RATIO``) calls a smaller change of
-#: size on one axis a jump cut.
-MIN_SIZE_RATIO: float = 1.3
+#: How far past an's jump-cut size ratio a capped close-up lands, so a ratio
+#: computed back from the frames is never a hair under it (1.2999999...).
+SIZE_RATIO_MARGIN: float = 1e-6
 #: Part boxes kept per (store, ref, descriptor digest): ``an`` lowers a scene
 #: several times per render, and each asks again.
 _CACHE_SIZE: int = 64
@@ -122,6 +124,9 @@ def character_shot_sizes(
     if chin is not None:
         bottom = fraction(chin)
         if "medium" in bands:
-            bottom = min(bottom, bands["medium"][1] / MIN_SIZE_RATIO)
+            from an.verify.constraints import JUMP_CUT_SIZE_RATIO
+
+            least = JUMP_CUT_SIZE_RATIO * (1 + SIZE_RATIO_MARGIN)
+            bottom = min(bottom, bands["medium"][1] / least)
         bands["close_up"] = (0.0, bottom)
     return {k: v for k, v in bands.items() if v[1] > v[0]} or None
