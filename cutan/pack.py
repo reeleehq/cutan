@@ -57,7 +57,7 @@ from pathlib import Path
 from an.stage.raster import is_svg_content, svg_problems
 from an.stores._common import asset_references, inside_folder
 
-from cutan.characters.cast import FOLLOW_UPS, NAME_RE, NEW_OPTIONS
+from cutan.characters.cast import FOLLOW_UPS, MAX_CAST_BYTES, NAME_RE, NEW_OPTIONS
 
 __all__ = [
     "PackCheck",
@@ -332,6 +332,11 @@ def cast_commands(pack: Path) -> list[list[str]]:
     """
     path = Path(pack) / CAST_FILE
     data = Path(pack) / CAST_YAML
+    for cast_file in (path, data):
+        # a link (or a FIFO) would read, or wait on, something outside the pack,
+        # and a refused line is quoted back in the report
+        if cast_file.is_symlink() or (cast_file.exists() and not cast_file.is_file()):
+            raise PackError(f"{cast_file.name} must be a plain file in the pack, not a link")
     if data.exists():
         if path.exists():
             raise PackError(f"the pack has both {CAST_YAML} and {CAST_FILE}: keep one")
@@ -348,7 +353,11 @@ def cast_commands(pack: Path) -> list[list[str]]:
     if not path.exists():
         return []
     try:
-        text = path.read_text(encoding="utf-8").replace("\\\n", " ")
+        with open(path, "rb") as f:  # at most the cap: never trust the size
+            data = f.read(MAX_CAST_BYTES + 1)
+        if len(data) > MAX_CAST_BYTES:
+            raise PackError(f"{CAST_FILE} is over {MAX_CAST_BYTES} bytes: a cast is a page")
+        text = data.decode("utf-8").replace("\\\n", " ")
     except (OSError, UnicodeDecodeError) as e:
         raise PackError(f"{CAST_FILE} cannot be read: {e}") from None
     commands = []
@@ -391,7 +400,39 @@ def _checked_cast_line(
         raise refuse(f"option {rest[-1]!r} needs a value")
     if sub == "new" and "--offline" not in rest:
         raise refuse("`an character new` needs `--offline`")
+    for opt, value in zip(rest, rest[1:]):
+        if opt == "--clothing-pattern" and (problem := _tile_image_problem(value)):
+            raise refuse(problem)
     return argv
+
+
+def _tile_image_problem(pattern: str) -> str | None:
+    """Why a clothing pattern's ``image=`` cannot be used in a pack: the factory
+    reads a path it is given (:func:`cutan.characters.patterns.resolve_tile_paths`),
+    so a pack may name only a file inside itself (relative, no ``..``), or give
+    the PNG's base64.
+
+    >>> _tile_image_problem("tile:image=assets/tiles/plaid.png,base=#345678") is None
+    True
+    >>> _tile_image_problem("tile:image=/etc/hosts")
+    'a clothing pattern image= must be a file inside the pack (a relative path, no ..) or its base64'
+    """
+    from pathlib import PurePosixPath, PureWindowsPath
+
+    from cutan.characters.patterns import _PNG_B64
+
+    for item in pattern.partition(":")[2].split(","):
+        key, eq, value = item.partition("=")
+        value = value.strip()
+        if key.strip() != "image" or not eq or value.startswith(_PNG_B64):
+            continue
+        posix, win = PurePosixPath(value), PureWindowsPath(value)
+        if posix.is_absolute() or win.is_absolute() or win.drive or ".." in posix.parts or ".." in win.parts:
+            return (
+                "a clothing pattern image= must be a file inside the pack "
+                "(a relative path, no ..) or its base64"
+            )
+    return None
 
 
 def lint_svg(path: Path, *, exact_size: bool) -> list[str]:

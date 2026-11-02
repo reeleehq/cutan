@@ -168,3 +168,55 @@ def test_an_import_defaults_beside_the_pack_and_never_inside_it(tmp_path, monkey
     report = P.import_pack(pack)
     assert report.ok, report.format()
     assert report.project == (tmp_path / "umbrella-project").resolve()
+
+
+@pytest.mark.parametrize(
+    "pattern, ok",
+    [
+        ("tile:image=/etc/hosts", False),
+        ("tile:image=../../secret.png", False),
+        ("tile:image=C:\\\\x.png", False),
+        ("tile:base=#345678,image=assets/tiles/plaid.png", True),
+        ("tile:image=iVBORw0KGgoAAAANSUhEUg", True),
+        ("stripes:base=#345678", True),
+    ],
+)
+def test_a_clothing_pattern_image_stays_inside_the_pack(tmp_path, pattern, ok):
+    """The factory reads a tile image's path; on a server that is any file (cutan#164)."""
+    pack = tmp_path / "pack"
+    pack.mkdir()
+    (pack / "cast.yaml").write_text(json.dumps({"teo": {"clothing_pattern": pattern}}))
+    if ok:
+        P.cast_commands(pack)
+    else:
+        with pytest.raises(P.PackError, match="inside the pack"):
+            P.cast_commands(pack)
+    (pack / "cast.yaml").unlink()
+    (pack / "cast.sh").write_text(f"an character new teo --offline --clothing-pattern '{pattern}'\n")
+    if not ok:
+        with pytest.raises(P.PackError, match="inside the pack"):
+            P.cast_commands(pack)
+
+
+def test_cast_sh_is_read_up_to_the_cap(tmp_path):
+    pack = tmp_path / "pack"
+    pack.mkdir()
+    (pack / "cast.sh").write_text("# padding\n" * 10_000)
+    with pytest.raises(P.PackError, match="bytes"):
+        P.cast_commands(pack)
+
+
+@pytest.mark.parametrize("name", ["cast.sh", "cast.yaml"])
+def test_a_cast_file_that_is_a_link_is_refused_unread(tmp_path, name):
+    """A link would quote an outside file back in the report (cutan#164)."""
+    secret = tmp_path / "secret.txt"
+    secret.write_text("root:x:0:0:secretline\n")
+    pack = tmp_path / "pack"
+    pack.mkdir()
+    try:
+        (pack / name).symlink_to(secret)
+    except OSError:  # Windows without the privilege to make links
+        pytest.skip("this machine cannot make a symbolic link")
+    with pytest.raises(P.PackError, match="plain file") as e:
+        P.cast_commands(pack)
+    assert "secretline" not in str(e.value)
