@@ -26,12 +26,12 @@ True
 
 from __future__ import annotations
 
-from typing import Callable, Iterable
+from typing import Iterable
 
 from an.audio.lipsync import Viseme, VisemeTrack, word_timings_to_visemes
 from an.audio.tts import AudioClip
 
-from cutan.audio.phones import clip_timings, phone_viseme, phones_track
+from cutan.audio.phones import PhoneToViseme, clip_timings, phone_viseme, phones_track
 
 # Map a single ASCII character (lowercased) to a Rhubarb viseme letter.
 # A=closed (P/B/M, rest), B=tight open (D/S/T/Z/N/L), C=eh, D=ah/wide,
@@ -101,7 +101,7 @@ class OfflineLipSync:
         self,
         *,
         char_to_viseme: dict[str, str] | None = None,
-        phone_to_viseme: Callable[[str], str | None] = phone_viseme,
+        phone_to_viseme: PhoneToViseme = phone_viseme,
     ) -> None:
         self._mapping = (
             dict(char_to_viseme) if char_to_viseme else dict(_CHAR_TO_VISEME)
@@ -110,11 +110,13 @@ class OfflineLipSync:
 
     def align(self, audio: AudioClip, transcript: str) -> VisemeTrack:
         # The aligner said which sound is when (an#491): each phone's own mouth
-        # shape, not a word's letters spread over its span. A phone the table
-        # does not know leaves this to the words below.
+        # shape, not a word's letters spread over its span (a word with no
+        # phones under it keeps its letters). A phone the table does not know
+        # leaves this to the words below.
         from_phones = phones_track(
             audio,
             phone_to_viseme=self._phone_to_viseme,
+            char_to_viseme=self._mapping,
             rest_viseme=_REST_VISEME,
             convention=self.convention,
         )

@@ -15,6 +15,7 @@ from cutan.audio.offline_lipsync import OfflineLipSync
 from cutan.audio.phones import (
     ARPABET_TO_VISEME,
     IPA_TO_VISEME,
+    phone_alphabet,
     phone_viseme,
     phones_to_visemes,
 )
@@ -61,7 +62,7 @@ def test_phones_beat_words_and_an_unknown_phone_falls_back_to_them():
 
 
 def test_a_caller_supplies_its_own_phone_table():
-    provider = OfflineLipSync(phone_to_viseme=lambda phone: "E")
+    provider = OfflineLipSync(phone_to_viseme=lambda phone, alphabet: "E")
     track = provider.align(_clip(phones=ARPA), "mama")
     assert [c for _, c in _shapes(track)] == ["X", "E", "X", "X"]
 
@@ -102,7 +103,61 @@ def test_every_arpabet_phone_with_stress_and_the_mfa_ipa_set_have_a_shape():
     for phone in ARPABET_TO_VISEME:
         for stress in ("", "0", "1", "2"):
             assert phone_viseme(phone + stress) == ARPABET_TO_VISEME[phone]
+            assert phone_viseme((phone + stress).lower()) == ARPABET_TO_VISEME[phone]
     # MFA's english_mfa phone set, diacritics and length marks included
-    for phone in "aj aw b bʲ cʰ dʒ dʲ ej iː kʰ m̩ n̩ ow pʰ tʃ tʰ uː ɑː ɒː ɔj əw ɛː ɜː ɫ̩ ʉː".split():
-        assert phone_viseme(phone) in set(IPA_TO_VISEME.values()), phone
-    assert phone_viseme("tʃ") == "B" and phone_viseme("ow") == "F"
+    mfa_ipa = (
+        "a aj aw b bʲ c cʰ d dʒ dʲ e ej f fʲ h i iː j k kʰ l m mʲ m̩ n n̩ o ow p pʰ "
+        "pʲ s t tʃ tʰ tʲ u uː v vʲ w z æ ç ð ŋ ɐ ɑ ɑː ɒ ɒː ɔ ɔj ə əw ɚ ɛ ɛː ɜ ɜː ɝ "
+        "ɟ ɡ ɪ ɫ ɫ̩ ɱ ɲ ɹ ɾ ʃ ʉ ʉː ʊ ʎ ʒ ʔ θ"
+    ).split()
+    assert phone_alphabet(mfa_ipa) == "ipa"
+    for phone in mfa_ipa:
+        assert phone_viseme(phone, alphabet="ipa") in set(IPA_TO_VISEME.values()), phone
+    assert [phone_viseme(p, alphabet="ipa") for p in ("tʃ", "ow", "əw", "ɱ", "ɜː")] == [
+        "B", "F", "F", "G", "E"
+    ]  # fmt: skip
+
+
+def test_the_alphabet_is_the_clips_not_each_phones():
+    # SAMPA "love": V is the vowel there, not ARPAbet's teeth-on-lip V
+    assert phone_alphabet(["l", "V", "v"]) == "ipa"
+    sampa = [("l", 0.0, 0.1), ("V", 0.1, 0.2), ("v", 0.2, 0.3)]
+    assert phones_to_visemes(sampa, total_duration=0.5) is None  # spread by words
+    # lowercase ARPAbet is ARPAbet: "ae" is AE (C), not IPA a (D)
+    got = phones_to_visemes([("ae1", 0.0, 0.1), ("er0", 0.1, 0.2)], total_duration=0.2)
+    assert [v.code for v in got] == ["X", "C", "E", "X"]
+
+
+def test_a_word_with_no_phones_under_it_is_spoken_by_its_letters():
+    """MFA writes ``spn`` under a word it cannot phonetise (a name); ``an``
+    drops it, so the word has no phones. Its span is not a pause."""
+    words = [("hi", 0.0, 0.3), ("gwendolyn", 0.3, 0.9)]
+    clip = _clip(phones=[("HH", 0.0, 0.1), ("AY1", 0.1, 0.3)], words=words, duration=1.2)
+    track = OfflineLipSync().align(clip, "hi gwendolyn")
+    in_name = [v for v in track.visemes if 0.3 <= v.time < 0.9]
+    assert len(in_name) >= 3 and all(v.code != "X" for v in in_name)
+    assert [(round(v.time, 6), v.code) for v in track.visemes][:3] == [
+        (0.0, "X"), (0.0, "C"), (0.1, "D")
+    ]  # fmt: skip
+
+
+def test_whisper_runs_its_model_for_phones_without_words(monkeypatch):
+    """Whisper promises word timings: phones alone do not give them."""
+    called = []
+    monkeypatch.setattr(
+        WhisperLipSync, "_get_model", lambda self: called.append(1) or _NoSpeech()
+    )
+    clip = AudioClip(bytes_=b"\0", duration=1.5, phones=ARPA)
+    WhisperLipSync().align(clip, "mama")
+    assert called
+
+
+class _NoSpeech:
+    def transcribe(self, *_, **__):
+        return [], None
+
+
+def test_unsorted_phones_are_read_in_time_order():
+    shuffled = [ARPA[2], ARPA[0], ARPA[3], ARPA[1]]
+    track = OfflineLipSync().align(_clip(phones=shuffled), "mama")
+    assert _shapes(track) == SHAPES + [(1.5, "X")]
