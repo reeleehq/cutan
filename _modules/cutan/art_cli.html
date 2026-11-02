@@ -192,64 +192,89 @@
 </span><span id="line-4"><span class="sd">the same way as ``an character ...`` (the ``cli.art`` service):</span>
 </span><span id="line-5">
 </span><span id="line-6"><span class="sd">    an art generate SPEC.json --out assets/environments/car/plates [--only cabin,road]</span>
-</span><span id="line-7">
-</span><span id="line-8"><span class="sd">The spec is ``{name: {prompt, size, background, key, fit, model, quality}}``;</span>
-</span><span id="line-9"><span class="sd">each image becomes ``&lt;name&gt;.png`` with its provenance in ``art_sources.json``.</span>
-</span><span id="line-10"><span class="sd">"""</span>
-</span><span id="line-11">
-</span><span id="line-12"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-</span><span id="line-13">
-</span><span id="line-14"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"generate"</span><span class="p">]</span>
-</span><span id="line-15">
+</span><span id="line-7"><span class="sd">    an art critique-plates [--project DIR]      # far plates of a travel holding near things</span>
+</span><span id="line-8">
+</span><span id="line-9"><span class="sd">The spec is ``{name: {prompt, size, background, key, fit, model, quality}}``;</span>
+</span><span id="line-10"><span class="sd">each image becomes ``&lt;name&gt;.png`` with its provenance in ``art_sources.json``.</span>
+</span><span id="line-11"><span class="sd">"""</span>
+</span><span id="line-12">
+</span><span id="line-13"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+</span><span id="line-14">
+</span><span id="line-15"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"generate"</span><span class="p">,</span> <span class="s2">"critique_plates"</span><span class="p">]</span>
 </span><span id="line-16">
+</span><span id="line-17">
 <div class="viewcode-block" id="generate">
 <a class="viewcode-back" href="../../_autosummary/cutan.art_cli.html#cutan.art_cli.generate">[docs]</a>
-</span><span id="line-17"><span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
-</span><span id="line-18">    <span class="n">spec</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-19">    <span class="n">out</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-20">    <span class="n">only</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-21">    <span class="n">keep_raw</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-22">    <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-23">    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-24"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-25"><span class="w">    </span><span class="sd">"""Generate each image of a spec with an image model, key its backdrop colour to alpha, fit it, and write it with its provenance.</span>
-</span><span id="line-26">
-</span><span id="line-27"><span class="sd">    spec: a JSON file: {name: {prompt, size, background (opaque|transparent), key (magenta|green|a matte recipe), fit [w, h], model, quality, prop {point, landmarks, max_side, keep, detach, despill}: carve it into a prop folder instead of a plate}}</span>
-</span><span id="line-28"><span class="sd">    out: the folder to write &lt;name&gt;.png (a plate) or &lt;name&gt;/prop.json + parts/ (a prop) and art_sources.json into (an environment's plates/, the props store)</span>
-</span><span id="line-29"><span class="sd">    only: comma-separated names to make (default: all)</span>
-</span><span id="line-30"><span class="sd">    keep_raw: also write the model's own image as &lt;name&gt;.raw.png</span>
-</span><span id="line-31"><span class="sd">    overwrite: make an image again when &lt;name&gt;.png exists (default: keep it; each generation is billed)</span>
-</span><span id="line-32"><span class="sd">    model: the default generator's model, where the spec names none (default: gpt-image-2)</span>
-</span><span id="line-33"><span class="sd">    """</span>
-</span><span id="line-34">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.carve.generate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AixGenerator</span><span class="p">,</span> <span class="n">generate_art</span>
-</span><span id="line-35">
-</span><span id="line-36">    <span class="n">made</span> <span class="o">=</span> <span class="n">generate_art</span><span class="p">(</span>
-</span><span id="line-37">        <span class="n">spec</span><span class="p">,</span>
-</span><span id="line-38">        <span class="n">out_dir</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
-</span><span id="line-39">        <span class="n">generator</span><span class="o">=</span><span class="n">AixGenerator</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span> <span class="k">if</span> <span class="n">model</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-40">        <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">only</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-41">        <span class="n">keep_raw</span><span class="o">=</span><span class="n">keep_raw</span><span class="p">,</span>
-</span><span id="line-42">        <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
-</span><span id="line-43">    <span class="p">)</span>
-</span><span id="line-44">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-45">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">  "</span>
-</span><span id="line-46">        <span class="o">+</span> <span class="p">(</span>
-</span><span id="line-47">            <span class="s2">"(kept: already there; --overwrite makes it again)"</span>
-</span><span id="line-48">            <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">kept</span>
-</span><span id="line-49">            <span class="k">else</span> <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">provider</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">license</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'licence unknown'</span><span class="si">}</span><span class="s2">)"</span>
-</span><span id="line-50">        <span class="p">)</span>
-</span><span id="line-51">        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">made</span>
-</span><span id="line-52">    <span class="p">]</span>
-</span><span id="line-53">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"  ! </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">made</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">warnings</span><span class="p">]</span>
-</span><span id="line-54">    <span class="k">if</span> <span class="ow">not</span> <span class="n">made</span><span class="p">:</span>
-</span><span id="line-55">        <span class="k">return</span> <span class="s2">"nothing made"</span>
-</span><span id="line-56">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span><span id="line-57">        <span class="p">[</span><span class="o">*</span><span class="n">lines</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"provenance: </span><span class="si">{</span><span class="n">made</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'art_sources.json'</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
-</span><span id="line-58">    <span class="p">)</span></div>
+</span><span id="line-18"><span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
+</span><span id="line-19">    <span class="n">spec</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-20">    <span class="n">out</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-21">    <span class="n">only</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-22">    <span class="n">keep_raw</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-23">    <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-24">    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-25"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-26"><span class="w">    </span><span class="sd">"""Generate each image of a spec with an image model, key its backdrop colour to alpha, fit it, and write it with its provenance.</span>
+</span><span id="line-27">
+</span><span id="line-28"><span class="sd">    spec: a JSON file: {name: {prompt, size, background (opaque|transparent), key (magenta|green|a matte recipe), fit [w, h], model, quality, prop {point, landmarks, max_side, keep, detach, despill}: carve it into a prop folder instead of a plate}}</span>
+</span><span id="line-29"><span class="sd">    out: the folder to write &lt;name&gt;.png (a plate) or &lt;name&gt;/prop.json + parts/ (a prop) and art_sources.json into (an environment's plates/, the props store)</span>
+</span><span id="line-30"><span class="sd">    only: comma-separated names to make (default: all)</span>
+</span><span id="line-31"><span class="sd">    keep_raw: also write the model's own image as &lt;name&gt;.raw.png</span>
+</span><span id="line-32"><span class="sd">    overwrite: make an image again when &lt;name&gt;.png exists (default: keep it; each generation is billed)</span>
+</span><span id="line-33"><span class="sd">    model: the default generator's model, where the spec names none (default: gpt-image-2)</span>
+</span><span id="line-34"><span class="sd">    """</span>
+</span><span id="line-35">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.carve.generate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AixGenerator</span><span class="p">,</span> <span class="n">generate_art</span>
+</span><span id="line-36">
+</span><span id="line-37">    <span class="n">made</span> <span class="o">=</span> <span class="n">generate_art</span><span class="p">(</span>
+</span><span id="line-38">        <span class="n">spec</span><span class="p">,</span>
+</span><span id="line-39">        <span class="n">out_dir</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
+</span><span id="line-40">        <span class="n">generator</span><span class="o">=</span><span class="n">AixGenerator</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span> <span class="k">if</span> <span class="n">model</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-41">        <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">only</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-42">        <span class="n">keep_raw</span><span class="o">=</span><span class="n">keep_raw</span><span class="p">,</span>
+</span><span id="line-43">        <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
+</span><span id="line-44">    <span class="p">)</span>
+</span><span id="line-45">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-46">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">  "</span>
+</span><span id="line-47">        <span class="o">+</span> <span class="p">(</span>
+</span><span id="line-48">            <span class="s2">"(kept: already there; --overwrite makes it again)"</span>
+</span><span id="line-49">            <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">kept</span>
+</span><span id="line-50">            <span class="k">else</span> <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">provider</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">license</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'licence unknown'</span><span class="si">}</span><span class="s2">)"</span>
+</span><span id="line-51">        <span class="p">)</span>
+</span><span id="line-52">        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">made</span>
+</span><span id="line-53">    <span class="p">]</span>
+</span><span id="line-54">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"  ! </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">made</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">warnings</span><span class="p">]</span>
+</span><span id="line-55">    <span class="k">if</span> <span class="ow">not</span> <span class="n">made</span><span class="p">:</span>
+</span><span id="line-56">        <span class="k">return</span> <span class="s2">"nothing made"</span>
+</span><span id="line-57">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span><span id="line-58">        <span class="p">[</span><span class="o">*</span><span class="n">lines</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"provenance: </span><span class="si">{</span><span class="n">made</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'art_sources.json'</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
+</span><span id="line-59">    <span class="p">)</span></div>
 
-</span><span id="line-59">
 </span><span id="line-60">
-</span><span id="line-61"><span class="n">_dispatch_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">generate</span><span class="p">]</span>
+</span><span id="line-61">
+<div class="viewcode-block" id="critique_plates">
+<a class="viewcode-back" href="../../_autosummary/cutan.art_cli.html#cutan.art_cli.critique_plates">[docs]</a>
+</span><span id="line-62"><span class="k">def</span><span class="w"> </span><span class="nf">critique_plates</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"."</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-63"><span class="w">    </span><span class="sd">"""Ask a vision model whether each plate a travel lists `far` holds anything near (a tree, a pole, the road close up), which would stand still while the scenery streams past (a paid call per plate; warnings, never the gate).</span>
+</span><span id="line-64">
+</span><span id="line-65"><span class="sd">    project: the project folder</span>
+</span><span id="line-66"><span class="sd">    model: the vision model (default: an's vision judge's)</span>
+</span><span id="line-67"><span class="sd">    """</span>
+</span><span id="line-68">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.cli_status</span><span class="w"> </span><span class="kn">import</span> <span class="n">failed</span>
+</span><span id="line-69">
+</span><span id="line-70">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.verify.critic</span><span class="w"> </span><span class="kn">import</span> <span class="n">critique_far_plates</span>
+</span><span id="line-71">
+</span><span id="line-72">    <span class="n">report</span> <span class="o">=</span> <span class="n">critique_far_plates</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-73">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"[</span><span class="si">{</span><span class="n">sev</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">sev</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">findings</span><span class="p">]</span>
+</span><span id="line-74">    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-75">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span><span class="si">}</span><span class="s2"> judge call(s): "</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">"plate"</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+</span><span id="line-76">        <span class="k">if</span> <span class="n">report</span><span class="o">.</span><span class="n">calls</span>
+</span><span id="line-77">        <span class="k">else</span> <span class="s2">"0 judge calls"</span>
+</span><span id="line-78">    <span class="p">)</span>
+</span><span id="line-79">    <span class="n">text</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+</span><span id="line-80">    <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">sev</span> <span class="o">==</span> <span class="s2">"error"</span> <span class="k">for</span> <span class="n">sev</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">findings</span><span class="p">)</span> <span class="k">else</span> <span class="n">text</span></div>
+
+</span><span id="line-81">
+</span><span id="line-82">
+</span><span id="line-83"><span class="n">_dispatch_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">generate</span><span class="p">,</span> <span class="n">critique_plates</span><span class="p">]</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -263,7 +288,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=a02dbd69"></script>
+    <script src="../../_static/documentation_options.js?v=04553970"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

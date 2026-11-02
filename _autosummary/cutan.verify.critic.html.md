@@ -34,13 +34,15 @@ and the frame source as keywords. A configured judge that fails is a failure (an
 
 ### Module Attributes
 
-| [`CHECKLISTS`](#cutan.verify.critic.CHECKLISTS)   | Narrow questions about a prop that depicts a character's limbs, answerable from appearance, by the prop's declared `view` (`"*"`: any view not listed).   |
-|---------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`CHECKLISTS`](#cutan.verify.critic.CHECKLISTS)          | Narrow questions about a prop that depicts a character's limbs, answerable from appearance, by the prop's declared `view` (`"*"`: any view not listed).   |
+|----------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`FAR_PLATE_CHECKLIST`](#cutan.verify.critic.FAR_PLATE_CHECKLIST) | What a `far` plate of a travelling shot must not hold (ADR 0007 of `an`): anything nearer than the far range stands still while the streams move.         |
 
 ### Functions
 
 | [`critique_body_props`](#cutan.verify.critic.critique_body_props)(project, \*[, judge, ...])   | Ask each body-depicting prop of `project`'s shots its view's checklist.                                                                                            |
 |---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`critique_far_plates`](#cutan.verify.critic.critique_far_plates)(project, \*[, judge, ...])   | Ask whether each `far` plate of `project`'s travel holds anything near (cutan#166): a tree baked into a plate stands still while the streams move.                 |
 | [`checklist_for`](#cutan.verify.critic.checklist_for)(view[, checklists])                | The questions for a prop declared in `view`: a mapping's entry for it (else its `"*"`), or `checklists` itself when it is one list.                                |
 | [`checklist_prompt`](#cutan.verify.critic.checklist_prompt)(checklist, \*, prop, character) | The prompt asking `checklist` about `prop` held by `character`.                                                                                                    |
 | [`parse_answers`](#cutan.verify.critic.parse_answers)(reply, checklist)                  | The answers in a judge's reply, one per question (`answer` is `yes`, `no` or `unsure`: read from its leading word); `None` when the reply holds no answers at all. |
@@ -62,6 +64,11 @@ listed). `{prop}` and `{character}` are filled in per shot.
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 The critic’s findings, and every judge call it made (what it cost).
+
+### cutan.verify.critic.FAR_PLATE_CHECKLIST *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[Question](#cutan.verify.critic.Question), ...]* *= (Question(text='Does the picture show the ground or a road close to the viewer?', expected='no'), Question(text="Are there trees, poles, fences, signs or buildings near the viewer: large, or cut off by the picture's edges?", expected='no'), Question(text='Is everything shown far away: sky, horizon, distant hills or mountains?', expected='yes'))*
+
+What a `far` plate of a travelling shot must not hold (ADR 0007 of `an`):
+anything nearer than the far range stands still while the streams move.
 
 ### *class* cutan.verify.critic.Question(text, expected)
 
@@ -121,6 +128,22 @@ differs from a correct drawing’s, an `info` per `unsure`, an `error`
 when the judge or the probe fails or the reply holds no answers. A prop
 whose character is not in the shot is not asked (a first-person prop’s is
 off screen by design, so it is).
+
+* **Return type:**
+  [`CritiqueReport`](#cutan.verify.critic.CritiqueReport)
+
+### cutan.verify.critic.critique_far_plates(project, , judge=None, checklist=(Question(text='Does the picture show the ground or a road close to the viewer?', expected='no'), Question(text="Are there trees, poles, fences, signs or buildings near the viewer: large, or cut off by the picture's edges?", expected='no'), Question(text='Is everything shown far away: sky, horizon, distant hills or mountains?', expected='yes')), model=None, max_side=1024)
+
+Ask whether each `far` plate of `project`’s travel holds anything near
+(cutan#166): a tree baked into a plate stands still while the streams move.
+
+The plate’s own image is judged, not a render: no probe, one call per plate
+(at most `max_side` px long; a plane’s `fit` never crops, so the image
+holds everything a pan could show). An SVG plate (drawn by hand, its content
+known to its author) and a plane with no picture are not judged, each said
+as an `info`. Only the plates a travel LISTS `far` are judged; a plane at
+infinity because its frame is coupled `far` is not yet (cutan#177).
+Findings and calls as [`critique_body_props()`](#cutan.verify.critic.critique_body_props).
 
 * **Return type:**
   [`CritiqueReport`](#cutan.verify.critic.CritiqueReport)

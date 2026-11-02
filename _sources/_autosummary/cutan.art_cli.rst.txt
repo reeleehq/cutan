@@ -9,4 +9,5 @@ cutan.art\_cli
    .. autosummary::
    
       generate
+      critique_plates
    

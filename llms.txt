@@ -97,7 +97,7 @@
 - [cutan.verify.critic](_autosummary/cutan.verify.critic.html.md): A vision critic for body-depicting props: narrow yes/no questions over probe frames (cutan#95).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-02 04:05 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-02 04:14 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

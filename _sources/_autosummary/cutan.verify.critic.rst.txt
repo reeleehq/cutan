@@ -9,12 +9,14 @@ cutan.verify.critic
    .. autosummary::
    
       CHECKLISTS
+      FAR_PLATE_CHECKLIST
    
    .. rubric:: Functions
 
    .. autosummary::
    
       critique_body_props
+      critique_far_plates
       checklist_for
       checklist_prompt
       parse_answers

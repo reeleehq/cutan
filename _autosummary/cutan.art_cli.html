@@ -141,7 +141,8 @@
 <p>Thin string-typed wrappers over <a class="reference internal" href="cutan.carve.generate.html#module-cutan.carve.generate" title="cutan.carve.generate"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cutan.carve.generate</span></code></a>, dispatched by typer
 the same way as <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span> <span class="pre">...</span></code> (the <code class="docutils literal notranslate"><span class="pre">cli.art</span></code> service):</p>
 <blockquote>
-<div><p>an art generate SPEC.json –out assets/environments/car/plates [–only cabin,road]</p>
+<div><p>an art generate SPEC.json –out assets/environments/car/plates [–only cabin,road]
+an art critique-plates [–project DIR]      # far plates of a travel holding near things</p>
 </div></blockquote>
 <p>The spec is <code class="docutils literal notranslate"><span class="pre">{name:</span> <span class="pre">{prompt,</span> <span class="pre">size,</span> <span class="pre">background,</span> <span class="pre">key,</span> <span class="pre">fit,</span> <span class="pre">model,</span> <span class="pre">quality}}</span></code>;
 each image becomes <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;.png</span></code> with its provenance in <code class="docutils literal notranslate"><span class="pre">art_sources.json</span></code>.</p>
@@ -151,8 +152,23 @@ each image becomes <code class="docutils literal notranslate"><span class="pre">
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.art_cli.generate" title="cutan.art_cli.generate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate</span></code></a>(spec, out[, only, keep_raw, ...])</p></td>
 <td><p>Generate each image of a spec with an image model, key its backdrop colour to alpha, fit it, and write it with its provenance.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.art_cli.critique_plates" title="cutan.art_cli.critique_plates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">critique_plates</span></code></a>([project, model])</p></td>
+<td><p>Ask a vision model whether each plate a travel lists <code class="code docutils literal notranslate"><span class="pre">far</span></code> holds anything near (a tree, a pole, the road close up), which would stand still while the scenery streams past (a paid call per plate; warnings, never the gate).</p></td>
+</tr>
 </tbody>
 </table>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.art_cli.critique_plates">
+<span class="sig-prename descclassname"><span class="pre">cutan.art_cli.</span></span><span class="sig-name descname"><span class="pre">critique_plates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/art_cli.html#critique_plates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.art_cli.critique_plates" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.art_cli.critique_plates'">¶</a></dt>
+<dd><p>Ask a vision model whether each plate a travel lists <code class="code docutils literal notranslate"><span class="pre">far</span></code> holds anything near (a tree, a pole, the road close up), which would stand still while the scenery streams past (a paid call per plate; warnings, never the gate).</p>
+<p>project: the project folder
+model: the vision model (default: an’s vision judge’s)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.art_cli.generate">
 <span class="sig-prename descclassname"><span class="pre">cutan.art_cli.</span></span><span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/art_cli.html#generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.art_cli.generate" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.art_cli.generate'">¶</a></dt>
@@ -173,6 +189,7 @@ model: the default generator’s model, where the spec names none (default: gpt-
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
+<li><a :data-current="activeSection === '#cutan.art_cli.critique_plates'" class="reference internal" href="#cutan.art_cli.critique_plates"><code class="docutils literal notranslate"><span class="pre">critique_plates()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.art_cli.generate'" class="reference internal" href="#cutan.art_cli.generate"><code class="docutils literal notranslate"><span class="pre">generate()</span></code></a></li>
 </ul>
 </div>
@@ -187,7 +204,7 @@ model: the default generator’s model, where the spec names none (default: gpt-
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=a02dbd69"></script>
+<script src="../_static/documentation_options.js?v=04553970"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
