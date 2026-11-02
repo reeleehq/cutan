@@ -92,7 +92,9 @@ CHECKLISTS: dict[str, tuple[Question, ...]] = {
             "edge, as if they were the camera's own arms?",
             "yes",
         ),
-        Question("Is the face of the person holding the {prop} visible in the picture?", "no"),
+        Question(
+            "Is the face of the person holding the {prop} visible in the picture?", "no"
+        ),
     ),
     "*": (_SLEEVES, _NOT_FROM_BELOW),
 }
@@ -158,7 +160,9 @@ def _first_json_object(text: str) -> Any:
 _LEADING_ANSWER = re.compile(r"^\W*(yes|no)\b(?!\s*/)", re.I)
 
 
-def parse_answers(reply: str, checklist: Sequence[Question]) -> list[dict[str, Any]] | None:
+def parse_answers(
+    reply: str, checklist: Sequence[Question]
+) -> list[dict[str, Any]] | None:
     """The answers in a judge's reply, one per question (``answer`` is ``yes``,
     ``no`` or ``unsure``: read from its leading word); ``None`` when the reply
     holds no answers at all.
@@ -183,10 +187,17 @@ def parse_answers(reply: str, checklist: Sequence[Question]) -> list[dict[str, A
         if not 1 <= n <= len(checklist):
             return None  # numbered from 0, or past the end: the answers would shift
         m = _LEADING_ANSWER.match(str(item.get("answer", "")))
-        by_n[n] = {"n": n, "answer": m.group(1).lower() if m else "unsure", "why": str(item.get("why", ""))}
+        by_n[n] = {
+            "n": n,
+            "answer": m.group(1).lower() if m else "unsure",
+            "why": str(item.get("why", "")),
+        }
     if not by_n:
         return None
-    return [by_n.get(n, {"n": n, "answer": "unsure", "why": ""}) for n in range(1, len(checklist) + 1)]
+    return [
+        by_n.get(n, {"n": n, "answer": "unsure", "why": ""})
+        for n in range(1, len(checklist) + 1)
+    ]
 
 
 @dataclass
@@ -207,7 +218,9 @@ def _envelope_judge(model: str | None) -> Callable[..., Mapping[str, Any]]:
     from an.verify.vision import judge_envelope
 
     def judge(frames: Sequence[bytes], *, prompt: str) -> Mapping[str, Any]:
-        return judge_envelope(frames, prompt=prompt, **({"model": model} if model else {}))
+        return judge_envelope(
+            frames, prompt=prompt, **({"model": model} if model else {})
+        )
 
     return judge
 
@@ -225,7 +238,11 @@ def _checked_default_judge(model: str | None, report: CritiqueReport, label: str
         import anthropic  # noqa: F401 - the default judge's SDK, checked before paying
     except ImportError:
         report.findings.append(
-            ("error", "", f"the {label}'s default judge needs the anthropic SDK: pip install an[vision]")
+            (
+                "error",
+                "",
+                f"the {label}'s default judge needs the anthropic SDK: pip install an[vision]",
+            )
         )
         return None
     return _envelope_judge(model)
@@ -257,7 +274,11 @@ def _ask(
         answer = judge(shown, prompt=prompt)
     except Exception as e:  # noqa: BLE001 - configured and broken is a failure, said aloud
         report.findings.append(
-            ("error", where, f"the {label} could not judge {subject}: {type(e).__name__}: {e}")
+            (
+                "error",
+                where,
+                f"the {label} could not judge {subject}: {type(e).__name__}: {e}",
+            )
         )
         return
     reply = str((answer.get("reply") if isinstance(answer, Mapping) else answer) or "")
@@ -266,7 +287,11 @@ def _ask(
     answers = parse_answers(reply, checklist)
     if answers is None:
         report.findings.append(
-            ("error", where, f"the {label}'s reply about {subject} held no answers: {reply[:200]!r}")
+            (
+                "error",
+                where,
+                f"the {label}'s reply about {subject} held no answers: {reply[:200]!r}",
+            )
         )
         return
     for q, a in zip(checklist, answers):
@@ -316,7 +341,9 @@ def critique_body_props(
     from an.project import load
 
     if not at or any(not 0.0 <= f <= 1.0 for f in at):
-        raise ValueError(f"`at` holds fractions of a shot's length in [0, 1], not {list(at)}")
+        raise ValueError(
+            f"`at` holds fractions of a shot's length in [0, 1], not {list(at)}"
+        )
     report = CritiqueReport()
     custom = judge is not None
     project = load(project) if not hasattr(project, "scene") else project
@@ -343,7 +370,9 @@ def critique_body_props(
             if not checklist:
                 continue
             prop = entity.ref or entity.id  # "wheel", not the entity's id
-            prompt = checklist_prompt(checklist, prop=prop, character=character or "the character")
+            prompt = checklist_prompt(
+                checklist, prop=prop, character=character or "the character"
+            )
             if judge is None:
                 judge = _checked_default_judge(model, report, "body critic")
                 if judge is None:
@@ -384,7 +413,9 @@ FAR_PLATE_CHECKLIST: tuple[Question, ...] = (
         "or cut off by the picture's edges?",
         "no",
     ),
-    Question("Is everything shown far away: sky, horizon, distant hills or mountains?", "yes"),
+    Question(
+        "Is everything shown far away: sky, horizon, distant hills or mountains?", "yes"
+    ),
 )
 
 _PLATE_PROMPT = """You are checking a background picture for a cut-out animated film. It
@@ -446,7 +477,11 @@ def _far_plates(project: Any) -> list[tuple[str, str, Any, str]]:
         where = f"world/travel/plates/far/{k}"
         path, why = None, "its file cannot be read in its environment's folder"
         if member is None or member.kind != "environment" or root is None:
-            why = "it is not a plane of an environment in the world" if root is not None else "the environments store has no folder"
+            why = (
+                "it is not a plane of an environment in the world"
+                if root is not None
+                else "the environments store has no folder"
+            )
             out.append((where, name, None, why))
             continue
         try:
@@ -494,7 +529,9 @@ def critique_far_plates(
     for where, name, path, why in _far_plates(project):
         if path is None or Path(path).suffix.lower() == ".svg":
             reason = "it is an SVG, drawn by hand" if path is not None else why
-            report.findings.append(("info", where, f"far plate {name!r} not judged: {reason}"))
+            report.findings.append(
+                ("info", where, f"far plate {name!r} not judged: {reason}")
+            )
             continue
         if judge is None:
             judge = _checked_default_judge(model, report, "far-plate critic")
@@ -520,4 +557,3 @@ def critique_far_plates(
             ),
         )
     return report
-

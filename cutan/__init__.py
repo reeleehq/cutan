@@ -72,7 +72,8 @@ PROJECT_STORE_RECORD: str = ".an/projects_store.json"
 #: (an#570 merged after level 10 was cut), which the body-continuity check reads.
 #: Level 13: the names cutan's checks and pack read, public (an#710): ``an.ir.validate.rig_scope``,
 #: ``an.semantic.matcher.lookup_method`` and ``as_choice``, ``an.audio.loudness.voice_loudness_offset``.
-REQUIRED_AN_API_LEVEL: int = 13
+#: Level 14: ``EntityKind.shot_sizes`` (cutan#106), the rig's own bands for a viewpoint's size.
+REQUIRED_AN_API_LEVEL: int = 14
 
 
 def require_an() -> None:

@@ -868,13 +868,16 @@ def critique_props(project: str = ".", at: str = "0.5", model: str = "") -> str:
     lines.append(
         f"{len(report.calls)} judge call(s): "
         + ", ".join(
-            f"{c['shot']}/{c['prop']} ({c['frames']} frame(s), {c['model']})" for c in report.calls
+            f"{c['shot']}/{c['prop']} ({c['frames']} frame(s), {c['model']})"
+            for c in report.calls
         )
         if report.calls
         else "no judge call made"
     )
     text = "\n".join(lines)
-    return failed(text) if any(sev == "error" for sev, _, _ in report.findings) else text
+    return (
+        failed(text) if any(sev == "error" for sev, _, _ in report.findings) else text
+    )
 
 
 def cast(file: str, out_dir: str = "") -> str:
