@@ -12,4 +12,5 @@ cutan.verify
 
    body
    cadence
+   critic
    style

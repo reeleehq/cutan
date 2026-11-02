@@ -41,6 +41,7 @@ Configuration (environment; the first match wins, `CUTAN_HOME` always forces loc
 | [`materialize_project`](#cutan.projects_store.materialize_project)(project_id, \*[, ...])      | A real folder holding `project_id`'s files.                                                                                                                |
 | [`new_project_dir`](#cutan.projects_store.new_project_dir)(project_id, \*[, default, ...]) | Where `an init <id> --id --genre cutout_animation` creates the project.                                                                                    |
 | [`projects_store`](#cutan.projects_store.projects_store)([settings])                      | The projects as `{relative path: bytes}`, over disk or S3 per `settings`.                                                                                  |
+| [`prune_project`](#cutan.projects_store.prune_project)(project_id, \*[, exclude, ...])   | Delete the store's copies of the files `exclude` covers (cutan#155); return their project-relative paths, sorted.                                          |
 | [`push_project`](#cutan.projects_store.push_project)(project_id, \*[, folder, ...])     | Write `folder`'s files to the store under `project_id/`: the inverse of [`materialize_project()`](#cutan.projects_store.materialize_project) (cutan#91). |
 | [`read_record`](#cutan.projects_store.read_record)(folder)                             | The folder's [`STORE_RECORD`](#cutan.projects_store.STORE_RECORD), `{}` when it has none or it is unreadable.                                     |
 
@@ -145,6 +146,34 @@ from a folder elsewhere lands whole.
 
 * **Return type:**
   [`MutableMapping`](https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping)
+
+### cutan.projects_store.prune_project(project_id, , exclude=('artifacts/render_reports/', 'artifacts/probes/', 'artifacts/voice_options/\*.lock'), settings=None, store=None, dry_run=False)
+
+Delete the store’s copies of the files `exclude` covers (cutan#155); return
+their project-relative paths, sorted.
+
+A push never writes an excluded file, but copies pushed before the excludes
+covered them stay in the store (the options manifests’ file locks, before
+the excludes followed `an`’s `.gitignore`), and every pull brings them
+back. A push does not delete them (an excluded file is never a reason to
+delete: cutan#91), so this is the one explicit step that does. The default
+is what `an` keeps out of git (`an.project.PROJECT_GITIGNORE`: render
+reports, probes, the locks), not every push exclude: a shot cache uploaded by
+hand to share it stays (pass `exclude=DEFAULT_PUSH_EXCLUDES` for all).
+Their entries leave the store’s record too. `dry_run`: only say what
+would go. On the local backend the store is the project folder itself:
+nothing is pruned.
+
+```pycon
+>>> store = {"p/scene.md": b"s", "p/artifacts/voice_options/a.json.lock": b""}
+>>> prune_project("p", settings=ProjectsStoreSettings(backend="s3"), store=store)
+('artifacts/voice_options/a.json.lock',)
+>>> sorted(store)
+['p/scene.md']
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
 
 ### cutan.projects_store.push_project(project_id, , folder=None, settings=None, store=None, delete_missing=False, exclude=('.git/', '.an/render_work/', 'artifacts/shot_cache/', 'artifacts/shots/', 'artifacts/render_reports/', 'artifacts/probes/', 'artifacts/voice_options/\*.lock'), force=False, cache=None)
 

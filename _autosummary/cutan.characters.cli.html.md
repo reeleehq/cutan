@@ -35,6 +35,7 @@ Subcommands (used as `an character <verb> ...`):
 | [`capabilities`](#cutan.characters.cli.capabilities)(name[, out_dir, as_json, style])     | What a character affords, and per aspect which methods apply and what the rest lack.                                                                                                                                                                                                      |
 | [`cast`](#cutan.characters.cli.cast)(file[, out_dir])                             | Make every character of a cast file (cast.yaml): one entry per character, the options of `an character new` plus its follow-up steps.                                                                                                                                                     |
 | [`contract`](#cutan.characters.cli.contract)()                                        | Print the art-package contract an illustrator must satisfy.                                                                                                                                                                                                                               |
+| [`critique_props`](#cutan.characters.cli.critique_props)([project, at, model])              | Ask a vision model whether each body-depicting prop's hands and sleeves belong to the body on screen (a paid call per prop and shot; warnings, never the gate).                                                                                                                           |
 | [`feet_origin`](#cutan.characters.cli.feet_origin)(name[, out_dir, undo])                | Make an existing character stand on its feet (an#285): its stage point (`stage.at`) becomes where its feet are, as for a character `an character new` makes now.                                                                                                                          |
 | [`from_sheet`](#cutan.characters.cli.from_sheet)(name, sheet, recipe[, out_dir])        | Draw attachments of `name` from regions of a reference sheet (cutan#128): each region is carved (`cutan.carve`) and set like `set-part`; the quality warnings of every part are printed.                                                                                                  |
 | [`mouths`](#cutan.characters.cli.mouths)(name[, out_dir, palette, variants])        | Regenerate the default 9-shape mouth set for `name`, plus its `viseme@<form>` variants, and declare them in the descriptor.                                                                                                                                                               |
@@ -168,6 +169,17 @@ Print the art-package contract an illustrator must satisfy.
 cannot drift from what `an character validate` actually enforces — a
 contract that disagrees with its checker is worse than none, because it
 gets a human paid for work that cannot land.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.characters.cli.critique_props(project='.', at='0.5', model='')
+
+Ask a vision model whether each body-depicting prop’s hands and sleeves belong to the body on screen (a paid call per prop and shot; warnings, never the gate).
+
+project: the project folder
+at: comma-separated instants to probe, as fractions of each shot’s length (0 to 1)
+model: the vision model (default: an’s vision judge’s)
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

@@ -784,6 +784,64 @@
 </span><span id="line-570">        <span class="n">conflicts</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">conflicts</span><span class="p">),</span>
 </span><span id="line-571">    <span class="p">)</span></div>
 
+</span><span id="line-572">
+</span><span id="line-573">
+<div class="viewcode-block" id="prune_project">
+<a class="viewcode-back" href="../../_autosummary/cutan.projects_store.html#cutan.projects_store.prune_project">[docs]</a>
+</span><span id="line-574"><span class="k">def</span><span class="w"> </span><span class="nf">prune_project</span><span class="p">(</span>
+</span><span id="line-575">    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-576">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-577">    <span class="n">exclude</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">PROJECT_GITIGNORE</span><span class="p">,</span>
+</span><span id="line-578">    <span class="n">settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProjectsStoreSettings</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-579">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MutableMapping</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-580">    <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-581"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+</span><span id="line-582"><span class="w">    </span><span class="sd">"""Delete the store's copies of the files ``exclude`` covers (cutan#155); return</span>
+</span><span id="line-583"><span class="sd">    their project-relative paths, sorted.</span>
+</span><span id="line-584">
+</span><span id="line-585"><span class="sd">    A push never writes an excluded file, but copies pushed before the excludes</span>
+</span><span id="line-586"><span class="sd">    covered them stay in the store (the options manifests' file locks, before</span>
+</span><span id="line-587"><span class="sd">    the excludes followed ``an``'s ``.gitignore``), and every pull brings them</span>
+</span><span id="line-588"><span class="sd">    back. A push does not delete them (an excluded file is never a reason to</span>
+</span><span id="line-589"><span class="sd">    delete: cutan#91), so this is the one explicit step that does. The default</span>
+</span><span id="line-590"><span class="sd">    is what ``an`` keeps out of git (``an.project.PROJECT_GITIGNORE``: render</span>
+</span><span id="line-591"><span class="sd">    reports, probes, the locks), not every push exclude: a shot cache uploaded by</span>
+</span><span id="line-592"><span class="sd">    hand to share it stays (pass ``exclude=DEFAULT_PUSH_EXCLUDES`` for all).</span>
+</span><span id="line-593"><span class="sd">    Their entries leave the store's record too. ``dry_run``: only say what</span>
+</span><span id="line-594"><span class="sd">    would go. On the local backend the store is the project folder itself:</span>
+</span><span id="line-595"><span class="sd">    nothing is pruned.</span>
+</span><span id="line-596">
+</span><span id="line-597"><span class="sd">    &gt;&gt;&gt; store = {"p/scene.md": b"s", "p/artifacts/voice_options/a.json.lock": b""}</span>
+</span><span id="line-598"><span class="sd">    &gt;&gt;&gt; prune_project("p", settings=ProjectsStoreSettings(backend="s3"), store=store)</span>
+</span><span id="line-599"><span class="sd">    ('artifacts/voice_options/a.json.lock',)</span>
+</span><span id="line-600"><span class="sd">    &gt;&gt;&gt; sorted(store)</span>
+</span><span id="line-601"><span class="sd">    ['p/scene.md']</span>
+</span><span id="line-602"><span class="sd">    """</span>
+</span><span id="line-603">    <span class="n">s</span> <span class="o">=</span> <span class="n">settings</span> <span class="ow">or</span> <span class="n">ProjectsStoreSettings</span><span class="o">.</span><span class="n">from_environ</span><span class="p">()</span>
+</span><span id="line-604">    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"local"</span> <span class="ow">and</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-605">        <span class="k">return</span> <span class="p">()</span>
+</span><span id="line-606">    <span class="n">store</span> <span class="o">=</span> <span class="n">projects_store</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">store</span>
+</span><span id="line-607">    <span class="n">prefix</span> <span class="o">=</span> <span class="n">_project_prefix</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+</span><span id="line-608">    <span class="n">excluded</span> <span class="o">=</span> <span class="n">_excluder</span><span class="p">(</span><span class="n">exclude</span><span class="p">)</span>
+</span><span id="line-609">    <span class="n">gone</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+</span><span id="line-610">        <span class="nb">sorted</span><span class="p">(</span>
+</span><span id="line-611">            <span class="n">key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:]</span>
+</span><span id="line-612">            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">_keys_under</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span>
+</span><span id="line-613">            <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:]</span> <span class="o">!=</span> <span class="n">STORE_RECORD</span> <span class="ow">and</span> <span class="n">excluded</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:])</span>
+</span><span id="line-614">        <span class="p">)</span>
+</span><span id="line-615">    <span class="p">)</span>
+</span><span id="line-616">    <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
+</span><span id="line-617">        <span class="k">return</span> <span class="n">gone</span>
+</span><span id="line-618">    <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">gone</span><span class="p">:</span>
+</span><span id="line-619">        <span class="k">del</span> <span class="n">store</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">rel</span><span class="p">]</span>
+</span><span id="line-620">    <span class="n">record_key</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">STORE_RECORD</span>
+</span><span id="line-621">    <span class="n">record</span> <span class="o">=</span> <span class="n">_store_record</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">record_key</span><span class="p">)</span>
+</span><span id="line-622">    <span class="n">files</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"files"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+</span><span id="line-623">    <span class="n">kept</span> <span class="o">=</span> <span class="p">{</span><span class="n">rel</span><span class="p">:</span> <span class="n">e</span> <span class="k">for</span> <span class="n">rel</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">excluded</span><span class="p">(</span><span class="n">rel</span><span class="p">)}</span>
+</span><span id="line-624">    <span class="k">if</span> <span class="n">kept</span> <span class="o">!=</span> <span class="n">files</span><span class="p">:</span>  <span class="c1"># also entries whose key went some other way</span>
+</span><span id="line-625">        <span class="n">store</span><span class="p">[</span><span class="n">record_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_record_bytes</span><span class="p">({</span><span class="o">**</span><span class="n">record</span><span class="p">,</span> <span class="s2">"files"</span><span class="p">:</span> <span class="n">kept</span><span class="p">})</span>
+</span><span id="line-626">    <span class="k">return</span> <span class="n">gone</span></div>
+
 </span></code></pre></div>
     </div></div>
           </main>
@@ -797,7 +855,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=60a9f236"></script>
+    <script src="../../_static/documentation_options.js?v=5751785c"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

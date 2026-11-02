@@ -1,0 +1,28 @@
+cutan.verify.critic
+===================
+
+.. automodule:: cutan.verify.critic
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      CHECKLISTS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      critique_body_props
+      checklist_for
+      checklist_prompt
+      parse_answers
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Question
+      CritiqueReport
+   

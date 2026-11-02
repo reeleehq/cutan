@@ -190,31 +190,34 @@ and returns a string for terminal display.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.contract" title="cutan.characters.cli.contract"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contract</span></code></a>()</p></td>
 <td><p>Print the art-package contract an illustrator must satisfy.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.feet_origin" title="cutan.characters.cli.feet_origin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">feet_origin</span></code></a>(name[, out_dir, undo])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.critique_props" title="cutan.characters.cli.critique_props"><code class="xref py py-obj docutils literal notranslate"><span class="pre">critique_props</span></code></a>([project, at, model])</p></td>
+<td><p>Ask a vision model whether each body-depicting prop's hands and sleeves belong to the body on screen (a paid call per prop and shot; warnings, never the gate).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.feet_origin" title="cutan.characters.cli.feet_origin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">feet_origin</span></code></a>(name[, out_dir, undo])</p></td>
 <td><p>Make an existing character stand on its feet (an#285): its stage point (<code class="code docutils literal notranslate"><span class="pre">stage.at</span></code>) becomes where its feet are, as for a character <code class="code docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span> <span class="pre">new</span></code> makes now.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.from_sheet" title="cutan.characters.cli.from_sheet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_sheet</span></code></a>(name, sheet, recipe[, out_dir])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.from_sheet" title="cutan.characters.cli.from_sheet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_sheet</span></code></a>(name, sheet, recipe[, out_dir])</p></td>
 <td><p>Draw attachments of <code class="docutils literal notranslate"><span class="pre">name</span></code> from regions of a reference sheet (cutan#128): each region is carved (<code class="docutils literal notranslate"><span class="pre">cutan.carve</span></code>) and set like <code class="docutils literal notranslate"><span class="pre">set-part</span></code>; the quality warnings of every part are printed.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.mouths" title="cutan.characters.cli.mouths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouths</span></code></a>(name[, out_dir, palette, variants])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.mouths" title="cutan.characters.cli.mouths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouths</span></code></a>(name[, out_dir, palette, variants])</p></td>
 <td><p>Regenerate the default 9-shape mouth set for <code class="docutils literal notranslate"><span class="pre">name</span></code>, plus its <code class="code docutils literal notranslate"><span class="pre">viseme@&lt;form&gt;</span></code> variants, and declare them in the descriptor.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.new" title="cutan.characters.cli.new"><code class="xref py py-obj docutils literal notranslate"><span class="pre">new</span></code></a>(name[, out_dir, seed, style, voice_ref, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.new" title="cutan.characters.cli.new"><code class="xref py py-obj docutils literal notranslate"><span class="pre">new</span></code></a>(name[, out_dir, seed, style, voice_ref, ...])</p></td>
 <td><p>Create a new character at <code class="docutils literal notranslate"><span class="pre">out_dir</span></code>/<code class="docutils literal notranslate"><span class="pre">name</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.preview" title="cutan.characters.cli.preview"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preview</span></code></a>(name[, out_dir, open_browser])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.preview" title="cutan.characters.cli.preview"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preview</span></code></a>(name[, out_dir, open_browser])</p></td>
 <td><p>Render a small HTML viewer that previews all visemes + idle animation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.record" title="cutan.characters.cli.record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record</span></code></a>(name[, out_dir, output, duration, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.record" title="cutan.characters.cli.record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record</span></code></a>(name[, out_dir, output, duration, ...])</p></td>
 <td><p>Record a character's preview HTML to mp4.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.set_part" title="cutan.characters.cli.set_part"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_part</span></code></a>(name, attachment, file[, out_dir])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.set_part" title="cutan.characters.cli.set_part"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_part</span></code></a>(name, attachment, file[, out_dir])</p></td>
 <td><p>Draw one attachment of <code class="docutils literal notranslate"><span class="pre">name</span></code> with a picture instead of the factory's SVG (cutan#92): a painted or generated part (PNG/WebP/JPEG with alpha) takes the place of <code class="docutils literal notranslate"><span class="pre">parts/&lt;attachment&gt;.svg</span></code>, in the box the attachment declared.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.silhouette" title="cutan.characters.cli.silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">silhouette</span></code></a>(name[, other, out_dir, output, size])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.silhouette" title="cutan.characters.cli.silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">silhouette</span></code></a>(name[, other, out_dir, output, size])</p></td>
 <td><p>Render a black silhouette for <code class="docutils literal notranslate"><span class="pre">name</span></code> (and optionally compare to <code class="docutils literal notranslate"><span class="pre">other</span></code>).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.cli.validate" title="cutan.characters.cli.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(name[, out_dir])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.cli.validate" title="cutan.characters.cli.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(name[, out_dir])</p></td>
 <td><p>Validate a character's directory structure and descriptor.</p></td>
 </tr>
 </tbody>
@@ -358,6 +361,19 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 cannot drift from what <code class="code docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span> <span class="pre">validate</span></code> actually enforces — a
 contract that disagrees with its checker is worse than none, because it
 gets a human paid for work that cannot land.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.cli.critique_props">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.cli.</span></span><span class="sig-name descname"><span class="pre">critique_props</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0.5'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/cli.html#critique_props"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.cli.critique_props" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.cli.critique_props'">¶</a></dt>
+<dd><p>Ask a vision model whether each body-depicting prop’s hands and sleeves belong to the body on screen (a paid call per prop and shot; warnings, never the gate).</p>
+<p>project: the project folder
+at: comma-separated instants to probe, as fractions of each shot’s length (0 to 1)
+model: the vision model (default: an’s vision judge’s)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
@@ -584,6 +600,7 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 <li><a :data-current="activeSection === '#cutan.characters.cli.capabilities'" class="reference internal" href="#cutan.characters.cli.capabilities"><code class="docutils literal notranslate"><span class="pre">capabilities()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.cast'" class="reference internal" href="#cutan.characters.cli.cast"><code class="docutils literal notranslate"><span class="pre">cast()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.contract'" class="reference internal" href="#cutan.characters.cli.contract"><code class="docutils literal notranslate"><span class="pre">contract()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.cli.critique_props'" class="reference internal" href="#cutan.characters.cli.critique_props"><code class="docutils literal notranslate"><span class="pre">critique_props()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.feet_origin'" class="reference internal" href="#cutan.characters.cli.feet_origin"><code class="docutils literal notranslate"><span class="pre">feet_origin()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.from_sheet'" class="reference internal" href="#cutan.characters.cli.from_sheet"><code class="docutils literal notranslate"><span class="pre">from_sheet()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.cli.mouths'" class="reference internal" href="#cutan.characters.cli.mouths"><code class="docutils literal notranslate"><span class="pre">mouths()</span></code></a></li>
@@ -606,7 +623,7 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=60a9f236"></script>
+<script src="../_static/documentation_options.js?v=5751785c"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

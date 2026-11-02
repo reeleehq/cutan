@@ -193,60 +193,84 @@
 </span><span id="line-5">
 </span><span id="line-6"><span class="sd">    an projects push &lt;id&gt; [--folder DIR] [--delete-missing]</span>
 </span><span id="line-7"><span class="sd">    an projects pull &lt;id&gt;</span>
-</span><span id="line-8">
-</span><span id="line-9"><span class="sd">Both read the backend from the environment (``CUTAN_PROJECTS_BACKEND=s3``,</span>
-</span><span id="line-10"><span class="sd">``CUTAN_HOME`` forces local). On the local backend a push of the project's own</span>
-</span><span id="line-11"><span class="sd">folder is a no-op, and a pull prints the folder.</span>
-</span><span id="line-12"><span class="sd">"""</span>
-</span><span id="line-13">
-</span><span id="line-14"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-</span><span id="line-15">
-</span><span id="line-16"><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-</span><span id="line-17">
-</span><span id="line-18"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.projects_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">materialize_project</span><span class="p">,</span> <span class="n">push_project</span>
-</span><span id="line-19">
-</span><span id="line-20"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"push"</span><span class="p">,</span> <span class="s2">"pull"</span><span class="p">]</span>
-</span><span id="line-21">
-</span><span id="line-22">
+</span><span id="line-8"><span class="sd">    an projects prune &lt;id&gt; [--dry-run]</span>
+</span><span id="line-9">
+</span><span id="line-10"><span class="sd">Both read the backend from the environment (``CUTAN_PROJECTS_BACKEND=s3``,</span>
+</span><span id="line-11"><span class="sd">``CUTAN_HOME`` forces local). On the local backend a push of the project's own</span>
+</span><span id="line-12"><span class="sd">folder is a no-op, and a pull prints the folder.</span>
+</span><span id="line-13"><span class="sd">"""</span>
+</span><span id="line-14">
+</span><span id="line-15"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+</span><span id="line-16">
+</span><span id="line-17"><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+</span><span id="line-18">
+</span><span id="line-19"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.projects_store</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-20">    <span class="n">ProjectsStoreSettings</span><span class="p">,</span>
+</span><span id="line-21">    <span class="n">materialize_project</span><span class="p">,</span>
+</span><span id="line-22">    <span class="n">prune_project</span><span class="p">,</span>
+</span><span id="line-23">    <span class="n">push_project</span><span class="p">,</span>
+</span><span id="line-24"><span class="p">)</span>
+</span><span id="line-25">
+</span><span id="line-26"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"push"</span><span class="p">,</span> <span class="s2">"pull"</span><span class="p">,</span> <span class="s2">"prune"</span><span class="p">]</span>
+</span><span id="line-27">
+</span><span id="line-28">
 <div class="viewcode-block" id="push">
 <a class="viewcode-back" href="../../_autosummary/cutan.projects_cli.html#cutan.projects_cli.push">[docs]</a>
-</span><span id="line-23"><span class="k">def</span><span class="w"> </span><span class="nf">push</span><span class="p">(</span>
-</span><span id="line-24">    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">delete_missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="line-25"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-26"><span class="w">    </span><span class="sd">"""Write what changed in a project folder to the projects store.</span>
-</span><span id="line-27">
-</span><span id="line-28"><span class="sd">    project_id: the project's id (its folder name)</span>
-</span><span id="line-29"><span class="sd">    folder: the folder to push (default: where `an projects pull` / `an init --id` put it)</span>
-</span><span id="line-30"><span class="sd">    delete_missing: also delete the store's keys the folder no longer has (never what the folder keeps local: the shot cache, render work)</span>
-</span><span id="line-31"><span class="sd">    force: also write files the store changed since this folder last synced (stale or in conflict), and delete keys it gained</span>
-</span><span id="line-32"><span class="sd">    """</span>
-</span><span id="line-33">    <span class="n">report</span> <span class="o">=</span> <span class="n">push_project</span><span class="p">(</span>
-</span><span id="line-34">        <span class="n">project_id</span><span class="p">,</span>
-</span><span id="line-35">        <span class="n">folder</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span> <span class="k">if</span> <span class="n">folder</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-36">        <span class="n">delete_missing</span><span class="o">=</span><span class="n">delete_missing</span><span class="p">,</span>
-</span><span id="line-37">        <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
-</span><span id="line-38">    <span class="p">)</span>
-</span><span id="line-39">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">report</span><span class="p">)]</span>
-</span><span id="line-40">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"  + </span><span class="si">{</span><span class="n">rel</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">written</span><span class="p">]</span>
-</span><span id="line-41">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"  - </span><span class="si">{</span><span class="n">rel</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">deleted</span><span class="p">]</span>
-</span><span id="line-42">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"  ! stale (pull first): </span><span class="si">{</span><span class="n">rel</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">stale</span><span class="p">]</span>
-</span><span id="line-43">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"  ! conflict (--force overwrites): </span><span class="si">{</span><span class="n">rel</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">conflicts</span><span class="p">]</span>
-</span><span id="line-44">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+</span><span id="line-29"><span class="k">def</span><span class="w"> </span><span class="nf">push</span><span class="p">(</span>
+</span><span id="line-30">    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">delete_missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="line-31"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-32"><span class="w">    </span><span class="sd">"""Write what changed in a project folder to the projects store.</span>
+</span><span id="line-33">
+</span><span id="line-34"><span class="sd">    project_id: the project's id (its folder name)</span>
+</span><span id="line-35"><span class="sd">    folder: the folder to push (default: where `an projects pull` / `an init --id` put it)</span>
+</span><span id="line-36"><span class="sd">    delete_missing: also delete the store's keys the folder no longer has (never what the folder keeps local: the shot cache, render work)</span>
+</span><span id="line-37"><span class="sd">    force: also write files the store changed since this folder last synced (stale or in conflict), and delete keys it gained</span>
+</span><span id="line-38"><span class="sd">    """</span>
+</span><span id="line-39">    <span class="n">report</span> <span class="o">=</span> <span class="n">push_project</span><span class="p">(</span>
+</span><span id="line-40">        <span class="n">project_id</span><span class="p">,</span>
+</span><span id="line-41">        <span class="n">folder</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span> <span class="k">if</span> <span class="n">folder</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-42">        <span class="n">delete_missing</span><span class="o">=</span><span class="n">delete_missing</span><span class="p">,</span>
+</span><span id="line-43">        <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+</span><span id="line-44">    <span class="p">)</span>
+</span><span id="line-45">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">report</span><span class="p">)]</span>
+</span><span id="line-46">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"  + </span><span class="si">{</span><span class="n">rel</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">written</span><span class="p">]</span>
+</span><span id="line-47">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"  - </span><span class="si">{</span><span class="n">rel</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">deleted</span><span class="p">]</span>
+</span><span id="line-48">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"  ! stale (pull first): </span><span class="si">{</span><span class="n">rel</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">stale</span><span class="p">]</span>
+</span><span id="line-49">    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"  ! conflict (--force overwrites): </span><span class="si">{</span><span class="n">rel</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">conflicts</span><span class="p">]</span>
+</span><span id="line-50">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
-</span><span id="line-45">
-</span><span id="line-46">
+</span><span id="line-51">
+</span><span id="line-52">
 <div class="viewcode-block" id="pull">
 <a class="viewcode-back" href="../../_autosummary/cutan.projects_cli.html#cutan.projects_cli.pull">[docs]</a>
-</span><span id="line-47"><span class="k">def</span><span class="w"> </span><span class="nf">pull</span><span class="p">(</span><span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-48"><span class="w">    </span><span class="sd">"""Read a project from the projects store into a real folder, and print the folder.</span>
-</span><span id="line-49">
-</span><span id="line-50"><span class="sd">    project_id: the project's id (its folder name)</span>
-</span><span id="line-51"><span class="sd">    """</span>
-</span><span id="line-52">    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">materialize_project</span><span class="p">(</span><span class="n">project_id</span><span class="p">))</span></div>
+</span><span id="line-53"><span class="k">def</span><span class="w"> </span><span class="nf">pull</span><span class="p">(</span><span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-54"><span class="w">    </span><span class="sd">"""Read a project from the projects store into a real folder, and print the folder.</span>
+</span><span id="line-55">
+</span><span id="line-56"><span class="sd">    project_id: the project's id (its folder name)</span>
+</span><span id="line-57"><span class="sd">    """</span>
+</span><span id="line-58">    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">materialize_project</span><span class="p">(</span><span class="n">project_id</span><span class="p">))</span></div>
 
-</span><span id="line-53">
-</span><span id="line-54">
-</span><span id="line-55"><span class="n">_dispatch_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">push</span><span class="p">,</span> <span class="n">pull</span><span class="p">]</span>
+</span><span id="line-59">
+</span><span id="line-60">
+<div class="viewcode-block" id="prune">
+<a class="viewcode-back" href="../../_autosummary/cutan.projects_cli.html#cutan.projects_cli.prune">[docs]</a>
+</span><span id="line-61"><span class="k">def</span><span class="w"> </span><span class="nf">prune</span><span class="p">(</span><span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-62"><span class="w">    </span><span class="sd">"""Delete the store's copies of what an keeps out of git (render reports, probes, the options manifests' file locks: pushed before the excludes covered them), so no pull brings them back.</span>
+</span><span id="line-63">
+</span><span id="line-64"><span class="sd">    project_id: the project's id (its folder name)</span>
+</span><span id="line-65"><span class="sd">    dry_run: only list what would be deleted</span>
+</span><span id="line-66"><span class="sd">    """</span>
+</span><span id="line-67">    <span class="k">if</span> <span class="n">ProjectsStoreSettings</span><span class="o">.</span><span class="n">from_environ</span><span class="p">()</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"local"</span><span class="p">:</span>
+</span><span id="line-68">        <span class="k">return</span> <span class="s2">"local backend: the store is the project folder itself; nothing to prune"</span>
+</span><span id="line-69">    <span class="n">gone</span> <span class="o">=</span> <span class="n">prune_project</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">)</span>
+</span><span id="line-70">    <span class="k">if</span> <span class="ow">not</span> <span class="n">gone</span><span class="p">:</span>
+</span><span id="line-71">        <span class="k">return</span> <span class="s2">"nothing to prune"</span>
+</span><span id="line-72">    <span class="n">head</span> <span class="o">=</span> <span class="s2">"would delete"</span> <span class="k">if</span> <span class="n">dry_run</span> <span class="k">else</span> <span class="s2">"deleted"</span>
+</span><span id="line-73">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">head</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gone</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s):"</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  - </span><span class="si">{</span><span class="n">rel</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">gone</span><span class="p">)])</span></div>
+
+</span><span id="line-74">
+</span><span id="line-75">
+</span><span id="line-76"><span class="n">_dispatch_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">push</span><span class="p">,</span> <span class="n">pull</span><span class="p">,</span> <span class="n">prune</span><span class="p">]</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -260,7 +284,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=60a9f236"></script>
+    <script src="../../_static/documentation_options.js?v=5751785c"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -10,4 +10,5 @@ cutan.projects\_cli
    
       push
       pull
+      prune
    

@@ -19,6 +19,7 @@ cutan.projects\_store
       materialize_project
       new_project_dir
       projects_store
+      prune_project
       push_project
       read_record
    

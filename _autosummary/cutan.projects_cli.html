@@ -142,7 +142,8 @@
 the same way as <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span> <span class="pre">...</span></code> (the <code class="docutils literal notranslate"><span class="pre">cli.projects</span></code> service):</p>
 <blockquote>
 <div><p>an projects push &lt;id&gt; [–folder DIR] [–delete-missing]
-an projects pull &lt;id&gt;</p>
+an projects pull &lt;id&gt;
+an projects prune &lt;id&gt; [–dry-run]</p>
 </div></blockquote>
 <p>Both read the backend from the environment (<code class="docutils literal notranslate"><span class="pre">CUTAN_PROJECTS_BACKEND=s3</span></code>,
 <code class="docutils literal notranslate"><span class="pre">CUTAN_HOME</span></code> forces local). On the local backend a push of the project’s own
@@ -156,8 +157,23 @@ folder is a no-op, and a pull prints the folder.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.projects_cli.pull" title="cutan.projects_cli.pull"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pull</span></code></a>(project_id)</p></td>
 <td><p>Read a project from the projects store into a real folder, and print the folder.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.projects_cli.prune" title="cutan.projects_cli.prune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prune</span></code></a>(project_id[, dry_run])</p></td>
+<td><p>Delete the store's copies of what an keeps out of git (render reports, probes, the options manifests' file locks: pushed before the excludes covered them), so no pull brings them back.</p></td>
+</tr>
 </tbody>
 </table>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.projects_cli.prune">
+<span class="sig-prename descclassname"><span class="pre">cutan.projects_cli.</span></span><span class="sig-name descname"><span class="pre">prune</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/projects_cli.html#prune"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_cli.prune" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_cli.prune'">¶</a></dt>
+<dd><p>Delete the store’s copies of what an keeps out of git (render reports, probes, the options manifests’ file locks: pushed before the excludes covered them), so no pull brings them back.</p>
+<p>project_id: the project’s id (its folder name)
+dry_run: only list what would be deleted</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="cutan.projects_cli.pull">
 <span class="sig-prename descclassname"><span class="pre">cutan.projects_cli.</span></span><span class="sig-name descname"><span class="pre">pull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/projects_cli.html#pull"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.projects_cli.pull" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.projects_cli.pull'">¶</a></dt>
@@ -187,6 +203,7 @@ force: also write files the store changed since this folder last synced (stale o
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
+<li><a :data-current="activeSection === '#cutan.projects_cli.prune'" class="reference internal" href="#cutan.projects_cli.prune"><code class="docutils literal notranslate"><span class="pre">prune()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.projects_cli.pull'" class="reference internal" href="#cutan.projects_cli.pull"><code class="docutils literal notranslate"><span class="pre">pull()</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.projects_cli.push'" class="reference internal" href="#cutan.projects_cli.push"><code class="docutils literal notranslate"><span class="pre">push()</span></code></a></li>
 </ul>
@@ -202,7 +219,7 @@ force: also write files the store changed since this folder last synced (stale o
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=60a9f236"></script>
+<script src="../_static/documentation_options.js?v=5751785c"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
