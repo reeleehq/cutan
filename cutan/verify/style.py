@@ -144,8 +144,8 @@ PIXEL_CHANGE_DELTA: float = 32.0
 MIN_CHANGED_PIXELS: int = 8
 #: Pixel cut detector (used only when no shot list is given). Measured against
 #: ``mixing.video.shots`` on the six study clips with hand-labelled hard cuts
-#: (cutan#151, ``misc/docs/cut_detection.md``): 32 of 36 and no false cut, on par
-#: with mixing's best setting (5 Hz spike: 33, 2 false); mixing's default finds
+#: (cutan#151, ``misc/docs/cut_detection.md``): 32 of 36 and 0 to 2 false cuts (one
+#: ambiguous reveal), on par with mixing's best setting (5 Hz spike: 33, 2 false); mixing's default finds
 #: all 36 with 30 false (motion read as cuts). Its misses are cuts between shots
 #: of one palette. Kept: the cut-rate targets were calibrated on it.
 CUT_HISTOGRAM_L1: float = 0.6

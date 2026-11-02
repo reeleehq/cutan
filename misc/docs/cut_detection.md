@@ -1,6 +1,6 @@
 # Cut detection for the style lint: the histogram jump vs `mixing.video.shots` (cutan#151)
 
-Measured 2026-11-02. **Decision: keep `cutan.verify.style`'s histogram-jump detector.** On six cut-out clips it found 32 of 36 hand-labelled hard cuts with no false cut. That is on par with mixing's best setting (5 Hz `spike`: 33/36, 2 false), not a clear win. It is kept because the style targets were calibrated on it, it needs no new dependency, and it never invented a cut here. It is offered to mixing as a strategy in reeleehq/mixing#164.
+Measured 2026-11-02. **Decision: keep `cutan.verify.style`'s histogram-jump detector.** On six cut-out clips it found 32 of 36 hand-labelled hard cuts with no false cut, or 2 false if one ambiguous Kurzgesagt reveal counts as a camera move (see Reading). That is on par with mixing's best setting (5 Hz `spike`: 33/36, 2 false), not a clear win. It is kept because the style targets were calibrated on it, it needs no new dependency, and it invents fewer cuts than any setting that finds more. It is offered to mixing as a strategy in reeleehq/mixing#164.
 
 To use mixing's cuts instead, no new option is needed: `measure_style`, `measure_video` and `style_lint` already take `shot_durations`. Pass `[b - a for a, b in mixing.video.shots(mp4)]`.
 
@@ -33,9 +33,10 @@ mixing's adaptive threshold applied to the lint's own full-rate 320×180 frames 
 
 - **The histogram detector's misses are hard cuts between shots of one palette.** These are South Park's two Cartman/Heidi reverse shots, OverSimplified's photo-to-title-card cut (both on black), and one dark Norstein cut. mixing's spike rule catches most of them.
 - **mixing's false cuts are motion.** These are Kurzgesagt's camera moves, Gilliam's and Norstein's fast motion and grain, and OverSimplified's crowds.
+- **One label decides "no false cut".** At 56.6 s in Kurzgesagt, a character fades and slides in while the planet stays in frame. It is labelled a transition here, so it counts neither way. Read as a camera move, it makes the histogram's two detections there false (32/36, 2 false, level with 5 Hz spike).
 - **For a lint that measures cut rate, shot length and cadence, a false cut is the worse error.** It splits a shot, and it hides a cadence step, because the step into a cut is skipped.
 - **Blind spot:** dissolves are not detected by any of these detectors, so they are not measured here. Recall is relative to the cuts at least one of the four detectors found.
 - **Not tested:** PySceneDetect (`strategy="pyscenedetect"`, not installed here), mixing's `min_shot_s`, and other `sigmas` values.
-- **The calibration cuts both ways.** The style specs' cut-rate targets were measured with the histogram detector, so they inherit its misses. On the hand labels, South Park cuts 16.6 times a minute, against a target of [10, 14] (measured 12.4). Kurzgesagt makes 5.0 hard cuts a minute, against [6, 8] (measured 7.0, which counts a slide). A render checked against its exact IR shot list measures true cuts, so these targets need re-deriving from the labels (reeleehq/cutan#160).
+- **The calibration cuts both ways.** The style specs' cut-rate targets were measured with the histogram detector, so they inherit its misses. On the hand labels, South Park cuts 16.5 times a minute, against a target of [10, 14] (measured 12.4). Kurzgesagt makes 5.0 hard cuts a minute, against [6, 8] (measured 7.0, which counts that one reveal twice). A render checked against its exact IR shot list measures true cuts, so these targets need re-deriving from the labels (reeleehq/cutan#160).
 
 The scripts, labels and contact sheets are kept with the agent working notes for cutan#151. They are not committed, because the sheets are frames of copyrighted clips.
