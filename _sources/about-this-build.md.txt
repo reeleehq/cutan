@@ -7,8 +7,10 @@ orphan: true
 
 This documentation was built on **2026-11-02 03:36 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/305ce3617098a25332817a749c6ebb8ac60b61ed"><code>305ce36</code></a> on branch <code>main</code>, for **cutan 0.0.97** (from <code>pyproject.toml</code>).
 
-:::{note}
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+:::{warning}
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.97) is ahead of the latest release on PyPI (0.0.96): these docs describe unreleased code.
 :::
 
 ## Source
@@ -26,9 +28,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 | | |
 |---|---|
 | Repository | <code>reeleehq/cutan</code> |
-| Run | <a href="https://github.com/reeleehq/cutan/actions/runs/41383363173">41383363173</a> |
+| Run | <a href="https://github.com/reeleehq/cutan/actions/runs/41383381016">41383381016</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>96ee3ac2cde475706a33cb413ef1e061c7288912</code> (in the history of the built commit) |
+| Event commit | <code>c0492c8b3ac9247a3b71ae0614ce042e72d0a8c5</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -53,7 +55,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.97/">0.0.97</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.96/">0.0.96</a>, older than the documented version (0.0.97).
 
 ## Reproduce
 
