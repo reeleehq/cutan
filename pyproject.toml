@@ -62,6 +62,12 @@ nw = [
 carve = [
     "opencv-python-headless",
 ]
+# cutan.carve.generate (cutan#100): art from an image model through aix, keyed
+# by carve's chroma matte. Imported lazily.
+generate = [
+    "cutan[carve]",
+    "aix",
+]
 rembg = [
     "cutan[carve]",
     "rembg",
