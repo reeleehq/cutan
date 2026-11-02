@@ -106,11 +106,11 @@ ValueError: unknown style target 'camera_shake'; measurable targets are [...]
 
 ### Classes
 
-| [`StyleMetrics`](#cutan.verify.style.StyleMetrics)(fps, frames, duration_s, ...)    | The statistics [`METRICS`](#cutan.verify.style.METRICS) names, measured on one clip.               |
-|------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
-| [`StyleLintResult`](#cutan.verify.style.StyleLintResult)(metrics, report[, per_shot])  | What one lint run measured, and what it found.                                                                     |
-| [`StyleLintVerifier`](#cutan.verify.style.StyleLintVerifier)(spec_or_targets, \*[, ...]) | Compare a render to a style spec's `targets`.                                                                      |
-| [`ShotMetrics`](#cutan.verify.style.ShotMetrics)(shot, start_s, duration_s, ...)   | The cadence of one shot, measured with the WHOLE clip's change threshold so a shot's numbers add up to the clip's. |
+| [`StyleMetrics`](#cutan.verify.style.StyleMetrics)(fps, frames, duration_s, ...)        | The statistics [`METRICS`](#cutan.verify.style.METRICS) names, measured on one clip.               |
+|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| [`StyleLintResult`](#cutan.verify.style.StyleLintResult)(metrics, report[, per_shot, ...]) | What one lint run measured, and what it found.                                                                     |
+| [`StyleLintVerifier`](#cutan.verify.style.StyleLintVerifier)(spec_or_targets, \*[, ...])     | Compare a render to a style spec's `targets`.                                                                      |
+| [`ShotMetrics`](#cutan.verify.style.ShotMetrics)(shot, start_s, duration_s, ...)       | The cadence of one shot, measured with the WHOLE clip's change threshold so a shot's numbers add up to the clip's. |
 
 ### cutan.verify.style.METRICS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'cuts_per_min': 'hard cuts per minute', 'dark_pixel_share': 'share of pixels with every channel below 60', 'identical_frame_share': 'share of frames identical to the previous one (holds)', 'max_hold_frames': 'longest run of identical frames', 'mean_saturation': 'mean HSV saturation, 0..1', 'mean_shot_s': 'mean shot length in seconds', 'one_frame_interval_share': 'share of change gaps of one frame (on ones)', 'pose_changes_per_s': 'changed frames per second', 'three_plus_interval_share': 'share of change gaps of three to twelve frames', 'top16_colour_coverage': 'coverage of the 16 commonest 4-bit colours (flatness)', 'two_frame_interval_share': 'share of change gaps of two frames (on twos)'}*
 
@@ -134,7 +134,7 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 The cadence of one shot, measured with the WHOLE clip’s change
 threshold so a shot’s numbers add up to the clip’s.
 
-### *class* cutan.verify.style.StyleLintResult(metrics, report, per_shot=list())
+### *class* cutan.verify.style.StyleLintResult(metrics, report, per_shot=list(), regions=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -143,6 +143,11 @@ What one lint run measured, and what it found.
 `per_shot` is the cadence of each shot ([`ShotMetrics`](#cutan.verify.style.ShotMetrics)) — the
 breakdown that finds which shot is holding a whole clip’s share up (a
 static date card is 90% identical frames on its own).
+
+#### regions *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+`{"mouth": cadence, "body": cadence}` when the lint had the project to
+find the mouths in (cutan#80, [`cutan.verify.regions`](cutan.verify.regions.html.md#module-cutan.verify.regions)); else `None`.
 
 ### *class* cutan.verify.style.StyleLintVerifier(spec_or_targets, , miss_severity='warning')
 

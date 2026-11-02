@@ -36,7 +36,7 @@
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
 <link href="../ai-agents.html" rel="next" title="For AI agents"/>
-<link href="cutan.verify.critic.html" rel="prev" title="cutan.verify.critic"/>
+<link href="cutan.verify.regions.html" rel="prev" title="cutan.verify.regions"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -263,7 +263,7 @@ less than it says is worse than one that fails to load:</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.verify.style.StyleMetrics" title="cutan.verify.style.StyleMetrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StyleMetrics</span></code></a>(fps, frames, duration_s, ...)</p></td>
 <td><p>The statistics <a class="reference internal" href="#cutan.verify.style.METRICS" title="cutan.verify.style.METRICS"><code class="xref py py-data docutils literal notranslate"><span class="pre">METRICS</span></code></a> names, measured on one clip.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.verify.style.StyleLintResult" title="cutan.verify.style.StyleLintResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StyleLintResult</span></code></a>(metrics, report[, per_shot])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.verify.style.StyleLintResult" title="cutan.verify.style.StyleLintResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StyleLintResult</span></code></a>(metrics, report[, per_shot, ...])</p></td>
 <td><p>What one lint run measured, and what it found.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.verify.style.StyleLintVerifier" title="cutan.verify.style.StyleLintVerifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StyleLintVerifier</span></code></a>(spec_or_targets, *[, ...])</p></td>
@@ -306,7 +306,7 @@ threshold so a shot’s numbers add up to the clip’s.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="cutan.verify.style.StyleLintResult">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.verify.style.</span></span><span class="sig-name descname"><span class="pre">StyleLintResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metrics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_shot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/verify/style.html#StyleLintResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.verify.style.StyleLintResult" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.verify.style.StyleLintResult'">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.verify.style.</span></span><span class="sig-name descname"><span class="pre">StyleLintResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metrics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_shot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/verify/style.html#StyleLintResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.verify.style.StyleLintResult" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.verify.style.StyleLintResult'">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
 <p>What one lint run measured, and what it found.</p>
 <p><code class="docutils literal notranslate"><span class="pre">per_shot</span></code> is the cadence of each shot (<a class="reference internal" href="#cutan.verify.style.ShotMetrics" title="cutan.verify.style.ShotMetrics"><code class="xref py py-class docutils literal notranslate"><span class="pre">ShotMetrics</span></code></a>) — the
@@ -314,6 +314,12 @@ breakdown that finds which shot is holding a whole clip’s share up (a
 static date card is 90% identical frames on its own).</p>
 <dl class="field-list simple">
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cutan.verify.style.StyleLintResult.regions">
+<span class="sig-name descname"><span class="pre">regions</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">dict</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">None</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.verify.style.StyleLintResult.regions" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.verify.style.StyleLintResult.regions'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">{"mouth":</span> <span class="pre">cadence,</span> <span class="pre">"body":</span> <span class="pre">cadence}</span></code> when the lint had the project to
+find the mouths in (cutan#80, <a class="reference internal" href="cutan.verify.regions.html#module-cutan.verify.regions" title="cutan.verify.regions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cutan.verify.regions</span></code></a>); else <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="cutan.verify.style.StyleLintVerifier">
@@ -502,7 +508,10 @@ the caller’s error, not the video’s.</p>
 <li><a :data-current="activeSection === '#cutan.verify.style.METRICS'" class="reference internal" href="#cutan.verify.style.METRICS"><code class="docutils literal notranslate"><span class="pre">METRICS</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.verify.style.SHOT_METRICS'" class="reference internal" href="#cutan.verify.style.SHOT_METRICS"><code class="docutils literal notranslate"><span class="pre">SHOT_METRICS</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.verify.style.ShotMetrics'" class="reference internal" href="#cutan.verify.style.ShotMetrics"><code class="docutils literal notranslate"><span class="pre">ShotMetrics</span></code></a></li>
-<li><a :data-current="activeSection === '#cutan.verify.style.StyleLintResult'" class="reference internal" href="#cutan.verify.style.StyleLintResult"><code class="docutils literal notranslate"><span class="pre">StyleLintResult</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.verify.style.StyleLintResult'" class="reference internal" href="#cutan.verify.style.StyleLintResult"><code class="docutils literal notranslate"><span class="pre">StyleLintResult</span></code></a><ul>
+<li><a :data-current="activeSection === '#cutan.verify.style.StyleLintResult.regions'" class="reference internal" href="#cutan.verify.style.StyleLintResult.regions"><code class="docutils literal notranslate"><span class="pre">StyleLintResult.regions</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#cutan.verify.style.StyleLintVerifier'" class="reference internal" href="#cutan.verify.style.StyleLintVerifier"><code class="docutils literal notranslate"><span class="pre">StyleLintVerifier</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.verify.style.StyleMetrics'" class="reference internal" href="#cutan.verify.style.StyleMetrics"><code class="docutils literal notranslate"><span class="pre">StyleMetrics</span></code></a><ul>
 <li><a :data-current="activeSection === '#cutan.verify.style.StyleMetrics.cut_source'" class="reference internal" href="#cutan.verify.style.StyleMetrics.cut_source"><code class="docutils literal notranslate"><span class="pre">StyleMetrics.cut_source</span></code></a></li>
@@ -529,7 +538,7 @@ the caller’s error, not the video’s.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=33adb31a"></script>
+<script src="../_static/documentation_options.js?v=97d53703"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

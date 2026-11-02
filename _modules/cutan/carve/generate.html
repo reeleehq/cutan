@@ -653,261 +653,265 @@
 </span><span id="line-439">            <span class="s2">"background"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">background</span><span class="p">,</span>
 </span><span id="line-440">            <span class="o">**</span><span class="p">({</span><span class="s2">"quality"</span><span class="p">:</span> <span class="n">quality</span><span class="p">}</span> <span class="k">if</span> <span class="n">quality</span> <span class="k">else</span> <span class="p">{}),</span>
 </span><span id="line-441">            <span class="o">**</span><span class="p">({</span><span class="s2">"key"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">key</span><span class="p">}</span> <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">key</span> <span class="k">else</span> <span class="p">{}),</span>
-</span><span id="line-442">            <span class="o">**</span><span class="p">({</span><span class="s2">"revised_prompt"</span><span class="p">:</span> <span class="n">facts</span><span class="p">[</span><span class="s2">"revised_prompt"</span><span class="p">]}</span> <span class="k">if</span> <span class="n">facts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"revised_prompt"</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}),</span>
-</span><span id="line-443">        <span class="p">},</span>
-</span><span id="line-444">    <span class="p">)</span></div>
+</span><span id="line-442">            <span class="o">**</span><span class="p">(</span>
+</span><span id="line-443">                <span class="p">{</span><span class="s2">"revised_prompt"</span><span class="p">:</span> <span class="n">facts</span><span class="p">[</span><span class="s2">"revised_prompt"</span><span class="p">]}</span>
+</span><span id="line-444">                <span class="k">if</span> <span class="n">facts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"revised_prompt"</span><span class="p">)</span>
+</span><span id="line-445">                <span class="k">else</span> <span class="p">{}</span>
+</span><span id="line-446">            <span class="p">),</span>
+</span><span id="line-447">        <span class="p">},</span>
+</span><span id="line-448">    <span class="p">)</span></div>
 
-</span><span id="line-445">
-</span><span id="line-446">
+</span><span id="line-449">
+</span><span id="line-450">
 <div class="viewcode-block" id="GeneratedArt">
 <a class="viewcode-back" href="../../../_autosummary/cutan.carve.generate.html#cutan.carve.generate.GeneratedArt">[docs]</a>
-</span><span id="line-447"><span class="nd">@dataclass</span>
-</span><span id="line-448"><span class="k">class</span><span class="w"> </span><span class="nc">GeneratedArt</span><span class="p">:</span>
-</span><span id="line-449"><span class="w">    </span><span class="sd">"""One image of the spec: its path and provenance; ``kept`` when it was</span>
-</span><span id="line-450"><span class="sd">    already there and not made again (its provenance read from the record)."""</span>
-</span><span id="line-451">
-</span><span id="line-452">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="line-453">    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span>
-</span><span id="line-454">    <span class="n">source</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AssetSource</span><span class="p">]</span>
-</span><span id="line-455">    <span class="n">size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-</span><span id="line-456">    <span class="n">kept</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="line-457">    <span class="c1">#: A carved prop's quality warnings (:class:`cutan.carve.CarveQuality`).</span>
-</span><span id="line-458">    <span class="n">warnings</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span></div>
+</span><span id="line-451"><span class="nd">@dataclass</span>
+</span><span id="line-452"><span class="k">class</span><span class="w"> </span><span class="nc">GeneratedArt</span><span class="p">:</span>
+</span><span id="line-453"><span class="w">    </span><span class="sd">"""One image of the spec: its path and provenance; ``kept`` when it was</span>
+</span><span id="line-454"><span class="sd">    already there and not made again (its provenance read from the record)."""</span>
+</span><span id="line-455">
+</span><span id="line-456">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="line-457">    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span>
+</span><span id="line-458">    <span class="n">source</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AssetSource</span><span class="p">]</span>
+</span><span id="line-459">    <span class="n">size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span id="line-460">    <span class="n">kept</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="line-461">    <span class="c1">#: A carved prop's quality warnings (:class:`cutan.carve.CarveQuality`).</span>
+</span><span id="line-462">    <span class="n">warnings</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span></div>
 
-</span><span id="line-459">
-</span><span id="line-460">
+</span><span id="line-463">
+</span><span id="line-464">
 <div class="viewcode-block" id="generate_art">
 <a class="viewcode-back" href="../../../_autosummary/cutan.carve.generate.html#cutan.carve.generate.generate_art">[docs]</a>
-</span><span id="line-461"><span class="k">def</span><span class="w"> </span><span class="nf">generate_art</span><span class="p">(</span>
-</span><span id="line-462">    <span class="n">spec</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ArtSpec</span><span class="p">]],</span>
-</span><span id="line-463">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-464">    <span class="n">out_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
-</span><span id="line-465">    <span class="n">generator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ImageGenerator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-466">    <span class="n">only</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-467">    <span class="n">keep_raw</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-468">    <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-469"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">GeneratedArt</span><span class="p">]:</span>
-</span><span id="line-470"><span class="w">    </span><span class="sd">"""Generate, key, fit and write each image of ``spec`` into ``out_dir``.</span>
-</span><span id="line-471">
-</span><span id="line-472"><span class="sd">    Each image is ``&lt;name&gt;.png``; ``art_sources.json`` (:data:`SOURCES_FILE`)</span>
-</span><span id="line-473"><span class="sd">    maps each file to its provenance (with the PNG's sha256), merged with what</span>
-</span><span id="line-474"><span class="sd">    the folder holds and written after every image. ``only``: the names to make</span>
-</span><span id="line-475"><span class="sd">    (default all). An existing ``&lt;name&gt;.png`` is kept, not paid for again,</span>
-</span><span id="line-476"><span class="sd">    unless ``overwrite``, so a batch that failed half way is resumed by running</span>
-</span><span id="line-477"><span class="sd">    it again. The model's own image is written first as ``&lt;name&gt;.raw.png``, with</span>
-</span><span id="line-478"><span class="sd">    its record, and removed once the PNG and its record are written, unless</span>
-</span><span id="line-479"><span class="sd">    ``keep_raw``: a key or fit that fails leaves the paid-for image, and the</span>
-</span><span id="line-480"><span class="sd">    next run keys that image instead of paying for a new one. Every file is</span>
-</span><span id="line-481"><span class="sd">    written whole or not at all (a prop's files by ``write_prop``, in place: a</span>
-</span><span id="line-482"><span class="sd">    ``prop.json`` a crash cut off is not taken as made, and is made again).</span>
-</span><span id="line-483"><span class="sd">    """</span>
-</span><span id="line-484">    <span class="n">specs</span> <span class="o">=</span> <span class="n">art_specs</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">))</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
-</span><span id="line-485">    <span class="n">wanted</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">only</span><span class="p">)</span> <span class="k">if</span> <span class="n">only</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-</span><span id="line-486">    <span class="k">if</span> <span class="n">wanted</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">unknown</span> <span class="o">:=</span> <span class="n">wanted</span> <span class="o">-</span> <span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">}):</span>
-</span><span id="line-487">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no such art in the spec: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-488">    <span class="n">specs</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span> <span class="k">if</span> <span class="n">wanted</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">wanted</span><span class="p">]</span>
-</span><span id="line-489">    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">key</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">):</span>
-</span><span id="line-490">        <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.carve._deps</span><span class="w"> </span><span class="kn">import</span> <span class="n">cv2</span>
-</span><span id="line-491">
-</span><span id="line-492">        <span class="n">cv2</span><span class="p">()</span>  <span class="c1"># the key needs OpenCV: say so before anything is paid for</span>
-</span><span id="line-493">        <span class="n">probe</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">"RGB"</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">246</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">242</span><span class="p">))</span>
-</span><span id="line-494">        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
-</span><span id="line-495">            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
-</span><span id="line-496">                <span class="k">try</span><span class="p">:</span>  <span class="c1"># a malformed recipe fails here, not after the payment</span>
-</span><span id="line-497">                    <span class="n">key_backdrop</span><span class="p">(</span><span class="n">probe</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-498">                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - any failure of the key is the spec's</span>
-</span><span id="line-499">                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="line-500">                        <span class="sa">f</span><span class="s2">"art </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">: key </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> does not key: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-501">                    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-</span><span id="line-502">    <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
-</span><span id="line-503">    <span class="n">out</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-504">    <span class="n">generator</span> <span class="o">=</span> <span class="n">generator</span> <span class="ow">or</span> <span class="n">AixGenerator</span><span class="p">()</span>
-</span><span id="line-505">    <span class="n">recorded</span> <span class="o">=</span> <span class="n">_read_sources</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-</span><span id="line-506">    <span class="n">made</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-507">    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
-</span><span id="line-508">        <span class="n">raw</span> <span class="o">=</span> <span class="n">out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.raw.png"</span>
-</span><span id="line-509">        <span class="n">path</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-510">            <span class="n">out</span> <span class="o">/</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="o">/</span> <span class="s2">"prop.json"</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.png"</span>
-</span><span id="line-511">        <span class="p">)</span>
-</span><span id="line-512">        <span class="n">entry</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
-</span><span id="line-513">        <span class="k">if</span> <span class="n">_made</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">prop</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">overwrite</span><span class="p">:</span>
-</span><span id="line-514">            <span class="n">known</span> <span class="o">=</span> <span class="n">recorded</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-</span><span id="line-515">            <span class="n">made</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-516">                <span class="n">GeneratedArt</span><span class="p">(</span>
-</span><span id="line-517">                    <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-</span><span id="line-518">                    <span class="n">path</span><span class="p">,</span>
-</span><span id="line-519">                    <span class="n">_source</span><span class="p">(</span><span class="n">known</span><span class="p">),</span>
-</span><span id="line-520">                    <span class="n">_image_size</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">prop</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_prop_size</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
-</span><span id="line-521">                    <span class="n">kept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="line-522">                <span class="p">)</span>
-</span><span id="line-523">            <span class="p">)</span>
-</span><span id="line-524">            <span class="k">continue</span>
-</span><span id="line-525">        <span class="k">if</span> <span class="n">raw</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">overwrite</span><span class="p">:</span>
-</span><span id="line-526">            <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>  <span class="c1"># paid for by a run that failed after it</span>
-</span><span id="line-527">            <span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-</span><span id="line-528">        <span class="k">else</span><span class="p">:</span>
-</span><span id="line-529">            <span class="n">drawn</span> <span class="o">=</span> <span class="n">_generated</span><span class="p">(</span>
-</span><span id="line-530">                <span class="n">generator</span><span class="p">(</span>
-</span><span id="line-531">                    <span class="n">s</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span>
-</span><span id="line-532">                    <span class="n">size</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-</span><span id="line-533">                    <span class="n">background</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">background</span><span class="p">,</span>
-</span><span id="line-534">                    <span class="n">quality</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span>
-</span><span id="line-535">                    <span class="n">model</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
-</span><span id="line-536">                <span class="p">)</span>
-</span><span id="line-537">            <span class="p">)</span>
-</span><span id="line-538">            <span class="n">image</span> <span class="o">=</span> <span class="n">drawn</span><span class="o">.</span><span class="n">image</span>
-</span><span id="line-539">            <span class="n">_save</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">raw</span><span class="p">)</span>
-</span><span id="line-540">            <span class="c1"># record it now: the paid image has its provenance even if what follows fails</span>
-</span><span id="line-541">            <span class="n">recorded</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span> <span class="o">=</span> <span class="n">art_source</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="n">drawn</span><span class="o">.</span><span class="n">facts</span><span class="p">)</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span>
-</span><span id="line-542">                <span class="n">mode</span><span class="o">=</span><span class="s2">"json"</span><span class="p">,</span> <span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span>
-</span><span id="line-543">            <span class="p">)</span>
-</span><span id="line-544">            <span class="n">_write_sources</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">recorded</span><span class="p">)</span>
-</span><span id="line-545">        <span class="n">source</span> <span class="o">=</span> <span class="n">_source</span><span class="p">(</span><span class="n">recorded</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entry</span><span class="p">))</span> <span class="ow">or</span> <span class="n">art_source</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">generator</span><span class="p">)</span>
-</span><span id="line-546">        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-547">            <span class="n">made</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_write_generated_prop</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span>
-</span><span id="line-548">            <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span>
-</span><span id="line-549">                <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"sha256"</span><span class="p">:</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()}</span>
-</span><span id="line-550">            <span class="p">)</span>
-</span><span id="line-551">            <span class="n">recorded</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"json"</span><span class="p">,</span> <span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-552">            <span class="n">_write_sources</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">recorded</span><span class="p">)</span>
-</span><span id="line-553">            <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_raw</span><span class="p">:</span>
-</span><span id="line-554">                <span class="n">raw</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
-</span><span id="line-555">            <span class="k">continue</span>
-</span><span id="line-556">        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
-</span><span id="line-557">            <span class="n">image</span> <span class="o">=</span> <span class="n">key_backdrop</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-558">        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">fit</span><span class="p">:</span>
-</span><span id="line-559">            <span class="n">image</span> <span class="o">=</span> <span class="n">cover_fit</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">fit</span><span class="p">)</span>
-</span><span id="line-560">        <span class="n">_save</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-</span><span id="line-561">        <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span>
-</span><span id="line-562">            <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"sha256"</span><span class="p">:</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()}</span>
-</span><span id="line-563">        <span class="p">)</span>
-</span><span id="line-564">        <span class="n">recorded</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"json"</span><span class="p">,</span> <span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-565">        <span class="n">_write_sources</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">recorded</span><span class="p">)</span>  <span class="c1"># the record first, then the raw goes</span>
-</span><span id="line-566">        <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_raw</span><span class="p">:</span>
-</span><span id="line-567">            <span class="n">raw</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
-</span><span id="line-568">        <span class="n">made</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GeneratedArt</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
-</span><span id="line-569">    <span class="k">return</span> <span class="n">made</span></div>
+</span><span id="line-465"><span class="k">def</span><span class="w"> </span><span class="nf">generate_art</span><span class="p">(</span>
+</span><span id="line-466">    <span class="n">spec</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ArtSpec</span><span class="p">]],</span>
+</span><span id="line-467">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-468">    <span class="n">out_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+</span><span id="line-469">    <span class="n">generator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ImageGenerator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-470">    <span class="n">only</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-471">    <span class="n">keep_raw</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-472">    <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-473"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">GeneratedArt</span><span class="p">]:</span>
+</span><span id="line-474"><span class="w">    </span><span class="sd">"""Generate, key, fit and write each image of ``spec`` into ``out_dir``.</span>
+</span><span id="line-475">
+</span><span id="line-476"><span class="sd">    Each image is ``&lt;name&gt;.png``; ``art_sources.json`` (:data:`SOURCES_FILE`)</span>
+</span><span id="line-477"><span class="sd">    maps each file to its provenance (with the PNG's sha256), merged with what</span>
+</span><span id="line-478"><span class="sd">    the folder holds and written after every image. ``only``: the names to make</span>
+</span><span id="line-479"><span class="sd">    (default all). An existing ``&lt;name&gt;.png`` is kept, not paid for again,</span>
+</span><span id="line-480"><span class="sd">    unless ``overwrite``, so a batch that failed half way is resumed by running</span>
+</span><span id="line-481"><span class="sd">    it again. The model's own image is written first as ``&lt;name&gt;.raw.png``, with</span>
+</span><span id="line-482"><span class="sd">    its record, and removed once the PNG and its record are written, unless</span>
+</span><span id="line-483"><span class="sd">    ``keep_raw``: a key or fit that fails leaves the paid-for image, and the</span>
+</span><span id="line-484"><span class="sd">    next run keys that image instead of paying for a new one. Every file is</span>
+</span><span id="line-485"><span class="sd">    written whole or not at all (a prop's files by ``write_prop``, in place: a</span>
+</span><span id="line-486"><span class="sd">    ``prop.json`` a crash cut off is not taken as made, and is made again).</span>
+</span><span id="line-487"><span class="sd">    """</span>
+</span><span id="line-488">    <span class="n">specs</span> <span class="o">=</span> <span class="n">art_specs</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">))</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+</span><span id="line-489">    <span class="n">wanted</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">only</span><span class="p">)</span> <span class="k">if</span> <span class="n">only</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span id="line-490">    <span class="k">if</span> <span class="n">wanted</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">unknown</span> <span class="o">:=</span> <span class="n">wanted</span> <span class="o">-</span> <span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">}):</span>
+</span><span id="line-491">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no such art in the spec: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-492">    <span class="n">specs</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span> <span class="k">if</span> <span class="n">wanted</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">wanted</span><span class="p">]</span>
+</span><span id="line-493">    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">key</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">):</span>
+</span><span id="line-494">        <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.carve._deps</span><span class="w"> </span><span class="kn">import</span> <span class="n">cv2</span>
+</span><span id="line-495">
+</span><span id="line-496">        <span class="n">cv2</span><span class="p">()</span>  <span class="c1"># the key needs OpenCV: say so before anything is paid for</span>
+</span><span id="line-497">        <span class="n">probe</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">"RGB"</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">246</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">242</span><span class="p">))</span>
+</span><span id="line-498">        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
+</span><span id="line-499">            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
+</span><span id="line-500">                <span class="k">try</span><span class="p">:</span>  <span class="c1"># a malformed recipe fails here, not after the payment</span>
+</span><span id="line-501">                    <span class="n">key_backdrop</span><span class="p">(</span><span class="n">probe</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-502">                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - any failure of the key is the spec's</span>
+</span><span id="line-503">                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="line-504">                        <span class="sa">f</span><span class="s2">"art </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">: key </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> does not key: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-505">                    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+</span><span id="line-506">    <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+</span><span id="line-507">    <span class="n">out</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-508">    <span class="n">generator</span> <span class="o">=</span> <span class="n">generator</span> <span class="ow">or</span> <span class="n">AixGenerator</span><span class="p">()</span>
+</span><span id="line-509">    <span class="n">recorded</span> <span class="o">=</span> <span class="n">_read_sources</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+</span><span id="line-510">    <span class="n">made</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-511">    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
+</span><span id="line-512">        <span class="n">raw</span> <span class="o">=</span> <span class="n">out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.raw.png"</span>
+</span><span id="line-513">        <span class="n">path</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-514">            <span class="n">out</span> <span class="o">/</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="o">/</span> <span class="s2">"prop.json"</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.png"</span>
+</span><span id="line-515">        <span class="p">)</span>
+</span><span id="line-516">        <span class="n">entry</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+</span><span id="line-517">        <span class="k">if</span> <span class="n">_made</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">prop</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">overwrite</span><span class="p">:</span>
+</span><span id="line-518">            <span class="n">known</span> <span class="o">=</span> <span class="n">recorded</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+</span><span id="line-519">            <span class="n">made</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-520">                <span class="n">GeneratedArt</span><span class="p">(</span>
+</span><span id="line-521">                    <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+</span><span id="line-522">                    <span class="n">path</span><span class="p">,</span>
+</span><span id="line-523">                    <span class="n">_source</span><span class="p">(</span><span class="n">known</span><span class="p">),</span>
+</span><span id="line-524">                    <span class="n">_image_size</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">prop</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_prop_size</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
+</span><span id="line-525">                    <span class="n">kept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="line-526">                <span class="p">)</span>
+</span><span id="line-527">            <span class="p">)</span>
+</span><span id="line-528">            <span class="k">continue</span>
+</span><span id="line-529">        <span class="k">if</span> <span class="n">raw</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">overwrite</span><span class="p">:</span>
+</span><span id="line-530">            <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>  <span class="c1"># paid for by a run that failed after it</span>
+</span><span id="line-531">            <span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+</span><span id="line-532">        <span class="k">else</span><span class="p">:</span>
+</span><span id="line-533">            <span class="n">drawn</span> <span class="o">=</span> <span class="n">_generated</span><span class="p">(</span>
+</span><span id="line-534">                <span class="n">generator</span><span class="p">(</span>
+</span><span id="line-535">                    <span class="n">s</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span>
+</span><span id="line-536">                    <span class="n">size</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+</span><span id="line-537">                    <span class="n">background</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">background</span><span class="p">,</span>
+</span><span id="line-538">                    <span class="n">quality</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span>
+</span><span id="line-539">                    <span class="n">model</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+</span><span id="line-540">                <span class="p">)</span>
+</span><span id="line-541">            <span class="p">)</span>
+</span><span id="line-542">            <span class="n">image</span> <span class="o">=</span> <span class="n">drawn</span><span class="o">.</span><span class="n">image</span>
+</span><span id="line-543">            <span class="n">_save</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">raw</span><span class="p">)</span>
+</span><span id="line-544">            <span class="c1"># record it now: the paid image has its provenance even if what follows fails</span>
+</span><span id="line-545">            <span class="n">recorded</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span> <span class="o">=</span> <span class="n">art_source</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="n">drawn</span><span class="o">.</span><span class="n">facts</span><span class="p">)</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span>
+</span><span id="line-546">                <span class="n">mode</span><span class="o">=</span><span class="s2">"json"</span><span class="p">,</span> <span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="line-547">            <span class="p">)</span>
+</span><span id="line-548">            <span class="n">_write_sources</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">recorded</span><span class="p">)</span>
+</span><span id="line-549">        <span class="n">source</span> <span class="o">=</span> <span class="n">_source</span><span class="p">(</span><span class="n">recorded</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entry</span><span class="p">))</span> <span class="ow">or</span> <span class="n">art_source</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">generator</span><span class="p">)</span>
+</span><span id="line-550">        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-551">            <span class="n">made</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_write_generated_prop</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span>
+</span><span id="line-552">            <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span>
+</span><span id="line-553">                <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"sha256"</span><span class="p">:</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()}</span>
+</span><span id="line-554">            <span class="p">)</span>
+</span><span id="line-555">            <span class="n">recorded</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"json"</span><span class="p">,</span> <span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-556">            <span class="n">_write_sources</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">recorded</span><span class="p">)</span>
+</span><span id="line-557">            <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_raw</span><span class="p">:</span>
+</span><span id="line-558">                <span class="n">raw</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+</span><span id="line-559">            <span class="k">continue</span>
+</span><span id="line-560">        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
+</span><span id="line-561">            <span class="n">image</span> <span class="o">=</span> <span class="n">key_backdrop</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-562">        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">fit</span><span class="p">:</span>
+</span><span id="line-563">            <span class="n">image</span> <span class="o">=</span> <span class="n">cover_fit</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">fit</span><span class="p">)</span>
+</span><span id="line-564">        <span class="n">_save</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+</span><span id="line-565">        <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span>
+</span><span id="line-566">            <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">"sha256"</span><span class="p">:</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()}</span>
+</span><span id="line-567">        <span class="p">)</span>
+</span><span id="line-568">        <span class="n">recorded</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"json"</span><span class="p">,</span> <span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-569">        <span class="n">_write_sources</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">recorded</span><span class="p">)</span>  <span class="c1"># the record first, then the raw goes</span>
+</span><span id="line-570">        <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_raw</span><span class="p">:</span>
+</span><span id="line-571">            <span class="n">raw</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+</span><span id="line-572">        <span class="n">made</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GeneratedArt</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+</span><span id="line-573">    <span class="k">return</span> <span class="n">made</span></div>
 
-</span><span id="line-570">
-</span><span id="line-571">
-</span><span id="line-572"><span class="k">def</span><span class="w"> </span><span class="nf">_save</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-573"><span class="w">    </span><span class="sd">"""Write ``path`` whole or not at all: a crash never leaves half a PNG to be kept."""</span>
-</span><span id="line-574">    <span class="n">tmp</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">".part"</span><span class="p">)</span>
-</span><span id="line-575">    <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"PNG"</span><span class="p">)</span>
-</span><span id="line-576">    <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-</span><span id="line-577">
-</span><span id="line-578">
-</span><span id="line-579"><span class="k">def</span><span class="w"> </span><span class="nf">_source</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AssetSource</span><span class="p">]:</span>
-</span><span id="line-580">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
-</span><span id="line-581">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-582">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-583">        <span class="k">return</span> <span class="n">AssetSource</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-</span><span id="line-584">    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="line-574">
+</span><span id="line-575">
+</span><span id="line-576"><span class="k">def</span><span class="w"> </span><span class="nf">_save</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-577"><span class="w">    </span><span class="sd">"""Write ``path`` whole or not at all: a crash never leaves half a PNG to be kept."""</span>
+</span><span id="line-578">    <span class="n">tmp</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">".part"</span><span class="p">)</span>
+</span><span id="line-579">    <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"PNG"</span><span class="p">)</span>
+</span><span id="line-580">    <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+</span><span id="line-581">
+</span><span id="line-582">
+</span><span id="line-583"><span class="k">def</span><span class="w"> </span><span class="nf">_source</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AssetSource</span><span class="p">]:</span>
+</span><span id="line-584">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
 </span><span id="line-585">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-586">
-</span><span id="line-587">
-</span><span id="line-588"><span class="k">def</span><span class="w"> </span><span class="nf">_made</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-589"><span class="w">    </span><span class="sd">"""Whether ``path`` is a finished image or prop: a ``prop.json`` cut off by a</span>
-</span><span id="line-590"><span class="sd">    crash (``write_prop`` writes it in place) is not, and is made again."""</span>
-</span><span id="line-591">    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="line-592">        <span class="k">return</span> <span class="kc">False</span>
-</span><span id="line-593">    <span class="k">if</span> <span class="ow">not</span> <span class="n">prop</span><span class="p">:</span>
-</span><span id="line-594">        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="line-595">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-596">        <span class="k">return</span> <span class="p">(</span>
-</span><span id="line-597">            <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"PropDescriptor"</span>
-</span><span id="line-598">        <span class="p">)</span>
-</span><span id="line-599">    <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
-</span><span id="line-600">        <span class="k">return</span> <span class="kc">False</span>
-</span><span id="line-601">
-</span><span id="line-602">
-</span><span id="line-603"><span class="k">def</span><span class="w"> </span><span class="nf">_prop_size</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-</span><span id="line-604"><span class="w">    </span><span class="sd">"""A written prop's size, from its descriptor's ``view_box``."""</span>
-</span><span id="line-605">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-606">        <span class="n">box</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"view_box"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
-</span><span id="line-607">            <span class="mi">0</span><span class="p">,</span>
-</span><span id="line-608">            <span class="mi">0</span><span class="p">,</span>
-</span><span id="line-609">            <span class="mi">0</span><span class="p">,</span>
-</span><span id="line-610">            <span class="mi">0</span><span class="p">,</span>
-</span><span id="line-611">        <span class="p">)</span>
-</span><span id="line-612">        <span class="k">return</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">])),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">])))</span>
-</span><span id="line-613">    <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
-</span><span id="line-614">        <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-</span><span id="line-615">
-</span><span id="line-616">
-</span><span id="line-617"><span class="k">def</span><span class="w"> </span><span class="nf">_write_generated_prop</span><span class="p">(</span>
-</span><span id="line-618">    <span class="n">spec</span><span class="p">:</span> <span class="n">ArtSpec</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">out</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">AssetSource</span>
-</span><span id="line-619"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeneratedArt</span><span class="p">:</span>
-</span><span id="line-620"><span class="w">    </span><span class="sd">"""Carve ``image`` by the spec's key and write it as a prop (cutan#162),</span>
-</span><span id="line-621"><span class="sd">    over a prop a crash left unfinished."""</span>
-</span><span id="line-622">    <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-</span><span id="line-623">
-</span><span id="line-624">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.carve</span><span class="w"> </span><span class="kn">import</span> <span class="n">carve</span><span class="p">,</span> <span class="n">write_prop</span>
-</span><span id="line-625">
-</span><span id="line-626">    <span class="n">prop</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">prop</span> <span class="ow">or</span> <span class="p">{})</span>
-</span><span id="line-627">    <span class="n">carving</span> <span class="o">=</span> <span class="n">carve</span><span class="p">(</span>
-</span><span id="line-628">        <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">"RGB"</span><span class="p">)),</span>
-</span><span id="line-629">        <span class="n">matte</span><span class="o">=</span><span class="n">_key_recipe</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">key</span><span class="p">)</span> <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">key</span> <span class="k">else</span> <span class="s2">"flat_colour"</span><span class="p">,</span>
-</span><span id="line-630">        <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
-</span><span id="line-631">        <span class="o">**</span><span class="p">{</span>
-</span><span id="line-632">            <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">"point"</span> <span class="k">else</span> <span class="n">v</span><span class="p">)</span>
-</span><span id="line-633">            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">prop</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-</span><span id="line-634">            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_CARVE_KEYS</span>
-</span><span id="line-635">        <span class="p">},</span>
-</span><span id="line-636">    <span class="p">)</span>
-</span><span id="line-637">    <span class="n">folder</span> <span class="o">=</span> <span class="n">out</span> <span class="o">/</span> <span class="n">spec</span><span class="o">.</span><span class="n">name</span>
-</span><span id="line-638">    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span>
-</span><span id="line-639">        <span class="n">record</span><span class="o">=</span><span class="kc">True</span>
-</span><span id="line-640">    <span class="p">)</span> <span class="k">as</span> <span class="n">said</span><span class="p">:</span>  <span class="c1"># write_prop warns on a far landmark</span>
-</span><span id="line-641">        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">"always"</span><span class="p">)</span>
-</span><span id="line-642">        <span class="n">write_prop</span><span class="p">(</span>
-</span><span id="line-643">            <span class="n">carving</span><span class="p">,</span>
-</span><span id="line-644">            <span class="n">folder</span><span class="p">,</span>
-</span><span id="line-645">            <span class="n">name</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-</span><span id="line-646">            <span class="n">landmarks</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"landmarks"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-</span><span id="line-647">            <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-648">            <span class="n">max_side</span><span class="o">=</span><span class="n">prop</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"max_side"</span><span class="p">),</span>
-</span><span id="line-649">            <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># generate_art decided: nothing finished is there</span>
-</span><span id="line-650">        <span class="p">)</span>
-</span><span id="line-651">    <span class="k">return</span> <span class="n">GeneratedArt</span><span class="p">(</span>
-</span><span id="line-652">        <span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-</span><span id="line-653">        <span class="n">folder</span> <span class="o">/</span> <span class="s2">"prop.json"</span><span class="p">,</span>
-</span><span id="line-654">        <span class="n">source</span><span class="p">,</span>
-</span><span id="line-655">        <span class="n">carving</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-</span><span id="line-656">        <span class="n">warnings</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">carving</span><span class="o">.</span><span class="n">quality</span><span class="o">.</span><span class="n">warnings</span><span class="p">())</span>
-</span><span id="line-657">        <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">message</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">said</span><span class="p">),</span>
-</span><span id="line-658">    <span class="p">)</span>
-</span><span id="line-659">
-</span><span id="line-660">
-</span><span id="line-661"><span class="k">def</span><span class="w"> </span><span class="nf">_image_size</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-</span><span id="line-662">    <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">im</span><span class="p">:</span>
-</span><span id="line-663">        <span class="k">return</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span>
+</span><span id="line-586">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-587">        <span class="k">return</span> <span class="n">AssetSource</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+</span><span id="line-588">    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="line-589">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-590">
+</span><span id="line-591">
+</span><span id="line-592"><span class="k">def</span><span class="w"> </span><span class="nf">_made</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-593"><span class="w">    </span><span class="sd">"""Whether ``path`` is a finished image or prop: a ``prop.json`` cut off by a</span>
+</span><span id="line-594"><span class="sd">    crash (``write_prop`` writes it in place) is not, and is made again."""</span>
+</span><span id="line-595">    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="line-596">        <span class="k">return</span> <span class="kc">False</span>
+</span><span id="line-597">    <span class="k">if</span> <span class="ow">not</span> <span class="n">prop</span><span class="p">:</span>
+</span><span id="line-598">        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="line-599">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-600">        <span class="k">return</span> <span class="p">(</span>
+</span><span id="line-601">            <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"PropDescriptor"</span>
+</span><span id="line-602">        <span class="p">)</span>
+</span><span id="line-603">    <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+</span><span id="line-604">        <span class="k">return</span> <span class="kc">False</span>
+</span><span id="line-605">
+</span><span id="line-606">
+</span><span id="line-607"><span class="k">def</span><span class="w"> </span><span class="nf">_prop_size</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+</span><span id="line-608"><span class="w">    </span><span class="sd">"""A written prop's size, from its descriptor's ``view_box``."""</span>
+</span><span id="line-609">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-610">        <span class="n">box</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"view_box"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+</span><span id="line-611">            <span class="mi">0</span><span class="p">,</span>
+</span><span id="line-612">            <span class="mi">0</span><span class="p">,</span>
+</span><span id="line-613">            <span class="mi">0</span><span class="p">,</span>
+</span><span id="line-614">            <span class="mi">0</span><span class="p">,</span>
+</span><span id="line-615">        <span class="p">)</span>
+</span><span id="line-616">        <span class="k">return</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">])),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">])))</span>
+</span><span id="line-617">    <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+</span><span id="line-618">        <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span id="line-619">
+</span><span id="line-620">
+</span><span id="line-621"><span class="k">def</span><span class="w"> </span><span class="nf">_write_generated_prop</span><span class="p">(</span>
+</span><span id="line-622">    <span class="n">spec</span><span class="p">:</span> <span class="n">ArtSpec</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">out</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">AssetSource</span>
+</span><span id="line-623"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeneratedArt</span><span class="p">:</span>
+</span><span id="line-624"><span class="w">    </span><span class="sd">"""Carve ``image`` by the spec's key and write it as a prop (cutan#162),</span>
+</span><span id="line-625"><span class="sd">    over a prop a crash left unfinished."""</span>
+</span><span id="line-626">    <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+</span><span id="line-627">
+</span><span id="line-628">    <span class="kn">from</span><span class="w"> </span><span class="nn">cutan.carve</span><span class="w"> </span><span class="kn">import</span> <span class="n">carve</span><span class="p">,</span> <span class="n">write_prop</span>
+</span><span id="line-629">
+</span><span id="line-630">    <span class="n">prop</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">prop</span> <span class="ow">or</span> <span class="p">{})</span>
+</span><span id="line-631">    <span class="n">carving</span> <span class="o">=</span> <span class="n">carve</span><span class="p">(</span>
+</span><span id="line-632">        <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">"RGB"</span><span class="p">)),</span>
+</span><span id="line-633">        <span class="n">matte</span><span class="o">=</span><span class="n">_key_recipe</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">key</span><span class="p">)</span> <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">key</span> <span class="k">else</span> <span class="s2">"flat_colour"</span><span class="p">,</span>
+</span><span id="line-634">        <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+</span><span id="line-635">        <span class="o">**</span><span class="p">{</span>
+</span><span id="line-636">            <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">"point"</span> <span class="k">else</span> <span class="n">v</span><span class="p">)</span>
+</span><span id="line-637">            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">prop</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+</span><span id="line-638">            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_CARVE_KEYS</span>
+</span><span id="line-639">        <span class="p">},</span>
+</span><span id="line-640">    <span class="p">)</span>
+</span><span id="line-641">    <span class="n">folder</span> <span class="o">=</span> <span class="n">out</span> <span class="o">/</span> <span class="n">spec</span><span class="o">.</span><span class="n">name</span>
+</span><span id="line-642">    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span>
+</span><span id="line-643">        <span class="n">record</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="line-644">    <span class="p">)</span> <span class="k">as</span> <span class="n">said</span><span class="p">:</span>  <span class="c1"># write_prop warns on a far landmark</span>
+</span><span id="line-645">        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">"always"</span><span class="p">)</span>
+</span><span id="line-646">        <span class="n">write_prop</span><span class="p">(</span>
+</span><span id="line-647">            <span class="n">carving</span><span class="p">,</span>
+</span><span id="line-648">            <span class="n">folder</span><span class="p">,</span>
+</span><span id="line-649">            <span class="n">name</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+</span><span id="line-650">            <span class="n">landmarks</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"landmarks"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+</span><span id="line-651">            <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-652">            <span class="n">max_side</span><span class="o">=</span><span class="n">prop</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"max_side"</span><span class="p">),</span>
+</span><span id="line-653">            <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># generate_art decided: nothing finished is there</span>
+</span><span id="line-654">        <span class="p">)</span>
+</span><span id="line-655">    <span class="k">return</span> <span class="n">GeneratedArt</span><span class="p">(</span>
+</span><span id="line-656">        <span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+</span><span id="line-657">        <span class="n">folder</span> <span class="o">/</span> <span class="s2">"prop.json"</span><span class="p">,</span>
+</span><span id="line-658">        <span class="n">source</span><span class="p">,</span>
+</span><span id="line-659">        <span class="n">carving</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+</span><span id="line-660">        <span class="n">warnings</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">carving</span><span class="o">.</span><span class="n">quality</span><span class="o">.</span><span class="n">warnings</span><span class="p">())</span>
+</span><span id="line-661">        <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">message</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">said</span><span class="p">),</span>
+</span><span id="line-662">    <span class="p">)</span>
+</span><span id="line-663">
 </span><span id="line-664">
-</span><span id="line-665">
-</span><span id="line-666"><span class="k">def</span><span class="w"> </span><span class="nf">_read_sources</span><span class="p">(</span><span class="n">out</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="line-667">    <span class="n">record</span> <span class="o">=</span> <span class="n">out</span> <span class="o">/</span> <span class="n">SOURCES_FILE</span>
-</span><span id="line-668">    <span class="k">if</span> <span class="ow">not</span> <span class="n">record</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="line-669">        <span class="k">return</span> <span class="p">{}</span>
-</span><span id="line-670">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-671">        <span class="n">sources</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
-</span><span id="line-672">    <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-673">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="line-674">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">record</span><span class="si">}</span><span class="s2"> cannot be read as JSON (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">): fix or move it"</span>
-</span><span id="line-675">        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-</span><span id="line-676">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sources</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="line-665"><span class="k">def</span><span class="w"> </span><span class="nf">_image_size</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+</span><span id="line-666">    <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">im</span><span class="p">:</span>
+</span><span id="line-667">        <span class="k">return</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span>
+</span><span id="line-668">
+</span><span id="line-669">
+</span><span id="line-670"><span class="k">def</span><span class="w"> </span><span class="nf">_read_sources</span><span class="p">(</span><span class="n">out</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="line-671">    <span class="n">record</span> <span class="o">=</span> <span class="n">out</span> <span class="o">/</span> <span class="n">SOURCES_FILE</span>
+</span><span id="line-672">    <span class="k">if</span> <span class="ow">not</span> <span class="n">record</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="line-673">        <span class="k">return</span> <span class="p">{}</span>
+</span><span id="line-674">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-675">        <span class="n">sources</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-676">    <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 </span><span id="line-677">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="line-678">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">record</span><span class="si">}</span><span class="s2"> holds </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, not </span><span class="se">{{</span><span class="s2">file: source</span><span class="se">}}</span><span class="s2">"</span>
-</span><span id="line-679">        <span class="p">)</span>
-</span><span id="line-680">    <span class="k">return</span> <span class="n">sources</span>
-</span><span id="line-681">
-</span><span id="line-682">
-</span><span id="line-683"><span class="k">def</span><span class="w"> </span><span class="nf">_write_sources</span><span class="p">(</span><span class="n">out</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sources</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-684">    <span class="n">record</span> <span class="o">=</span> <span class="n">out</span> <span class="o">/</span> <span class="n">SOURCES_FILE</span>
-</span><span id="line-685">    <span class="n">tmp</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">".part"</span><span class="p">)</span>
-</span><span id="line-686">    <span class="n">tmp</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
-</span><span id="line-687">        <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">sources</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span>
-</span><span id="line-688">    <span class="p">)</span>
-</span><span id="line-689">    <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span>
+</span><span id="line-678">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">record</span><span class="si">}</span><span class="s2"> cannot be read as JSON (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">): fix or move it"</span>
+</span><span id="line-679">        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+</span><span id="line-680">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sources</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="line-681">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="line-682">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">record</span><span class="si">}</span><span class="s2"> holds </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, not </span><span class="se">{{</span><span class="s2">file: source</span><span class="se">}}</span><span class="s2">"</span>
+</span><span id="line-683">        <span class="p">)</span>
+</span><span id="line-684">    <span class="k">return</span> <span class="n">sources</span>
+</span><span id="line-685">
+</span><span id="line-686">
+</span><span id="line-687"><span class="k">def</span><span class="w"> </span><span class="nf">_write_sources</span><span class="p">(</span><span class="n">out</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sources</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-688">    <span class="n">record</span> <span class="o">=</span> <span class="n">out</span> <span class="o">/</span> <span class="n">SOURCES_FILE</span>
+</span><span id="line-689">    <span class="n">tmp</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">".part"</span><span class="p">)</span>
+</span><span id="line-690">    <span class="n">tmp</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+</span><span id="line-691">        <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">sources</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span>
+</span><span id="line-692">    <span class="p">)</span>
+</span><span id="line-693">    <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -921,7 +925,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=33adb31a"></script>
+    <script src="../../../_static/documentation_options.js?v=97d53703"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

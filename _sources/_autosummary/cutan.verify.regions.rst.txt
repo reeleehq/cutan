@@ -1,0 +1,29 @@
+cutan.verify.regions
+====================
+
+.. automodule:: cutan.verify.regions
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      MOUTH_CHANNEL
+      MOUTH_GROW
+      MOUTH_GROW_MAX_PX
+      CHUNK_FRAMES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      mouth_track
+      region_findings
+      split_cadence
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      MouthTrack
+   

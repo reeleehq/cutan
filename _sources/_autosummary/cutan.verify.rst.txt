@@ -13,4 +13,5 @@ cutan.verify
    body
    cadence
    critic
+   regions
    style
