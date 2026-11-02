@@ -34,7 +34,7 @@ live:
   tween_duration_s: [0.12, 0.25]
   motion_presets: [waddle, hop, nod, slide_in, slide_out, turn]   # cutan.motion.PRESETS; waddle walk, hop-turn, head snap, slides, turn (front/three_quarter/side/back swapped at the edge-on midpoint)
   shots:
-    mean_s: 4.2              # measured, n=7
+    mean_s: 3.2              # by hand, n=9 shots (4.2 by the pixel detector, n=7; cutan#160)
     range_s: [1.5, 9]
   characters:
     generate: offline        # `an character new <name> --offline`

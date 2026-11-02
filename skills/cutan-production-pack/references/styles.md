@@ -276,7 +276,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
 - **Cost:** `low`, rigid shape characters, a locked camera and flat sets; `an character new --offline --build squat --head-scale 1.3 --hat beanie` characters are close to the look.
 - **meta:** fps: 24; default_easing: linear; step_hz: 12; style_pack: south_park
 - **camera:** default: hold; allowed: hold, push_in
-- **shots:** mean_s: 4.2; range_s: 1.5, 9
+- **shots:** mean_s: 3.2; range_s: 1.5, 9
 - **transitions:** default: kind: cut
 - **characters:** generate: offline; mouth_variants: happy, sad; build: squat; head_scale: 1.3; hat: beanie, cap, none; sash: False; palette: per_character
 - **environment:** preset: indoor
@@ -307,7 +307,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "south_park",
-      "sha256": "f170bb6e7b48993c27c6aa8f245de8992837320711aa2aea83044571b2765b9b"
+      "sha256": "54daae444b0010679f0c8dcddfc440020f3b72d1494ddacb9b07592abf818935"
     }
   },
   "surface": {
