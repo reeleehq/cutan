@@ -405,19 +405,32 @@ def _step_changes(
     """
     grey = frames.astype(np.float32).mean(axis=3)
     delta = np.abs(grey[1:] - grey[:-1])
-    step_diff = delta.mean(axis=(1, 2))
+    moved = (delta > PIXEL_CHANGE_DELTA).reshape(len(delta), -1).sum(axis=1)
+    return changes_from_stats(
+        delta.mean(axis=(1, 2)), moved, min_changed_pixels=min_changed_pixels
+    )
+
+
+def changes_from_stats(
+    step_diff: np.ndarray,
+    moved: np.ndarray,
+    *,
+    min_changed_pixels: int = MIN_CHANGED_PIXELS,
+) -> tuple[np.ndarray, np.ndarray, float]:
+    """:func:`_step_changes`'s rule from each step's mean grey difference and
+    its count of pixels moved past :data:`PIXEL_CHANGE_DELTA`: what a region's
+    measurement reuses on the rest of the picture (:mod:`cutan.verify.regions`)."""
     noise_floor = min(
         NOISE_FLOOR_CAP, float(np.percentile(step_diff, NOISE_FLOOR_PERCENTILE))
     )
     threshold = max(MIN_CHANGE_THRESHOLD, NOISE_FLOOR_MULTIPLIER * noise_floor)
     changed = step_diff > threshold
     if min_changed_pixels > 0:
-        moved = (delta > PIXEL_CHANGE_DELTA).reshape(len(delta), -1).sum(axis=1)
         changed |= moved >= min_changed_pixels
     return step_diff, changed, threshold
 
 
-def _cadence(changed: np.ndarray, *, cut_steps: set[int], fps: float) -> dict:
+def cadence_of(changed: np.ndarray, *, cut_steps: set[int], fps: float) -> dict:
     """The hold and cadence statistics of one run of steps (a clip or a shot).
 
     Cadence ignores the step INTO a cut: that is an edit, not a pose change.
@@ -492,7 +505,7 @@ def measure_style(
     bounds = [0, *cuts, n]
     shots = [(b - a) / fps for a, b in zip(bounds[:-1], bounds[1:])]
 
-    cadence = _cadence(changed, cut_steps={c - 1 for c in cuts}, fps=fps)
+    cadence = cadence_of(changed, cut_steps={c - 1 for c in cuts}, fps=fps)
     sat, dark, top16 = _palette_stats(frames)
     r3 = _r3
     return StyleMetrics(
@@ -584,7 +597,7 @@ def measure_shots(
                 start_s=_r3(a / fps),
                 duration_s=_r3((b - a) / fps),
                 frames=b - a,
-                **_cadence(steps, cut_steps=set(), fps=fps),
+                **cadence_of(steps, cut_steps=set(), fps=fps),
             )
         )
     return rows
@@ -826,6 +839,26 @@ def _probe_fps(mp4: Path) -> float:
     )
 
 
+def _probe_size(mp4: Path) -> tuple[int, int]:
+    """The video stream's ``(width, height)``."""
+    out = _run(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=width,height",
+            "-of",
+            "csv=p=0:s=x",
+            str(mp4),
+        ]
+    ).decode("utf-8").strip()
+    w, h = out.split("x")[:2]
+    return int(w), int(h)
+
+
 def _decode_frames(mp4: Path, *, width: int, height: int) -> np.ndarray:
     raw = _run(
         [
@@ -957,6 +990,9 @@ class StyleLintResult:
     metrics: StyleMetrics | None
     report: VerificationReport
     per_shot: list[ShotMetrics] = field(default_factory=list)
+    #: ``{"mouth": cadence, "body": cadence}`` when the lint had the project to
+    #: find the mouths in (cutan#80, :mod:`cutan.verify.regions`); else ``None``.
+    regions: dict | None = None
 
 
 def style_lint(
@@ -1069,7 +1105,67 @@ def style_lint(
         )
     for f in check_targets(metrics, targets, miss_severity=miss_severity, live=live):
         report.add(f.severity, f.ir_path, f.description, f.suggested_fix)
-    return StyleLintResult(metrics, report, per_shot)
+    regions = _regions(
+        mp4, frames, fps=fps, scene=scene, shot_durations=shot_durations, report=report
+    )
+    return StyleLintResult(metrics, report, per_shot, regions)
+
+
+def _regions(
+    mp4: Path,
+    frames: np.ndarray,
+    *,
+    fps: float,
+    scene: Any,
+    shot_durations: Sequence[float] | None,
+    report: Any,
+) -> dict | None:
+    """The mouth's and the body's cadence apart (cutan#80), when the project is
+    at hand: ``scene`` as a project folder or its ``ir/scene.json``, else the
+    project a render under ``<project>/output/`` came from. Said as an ``info``;
+    a project whose mouths cannot be placed says why, never fails the lint."""
+    from cutan.verify.regions import mouth_track, region_findings, split_cadence
+
+    project = _project_dir(scene) or project_of_render(mp4)
+    if project is None:
+        return None
+    try:
+        track = mouth_track(
+            project,
+            n=len(frames),
+            fps=fps,
+            size=(DECODE_WIDTH, DECODE_HEIGHT),
+            render_size=_probe_size(mp4),
+        )
+        if not track.any():
+            report.add("info", "<style>/regions", "no mouth was found to measure apart from the body")
+            return None
+        if shot_durations is None:  # the project found from the render: its shots
+            shot_durations = [d for _, d in film_shots(_load_scene(project))]
+        cuts = _cut_frames_from_shots(shot_durations, fps, len(frames)) if shot_durations else []
+        regions = split_cadence(frames, track, fps=fps, cut_steps=[c - 1 for c in cuts])
+    except Exception as e:  # noqa: BLE001 - an extra measurement that cannot be made is a note
+        report.add(
+            "info",
+            "<style>/regions",
+            f"the mouth and body cadence could not be measured apart: {type(e).__name__}: {e}",
+        )
+        return None
+    report.add("info", "<style>/regions", f"cadence by region: {region_findings(regions)}")
+    return regions
+
+
+def _project_dir(scene: Any) -> Path | None:
+    """The project folder ``scene`` names: the folder itself, or the one holding
+    its ``ir/scene.json``; ``None`` for a scene object or a stray file."""
+    if not isinstance(scene, (str, Path)):
+        return None
+    path = Path(scene)
+    if path.is_dir():
+        return path
+    if path.name == Path(PROJECT_SCENE_JSON).name and path.parent.name == Path(PROJECT_SCENE_JSON).parent.name:
+        return path.parent.parent
+    return None
 
 
 class StyleLintVerifier:
@@ -1234,6 +1330,7 @@ def _main(argv: Sequence[str]) -> int:
                 {
                     "metrics": result.metrics.as_dict() if result.metrics else None,
                     "per_shot": [r.as_dict() for r in result.per_shot],
+                    "regions": result.regions,
                     "findings": [asdict(f) for f in result.report.findings],
                 },
                 indent=2,
