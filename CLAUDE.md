@@ -15,7 +15,7 @@ cutan/characters/     descriptor schema (CharacterDescriptor), factory (patterns
 cutan/expression/     expression presets, axes, bindings, the face provider
 cutan/compile/        passes.py (the cut-out passes over an.stage.compile), body.py (body-attached props placed by their character), lowering.py (play/expression lowering, swap declaration), coarticulate.py, gaze.py
 cutan/audio/          lip-sync providers (offline, rhubarb, whisper, word timings)
-cutan/impacts/        impact choreography and ground truth;  cutan/verify/style.py: the style lint;  cutan/verify/body.py: the body-continuity check;  cutan/library.py: the character analyser
+cutan/impacts/        impact choreography and ground truth;  cutan/verify/style.py: the style lint;  cutan/verify/body.py: the body-continuity check;  cutan/verify/critic.py: the optional vision critic of body-depicting props (`an character critique-props`);  cutan/library.py: the character analyser
 cutan/carve/          photo/frame → matted, provenance-carrying part: matte strategies, super-resolution strategies (superres.py), refine, head mode, split_parts, write_prop (cutan[carve]); generate.py: art from an image model, keyed and fitted (cutan[generate], `an art generate`, art_cli.py)
 cutan/styles/         the named style specs (*.yaml, package data) and their loader: style_spec(name), style_specs(); python -m cutan.styles
 cutan/body_attachment.py  a prop that depicts a character's limbs: its `metadata.body_attachment` declaration, the socket geometry, place_body_prop

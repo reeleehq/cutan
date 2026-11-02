@@ -848,6 +848,26 @@ def contract() -> str:
     return _render_contract()
 
 
+def critique_props(project: str = ".", at: str = "0.5") -> str:
+    """Ask a vision model whether each body-depicting prop's hands and sleeves belong to the body on screen (a paid call per prop and shot; warnings, never the gate).
+
+    project: the project folder
+    at: comma-separated instants to probe, as fractions of each shot's length
+    """
+    from cutan.verify.critic import critique_body_props
+
+    report = critique_body_props(project, at=[float(x) for x in at.split(",") if x.strip()])
+    lines = [f"[{sev}] {where}: {msg}" for sev, where, msg in report.findings]
+    lines.append(
+        f"{len(report.calls)} judge call(s): "
+        + ", ".join(f"{c['shot']}/{c['prop']} ({c['frames']} frame(s))" for c in report.calls)
+        if report.calls
+        else "no body-depicting prop to judge"
+    )
+    text = "\n".join(lines)
+    return failed(text) if any(sev == "error" for sev, _, _ in report.findings) else text
+
+
 _dispatch_funcs = [
     new,
     mouths,
@@ -865,4 +885,5 @@ _dispatch_funcs = [
     silhouette,
     preview,
     record,
+    critique_props,
 ]
