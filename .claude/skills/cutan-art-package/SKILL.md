@@ -83,6 +83,10 @@ a required part may ship in either format. Rules, all checked by
   do not hold. A part carved from ANOTHER clip than the rest carries its own
   `source` on its attachment (an#220) — `an credits` lists each part by path.
 
+## Name the head `head` and the torso `torso` (cutan#106)
+
+A world viewpoint's `size: close_up` or `medium` frames a character by its own rig: down to the chin (the lowest point of the part named `head` and everything drawn under it) or to the bottom of the part named `torso`. A rig whose parts have other names is framed by `an`'s human table instead, which cuts a big-headed build at the wrong place. So name those two slots `head` and `torso`.
+
 ## Views that draw the face differently (an#220)
 
 A profile head carved with its eye and mouth in it is the trap: hiding the
