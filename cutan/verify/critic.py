@@ -89,7 +89,9 @@ CHECKLISTS: dict[str, tuple[Question, ...]] = {
             "edge, as if they were the camera's own arms?",
             "yes",
         ),
-        Question("Is the face of the person holding the {prop} visible in the picture?", "no"),
+        Question(
+            "Is the face of the person holding the {prop} visible in the picture?", "no"
+        ),
     ),
     "*": (_SLEEVES, _NOT_FROM_BELOW),
 }
@@ -155,7 +157,9 @@ def _first_json_object(text: str) -> Any:
 _LEADING_ANSWER = re.compile(r"^\W*(yes|no)\b(?!\s*/)", re.I)
 
 
-def parse_answers(reply: str, checklist: Sequence[Question]) -> list[dict[str, Any]] | None:
+def parse_answers(
+    reply: str, checklist: Sequence[Question]
+) -> list[dict[str, Any]] | None:
     """The answers in a judge's reply, one per question (``answer`` is ``yes``,
     ``no`` or ``unsure``: read from its leading word); ``None`` when the reply
     holds no answers at all.
@@ -180,10 +184,17 @@ def parse_answers(reply: str, checklist: Sequence[Question]) -> list[dict[str, A
         if not 1 <= n <= len(checklist):
             return None  # numbered from 0, or past the end: the answers would shift
         m = _LEADING_ANSWER.match(str(item.get("answer", "")))
-        by_n[n] = {"n": n, "answer": m.group(1).lower() if m else "unsure", "why": str(item.get("why", ""))}
+        by_n[n] = {
+            "n": n,
+            "answer": m.group(1).lower() if m else "unsure",
+            "why": str(item.get("why", "")),
+        }
     if not by_n:
         return None
-    return [by_n.get(n, {"n": n, "answer": "unsure", "why": ""}) for n in range(1, len(checklist) + 1)]
+    return [
+        by_n.get(n, {"n": n, "answer": "unsure", "why": ""})
+        for n in range(1, len(checklist) + 1)
+    ]
 
 
 @dataclass
@@ -204,7 +215,9 @@ def _envelope_judge(model: str | None) -> Callable[..., Mapping[str, Any]]:
     from an.verify.vision import judge_envelope
 
     def judge(frames: Sequence[bytes], *, prompt: str) -> Mapping[str, Any]:
-        return judge_envelope(frames, prompt=prompt, **({"model": model} if model else {}))
+        return judge_envelope(
+            frames, prompt=prompt, **({"model": model} if model else {})
+        )
 
     return judge
 
@@ -239,7 +252,9 @@ def critique_body_props(
     from an.project import load
 
     if not at or any(not 0.0 <= f <= 1.0 for f in at):
-        raise ValueError(f"`at` holds fractions of a shot's length in [0, 1], not {list(at)}")
+        raise ValueError(
+            f"`at` holds fractions of a shot's length in [0, 1], not {list(at)}"
+        )
     report = CritiqueReport()
     custom = judge is not None
     project = load(project) if not hasattr(project, "scene") else project
@@ -266,13 +281,19 @@ def critique_body_props(
             if not checklist:
                 continue
             prop = entity.ref or entity.id  # "wheel", not the entity's id
-            prompt = checklist_prompt(checklist, prop=prop, character=character or "the character")
+            prompt = checklist_prompt(
+                checklist, prop=prop, character=character or "the character"
+            )
             if judge is None:
                 try:
                     import anthropic  # noqa: F401 - the default judge's SDK, checked before paying
                 except ImportError:
                     report.findings.append(
-                        ("error", "", "the body critic's default judge needs the anthropic SDK: pip install an[vision]")
+                        (
+                            "error",
+                            "",
+                            "the body critic's default judge needs the anthropic SDK: pip install an[vision]",
+                        )
                     )
                     return report
                 judge = _envelope_judge(model)
@@ -284,22 +305,45 @@ def critique_body_props(
                 answer = judge(shown, prompt=prompt)
             except Exception as e:  # noqa: BLE001 - configured and broken is a failure, said aloud
                 report.findings.append(
-                    ("error", where, f"the body critic could not judge prop {entity.id!r}: {type(e).__name__}: {e}")
+                    (
+                        "error",
+                        where,
+                        f"the body critic could not judge prop {entity.id!r}: {type(e).__name__}: {e}",
+                    )
                 )
                 continue
-            reply = str((answer.get("reply") if isinstance(answer, Mapping) else answer) or "")
-            used = answer.get("model") if isinstance(answer, Mapping) else (None if custom else model)
-            report.calls.append({"shot": shot.id, "prop": entity.id, "frames": len(shown), "model": used})
+            reply = str(
+                (answer.get("reply") if isinstance(answer, Mapping) else answer) or ""
+            )
+            used = (
+                answer.get("model")
+                if isinstance(answer, Mapping)
+                else (None if custom else model)
+            )
+            report.calls.append(
+                {
+                    "shot": shot.id,
+                    "prop": entity.id,
+                    "frames": len(shown),
+                    "model": used,
+                }
+            )
             answers = parse_answers(reply, checklist)
             if answers is None:
                 report.findings.append(
-                    ("error", where, f"the body critic's reply about prop {entity.id!r} held no answers: {reply[:200]!r}")
+                    (
+                        "error",
+                        where,
+                        f"the body critic's reply about prop {entity.id!r} held no answers: {reply[:200]!r}",
+                    )
                 )
                 continue
             for q, a in zip(checklist, answers):
                 text = q.text.format(prop=prop, character=character or "the character")
                 if a["answer"] == "unsure":
-                    report.findings.append(("info", where, f"body critic, unsure: {text}"))
+                    report.findings.append(
+                        ("info", where, f"body critic, unsure: {text}")
+                    )
                 elif a["answer"] != q.expected:
                     report.findings.append(
                         (
