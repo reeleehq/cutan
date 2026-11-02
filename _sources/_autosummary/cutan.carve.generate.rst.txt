@@ -34,5 +34,6 @@ cutan.carve.generate
    
       AixGenerator
       ArtSpec
+      Generated
       GeneratedArt
    

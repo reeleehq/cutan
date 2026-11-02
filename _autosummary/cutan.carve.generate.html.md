@@ -32,8 +32,9 @@ stage canvas and written as a PNG beside a record of where it came from.
 
   [`write_prop()`](cutan.carve.html.md#cutan.carve.write_prop), with its quality warnings) instead of a plate.
 - **The generator** is the seam: `generator(prompt, *, size, background,
-  quality, model) -> PIL image`, carrying `provider`, `model` and
-  `license` for the provenance. The default, [`AixGenerator`](#cutan.carve.generate.AixGenerator), calls
+  quality, model) -> PIL image` (or a [`Generated`](#cutan.carve.generate.Generated): the image and facts
+  about making it, such as the provider’s revised prompt), carrying
+  `provider`, `model` and `license` for the provenance. The default, [`AixGenerator`](#cutan.carve.generate.AixGenerator), calls
   the fleet’s `aix.generate_image()` (OpenAI’s `gpt-image` models by
   default; `pip install "cutan[generate]"`).
 - **The record**: each image’s `AssetSource` (provider,
@@ -46,32 +47,33 @@ generator; nothing here is imported by `import cutan`.
 
 ### Module Attributes
 
-| [`DEFAULT_MODEL`](#cutan.carve.generate.DEFAULT_MODEL)         | The model [`AixGenerator`](#cutan.carve.generate.AixGenerator) asks for when the spec names none.                                   |
-|------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| [`DEFAULT_QUALITY`](#cutan.carve.generate.DEFAULT_QUALITY)       | the provider's own default quality (`"high"` is the dearest tier, and not every model has it).                                               |
-| [`OPENAI_OUTPUT_LICENSE`](#cutan.carve.generate.OPENAI_OUTPUT_LICENSE) | The licence code of OpenAI's image output, which its terms assign to the user.                                                               |
-| [`SOURCES_FILE`](#cutan.carve.generate.SOURCES_FILE)          | Where each generated image's provenance is written, beside the images.                                                                       |
-| [`KEYS`](#cutan.carve.generate.KEYS)                  | a hue band in degrees, and only saturated, bright pixels in it.                                                                              |
-| [`ImageGenerator`](#cutan.carve.generate.ImageGenerator)        | `generator(prompt, *, size, background, quality, model) -> PIL image`, with `provider`, `model` and `license` attributes for the provenance. |
-| [`OPENAI_IMAGE_MODELS`](#cutan.carve.generate.OPENAI_IMAGE_MODELS)   | Bare model names (no `provider/` prefix) that LiteLLM routes to OpenAI.                                                                      |
-| [`PROVIDER_LICENSES`](#cutan.carve.generate.PROVIDER_LICENSES)     | The licence code of each provider's terms for its image output, by the provider `aix` infers from the model.                                 |
+| [`DEFAULT_MODEL`](#cutan.carve.generate.DEFAULT_MODEL)         | The model [`AixGenerator`](#cutan.carve.generate.AixGenerator) asks for when the spec names none.                                                                                                                                          |
+|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`DEFAULT_QUALITY`](#cutan.carve.generate.DEFAULT_QUALITY)       | the provider's own default quality (`"high"` is the dearest tier, and not every model has it).                                                                                                                                                      |
+| [`OPENAI_OUTPUT_LICENSE`](#cutan.carve.generate.OPENAI_OUTPUT_LICENSE) | The licence code of OpenAI's image output, which its terms assign to the user.                                                                                                                                                                      |
+| [`SOURCES_FILE`](#cutan.carve.generate.SOURCES_FILE)          | Where each generated image's provenance is written, beside the images.                                                                                                                                                                              |
+| [`KEYS`](#cutan.carve.generate.KEYS)                  | a hue band in degrees, and only saturated, bright pixels in it.                                                                                                                                                                                     |
+| [`ImageGenerator`](#cutan.carve.generate.ImageGenerator)        | `generator(prompt, *, size, background, quality, model) -> PIL image` (or a [`Generated`](#cutan.carve.generate.Generated): the image and facts about making it), with `provider`, `model` and `license` attributes for the provenance. |
+| [`OPENAI_IMAGE_MODELS`](#cutan.carve.generate.OPENAI_IMAGE_MODELS)   | Bare model names (no `provider/` prefix) that LiteLLM routes to OpenAI.                                                                                                                                                                             |
+| [`PROVIDER_LICENSES`](#cutan.carve.generate.PROVIDER_LICENSES)     | The licence code of each provider's terms for its image output, by the provider `aix` infers from the model.                                                                                                                                        |
 
 ### Functions
 
-| [`art_source`](#cutan.carve.generate.art_source)(spec, generator)                       | The provenance of `spec`'s image as `generator` made it.                                                                                                                                                                                               |
-|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`art_specs`](#cutan.carve.generate.art_specs)(spec)                                   | The [`ArtSpec`](#cutan.carve.generate.ArtSpec) list of a spec mapping or a JSON file of one.                                                                                                                                             |
-| [`cover_fit`](#cutan.carve.generate.cover_fit)(image, size)                            | Scale `image` to cover `size` (w, h), then centre-crop to it.                                                                                                                                                                                          |
-| [`generate_art`](#cutan.carve.generate.generate_art)(spec, \*, out_dir[, generator, ...]) | Generate, key, fit and write each image of `spec` into `out_dir`.                                                                                                                                                                                      |
-| [`key_backdrop`](#cutan.carve.generate.key_backdrop)(image, key)                          | `image` with its key colour keyed to alpha and the rim de-spilled, by [`cutan.carve`](cutan.carve.html.md#module-cutan.carve)'s matte (`key`: a [`KEYS`](#cutan.carve.generate.KEYS) name or a matte recipe). |
-| [`provider_of`](#cutan.carve.generate.provider_of)(model)                                | The provider of a LiteLLM model name, by LiteLLM's own convention (a `provider/` prefix; OpenAI's image models go bare), without the network lookup LiteLLM's resolver makes; `None` when the name does not say.                                       |
+| [`art_source`](#cutan.carve.generate.art_source)(spec, generator[, facts])              | The provenance of `spec`'s image as `generator` made it; `facts` are what the provider said about this image ([`Generated`](#cutan.carve.generate.Generated)): the model it resolved to wins over the one asked for, and a `revised_prompt` is kept.   |
+|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`art_specs`](#cutan.carve.generate.art_specs)(spec)                                   | The [`ArtSpec`](#cutan.carve.generate.ArtSpec) list of a spec mapping or a JSON file of one.                                                                                                                                                         |
+| [`cover_fit`](#cutan.carve.generate.cover_fit)(image, size)                            | Scale `image` to cover `size` (w, h), then centre-crop to it.                                                                                                                                                                                                      |
+| [`generate_art`](#cutan.carve.generate.generate_art)(spec, \*, out_dir[, generator, ...]) | Generate, key, fit and write each image of `spec` into `out_dir`.                                                                                                                                                                                                  |
+| [`key_backdrop`](#cutan.carve.generate.key_backdrop)(image, key)                          | `image` with its key colour keyed to alpha and the rim de-spilled, by [`cutan.carve`](cutan.carve.html.md#module-cutan.carve)'s matte (`key`: a [`KEYS`](#cutan.carve.generate.KEYS) name or a matte recipe).             |
+| [`provider_of`](#cutan.carve.generate.provider_of)(model)                                | The provider of a LiteLLM model name, by LiteLLM's own convention (a `provider/` prefix; OpenAI's image models go bare), without the network lookup LiteLLM's resolver makes; `None` when the name does not say.                                                   |
 
 ### Classes
 
-| [`AixGenerator`](#cutan.carve.generate.AixGenerator)([model, quality, licenses])       | The default generator: `aix.generate_image()`, whose model names its provider (OpenAI's `gpt-image` by default).                           |
-|-------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| [`ArtSpec`](#cutan.carve.generate.ArtSpec)(name, prompt[, size, background, ...]) | One image to generate.                                                                                                                     |
-| [`GeneratedArt`](#cutan.carve.generate.GeneratedArt)(name, path, source[, size, ...])  | One image of the spec: its path and provenance; `kept` when it was already there and not made again (its provenance read from the record). |
+| [`AixGenerator`](#cutan.carve.generate.AixGenerator)([model, quality, licenses])       | The default generator: `aix.generate_image()`, whose model names its provider (OpenAI's `gpt-image` by default).                                                                                                                                                                       |
+|-------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`ArtSpec`](#cutan.carve.generate.ArtSpec)(name, prompt[, size, background, ...]) | One image to generate.                                                                                                                                                                                                                                                                 |
+| [`Generated`](#cutan.carve.generate.Generated)(image[, facts])                      | What a generator may return instead of a bare image: the image, and facts about making it (`model`: the model the request was resolved to, e.g. aix substituting a configured alias; `revised_prompt`: the prompt the provider says it actually drew), recorded in the image's source. |
+| [`GeneratedArt`](#cutan.carve.generate.GeneratedArt)(name, path, source[, size, ...])  | One image of the spec: its path and provenance; `kept` when it was already there and not made again (its provenance read from the record).                                                                                                                                             |
 
 ### *class* cutan.carve.generate.AixGenerator(model='gpt-image-2', quality=None, licenses=<factory>)
 
@@ -123,6 +125,15 @@ and not every model has it).
 * **Type:**
   `None`
 
+### *class* cutan.carve.generate.Generated(image, facts=dict())
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+What a generator may return instead of a bare image: the image, and facts
+about making it (`model`: the model the request was resolved to, e.g. aix
+substituting a configured alias; `revised_prompt`: the prompt the provider
+says it actually drew), recorded in the image’s source.
+
 ### *class* cutan.carve.generate.GeneratedArt(name, path, source, size=(0, 0), kept=False, warnings=())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -136,7 +147,8 @@ A carved prop’s quality warnings ([`cutan.carve.CarveQuality`](cutan.carve.htm
 
 ### cutan.carve.generate.ImageGenerator
 
-`generator(prompt, *, size, background, quality, model) -> PIL image`, with
+`generator(prompt, *, size, background, quality, model) -> PIL image` (or a
+[`Generated`](#cutan.carve.generate.Generated): the image and facts about making it), with
 `provider`, `model` and `license` attributes for the provenance.
 
 alias of [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[…], `Image`]
@@ -173,9 +185,11 @@ with no licence: unknown, which `an credits` says aloud.
 
 Where each generated image’s provenance is written, beside the images.
 
-### cutan.carve.generate.art_source(spec, generator)
+### cutan.carve.generate.art_source(spec, generator, facts=None)
 
-The provenance of `spec`’s image as `generator` made it.
+The provenance of `spec`’s image as `generator` made it; `facts` are
+what the provider said about this image ([`Generated`](#cutan.carve.generate.Generated)): the model it
+resolved to wins over the one asked for, and a `revised_prompt` is kept.
 
 ```pycon
 >>> g = AixGenerator()

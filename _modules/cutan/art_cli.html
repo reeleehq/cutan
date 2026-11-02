@@ -265,16 +265,19 @@
 </span><span id="line-72">    <span class="n">report</span> <span class="o">=</span> <span class="n">critique_far_plates</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span>
 </span><span id="line-73">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"[</span><span class="si">{</span><span class="n">sev</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">sev</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">findings</span><span class="p">]</span>
 </span><span id="line-74">    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-75">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span><span class="si">}</span><span class="s2"> judge call(s): "</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">"plate"</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
-</span><span id="line-76">        <span class="k">if</span> <span class="n">report</span><span class="o">.</span><span class="n">calls</span>
-</span><span id="line-77">        <span class="k">else</span> <span class="s2">"0 judge calls"</span>
-</span><span id="line-78">    <span class="p">)</span>
-</span><span id="line-79">    <span class="n">text</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
-</span><span id="line-80">    <span class="k">return</span> <span class="n">failed</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">sev</span> <span class="o">==</span> <span class="s2">"error"</span> <span class="k">for</span> <span class="n">sev</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">findings</span><span class="p">)</span> <span class="k">else</span> <span class="n">text</span></div>
+</span><span id="line-75">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span><span class="si">}</span><span class="s2"> judge call(s): "</span>
+</span><span id="line-76">        <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">"plate"</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+</span><span id="line-77">        <span class="k">if</span> <span class="n">report</span><span class="o">.</span><span class="n">calls</span>
+</span><span id="line-78">        <span class="k">else</span> <span class="s2">"0 judge calls"</span>
+</span><span id="line-79">    <span class="p">)</span>
+</span><span id="line-80">    <span class="n">text</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+</span><span id="line-81">    <span class="k">return</span> <span class="p">(</span>
+</span><span id="line-82">        <span class="n">failed</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">sev</span> <span class="o">==</span> <span class="s2">"error"</span> <span class="k">for</span> <span class="n">sev</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">findings</span><span class="p">)</span> <span class="k">else</span> <span class="n">text</span>
+</span><span id="line-83">    <span class="p">)</span></div>
 
-</span><span id="line-81">
-</span><span id="line-82">
-</span><span id="line-83"><span class="n">_dispatch_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">generate</span><span class="p">,</span> <span class="n">critique_plates</span><span class="p">]</span>
+</span><span id="line-84">
+</span><span id="line-85">
+</span><span id="line-86"><span class="n">_dispatch_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">generate</span><span class="p">,</span> <span class="n">critique_plates</span><span class="p">]</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -288,7 +291,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=04553970"></script>
+    <script src="../../_static/documentation_options.js?v=33adb31a"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
