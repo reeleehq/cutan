@@ -1000,7 +1000,9 @@ def import_pack(
             "(choose another folder, or --dry-run to only check)"
         )
     if project == pack or pack in project.parents:
-        return refused("the project cannot be inside the pack: choose a folder outside it")
+        return refused(
+            "the project cannot be inside the pack: choose a folder outside it"
+        )
     if (pack / "scene.md").is_file():
         project.parent.mkdir(parents=True, exist_ok=True)
     report = _pack_report(

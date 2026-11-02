@@ -15,7 +15,9 @@ from __future__ import annotations
 __all__ = ["import_"]
 
 
-def import_(pack: str, project: str = "", dry_run: bool = False, json: bool = False) -> str:
+def import_(
+    pack: str, project: str = "", dry_run: bool = False, json: bool = False
+) -> str:
     """Turn a production pack into a project: init it, copy the pack in, make the cast, lay redrawn parts over the factory's, and validate everything.
 
     pack: the production pack folder (scene.md, cast.yaml or cast.sh, assets/, PRODUCTION.md)

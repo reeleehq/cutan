@@ -124,21 +124,26 @@ def _scalar_ok(value: Any) -> bool:
     if isinstance(value, (int, float)):
         return True
     return (
-        isinstance(value, str) and len(value) <= MAX_VALUE_CHARS and not _CONTROL.search(value)
+        isinstance(value, str)
+        and len(value) <= MAX_VALUE_CHARS
+        and not _CONTROL.search(value)
     )
 
 
 def _checked(name: str, key: str, value: Any, types: tuple[type, ...]) -> Any:
     """``value`` when it has one of ``types``; its items (a list's, a mapping's
     keys and values) short text or numbers; no control characters."""
-    ok = isinstance(value, types) and not (isinstance(value, bool) and bool not in types)
+    ok = isinstance(value, types) and not (
+        isinstance(value, bool) and bool not in types
+    )
     if ok and isinstance(value, str):
         ok = _scalar_ok(value)
     elif ok and isinstance(value, list):
         ok = len(value) <= MAX_VALUE_CHARS and all(_scalar_ok(v) for v in value)
     elif ok and isinstance(value, Mapping):
         ok = len(value) <= MAX_VALUE_CHARS and all(
-            isinstance(k, str) and _scalar_ok(k) and _scalar_ok(v) for k, v in value.items()
+            isinstance(k, str) and _scalar_ok(k) and _scalar_ok(v)
+            for k, v in value.items()
         )
     if not ok:
         wanted = {
@@ -146,7 +151,9 @@ def _checked(name: str, key: str, value: Any, types: tuple[type, ...]) -> Any:
             (bool,): "true or false",
             (str,): f"short text (at most {MAX_VALUE_CHARS} characters, one line)",
         }.get(types, "short text, or a list or mapping of short text and numbers")
-        raise CastError(f"{CAST_YAML} {name!r}: {key} must be a {wanted}, not {value!r}")
+        raise CastError(
+            f"{CAST_YAML} {name!r}: {key} must be a {wanted}, not {value!r}"
+        )
     return value
 
 
@@ -164,7 +171,9 @@ def _load_yaml(path: Path) -> Any:
     class _NoAliases(yaml.SafeLoader):
         def compose_node(self, parent, index):
             if self.check_event(yaml.AliasEvent):
-                raise CastError(f"{CAST_YAML}: anchors and aliases (& and *) are not allowed")
+                raise CastError(
+                    f"{CAST_YAML}: anchors and aliases (& and *) are not allowed"
+                )
             return super().compose_node(parent, index)
 
     try:
@@ -186,7 +195,9 @@ def cast_steps(cast: Union[str, os.PathLike, Mapping[str, Any]]) -> list[CastSte
     if not isinstance(cast, Mapping):
         cast = _load_yaml(Path(cast)) or {}
         if not isinstance(cast, Mapping):
-            raise CastError(f"{CAST_YAML} holds a mapping {{name: options}}, not {type(cast).__name__}")
+            raise CastError(
+                f"{CAST_YAML} holds a mapping {{name: options}}, not {type(cast).__name__}"
+            )
     steps: list[CastStep] = []
     for name, entry in cast.items():
         if not isinstance(name, str) or not NAME_RE.match(name):
@@ -195,7 +206,9 @@ def cast_steps(cast: Union[str, os.PathLike, Mapping[str, Any]]) -> list[CastSte
             )
         entry = {} if entry is None else entry
         if not isinstance(entry, Mapping):
-            raise CastError(f"{CAST_YAML} {name!r}: an entry is a mapping of options, not {entry!r}")
+            raise CastError(
+                f"{CAST_YAML} {name!r}: an entry is a mapping of options, not {entry!r}"
+            )
         unknown = set(entry) - set(NEW_OPTIONS) - set(FOLLOW_UPS)
         if unknown:
             raise CastError(
@@ -203,7 +216,9 @@ def cast_steps(cast: Union[str, os.PathLike, Mapping[str, Any]]) -> list[CastSte
                 f"{', '.join([*NEW_OPTIONS, *FOLLOW_UPS])}"
             )
         new = {
-            k: _checked(name, k, v, NEW_OPTIONS[k]) for k, v in entry.items() if k in NEW_OPTIONS
+            k: _checked(name, k, v, NEW_OPTIONS[k])
+            for k, v in entry.items()
+            if k in NEW_OPTIONS
         }
         steps.append(CastStep("new", name, new))
         for key, (command, option, types) in FOLLOW_UPS.items():
