@@ -21,12 +21,12 @@
   "ci": {
     "provider": "github",
     "repository": "reeleehq/cutan",
-    "sha": "bcf9561e07221f5b9be73a15a08915212e11038f",
+    "sha": "119ca9e81fd8bf150eab3f2a9600cceb30cc067f",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "41381161327",
-    "run_url": "https://github.com/reeleehq/cutan/actions/runs/41381161327",
+    "run_id": "41381153257",
+    "run_url": "https://github.com/reeleehq/cutan/actions/runs/41381153257",
     "server_url": "https://github.com"
   },
   "tools": {

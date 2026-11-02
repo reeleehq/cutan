@@ -24,9 +24,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/41381161327">41381161327</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/41381153257">41381153257</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>bcf9561e07221f5b9be73a15a08915212e11038f</code> (in the history of the built commit) |
+| Event commit | <code>119ca9e81fd8bf150eab3f2a9600cceb30cc067f</code> (in the history of the built commit) |
 
 ## Tools
 
