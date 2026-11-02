@@ -2,37 +2,46 @@
 
 Three ways to give the film a character, cheapest first. Use the first unless the writer asks for a look it cannot make.
 
-1. **A factory character** (`cast.sh`): built from options (build, head size, hat, hair, colours). Fully rigged: lip-sync, blinks, gaze, expressions, a four-view turnaround, walking legs. Costs nothing.
+1. **A factory character** (`cast.yaml`): built from options (build, head size, hat, hair, colours). Fully rigged: lip-sync, blinks, gaze, expressions, a four-view turnaround, walking legs. Costs nothing.
 2. **A factory character with redrawn parts**: run the factory, then replace some of its drawings (head, torso, arms, legs) with your own SVG on the same canvases. Keeps the rig and the face.
 3. **A hand-drawn character**: a full art package (`assets/characters/<name>/`), for an illustrator. Expensive; describe it in `PRODUCTION.md` and let the pipeline owner commission it.
 
-## 1. The factory: `cast.sh`
+## 1. The factory: `cast.yaml`
 
-One command per character, run from the project root by the pipeline. Comments (`#`) above each line say who the character is. Only `an character ...` commands are allowed in this file.
+One entry per character: its id, then the factory's options. Comments (`#`) above each entry say who the character is. The pipeline builds each character from its entry (always offline: the deterministic, fully rigged factory).
 
-```
+```yaml
 # Teo: short and round, red cap, mustard jacket. Relentlessly cheerful.
-an character new teo --offline --build squat --head-scale 1.2 --hat cap --hair-style curly --palette "skin=#f1c9a5,hair=#5a3a22,clothing=#d9a62e,accessory=#c0392b,leg=#3a4a6a" --mouth-variants happy,sad
+teo:
+  build: squat
+  head_scale: 1.2
+  hat: cap
+  hair_style: curly
+  palette: {skin: "#f1c9a5", hair: "#5a3a22", clothing: "#d9a62e", accessory: "#c0392b", leg: "#3a4a6a"}
+  mouth_variants: [happy, sad]
 ```
 
-Always write `--offline` (the deterministic, fully rigged factory). The options:
+The options (any subset; quote colours, since `#` starts a YAML comment):
 
-| option | values | notes |
+| key | values | notes |
 |---|---|---|
-| `NAME` | lowercase id, no spaces | the id scenes use: `teo` |
-| `--build` | `regular` (264 px tall at scale 1), `tall` (312), `squat` (179: round body, short legs), `stick` (225: small blocky body, stick limbs) | the silhouette is the first thing that tells two characters apart |
-| `--head-scale` | a number, 1.0 regular; 1.2 to 1.7 for cartoon heads | the head and the whole face together |
-| `--hat` | `none`, `cap`, `beanie`, `bowler`, `bicorne` | worn above the brows, in the `accessory` colour |
-| `--hair-style` | `peak` (default), `bald`, `bun`, `curly` | in the `hair` colour |
-| `--hair-length` | `short` (default), `medium` (to the jaw), `long` (past the chin) | `bald` takes `short` |
-| `--sash` | flag | a diagonal band across the torso, `accessory` colour |
-| `--palette` | `"skin=#..,hair=#..,clothing=#..,leg=#..,accessory=#.."` | any subset; quote the whole value. Unset roles take a seeded colour |
-| `--clothing-pattern` | `stripes`, `check` or `floral`, with `:base=#..,motif=#..,leaf=#..,scale=1` (quote the whole value) | a print on the clothing, torso and sleeves, in every view; `base` is the clothing colour (give it here OR in `--palette`, not both) |
-| `--mouth-variants` | comma list of `happy`, `sad`, `angry`, `surprised`, `afraid`, `disgusted` | the mouth shapes the character's emotions use; default `happy,sad`. Include every mood its lines carry |
-| `--voice-ref` | a key of `assets/voices/` | the voice document the character speaks with (`voices-and-looks.md`) |
-| `--no-views` | flag | leaves out the turnaround (rarely wanted) |
+| the entry's id | lowercase, digits, `_`; no spaces | the id scenes use: `teo` |
+| `build` | `regular` (264 px tall at scale 1), `tall` (312), `squat` (179: round body, short legs), `stick` (225: small blocky body, stick limbs) | the silhouette is the first thing that tells two characters apart |
+| `head_scale` | a number, 1.0 regular; 1.2 to 1.7 for cartoon heads | the head and the whole face together |
+| `hat` | `none`, `cap`, `beanie`, `bowler`, `bicorne` | worn above the brows, in the `accessory` colour |
+| `hair_style` | `peak` (default), `bald`, `bun`, `curly` | in the `hair` colour |
+| `hair_length` | `short` (default), `medium` (to the jaw), `long` (past the chin) | `bald` takes `short` |
+| `sash` | `true` | a diagonal band across the torso, `accessory` colour |
+| `palette` | a mapping of `skin`, `hair`, `clothing`, `leg`, `accessory` to colours | any subset. Unset roles take a seeded colour |
+| `clothing_pattern` | `"stripes"`, `"check"` or `"floral"`, with `:base=#..,motif=#..,leaf=#..,scale=1` (quote the whole value) | a print on the clothing, torso and sleeves, in every view; `base` is the clothing colour (give it here OR in `palette`, not both) |
+| `mouth_variants` | a list of `happy`, `sad`, `angry`, `surprised`, `afraid`, `disgusted` | the mouth shapes the character's emotions use; default `[happy, sad]`. Include every mood its lines carry |
+| `voice_ref` | a key of `assets/voices/` | the voice document the character speaks with (`voices-and-looks.md`) |
+| `views` | `false` | leaves out the turnaround (rarely wanted) |
+| `mouths` | a list, as `mouth_variants` | more mouth sets, made after the character |
+| `half_lid` | a number from 0 to 1 (0.5 usual) | a half eyelid for squints, made after the character |
+| `gaze` | `true` | the eye stack; a new character has it already, so this matters only with `views: false` |
 
-More commands allowed in `cast.sh`, after a character's `new` line: `an character mouths <name> --variants angry` (adds mouth sets), `an character add-half-lid <name>`, `an character add-views <name>` and `an character add-gaze <name>` (the last three are already done for a new character; they matter only after `--no-views`). Nothing else is accepted: the pipeline refuses any other command or option.
+Nothing else is accepted: the pipeline refuses any other key. (An older pack's `cast.sh`, one `an character ...` command per line, is still read; a pack has one or the other.)
 
 Give every character a different combination of build, head scale, hat, hair and costume colour, so a silhouette tells them apart. Describe what each looks like and sounds like in `PRODUCTION.md`.
 
@@ -127,17 +136,17 @@ A target is `<entity id>/<part>`. On a factory character the face parts are chil
 | no descriptor (the placeholder rig) | `c`, `c/head`, `c/head/hair`, `c/head/left_brow`, `c/head/left_eye`, `c/head/mouth`, `c/head/right_brow`, `c/head/right_eye`, `c/left_arm`, `c/right_arm`, `c/torso` |
 <!-- rig-paths:end -->
 
-Use the first row: a character from `cast.sh` is `an character new --offline`. Arms hang from the shoulder, legs from the hip, the head from the neck: a `rotation` turns a part about that joint, and is absolute (`to: 0` straightens it).
+Use the first row: a character from `cast.yaml` is `an character new --offline`. Arms hang from the shoulder, legs from the hip, the head from the neck: a `rotation` turns a part about that joint, and is absolute (`to: 0` straightens it).
 
 ## 2. Redrawing factory parts
 
 When the writer wants a look the options cannot make (a beard, a crown, a robe, a non-human head), keep the factory rig and redraw parts:
 
-1. Add the character's `an character new ... --offline` line to `cast.sh` as usual.
+1. Add the character's entry to `cast.yaml` as usual.
 2. If you can run code: `pip install cutan`, run that line yourself, and open the generated `assets/characters/<name>/parts/*.svg`. Each part's `viewBox` and `width`/`height` are its canvas, and they differ with the build and head scale (a `tall` torso is 224x320, a `squat` one 300x220; a head is `viewBox="0 0 80 80"` drawn at 285 to 342 px), so read them from the files, never from memory. An arm hangs from the top centre of its canvas (the shoulder) to the hand at the bottom; a leg from the hip at the top. If you cannot run code, ask the pipeline owner for the generated folder before drawing.
 3. Draw the replacement **on the same canvas**, with the joint where the original has it (the neck at the bottom of the head, the shoulder at the top of the arm). Keep the face clear: eyes, brows and mouth are separate parts drawn on top of the head, so the head drawing has no features of its own. Redraw the matching view drawings too (`head_side.svg`, `head_back.svg`, `head_three_quarter.svg`, `torso_*.svg`) or the turnaround will show the old look.
 4. Keep each file's root `<svg ...>` tag exactly as the factory wrote it (its `width`/`height` set the part's size on screen and may differ from its viewBox: a head is `viewBox="0 0 80 80" width="285"`). Change only what is inside.
-5. Ship only the redrawn files, under `assets/characters/<name>/parts/` in the pack (no `character.json`: that folder then means "redrawn parts"), and list them in `PRODUCTION.md` ("teo: head and head_* redrawn with a beard"). The validator and the pipeline build the character from `cast.sh` first, then copy your parts over the factory's.
+5. Ship only the redrawn files, under `assets/characters/<name>/parts/` in the pack (no `character.json`: that folder then means "redrawn parts"), and list them in `PRODUCTION.md` ("teo: head and head_* redrawn with a beard"). The validator and the pipeline build the character from `cast.yaml` first, then copy your parts over the factory's.
 
 Colours in a redrawn part are yours: a style pack does not recolour them.
 

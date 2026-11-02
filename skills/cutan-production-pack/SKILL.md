@@ -17,7 +17,7 @@ Everything cutan needs to render the film, plus the optional elements the writer
 <production-id>/                lowercase, hyphens: "the-umbrella"
   PRODUCTION.md                 for humans: logline, style, cast and voice notes, sets, decisions, open questions
   scene.md                      the film: meta, then one section per shot (entities, actions, dialogue)
-  cast.sh                       one `an character ...` command per line: the factory builds each character
+  cast.yaml                     one entry per character, the factory's options: the pipeline builds each character
   assets/
     environments/<key>/meta.json          a set: planes (fill, gradient or drawn image) at parallax depths
     environments/<key>/plates/*.png|svg   pictures an image plane shows (PNG/JPEG/WebP from the writer, or your SVG)
@@ -32,7 +32,7 @@ Everything cutan needs to render the film, plus the optional elements the writer
 | element | needed | reference |
 |---|---|---|
 | `scene.md` | always | `scene-format.md` |
-| `cast.sh` | when the film has characters | `characters.md` |
+| `cast.yaml` | when the film has characters | `characters.md` |
 | environments | one per set (or a built-in preset) | `environments-and-props.md` |
 | props | for every object, title, label or arrow on screen | `environments-and-props.md` |
 | voices | optional: for real, acted speech | `voices-and-looks.md` |
@@ -52,7 +52,7 @@ Ask the writer which optional elements they want; propose voices and a look when
 3. **Pick a style**, or none. If the writer names one of the six shipped looks, read `references/styles.md` and tell them its **cost class** before going on: `low` (South Park) and `low_to_medium` (OverSimplified) render with factory characters, while the `high`/`very_high` looks (Reiniger, Kurzgesagt, Norstein) and Gilliam's photo collage need drawn or sourced art, so factory characters are only stand-ins for them.
 4. **Settle the art** before you draw anything (`references/art.md`): tell the writer that you can draw only SVG, which looks obviously computer-generated (simple geometric shapes, flat colours), and offer the better routes: an image generator or photos and scans of drawings on paper. If they choose pictures, list every picture the film needs (each set's layers, each prop, each character's reference sheet), say what each must show, and give them a ready-to-paste prompt for each in the film's look.
 5. **Echo the plan back** as a shot list (shot id, length, framing, camera, what happens, lines) and get a yes before writing files.
-6. **Write the pack**: `cast.sh` first, then each environment and prop, the voices and the style pack if any, then `scene.md`, then `PRODUCTION.md`. The references hold every format.
+6. **Write the pack**: `cast.yaml` first, then each environment and prop, the voices and the style pack if any, then `scene.md`, then `PRODUCTION.md`. The references hold every format.
 7. **Check it** (next section), fix what the check reports, and say plainly what you could not check.
 8. **Design the voices with the writer** when the film has voice documents and the reelee connector is there (section below): the writer listens and chooses, and each choice becomes that voice's `voice_id`.
 9. **Deliver**: zip the folder (`<production-id>.zip`) if you can create files, or else give each file in its own code block with its path as the heading. End with three lines for the writer: what is in the pack, what the pipeline will do with it, and any decisions you made that they did not ask for.
@@ -61,11 +61,11 @@ Ask the writer which optional elements they want; propose voices and a look when
 
 Check before you deliver, with the first of these you have:
 
-1. **The reelee connector** (a `reelee_check_production_pack` tool is in your tools): send the pack's text files (`scene.md`, `cast.sh`, `PRODUCTION.md`, every `.json`) and SVG drawings as `files`, a map from each path inside the pack (`assets/props/umbrella/parts/umbrella.svg`) to its text; a picture (PNG, JPEG, WebP) is sent as the text `image WxH`, its size in pixels, and checked as a stand-in of that size. The server runs cutan's real checks and returns a report: `ok`, a `summary` line, per check its `errors` and `warnings`, and `notes` (with `art_guidance` when every drawing is your SVG: tell the writer). Nothing is installed on your side.
+1. **The reelee connector** (a `reelee_check_production_pack` tool is in your tools): send the pack's text files (`scene.md`, `cast.yaml`, `PRODUCTION.md`, every `.json`) and SVG drawings as `files`, a map from each path inside the pack (`assets/props/umbrella/parts/umbrella.svg`) to its text; a picture (PNG, JPEG, WebP) is sent as the text `image WxH`, its size in pixels, and checked as a stand-in of that size. The server runs cutan's real checks and returns a report: `ok`, a `summary` line, per check its `errors` and `warnings`, and `notes` (with `art_guidance` when every drawing is your SVG: tell the writer). Nothing is installed on your side.
 2. **If you can run code and install packages**: `pip install cutan` (pure Python, about 140 MB, it brings the `an` command; no browser needed), then `python scripts/validate_pack.py <pack folder>` (add `--json` for the report as data).
 3. **Otherwise** go through `references/checklist.md` line by line, and write in `PRODUCTION.md` that the pack is unvalidated. Never claim a check you did not run.
 
-Both checks lint every SVG, build a scratch project, run `cast.sh`, validate every character and prop, and run `an validate --strict-assets` on the scene. Fix every error and every warning and check again until the summary says `PASS` with 0 warnings (a warning the writer has knowingly accepted, such as the wide-eyes warning of `surprised` below, may stay: say so in `PRODUCTION.md`), and keep the summary line for `PRODUCTION.md`. The messages name the fix: follow them. Rendering a video needs a headless browser and is the pipeline owner's job, not yours.
+Both checks lint every SVG, build a scratch project, build the cast, validate every character and prop, and run `an validate --strict-assets` on the scene. Fix every error and every warning and check again until the summary says `PASS` with 0 warnings (a warning the writer has knowingly accepted, such as the wide-eyes warning of `surprised` below, may stay: say so in `PRODUCTION.md`), and keep the summary line for `PRODUCTION.md`. The messages name the fix: follow them. Rendering a video needs a headless browser and is the pipeline owner's job, not yours.
 
 ## Designing the voices (with the reelee connector)
 

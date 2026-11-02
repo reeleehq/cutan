@@ -45,8 +45,8 @@ live:
 
 targets:
   identical_frame_share: [0.02, 0.17]   # measured 0.11 (0.24 before the local-change rule, an#255): the picture is almost never still
-  cuts_per_min: [6, 8]                  # measured 7.0
-  mean_shot_s: [5.5, 9]                 # measured 7.5
+  cuts_per_min: [4, 8]                  # 5.0 hard cuts by hand; 7.0 by the pixel detector, which counts one slide twice; slides and pushes are camera moves, not cuts (cutan#160)
+  mean_shot_s: [6, 13]                  # 10 by hand, 7.5 by the pixel detector (cutan#160)
 
 guidance:
   image_prompt: flat vector illustration, clean geometric shapes, no outlines, soft gradients, vivid saturated colours with soft glowing highlights, rounded corners, deep blue night tones   # the look in words, for an image generator (cutan.art_brief); never a show's name

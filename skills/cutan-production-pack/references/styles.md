@@ -6,7 +6,7 @@ How to apply one in a pack:
 
 - **The style pack file:** copy the style's JSON below, exactly, to `assets/styles/<name>.json`, and put its `meta` values (`fps`, `step_hz` if any, `default_easing`) and `style_pack: <name>` in the `scene.md` meta block. Without the file, `style_pack:` is an error.
 - **Shots:** lengths inside the style's `shots` range, camera moves only from its `allowed` list, its default transition between shots (a `dissolve` default means a `transition: {kind: dissolve, duration: ...}` on every shot after the first, and a `duration` in meta: see `scene-format.md`).
-- **Cast:** build the characters with the style's `characters` knobs: `build`, `head_scale`, `hat`, `hair_style`, `hair_length` and `sash` are `cast.sh` options (`--build`, `--head-scale`, ...; a list means pick one per character); `mouth_variants` is `--mouth-variants`; `palette: per_character` means each character gets its own costume colours. `tint` means `{kind: set, target: <id>, property: tint, value: <colour>, at: 0.0}` on every character in every shot (black makes a silhouette); `part_tints` means the same `set` on each listed part (`<id>/head/left_sclera` to `"#ffffff"` keeps the eyes white inside a black figure); `view` means `{kind: set, target: <id>, property: view, value: <view>, at: 0.0}` in every shot.
+- **Cast:** build the characters with the style's `characters` knobs: `build`, `head_scale`, `hat`, `hair_style`, `hair_length` and `sash` are `cast.yaml` keys (a list means pick one per character); so is `mouth_variants`; `palette: per_character` means each character gets its own costume colours. `tint` means `{kind: set, target: <id>, property: tint, value: <colour>, at: 0.0}` on every character in every shot (black makes a silhouette); `part_tints` means the same `set` on each listed part (`<id>/head/left_sclera` to `"#ffffff"` keeps the eyes white inside a black figure); `view` means `{kind: set, target: <id>, property: view, value: <view>, at: 0.0}` in every shot.
 - `generate: promote` (Gilliam, Norstein) means the characters are cut from real art, which the factory cannot make: build stand-ins and say so in `PRODUCTION.md`.
 - **Motion:** tween lengths inside `tween_duration_s`; `easing` is the style's house curves; `motion_presets` are its signature moves (any preset is allowed).
 - **Environment:** a `preset` is a built-in environment `ref`; a `descriptor` is an environment document to write under `assets/environments/`.
@@ -92,7 +92,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "kurzgesagt",
-      "sha256": "3f6883c9190e8c9d104542141325091a4a34ed87fe953624b0a0bd1ecd7351a7"
+      "sha256": "dba16f077b3bdc30ddd8a61d03224e7af39c8747392100b900ae833b8c0478d3"
     }
   },
   "entity_surfaces": {},
@@ -168,7 +168,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "norstein",
-      "sha256": "42b220f04261823c1b9b70d39f3ec560e4626c6dc5a5de891431375946989527"
+      "sha256": "ff7541d307b71a48b0762cdc163bf9052b9d99b29ae045324433017ad9ce8456"
     }
   },
   "entity_surfaces": {},
@@ -215,7 +215,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "oversimplified",
-      "sha256": "ff180201f5762c6d606c821151ab2b253963b347fd75d42d8be689c8f2dbed5b"
+      "sha256": "ae5f1d012d088070909635868334705f388650082ee96f820a7bf7445a724f90"
     }
   },
   "entity_surfaces": {},
@@ -276,7 +276,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
 - **Cost:** `low`, rigid shape characters, a locked camera and flat sets; `an character new --offline --build squat --head-scale 1.3 --hat beanie` characters are close to the look.
 - **meta:** fps: 24; default_easing: linear; step_hz: 12; style_pack: south_park
 - **camera:** default: hold; allowed: hold, push_in
-- **shots:** mean_s: 4.2; range_s: 1.5, 9
+- **shots:** mean_s: 3.2; range_s: 1.5, 9
 - **transitions:** default: kind: cut
 - **characters:** generate: offline; mouth_variants: happy, sad; build: squat; head_scale: 1.3; hat: beanie, cap, none; sash: False; palette: per_character
 - **environment:** preset: indoor
@@ -307,7 +307,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "south_park",
-      "sha256": "46803413697591f765db43c57db265061835246416c1267eb35fb01ece9d571a"
+      "sha256": "54daae444b0010679f0c8dcddfc440020f3b72d1494ddacb9b07592abf818935"
     }
   },
   "surface": {
