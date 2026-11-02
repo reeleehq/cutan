@@ -404,7 +404,17 @@ def _step_changes(
     ([False, True], [False, False])
     """
     grey = frames.astype(np.float32).mean(axis=3)
-    delta = np.abs(grey[1:] - grey[:-1])
+    return step_changes_of(
+        np.abs(grey[1:] - grey[:-1]), min_changed_pixels=min_changed_pixels
+    )
+
+
+def step_changes_of(
+    delta: np.ndarray, *, min_changed_pixels: int = MIN_CHANGED_PIXELS
+) -> tuple[np.ndarray, np.ndarray, float]:
+    """:func:`_step_changes`'s rule on the absolute grey differences ``delta``
+    (``(steps, h, w)``) themselves: what a region's measurement reuses with
+    the rest of the picture zeroed (:mod:`cutan.verify.regions`)."""
     step_diff = delta.mean(axis=(1, 2))
     noise_floor = min(
         NOISE_FLOOR_CAP, float(np.percentile(step_diff, NOISE_FLOOR_PERCENTILE))
@@ -826,6 +836,26 @@ def _probe_fps(mp4: Path) -> float:
     )
 
 
+def _probe_size(mp4: Path) -> tuple[int, int]:
+    """The video stream's ``(width, height)``."""
+    out = _run(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=width,height",
+            "-of",
+            "csv=p=0:s=x",
+            str(mp4),
+        ]
+    ).decode("utf-8").strip()
+    w, h = out.split("x")[:2]
+    return int(w), int(h)
+
+
 def _decode_frames(mp4: Path, *, width: int, height: int) -> np.ndarray:
     raw = _run(
         [
@@ -957,6 +987,9 @@ class StyleLintResult:
     metrics: StyleMetrics | None
     report: VerificationReport
     per_shot: list[ShotMetrics] = field(default_factory=list)
+    #: ``{"mouth": cadence, "body": cadence}`` when the lint had the project to
+    #: find the mouths in (cutan#80, :mod:`cutan.verify.regions`); else ``None``.
+    regions: dict | None = None
 
 
 def style_lint(
@@ -1069,7 +1102,45 @@ def style_lint(
         )
     for f in check_targets(metrics, targets, miss_severity=miss_severity, live=live):
         report.add(f.severity, f.ir_path, f.description, f.suggested_fix)
-    return StyleLintResult(metrics, report, per_shot)
+    regions = _regions(mp4, frames, fps=fps, scene=scene, report=report)
+    return StyleLintResult(metrics, report, per_shot, regions)
+
+
+def _regions(
+    mp4: Path, frames: np.ndarray, *, fps: float, scene: Any, report: Any
+) -> dict | None:
+    """The mouth's and the body's cadence apart (cutan#80), when ``scene`` is a
+    project folder (its stores hold the rigs the mouths are found in); said as
+    an ``info``. A project whose mouths cannot be placed says why, never fails
+    the lint."""
+    if not (isinstance(scene, (str, Path)) and Path(scene).is_dir()):
+        return None
+    from cutan.verify.regions import mouth_masks, region_findings, split_cadence
+
+    try:
+        masks = mouth_masks(
+            scene,
+            n=len(frames),
+            fps=fps,
+            size=(DECODE_WIDTH, DECODE_HEIGHT),
+            render_size=_probe_size(mp4),
+        )
+        if not masks.any():
+            report.add("info", "<style>/regions", "no mouth was found to measure apart from the body")
+            return None
+        cut_steps = [c - 1 for c in _cut_frames_from_shots(
+            [d for _, d in film_shots(_load_scene(scene))], fps, len(frames)
+        )]
+        regions = split_cadence(frames, masks, fps=fps, cut_steps=cut_steps)
+    except Exception as e:  # noqa: BLE001 - an extra measurement that cannot be made is a note
+        report.add(
+            "info",
+            "<style>/regions",
+            f"the mouth and body cadence could not be measured apart: {type(e).__name__}: {e}",
+        )
+        return None
+    report.add("info", "<style>/regions", f"cadence by region: {region_findings(regions)}")
+    return regions
 
 
 class StyleLintVerifier:
