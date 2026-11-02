@@ -15,14 +15,14 @@ cutan/characters/     descriptor schema (CharacterDescriptor), factory (patterns
 cutan/expression/     expression presets, axes, bindings, the face provider
 cutan/compile/        passes.py (the cut-out passes over an.stage.compile), body.py (body-attached props placed by their character), lowering.py (play/expression lowering, swap declaration), coarticulate.py, gaze.py
 cutan/audio/          lip-sync providers (offline, rhubarb, whisper, word timings)
-cutan/impacts/        impact choreography and ground truth;  cutan/verify/style.py: the style lint;  cutan/verify/body.py: the body-continuity check;  cutan/library.py: the character analyser
+cutan/impacts/        impact choreography and ground truth;  cutan/verify/style.py: the style lint;  cutan/verify/body.py: the body-continuity check;  cutan/verify/critic.py: the optional vision critic of body-depicting props (`an character critique-props`);  cutan/library.py: the character analyser
 cutan/carve/          photo/frame → matted, provenance-carrying part: matte strategies, super-resolution strategies (superres.py), refine, head mode, split_parts, write_prop (cutan[carve]); generate.py: art from an image model, keyed and fitted (cutan[generate], `an art generate`, art_cli.py)
 cutan/styles/         the named style specs (*.yaml, package data) and their loader: style_spec(name), style_specs(); python -m cutan.styles
 cutan/body_attachment.py  a prop that depicts a character's limbs: its `metadata.body_attachment` declaration, the socket geometry, place_body_prop
 cutan/motion.py       the rig presets (nod, point, turn, walk, waddle, speech_pulse; an#322) and PRESETS, the table a `play` resolves in
 cutan/runtime/        visuals.js: the procedural mouth and eye, registered through the stage runtime's anRegisterVisual
 cutan/pack.py         check_pack(): the production-pack checker (cutan#87), run by the skill's validate_pack.py and the reelee connector; import_pack(): the pack into a real project (`an pack import`, pack_cli.py)
-cutan/projects_store.py  the projects kind over disk or S3 (ADR-0024; cutan#88, #91): projects_store(), materialize_project(), push_project(), new_project_dir(); projects_cli.py: `an projects push/pull`
+cutan/projects_store.py  the projects kind over disk or S3 (ADR-0024; cutan#88, #91): projects_store(), materialize_project(), push_project(), prune_project(), new_project_dir(); projects_cli.py: `an projects push/pull/prune`
 cutan/bench.py        CUTOUT_FIXTURES and run_bench() over this repo's misc/bench/ corpus
 tests/  examples/  misc/bench/{corpus,golden}/  misc/demos/  misc/docs/ (design notes: locomotion_gaits.md)  .claude/skills/
 skills/cutan-production-pack/  a Claude.ai skill for writers (not loaded by Claude Code here): production packs; its tables are generated and checked by tests/test_production_pack_skill.py

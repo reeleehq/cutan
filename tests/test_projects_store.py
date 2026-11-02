@@ -400,3 +400,30 @@ def test_an_init_by_id_on_s3_lands_in_the_cache_and_is_pushable(tmp_path, monkey
     # A second `an init` of the same id refuses to clobber the project.
     with pytest.raises(FileExistsError):
         init_cli("alice-and-bob", id=True, genre="cutout_animation")
+
+
+def test_prune_deletes_the_stores_copies_of_what_a_push_keeps_local(tmp_path):
+    """Locks pushed before the excludes followed an's .gitignore (cutan#155)."""
+    from cutan.projects_store import prune_project
+
+    folder = _project(tmp_path)
+    store: dict = {}
+    _push("p1", folder, store)
+    lock = "artifacts/voice_options/n.json.lock"
+    store["p1/" + lock] = b""  # pushed by an older cutan, recorded in the store's record
+    record = json.loads(store[RECORD])
+    record["files"][lock] = {"size": 0, "sha256": "e3b0"}
+    store[RECORD] = json.dumps(record).encode()
+    store["p2/" + lock] = b""  # another project: not this prune's
+    shared = "p1/artifacts/shot_cache/blobs/shared"
+    store[shared] = b"blob"  # a shot cache uploaded by hand to share it (#91): stays
+
+    assert prune_project("p1", settings=S3, store=store, dry_run=True) == (lock,)
+    assert "p1/" + lock in store, "a dry run deletes nothing"
+    assert prune_project("p1", settings=S3, store=store) == (lock,)
+    assert "p1/" + lock not in store and "p2/" + lock in store
+    assert lock not in json.loads(store[RECORD])["files"]
+    assert "p1/scene.md" in store and shared in store, "project files and a shared cache stay"
+    out = materialize_project("p1", settings=S3, store=store, cache=tmp_path / "other")
+    assert not (out / lock).exists(), "so no pull brings it back"
+    assert prune_project("p1", settings=S3, store=store) == ()

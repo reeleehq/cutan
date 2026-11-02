@@ -848,6 +848,35 @@ def contract() -> str:
     return _render_contract()
 
 
+def critique_props(project: str = ".", at: str = "0.5", model: str = "") -> str:
+    """Ask a vision model whether each body-depicting prop's hands and sleeves belong to the body on screen (a paid call per prop and shot; warnings, never the gate).
+
+    project: the project folder
+    at: comma-separated instants to probe, as fractions of each shot's length (0 to 1)
+    model: the vision model (default: an's vision judge's)
+    """
+    from cutan.verify.critic import critique_body_props
+
+    try:
+        fractions = [float(x) for x in at.split(",") if x.strip()]
+    except ValueError as e:
+        return failed(f"--at: {e}")
+    if not fractions or any(not 0.0 <= f <= 1.0 for f in fractions):
+        return failed(f"--at: fractions of a shot's length in [0, 1], not {at!r}")
+    report = critique_body_props(project, at=fractions, model=model or None)
+    lines = [f"[{sev}] {where}: {msg}" for sev, where, msg in report.findings]
+    lines.append(
+        f"{len(report.calls)} judge call(s): "
+        + ", ".join(
+            f"{c['shot']}/{c['prop']} ({c['frames']} frame(s), {c['model']})" for c in report.calls
+        )
+        if report.calls
+        else "no judge call made"
+    )
+    text = "\n".join(lines)
+    return failed(text) if any(sev == "error" for sev, _, _ in report.findings) else text
+
+
 def cast(file: str, out_dir: str = "") -> str:
     """Make every character of a cast file (cast.yaml): one entry per character, the options of `an character new` plus its follow-up steps.
 
@@ -882,4 +911,5 @@ _dispatch_funcs = [
     silhouette,
     preview,
     record,
+    critique_props,
 ]
