@@ -16,7 +16,7 @@ cutan/expression/     expression presets, axes, bindings, the face provider
 cutan/compile/        passes.py (the cut-out passes over an.stage.compile), body.py (body-attached props placed by their character), lowering.py (play/expression lowering, swap declaration), coarticulate.py, gaze.py
 cutan/audio/          lip-sync providers (offline, rhubarb, whisper, word timings)
 cutan/impacts/        impact choreography and ground truth;  cutan/verify/style.py: the style lint;  cutan/verify/body.py: the body-continuity check;  cutan/library.py: the character analyser
-cutan/carve/          photo/frame → matted, provenance-carrying part: matte strategies, super-resolution strategies (superres.py), refine, head mode, split_parts, write_prop (cutan[carve])
+cutan/carve/          photo/frame → matted, provenance-carrying part: matte strategies, super-resolution strategies (superres.py), refine, head mode, split_parts, write_prop (cutan[carve]); generate.py: art from an image model, keyed and fitted (cutan[generate], `an art generate`, art_cli.py)
 cutan/styles/         the named style specs (*.yaml, package data) and their loader: style_spec(name), style_specs(); python -m cutan.styles
 cutan/body_attachment.py  a prop that depicts a character's limbs: its `metadata.body_attachment` declaration, the socket geometry, place_body_prop
 cutan/motion.py       the rig presets (nod, point, turn, walk, waddle, speech_pulse; an#322) and PRESETS, the table a `play` resolves in
@@ -36,7 +36,7 @@ skills/cutan-production-pack/  a Claude.ai skill for writers (not loaded by Clau
 - **A change to any module here changes the core's shot-cache key** (`an.stage.cache_key.genre_code_modules` keys every module of this package), so a cut-out shot re-renders after an upgrade. That is intended.
 - `cutan.REQUIRED_AN_API_LEVEL` is the lowest `an.genres.API_LEVEL` this package runs against (instead of a version pin: `an`'s version is assigned by CI at merge). Raise it in the same change that uses a new seam.
 - Local packages carry no version pins: `an`, not `an>=…`.
-- One `CLI`: `cutan` adds no console script. Its commands are `an character …`, `an impacts …` and `an projects …`.
+- One `CLI`: `cutan` adds no console script. Its commands are `an character …`, `an impacts …`, `an projects …` and `an art …`.
 - Shims in `an` (`an.characters`, `an.expression`, `an.impacts`, `an.audio.*_lipsync`, `an.verify.style`, `an.library.character`, `an.genres.cutout`, `an.genre`, `an.adapters.cutout.{coarticulate,gaze}`, and the rig presets' names in `an.motion`, an#322) are removed when no package under `$PP` imports an old path and 14 days have passed (checked by a script, not by memory).
 - Decisions of the move (the lead's, 2026-10-02): the bench *runner* stays in `an` (generic); skill names `cutan-style` and `cutan-dev-*`, with stubs of the old names left in `an` for one cycle; `an.genres.API_LEVEL` instead of a version floor.
 
