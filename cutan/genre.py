@@ -54,6 +54,7 @@ from cutan.verify.body import (
     BODY_ATTACHMENT_CONSISTENCY,
     check_body_attachments,
 )
+from cutan.characters.framing import character_shot_sizes
 from cutan.characters.methods import (
     CUTOUT_ASPECTS,
     CUTOUT_METHODS,
@@ -61,7 +62,6 @@ from cutan.characters.methods import (
     check_declared_speech,
     check_walk_gaits,
 )
-from cutan.characters.framing import character_shot_sizes
 from cutan.characters.hands import character_landmarks
 from cutan.characters.registration import CHARACTER, PLAY, character_specimen
 from cutan.characters.vocabulary import CUTOUT_VOCABULARY
