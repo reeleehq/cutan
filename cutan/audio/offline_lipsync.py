@@ -8,6 +8,11 @@ into a single keyframe so the mouth doesn't "stutter" on long vowel runs.
 Crude but visible. Use ``RhubarbLipSync`` for real phoneme alignment once
 you've installed the Rhubarb binary.
 
+A clip that knows its timings is followed instead of spread: its phones first
+(``AudioClip.phones``, a take timed by a forced aligner, an#491: each phone's own
+mouth shape, :mod:`cutan.audio.phones`), else its words (``AudioClip.words``,
+an#490: each word's letters over its span).
+
 >>> from an.audio.tts import AudioClip
 >>> ls = OfflineLipSync()
 >>> track = ls.align(AudioClip(duration=1.0, transcript="hello"), "hello")
@@ -25,6 +30,8 @@ from typing import Iterable
 
 from an.audio.lipsync import Viseme, VisemeTrack, word_timings_to_visemes
 from an.audio.tts import AudioClip
+
+from cutan.audio.phones import PhoneToViseme, clip_timings, phone_viseme, phones_track
 
 # Map a single ASCII character (lowercased) to a Rhubarb viseme letter.
 # A=closed (P/B/M, rest), B=tight open (D/S/T/Z/N/L), C=eh, D=ah/wide,
@@ -74,10 +81,7 @@ def clip_words(audio: AudioClip) -> list[tuple[str, float, float]] | None:
     >>> clip_words(AudioClip(duration=1.0)) is None
     True
     """
-    words = getattr(audio, "words", None)
-    if not words:
-        return None
-    return [(str(w[0]), float(w[1]), float(w[2])) for w in words]
+    return clip_timings(audio, "words")
 
 
 class OfflineLipSync:
@@ -93,12 +97,31 @@ class OfflineLipSync:
     repeatable: bool = True
     billed: bool = False
 
-    def __init__(self, *, char_to_viseme: dict[str, str] | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        char_to_viseme: dict[str, str] | None = None,
+        phone_to_viseme: PhoneToViseme = phone_viseme,
+    ) -> None:
         self._mapping = (
             dict(char_to_viseme) if char_to_viseme else dict(_CHAR_TO_VISEME)
         )
+        self._phone_to_viseme = phone_to_viseme
 
     def align(self, audio: AudioClip, transcript: str) -> VisemeTrack:
+        # The aligner said which sound is when (an#491): each phone's own mouth
+        # shape, not a word's letters spread over its span (a word with no
+        # phones under it keeps its letters). A phone the table does not know
+        # leaves this to the words below.
+        from_phones = phones_track(
+            audio,
+            phone_to_viseme=self._phone_to_viseme,
+            char_to_viseme=self._mapping,
+            rest_viseme=_REST_VISEME,
+            convention=self.convention,
+        )
+        if from_phones is not None:
+            return from_phones
         words = clip_words(audio)
         if words:
             # The clip knows when its words were spoken (a recorded take imported
