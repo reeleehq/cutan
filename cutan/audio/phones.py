@@ -29,7 +29,9 @@ from an.audio.tts import AudioClip
 
 #: ``(label, start_s, end_s)``, as ``AudioClip.phones`` and ``.words`` hold them.
 Timing = tuple[str, float, float]
-#: ``phone_to_viseme(phone, alphabet=...)``: a Rhubarb shape, or ``None`` when unknown.
+#: ``phone_to_viseme(phone, *, alphabet)``: a Rhubarb shape, or ``None`` when
+#: unknown (``alphabet`` is the clip's, :func:`phone_alphabet`). Silences never
+#: reach it: they are the rest shape.
 PhoneToViseme = Callable[..., Optional[str]]
 
 REST_VISEME: str = "X"
@@ -217,12 +219,14 @@ def phones_to_visemes(
     alphabet = phone_alphabet(p for p, _, _ in phones)
     segments: list[Timing] = []
     for phone, start, stop in phones:
-        code = phone_to_viseme(str(phone), alphabet=alphabet)
+        silent = _is_silence(str(phone))
+        code = rest_viseme if silent else phone_to_viseme(str(phone), alphabet=alphabet)
         if code is None:
             return None
         segments.append((code, float(start), float(stop)))
+    spoken = [(s, e) for p, s, e in phones if not _is_silence(str(p))]
     for word in words:
-        if not any(word[1] <= (s + e) / 2 <= word[2] for _, s, e in phones):
+        if word[2] > word[1] and not any(word[1] <= (s + e) / 2 <= word[2] for s, e in spoken):
             segments += _letter_segments(word, char_to_viseme or {})
     return _keyframes(
         segments,

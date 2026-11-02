@@ -161,3 +161,13 @@ def test_unsorted_phones_are_read_in_time_order():
     shuffled = [ARPA[2], ARPA[0], ARPA[3], ARPA[1]]
     track = OfflineLipSync().align(_clip(phones=shuffled), "mama")
     assert _shapes(track) == SHAPES + [(1.5, "X")]
+
+
+def test_a_silence_label_does_not_cover_a_word_and_a_zero_length_word_adds_nothing():
+    words = [("gwendolyn", 0.0, 0.6), ("zero", 0.7, 0.7)]
+    phones = [("spn", 0.0, 0.6), ("M", 0.6, 0.8)]
+    got = phones_to_visemes(phones, total_duration=1.0, words=words, rest_viseme="R")
+    codes = [v.code for v in got if v.time < 0.6][1:]  # after the leading rest
+    assert codes and set(codes) - {"R", "X"}  # the name is spoken
+    assert not [v for v in got if v.time == 0.7]
+    assert {v.code for v in got} <= {"R", "A", "B", "C", "D", "E", "F", "G", "H"}
