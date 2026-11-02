@@ -146,11 +146,11 @@ import json, sys
 from pathlib import Path
 from an.audio.effects import voice_effects
 from an.audio.elevenlabs_tts import ElevenLabsTTS
-from an.audio.loudness import _offset
+from an.audio.loudness import voice_loudness_offset
 voices = {p.stem: json.loads(p.read_text()) for p in sorted(Path(sys.argv[1]).glob('*.json'))}
 mall = {'voices': voices}
 for key, doc in voices.items():
-    checks = [lambda: voice_effects(mall, key), lambda: _offset(mall, key)]
+    checks = [lambda: voice_effects(mall, key), lambda: voice_loudness_offset(mall, key)]
     if doc.get('provider') == 'elevenlabs':
         checks.append(lambda: ElevenLabsTTS(api_key='never-called').synthesis_options(doc, emotion=None, direction=None))
     for check in checks:

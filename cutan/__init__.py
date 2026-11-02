@@ -70,7 +70,9 @@ PROJECT_STORE_RECORD: str = ".an/projects_store.json"
 #: Level 10: ``an.stores._common.asset_references`` and ``asset_ref_problems`` (an#552).
 #: Level 11: the first level whose every release ships ``an.stage.solve.solve_report``
 #: (an#570 merged after level 10 was cut), which the body-continuity check reads.
-REQUIRED_AN_API_LEVEL: int = 11
+#: Level 13: the names cutan's checks and pack read, public (an#710): ``an.ir.validate.rig_scope``,
+#: ``an.semantic.matcher.lookup_method`` and ``as_choice``, ``an.audio.loudness.voice_loudness_offset``.
+REQUIRED_AN_API_LEVEL: int = 13
 
 
 def require_an() -> None:

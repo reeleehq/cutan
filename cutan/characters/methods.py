@@ -800,13 +800,13 @@ def normalise_gait_args(args: Mapping[str, Any]) -> dict[str, Any]:
     """
     from cutan.characters.schema import GAITS
     from an.semantic import Choice
-    from an.semantic.matcher import _as_choice, _method
+    from an.semantic.matcher import as_choice, lookup_method
 
     gait = args.get("gait")
     if gait is None or (isinstance(gait, str) and gait in GAITS):
         return dict(args)
-    choice = _as_choice(gait, LOCOMOTION)
-    method = _method(choice, LOCOMOTION)
+    choice = as_choice(gait, LOCOMOTION)
+    method = lookup_method(choice, LOCOMOTION)
     rest = {k: v for k, v in args.items() if k != "gait"}
     extra = dict(choice.args) if isinstance(choice, Choice) else {}
     return {**extra, **rest, "gait": method.term}
@@ -824,12 +824,12 @@ def speech_problems(declared: Any) -> list[str]:
     True
     """
     from an.semantic import VocabularyError
-    from an.semantic.matcher import _as_choice, _method
+    from an.semantic.matcher import as_choice, lookup_method
 
     if declared is None:
         return []
     try:
-        _method(_as_choice(declared, SPEECH), SPEECH)
+        lookup_method(as_choice(declared, SPEECH), SPEECH)
     except VocabularyError as e:
         name = declared.get("method") if isinstance(declared, Mapping) else declared
         return [f"speech {name!r} cannot be honoured: {e}"]
@@ -1095,7 +1095,7 @@ def check_walk_gaits(ctx) -> None:
     from pydantic import ValidationError
 
     from an.ir.compose import flatten
-    from an.ir.validate import _rig_scope
+    from an.ir.validate import rig_scope
     from an.semantic import VocabularyError
     from an.stores._common import art_exists_for
 
@@ -1104,7 +1104,7 @@ def check_walk_gaits(ctx) -> None:
     from cutan.styles.policy import policy_in_force
     from cutan.motion import DFLT_TURN_SET
 
-    rigs, unchecked = _rig_scope(ctx.shot, ctx.stores)
+    rigs, unchecked = rig_scope(ctx.shot, ctx.stores)
     resolved = _turns_of(ctx, ctx.index, ctx.shot)
     if resolved is not None:
         resolution, origin = resolved
