@@ -152,7 +152,7 @@ def _first_json_object(text: str) -> Any:
     return None
 
 
-_LEADING_ANSWER = re.compile(r"^\W*(yes|no)\b", re.I)
+_LEADING_ANSWER = re.compile(r"^\W*(yes|no)\b(?!\s*/)", re.I)
 
 
 def parse_answers(reply: str, checklist: Sequence[Question]) -> list[dict[str, Any]] | None:
@@ -170,13 +170,15 @@ def parse_answers(reply: str, checklist: Sequence[Question]) -> list[dict[str, A
     if not isinstance(raw, list):
         return None
     by_n = {}
-    for item in raw:
+    for position, item in enumerate(raw, 1):
         if not isinstance(item, dict):
             continue
-        n = item.get("n")
+        n = item.get("n", position)  # an unnumbered answer is read by its place
         n = int(n) if isinstance(n, str) and n.strip().isdigit() else n
         if not isinstance(n, int) or isinstance(n, bool):
             continue
+        if not 1 <= n <= len(checklist):
+            return None  # numbered from 0, or past the end: the answers would shift
         m = _LEADING_ANSWER.match(str(item.get("answer", "")))
         by_n[n] = {"n": n, "answer": m.group(1).lower() if m else "unsure", "why": str(item.get("why", ""))}
     if not by_n:
@@ -239,15 +241,7 @@ def critique_body_props(
     if not at or any(not 0.0 <= f <= 1.0 for f in at):
         raise ValueError(f"`at` holds fractions of a shot's length in [0, 1], not {list(at)}")
     report = CritiqueReport()
-    if judge is None:
-        try:
-            import anthropic  # noqa: F401 - the default judge's SDK, checked before any probe
-        except ImportError:
-            report.findings.append(
-                ("error", "", "the body critic's default judge needs the anthropic SDK: pip install an[vision]")
-            )
-            return report
-        judge = _envelope_judge(model)
+    custom = judge is not None
     project = load(project) if not hasattr(project, "scene") else project
     frames = frames or _default_frames
     props = project.mall.get("props")
@@ -264,23 +258,37 @@ def critique_body_props(
             if ba is None:
                 continue
             char_entity, character = bound_character(shot, entity, ba)
-            if char_entity is None and ba.view != FIRST_PERSON:
-                continue  # nobody on screen to belong to: the body check says so
+            if (char_entity is None) != (ba.view == FIRST_PERSON):
+                # nobody on screen for the arms to belong to, or a first-person
+                # prop with its own body in view: the body check reports both
+                continue
             checklist = checklist_for(ba.view, checklists)
             if not checklist:
                 continue
-            prompt = checklist_prompt(checklist, prop=entity.id, character=character or "the character")
+            prop = entity.ref or entity.id  # "wheel", not the entity's id
+            prompt = checklist_prompt(checklist, prop=prop, character=character or "the character")
+            if judge is None:
+                try:
+                    import anthropic  # noqa: F401 - the default judge's SDK, checked before paying
+                except ImportError:
+                    report.findings.append(
+                        ("error", "", "the body critic's default judge needs the anthropic SDK: pip install an[vision]")
+                    )
+                    return report
+                judge = _envelope_judge(model)
             try:
                 if shown is None:
                     shown = frames(project, shot.id, [f * shot.duration for f in at])
+                if not shown:
+                    raise ValueError(f"the probe of shot {shot.id!r} gave no frames")
                 answer = judge(shown, prompt=prompt)
             except Exception as e:  # noqa: BLE001 - configured and broken is a failure, said aloud
                 report.findings.append(
                     ("error", where, f"the body critic could not judge prop {entity.id!r}: {type(e).__name__}: {e}")
                 )
                 continue
-            reply = answer.get("reply", "") if isinstance(answer, Mapping) else str(answer)
-            used = answer.get("model", model) if isinstance(answer, Mapping) else model
+            reply = str((answer.get("reply") if isinstance(answer, Mapping) else answer) or "")
+            used = answer.get("model") if isinstance(answer, Mapping) else (None if custom else model)
             report.calls.append({"shot": shot.id, "prop": entity.id, "frames": len(shown), "model": used})
             answers = parse_answers(reply, checklist)
             if answers is None:
@@ -289,7 +297,7 @@ def critique_body_props(
                 )
                 continue
             for q, a in zip(checklist, answers):
-                text = q.text.format(prop=entity.id, character=character or "the character")
+                text = q.text.format(prop=prop, character=character or "the character")
                 if a["answer"] == "unsure":
                     report.findings.append(("info", where, f"body critic, unsure: {text}"))
                 elif a["answer"] != q.expected:

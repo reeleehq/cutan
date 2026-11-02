@@ -859,9 +859,11 @@ def critique_props(project: str = ".", at: str = "0.5", model: str = "") -> str:
 
     try:
         fractions = [float(x) for x in at.split(",") if x.strip()]
-        report = critique_body_props(project, at=fractions, model=model or None)
     except ValueError as e:
         return failed(f"--at: {e}")
+    if not fractions or any(not 0.0 <= f <= 1.0 for f in fractions):
+        return failed(f"--at: fractions of a shot's length in [0, 1], not {at!r}")
+    report = critique_body_props(project, at=fractions, model=model or None)
     lines = [f"[{sev}] {where}: {msg}" for sev, where, msg in report.findings]
     lines.append(
         f"{len(report.calls)} judge call(s): "

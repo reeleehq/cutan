@@ -170,3 +170,29 @@ def test_the_envelope_names_the_model_and_bad_instants_are_refused(project):
     assert report.calls[0]["model"] == "m-1"
     with pytest.raises(ValueError, match="fractions"):
         critique_body_props(project, judge=Judge(""), frames=_frames([]), at=(1.5,))
+
+
+def test_replies_that_would_shift_or_break_are_errors_not_answers(project):
+    zero_based = json.dumps({"answers": [{"n": n, "answer": "no"} for n in range(3)]})
+    for reply in (zero_based, {"reply": None}):
+        report = critique_body_props(project, judge=lambda frames, *, prompt, r=reply: r, frames=_frames([]))
+        assert [f[0] for f in report.findings] == ["error"], reply
+    unnumbered = json.dumps({"answers": [{"answer": "yes"}, {"answer": "Yes/No"}, {"answer": "yes"}]})
+    report = critique_body_props(project, judge=Judge(unnumbered), frames=_frames([]))
+    assert [f[0] for f in report.findings] == ["info"], "read by place; 'Yes/No' is unsure"
+    assert report.calls[0]["model"] is None, "a custom judge's model is not guessed"
+
+
+def test_no_frames_is_an_error_not_a_paid_call(project):
+    judge = Judge(_reply("yes", "no", "yes"))
+    report = critique_body_props(project, judge=judge, frames=lambda project, shot, times: [])
+    assert [f[0] for f in report.findings] == ["error"] and judge.prompts == []
+
+
+def test_a_first_person_prop_with_its_body_in_view_is_left_to_the_body_check(project):
+    e = _entity
+    shot = Shot(id="pov", renderer="cutout", duration=1.0,
+                entities=[e("character", "ned", "ned", "characters"), e("prop", "p", "pov", "props")])  # fmt: skip
+    judge = Judge(_reply("yes", "no"))
+    critique_body_props(_with_shots(project, shot), judge=judge, frames=_frames([]))
+    assert judge.prompts == []
