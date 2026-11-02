@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cutan"
-version = "0.0.91"
+version = "0.0.92"
 description = "Cut-out animation for an: rigged characters, faces, lip-sync and styles, as a genre package on the an core."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -61,6 +61,12 @@ nw = [
 # for carve_head's face locator. All imported lazily: `import cutan` needs none.
 carve = [
     "opencv-python-headless",
+]
+# cutan.carve.generate (cutan#100): art from an image model through aix, keyed
+# by carve's chroma matte. Imported lazily.
+generate = [
+    "cutan[carve]",
+    "aix",
 ]
 rembg = [
     "cutan[carve]",
