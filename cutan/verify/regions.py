@@ -2,25 +2,29 @@
 
 The style lint (:mod:`cutan.verify.style`) measures the whole frame, so a
 lip-synced line on a still body reads as body motion. For an ``an`` render the
-mouth's screen rectangle is known at every frame: the compiled shot has the
-mouth node (``<character>/head/mouth``), and ``an`` gives its box at any pose
-(``an.stage.timeline.node_box`` over ``evaluate_timeline``). So each frame step
-splits in two:
+mouth is known at every frame, from the compiled shots:
 
-- **mouth**: the step changed pixels inside the mouths' boxes (of either frame);
-- **body**: the step changed the picture outside them, by the lint's own rule
-  (the frame-wide mean, or the local change of :data:`~cutan.verify.style.MIN_CHANGED_PIXELS`).
+- **mouth**: a step changes the mouth when a mouth's swap channel (``viseme``,
+  and its ``viseme@<form>`` variants) changes value between the two frames:
+  exactly the lip-sync's own steps, whatever the head does around it;
+- **body**: the lint's own change rule (:func:`~cutan.verify.style.changes_from_stats`)
+  on the picture with the mouths' boxes left out. A mouth's art can draw past
+  its box (an open viseme), so each box is grown by :data:`MOUTH_GROW` of its
+  size before it is left out.
 
-:func:`split_cadence` is the pure measurement (frames and masks in);
-:func:`mouth_masks` builds the masks from a project. Reference footage has no
-project, so this measures our renders only (a face locator for footage is
-separate research).
+The mouths are found by their channel, not by a node's name: any node a
+``viseme`` set swaps. :func:`mouth_track` compiles the shots and reads the
+channel and the boxes (from the IR shots, not yet exactly the render's
+preparation: reeleehq/an#733); :func:`split_cadence` measures, streaming the frames
+(no per-pixel mask of the whole film is held). Reference footage has no rig,
+so this measures our renders only (a face locator for footage is research).
 """
 
 from __future__ import annotations
 
 import warnings
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
@@ -28,83 +32,58 @@ import numpy as np
 from cutan.verify.style import (
     MIN_CHANGED_PIXELS,
     PIXEL_CHANGE_DELTA,
-    _cadence,
-    step_changes_of,
+    cadence_of,
+    changes_from_stats,
 )
 
-#: A mouth step counts when at least this many pixels inside the mouths' boxes
-#: (at the decode size) move by more than ``PIXEL_CHANGE_DELTA``: a mouth at
-#: 320x180 is a few pixels across, so a swap changes a handful.
-MOUTH_MIN_CHANGED_PIXELS: int = 2
-#: The mouth's box is grown by this many decode pixels, for anti-aliasing and
-#: the art's slack in its box.
-MOUTH_MARGIN_PX: int = 1
-MOUTH_NODE: str = "mouth"
+#: The swap channel that draws a mouth (and its ``viseme@<form>`` variants).
+MOUTH_CHANNEL: str = "viseme"
+#: Each mouth box is grown by this share of its own width and height on every
+#: side before the body is measured without it: an open viseme draws past the
+#: box the closed one sizes. Measured on the corpus dialogue render (a mouth box
+#: 4 render px tall): at 0.5 two lip-sync steps still leaked into the body, at
+#: 1.0 none did, and only the head's real move remained.
+MOUTH_GROW: float = 1.0
+#: Frames are read this many at a time when the body is measured.
+CHUNK_FRAMES: int = 256
+
+Box = tuple[int, int, int, int]
 
 
-def split_cadence(
-    frames: np.ndarray,
-    masks: np.ndarray,
-    *,
-    fps: float,
-    cut_steps: Sequence[int] = (),
-    min_mouth_pixels: int = MOUTH_MIN_CHANGED_PIXELS,
-    min_changed_pixels: int = MIN_CHANGED_PIXELS,
-) -> dict[str, dict[str, float]]:
-    """``{"mouth": cadence, "body": cadence}`` of ``frames`` (``(n, h, w, 3)``),
-    ``masks`` (``(n, h, w)`` bool) marking the mouths in each frame. A step's
-    region is the union of its two frames' masks. The cadence dicts are the
-    lint's own (:func:`cutan.verify.style._cadence`): identical-frame share, pose
-    changes per second, 1/2/3+ interval shares, longest hold. ``cut_steps``:
-    steps into a cut, left out of cadence as the lint does.
+@dataclass
+class MouthTrack:
+    """Per film frame: the mouths' boxes (decode pixels, grown) and the values of
+    their swap channels (a change of value is a mouth step)."""
 
-    >>> f = np.zeros((5, 20, 20, 3), np.uint8)
-    >>> f[1:, 2:4, 2:4] = 255; f[3:, 2:4, 2:4] = 0     # the mouth: on at 1, off at 3
-    >>> m = np.zeros((5, 20, 20), bool); m[:, 1:5, 1:5] = True
-    >>> out = split_cadence(f, m, fps=12.0, min_changed_pixels=1)
-    >>> out["mouth"]["pose_changes_per_s"] > 0, out["body"]["pose_changes_per_s"]
-    (True, 0.0)
-    """
-    if len(frames) < 2:
-        raise ValueError("the cadence needs at least two frames")
-    if masks.shape != frames.shape[:3]:
-        raise ValueError(f"masks {masks.shape} do not match frames {frames.shape[:3]}")
-    region = masks[1:] | masks[:-1]
-    grey = frames.astype(np.float32).mean(axis=3)
-    delta = np.abs(grey[1:] - grey[:-1])
-    mouth_moved = ((delta > PIXEL_CHANGE_DELTA) & region).reshape(len(region), -1).sum(axis=1)
-    mouth_changed = mouth_moved >= min_mouth_pixels
-    # the body: the lint's own rule, on the differences with the mouths zeroed
-    _, body, _ = step_changes_of(
-        np.where(region, 0.0, delta), min_changed_pixels=min_changed_pixels
-    )
-    cuts = set(cut_steps)
-    return {
-        "mouth": _cadence(mouth_changed, cut_steps=cuts, fps=fps),
-        "body": _cadence(body, cut_steps=cuts, fps=fps),
-    }
+    boxes: list[list[Box]] = field(default_factory=list)
+    states: list[tuple] = field(default_factory=list)
+
+    def any(self) -> bool:
+        return any(self.boxes)
 
 
-def mouth_masks(
+def _is_mouth_channel(prop: str) -> bool:
+    return prop == MOUTH_CHANNEL or prop.startswith(MOUTH_CHANNEL + "@")
+
+
+def mouth_track(
     project: Any,
     *,
     n: int,
     fps: float,
     size: tuple[int, int],
     render_size: tuple[int, int],
-    margin: int = MOUTH_MARGIN_PX,
-) -> np.ndarray:
-    """``(n, h, w)`` bool: where the characters' mouths are in each of the film's
-    ``n`` frames, at the decode ``size`` (w, h), for a render at
-    ``render_size`` (w, h). Each shot is compiled as ``an`` renders it (a world
-    lowered first), placed at its film start (``an.assemble.film_timeline``),
-    and its mouth nodes boxed at every frame's pose.
-    """
+    grow: float = MOUTH_GROW,
+) -> MouthTrack:
+    """Where the mouths are, and what they show, in each of the film's ``n``
+    frames, at the decode ``size`` (w, h) of a render at ``render_size`` (w, h).
+    Each shot is compiled (a world lowered first), placed at its film start
+    (``an.assemble.film_timeline``) and read over its whole length, so during a
+    dissolve both shots' mouths count."""
     from an.assemble import film_timeline
     from an.project import load
     from an.stage.compile import compile_shot
     from an.stage.timeline import evaluate_timeline, node_box, timeline_from_scene
-    from an.stage.tree import walk_document
 
     project = load(project) if not hasattr(project, "scene") else project
     scene = project.scene
@@ -115,41 +94,82 @@ def mouth_masks(
     w, h = size
     rw, rh = render_size
     sx, sy = w / rw, h / rh
-    masks = np.zeros((n, h, w), bool)
+    track = MouthTrack([[] for _ in range(n)], [() for _ in range(n)])
     shots = list(scene.timeline)
     tl = film_timeline(shots, fps=fps)
-    ends = [*tl.starts[1:], tl.total_frames]
-    for shot, start, end in zip(shots, tl.starts, ends):
-        chars = {e.id for e in shot.entities if e.kind == "character"}
-        if not chars:
-            continue
+    for shot, start in zip(shots, tl.starts):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            doc = compile_shot(shot, project.mall, fps=fps, width=rw, height=rh)
-        mouths = [
-            path
-            for path, _ in walk_document(doc)
-            if path.rsplit("/", 1)[-1] == MOUTH_NODE and path.split("/", 1)[0] in chars
-        ]
-        if not mouths:
-            continue
+            doc = compile_shot(shot, project.mall, fps=int(round(fps)), width=rw, height=rh)
         timeline = timeline_from_scene(doc)
-        for i in range(max(0, end - start)):
+        frames = int(round(shot.duration * fps))
+        for i in range(frames):
             frame = start + i
             if frame >= n:
                 break
             pose = evaluate_timeline(timeline, i / fps)
-            for path in mouths:
+            channels = sorted((k, str(v)) for k, v in pose.items() if _is_mouth_channel(k[1]))
+            if not channels:
+                continue
+            track.states[frame] = track.states[frame] + tuple(channels)
+            for path in dict.fromkeys(k[0] for k, _ in channels):
                 box = node_box(doc, path, pose=pose)
                 if box is None:
                     continue
-                x0 = max(0, int(np.floor(box[0] * sx)) - margin)
-                y0 = max(0, int(np.floor(box[1] * sy)) - margin)
-                x1 = min(w, int(np.ceil(box[2] * sx)) + margin)
-                y1 = min(h, int(np.ceil(box[3] * sy)) + margin)
+                gx, gy = grow * (box[2] - box[0]), grow * (box[3] - box[1])
+                x0 = max(0, int(np.floor((box[0] - gx) * sx)))
+                y0 = max(0, int(np.floor((box[1] - gy) * sy)))
+                x1 = min(w, int(np.ceil((box[2] + gx) * sx)))
+                y1 = min(h, int(np.ceil((box[3] + gy) * sy)))
                 if x1 > x0 and y1 > y0:
-                    masks[frame, y0:y1, x0:x1] = True
-    return masks
+                    track.boxes[frame].append((x0, y0, x1, y1))
+    return track
+
+
+def split_cadence(
+    frames: np.ndarray,
+    track: MouthTrack,
+    *,
+    fps: float,
+    cut_steps: Sequence[int] = (),
+    min_changed_pixels: int = MIN_CHANGED_PIXELS,
+) -> dict[str, dict[str, float]]:
+    """``{"mouth": cadence, "body": cadence}`` of ``frames`` (``(n, h, w, 3)``),
+    in the lint's own statistics (:func:`cutan.verify.style.cadence_of`). A mouth
+    step is a change of a mouth channel's value; a body step is the lint's rule
+    on the picture with the boxes of both frames of the step left out.
+    ``cut_steps``: steps into a cut, left out of cadence as the lint does.
+
+    >>> f = np.zeros((5, 20, 20, 3), np.uint8)
+    >>> f[1:3, 2:4, 2:4] = 255                       # the mouth opens at 1, shuts at 3
+    >>> t = MouthTrack([[(1, 1, 5, 5)]] * 5, [(("m", "X"),), (("m", "A"),), (("m", "A"),), (("m", "X"),), (("m", "X"),)])
+    >>> out = split_cadence(f, t, fps=12.0, min_changed_pixels=1)
+    >>> out["mouth"]["pose_changes_per_s"] > 0, out["body"]["pose_changes_per_s"]
+    (True, 0.0)
+    """
+    n = len(frames)
+    if n < 2:
+        raise ValueError("the cadence needs at least two frames")
+    if len(track.boxes) != n or len(track.states) != n:
+        raise ValueError(f"the mouth track has {len(track.boxes)} frames, the film {n}")
+    mouth = np.array([track.states[k] != track.states[k + 1] for k in range(n - 1)])
+    step_diff = np.empty(n - 1, np.float32)
+    moved = np.empty(n - 1, np.int64)
+    for lo in range(0, n - 1, CHUNK_FRAMES):
+        hi = min(n - 1, lo + CHUNK_FRAMES)
+        grey = frames[lo : hi + 1].astype(np.float32).mean(axis=3)
+        delta = np.abs(grey[1:] - grey[:-1])
+        for k in range(lo, hi):
+            for x0, y0, x1, y1 in (*track.boxes[k], *track.boxes[k + 1]):
+                delta[k - lo, y0:y1, x0:x1] = 0.0
+        step_diff[lo:hi] = delta.mean(axis=(1, 2))
+        moved[lo:hi] = (delta > PIXEL_CHANGE_DELTA).reshape(hi - lo, -1).sum(axis=1)
+    _, body, _ = changes_from_stats(step_diff, moved, min_changed_pixels=min_changed_pixels)
+    cuts = set(cut_steps)
+    return {
+        "mouth": cadence_of(mouth, cut_steps=cuts, fps=fps),
+        "body": cadence_of(body, cut_steps=cuts, fps=fps),
+    }
 
 
 def region_findings(regions: Mapping[str, Mapping[str, float]]) -> str:

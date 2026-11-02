@@ -404,30 +404,33 @@ def _step_changes(
     ([False, True], [False, False])
     """
     grey = frames.astype(np.float32).mean(axis=3)
-    return step_changes_of(
-        np.abs(grey[1:] - grey[:-1]), min_changed_pixels=min_changed_pixels
+    delta = np.abs(grey[1:] - grey[:-1])
+    moved = (delta > PIXEL_CHANGE_DELTA).reshape(len(delta), -1).sum(axis=1)
+    return changes_from_stats(
+        delta.mean(axis=(1, 2)), moved, min_changed_pixels=min_changed_pixels
     )
 
 
-def step_changes_of(
-    delta: np.ndarray, *, min_changed_pixels: int = MIN_CHANGED_PIXELS
+def changes_from_stats(
+    step_diff: np.ndarray,
+    moved: np.ndarray,
+    *,
+    min_changed_pixels: int = MIN_CHANGED_PIXELS,
 ) -> tuple[np.ndarray, np.ndarray, float]:
-    """:func:`_step_changes`'s rule on the absolute grey differences ``delta``
-    (``(steps, h, w)``) themselves: what a region's measurement reuses with
-    the rest of the picture zeroed (:mod:`cutan.verify.regions`)."""
-    step_diff = delta.mean(axis=(1, 2))
+    """:func:`_step_changes`'s rule from each step's mean grey difference and
+    its count of pixels moved past :data:`PIXEL_CHANGE_DELTA`: what a region's
+    measurement reuses on the rest of the picture (:mod:`cutan.verify.regions`)."""
     noise_floor = min(
         NOISE_FLOOR_CAP, float(np.percentile(step_diff, NOISE_FLOOR_PERCENTILE))
     )
     threshold = max(MIN_CHANGE_THRESHOLD, NOISE_FLOOR_MULTIPLIER * noise_floor)
     changed = step_diff > threshold
     if min_changed_pixels > 0:
-        moved = (delta > PIXEL_CHANGE_DELTA).reshape(len(delta), -1).sum(axis=1)
         changed |= moved >= min_changed_pixels
     return step_diff, changed, threshold
 
 
-def _cadence(changed: np.ndarray, *, cut_steps: set[int], fps: float) -> dict:
+def cadence_of(changed: np.ndarray, *, cut_steps: set[int], fps: float) -> dict:
     """The hold and cadence statistics of one run of steps (a clip or a shot).
 
     Cadence ignores the step INTO a cut: that is an edit, not a pose change.
@@ -502,7 +505,7 @@ def measure_style(
     bounds = [0, *cuts, n]
     shots = [(b - a) / fps for a, b in zip(bounds[:-1], bounds[1:])]
 
-    cadence = _cadence(changed, cut_steps={c - 1 for c in cuts}, fps=fps)
+    cadence = cadence_of(changed, cut_steps={c - 1 for c in cuts}, fps=fps)
     sat, dark, top16 = _palette_stats(frames)
     r3 = _r3
     return StyleMetrics(
@@ -594,7 +597,7 @@ def measure_shots(
                 start_s=_r3(a / fps),
                 duration_s=_r3((b - a) / fps),
                 frames=b - a,
-                **_cadence(steps, cut_steps=set(), fps=fps),
+                **cadence_of(steps, cut_steps=set(), fps=fps),
             )
         )
     return rows
@@ -1102,36 +1105,43 @@ def style_lint(
         )
     for f in check_targets(metrics, targets, miss_severity=miss_severity, live=live):
         report.add(f.severity, f.ir_path, f.description, f.suggested_fix)
-    regions = _regions(mp4, frames, fps=fps, scene=scene, report=report)
+    regions = _regions(
+        mp4, frames, fps=fps, scene=scene, shot_durations=shot_durations, report=report
+    )
     return StyleLintResult(metrics, report, per_shot, regions)
 
 
 def _regions(
-    mp4: Path, frames: np.ndarray, *, fps: float, scene: Any, report: Any
+    mp4: Path,
+    frames: np.ndarray,
+    *,
+    fps: float,
+    scene: Any,
+    shot_durations: Sequence[float] | None,
+    report: Any,
 ) -> dict | None:
-    """The mouth's and the body's cadence apart (cutan#80), when ``scene`` is a
-    project folder (its stores hold the rigs the mouths are found in); said as
-    an ``info``. A project whose mouths cannot be placed says why, never fails
-    the lint."""
-    if not (isinstance(scene, (str, Path)) and Path(scene).is_dir()):
-        return None
-    from cutan.verify.regions import mouth_masks, region_findings, split_cadence
+    """The mouth's and the body's cadence apart (cutan#80), when the project is
+    at hand: ``scene`` as a project folder or its ``ir/scene.json``, else the
+    project a render under ``<project>/output/`` came from. Said as an ``info``;
+    a project whose mouths cannot be placed says why, never fails the lint."""
+    from cutan.verify.regions import mouth_track, region_findings, split_cadence
 
+    project = _project_dir(scene) or project_of_render(mp4)
+    if project is None:
+        return None
     try:
-        masks = mouth_masks(
-            scene,
+        track = mouth_track(
+            project,
             n=len(frames),
             fps=fps,
             size=(DECODE_WIDTH, DECODE_HEIGHT),
             render_size=_probe_size(mp4),
         )
-        if not masks.any():
+        if not track.any():
             report.add("info", "<style>/regions", "no mouth was found to measure apart from the body")
             return None
-        cut_steps = [c - 1 for c in _cut_frames_from_shots(
-            [d for _, d in film_shots(_load_scene(scene))], fps, len(frames)
-        )]
-        regions = split_cadence(frames, masks, fps=fps, cut_steps=cut_steps)
+        cuts = _cut_frames_from_shots(shot_durations, fps, len(frames)) if shot_durations else []
+        regions = split_cadence(frames, track, fps=fps, cut_steps=[c - 1 for c in cuts])
     except Exception as e:  # noqa: BLE001 - an extra measurement that cannot be made is a note
         report.add(
             "info",
@@ -1141,6 +1151,19 @@ def _regions(
         return None
     report.add("info", "<style>/regions", f"cadence by region: {region_findings(regions)}")
     return regions
+
+
+def _project_dir(scene: Any) -> Path | None:
+    """The project folder ``scene`` names: the folder itself, or the one holding
+    its ``ir/scene.json``; ``None`` for a scene object or a stray file."""
+    if not isinstance(scene, (str, Path)):
+        return None
+    path = Path(scene)
+    if path.is_dir():
+        return path
+    if path.name == Path(PROJECT_SCENE_JSON).name and path.parent.name == Path(PROJECT_SCENE_JSON).parent.name:
+        return path.parent.parent
+    return None
 
 
 class StyleLintVerifier:
@@ -1305,6 +1328,7 @@ def _main(argv: Sequence[str]) -> int:
                 {
                     "metrics": result.metrics.as_dict() if result.metrics else None,
                     "per_shot": [r.as_dict() for r in result.per_shot],
+                    "regions": result.regions,
                     "findings": [asdict(f) for f in result.report.findings],
                 },
                 indent=2,
