@@ -362,9 +362,10 @@ def _gitignore_matcher(line: str):
     """``rel -> bool`` for one ``.gitignore`` line, by git's rules: a line with a
     ``/`` before its end is anchored at the project root, one without matches a
     name at any depth; a trailing ``/`` matches folders only; wildcards never
-    cross a ``/``; a matched folder covers everything under it. Negation (``!``)
-    and ``**`` are refused rather than misread: a line this cannot honour would
-    push what it should keep.
+    cross a ``/``; a matched folder covers everything under it; case counts.
+    What it does not read the way git does is refused rather than misread (a
+    line misread could push what it should keep): negation (``!``), comments
+    (``#``), ``**``, escapes (``\\``), ``[^...]`` and surrounding spaces.
 
     >>> _gitignore_matcher("artifacts/v/*.lock")("artifacts/v/a.json.lock")
     True
@@ -373,8 +374,15 @@ def _gitignore_matcher(line: str):
     >>> _gitignore_matcher("cache/")("cache"), _gitignore_matcher("a/*/c")("a/b/c/d")
     (False, True)
     """
-    if line.startswith("!") or "**" in line:
-        raise ValueError(f"an exclude line cannot use '!' or '**' (got {line!r})")
+    if (
+        line != line.strip()
+        or line.startswith(("!", "#"))
+        or any(token in line for token in ("**", "\\", "[^"))
+    ):
+        raise ValueError(
+            "an exclude line cannot use '!', '#', '**', '\\', '[^' or surrounding "
+            f"spaces (got {line!r})"
+        )
     folders_only = line.endswith("/")
     pattern = line.rstrip("/")
     anchored = "/" in pattern

@@ -91,6 +91,8 @@ def test_a_push_keeps_the_options_locks_local(tmp_path):
 
 _GIT_SAMPLE_PATHS = (
     "scene.md",
+    "Probes/x.png",
+    "sub/scene.md",
     "artifacts/voice_options/a.json",
     "artifacts/voice_options/a.json.lock",
     "artifacts/voice_options/sub/b.lock",
@@ -105,7 +107,13 @@ _GIT_SAMPLE_PATHS = (
     "deep/probes/x.png",
     "a/b/c/d",
 )
-_GIT_SAMPLE_LINES = ("*.lock", "probes", "a/*/c", "artifacts/v?ice_options/[ab].json")
+_GIT_SAMPLE_LINES = (
+    "*.lock",
+    "probes",
+    "a/*/c",
+    "artifacts/v?ice_options/[ab].json",
+    "/scene.md",
+)
 
 
 @pytest.mark.skipif(shutil.which("git") is None, reason="needs git")
@@ -120,7 +128,8 @@ def test_the_excluder_agrees_with_git_check_ignore(tmp_path, lines):
     subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
     (tmp_path / ".gitignore").write_text("".join(f"{line}\n" for line in lines))
     got = subprocess.run(
-        ["git", "-C", str(tmp_path), "check-ignore", "--no-index", "--stdin"],
+        ["git", "-C", str(tmp_path), "-c", "core.ignorecase=false"]
+        + ["check-ignore", "--no-index", "--stdin"],
         input="\n".join(_GIT_SAMPLE_PATHS),
         capture_output=True,
         text=True,
@@ -131,7 +140,7 @@ def test_the_excluder_agrees_with_git_check_ignore(tmp_path, lines):
 
 
 def test_an_exclude_line_it_cannot_honour_is_refused():
-    for line in ("!keep.me", "artifacts/**/x"):
+    for line in ("!keep.me", "artifacts/**/x", "# note", "\\*.md", "[^a].txt", "foo "):
         with pytest.raises(ValueError, match="cannot use"):
             _excluder((line,))
 
