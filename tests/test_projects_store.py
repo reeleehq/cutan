@@ -66,6 +66,22 @@ def test_the_default_excludes_cover_what_an_keeps_out_of_git():
     from an.project import PROJECT_GITIGNORE
 
     assert set(PROJECT_GITIGNORE) <= set(DEFAULT_PUSH_EXCLUDES)
+    assert len(set(DEFAULT_PUSH_EXCLUDES)) == len(DEFAULT_PUSH_EXCLUDES)
+
+
+def test_a_push_keeps_the_options_locks_local(tmp_path):
+    """A ``.gitignore`` pattern ``an`` keeps out of git (an#587's options-manifest
+    locks) stays out of the store; the manifest beside it is pushed."""
+    folder = _project(tmp_path)
+    voices = folder / "artifacts" / "voice_options"
+    voices.mkdir(parents=True)
+    (voices / "narrator.json").write_text("{}")
+    (voices / "narrator.json.lock").write_text("")
+    store: dict = {}
+    r = _push("p1", folder, store)
+    assert "artifacts/voice_options/narrator.json.lock" in r.excluded
+    assert "p1/artifacts/voice_options/narrator.json" in store
+    assert "p1/artifacts/voice_options/narrator.json.lock" not in store
     assert {"artifacts/shot_cache/", ".an/render_work/", ".git/"} <= set(
         DEFAULT_PUSH_EXCLUDES
     )

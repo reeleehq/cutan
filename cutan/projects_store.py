@@ -37,7 +37,10 @@ from collections.abc import MutableMapping
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from fnmatch import fnmatchcase
 from typing import Iterable, Mapping, Optional
+
+from an.project import PROJECT_GITIGNORE
 
 from . import LIBRARY_NAME, PROJECT_STORE_RECORD
 
@@ -52,16 +55,21 @@ STORE_RECORD: str = PROJECT_STORE_RECORD
 #: What a push keeps on the machine that made it: derived or transient output,
 #: keyed by that machine or re-made from the project. The shot cache (an#242) and
 #: the shot archive re-render from the project; the render work dirs are a run's
-#: scratch; render reports and probes are what ``an init`` keeps out of git
-#: (``an.project.PROJECT_GITIGNORE``, held equal by a test); a repository is
-#: not project content. Each entry is a folder prefix (ending in ``/``) or a file.
-DEFAULT_PUSH_EXCLUDES: tuple[str, ...] = (
-    ".git/",
-    ".an/render_work/",
-    "artifacts/shot_cache/",
-    "artifacts/shots/",
-    "artifacts/render_reports/",
-    "artifacts/probes/",
+#: scratch; a repository is not project content; and every line ``an init``
+#: keeps out of git (``an.project.PROJECT_GITIGNORE``: render reports, probes, the
+#: options manifests' file locks) is read from ``an``, so a line it adds there is
+#: kept local here too. Each entry is a folder prefix (ending in ``/``), a
+#: pattern (:func:`_excluder`), or a file.
+DEFAULT_PUSH_EXCLUDES: tuple[str, ...] = tuple(
+    dict.fromkeys(
+        (
+            ".git/",
+            ".an/render_work/",
+            "artifacts/shot_cache/",
+            "artifacts/shots/",
+            *PROJECT_GITIGNORE,
+        )
+    )
 )
 
 #: A project id is one folder name (the rule of ``an.library.root.project_dir``).
@@ -352,17 +360,31 @@ class PushReport:
 
 
 def _excluder(exclude: Iterable[str]):
-    """``rel -> bool``: whether an entry (a folder prefix ending in ``/``, or a file) covers it.
+    """``rel -> bool``: whether an entry covers it. An entry is a folder prefix
+    (ending in ``/``), a pattern (holding ``*``, ``?`` or ``[``), or a file. A
+    pattern matches as a ``.gitignore`` line with a slash does: from the project
+    root, its wildcards never crossing a ``/``.
 
-    >>> keep = _excluder(("artifacts/shot_cache/", "notes.txt"))
+    >>> keep = _excluder(("artifacts/shot_cache/", "notes.txt", "artifacts/v/*.lock"))
     >>> keep("artifacts/shot_cache/blobs/x"), keep("notes.txt"), keep("artifacts/audio/a.wav")
     (True, True, False)
+    >>> keep("artifacts/v/a.json.lock"), keep("artifacts/v/a.json"), keep("artifacts/v/sub/a.lock")
+    (True, False, False)
     """
+    exclude = tuple(exclude)
     folders = tuple(e for e in exclude if e.endswith("/"))
-    files = frozenset(e for e in exclude if not e.endswith("/"))
+    patterns = tuple(e for e in exclude if not e.endswith("/") and any(c in e for c in "*?["))
+    files = frozenset(exclude) - set(folders) - set(patterns)
+
+    def matches(rel: str, pattern: str) -> bool:
+        return rel.count("/") == pattern.count("/") and fnmatchcase(rel, pattern)
 
     def excluded(rel: str) -> bool:
-        return rel in files or any(rel.startswith(f) for f in folders)
+        return (
+            rel in files
+            or any(rel.startswith(f) for f in folders)
+            or any(matches(rel, p) for p in patterns)
+        )
 
     return excluded
 
