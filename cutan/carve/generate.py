@@ -107,7 +107,9 @@ class ArtSpec:
 
     def __post_init__(self):
         if not isinstance(self.name, str) or not _NAME.match(self.name):
-            raise ValueError(f"art {self.name!r}: a name is a file name (letters, digits, . _ -)")
+            raise ValueError(
+                f"art {self.name!r}: a name is a file name (letters, digits, . _ -)"
+            )
         if not isinstance(self.prompt, str) or not self.prompt.strip():
             raise ValueError(f"art {self.name!r}: the prompt is empty (or not text)")
         if self.background not in ("opaque", "transparent"):
@@ -122,8 +124,12 @@ class ArtSpec:
         if self.fit is not None:
             if isinstance(self.fit, str) or len(self.fit) != 2:
                 raise ValueError(f"art {self.name!r}: fit is [w, h], not {self.fit!r}")
-            if not all(isinstance(x, int) and not isinstance(x, bool) for x in self.fit):
-                raise ValueError(f"art {self.name!r}: fit is two whole numbers, not {self.fit!r}")
+            if not all(
+                isinstance(x, int) and not isinstance(x, bool) for x in self.fit
+            ):
+                raise ValueError(
+                    f"art {self.name!r}: fit is two whole numbers, not {self.fit!r}"
+                )
             w, h = self.fit
             if w <= 0 or h <= 0:
                 raise ValueError(
@@ -374,7 +380,9 @@ def generate_art(
                 try:  # a malformed recipe fails here, not after the payment
                     key_backdrop(probe, s.key)
                 except Exception as e:  # noqa: BLE001 - any failure of the key is the spec's
-                    raise ValueError(f"art {s.name!r}: key {s.key!r} does not key: {e}") from None
+                    raise ValueError(
+                        f"art {s.name!r}: key {s.key!r} does not key: {e}"
+                    ) from None
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     generator = generator or AixGenerator()
@@ -384,18 +392,26 @@ def generate_art(
         path, raw = out / f"{s.name}.png", out / f"{s.name}.raw.png"
         if path.exists() and not overwrite:
             known = recorded.get(path.name)
-            made.append(GeneratedArt(s.name, path, _source(known), _image_size(path), kept=True))
+            made.append(
+                GeneratedArt(s.name, path, _source(known), _image_size(path), kept=True)
+            )
             continue
         if raw.exists() and not overwrite:
             image = Image.open(raw)  # paid for by a run that failed after it
             image.load()
         else:
             image = generator(
-                s.prompt, size=s.size, background=s.background, quality=s.quality, model=s.model
+                s.prompt,
+                size=s.size,
+                background=s.background,
+                quality=s.quality,
+                model=s.model,
             )
             _save(image, raw)
             # record it now: the paid image has its provenance even if what follows fails
-            recorded[path.name] = art_source(s, generator).model_dump(mode="json", exclude_none=True)
+            recorded[path.name] = art_source(s, generator).model_dump(
+                mode="json", exclude_none=True
+            )
             _write_sources(out, recorded)
         source = _source(recorded.get(path.name)) or art_source(s, generator)
         if s.key:
@@ -403,7 +419,9 @@ def generate_art(
         if s.fit:
             image = cover_fit(image, s.fit)
         _save(image, path)
-        source = source.model_copy(update={"sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+        source = source.model_copy(
+            update={"sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+        )
         recorded[path.name] = source.model_dump(mode="json", exclude_none=True)
         _write_sources(out, recorded)  # the record first, then the raw goes
         if not keep_raw:
@@ -440,14 +458,20 @@ def _read_sources(out: Path) -> dict[str, Any]:
     try:
         sources = json.loads(record.read_text(encoding="utf-8"))
     except (OSError, ValueError) as e:
-        raise ValueError(f"{record} cannot be read as JSON ({e}): fix or move it") from None
+        raise ValueError(
+            f"{record} cannot be read as JSON ({e}): fix or move it"
+        ) from None
     if not isinstance(sources, dict):
-        raise ValueError(f"{record} holds {type(sources).__name__}, not {{file: source}}")
+        raise ValueError(
+            f"{record} holds {type(sources).__name__}, not {{file: source}}"
+        )
     return sources
 
 
 def _write_sources(out: Path, sources: Mapping[str, Any]) -> None:
     record = out / SOURCES_FILE
     tmp = record.with_name(record.name + ".part")
-    tmp.write_text(json.dumps(sources, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    tmp.write_text(
+        json.dumps(sources, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     os.replace(tmp, record)
