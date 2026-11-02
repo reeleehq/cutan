@@ -25,7 +25,7 @@ def test_a_mouth_on_ones_over_a_still_body_is_mouth_motion_only():
     states = []
     for i in range(len(frames)):  # the mouth swaps every frame, nothing else moves
         frames[i, 6:9, 22:28] = 255 if i % 2 else 0
-        states.append((("m", "A" if i % 2 else "X"),))
+        states.append({"m": "A" if i % 2 else "X"})
     track = MouthTrack([[(20, 5, 30, 10)]] * len(frames), states)
     out = split_cadence(frames, track, fps=12.0)
     assert out["mouth"]["one_frame_interval_share"] == 1.0
@@ -37,7 +37,7 @@ def test_a_head_bob_inside_the_mouth_box_is_body_not_mouth():
     frames = _film()
     for i in range(len(frames)):  # the whole head moves every second frame
         frames[i, 2:20, 15:35] = 200 if (i // 2) % 2 else 40
-    track = MouthTrack([[(20, 5, 30, 10)]] * len(frames), [(("m", "X"),)] * len(frames))
+    track = MouthTrack([[(20, 5, 30, 10)]] * len(frames), [{"m": "X"}] * len(frames))
     out = split_cadence(frames, track, fps=12.0)
     assert out["mouth"]["pose_changes_per_s"] == 0.0
     assert out["body"]["two_frame_interval_share"] == 1.0
@@ -45,7 +45,7 @@ def test_a_head_bob_inside_the_mouth_box_is_body_not_mouth():
 
 def test_the_track_must_match_the_film():
     with pytest.raises(ValueError, match="frames"):
-        split_cadence(_film(), MouthTrack([[]] * 3, [()] * 3), fps=12.0)
+        split_cadence(_film(), MouthTrack([[]] * 3, [{}] * 3), fps=12.0)
 
 
 @pytest.fixture()
@@ -92,3 +92,21 @@ def test_on_a_real_render_lip_sync_does_not_leak_into_the_body(dialogue):
     result = S.style_lint(dialogue / "output" / "main.mp4", "south_park", scene=dialogue)
     assert result.regions["mouth"]["pose_changes_per_s"] == 6.0
     assert result.regions["body"]["pose_changes_per_s"] <= 1.0
+
+
+def test_a_mouth_that_comes_or_goes_is_not_a_mouth_step():
+    """At a cut, a dissolve's edge or an off-screen mouth, nothing was lip-synced."""
+    frames = _film(n=5)
+    states = [{}, {"a": "X"}, {"a": "X", "b": "X"}, {"b": "X"}, {"b": "A"}]
+    track = MouthTrack([[]] * 5, states)
+    out = split_cadence(frames, track, fps=12.0)
+    assert out["mouth"]["pose_changes_per_s"] == pytest.approx(12.0 / 5), "only b's X->A"
+
+
+def test_a_close_up_mouth_is_not_grown_over_the_face(dialogue):
+    from cutan.verify.regions import MOUTH_GROW_MAX_PX
+
+    track = mouth_track(dialogue, n=24, fps=24.0, size=(1280, 720), render_size=(320, 240))
+    raw = mouth_track(dialogue, n=24, fps=24.0, size=(1280, 720), render_size=(320, 240), grow=0.0)
+    (x0, y0, x1, y1), (r0, s0, r1, s1) = track.boxes[0][0], raw.boxes[0][0]
+    assert r0 - x0 <= MOUTH_GROW_MAX_PX + 1 and y1 - s1 <= MOUTH_GROW_MAX_PX + 1

@@ -1140,6 +1140,8 @@ def _regions(
         if not track.any():
             report.add("info", "<style>/regions", "no mouth was found to measure apart from the body")
             return None
+        if shot_durations is None:  # the project found from the render: its shots
+            shot_durations = [d for _, d in film_shots(_load_scene(project))]
         cuts = _cut_frames_from_shots(shot_durations, fps, len(frames)) if shot_durations else []
         regions = split_cadence(frames, track, fps=fps, cut_steps=[c - 1 for c in cuts])
     except Exception as e:  # noqa: BLE001 - an extra measurement that cannot be made is a note

@@ -44,6 +44,10 @@ MOUTH_CHANNEL: str = "viseme"
 #: 4 render px tall): at 0.5 two lip-sync steps still leaked into the body, at
 #: 1.0 none did, and only the head's real move remained.
 MOUTH_GROW: float = 1.0
+#: ...but by no more than this many decode pixels a side: a close-up's mouth
+#: (88x33 decode px on the corpus expressions scene) grown by its own size would
+#: hide the brows and the blinks from the body.
+MOUTH_GROW_MAX_PX: int = 8
 #: Frames are read this many at a time when the body is measured.
 CHUNK_FRAMES: int = 256
 
@@ -56,7 +60,9 @@ class MouthTrack:
     their swap channels (a change of value is a mouth step)."""
 
     boxes: list[list[Box]] = field(default_factory=list)
-    states: list[tuple] = field(default_factory=list)
+    #: per frame, ``{mouth node path: its swap channels' values}`` for each mouth
+    #: drawn in the frame (an off-screen mouth is not drawn)
+    states: list[dict] = field(default_factory=list)
 
     def any(self) -> bool:
         return any(self.boxes)
@@ -74,6 +80,7 @@ def mouth_track(
     size: tuple[int, int],
     render_size: tuple[int, int],
     grow: float = MOUTH_GROW,
+    grow_max_px: int = MOUTH_GROW_MAX_PX,
 ) -> MouthTrack:
     """Where the mouths are, and what they show, in each of the film's ``n``
     frames, at the decode ``size`` (w, h) of a render at ``render_size`` (w, h).
@@ -94,7 +101,7 @@ def mouth_track(
     w, h = size
     rw, rh = render_size
     sx, sy = w / rw, h / rh
-    track = MouthTrack([[] for _ in range(n)], [() for _ in range(n)])
+    track = MouthTrack([[] for _ in range(n)], [{} for _ in range(n)])
     shots = list(scene.timeline)
     tl = film_timeline(shots, fps=fps)
     for shot, start in zip(shots, tl.starts):
@@ -108,21 +115,23 @@ def mouth_track(
             if frame >= n:
                 break
             pose = evaluate_timeline(timeline, i / fps)
-            channels = sorted((k, str(v)) for k, v in pose.items() if _is_mouth_channel(k[1]))
-            if not channels:
-                continue
-            track.states[frame] = track.states[frame] + tuple(channels)
-            for path in dict.fromkeys(k[0] for k, _ in channels):
+            values: dict[str, list] = {}
+            for (path, prop), value in pose.items():
+                if _is_mouth_channel(prop):
+                    values.setdefault(path, []).append((prop, str(value)))
+            for path, channels in values.items():
                 box = node_box(doc, path, pose=pose)
                 if box is None:
                     continue
-                gx, gy = grow * (box[2] - box[0]), grow * (box[3] - box[1])
-                x0 = max(0, int(np.floor((box[0] - gx) * sx)))
-                y0 = max(0, int(np.floor((box[1] - gy) * sy)))
-                x1 = min(w, int(np.ceil((box[2] + gx) * sx)))
-                y1 = min(h, int(np.ceil((box[3] + gy) * sy)))
-                if x1 > x0 and y1 > y0:
+                # in decode pixels: grown by its own size, at most grow_max_px a side
+                bx0, by0, bx1, by1 = box[0] * sx, box[1] * sy, box[2] * sx, box[3] * sy
+                gx = min(grow * (bx1 - bx0), grow_max_px)
+                gy = min(grow * (by1 - by0), grow_max_px)
+                x0, y0 = max(0, int(np.floor(bx0 - gx))), max(0, int(np.floor(by0 - gy)))
+                x1, y1 = min(w, int(np.ceil(bx1 + gx))), min(h, int(np.ceil(by1 + gy)))
+                if x1 > x0 and y1 > y0:  # drawn in the frame: its state counts
                     track.boxes[frame].append((x0, y0, x1, y1))
+                    track.states[frame][path] = tuple(sorted(channels))
     return track
 
 
@@ -142,7 +151,7 @@ def split_cadence(
 
     >>> f = np.zeros((5, 20, 20, 3), np.uint8)
     >>> f[1:3, 2:4, 2:4] = 255                       # the mouth opens at 1, shuts at 3
-    >>> t = MouthTrack([[(1, 1, 5, 5)]] * 5, [(("m", "X"),), (("m", "A"),), (("m", "A"),), (("m", "X"),), (("m", "X"),)])
+    >>> t = MouthTrack([[(1, 1, 5, 5)]] * 5, [{"m": v} for v in "XAAXX"])
     >>> out = split_cadence(f, t, fps=12.0, min_changed_pixels=1)
     >>> out["mouth"]["pose_changes_per_s"] > 0, out["body"]["pose_changes_per_s"]
     (True, 0.0)
@@ -152,7 +161,12 @@ def split_cadence(
         raise ValueError("the cadence needs at least two frames")
     if len(track.boxes) != n or len(track.states) != n:
         raise ValueError(f"the mouth track has {len(track.boxes)} frames, the film {n}")
-    mouth = np.array([track.states[k] != track.states[k + 1] for k in range(n - 1)])
+    def mouth_step(a: dict, b: dict) -> bool:
+        """A mouth drawn in both frames changed what it shows (a mouth that comes
+        or goes, at a cut or a dissolve's edge, is not a step)."""
+        return any(a[p] != b[p] for p in a.keys() & b.keys())
+
+    mouth = np.array([mouth_step(track.states[k], track.states[k + 1]) for k in range(n - 1)])
     step_diff = np.empty(n - 1, np.float32)
     moved = np.empty(n - 1, np.int64)
     for lo in range(0, n - 1, CHUNK_FRAMES):
