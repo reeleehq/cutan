@@ -9,6 +9,7 @@
 - [API reference](api.html.md): | &#96;cutan&#96;   | cutan: cut-out animation, as a genre package on the &#96;an&#96; core.   |
 - [cutan](_autosummary/cutan.html.md): cutan: cut-out animation, as a genre package on the &#96;an&#96; core.
 - [cutan.art_brief](_autosummary/cutan.art_brief.html.md): What art a cut-out film needs, and how to ask an image generator for it.
+- [cutan.art_cli](_autosummary/cutan.art_cli.html.md): &#96;an art ...&#96; — art from an image model, keyed and fitted for a cut-out art package (cutan#100).
 - [cutan.audio](_autosummary/cutan.audio.html.md): The cut-out genre’s lip-sync providers: letters, Rhubarb and word timings to mouth shapes.
 - [cutan.audio.injectable_lipsync](_autosummary/cutan.audio.injectable_lipsync.html.md): Lip-sync provider that consumes pre-computed word timings.
 - [cutan.audio.offline_lipsync](_autosummary/cutan.audio.offline_lipsync.html.md): OfflineLipSync — deterministic transcript → viseme track. No network, no binary.
@@ -19,6 +20,7 @@
 - [cutan.body_attachment](_autosummary/cutan.body_attachment.html.md): Props that depict part of a character’s body: the declaration, the geometry, the placement.
 - [cutan.carve](_autosummary/cutan.carve.html.md): Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cuta...
 - [cutan.carve.core](_autosummary/cutan.carve.core.html.md): The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.
+- [cutan.carve.generate](_autosummary/cutan.carve.generate.html.md): Generated art: a prompt in, a keyed, fitted, provenance-carrying plate or part out (cutan#100).
 - [cutan.carve.head](_autosummary/cutan.carve.head.html.md): Head mode: a face located, the neck cut under the jaw, the head normalised on a fixed canvas.
 - [cutan.carve.mattes](_autosummary/cutan.carve.mattes.html.md): Matte strategies: which pixels of an image are the subject.
 - [cutan.carve.parts](_autosummary/cutan.carve.parts.html.md): Split a carved prop into moving parts, each with a declared pivot.
@@ -91,7 +93,7 @@
 - [cutan.verify.cadence](_autosummary/cutan.verify.cadence.html.md): Pre-render cadence lint: the scene’s timing against its style spec (catalogue B6, an#519 rank 5).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-02 02:09 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-02 02:34 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

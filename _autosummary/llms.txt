@@ -7,6 +7,7 @@
 
 - [cutan](cutan.html.md): cutan: cut-out animation, as a genre package on the &#96;an&#96; core.
 - [cutan.art_brief](cutan.art_brief.html.md): What art a cut-out film needs, and how to ask an image generator for it.
+- [cutan.art_cli](cutan.art_cli.html.md): &#96;an art ...&#96; — art from an image model, keyed and fitted for a cut-out art package (cutan#100).
 - [cutan.audio](cutan.audio.html.md): The cut-out genre’s lip-sync providers: letters, Rhubarb and word timings to mouth shapes.
 - [cutan.audio.injectable_lipsync](cutan.audio.injectable_lipsync.html.md): Lip-sync provider that consumes pre-computed word timings.
 - [cutan.audio.offline_lipsync](cutan.audio.offline_lipsync.html.md): OfflineLipSync — deterministic transcript → viseme track. No network, no binary.
@@ -17,6 +18,7 @@
 - [cutan.body_attachment](cutan.body_attachment.html.md): Props that depict part of a character’s body: the declaration, the geometry, the placement.
 - [cutan.carve](cutan.carve.html.md): Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cuta...
 - [cutan.carve.core](cutan.carve.core.html.md): The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.
+- [cutan.carve.generate](cutan.carve.generate.html.md): Generated art: a prompt in, a keyed, fitted, provenance-carrying plate or part out (cutan#100).
 - [cutan.carve.head](cutan.carve.head.html.md): Head mode: a face located, the neck cut under the jaw, the head normalised on a fixed canvas.
 - [cutan.carve.mattes](cutan.carve.mattes.html.md): Matte strategies: which pixels of an image are the subject.
 - [cutan.carve.parts](cutan.carve.parts.html.md): Split a carved prop into moving parts, each with a declared pivot.

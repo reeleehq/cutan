@@ -63,6 +63,7 @@ cutan.carve
    :recursive:
 
    core
+   generate
    head
    mattes
    parts

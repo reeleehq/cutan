@@ -1,0 +1,12 @@
+cutan.art\_cli
+==============
+
+.. automodule:: cutan.art_cli
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      generate
+   

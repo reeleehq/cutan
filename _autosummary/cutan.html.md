@@ -137,6 +137,7 @@ The names of the style specs that ship with `cutan`, sorted.
 
 | [`art_brief`](cutan.art_brief.html.md#module-cutan.art_brief)             | What art a cut-out film needs, and how to ask an image generator for it.                                   |
 |-----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| [`art_cli`](cutan.art_cli.html.md#module-cutan.art_cli)                 | `an art ...` — art from an image model, keyed and fitted for a cut-out art package (cutan#100).            |
 | [`audio`](cutan.audio.html.md#module-cutan.audio)                     | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.                 |
 | [`bench`](cutan.bench.html.md#module-cutan.bench)                     | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.                     |
 | [`body_attachment`](cutan.body_attachment.html.md#module-cutan.body_attachment) | Props that depict part of a character's body: the declaration, the geometry, the placement.                |

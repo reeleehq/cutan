@@ -32,6 +32,7 @@
    :recursive:
 
    art_brief
+   art_cli
    audio
    bench
    body_attachment

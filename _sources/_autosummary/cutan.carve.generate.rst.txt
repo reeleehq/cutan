@@ -1,0 +1,38 @@
+cutan.carve.generate
+====================
+
+.. automodule:: cutan.carve.generate
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DEFAULT_MODEL
+      DEFAULT_QUALITY
+      OPENAI_OUTPUT_LICENSE
+      SOURCES_FILE
+      KEYS
+      ImageGenerator
+      OPENAI_IMAGE_MODELS
+      PROVIDER_LICENSES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      art_source
+      art_specs
+      cover_fit
+      generate_art
+      key_backdrop
+      provider_of
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AixGenerator
+      ArtSpec
+      GeneratedArt
+   

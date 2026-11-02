@@ -1,4 +1,4 @@
-> built 2026-11-02 02:09 UTC from 97ed8ff (main) · cutan 0.0.91. Details: build_info.json
+> built 2026-11-02 02:34 UTC from fa0a0c9 (main) · cutan 0.0.92. Details: build_info.json
 
 # index.html.md
 
@@ -250,6 +250,40 @@ True
 >>> style_look(None)
 '<your look in words: medium, colours, line, texture>'
 ```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+
+# _autosummary/cutan.art_cli.html.md
+
+# cutan.art_cli
+
+`an art ...` — art from an image model, keyed and fitted for a cut-out art package (cutan#100).
+
+Thin string-typed wrappers over [`cutan.carve.generate`](_autosummary/cutan.carve.generate.html.md#module-cutan.carve.generate), dispatched by typer
+the same way as `an character ...` (the `cli.art` service):
+
+> an art generate SPEC.json –out assets/environments/car/plates [–only cabin,road]
+
+The spec is `{name: {prompt, size, background, key, fit, model, quality}}`;
+each image becomes `<name>.png` with its provenance in `art_sources.json`.
+
+### Functions
+
+| [`generate`](_autosummary/cutan.art_cli.html.md#cutan.art_cli.generate)(spec, out[, only, keep_raw, ...])   | Generate each image of a spec with an image model, key its backdrop colour to alpha, fit it, and write it with its provenance.   |
+|-----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+
+### cutan.art_cli.generate(spec, out, only='', keep_raw=False, overwrite=False, model='')
+
+Generate each image of a spec with an image model, key its backdrop colour to alpha, fit it, and write it with its provenance.
+
+spec: a JSON file: {name: {prompt, size, background (opaque|transparent), key (magenta|green|a matte recipe), fit [w, h], model, quality}}
+out: the folder to write <name>.png and art_sources.json into (an environment’s plates/, a prop’s parts/)
+only: comma-separated names to make (default: all)
+keep_raw: also write the model’s own image as <name>.raw.png
+overwrite: make an image again when <name>.png exists (default: keep it; each generation is billed)
+model: the default generator’s model, where the spec names none (default: gpt-image-2)
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
@@ -915,7 +949,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'eye', 'mouth', 'rect'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse', 'mouth', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -1616,6 +1650,251 @@ An `HxWx3` `uint8` RGB array from a path, a PIL image or an array.
 
 * **Return type:**
   `ndarray`
+
+
+# _autosummary/cutan.carve.generate.html.md
+
+# cutan.carve.generate
+
+Generated art: a prompt in, a keyed, fitted, provenance-carrying plate or part out (cutan#100).
+
+An image model draws a plate (a landscape, a car’s cabin) or a part; where the
+art must be see-through (a car’s windows) the prompt asks for a flat key colour,
+and that colour is keyed to alpha by [`cutan.carve`](_autosummary/cutan.carve.html.md#module-cutan.carve)’s own matte (the
+`chroma` strategy), its rim de-spilled, then the image is cover-fitted to the
+stage canvas and written as a PNG beside a record of where it came from.
+
+```pycon
+>>> from PIL import Image
+>>> def painter(prompt, *, size, background, quality=None, model=None):
+...     im = Image.new("RGB", (64, 48), (246, 3, 242))      # the magenta key
+...     im.paste((40, 110, 200), (16, 12, 48, 36))          # the subject
+...     return im
+>>> painter.provider, painter.model, painter.license = "test", "toy", "cc0-1.0"
+>>> import tempfile
+>>> made = generate_art({"box": {"prompt": "a blue box", "key": "magenta", "fit": [32, 24]}},
+...                     out_dir=tempfile.mkdtemp(), generator=painter)
+>>> made[0].path.name, made[0].size, made[0].source.license
+('box.png', (32, 24), 'cc0-1.0')
+```
+
+- **The spec** ([`art_specs()`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.art_specs)): `{name: {prompt, size, background, key,
+  fit, model, quality}}`, a mapping or a JSON file. `background`:
+  `"opaque"` or `"transparent"` (the model’s own alpha, where it has one);
+  `key`: a named key colour ([`KEYS`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.KEYS), `"magenta"`) or any matte recipe
+  [`as_matte()`](_autosummary/cutan.carve.mattes.html.md#cutan.carve.mattes.as_matte) reads; `fit`: `[w, h]`, scale to
+  > cover and centre-crop.
+- **The generator** is the seam: `generator(prompt, *, size, background,
+  quality, model) -> PIL image`, carrying `provider`, `model` and
+  `license` for the provenance. The default, [`AixGenerator`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.AixGenerator), calls
+  the fleet’s `aix.generate_image()` (OpenAI’s `gpt-image` models by
+  default; `pip install "cutan[generate]"`).
+- **The record**: each image’s `AssetSource` (provider,
+  model, prompt, licence) goes into `art_sources.json` beside the PNGs, to be
+  set as the plane’s or the prop’s `source` so `an credits` can say where
+  the picture came from.
+
+Needs OpenCV for the key (`cutan[carve]`) and `aix` for the default
+generator; nothing here is imported by `import cutan`.
+
+### Module Attributes
+
+| [`DEFAULT_MODEL`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.DEFAULT_MODEL)         | The model [`AixGenerator`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.AixGenerator) asks for when the spec names none.                                   |
+|------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| [`DEFAULT_QUALITY`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.DEFAULT_QUALITY)       | the provider's own default quality (`"high"` is the dearest tier, and not every model has it).                                               |
+| [`OPENAI_OUTPUT_LICENSE`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.OPENAI_OUTPUT_LICENSE) | The licence code of OpenAI's image output, which its terms assign to the user.                                                               |
+| [`SOURCES_FILE`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.SOURCES_FILE)          | Where each generated image's provenance is written, beside the images.                                                                       |
+| [`KEYS`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.KEYS)                  | a hue band in degrees, and only saturated, bright pixels in it.                                                                              |
+| [`ImageGenerator`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.ImageGenerator)        | `generator(prompt, *, size, background, quality, model) -> PIL image`, with `provider`, `model` and `license` attributes for the provenance. |
+| [`OPENAI_IMAGE_MODELS`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.OPENAI_IMAGE_MODELS)   | Bare model names (no `provider/` prefix) that LiteLLM routes to OpenAI.                                                                      |
+| [`PROVIDER_LICENSES`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.PROVIDER_LICENSES)     | The licence code of each provider's terms for its image output, by the provider `aix` infers from the model.                                 |
+
+### Functions
+
+| [`art_source`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.art_source)(spec, generator)                       | The provenance of `spec`'s image as `generator` made it.                                                                                                                                                                                               |
+|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`art_specs`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.art_specs)(spec)                                   | The [`ArtSpec`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.ArtSpec) list of a spec mapping or a JSON file of one.                                                                                                                                             |
+| [`cover_fit`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.cover_fit)(image, size)                            | Scale `image` to cover `size` (w, h), then centre-crop to it.                                                                                                                                                                                          |
+| [`generate_art`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.generate_art)(spec, \*, out_dir[, generator, ...]) | Generate, key, fit and write each image of `spec` into `out_dir`.                                                                                                                                                                                      |
+| [`key_backdrop`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.key_backdrop)(image, key)                          | `image` with its key colour keyed to alpha and the rim de-spilled, by [`cutan.carve`](_autosummary/cutan.carve.html.md#module-cutan.carve)'s matte (`key`: a [`KEYS`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.KEYS) name or a matte recipe). |
+| [`provider_of`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.provider_of)(model)                                | The provider of a LiteLLM model name, by LiteLLM's own convention (a `provider/` prefix; OpenAI's image models go bare), without the network lookup LiteLLM's resolver makes; `None` when the name does not say.                                       |
+
+### Classes
+
+| [`AixGenerator`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.AixGenerator)([model, quality, licenses])       | The default generator: `aix.generate_image()`, whose model names its provider (OpenAI's `gpt-image` by default).                           |
+|-------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| [`ArtSpec`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.ArtSpec)(name, prompt[, size, background, ...]) | One image to generate.                                                                                                                     |
+| [`GeneratedArt`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.GeneratedArt)(name, path, source[, size, kept]) | One image of the spec: its path and provenance; `kept` when it was already there and not made again (its provenance read from the record). |
+
+### *class* cutan.carve.generate.AixGenerator(model='gpt-image-2', quality=None, licenses=<factory>)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+The default generator: `aix.generate_image()`, whose model names its
+provider (OpenAI’s `gpt-image` by default). [`describe()`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.AixGenerator.describe) says which
+provider made an image and under what licence ([`PROVIDER_LICENSES`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.PROVIDER_LICENSES)).
+
+#### describe(model=None)
+
+`{"provider", "license"}` of an image made with `model`.
+
+```pycon
+>>> AixGenerator().describe("gpt-image-2")
+{'provider': 'openai', 'license': 'openai-output-owned'}
+>>> AixGenerator().describe("gemini/imagen-4.0-generate-001")
+{'provider': 'gemini', 'license': None}
+```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
+
+### *class* cutan.carve.generate.ArtSpec(name, prompt, size='1536x1024', background='opaque', key=None, fit=None, model=None, quality=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One image to generate. `key`: a [`KEYS`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.KEYS) name or a matte recipe.
+
+### cutan.carve.generate.DEFAULT_MODEL *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'gpt-image-2'*
+
+The model [`AixGenerator`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.AixGenerator) asks for when the spec names none.
+
+### cutan.carve.generate.DEFAULT_QUALITY *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= None*
+
+the provider’s own default quality (`"high"` is the dearest tier,
+and not every model has it).
+
+* **Type:**
+  `None`
+
+### *class* cutan.carve.generate.GeneratedArt(name, path, source, size=(0, 0), kept=False)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One image of the spec: its path and provenance; `kept` when it was
+already there and not made again (its provenance read from the record).
+
+### cutan.carve.generate.ImageGenerator
+
+`generator(prompt, *, size, background, quality, model) -> PIL image`, with
+`provider`, `model` and `license` attributes for the provenance.
+
+alias of [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[…], `Image`]
+
+### cutan.carve.generate.KEYS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]]* *= {'green': {'hue': [90.0, 150.0], 'matte': 'chroma', 'min_sat': 0.5, 'min_val': 0.4}, 'magenta': {'hue': [280.0, 322.0], 'matte': 'chroma', 'min_sat': 0.5, 'min_val': 0.4}}*
+
+a hue band in degrees,
+and only saturated, bright pixels in it. Magenta survives gpt-image’s
+anti-aliasing as roughly (246, 3, 242), hue 301; the band is narrow and the
+floors high so orchid, lavender, deep pink and violet in the subject stay.
+A subject in strong purple or magenta itself is keyed: keep those colours
+out of art that uses the key (or key `"green"`).
+
+* **Type:**
+  Named key colours, as the `chroma` matte’s recipe
+
+### cutan.carve.generate.OPENAI_IMAGE_MODELS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('gpt-image', 'dall-e')*
+
+Bare model names (no `provider/` prefix) that LiteLLM routes to OpenAI.
+
+### cutan.carve.generate.OPENAI_OUTPUT_LICENSE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'openai-output-owned'*
+
+The licence code of OpenAI’s image output, which its terms assign to the user.
+`an`’s licence classes do not know it yet (reeleehq/an#728), so `an
+credits` reports it as unknown until they do.
+
+### cutan.carve.generate.PROVIDER_LICENSES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'openai': 'openai-output-owned'}*
+
+The licence code of each provider’s terms for its image output, by the
+provider `aix` infers from the model. A provider not listed is recorded
+with no licence: unknown, which `an credits` says aloud.
+
+### cutan.carve.generate.SOURCES_FILE *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'art_sources.json'*
+
+Where each generated image’s provenance is written, beside the images.
+
+### cutan.carve.generate.art_source(spec, generator)
+
+The provenance of `spec`’s image as `generator` made it.
+
+```pycon
+>>> g = AixGenerator()
+>>> s = art_source(ArtSpec(name="road", prompt="a road"), g)
+>>> s.provider, s.id, s.license, s.extra["prompt"]
+('openai', 'gpt-image-2', 'openai-output-owned', 'a road')
+```
+
+* **Return type:**
+  `AssetSource`
+
+### cutan.carve.generate.art_specs(spec)
+
+The [`ArtSpec`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.ArtSpec) list of a spec mapping or a JSON file of one.
+
+`key_magenta: true` (the spec shape the first production wrote) means
+`key: "magenta"`.
+
+```pycon
+>>> [(s.name, s.key, s.fit) for s in art_specs(
+...     {"road": {"prompt": "a road", "fit": [1280, 720]},
+...      "cabin": {"prompt": "a cabin", "key_magenta": True}})]
+[('road', None, (1280, 720)), ('cabin', 'magenta', None)]
+```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`ArtSpec`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.ArtSpec)]
+
+### cutan.carve.generate.cover_fit(image, size)
+
+Scale `image` to cover `size` (w, h), then centre-crop to it.
+
+```pycon
+>>> cover_fit(Image.new("RGB", (300, 100)), (100, 100)).size
+(100, 100)
+```
+
+* **Return type:**
+  `Image`
+
+### cutan.carve.generate.generate_art(spec, , out_dir, generator=None, only=None, keep_raw=False, overwrite=False)
+
+Generate, key, fit and write each image of `spec` into `out_dir`.
+
+Each image is `<name>.png`; `art_sources.json` ([`SOURCES_FILE`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.SOURCES_FILE))
+maps each file to its provenance (with the PNG’s sha256), merged with what
+the folder holds and written after every image. `only`: the names to make
+(default all). An existing `<name>.png` is kept, not paid for again,
+unless `overwrite`, so a batch that failed half way is resumed by running
+it again. The model’s own image is written first as `<name>.raw.png`, with
+its record, and removed once the PNG and its record are written, unless
+`keep_raw`: a key or fit that fails leaves the paid-for image, and the
+next run keys that image instead of paying for a new one. Every file is
+written whole or not at all.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`GeneratedArt`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.GeneratedArt)]
+
+### cutan.carve.generate.key_backdrop(image, key)
+
+`image` with its key colour keyed to alpha and the rim de-spilled, by
+[`cutan.carve`](_autosummary/cutan.carve.html.md#module-cutan.carve)’s matte (`key`: a [`KEYS`](_autosummary/cutan.carve.generate.html.md#cutan.carve.generate.KEYS) name or a matte recipe).
+An alpha the image already has is kept where it is lower.
+
+* **Return type:**
+  `Image`
+
+### cutan.carve.generate.provider_of(model)
+
+The provider of a LiteLLM model name, by LiteLLM’s own convention (a
+`provider/` prefix; OpenAI’s image models go bare), without the network
+lookup LiteLLM’s resolver makes; `None` when the name does not say.
+
+```pycon
+>>> provider_of("gpt-image-2"), provider_of("gemini/imagen-4"), provider_of("flux")
+('openai', 'gemini', None)
+```
+
+* **Return type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 
 # _autosummary/cutan.carve.head.html.md
@@ -2557,6 +2836,7 @@ The video id of a YouTube URL, else `None`.
 
 | [`core`](_autosummary/cutan.carve.core.html.md#module-cutan.carve.core)             | The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.   |
 |-------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| [`generate`](_autosummary/cutan.carve.generate.html.md#module-cutan.carve.generate)     | Generated art: a prompt in, a keyed, fitted, provenance-carrying plate or part out (cutan#100).        |
 | [`head`](_autosummary/cutan.carve.head.html.md#module-cutan.carve.head)             | Head mode: a face located, the neck cut under the jaw, the head normalised on a fixed canvas.          |
 | [`mattes`](_autosummary/cutan.carve.mattes.html.md#module-cutan.carve.mattes)         | Matte strategies: which pixels of an image are the subject.                                            |
 | [`parts`](_autosummary/cutan.carve.parts.html.md#module-cutan.carve.parts)           | Split a carved prop into moving parts, each with a declared pivot.                                     |
@@ -11724,6 +12004,7 @@ The names of the style specs that ship with `cutan`, sorted.
 
 | [`art_brief`](_autosummary/cutan.art_brief.html.md#module-cutan.art_brief)             | What art a cut-out film needs, and how to ask an image generator for it.                                   |
 |-----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| [`art_cli`](_autosummary/cutan.art_cli.html.md#module-cutan.art_cli)                 | `an art ...` — art from an image model, keyed and fitted for a cut-out art package (cutan#100).            |
 | [`audio`](_autosummary/cutan.audio.html.md#module-cutan.audio)                     | The cut-out genre's lip-sync providers: letters, Rhubarb and word timings to mouth shapes.                 |
 | [`bench`](_autosummary/cutan.bench.html.md#module-cutan.bench)                     | The cut-out genre's bench corpus: eight scenes that use characters, and their goldens.                     |
 | [`body_attachment`](_autosummary/cutan.body_attachment.html.md#module-cutan.body_attachment) | Props that depict part of a character's body: the declaration, the geometry, the placement.                |
@@ -15261,18 +15542,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-11-02 02:09 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/97ed8ff6dcb0a38d16212b6d4931fe6504e87911"><code>97ed8ff</code></a> on branch <code>main</code>, for **cutan 0.0.91** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 02:34 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/fa0a0c9c92c02170b53dba8bbe5b22c1ad81b3bb"><code>fa0a0c9</code></a> on branch <code>main</code>, for **cutan 0.0.92** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.91) is behind the latest release on PyPI (0.0.92): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.92) is behind the latest release on PyPI (0.0.93): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/97ed8ff6dcb0a38d16212b6d4931fe6504e87911"><code>97ed8ff6dcb0a38d16212b6d4931fe6504e87911</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/fa0a0c9c92c02170b53dba8bbe5b22c1ad81b3bb"><code>fa0a0c9c92c02170b53dba8bbe5b22c1ad81b3bb</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -15283,9 +15564,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/41375789349">41375789349</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/41377882808">41377882808</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>d055f85e9f158b88f8689febf42ca302fedcf2d2</code> (in the history of the built commit) |
+| Event commit | <code>fa0a0c9c92c02170b53dba8bbe5b22c1ad81b3bb</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -15310,13 +15591,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.92/">0.0.92</a>, newer than the documented version (0.0.91).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.93/">0.0.93</a>, newer than the documented version (0.0.92).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 97ed8ff6dcb0a38d16212b6d4931fe6504e87911
+git checkout fa0a0c9c92c02170b53dba8bbe5b22c1ad81b3bb
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
