@@ -5,7 +5,6 @@ compiled timeline, as `test_hands.py` does.
 """
 
 from __future__ import annotations
-from an.stage.solve import solve_report
 
 import json
 import math
@@ -17,7 +16,7 @@ import pytest
 from an.ir.schema import Shot
 from an.project import init, load
 from an.stage.compile import compile_shot
-from an.stage.solve import _local_box, _pivot
+from an.stage.solve import _local_box, _pivot, solve_report
 from an.stage.timeline import evaluate_timeline, screen_position, timeline_from_scene
 from an.stage.tree import walk_children
 from cutan.characters import new_character

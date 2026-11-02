@@ -9,7 +9,6 @@ left as they were. No browser, no render.
 """
 
 from __future__ import annotations
-from an.stage.solve import solve_report
 
 import json
 import math
@@ -25,7 +24,7 @@ from an.ir.schema import AssetRef, Shot, StagePlacement
 from an.ir.validate import validate_semantic
 from an.project import init, load
 from an.stage.compile import compile_shot
-from an.stage.solve import _local_box, joint_residuals
+from an.stage.solve import _local_box, joint_residuals, solve_report
 from an.stage.timeline import evaluate_timeline, screen_position, timeline_from_scene
 from an.stage.tree import walk_children
 from cutan.body_attachment import BODY_ATTACHMENT_KEY
@@ -128,7 +127,7 @@ def test_no_pins_when_there_is_nothing_to_follow_or_nowhere_to_follow(project, w
 
 def test_a_still_shot_compiles_to_the_scene_it_did(project):
     doc = _compile(project, _shot())
-    assert "solve" not in (doc.meta.extensions or {})
+    assert solve_report(doc) == {}
 
 
 def test_the_sockets_stay_on_the_shoulders_at_every_frame_of_a_nod(project):

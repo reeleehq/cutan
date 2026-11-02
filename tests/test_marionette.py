@@ -7,7 +7,6 @@ hinge is bent past its range. No browser, no render.
 """
 
 from __future__ import annotations
-from an.stage.solve import solve_report
 
 import json
 import math
@@ -20,7 +19,7 @@ from an.ir.schema import Shot
 from an.ir.validate import validate_semantic
 from an.project import init, load
 from an.stage.compile import compile_shot
-from an.stage.solve import joint_residuals
+from an.stage.solve import joint_residuals, solve_report
 from an.stage.timeline import evaluate_timeline, screen_position, timeline_from_scene
 from cutan.characters import new_character
 from cutan.characters.factory import add_limits
