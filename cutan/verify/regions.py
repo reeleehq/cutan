@@ -107,7 +107,9 @@ def mouth_track(
     for shot, start in zip(shots, tl.starts):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            doc = compile_shot(shot, project.mall, fps=int(round(fps)), width=rw, height=rh)
+            doc = compile_shot(
+                shot, project.mall, fps=int(round(fps)), width=rw, height=rh
+            )
         timeline = timeline_from_scene(doc)
         frames = int(round(shot.duration * fps))
         for i in range(frames):
@@ -127,7 +129,10 @@ def mouth_track(
                 bx0, by0, bx1, by1 = box[0] * sx, box[1] * sy, box[2] * sx, box[3] * sy
                 gx = min(grow * (bx1 - bx0), grow_max_px)
                 gy = min(grow * (by1 - by0), grow_max_px)
-                x0, y0 = max(0, int(np.floor(bx0 - gx))), max(0, int(np.floor(by0 - gy)))
+                x0, y0 = (
+                    max(0, int(np.floor(bx0 - gx))),
+                    max(0, int(np.floor(by0 - gy))),
+                )
                 x1, y1 = min(w, int(np.ceil(bx1 + gx))), min(h, int(np.ceil(by1 + gy)))
                 if x1 > x0 and y1 > y0:  # drawn in the frame: its state counts
                     track.boxes[frame].append((x0, y0, x1, y1))
@@ -161,12 +166,15 @@ def split_cadence(
         raise ValueError("the cadence needs at least two frames")
     if len(track.boxes) != n or len(track.states) != n:
         raise ValueError(f"the mouth track has {len(track.boxes)} frames, the film {n}")
+
     def mouth_step(a: dict, b: dict) -> bool:
         """A mouth drawn in both frames changed what it shows (a mouth that comes
         or goes, at a cut or a dissolve's edge, is not a step)."""
         return any(a[p] != b[p] for p in a.keys() & b.keys())
 
-    mouth = np.array([mouth_step(track.states[k], track.states[k + 1]) for k in range(n - 1)])
+    mouth = np.array(
+        [mouth_step(track.states[k], track.states[k + 1]) for k in range(n - 1)]
+    )
     step_diff = np.empty(n - 1, np.float32)
     moved = np.empty(n - 1, np.int64)
     for lo in range(0, n - 1, CHUNK_FRAMES):
@@ -178,7 +186,9 @@ def split_cadence(
                 delta[k - lo, y0:y1, x0:x1] = 0.0
         step_diff[lo:hi] = delta.mean(axis=(1, 2))
         moved[lo:hi] = (delta > PIXEL_CHANGE_DELTA).reshape(hi - lo, -1).sum(axis=1)
-    _, body, _ = changes_from_stats(step_diff, moved, min_changed_pixels=min_changed_pixels)
+    _, body, _ = changes_from_stats(
+        step_diff, moved, min_changed_pixels=min_changed_pixels
+    )
     cuts = set(cut_steps)
     return {
         "mouth": cadence_of(mouth, cut_steps=cuts, fps=fps),

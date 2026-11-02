@@ -841,20 +841,24 @@ def _probe_fps(mp4: Path) -> float:
 
 def _probe_size(mp4: Path) -> tuple[int, int]:
     """The video stream's ``(width, height)``."""
-    out = _run(
-        [
-            "ffprobe",
-            "-v",
-            "error",
-            "-select_streams",
-            "v:0",
-            "-show_entries",
-            "stream=width,height",
-            "-of",
-            "csv=p=0:s=x",
-            str(mp4),
-        ]
-    ).decode("utf-8").strip()
+    out = (
+        _run(
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-select_streams",
+                "v:0",
+                "-show_entries",
+                "stream=width,height",
+                "-of",
+                "csv=p=0:s=x",
+                str(mp4),
+            ]
+        )
+        .decode("utf-8")
+        .strip()
+    )
     w, h = out.split("x")[:2]
     return int(w), int(h)
 
@@ -1138,11 +1142,19 @@ def _regions(
             render_size=_probe_size(mp4),
         )
         if not track.any():
-            report.add("info", "<style>/regions", "no mouth was found to measure apart from the body")
+            report.add(
+                "info",
+                "<style>/regions",
+                "no mouth was found to measure apart from the body",
+            )
             return None
         if shot_durations is None:  # the project found from the render: its shots
             shot_durations = [d for _, d in film_shots(_load_scene(project))]
-        cuts = _cut_frames_from_shots(shot_durations, fps, len(frames)) if shot_durations else []
+        cuts = (
+            _cut_frames_from_shots(shot_durations, fps, len(frames))
+            if shot_durations
+            else []
+        )
         regions = split_cadence(frames, track, fps=fps, cut_steps=[c - 1 for c in cuts])
     except Exception as e:  # noqa: BLE001 - an extra measurement that cannot be made is a note
         report.add(
@@ -1151,7 +1163,9 @@ def _regions(
             f"the mouth and body cadence could not be measured apart: {type(e).__name__}: {e}",
         )
         return None
-    report.add("info", "<style>/regions", f"cadence by region: {region_findings(regions)}")
+    report.add(
+        "info", "<style>/regions", f"cadence by region: {region_findings(regions)}"
+    )
     return regions
 
 
@@ -1163,7 +1177,10 @@ def _project_dir(scene: Any) -> Path | None:
     path = Path(scene)
     if path.is_dir():
         return path
-    if path.name == Path(PROJECT_SCENE_JSON).name and path.parent.name == Path(PROJECT_SCENE_JSON).parent.name:
+    if (
+        path.name == Path(PROJECT_SCENE_JSON).name
+        and path.parent.name == Path(PROJECT_SCENE_JSON).parent.name
+    ):
         return path.parent.parent
     return None
 
