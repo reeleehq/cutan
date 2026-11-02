@@ -37,6 +37,7 @@ from an.audio.tts import AudioClip
 
 # Reuse the offline char→viseme mapping so the two providers stay consistent.
 from cutan.audio.offline_lipsync import _CHAR_TO_VISEME, _REST_VISEME, clip_words
+from cutan.audio.phones import phones_track
 
 _DEFAULT_MODEL_SIZE: str = "tiny"  # ~75 MB; "base" gives slightly better word-timing
 _DEFAULT_DEVICE: str = "cpu"
@@ -93,6 +94,12 @@ class WhisperLipSync:
         return WhisperLipSync._model
 
     def align(self, audio: AudioClip, transcript: str) -> VisemeTrack:
+        # A take timed by a forced aligner (an#491): its phones, no model run.
+        from_phones = phones_track(
+            audio, rest_viseme=_REST_VISEME, convention=self.convention
+        )
+        if from_phones is not None:
+            return from_phones
         known = clip_words(audio)
         if known:
             # A recorded take whose words are already timed (an#490): no model
