@@ -226,7 +226,9 @@ def phones_to_visemes(
         segments.append((code, float(start), float(stop)))
     spoken = [(s, e) for p, s, e in phones if not _is_silence(str(p))]
     for word in words:
-        if word[2] > word[1] and not any(word[1] <= (s + e) / 2 <= word[2] for s, e in spoken):
+        if word[2] > word[1] and not any(
+            word[1] <= (s + e) / 2 <= word[2] for s, e in spoken
+        ):
             segments += _letter_segments(word, char_to_viseme or {})
     return _keyframes(
         segments,
