@@ -57,6 +57,11 @@ def test_a_cast_entry_is_the_factory_options_and_its_follow_ups():
         ({"teo": {"sash": "yes"}}, "sash must be"),
         ({"teo": {"half_lid": True}}, "half_lid must be"),
         ({"teo": "squat"}, "a mapping"),
+        ({"teo\n": {}}, "not a character name"),
+        ({"teo": {"voice_ref": "x\ny"}}, "short text"),
+        ({"teo": {"hat": "x" * 500}}, "short text"),
+        ({"teo": {"mouth_variants": [["happy"]]}}, "short text"),
+        ({"teo": {"palette": {"skin": ["#fff"]}}}, "short text"),
     ],
 )
 def test_a_cast_that_could_reach_further_is_refused(cast, match):
@@ -72,6 +77,28 @@ def test_a_cast_file_that_is_not_a_mapping_is_named(tmp_path):
     f.write_text("teo: {build: [\n")
     with pytest.raises(CastError, match="not YAML"):
         cast_steps(f)
+
+
+def test_a_cast_file_cannot_grow_on_the_server(tmp_path):
+    """Aliases expand: a few hundred bytes of them are gigabytes in memory."""
+    f = tmp_path / "cast.yaml"
+    f.write_text("a: &a [x, x]\nteo: {mouth_variants: *a}\n")
+    with pytest.raises(CastError, match="aliases"):
+        cast_steps(f)
+    f.write_text("teo: {}\n" + "# padding\n" * 10_000)
+    with pytest.raises(CastError, match="bytes"):
+        cast_steps(f)
+
+
+def test_the_cast_options_are_one_table():
+    """The pack's allow-list is derived from the cast file's table."""
+    from cutan.characters.cast import FOLLOW_UPS, NEW_OPTIONS
+
+    new = P.CAST_OPTIONS["new"]
+    assert {k.lstrip("-").replace("-", "_") for k in new} - {"offline", "no_views"} == set(
+        NEW_OPTIONS
+    ) - {"views"}
+    assert {c for c, _, _ in FOLLOW_UPS.values()} <= set(P.CAST_OPTIONS)
 
 
 def test_the_example_cast_is_its_old_cast_sh_line_for_line():
@@ -116,6 +143,7 @@ def test_import_makes_the_project_and_never_overwrites_one(tmp_path):
     assert (project / "scene.md").is_file()
     assert (project / "assets" / "characters" / "teo" / "character.json").is_file()
     assert not (project / "cast.yaml").exists(), "the cast is made, not copied"
+    assert report.project == project.resolve()
     again = P.import_pack(EXAMPLE, project)
     assert not again.ok and "exists already" in again.errors[0]
     assert str(tmp_path) not in json.dumps(report.to_dict()), "no path of this machine"
@@ -126,3 +154,15 @@ def test_import_dry_run_is_the_check_and_leaves_nothing(tmp_path):
     report = P.import_pack(EXAMPLE, project, dry_run=True)
     assert report.ok, report.format()
     assert not project.exists()
+
+
+def test_an_import_defaults_beside_the_pack_and_never_inside_it(tmp_path, monkeypatch):
+    pack = tmp_path / "umbrella"
+    shutil.copytree(EXAMPLE, pack)
+    inside = P.import_pack(pack, pack / "project")
+    assert not inside.ok and "inside the pack" in inside.errors[0]
+    assert not (pack / "project").exists()
+    monkeypatch.chdir(tmp_path)  # where the pack is: the default must not be the pack
+    report = P.import_pack(pack)
+    assert report.ok, report.format()
+    assert report.project == (tmp_path / "umbrella-project").resolve()

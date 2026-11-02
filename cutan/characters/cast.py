@@ -33,12 +33,21 @@ process through the factory's own commands (``an character cast FILE``).
 from __future__ import annotations
 
 import os
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Union
 
 CAST_YAML = "cast.yaml"
+#: A character id: lowercase letters, digits, ``_``. ``\Z``, not ``$``: a name
+#: ending in a newline would make a folder of that name.
+NAME_RE = re.compile(r"^[a-z][a-z0-9_]{0,40}\Z")
+#: The largest cast file read, and the longest value in it (characters): a
+#: cast is a page of options, and a pack is checked on a server.
+MAX_CAST_BYTES: int = 64 * 1024
+MAX_VALUE_CHARS: int = 200
+_CONTROL = re.compile(r"[\x00-\x1f\x7f]")
 
 #: The options of ``an character new`` a cast entry may set, by key, with the
 #: type its value must have (a list joins with commas, a mapping as
@@ -78,12 +87,18 @@ class CastStep:
     name: str
     options: dict[str, Any] = field(default_factory=dict)
 
-    def argv(self) -> list[str]:
-        """The ``an character`` command line of this step."""
-        args = ["an", "character", self.command, self.name]
-        if self.command == "new":
-            args.append("--offline")
+    def kwargs(self) -> dict[str, Any]:
+        """The factory command's keyword arguments (lists and mappings as the
+        command's text; a new character is always made offline)."""
+        out: dict[str, Any] = {"offline": True} if self.command == "new" else {}
         for key, value in self.options.items():
+            out[key] = _text(value) if isinstance(value, (list, Mapping)) else value
+        return out
+
+    def argv(self) -> list[str]:
+        """The ``an character`` command line of this step (from :meth:`kwargs`)."""
+        args = ["an", "character", self.command, self.name]
+        for key, value in self.kwargs().items():
             flag = "--" + key.replace("_", "-")
             if key == "views":
                 if not value:
@@ -91,7 +106,7 @@ class CastStep:
             elif value is True:
                 args.append(flag)
             elif value is not False:
-                args += [flag, _text(value)]
+                args += [flag, str(value)]
         return args
 
 
@@ -103,12 +118,56 @@ def _text(value: Any) -> str:
     return str(value)
 
 
+def _scalar_ok(value: Any) -> bool:
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, (int, float)):
+        return True
+    return (
+        isinstance(value, str) and len(value) <= MAX_VALUE_CHARS and not _CONTROL.search(value)
+    )
+
+
 def _checked(name: str, key: str, value: Any, types: tuple[type, ...]) -> Any:
+    """``value`` when it has one of ``types``; its items (a list's, a mapping's
+    keys and values) short text or numbers; no control characters."""
     ok = isinstance(value, types) and not (isinstance(value, bool) and bool not in types)
+    if ok and isinstance(value, str):
+        ok = _scalar_ok(value)
+    elif ok and isinstance(value, list):
+        ok = len(value) <= MAX_VALUE_CHARS and all(_scalar_ok(v) for v in value)
+    elif ok and isinstance(value, Mapping):
+        ok = len(value) <= MAX_VALUE_CHARS and all(
+            isinstance(k, str) and _scalar_ok(k) and _scalar_ok(v) for k, v in value.items()
+        )
     if not ok:
         wanted = " or ".join(t.__name__ for t in types)
-        raise CastError(f"{CAST_YAML} {name!r}: {key} must be a {wanted}, not {value!r}")
+        raise CastError(
+            f"{CAST_YAML} {name!r}: {key} must be a {wanted} of short text or numbers, "
+            f"not {value!r}"
+        )
     return value
+
+
+def _load_yaml(path: Path) -> Any:
+    """A cast file's YAML, refusing what a cast never needs and a server must not
+    expand: anchors and aliases (a few hundred bytes of them grow into gigabytes),
+    tags, and a file over :data:`MAX_CAST_BYTES`."""
+    import yaml
+
+    if path.stat().st_size > MAX_CAST_BYTES:
+        raise CastError(f"{CAST_YAML} is over {MAX_CAST_BYTES} bytes: a cast is a page")
+
+    class _NoAliases(yaml.SafeLoader):
+        def compose_node(self, parent, index):
+            if self.check_event(yaml.AliasEvent):
+                raise CastError(f"{CAST_YAML}: anchors and aliases (& and *) are not allowed")
+            return super().compose_node(parent, index)
+
+    try:
+        return yaml.load(path.read_text(encoding="utf-8"), Loader=_NoAliases)  # noqa: S506 - a SafeLoader
+    except yaml.YAMLError as e:
+        raise CastError(f"{CAST_YAML} is not YAML: {e}") from None
 
 
 def cast_steps(cast: Union[str, os.PathLike, Mapping[str, Any]]) -> list[CastStep]:
@@ -121,16 +180,8 @@ def cast_steps(cast: Union[str, os.PathLike, Mapping[str, Any]]) -> list[CastSte
     ...
     cutan.characters.cast.CastError: cast.yaml 'Teo': not a character name (lowercase letters, digits, _)
     """
-    from cutan.pack import NAME_RE
-
     if not isinstance(cast, Mapping):
-        import yaml
-
-        text = Path(cast).read_text(encoding="utf-8")
-        try:
-            cast = yaml.safe_load(text) or {}
-        except yaml.YAMLError as e:
-            raise CastError(f"{CAST_YAML} is not YAML: {e}") from None
+        cast = _load_yaml(Path(cast)) or {}
         if not isinstance(cast, Mapping):
             raise CastError(f"{CAST_YAML} holds a mapping {{name: options}}, not {type(cast).__name__}")
     steps: list[CastStep] = []
@@ -181,12 +232,9 @@ def run_cast(
     }
     messages = []
     for step in cast_steps(cast):
-        kwargs = {k: _text(v) if isinstance(v, (list, Mapping)) else v for k, v in step.options.items()}
-        if step.command == "new":
-            kwargs["offline"] = True
         label = " ".join(step.argv()[2:4])
         try:
-            result = commands[step.command](step.name, out_dir=out_dir, **kwargs)
+            result = commands[step.command](step.name, out_dir=out_dir, **step.kwargs())
         except (OSError, ValueError) as e:  # the factory raises on some refusals
             messages.append(f"{label}: [error] {type(e).__name__}: {e}")
             return False, messages

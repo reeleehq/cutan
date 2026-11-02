@@ -854,11 +854,11 @@ def cast(file: str, out_dir: str = "") -> str:
     file: the cast file, e.g. {teo: {build: squat, hat: cap, palette: {skin: "#f1c9a5"}, mouth_variants: [happy, sad], half_lid: 0.5}}
     out_dir: parent directory; defaults to ./assets/characters
     """
-    from cutan.characters.cast import CastError, run_cast
+    from cutan.characters.cast import run_cast
 
     try:
         ok, messages = run_cast(file, out_dir=out_dir)
-    except (CastError, OSError) as e:
+    except (ValueError, OSError) as e:  # CastError, and a file that is not UTF-8
         return failed(str(e))
     report = "\n".join(messages) or "the cast is empty"
     return report if ok else failed(report)
