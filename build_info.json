@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-02T03:58:43Z",
+  "built_at": "2026-11-02T04:05:18Z",
   "package": {
     "name": "cutan",
-    "version": "0.0.99",
+    "version": "0.0.100",
     "display_name": "cutan",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "6e76e26b74ef0d6db6d3e32ee1a565140ae40917",
-    "short_commit": "6e76e26",
+    "commit": "ad516dd85088671135f747ed16ae16e21a3c02de",
+    "short_commit": "ad516dd",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/cutan",
-    "commit_url": "https://github.com/reeleehq/cutan/commit/6e76e26b74ef0d6db6d3e32ee1a565140ae40917",
+    "commit_url": "https://github.com/reeleehq/cutan/commit/ad516dd85088671135f747ed16ae16e21a3c02de",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/cutan",
-    "sha": "f28847e7da23a15dc649e2edbac1e48755828cbf",
+    "sha": "6e76e26b74ef0d6db6d3e32ee1a565140ae40917",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "41385172341",
-    "run_url": "https://github.com/reeleehq/cutan/actions/runs/41385172341",
+    "run_id": "41385824374",
+    "run_url": "https://github.com/reeleehq/cutan/actions/runs/41385824374",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -60,11 +60,11 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.99",
+    "latest": "0.0.100",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 6e76e26b74ef0d6db6d3e32ee1a565140ae40917\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout ad516dd85088671135f747ed16ae16e21a3c02de\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,
