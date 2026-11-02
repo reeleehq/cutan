@@ -50,14 +50,15 @@ Configuration (environment; the first match wins, `CUTAN_HOME` always forces loc
 |--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
 | [`PushReport`](#cutan.projects_store.PushReport)(project_id, folder, written, ...)    | What one [`push_project()`](#cutan.projects_store.push_project) did, as relative paths. |
 
-### cutan.projects_store.DEFAULT_PUSH_EXCLUDES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('.git/', '.an/render_work/', 'artifacts/shot_cache/', 'artifacts/shots/', 'artifacts/render_reports/', 'artifacts/probes/')*
+### cutan.projects_store.DEFAULT_PUSH_EXCLUDES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('.git/', '.an/render_work/', 'artifacts/shot_cache/', 'artifacts/shots/', 'artifacts/render_reports/', 'artifacts/probes/', 'artifacts/voice_options/\*.lock')*
 
 derived or transient output,
 keyed by that machine or re-made from the project. The shot cache (an#242) and
 the shot archive re-render from the project; the render work dirs are a run’s
-scratch; render reports and probes are what `an init` keeps out of git
-(`an.project.PROJECT_GITIGNORE`, held equal by a test); a repository is
-not project content. Each entry is a folder prefix (ending in `/`) or a file.
+scratch; a repository is not project content; and every line `an init`
+keeps out of git (`an.project.PROJECT_GITIGNORE`: render reports, probes, the
+options manifests’ file locks) is read from `an`, so a line it adds there is
+kept local here too. Each entry is a `.gitignore` line (`_gitignore_matcher()`).
 
 * **Type:**
   What a push keeps on the machine that made it
@@ -145,7 +146,7 @@ from a folder elsewhere lands whole.
 * **Return type:**
   [`MutableMapping`](https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping)
 
-### cutan.projects_store.push_project(project_id, , folder=None, settings=None, store=None, delete_missing=False, exclude=('.git/', '.an/render_work/', 'artifacts/shot_cache/', 'artifacts/shots/', 'artifacts/render_reports/', 'artifacts/probes/'), force=False, cache=None)
+### cutan.projects_store.push_project(project_id, , folder=None, settings=None, store=None, delete_missing=False, exclude=('.git/', '.an/render_work/', 'artifacts/shot_cache/', 'artifacts/shots/', 'artifacts/render_reports/', 'artifacts/probes/', 'artifacts/voice_options/\*.lock'), force=False, cache=None)
 
 Write `folder`’s files to the store under `project_id/`: the inverse of
 [`materialize_project()`](#cutan.projects_store.materialize_project) (cutan#91).
