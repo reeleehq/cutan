@@ -70,7 +70,7 @@ def test_the_lint_reports_regions_for_a_project(dialogue, monkeypatch):
     monkeypatch.setattr(S, "_probe_fps", lambda mp4: 24.0)
     monkeypatch.setattr(S, "_probe_size", lambda mp4: (320, 240))
     video = dialogue / "output" / "main.mp4"
-    video.parent.mkdir()
+    video.parent.mkdir(exist_ok=True)
     video.write_bytes(b"stand-in")
     for scene in (dialogue, dialogue / "ir" / "scene.json", None):  # None: found from the render's folder
         result = S.style_lint(video, "south_park", scene=scene)
