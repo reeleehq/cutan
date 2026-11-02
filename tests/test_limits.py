@@ -5,6 +5,7 @@ compiled timeline, as `test_hands.py` does.
 """
 
 from __future__ import annotations
+from an.stage.solve import solve_report
 
 import json
 import math
@@ -232,16 +233,16 @@ def _turn_the_head_to(root: Path, degrees: float):
 def test_a_turn_inside_the_neck_range_is_reached_with_or_without_it(tmp_path, limits):
     root = _character(tmp_path / "p", limits=limits)
     doc, goal = _turn_the_head_to(root, 30)
-    assert doc.meta.extensions["solve"]["dropped"] == []
+    assert solve_report(doc)["dropped"] == []
     assert math.dist(_head_tip(doc, 1.0), goal) < 0.5
 
 
 def test_a_turn_beyond_the_neck_range_is_refused_only_when_the_neck_has_one(tmp_path):
     free, goal = _turn_the_head_to(_character(tmp_path / "a", limits=False), 70)
-    assert free.meta.extensions["solve"]["dropped"] == []
+    assert solve_report(free)["dropped"] == []
     assert math.dist(_head_tip(free, 1.0), goal) < 0.5
     limited, goal = _turn_the_head_to(_character(tmp_path / "b", limits=True), 70)
-    (dropped,) = limited.meta.extensions["solve"]["dropped"]
+    (dropped,) = solve_report(limited)["dropped"]
     assert dropped["gap"] > 10  # the pin was given up, the head stays inside its range
     assert math.dist(_head_tip(limited, 1.0), goal) > 10
 
@@ -254,4 +255,4 @@ def test_limits_change_nothing_in_a_shot_that_declares_no_joint(tmp_path):
         for name, limits in (("free", False), ("limited", True))
     ]
     assert docs[0].scene.model_dump_json() == docs[1].scene.model_dump_json()
-    assert docs[0].meta.extensions.get("solve") == docs[1].meta.extensions.get("solve")
+    assert solve_report(docs[0]) == solve_report(docs[1])

@@ -8,6 +8,7 @@ render: shots are compiled and the joints measured on the compiled nodes.
 """
 
 from __future__ import annotations
+from an.stage.solve import solve_report
 
 import json
 import math
@@ -286,7 +287,7 @@ def test_both_hands_are_on_the_wheel_at_every_frame(tmp_path, framing):
     root = _project(tmp_path / "p")
     shot = _wheel_shot(*FRAMINGS[framing])
     doc = _compile(root, shot)
-    assert doc.meta.extensions["solve"]["dropped"] == []
+    assert solve_report(doc)["dropped"] == []
     puppet, times, gaps, excess = joint_residuals(doc, shot, load(root).mall)
     pins = [j for j, row in enumerate(puppet.rows) if "pin" in str(row.id)]
     assert len(pins) == 2 and len(times) == 25
@@ -369,7 +370,7 @@ def test_a_hand_takes_a_cup_by_its_hand_bone(tmp_path):
         encoding="utf-8",
     )
     doc = _compile(root, _shot((50.0, 60.0)))
-    (g,) = doc.meta.extensions["solve"]["holds"]["gestures"]
+    (g,) = solve_report(doc)["holds"]["gestures"]
     assert g["by"] == "ned@hand_r" and g["gap"] <= 0.5, g
     contact = g["contact"]
     nodes = dict(walk_children(doc.scene))
@@ -395,7 +396,7 @@ def test_a_preset_drives_the_joined_rig_and_is_unchanged_without_joints(tmp_path
     )
     bare, joined = _compile(root, free), _compile(root, pinned)
     assert "solve" not in (bare.meta.extensions or {})
-    assert joined.meta.extensions["solve"]["dropped"] == []
+    assert solve_report(joined)["dropped"] == []
     puppet, times, gaps, _ = joint_residuals(joined, pinned, load(root).mall)
     pins = [j for j, row in enumerate(puppet.rows) if "pin" in str(row.id)]
     assert max(gaps[k][j] for k in range(len(times)) for j in pins) < 0.25
