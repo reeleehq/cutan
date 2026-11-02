@@ -1,36 +1,41 @@
 # Cut detection for the style lint: the histogram jump vs `mixing.video.shots` (cutan#151)
 
-Measured 2026-11-02. **Decision: keep `cutan.verify.style`'s histogram-jump detector. It found 34 of 37 hand-labelled cuts and no false one. Offer it to `mixing` as a shot strategy** (reeleehq/mixing#164).
+Measured 2026-11-02. **Decision: keep `cutan.verify.style`'s histogram-jump detector.** On six cut-out clips it found 32 of 36 hand-labelled hard cuts with no false cut. That is on par with mixing's best setting (5 Hz `spike`: 33/36, 2 false), not a clear win. It is kept because the style targets were calibrated on it, it needs no new dependency, and it never invented a cut here. It is offered to mixing as a strategy in reeleehq/mixing#164.
 
-## The question
-
-Without an IR shot list (any mp4), `cutan.verify.style` finds cuts itself. A frame counts as a cut when the L1 distance between its 8×8×8 colour histogram and the previous frame's exceeds 0.6 and the mean grey difference exceeds 8. `mixing.video.shots` is the fleet's shot detector. Its `"diff"` strategy samples the video at a low frame rate as 64×36 grayscale frames, takes the mean absolute difference, and applies an adaptive threshold, using either the `"level"` or the `"spike"` rule. The question was whether the lint should take its cuts from mixing.
+To use mixing's cuts instead, no new option is needed: `measure_style`, `measure_video` and `style_lint` already take `shot_durations`. Pass `[b - a for a, b in mixing.video.shots(mp4)]`.
 
 ## Method
 
-- The six study clips of the cut-out styles research (an `misc/docs/cutout_styles_research.md` §3). They are kept outside every repository.
-- For each clip, the candidate cuts are the union of four detectors' outputs, merged within 0.6 s. The four are: the histogram detector, mixing `diff` at 2 Hz `level` (its default), mixing `diff` at 5 Hz `spike`, and mixing's array stages run on the lint's own full-rate 320×180 frames with the `spike` rule.
-- Each candidate was labelled real or not by eye from before/after frames. Cuts that none of the four found are not counted, so recall is relative to that union.
-- A detector's cut matches a labelled cut within 0.6 s. Three dark Norstein candidates and one OverSimplified text overlay were unclear and count neither way.
+- **Clips:** the six study clips of the cut-out styles research (an `misc/docs/cutout_styles_research.md` §3), kept outside every repository.
+- **Candidates:** the union of four detectors' cuts, merged within 0.6 s. The four are: the histogram detector; mixing `diff` at 2 Hz `level` (its default); mixing `diff` at 5 Hz `spike`; and mixing's array stages on the lint's own full-rate 320×180 frames with `spike`.
+- **Labels:** each candidate was labelled from before/after frames, with frame strips where it was unclear.
+  - **A cut is a hard cut:** one frame to the next changes shot.
+  - **Transitions count neither way:** a push or slide, a dissolve, a title overlay. That is four Kurzgesagt pushes and slides, three Norstein dissolves and one OverSimplified overlay.
+  - The labeller could see which detectors flagged each candidate, so the labels are not blind.
+- **Scoring:** one-to-one. Each hard cut is matched by at most one detection, and each detection credits at most one cut, nearest first, within 0.6 s. A detection near a transition counts neither way; every other detection is a false cut.
+- **Coverage:** every detection of the spike variants scored below was among the labelled candidates. The level variants' extra detections are camera moves and motion.
 
-## Result (true cuts found / labelled, false cuts)
+## Result (hard cuts found / labelled, false cuts)
 
-| clip | labelled | histogram | 2 Hz level (mixing default) | 2 Hz spike | 5 Hz level | 5 Hz spike | full-rate level | full-rate spike |
+| clip | cuts | histogram | 2 Hz level (mixing default) | 2 Hz spike | 2 Hz spike, ratio 1.5 | 5 Hz level | 5 Hz spike | 5 Hz spike, ratio 1.5 |
 |---|---|---|---|---|---|---|---|---|
-| South Park | 8 | 6, 0 | 8, 0 | 8, 0 | 8, 0 | 8, 0 | 8, 1 | 8, 1 |
-| OverSimplified | 10 | 10, 0 | 10, 6 | 9, 2 | 10, 13 | 10, 1 | 10, 20 | 10, 0 |
-| Kurzgesagt | 6 | 6, 0 | 6, 12 | 5, 5 | 6, 22 | 3, 0 | 6, 110 | 5, 0 |
-| Reiniger | 4 | 4, 0 | 4, 0 | 4, 0 | 4, 1 | 4, 0 | 4, 23 | 4, 5 |
-| Gilliam | 2 | 2, 0 | 2, 10 | 2, 2 | 2, 32 | 2, 1 | 2, 109 | 2, 59 |
-| Norstein | 7 | 6, 0 | 7, 6 | 6, 0 | 6, 1 | 6, 0 | 7, 119 | 7, 52 |
-| **total** | **37** | **34, 0** | 37, 34 | 34, 9 | 36, 69 | 33, 2 | 37, 382 | 36, 117 |
+| South Park | 8 | 6, 0 | 8, 0 | 8, 0 | 8, 0 | 8, 0 | 8, 0 | 8, 0 |
+| OverSimplified | 10 | 9, 0 | 10, 6 | 9, 2 | 9, 2 | 10, 13 | 10, 1 | 10, 2 |
+| Kurzgesagt | 5 | 5, 0 | 5, 8 | 5, 2 | 5, 3 | 5, 16 | 3, 0 | 4, 0 |
+| Reiniger | 4 | 4, 0 | 4, 0 | 4, 0 | 4, 0 | 4, 1 | 4, 0 | 4, 0 |
+| Gilliam | 2 | 2, 0 | 2, 10 | 2, 2 | 2, 4 | 2, 32 | 2, 1 | 2, 4 |
+| Norstein | 7 | 6, 0 | 7, 6 | 6, 0 | 7, 1 | 6, 1 | 6, 0 | 6, 0 |
+| **total** | **36** | **32, 0** | 36, 30 | 34, 6 | 35, 10 | 35, 63 | 33, 2 | 34, 6 |
 
-The full-rate columns use mixing's adaptive threshold, which is calibrated on 64×36 frames, on 320×180 frames. They show that the mixing stages cannot be dropped in on the lint's frames as they are.
+mixing's adaptive threshold applied to the lint's own full-rate 320×180 frames found every cut, but with 350 false cuts (`level`) and 131 (`spike`). It is calibrated on 64×36 frames, so those stages cannot be dropped in on the lint's frames as they are.
 
 ## Reading
 
-- **What the lint measures is cut rate and shot length.** A false cut ruins both, and it also removes a step from the cadence statistics, which skip the step into a cut. The histogram detector has no false cuts on these clips. mixing's default reads Kurzgesagt's camera moves and Gilliam's and Norstein's fast motion and grain as cuts.
-- **The histogram's misses are reverse shots in one palette.** These are South Park's Cartman/Heidi cuts (2) and one dark Norstein cut. mixing's spike rule catches them. The union of the histogram detector and 5 Hz spike scored 36/37 with 2 false. That is a possible later improvement, but adopting it means re-measuring the cut-rate targets of every style spec (the module's rule: an estimator changes only together with its targets).
-- The cut-rate targets in the style specs were calibrated with the histogram detector. Switching detectors would measure a different quantity against them.
+- **The histogram detector's misses are hard cuts between shots of one palette.** These are South Park's two Cartman/Heidi reverse shots, OverSimplified's photo-to-title-card cut (both on black), and one dark Norstein cut. mixing's spike rule catches most of them.
+- **mixing's false cuts are motion.** These are Kurzgesagt's camera moves, Gilliam's and Norstein's fast motion and grain, and OverSimplified's crowds.
+- **For a lint that measures cut rate, shot length and cadence, a false cut is the worse error.** It splits a shot, and it hides a cadence step, because the step into a cut is skipped.
+- **Blind spot:** dissolves are not detected by any of these detectors, so they are not measured here. Recall is relative to the cuts at least one of the four detectors found.
+- **Not tested:** PySceneDetect (`strategy="pyscenedetect"`, not installed here), mixing's `min_shot_s`, and other `sigmas` values.
+- **The calibration cuts both ways.** The style specs' cut-rate targets were measured with the histogram detector, so they inherit its misses. On the hand labels, South Park cuts 16.6 times a minute, against a target of [10, 14] (measured 12.4). Kurzgesagt makes 5.0 hard cuts a minute, against [6, 8] (measured 7.0, which counts a slide). A render checked against its exact IR shot list measures true cuts, so these targets need re-deriving from the labels (reeleehq/cutan#160).
 
-The scripts and contact sheets are kept with the agent working notes for cutan#151. They are not committed, because the sheets are frames of copyrighted clips.
+The scripts, labels and contact sheets are kept with the agent working notes for cutan#151. They are not committed, because the sheets are frames of copyrighted clips.
