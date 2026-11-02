@@ -52,10 +52,14 @@ def _descriptor_digest(entity: Any, mall: Mapping[str, Any]) -> str:
         doc = (mall or {}).get(entity.store, {})[entity.ref]
     except Exception:  # noqa: BLE001 - an unknown ref draws a placeholder: key it as such
         return "placeholder"
-    return hashlib.sha256(json.dumps(doc, sort_keys=True, default=str).encode()).hexdigest()
+    return hashlib.sha256(
+        json.dumps(doc, sort_keys=True, default=str).encode()
+    ).hexdigest()
 
 
-def _part_boxes(entity: Any, mall: Mapping[str, Any]) -> dict[str, tuple[float, float, float, float]]:
+def _part_boxes(
+    entity: Any, mall: Mapping[str, Any]
+) -> dict[str, tuple[float, float, float, float]]:
     """``{node path below the character: (x0, y0, x1, y1)}`` of its drawn nodes, in
     scene pixels relative to its placement point, as
     ``an.stage.world.native_box`` measures the whole."""
@@ -72,12 +76,22 @@ def _part_boxes(entity: Any, mall: Mapping[str, Any]) -> dict[str, tuple[float, 
     width, height = SPECIMEN_SIZE
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        doc = compile_shot(character_specimen(bare), mall=mall or {}, width=width, height=height)
+        doc = compile_shot(
+            character_specimen(bare), mall=mall or {}, width=width, height=height
+        )
     ox, oy = screen_position(doc, entity.id)
     out: dict[str, tuple[float, float, float, float]] = {}
     for path, _node in walk_document(doc):
-        if path.startswith(entity.id + "/") and (box := node_box(doc, path)) is not None:
-            out[path[len(entity.id) + 1 :]] = (box[0] - ox, box[1] - oy, box[2] - ox, box[3] - oy)
+        if (
+            path.startswith(entity.id + "/")
+            and (box := node_box(doc, path)) is not None
+        ):
+            out[path[len(entity.id) + 1 :]] = (
+                box[0] - ox,
+                box[1] - oy,
+                box[2] - ox,
+                box[3] - oy,
+            )
     if len(_cache) >= _CACHE_SIZE:
         _cache.pop(next(iter(_cache)))
     _cache[key] = out
@@ -89,14 +103,20 @@ def _lowest(
 ) -> float | None:
     """The lowest point of the shallowest part named ``name``, and with
     ``subtree`` of everything drawn under it (a mouth below a small head box)."""
-    paths = sorted((p for p in parts if name in p.split("/")), key=lambda p: p.count("/"))
+    paths = sorted(
+        (p for p in parts if name in p.split("/")), key=lambda p: p.count("/")
+    )
     if not paths:
         return None
     segments = paths[0].split("/")
     root = "/".join(segments[: segments.index(name) + 1])
     if not subtree:
         return parts[root][3] if root in parts else None
-    ys = [box[3] for path, box in parts.items() if path == root or path.startswith(root + "/")]
+    ys = [
+        box[3]
+        for path, box in parts.items()
+        if path == root or path.startswith(root + "/")
+    ]
     return max(ys) if ys else None
 
 
