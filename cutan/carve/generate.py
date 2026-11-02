@@ -439,7 +439,11 @@ def art_source(
             "background": spec.background,
             **({"quality": quality} if quality else {}),
             **({"key": spec.key} if spec.key else {}),
-            **({"revised_prompt": facts["revised_prompt"]} if facts.get("revised_prompt") else {}),
+            **(
+                {"revised_prompt": facts["revised_prompt"]}
+                if facts.get("revised_prompt")
+                else {}
+            ),
         },
     )
 
