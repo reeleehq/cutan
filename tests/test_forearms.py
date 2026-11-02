@@ -21,7 +21,7 @@ from an.ir.schema import Shot
 from an.ir.validate import validate_semantic
 from an.project import init, load
 from an.stage.compile import compile_shot
-from an.stage.solve import _local_box, _pivot, joint_residuals
+from an.stage.solve import _local_box, _pivot, joint_residuals, solve_report
 from an.stage.timeline import evaluate_timeline, screen_position, timeline_from_scene
 from an.stage.tree import walk_children
 from cutan.characters import new_character
@@ -286,7 +286,7 @@ def test_both_hands_are_on_the_wheel_at_every_frame(tmp_path, framing):
     root = _project(tmp_path / "p")
     shot = _wheel_shot(*FRAMINGS[framing])
     doc = _compile(root, shot)
-    assert doc.meta.extensions["solve"]["dropped"] == []
+    assert solve_report(doc)["dropped"] == []
     puppet, times, gaps, excess = joint_residuals(doc, shot, load(root).mall)
     pins = [j for j, row in enumerate(puppet.rows) if "pin" in str(row.id)]
     assert len(pins) == 2 and len(times) == 25
@@ -353,7 +353,7 @@ def test_the_old_one_piece_character_is_untouched_by_all_of_it(tmp_path):
     root = _project(tmp_path / "p", split=False)
     doc = _compile(root, _character_shot())
     assert "forearm" not in doc.scene.model_dump_json()
-    assert "solve" not in (doc.meta.extensions or {})
+    assert solve_report(doc) == {}
 
 
 def test_a_hand_takes_a_cup_by_its_hand_bone(tmp_path):
@@ -369,7 +369,7 @@ def test_a_hand_takes_a_cup_by_its_hand_bone(tmp_path):
         encoding="utf-8",
     )
     doc = _compile(root, _shot((50.0, 60.0)))
-    (g,) = doc.meta.extensions["solve"]["holds"]["gestures"]
+    (g,) = solve_report(doc)["holds"]["gestures"]
     assert g["by"] == "ned@hand_r" and g["gap"] <= 0.5, g
     contact = g["contact"]
     nodes = dict(walk_children(doc.scene))
@@ -394,8 +394,8 @@ def test_a_preset_drives_the_joined_rig_and_is_unchanged_without_joints(tmp_path
         update={"actions": Shot.model_validate({**pinned.model_dump(), "actions": [*pinned.actions, nod]}).actions}
     )
     bare, joined = _compile(root, free), _compile(root, pinned)
-    assert "solve" not in (bare.meta.extensions or {})
-    assert joined.meta.extensions["solve"]["dropped"] == []
+    assert solve_report(bare) == {}
+    assert solve_report(joined)["dropped"] == []
     puppet, times, gaps, _ = joint_residuals(joined, pinned, load(root).mall)
     pins = [j for j, row in enumerate(puppet.rows) if "pin" in str(row.id)]
     assert max(gaps[k][j] for k in range(len(times)) for j in pins) < 0.25

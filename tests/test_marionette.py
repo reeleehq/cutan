@@ -19,7 +19,7 @@ from an.ir.schema import Shot
 from an.ir.validate import validate_semantic
 from an.project import init, load
 from an.stage.compile import compile_shot
-from an.stage.solve import joint_residuals
+from an.stage.solve import joint_residuals, solve_report
 from an.stage.timeline import evaluate_timeline, screen_position, timeline_from_scene
 from cutan.characters import new_character
 from cutan.characters.factory import add_limits
@@ -145,7 +145,7 @@ def test_the_figure_follows_the_bar_swings_and_settles(tmp_path):
     root = _project(tmp_path / "p")
     shot = _shot(root)
     doc = _compile(root, shot)
-    report = doc.meta.extensions["solve"]
+    report = solve_report(doc)
     assert report["mode"] == "dynamic" and report["gravity"] is not None
     assert report["dropped"] == []
     xs = [_head_x(doc, k / 24) for k in range(0, 97)]
@@ -177,7 +177,7 @@ def test_a_figure_with_hands_hangs_by_them_too(tmp_path):
     shot = _shot(root)
     assert any(j.a == "ned/hand_l@hand_l" for j in shot.joints)
     doc = _compile(root, shot)
-    assert doc.meta.extensions["solve"]["dropped"] == []
+    assert solve_report(doc)["dropped"] == []
     assert _head_x(doc, 4.0) - _head_x(doc, 0.0) > 100
 
 

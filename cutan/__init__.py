@@ -68,7 +68,9 @@ PROJECT_STORE_RECORD: str = ".an/projects_store.json"
 #: Level 9: ``an.cli_status.failed`` (an#480), which ``an character`` commands return
 #: to exit non-zero on a failure.
 #: Level 10: ``an.stores._common.asset_references`` and ``asset_ref_problems`` (an#552).
-REQUIRED_AN_API_LEVEL: int = 10
+#: Level 11: the first level whose every release ships ``an.stage.solve.solve_report``
+#: (an#570 merged after level 10 was cut), which the body-continuity check reads.
+REQUIRED_AN_API_LEVEL: int = 11
 
 
 def require_an() -> None:

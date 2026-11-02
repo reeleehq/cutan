@@ -581,10 +581,11 @@ def _follow_findings(ctx: Any) -> None:
             )
     if not declaring:
         return
+    from an.stage.solve import solve_report
     from an.verify.constraints import compiled_shot
 
     doc = compiled_shot(ctx)
-    report = ((doc.meta.extensions or {}).get("solve") or {}) if doc is not None else {}
+    report = solve_report(doc) if doc is not None else {}
     joints = report.get("joints") or []
     authored = len(ctx.shot.actions)
     for entry in report.get("dropped") or []:

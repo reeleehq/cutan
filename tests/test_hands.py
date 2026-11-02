@@ -147,7 +147,7 @@ def test_a_character_rig_names_its_hands():
 def test_a_character_takes_a_cup_by_its_hand(tmp_path, elbow):
     """The grip is on the far end of the arm's LAST part (the forearm when there
     is an elbow) at the frame the cup is taken, measured on the compiled nodes."""
-    from an.stage.solve import _local_box, _pivot, end_effector
+    from an.stage.solve import _local_box, _pivot, end_effector, solve_report
     from an.stage.tree import walk_children
 
     root = _project(tmp_path / "p", elbow=elbow)
@@ -160,7 +160,7 @@ def test_a_character_takes_a_cup_by_its_hand(tmp_path, elbow):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         doc = compile_shot(_shot((70.0, 60.0)), project.mall, fps=24, width=W, height=H)
-    (g,) = doc.meta.extensions["solve"]["holds"]["gestures"]
+    (g,) = solve_report(doc)["holds"]["gestures"]
     assert g["by"] == "ned@hand_r" and g["start"] == 0.3 and g["gap"] <= 0.5, g
     contact = round(g["contact"] * 24) / 24
     pose = evaluate_timeline(timeline_from_scene(doc), contact)

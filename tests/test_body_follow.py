@@ -24,7 +24,7 @@ from an.ir.schema import AssetRef, Shot, StagePlacement
 from an.ir.validate import validate_semantic
 from an.project import init, load
 from an.stage.compile import compile_shot
-from an.stage.solve import _local_box, joint_residuals
+from an.stage.solve import _local_box, joint_residuals, solve_report
 from an.stage.timeline import evaluate_timeline, screen_position, timeline_from_scene
 from an.stage.tree import walk_children
 from cutan.body_attachment import BODY_ATTACHMENT_KEY
@@ -127,13 +127,13 @@ def test_no_pins_when_there_is_nothing_to_follow_or_nowhere_to_follow(project, w
 
 def test_a_still_shot_compiles_to_the_scene_it_did(project):
     doc = _compile(project, _shot())
-    assert "solve" not in (doc.meta.extensions or {})
+    assert solve_report(doc) == {}
 
 
 def test_the_sockets_stay_on_the_shoulders_at_every_frame_of_a_nod(project):
     shot = _shot([NOD])
     doc = _compile(project, shot)
-    report = doc.meta.extensions["solve"]
+    report = solve_report(doc)
     assert report["dropped"] == []
     expanded = derive_body_placements(shot, project.mall)
     puppet, times, gaps, _ = joint_residuals(doc, expanded, project.mall)
@@ -220,7 +220,7 @@ def test_validate_says_when_the_motion_pulls_a_followed_socket_off_its_bone(proj
         "duration": 1.0,
     }
     shot = _shot([stretch])
-    assert _compile(project, shot).meta.extensions["solve"]["dropped"]
+    assert solve_report(_compile(project, shot))["dropped"]
     report = _validate(project, shot, {"cutout.body_attachment"})
     said = [f.description for f in report.findings if "cannot stay on its bone" in f.description]
     assert said and "px off" in said[0] and " s to " in said[0], [f.description for f in report.findings]
