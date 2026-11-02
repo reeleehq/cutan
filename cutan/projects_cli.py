@@ -5,6 +5,7 @@ the same way as ``an character ...`` (the ``cli.projects`` service):
 
     an projects push <id> [--folder DIR] [--delete-missing]
     an projects pull <id>
+    an projects prune <id> [--dry-run]
 
 Both read the backend from the environment (``CUTAN_PROJECTS_BACKEND=s3``,
 ``CUTAN_HOME`` forces local). On the local backend a push of the project's own
@@ -15,9 +16,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cutan.projects_store import materialize_project, push_project
+from cutan.projects_store import materialize_project, prune_project, push_project
 
-__all__ = ["push", "pull"]
+__all__ = ["push", "pull", "prune"]
 
 
 def push(
@@ -52,4 +53,17 @@ def pull(project_id: str) -> str:
     return str(materialize_project(project_id))
 
 
-_dispatch_funcs = [push, pull]
+def prune(project_id: str, dry_run: bool = False) -> str:
+    """Delete the store's copies of what a push keeps local (pushed before the excludes covered them: the options manifests' file locks), so no pull brings them back.
+
+    project_id: the project's id (its folder name)
+    dry_run: only list what would be deleted
+    """
+    gone = prune_project(project_id, dry_run=dry_run)
+    if not gone:
+        return "nothing to prune"
+    head = "would delete" if dry_run else "deleted"
+    return "\n".join([f"{head} {len(gone)} file(s):", *(f"  - {rel}" for rel in gone)])
+
+
+_dispatch_funcs = [push, pull, prune]
