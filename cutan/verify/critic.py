@@ -212,6 +212,13 @@ def _envelope_judge(model: str | None) -> Callable[..., Mapping[str, Any]]:
     return judge
 
 
+class _Fill(dict):
+    """``str.format_map`` filling: an unknown ``{name}`` stays as written."""
+
+    def __missing__(self, key: str) -> str:
+        return "{" + key + "}"
+
+
 def _checked_default_judge(model: str | None, report: CritiqueReport, label: str):
     """The default judge, or ``None`` with an error finding when its SDK is missing."""
     try:
@@ -263,7 +270,7 @@ def _ask(
         )
         return
     for q, a in zip(checklist, answers):
-        text = q.text.format(**fill)
+        text = q.text.format_map(_Fill(fill))
         if a["answer"] == "unsure":
             report.findings.append(("info", where, f"{label}, unsure: {text}"))
         elif a["answer"] != q.expected:
@@ -346,6 +353,8 @@ def critique_body_props(
                 nonlocal shown
                 if shown is None:
                     shown = frames(project, shot.id, [f * shot.duration for f in at])
+                if not shown:
+                    raise ValueError(f"the probe of shot {shot.id!r} gave no frames")
                 return shown
 
             _ask(
@@ -392,24 +401,33 @@ or "unsure", with a few words why. Reply with JSON only:
 PLATE_MAX_SIDE: int = 1024
 
 
+#: What a plate's transparent parts are shown on: a neutral mid grey, since how
+#: a vision model reads transparency is undefined.
+PLATE_MATTE: tuple[int, int, int] = (128, 128, 128)
+
+
 def _plate_png(path: Any, *, max_side: int = PLATE_MAX_SIDE) -> bytes:
-    """A raster plate as PNG bytes, at most ``max_side`` pixels long."""
+    """A raster plate as RGB PNG bytes, at most ``max_side`` pixels long, its
+    transparency flattened onto :data:`PLATE_MATTE`."""
     import io
 
     from PIL import Image
 
     with Image.open(path) as im:
-        im = im.convert("RGBA")
-        im.thumbnail((max_side, max_side))
+        rgba = im.convert("RGBA")
+        rgba.thumbnail((max_side, max_side))
+        flat = Image.new("RGB", rgba.size, PLATE_MATTE)
+        flat.paste(rgba, mask=rgba.getchannel("A"))
         buf = io.BytesIO()
-        im.save(buf, format="PNG")
+        flat.save(buf, format="PNG")
     return buf.getvalue()
 
 
-def _far_plates(project: Any) -> list[tuple[str, str, Any]]:
-    """``(where, "member/plane", plate path or None)`` of each plane a travel
-    lists ``far``; the path is ``None`` when the plane has no image (a fill, a
-    gradient) or its file is outside its environment's folder."""
+def _far_plates(project: Any) -> list[tuple[str, str, Any, str]]:
+    """``(where, "member/plane", plate path or None, why not)`` of each plane a
+    travel lists ``far``; the path is ``None`` (and ``why not`` says why) when
+    the plane has no image (a fill, a gradient), its member is not an
+    environment, or its file cannot be read inside its environment's folder."""
     from an.ir.migrate import migrate
     from an.stage.environments import ENVIRONMENT_DOCUMENT_KIND, EnvironmentDescriptor
     from an.stores._common import inside_folder
@@ -426,18 +444,26 @@ def _far_plates(project: Any) -> list[tuple[str, str, Any]]:
         member_id, _, plane_name = name.partition("/")
         member = members.get(member_id)
         where = f"world/travel/plates/far/{k}"
-        path = None
+        path, why = None, "its file cannot be read in its environment's folder"
+        if member is None or member.kind != "environment" or root is None:
+            why = "it is not a plane of an environment in the world" if root is not None else "the environments store has no folder"
+            out.append((where, name, None, why))
+            continue
         try:
             raw = env_store[member.ref]
             env = EnvironmentDescriptor.model_validate(
                 migrate(dict(raw), kind=ENVIRONMENT_DOCUMENT_KIND.name)
             )
             plane = next(p for p in env.planes if p.name == plane_name)
-            if plane.art.kind == "image" and plane.art.src and root is not None:
+            if plane.art.kind != "image" or not plane.art.src:
+                why = f"it is a {plane.art.kind}, not a picture"
+            else:
                 path = inside_folder(Path(root) / str(member.ref), plane.art.src)
-        except Exception:  # noqa: BLE001 - a missing plane is the travel check's to report
+        except StopIteration:
+            why = "its environment has no such plane"
+        except Exception:  # noqa: BLE001 - a malformed environment is another check's to report
             path = None
-        out.append((where, name, path))
+        out.append((where, name, path, why))
     return out
 
 
@@ -447,21 +473,28 @@ def critique_far_plates(
     judge: Callable[..., Union[str, Mapping[str, Any]]] | None = None,
     checklist: Sequence[Question] = FAR_PLATE_CHECKLIST,
     model: str | None = None,
+    max_side: int = PLATE_MAX_SIDE,
 ) -> CritiqueReport:
     """Ask whether each ``far`` plate of ``project``'s travel holds anything near
     (cutan#166): a tree baked into a plate stands still while the streams move.
 
-    The plate's own image is judged, not a render: no probe, one call per plate.
-    An SVG plate (drawn by hand, its content known to its author) and a plane
-    with no image are not judged. Findings and calls as :func:`critique_body_props`.
+    The plate's own image is judged, not a render: no probe, one call per plate
+    (at most ``max_side`` px long; a plane's ``fit`` never crops, so the image
+    holds everything a pan could show). An SVG plate (drawn by hand, its content
+    known to its author) and a plane with no picture are not judged, each said
+    as an ``info``. Only the plates a travel LISTS ``far`` are judged; a plane at
+    infinity because its frame is coupled ``far`` is not yet (cutan#177).
+    Findings and calls as :func:`critique_body_props`.
     """
     from an.project import load
 
     project = load(project) if not hasattr(project, "scene") else project
     report = CritiqueReport()
     custom = judge is not None
-    for where, name, path in _far_plates(project):
+    for where, name, path, why in _far_plates(project):
         if path is None or Path(path).suffix.lower() == ".svg":
+            reason = "it is an SVG, drawn by hand" if path is not None else why
+            report.findings.append(("info", where, f"far plate {name!r} not judged: {reason}"))
             continue
         if judge is None:
             judge = _checked_default_judge(model, report, "far-plate critic")
@@ -471,7 +504,7 @@ def critique_far_plates(
         _ask(
             report,
             judge=judge,
-            images=lambda path=path: [_plate_png(path)],
+            images=lambda path=path: [_plate_png(path, max_side=max_side)],
             prompt=_PLATE_PROMPT.format(questions=questions),
             checklist=checklist,
             fill={},

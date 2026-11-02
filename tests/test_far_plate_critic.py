@@ -56,7 +56,8 @@ class Judge:
 def test_only_raster_far_plates_are_judged_as_png_and_small(project):
     judge = Judge(GOOD)
     report = critique_far_plates(project, judge=judge)
-    assert report.findings == []
+    assert {f[0] for f in report.findings} == {"info"}, "the plates not judged are said"
+    assert len(report.findings) == 4 and all("not judged" in f[2] for f in report.findings)
     assert [c["plate"] for c in report.calls] == ["set/sky", "set/verge"], "no SVG, fill, escape or unknown plane"
     for (png,) in judge.shown:
         assert png.startswith(b"\x89PNG")
@@ -66,8 +67,8 @@ def test_only_raster_far_plates_are_judged_as_png_and_small(project):
 
 def test_a_plate_with_near_things_is_a_warning_on_its_travel_entry(project):
     report = critique_far_plates(project, judge=Judge(TREES))
-    assert {f[0] for f in report.findings} == {"warning"}
-    assert {f[1] for f in report.findings} == {"world/travel/plates/far/0", "world/travel/plates/far/1"}
+    warnings = [f for f in report.findings if f[0] == "warning"]
+    assert {f[1] for f in warnings} == {"world/travel/plates/far/0", "world/travel/plates/far/1"}
     assert any("a tree" in f[2] and "vehicle" in f[2] for f in report.findings)
 
 
@@ -82,5 +83,30 @@ def test_a_broken_judge_is_an_error(project):
         raise RuntimeError("no key")
 
     report = critique_far_plates(project, judge=broken)
-    assert [f[0] for f in report.findings] == ["error", "error"]
+    assert [f[0] for f in report.findings if f[0] != "info"] == ["error", "error"]
     assert len(FAR_PLATE_CHECKLIST) == 3
+
+
+def test_a_far_entry_on_a_member_that_is_not_an_environment_is_not_judged(project):
+    project.scene.world.members.append(WorldMember(kind="prop", id="cup", store="props", ref="road", at=(0.0, 0.0, 5.0), height=0.2))
+    project.scene.world.travel.plates["far"] = ["cup/sky"]
+    judge = Judge(GOOD)
+    report = critique_far_plates(project, judge=judge)
+    assert judge.shown == [] and "not a plane of an environment" in report.findings[0][2]
+
+
+def test_transparency_is_flattened_before_the_judge_sees_it(project, tmp_path):
+    from cutan.verify.critic import PLATE_MATTE, _plate_png
+
+    clear = tmp_path / "clear.png"
+    Image.new("RGBA", (8, 8), (255, 0, 0, 0)).save(clear)
+    with Image.open(__import__("io").BytesIO(_plate_png(clear))) as im:
+        assert im.mode == "RGB" and im.getpixel((0, 0)) == PLATE_MATTE
+
+
+def test_the_cli_says_when_nothing_was_judged(project, monkeypatch):
+    from cutan import art_cli
+    from cutan.verify import critic
+
+    monkeypatch.setattr(critic, "critique_far_plates", lambda project, model=None: critic.CritiqueReport())
+    assert art_cli.critique_plates(".") == "0 judge calls"

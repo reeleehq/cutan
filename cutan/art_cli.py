@@ -73,7 +73,7 @@ def critique_plates(project: str = ".", model: str = "") -> str:
     lines.append(
         f"{len(report.calls)} judge call(s): " + ", ".join(c["plate"] for c in report.calls)
         if report.calls
-        else "no far plate with a raster image to judge"
+        else "0 judge calls"
     )
     text = "\n".join(lines)
     return failed(text) if any(sev == "error" for sev, _, _ in report.findings) else text
