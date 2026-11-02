@@ -90,7 +90,9 @@ RECORDS_KEY: str = "cutout.body_attachment.records"
 Finding = tuple[str, str, str]
 
 
-def _declaring_props(shot: Any, props: Any) -> list[tuple[int, Any, Any]]:
+def declaring_props(shot: Any, props: Any) -> list[tuple[int, Any, Any]]:
+    """``(entity index, entity, prop document)`` of each prop in ``shot`` that
+    declares a ``metadata.body_attachment``."""
     out = []
     for j, entity in enumerate(shot.entities):
         if entity.kind != "prop":
@@ -129,7 +131,7 @@ def body_attachment_findings(
     props = stores.get("props")
     if props is None:
         return []
-    declaring = _declaring_props(shot, props)
+    declaring = declaring_props(shot, props)
     if not declaring:
         return []
     if callable(poses):
@@ -486,7 +488,7 @@ def view_swap_findings(
     from cutan.characters.play import facing_at
 
     props, chars = stores.get("props"), stores.get("characters")
-    if props is None or chars is None or not _declaring_props(shot, props):
+    if props is None or chars is None or not declaring_props(shot, props):
         return []
     try:
         resolved = _turn_resolution(shot, stores)
@@ -495,7 +497,7 @@ def view_swap_findings(
         events = resolved[0].events
         changes = view_changes(events)
         out: list[Finding] = []
-        for j, entity, raw in _declaring_props(shot, props):
+        for j, entity, raw in declaring_props(shot, props):
             ba = body_attachment_of(raw)
             who, name = bound_character(shot, entity, ba)
             if who is None or ba.view == FIRST_PERSON or who.id not in changes:

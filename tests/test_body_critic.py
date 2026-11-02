@@ -16,7 +16,8 @@ from an.ir.schema import AssetRef, Shot, StagePlacement
 from an.project import init, load
 from cutan.body_attachment import BODY_ATTACHMENT_KEY
 from cutan.characters import new_character
-from cutan.verify.critic import BODY_CHECKLIST, critique_body_props
+from cutan.body_attachment import FIRST_PERSON
+from cutan.verify.critic import CHECKLISTS, critique_body_props
 
 SOCKETS = [{"bone": "arm_l", "at": [0.25, -0.6]}, {"bone": "arm_r", "at": [0.75, -0.6]}]
 
@@ -35,6 +36,10 @@ def _prop(root: Path, name: str, metadata: dict) -> None:
     (d / "prop.json").write_text(json.dumps(doc), encoding="utf-8")
 
 
+def _entity(kind, id_, ref, store):
+    return AssetRef(kind=kind, id=id_, store=store, ref=ref, stage=StagePlacement(at=(0.0, 0.0), scale=1.0))
+
+
 @pytest.fixture(scope="module")
 def project():
     with tempfile.TemporaryDirectory() as d:
@@ -42,11 +47,9 @@ def project():
         new_character(root / "assets" / "characters", name="ned", seed="ned", use_dicebear=False)
         _prop(root, "wheel", {BODY_ATTACHMENT_KEY: {"character": "ned", "view": "front", "sockets": SOCKETS}})
         _prop(root, "cup", {})  # depicts no body: never asked about
+        _prop(root, "pov", {BODY_ATTACHMENT_KEY: {"character": "ned", "view": FIRST_PERSON, "sockets": SOCKETS}})
         p = load(root)
-
-        def entity(kind, id_, ref, store):
-            return AssetRef(kind=kind, id=id_, store=store, ref=ref, stage=StagePlacement(at=(0.0, 0.0), scale=1.0))
-
+        entity = _entity
         shots = [
             Shot(id="drive", renderer="cutout", duration=2.0,
                  entities=[entity("character", "ned", "ned", "characters"), entity("prop", "w", "wheel", "props")]),
@@ -112,4 +115,58 @@ def test_a_missing_answer_is_unsure_not_a_pass(project):
     report = critique_body_props(
         project, judge=Judge(json.dumps({"answers": [{"n": 1, "answer": "yes"}]})), frames=_frames([])
     )
-    assert [f[0] for f in report.findings] == ["info"] * (len(BODY_CHECKLIST) - 1)
+    assert [f[0] for f in report.findings] == ["info"] * (len(CHECKLISTS["front"]) - 1)
+    empty = critique_body_props(project, judge=Judge('{"answers": []}'), frames=_frames([]))
+    assert [f[0] for f in empty.findings] == ["error"], "no answers is not 'unsure'"
+
+
+def _with_shots(project, *shots):
+    return type(project)(root=project.root, mall=project.mall,
+                         scene=project.scene.model_copy(update={"timeline": list(shots)}))  # fmt: skip
+
+
+def test_a_first_person_prop_is_asked_its_own_questions(project):
+    e = _entity
+    pov = Shot(id="pov", renderer="cutout", duration=1.0, entities=[e("prop", "p", "pov", "props")])
+    judge = Judge(_reply("yes", "no"))  # arms from below, no face: a correct first-person drawing
+    report = critique_body_props(_with_shots(project, pov), judge=judge, frames=_frames([]))
+    assert report.findings == [] and len(judge.prompts) == 1
+    assert "bottom edge" in judge.prompts[0]
+
+
+def test_the_prop_is_asked_about_the_character_it_is_bound_to(project):
+    e = _entity
+    wheel = e("prop", "w", "wheel", "props").model_copy(update={"overrides": {"body_of": "kim"}})
+    kim = e("character", "kim", "ned", "characters")
+    shot = Shot(id="s", renderer="cutout", duration=1.0, entities=[kim, wheel])
+    judge = Judge(_reply("yes", "no", "yes"))
+    critique_body_props(_with_shots(project, shot), judge=judge, frames=_frames([]))
+    assert "kim" in judge.prompts[0] and "ned" not in judge.prompts[0]
+    off_stage = Shot(id="s", renderer="cutout", duration=1.0, entities=[e("prop", "w", "wheel", "props")])
+    judge = Judge(_reply("yes", "no", "yes"))
+    critique_body_props(_with_shots(project, off_stage), judge=judge, frames=_frames([]))
+    assert judge.prompts == [], "nobody on screen for the arms to belong to"
+
+
+def test_a_probe_that_fails_is_an_error_and_a_shot_is_probed_once(project):
+    def broken(project, shot, times):
+        raise RuntimeError("no browser")
+
+    report = critique_body_props(project, judge=Judge(_reply("yes", "no", "yes")), frames=broken)
+    assert [f[0] for f in report.findings] == ["error"] and "no browser" in report.findings[0][2]
+    e = _entity
+    two = Shot(id="two", renderer="cutout", duration=1.0, entities=[
+        e("character", "ned", "ned", "characters"), e("prop", "w1", "wheel", "props"), e("prop", "w2", "wheel", "props")])  # fmt: skip
+    probed = []
+    critique_body_props(_with_shots(project, two), judge=Judge(_reply("yes", "no", "yes")), frames=_frames(probed))
+    assert len(probed) == 1
+
+
+def test_the_envelope_names_the_model_and_bad_instants_are_refused(project):
+    report = critique_body_props(
+        project, judge=lambda frames, *, prompt: {"reply": _reply("yes", "no", "yes"), "model": "m-1"},
+        frames=_frames([]),
+    )
+    assert report.calls[0]["model"] == "m-1"
+    with pytest.raises(ValueError, match="fractions"):
+        critique_body_props(project, judge=Judge(""), frames=_frames([]), at=(1.5,))
