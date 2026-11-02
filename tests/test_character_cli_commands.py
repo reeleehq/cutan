@@ -17,6 +17,7 @@ from cutan.characters.cli import _dispatch_funcs
 def test_the_character_command_set_is_pinned_by_literal():
     assert [f.__name__.replace("_", "-") for f in _dispatch_funcs] == [
         "new",
+        "cast",
         "mouths",
         "add-gaze",
         "add-half-lid",

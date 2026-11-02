@@ -13,7 +13,7 @@ Then let the writer choose, per piece if they like:
 - **Your SVG**: for placeholders, maps, title cards, diagrams, or a deliberately flat look. Say in `PRODUCTION.md` which drawings are yours.
 - **A mix**: real art for the sets and the characters people look at, your SVG for small props and labels.
 
-The factory characters (`cast.sh`) are drawn by the pipeline and are not yours to apologise for; what you would draw are the sets, the props and any redrawn parts.
+The factory characters (`cast.yaml`) are drawn by the pipeline and are not yours to apologise for; what you would draw are the sets, the props and any redrawn parts.
 
 ## What the pack does with pictures
 
