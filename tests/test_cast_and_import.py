@@ -146,7 +146,9 @@ def test_import_makes_the_project_and_never_overwrites_one(tmp_path):
     assert report.project == project.resolve()
     again = P.import_pack(EXAMPLE, project)
     assert not again.ok and "exists already" in again.errors[0]
-    assert str(tmp_path) not in json.dumps(report.to_dict()), "no path of this machine"
+    data = report.to_dict()
+    assert data.pop("project") == str(project.resolve()), "the import names its project"
+    assert str(tmp_path) not in json.dumps(data), "the checks name no path of this machine"
 
 
 def test_import_dry_run_is_the_check_and_leaves_nothing(tmp_path):
