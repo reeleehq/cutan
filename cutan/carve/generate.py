@@ -23,7 +23,9 @@ stage canvas and written as a PNG beside a record of where it came from.
   ``"opaque"`` or ``"transparent"`` (the model's own alpha, where it has one);
   ``key``: a named key colour (:data:`KEYS`, ``"magenta"``) or any matte recipe
   :func:`~cutan.carve.mattes.as_matte` reads; ``fit``: ``[w, h]``, scale to
-  cover and centre-crop.
+  cover and centre-crop; ``prop``: carve the image into a prop folder
+  (``<name>/prop.json`` + ``parts/``, through :func:`~cutan.carve.carve` and
+  :func:`~cutan.carve.write_prop`, with its quality warnings) instead of a plate.
 - **The generator** is the seam: ``generator(prompt, *, size, background,
   quality, model) -> PIL image``, carrying ``provider``, ``model`` and
   ``license`` for the provenance. The default, :class:`AixGenerator`, calls
@@ -82,6 +84,14 @@ KEYS: dict[str, dict[str, Any]] = {
     },
     "green": {"matte": "chroma", "hue": [90.0, 150.0], "min_sat": 0.5, "min_val": 0.4},
 }
+#: What an art spec's ``prop`` may say: carve's ``point`` (the anchor: where a
+#: hand holds it), ``keep``, ``detach`` and ``despill``, and ``write_prop``'s
+#: ``landmarks`` (``{"grip": [x, y]}`` in the image's pixels) and ``max_side``.
+_CARVE_KEYS: tuple[str, ...] = ("point", "keep", "detach", "despill")
+_WRITE_KEYS: tuple[str, ...] = ("landmarks", "max_side")
+PROP_KEYS: tuple[str, ...] = _CARVE_KEYS + _WRITE_KEYS
+#: carve's ``keep`` values.
+_KEEPS: tuple[str, ...] = ("point", "largest", "all")
 _SIZE = re.compile(r"^([1-9]\d*x[1-9]\d*|auto)$")
 #: An art name is a file name: no folder, no hidden file.
 _NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
@@ -104,6 +114,11 @@ class ArtSpec:
     fit: Optional[tuple[int, int]] = None
     model: Optional[str] = None
     quality: Optional[str] = None
+    #: Make a prop, not a plate (cutan#162): the image is carved
+    #: (:func:`cutan.carve.carve`, its matte the ``key``, else carve's flat-colour
+    #: default) and written as ``<name>/prop.json`` + ``parts/`` (``write_prop``),
+    #: the source in the descriptor. Keys: :data:`PROP_KEYS`.
+    prop: Optional[Mapping[str, Any]] = None
 
     def __post_init__(self):
         if not isinstance(self.name, str) or not _NAME.match(self.name):
@@ -136,6 +151,18 @@ class ArtSpec:
                     f"art {self.name!r}: fit must be positive, got {self.fit}"
                 )
             object.__setattr__(self, "fit", (w, h))
+        if self.prop is not None:
+            if not isinstance(self.prop, Mapping) or set(self.prop) - set(PROP_KEYS):
+                raise ValueError(
+                    f"art {self.name!r}: prop is a mapping of {list(PROP_KEYS)}, not {self.prop!r}"
+                )
+            if self.fit is not None or self.background == "transparent":
+                raise ValueError(
+                    f"art {self.name!r}: a prop is carved from an opaque image by its key; "
+                    "`fit` and `background: transparent` are for plates"
+                )
+            if problem := _prop_problem(self.prop, self.size):
+                raise ValueError(f"art {self.name!r}: prop {problem}")
         if self.key is not None:
             from cutan.carve.mattes import as_matte
 
@@ -146,6 +173,55 @@ class ArtSpec:
                     f"art {self.name!r}: key {self.key!r} is neither one of "
                     f"{sorted(KEYS)} nor a matte recipe ({e})"
                 ) from None
+
+
+def _xy(value: Any) -> tuple[float, float] | None:
+    """``value`` as two finite numbers, or ``None``."""
+    if isinstance(value, (str, bytes, Mapping)) or not hasattr(value, "__len__") or len(value) != 2:
+        return None
+    if not all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in value):
+        return None
+    x, y = (float(v) for v in value)
+    return (x, y) if np.isfinite(x) and np.isfinite(y) else None
+
+
+def _prop_problem(prop: Mapping[str, Any], size: str) -> str | None:
+    """Why a spec's ``prop`` would fail after the image is paid for, or ``None``.
+
+    >>> _prop_problem({"point": [40, 48], "landmarks": {"grip": [1, 2]}}, "160x96") is None
+    True
+    >>> _prop_problem({"point": [900, 900]}, "160x96")
+    'point (900.0, 900.0) is outside the 160x96 image'
+    """
+    from cutan.carve.prop import _LANDMARK_NAME
+
+    w, h = (float(v) for v in size.split("x")) if "x" in size else (None, None)
+    points = {}
+    if "point" in prop:
+        points["point"] = prop["point"]
+    landmarks = prop.get("landmarks") or {}
+    if not isinstance(landmarks, Mapping):
+        return f"landmarks is {{name: [x, y]}}, not {landmarks!r}"
+    for name, xy in landmarks.items():
+        if not isinstance(name, str) or not _LANDMARK_NAME.fullmatch(name):
+            return f"landmark name {name!r} is not a name (letters, digits, _ . -)"
+        points[f"landmark {name!r}"] = xy
+    for label, value in points.items():
+        xy = _xy(value)
+        if xy is None:
+            return f"{label} is [x, y] in the image's pixels, not {value!r}"
+        if w is not None and not (0 <= xy[0] <= w and 0 <= xy[1] <= h):
+            return f"{label} {xy} is outside the {size} image"
+    if "keep" in prop and prop["keep"] not in _KEEPS:
+        return f"keep is one of {list(_KEEPS)}, not {prop['keep']!r}"
+    for key in ("detach", "despill", "max_side"):
+        value = prop.get(key)
+        if value is not None and (
+            isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0
+            or (key == "max_side" and value == 0)
+        ):
+            return f"{key} is a number >= 0 (max_side > 0), not {value!r}"
+    return None
 
 
 def _key_recipe(key: Union[str, Mapping[str, Any], Any]) -> Any:
@@ -341,6 +417,8 @@ class GeneratedArt:
     source: Optional[AssetSource]
     size: tuple[int, int] = (0, 0)
     kept: bool = False
+    #: A carved prop's quality warnings (:class:`cutan.carve.CarveQuality`).
+    warnings: tuple[str, ...] = ()
 
 
 def generate_art(
@@ -363,7 +441,8 @@ def generate_art(
     its record, and removed once the PNG and its record are written, unless
     ``keep_raw``: a key or fit that fails leaves the paid-for image, and the
     next run keys that image instead of paying for a new one. Every file is
-    written whole or not at all.
+    written whole or not at all (a prop's files by ``write_prop``, in place: a
+    ``prop.json`` a crash cut off is not taken as made, and is made again).
     """
     specs = art_specs(spec) if isinstance(spec, (str, Path, Mapping)) else list(spec)
     wanted = set(only) if only is not None else None
@@ -389,11 +468,19 @@ def generate_art(
     recorded = _read_sources(out)
     made = []
     for s in specs:
-        path, raw = out / f"{s.name}.png", out / f"{s.name}.raw.png"
-        if path.exists() and not overwrite:
-            known = recorded.get(path.name)
+        raw = out / f"{s.name}.raw.png"
+        path = out / s.name / "prop.json" if s.prop is not None else out / f"{s.name}.png"
+        entry = path.relative_to(out).as_posix()
+        if _made(path, prop=s.prop is not None) and not overwrite:
+            known = recorded.get(entry)
             made.append(
-                GeneratedArt(s.name, path, _source(known), _image_size(path), kept=True)
+                GeneratedArt(
+                    s.name,
+                    path,
+                    _source(known),
+                    _image_size(path) if s.prop is None else _prop_size(path),
+                    kept=True,
+                )
             )
             continue
         if raw.exists() and not overwrite:
@@ -409,11 +496,21 @@ def generate_art(
             )
             _save(image, raw)
             # record it now: the paid image has its provenance even if what follows fails
-            recorded[path.name] = art_source(s, generator).model_dump(
+            recorded[entry] = art_source(s, generator).model_dump(
                 mode="json", exclude_none=True
             )
             _write_sources(out, recorded)
-        source = _source(recorded.get(path.name)) or art_source(s, generator)
+        source = _source(recorded.get(entry)) or art_source(s, generator)
+        if s.prop is not None:
+            made.append(_write_generated_prop(s, image, out, source))
+            source = source.model_copy(
+                update={"sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+            )
+            recorded[entry] = source.model_dump(mode="json", exclude_none=True)
+            _write_sources(out, recorded)
+            if not keep_raw:
+                raw.unlink()
+            continue
         if s.key:
             image = key_backdrop(image, s.key)
         if s.fit:
@@ -422,7 +519,7 @@ def generate_art(
         source = source.model_copy(
             update={"sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
         )
-        recorded[path.name] = source.model_dump(mode="json", exclude_none=True)
+        recorded[entry] = source.model_dump(mode="json", exclude_none=True)
         _write_sources(out, recorded)  # the record first, then the raw goes
         if not keep_raw:
             raw.unlink()
@@ -444,6 +541,64 @@ def _source(entry: Any) -> Optional[AssetSource]:
         return AssetSource.model_validate(entry)
     except ValueError:
         return None
+
+
+def _made(path: Path, *, prop: bool) -> bool:
+    """Whether ``path`` is a finished image or prop: a ``prop.json`` cut off by a
+    crash (``write_prop`` writes it in place) is not, and is made again."""
+    if not path.exists():
+        return False
+    if not prop:
+        return True
+    try:
+        return json.loads(path.read_text(encoding="utf-8")).get("kind") == "PropDescriptor"
+    except (OSError, ValueError, AttributeError):
+        return False
+
+
+def _prop_size(path: Path) -> tuple[int, int]:
+    """A written prop's size, from its descriptor's ``view_box``."""
+    try:
+        box = json.loads(path.read_text(encoding="utf-8")).get("view_box") or (0, 0, 0, 0)
+        return (int(round(box[2])), int(round(box[3])))
+    except (OSError, ValueError, TypeError, IndexError, AttributeError):
+        return (0, 0)
+
+
+def _write_generated_prop(
+    spec: ArtSpec, image: Image.Image, out: Path, source: AssetSource
+) -> GeneratedArt:
+    """Carve ``image`` by the spec's key and write it as a prop (cutan#162),
+    over a prop a crash left unfinished."""
+    import warnings
+
+    from cutan.carve import carve, write_prop
+
+    prop = dict(spec.prop or {})
+    carving = carve(
+        np.asarray(image.convert("RGB")),
+        matte=_key_recipe(spec.key) if spec.key else "flat_colour",
+        source=source,
+        **{k: (tuple(v) if k == "point" else v) for k, v in prop.items() if k in _CARVE_KEYS},
+    )
+    folder = out / spec.name
+    with warnings.catch_warnings(record=True) as said:  # write_prop warns on a far landmark
+        warnings.simplefilter("always")
+        write_prop(
+            carving,
+            folder,
+            name=spec.name,
+            landmarks={k: tuple(v) for k, v in (prop.get("landmarks") or {}).items()} or None,
+            max_side=prop.get("max_side"),
+            overwrite=True,  # generate_art decided: nothing finished is there
+        )
+    return GeneratedArt(
+        spec.name,
+        folder / "prop.json",
+        source,
+        carving.size,
+        warnings=tuple(carving.quality.warnings()) + tuple(str(w.message) for w in said),
+    )
 
 
 def _image_size(path: Path) -> tuple[int, int]:

@@ -239,3 +239,61 @@ def test_a_palette_image_is_fitted_smoothly():
     fitted = G.cover_fit(im.convert("P"), (20, 10))
     assert fitted.mode == "RGBA"
     assert len({px[:3] for px in fitted.getdata()}) > 2, "resampled, not nearest"
+
+
+def test_a_prop_is_carved_by_its_key_and_written_with_its_source(tmp_path):
+    """cutan#162: a generated part goes through carve() and write_prop."""
+    spec = {"mug": {"prompt": "a mug on magenta", "size": "160x96", "key": "magenta",
+                    "prop": {"point": [40, 48], "landmarks": {"grip": [30, 40]}}}}  # fmt: skip
+    painter = Painter()
+    (mug,) = G.generate_art(spec, out_dir=tmp_path, generator=painter)
+    assert mug.path == tmp_path / "mug" / "prop.json"
+    doc = json.loads(mug.path.read_text())
+    assert doc["kind"] == "PropDescriptor"
+    assert doc["source"]["provider"] == "stub" and doc["source"]["extra"]["prompt"] == "a mug on magenta"
+    assert any(b["name"] == "grip" for b in doc["bones"]), "the landmark is a bone"
+    assert list((tmp_path / "mug" / "parts").glob("*.png"))
+    assert not (tmp_path / "mug.raw.png").exists()
+    record = json.loads((tmp_path / G.SOURCES_FILE).read_text())
+    assert "mug/prop.json" in record
+    again = G.generate_art(spec, out_dir=tmp_path, generator=painter)
+    assert again[0].kept and len(painter.calls) == 1, "an existing prop is not paid for twice"
+    assert again[0].size != (0, 0), "a kept prop's size is read from its descriptor"
+    assert again[0].source.sha256 and "sha256" in record["mug/prop.json"]
+    # a prop.json cut off by a crash is not "made": it is carved again from the raw
+    mug.path.write_text('{"kind": "PropDesc')
+    redo = G.generate_art(spec, out_dir=tmp_path, generator=painter)
+    assert not redo[0].kept and json.loads(mug.path.read_text())["kind"] == "PropDescriptor"
+
+
+def test_a_prop_spec_is_checked_before_payment():
+    for entry, match in (
+        ({"prompt": "p", "prop": {"colour": "red"}}, "prop is a mapping"),
+        ({"prompt": "p", "prop": {}, "fit": [10, 10]}, "for plates"),
+        ({"prompt": "p", "prop": {}, "background": "transparent"}, "for plates"),
+        ({"prompt": "p", "prop": {"point": 5}}, "point is"),
+        ({"prompt": "p", "prop": {"point": [40]}}, "point is"),
+        ({"prompt": "p", "size": "160x96", "prop": {"point": [900, 900]}}, "outside"),
+        ({"prompt": "p", "prop": {"landmarks": {"a b": [1, 2]}}}, "not a name"),
+        ({"prompt": "p", "prop": {"landmarks": {"grip": "here"}}}, "landmark 'grip' is"),
+        ({"prompt": "p", "prop": {"max_side": "big"}}, "max_side"),
+        ({"prompt": "p", "prop": {"keep": "bogus"}}, "keep is one of"),
+    ):
+        with pytest.raises(ValueError, match=match):
+            G.art_specs({"x": entry})
+
+
+def test_a_carve_that_finds_nothing_keeps_the_paid_image_for_the_next_run(tmp_path):
+    class Blank(Painter):
+        def __call__(self, prompt, **kw):
+            self.calls.append(kw)
+            return Image.new("RGB", (64, 48), MAGENTA)  # all key: nothing to carve
+
+    painter = Blank()
+    spec = {"cup": {"prompt": "a cup", "size": "64x48", "key": "magenta", "prop": {}}}
+    with pytest.raises(ValueError):
+        G.generate_art(spec, out_dir=tmp_path, generator=painter)
+    assert (tmp_path / "cup.raw.png").exists()
+    with pytest.raises(ValueError):
+        G.generate_art(spec, out_dir=tmp_path, generator=painter)
+    assert len(painter.calls) == 1, "the rerun carved the paid image again, it did not pay twice"
