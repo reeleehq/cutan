@@ -35,7 +35,7 @@
 <link href="../_static/epythet.css?v=a2fb8f2c" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="cutan.audio.rhubarb_lipsync.html" rel="next" title="cutan.audio.rhubarb_lipsync"/>
+<link href="cutan.audio.phones.html" rel="next" title="cutan.audio.phones"/>
 <link href="cutan.audio.injectable_lipsync.html" rel="prev" title="cutan.audio.injectable_lipsync"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
@@ -143,6 +143,10 @@ keyframes evenly across the audio’s duration. Repeated visemes get collapsed
 into a single keyframe so the mouth doesn’t “stutter” on long vowel runs.</p>
 <p>Crude but visible. Use <code class="docutils literal notranslate"><span class="pre">RhubarbLipSync</span></code> for real phoneme alignment once
 you’ve installed the Rhubarb binary.</p>
+<p>A clip that knows its timings is followed instead of spread: its phones first
+(<code class="docutils literal notranslate"><span class="pre">AudioClip.phones</span></code>, a take timed by a forced aligner, an#491: each phone’s own
+mouth shape, <a class="reference internal" href="cutan.audio.phones.html#module-cutan.audio.phones" title="cutan.audio.phones"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cutan.audio.phones</span></code></a>), else its words (<code class="docutils literal notranslate"><span class="pre">AudioClip.words</span></code>,
+an#490: each word’s letters over its span).</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">an.audio.tts</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioClip</span>
 </span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">ls</span> <span class="o">=</span> <span class="n">OfflineLipSync</span><span class="p">()</span>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">track</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">AudioClip</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">transcript</span><span class="o">=</span><span class="s2">"hello"</span><span class="p">),</span> <span class="s2">"hello"</span><span class="p">)</span>
@@ -165,14 +169,14 @@ you’ve installed the Rhubarb binary.</p>
 <p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.audio.offline_lipsync.OfflineLipSync" title="cutan.audio.offline_lipsync.OfflineLipSync"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OfflineLipSync</span></code></a>(*[, char_to_viseme])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.audio.offline_lipsync.OfflineLipSync" title="cutan.audio.offline_lipsync.OfflineLipSync"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OfflineLipSync</span></code></a>(*[, char_to_viseme, ...])</p></td>
 <td><p>Default lip-sync provider: deterministic char-to-viseme mapping.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py class">
 <dt class="sig sig-object py" id="cutan.audio.offline_lipsync.OfflineLipSync">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.audio.offline_lipsync.</span></span><span class="sig-name descname"><span class="pre">OfflineLipSync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">char_to_viseme</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/audio/offline_lipsync.html#OfflineLipSync"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.audio.offline_lipsync.OfflineLipSync" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.audio.offline_lipsync.OfflineLipSync'">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.audio.offline_lipsync.</span></span><span class="sig-name descname"><span class="pre">OfflineLipSync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">char_to_viseme</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phone_to_viseme</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">phone_viseme&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/audio/offline_lipsync.html#OfflineLipSync"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.audio.offline_lipsync.OfflineLipSync" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.audio.offline_lipsync.OfflineLipSync'">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
 <p>Default lip-sync provider: deterministic char-to-viseme mapping.</p>
 <p>Implements the <code class="docutils literal notranslate"><span class="pre">LipSyncProvider</span></code> protocol.</p>
@@ -228,7 +232,7 @@ none or when the core predates the field.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=7ffc8fc3"></script>
+<script src="../_static/documentation_options.js?v=db840bda"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

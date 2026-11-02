@@ -1,4 +1,4 @@
-> built 2026-11-02 01:51 UTC from eb3d69a (main) · cutan 0.0.88. Details: build_info.json
+> built 2026-11-02 02:03 UTC from 99cf423 (main) · cutan 0.0.89. Details: build_info.json
 
 # index.html.md
 
@@ -282,14 +282,14 @@ draws mouths. The genre registers these by name as `lipsync.<name>` services
 
 ### Classes
 
-| [`OfflineLipSync`](_autosummary/cutan.audio.html.md#cutan.audio.OfflineLipSync)(\*[, char_to_viseme])             | Default lip-sync provider: deterministic char-to-viseme mapping.   |
+| [`OfflineLipSync`](_autosummary/cutan.audio.html.md#cutan.audio.OfflineLipSync)(\*[, char_to_viseme, ...])        | Default lip-sync provider: deterministic char-to-viseme mapping.   |
 |---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
 | [`RhubarbLipSync`](_autosummary/cutan.audio.html.md#cutan.audio.RhubarbLipSync)(\*[, binary_path, language, ...]) | Wrap the rhubarb CLI.                                              |
 | [`StaticWordTimings`](_autosummary/cutan.audio.html.md#cutan.audio.StaticWordTimings)(words, \*[, label])            | A `WordTimingProvider` over a fixed list of timings.               |
 | [`WhisperLipSync`](_autosummary/cutan.audio.html.md#cutan.audio.WhisperLipSync)(\*[, model_size, device, ...])    | faster-whisper word timestamps → visemes.                          |
 | [`WordTimingsLipSync`](_autosummary/cutan.audio.html.md#cutan.audio.WordTimingsLipSync)(provider, \*[, ...])          | `LipSyncProvider` driven by a `WordTimingProvider`.                |
 
-### *class* cutan.audio.OfflineLipSync(, char_to_viseme=None)
+### *class* cutan.audio.OfflineLipSync(\*, char_to_viseme=None, phone_to_viseme=<function phone_viseme>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -344,7 +344,7 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 A `WordTimingProvider` over a fixed list of timings.
 
-### *class* cutan.audio.WhisperLipSync(, model_size='tiny', device='cpu', compute_type='int8', char_to_viseme=None)
+### *class* cutan.audio.WhisperLipSync(\*, model_size='tiny', device='cpu', compute_type='int8', char_to_viseme=None, phone_to_viseme=<function phone_viseme>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -411,6 +411,7 @@ Word timings from Whisper, distributed over the mouth shapes.
 | [`injectable_lipsync`](_autosummary/cutan.audio.injectable_lipsync.html.md#module-cutan.audio.injectable_lipsync)   | Lip-sync provider that consumes pre-computed word timings.                      |
 |-------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
 | [`offline_lipsync`](_autosummary/cutan.audio.offline_lipsync.html.md#module-cutan.audio.offline_lipsync)         | OfflineLipSync — deterministic transcript → viseme track.                       |
+| [`phones`](_autosummary/cutan.audio.phones.html.md#module-cutan.audio.phones)                           | Phones to mouth shapes: an aligner's phone timings as a Rhubarb viseme track.   |
 | [`rhubarb_lipsync`](_autosummary/cutan.audio.rhubarb_lipsync.html.md#module-cutan.audio.rhubarb_lipsync)         | RhubarbLipSync — calls the rhubarb-lip-sync binary for phoneme-aligned visemes. |
 | [`whisper_lipsync`](_autosummary/cutan.audio.whisper_lipsync.html.md#module-cutan.audio.whisper_lipsync)         | WhisperLipSync — faster-whisper word timestamps → viseme keyframes.             |
 
@@ -504,6 +505,11 @@ into a single keyframe so the mouth doesn’t “stutter” on long vowel runs.
 Crude but visible. Use `RhubarbLipSync` for real phoneme alignment once
 you’ve installed the Rhubarb binary.
 
+A clip that knows its timings is followed instead of spread: its phones first
+(`AudioClip.phones`, a take timed by a forced aligner, an#491: each phone’s own
+mouth shape, [`cutan.audio.phones`](_autosummary/cutan.audio.phones.html.md#module-cutan.audio.phones)), else its words (`AudioClip.words`,
+an#490: each word’s letters over its span).
+
 ```pycon
 >>> from an.audio.tts import AudioClip
 >>> ls = OfflineLipSync()
@@ -523,10 +529,10 @@ True
 
 ### Classes
 
-| [`OfflineLipSync`](_autosummary/cutan.audio.offline_lipsync.html.md#cutan.audio.offline_lipsync.OfflineLipSync)(\*[, char_to_viseme])   | Default lip-sync provider: deterministic char-to-viseme mapping.   |
-|-----------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| [`OfflineLipSync`](_autosummary/cutan.audio.offline_lipsync.html.md#cutan.audio.offline_lipsync.OfflineLipSync)(\*[, char_to_viseme, ...])   | Default lip-sync provider: deterministic char-to-viseme mapping.   |
+|----------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
 
-### *class* cutan.audio.offline_lipsync.OfflineLipSync(, char_to_viseme=None)
+### *class* cutan.audio.offline_lipsync.OfflineLipSync(\*, char_to_viseme=None, phone_to_viseme=<function phone_viseme>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -555,6 +561,182 @@ True
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+
+# _autosummary/cutan.audio.phones.html.md
+
+# cutan.audio.phones
+
+Phones to mouth shapes: an aligner’s phone timings as a Rhubarb viseme track.
+
+A recorded take imported with a forced aligner’s output carries its phones,
+`AudioClip.phones`: `(phone, start_s, end_s)` from the clip’s start (an#491),
+in ARPAbet (MFA’s English models: `HH`, `AH0`) or IPA (`mfa:ipa`: `h`,
+`ə`). The take’s record knows which, but the clip does not, so the alphabet is
+decided once per clip ([`phone_alphabet()`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.phone_alphabet)).
+
+[`phones_track()`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.phones_track) is what a lip-sync provider calls: the clip’s track from its
+phones, or `None` to align some other way. A word the aligner could not
+phonetise (MFA writes `spn` under a name it does not know, and `an` drops it)
+has no phones under it; it is spoken by its letters over its own span, as the
+word-timing rule does (`an.audio.lipsync.word_timings_to_visemes`).
+
+```pycon
+>>> [(v.time, v.code) for v in phones_to_visemes(
+...     [("HH", 0.1, 0.2), ("AH0", 0.2, 0.3), ("L", 0.3, 0.4), ("OW1", 0.4, 0.6)],
+...     total_duration=1.0,
+... )]
+[(0.0, 'X'), (0.1, 'C'), (0.3, 'H'), (0.4, 'F'), (0.6, 'X'), (1.0, 'X')]
+```
+
+### Module Attributes
+
+| [`Timing`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.Timing)                | `(label, start_s, end_s)`, as `AudioClip.phones` and `.words` hold them.                                                                |
+|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| [`PhoneToViseme`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.PhoneToViseme)         | a Rhubarb shape, or `None` when unknown (`alphabet` is the clip's, [`phone_alphabet()`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.phone_alphabet)).  |
+| [`DEFAULT_LETTER_VISEME`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.DEFAULT_LETTER_VISEME) | The letter shape a word's unknown letter takes (the word-timing rule's).                                                                |
+| [`MIN_GAP_FOR_REST_S`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.MIN_GAP_FOR_REST_S)    | the word-timing rule's value (`an.audio.lipsync`'s minimum word gap for a rest).                                                        |
+| [`SILENCES`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.SILENCES)              | Silence and noise labels, should a clip carry them (`an` drops these when it reads a TextGrid: `an.audio.transcripts`' silence labels). |
+| [`ARPABET_TO_VISEME`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.ARPABET_TO_VISEME)     | ARPAbet (stress digits removed) to a Rhubarb shape.                                                                                     |
+| [`IPA_TO_VISEME`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.IPA_TO_VISEME)         | IPA (diacritics, length and stress marks removed) to a Rhubarb shape.                                                                   |
+
+### Functions
+
+| [`clip_timings`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.clip_timings)(audio, field)                      | `audio`'s `words` or `phones` as a list of `(label, start_s, end_s)`; `None` when it has none (or its `an` predates the field).                                                                                                                          |
+|--------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`phone_alphabet`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.phone_alphabet)(phones)                          | `"arpabet"` when every phone is ARPAbet as aligners write it (ASCII, one case throughout, each in [`ARPABET_TO_VISEME`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.ARPABET_TO_VISEME) once its stress digit is dropped), else `"ipa"`.                                    |
+| [`phone_viseme`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.phone_viseme)(phone, \*[, alphabet])             | The Rhubarb shape of one phone in `alphabet`; `REST_VISEME` for a silence; `None` for a phone the table does not know.                                                                                                                                   |
+| [`phones_to_visemes`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.phones_to_visemes)(phones, \*, total_duration)   | A viseme track from phone timings: each phone's shape at its start (in the clip's [`phone_alphabet()`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.phone_alphabet)), the mouth closed at a silence, at a pause longer than `min_gap_for_rest` and after the last sound. |
+| [`phones_track`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.phones_track)(audio, \*[, phone_to_viseme, ...]) | The mouth track of a clip whose phones are timed (`AudioClip.phones`, a take timed by a forced aligner, an#491), carrying the clip's words too; `None` when it has no phones, or one `phone_to_viseme` does not know.                                    |
+
+### cutan.audio.phones.ARPABET_TO_VISEME *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'AA': 'D', 'AE': 'C', 'AH': 'C', 'AO': 'E', 'AW': 'D', 'AY': 'D', 'B': 'A', 'CH': 'B', 'D': 'B', 'DH': 'B', 'EH': 'C', 'ER': 'E', 'EY': 'C', 'F': 'G', 'G': 'B', 'HH': 'C', 'IH': 'B', 'IY': 'B', 'JH': 'B', 'K': 'B', 'L': 'H', 'M': 'A', 'N': 'B', 'NG': 'B', 'OW': 'F', 'OY': 'E', 'P': 'A', 'R': 'B', 'S': 'B', 'SH': 'B', 'T': 'B', 'TH': 'B', 'UH': 'F', 'UW': 'F', 'V': 'G', 'W': 'F', 'Y': 'B', 'Z': 'B', 'ZH': 'B'}*
+
+ARPAbet (stress digits removed) to a Rhubarb shape.
+
+### cutan.audio.phones.DEFAULT_LETTER_VISEME *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'C'*
+
+The letter shape a word’s unknown letter takes (the word-timing rule’s).
+
+### cutan.audio.phones.IPA_TO_VISEME *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'a': 'D', 'b': 'A', 'c': 'B', 'd': 'B', 'e': 'C', 'f': 'G', 'g': 'B', 'h': 'C', 'i': 'B', 'j': 'B', 'k': 'B', 'l': 'H', 'm': 'A', 'n': 'B', 'o': 'F', 'p': 'A', 'r': 'B', 's': 'B', 't': 'B', 'u': 'F', 'v': 'G', 'w': 'F', 'y': 'F', 'z': 'B', 'æ': 'C', 'ç': 'B', 'ð': 'B', 'ŋ': 'B', 'ɐ': 'C', 'ɑ': 'D', 'ɒ': 'D', 'ɔ': 'E', 'ə': 'C', 'əw': 'F', 'əʊ': 'F', 'ɚ': 'E', 'ɛ': 'C', 'ɜ': 'E', 'ɝ': 'E', 'ɟ': 'B', 'ɡ': 'B', 'ɪ': 'B', 'ɫ': 'H', 'ɱ': 'G', 'ɲ': 'B', 'ɹ': 'B', 'ɾ': 'B', 'ʃ': 'B', 'ʉ': 'F', 'ʊ': 'F', 'ʌ': 'C', 'ʎ': 'H', 'ʒ': 'B', 'ʔ': 'B', 'θ': 'B'}*
+
+IPA (diacritics, length and stress marks removed) to a Rhubarb shape. A
+phone not in it is read by its first symbol (`aj` as `a`, `tʃ` as `t`).
+
+### cutan.audio.phones.MIN_GAP_FOR_REST_S *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.2*
+
+the
+word-timing rule’s value (`an.audio.lipsync`’s minimum word gap for a rest).
+
+* **Type:**
+  A pause between two phones longer than this closes the mouth (seconds)
+
+### cutan.audio.phones.PhoneToViseme
+
+a Rhubarb shape, or `None` when
+unknown (`alphabet` is the clip’s, [`phone_alphabet()`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.phone_alphabet)). Silences never
+reach it: they are the rest shape.
+
+* **Type:**
+  `phone_to_viseme(phone, *, alphabet)`
+
+alias of `Callable`[[…], [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)]
+
+### cutan.audio.phones.SILENCES *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'', 'oov', 'sil', 'sp', 'spn'})*
+
+Silence and noise labels, should a clip carry them (`an` drops these when it
+reads a TextGrid: `an.audio.transcripts`’ silence labels).
+
+### cutan.audio.phones.Timing
+
+`(label, start_s, end_s)`, as `AudioClip.phones` and `.words` hold them.
+
+alias of [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### cutan.audio.phones.clip_timings(audio, field)
+
+`audio`’s `words` or `phones` as a list of `(label, start_s, end_s)`;
+`None` when it has none (or its `an` predates the field).
+
+```pycon
+>>> clip_timings(AudioClip(duration=1.0, phones=[("M", 0, 0.1)]), "phones")
+[('M', 0.0, 0.1)]
+>>> clip_timings(AudioClip(duration=1.0), "phones") is None
+True
+```
+
+* **Return type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]]]
+
+### cutan.audio.phones.phone_alphabet(phones)
+
+`"arpabet"` when every phone is ARPAbet as aligners write it (ASCII, one
+case throughout, each in [`ARPABET_TO_VISEME`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.ARPABET_TO_VISEME) once its stress digit is
+dropped), else `"ipa"`. Decided per clip: a SAMPA `V` (the vowel of
+*love*) beside a lowercase `l` is not ARPAbet `V`.
+
+```pycon
+>>> phone_alphabet(["HH", "AH0", "L"]), phone_alphabet(["hh", "ah0"])
+('arpabet', 'arpabet')
+>>> phone_alphabet(["l", "V", "v"]), phone_alphabet(["h", "ə", "l"])
+('ipa', 'ipa')
+```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### cutan.audio.phones.phone_viseme(phone, , alphabet='arpabet')
+
+The Rhubarb shape of one phone in `alphabet`; `REST_VISEME` for a
+silence; `None` for a phone the table does not know.
+
+```pycon
+>>> phone_viseme("AA1"), phone_viseme("M"), phone_viseme("sil"), phone_viseme("Q9")
+('D', 'A', 'X', None)
+>>> [phone_viseme(p, alphabet="ipa") for p in ("tʃ", "iː", "əw", "ʘ")]
+['B', 'B', 'F', None]
+```
+
+* **Return type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### cutan.audio.phones.phones_to_visemes(phones, \*, total_duration, words=(), phone_to_viseme=<function phone_viseme>, char_to_viseme=None, rest_viseme='X', min_gap_for_rest=0.2)
+
+A viseme track from phone timings: each phone’s shape at its start (in the
+clip’s [`phone_alphabet()`](_autosummary/cutan.audio.phones.html.md#cutan.audio.phones.phone_alphabet)), the mouth closed at a silence, at a pause
+longer than `min_gap_for_rest` and after the last sound. A word of `words`
+with no phone under it is spoken by its letters (`char_to_viseme`).
+
+`None` when a phone is one `phone_to_viseme` does not know: a phone set
+this table was not written for is better spread by its words than guessed.
+
+```pycon
+>>> phones_to_visemes([("ʘ", 0.0, 0.1)], total_duration=1.0) is None
+True
+>>> [(v.time, v.code) for v in phones_to_visemes(
+...     [("M", 0.0, 0.1), ("AA1", 0.1, 0.3), ("P", 0.6, 0.7)], total_duration=0.7)]
+[(0.0, 'X'), (0.0, 'A'), (0.1, 'D'), (0.3, 'X'), (0.6, 'A'), (0.7, 'X')]
+```
+
+* **Return type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Viseme`]]
+
+### cutan.audio.phones.phones_track(audio, \*, phone_to_viseme=<function phone_viseme>, char_to_viseme=None, rest_viseme='X', convention='rhubarb')
+
+The mouth track of a clip whose phones are timed (`AudioClip.phones`, a
+take timed by a forced aligner, an#491), carrying the clip’s words too;
+`None` when it has no phones, or one `phone_to_viseme` does not know.
+
+```pycon
+>>> clip = AudioClip(duration=0.5, phones=[("M", 0.1, 0.2)], words=[("m", 0.1, 0.2)])
+>>> track = phones_track(clip)
+>>> [v.code for v in track.visemes], track.words
+(['X', 'A', 'X', 'X'], [('m', 0.1, 0.2)])
+>>> phones_track(AudioClip(duration=0.5)) is None
+True
+```
+
+* **Return type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[`VisemeTrack`]
 
 
 # _autosummary/cutan.audio.rhubarb_lipsync.html.md
@@ -691,7 +873,7 @@ Trade-offs vs. OfflineLipSync:
 | [`WhisperLipSync`](_autosummary/cutan.audio.whisper_lipsync.html.md#cutan.audio.whisper_lipsync.WhisperLipSync)(\*[, model_size, device, ...])   | faster-whisper word timestamps → visemes.   |
 |--------------------------------------------------------------------------------------------------|---------------------------------------------|
 
-### *class* cutan.audio.whisper_lipsync.WhisperLipSync(, model_size='tiny', device='cpu', compute_type='int8', char_to_viseme=None)
+### *class* cutan.audio.whisper_lipsync.WhisperLipSync(\*, model_size='tiny', device='cpu', compute_type='int8', char_to_viseme=None, phone_to_viseme=<function phone_viseme>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -733,7 +915,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'eye', 'ellipse', 'mouth', 'rect'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'rect', 'ellipse', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -11491,7 +11673,7 @@ cutan#91). Pushed with the project, so it is a key of the store too.
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
-### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 10*
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 11*
 
 The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
 it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
@@ -11510,6 +11692,8 @@ named points (`stu@hand_r`) for the core’s hold verbs.
 Level 9: `an.cli_status.failed` (an#480), which `an character` commands return
 to exit non-zero on a failure.
 Level 10: `an.stores._common.asset_references` and `asset_ref_problems` (an#552).
+Level 11: the first level whose every release ships `an.stage.solve.solve_report`
+(an#570 merged after level 10 was cut), which the body-continuity check reads.
 
 ### cutan.require_an()
 
@@ -15077,18 +15261,16 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-11-02 01:51 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/eb3d69afcd81cd3355434b7e9ae7265db5f6fd72"><code>eb3d69a</code></a> on branch <code>main</code>, for **cutan 0.0.88** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 02:03 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/99cf423be21e1dcc7a1730df8373fd5d89680c43"><code>99cf423</code></a> on branch <code>main</code>, for **cutan 0.0.89** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.88) is behind the latest release on PyPI (0.0.89): `pip install cutan` gives newer code than these docs describe.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/eb3d69afcd81cd3355434b7e9ae7265db5f6fd72"><code>eb3d69afcd81cd3355434b7e9ae7265db5f6fd72</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/99cf423be21e1dcc7a1730df8373fd5d89680c43"><code>99cf423be21e1dcc7a1730df8373fd5d89680c43</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -15099,9 +15281,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/41373965283">41373965283</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/41375013449">41375013449</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>eb3d69afcd81cd3355434b7e9ae7265db5f6fd72</code> (in the history of the built commit) |
+| Event commit | <code>e576bced81450d57d706434b0254aab573839d7a</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -15126,13 +15308,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.89/">0.0.89</a>, newer than the documented version (0.0.88).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.89/">0.0.89</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout eb3d69afcd81cd3355434b7e9ae7265db5f6fd72
+git checkout 99cf423be21e1dcc7a1730df8373fd5d89680c43
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

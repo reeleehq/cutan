@@ -30,5 +30,6 @@ cutan.audio
 
    injectable_lipsync
    offline_lipsync
+   phones
    rhubarb_lipsync
    whisper_lipsync

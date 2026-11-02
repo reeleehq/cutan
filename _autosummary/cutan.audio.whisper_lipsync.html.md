@@ -25,7 +25,7 @@ Trade-offs vs. OfflineLipSync:
 | [`WhisperLipSync`](#cutan.audio.whisper_lipsync.WhisperLipSync)(\*[, model_size, device, ...])   | faster-whisper word timestamps → visemes.   |
 |--------------------------------------------------------------------------------------------------|---------------------------------------------|
 
-### *class* cutan.audio.whisper_lipsync.WhisperLipSync(, model_size='tiny', device='cpu', compute_type='int8', char_to_viseme=None)
+### *class* cutan.audio.whisper_lipsync.WhisperLipSync(\*, model_size='tiny', device='cpu', compute_type='int8', char_to_viseme=None, phone_to_viseme=<function phone_viseme>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 

@@ -10,6 +10,11 @@ into a single keyframe so the mouth doesn’t “stutter” on long vowel runs.
 Crude but visible. Use `RhubarbLipSync` for real phoneme alignment once
 you’ve installed the Rhubarb binary.
 
+A clip that knows its timings is followed instead of spread: its phones first
+(`AudioClip.phones`, a take timed by a forced aligner, an#491: each phone’s own
+mouth shape, [`cutan.audio.phones`](cutan.audio.phones.html.md#module-cutan.audio.phones)), else its words (`AudioClip.words`,
+an#490: each word’s letters over its span).
+
 ```pycon
 >>> from an.audio.tts import AudioClip
 >>> ls = OfflineLipSync()
@@ -29,10 +34,10 @@ True
 
 ### Classes
 
-| [`OfflineLipSync`](#cutan.audio.offline_lipsync.OfflineLipSync)(\*[, char_to_viseme])   | Default lip-sync provider: deterministic char-to-viseme mapping.   |
-|-----------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| [`OfflineLipSync`](#cutan.audio.offline_lipsync.OfflineLipSync)(\*[, char_to_viseme, ...])   | Default lip-sync provider: deterministic char-to-viseme mapping.   |
+|----------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
 
-### *class* cutan.audio.offline_lipsync.OfflineLipSync(, char_to_viseme=None)
+### *class* cutan.audio.offline_lipsync.OfflineLipSync(\*, char_to_viseme=None, phone_to_viseme=<function phone_viseme>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 

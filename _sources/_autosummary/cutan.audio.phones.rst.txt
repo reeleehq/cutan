@@ -1,0 +1,28 @@
+cutan.audio.phones
+==================
+
+.. automodule:: cutan.audio.phones
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      Timing
+      PhoneToViseme
+      DEFAULT_LETTER_VISEME
+      MIN_GAP_FOR_REST_S
+      SILENCES
+      ARPABET_TO_VISEME
+      IPA_TO_VISEME
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      clip_timings
+      phone_alphabet
+      phone_viseme
+      phones_to_visemes
+      phones_track
+   
