@@ -27,8 +27,9 @@ stage canvas and written as a PNG beside a record of where it came from.
   (``<name>/prop.json`` + ``parts/``, through :func:`~cutan.carve.carve` and
   :func:`~cutan.carve.write_prop`, with its quality warnings) instead of a plate.
 - **The generator** is the seam: ``generator(prompt, *, size, background,
-  quality, model) -> PIL image``, carrying ``provider``, ``model`` and
-  ``license`` for the provenance. The default, :class:`AixGenerator`, calls
+  quality, model) -> PIL image`` (or a :class:`Generated`: the image and facts
+  about making it, such as the provider's revised prompt), carrying
+  ``provider``, ``model`` and ``license`` for the provenance. The default, :class:`AixGenerator`, calls
   the fleet's :func:`aix.generate_image` (OpenAI's ``gpt-image`` models by
   default; ``pip install "cutan[generate]"``).
 - **The record**: each image's :class:`~an.ir.assets.AssetSource` (provider,
@@ -98,7 +99,7 @@ _NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 Background = Literal["opaque", "transparent"]
 #: ``generator(prompt, *, size, background, quality, model) -> PIL image`` (or a
-#: :class:`Generated`: the image and what the provider said about it), with
+#: :class:`Generated`: the image and facts about making it), with
 #: ``provider``, ``model`` and ``license`` attributes for the provenance.
 ImageGenerator = Callable[..., Image.Image]
 
@@ -287,9 +288,10 @@ PROVIDER_LICENSES: dict[str, str] = {"openai": OPENAI_OUTPUT_LICENSE}
 
 @dataclass
 class Generated:
-    """What a generator may return instead of a bare image: the image, and what
-    the provider said about making it (``model`` it resolved to,
-    ``revised_prompt`` it actually drew), recorded in the image's source."""
+    """What a generator may return instead of a bare image: the image, and facts
+    about making it (``model``: the model the request was resolved to, e.g. aix
+    substituting a configured alias; ``revised_prompt``: the prompt the provider
+    says it actually drew), recorded in the image's source."""
 
     image: Image.Image
     facts: Mapping[str, Any] = field(default_factory=dict)

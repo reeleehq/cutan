@@ -214,7 +214,7 @@ def test_the_default_generator_asks_aix_for_base64_and_the_background(monkeypatc
         buf = __import__("io").BytesIO()
         Image.new("RGB", (8, 8), MAGENTA).save(buf, "PNG")
         return types.SimpleNamespace(
-            as_bytes=lambda: buf.getvalue(), model="gpt-image-2-2026", revised_prompt="p, flat"
+            as_bytes=lambda: buf.getvalue(), model="gpt-image-2", revised_prompt="p, flat"
         )
 
     monkeypatch.setitem(
@@ -224,7 +224,7 @@ def test_the_default_generator_asks_aix_for_base64_and_the_background(monkeypatc
     assert made.image.size == (8, 8)
     assert seen["response_format"] is None and seen["background"] == "transparent"
     assert seen["model"] == G.DEFAULT_MODEL and "quality" not in seen, "the provider's default"
-    assert made.facts == {"model": "gpt-image-2-2026", "revised_prompt": "p, flat"}
+    assert made.facts == {"model": "gpt-image-2", "revised_prompt": "p, flat"}
 
 
 def test_the_cli_writes_and_reports(tmp_path, monkeypatch):
