@@ -53,6 +53,7 @@ cutan.characters
    dicebear
    drawn
    factory
+   framing
    hands
    idle
    licenses

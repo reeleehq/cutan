@@ -86,7 +86,7 @@ cutan#91). Pushed with the project, so it is a key of the store too.
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
-### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 13*
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 14*
 
 The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
 it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
@@ -109,6 +109,7 @@ Level 11: the first level whose every release ships `an.stage.solve.solve_report
 (an#570 merged after level 10 was cut), which the body-continuity check reads.
 Level 13: the names cutan’s checks and pack read, public (an#710): `an.ir.validate.rig_scope`,
 `an.semantic.matcher.lookup_method` and `as_choice`, `an.audio.loudness.voice_loudness_offset`.
+Level 14: `EntityKind.shot_sizes` (cutan#106), the rig’s own bands for a viewpoint’s size.
 
 ### cutan.require_an()
 

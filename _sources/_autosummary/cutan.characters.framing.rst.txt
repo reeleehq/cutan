@@ -1,0 +1,19 @@
+cutan.characters.framing
+========================
+
+.. automodule:: cutan.characters.framing
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      SPECIMEN_SIZE
+      SIZE_RATIO_MARGIN
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      character_shot_sizes
+   

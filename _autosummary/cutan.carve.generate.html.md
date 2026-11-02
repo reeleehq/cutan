@@ -27,7 +27,10 @@ stage canvas and written as a PNG beside a record of where it came from.
   `"opaque"` or `"transparent"` (the model’s own alpha, where it has one);
   `key`: a named key colour ([`KEYS`](#cutan.carve.generate.KEYS), `"magenta"`) or any matte recipe
   [`as_matte()`](cutan.carve.mattes.html.md#cutan.carve.mattes.as_matte) reads; `fit`: `[w, h]`, scale to
-  > cover and centre-crop.
+  > cover and centre-crop; `prop`: carve the image into a prop folder
+  > (`<name>/prop.json` + `parts/`, through [`carve()`](cutan.carve.html.md#cutan.carve.carve) and
+
+  [`write_prop()`](cutan.carve.html.md#cutan.carve.write_prop), with its quality warnings) instead of a plate.
 - **The generator** is the seam: `generator(prompt, *, size, background,
   quality, model) -> PIL image`, carrying `provider`, `model` and
   `license` for the provenance. The default, [`AixGenerator`](#cutan.carve.generate.AixGenerator), calls
@@ -68,7 +71,7 @@ generator; nothing here is imported by `import cutan`.
 | [`AixGenerator`](#cutan.carve.generate.AixGenerator)([model, quality, licenses])       | The default generator: `aix.generate_image()`, whose model names its provider (OpenAI's `gpt-image` by default).                           |
 |-------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
 | [`ArtSpec`](#cutan.carve.generate.ArtSpec)(name, prompt[, size, background, ...]) | One image to generate.                                                                                                                     |
-| [`GeneratedArt`](#cutan.carve.generate.GeneratedArt)(name, path, source[, size, kept]) | One image of the spec: its path and provenance; `kept` when it was already there and not made again (its provenance read from the record). |
+| [`GeneratedArt`](#cutan.carve.generate.GeneratedArt)(name, path, source[, size, ...])  | One image of the spec: its path and provenance; `kept` when it was already there and not made again (its provenance read from the record). |
 
 ### *class* cutan.carve.generate.AixGenerator(model='gpt-image-2', quality=None, licenses=<factory>)
 
@@ -92,11 +95,21 @@ provider made an image and under what licence ([`PROVIDER_LICENSES`](#cutan.carv
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
-### *class* cutan.carve.generate.ArtSpec(name, prompt, size='1536x1024', background='opaque', key=None, fit=None, model=None, quality=None)
+### *class* cutan.carve.generate.ArtSpec(name, prompt, size='1536x1024', background='opaque', key=None, fit=None, model=None, quality=None, prop=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 One image to generate. `key`: a [`KEYS`](#cutan.carve.generate.KEYS) name or a matte recipe.
+
+#### prop *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]]* *= None*
+
+the image is carved
+([`cutan.carve.carve()`](cutan.carve.html.md#cutan.carve.carve), its matte the `key`, else carve’s flat-colour
+default) and written as `<name>/prop.json` + `parts/` (`write_prop`),
+the source in the descriptor. Keys: `PROP_KEYS`.
+
+* **Type:**
+  Make a prop, not a plate (cutan#162)
 
 ### cutan.carve.generate.DEFAULT_MODEL *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'gpt-image-2'*
 
@@ -110,12 +123,16 @@ and not every model has it).
 * **Type:**
   `None`
 
-### *class* cutan.carve.generate.GeneratedArt(name, path, source, size=(0, 0), kept=False)
+### *class* cutan.carve.generate.GeneratedArt(name, path, source, size=(0, 0), kept=False, warnings=())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 One image of the spec: its path and provenance; `kept` when it was
 already there and not made again (its provenance read from the record).
+
+#### warnings *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ()*
+
+A carved prop’s quality warnings ([`cutan.carve.CarveQuality`](cutan.carve.html.md#cutan.carve.CarveQuality)).
 
 ### cutan.carve.generate.ImageGenerator
 
@@ -212,7 +229,8 @@ it again. The model’s own image is written first as `<name>.raw.png`, with
 its record, and removed once the PNG and its record are written, unless
 `keep_raw`: a key or fit that fails leaves the paid-for image, and the
 next run keys that image instead of paying for a new one. Every file is
-written whole or not at all.
+written whole or not at all (a prop’s files by `write_prop`, in place: a
+`prop.json` a crash cut off is not taken as made, and is made again).
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`GeneratedArt`](#cutan.carve.generate.GeneratedArt)]

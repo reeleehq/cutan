@@ -39,6 +39,7 @@
 - [cutan.characters.dicebear](_autosummary/cutan.characters.dicebear.html.md): DiceBear HTTP API client + best-effort post-processing.
 - [cutan.characters.drawn](_autosummary/cutan.characters.drawn.html.md): What the character factory wrote, as it wrote it: the in-memory log behind its record of drawn bytes...
 - [cutan.characters.factory](_autosummary/cutan.characters.factory.html.md): High-level entry points: build and inspect a character.
+- [cutan.characters.framing](_autosummary/cutan.characters.framing.html.md): Shot sizes from a character’s own rig: where a close-up and a medium shot cut THIS build (cutan#106)...
 - [cutan.characters.hands](_autosummary/cutan.characters.hands.html.md): A character’s hands as named points: &#96;ned@hand_r&#96; (an#502, reeleehq/cutan#104).
 - [cutan.characters.idle](_autosummary/cutan.characters.idle.html.md): Idle animation factories: breath, blink, weight-shift.
 - [cutan.characters.licenses](_autosummary/cutan.characters.licenses.html.md): DiceBear per-style licences, as data.
@@ -96,7 +97,7 @@
 - [cutan.verify.critic](_autosummary/cutan.verify.critic.html.md): A vision critic for body-depicting props: narrow yes/no questions over probe frames (cutan#95).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-02 03:36 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-02 03:58 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 
