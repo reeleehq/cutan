@@ -336,7 +336,9 @@ def cast_commands(pack: Path) -> list[list[str]]:
         # a link (or a FIFO) would read, or wait on, something outside the pack,
         # and a refused line is quoted back in the report
         if cast_file.is_symlink() or (cast_file.exists() and not cast_file.is_file()):
-            raise PackError(f"{cast_file.name} must be a plain file in the pack, not a link")
+            raise PackError(
+                f"{cast_file.name} must be a plain file in the pack, not a link"
+            )
     if data.exists():
         if path.exists():
             raise PackError(f"the pack has both {CAST_YAML} and {CAST_FILE}: keep one")
@@ -356,7 +358,9 @@ def cast_commands(pack: Path) -> list[list[str]]:
         with open(path, "rb") as f:  # at most the cap: never trust the size
             data = f.read(MAX_CAST_BYTES + 1)
         if len(data) > MAX_CAST_BYTES:
-            raise PackError(f"{CAST_FILE} is over {MAX_CAST_BYTES} bytes: a cast is a page")
+            raise PackError(
+                f"{CAST_FILE} is over {MAX_CAST_BYTES} bytes: a cast is a page"
+            )
         text = data.decode("utf-8").replace("\\\n", " ")
     except (OSError, UnicodeDecodeError) as e:
         raise PackError(f"{CAST_FILE} cannot be read: {e}") from None
@@ -427,7 +431,13 @@ def _tile_image_problem(pattern: str) -> str | None:
         if key.strip() != "image" or not eq or value.startswith(_PNG_B64):
             continue
         posix, win = PurePosixPath(value), PureWindowsPath(value)
-        if posix.is_absolute() or win.is_absolute() or win.drive or ".." in posix.parts or ".." in win.parts:
+        if (
+            posix.is_absolute()
+            or win.is_absolute()
+            or win.drive
+            or ".." in posix.parts
+            or ".." in win.parts
+        ):
             return (
                 "a clothing pattern image= must be a file inside the pack "
                 "(a relative path, no ..) or its base64"
