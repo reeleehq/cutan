@@ -92,7 +92,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "kurzgesagt",
-      "sha256": "3f6883c9190e8c9d104542141325091a4a34ed87fe953624b0a0bd1ecd7351a7"
+      "sha256": "dba16f077b3bdc30ddd8a61d03224e7af39c8747392100b900ae833b8c0478d3"
     }
   },
   "entity_surfaces": {},
@@ -168,7 +168,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "norstein",
-      "sha256": "42b220f04261823c1b9b70d39f3ec560e4626c6dc5a5de891431375946989527"
+      "sha256": "ff7541d307b71a48b0762cdc163bf9052b9d99b29ae045324433017ad9ce8456"
     }
   },
   "entity_surfaces": {},
@@ -215,7 +215,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "oversimplified",
-      "sha256": "ff180201f5762c6d606c821151ab2b253963b347fd75d42d8be689c8f2dbed5b"
+      "sha256": "ae5f1d012d088070909635868334705f388650082ee96f820a7bf7445a724f90"
     }
   },
   "entity_surfaces": {},
@@ -307,7 +307,7 @@ The shipped styles (generated from the style specs in the code; the pipeline mea
   "metadata": {
     "style_spec": {
       "name": "south_park",
-      "sha256": "46803413697591f765db43c57db265061835246416c1267eb35fb01ece9d571a"
+      "sha256": "f170bb6e7b48993c27c6aa8f245de8992837320711aa2aea83044571b2765b9b"
     }
   },
   "surface": {
