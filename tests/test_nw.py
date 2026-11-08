@@ -123,3 +123,11 @@ def test_render_records_a_film_that_goes_stale_when_the_scene_changes(
     assert status.run(proj, {})["films"][0]["stale"] is True
     nw.genre_op(CUTOUT_ANIMATION_SLUG, "render").run(proj, {})
     assert [f["stale"] for f in status.run(proj, {})["films"]] == [False]
+
+
+def test_the_film_generator_id_follows_lacings_grammar():
+    from lacing import generator_id_findings
+
+    from cutan.nw import FILM_GENERATOR
+
+    assert generator_id_findings(FILM_GENERATOR) == []
