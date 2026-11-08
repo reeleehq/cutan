@@ -5,8 +5,9 @@ Phones to mouth shapes: an aligner’s phone timings as a Rhubarb viseme track.
 A recorded take imported with a forced aligner’s output carries its phones,
 `AudioClip.phones`: `(phone, start_s, end_s)` from the clip’s start (an#491),
 in ARPAbet (MFA’s English models: `HH`, `AH0`) or IPA (`mfa:ipa`: `h`,
-`ə`). The take’s record knows which, but the clip does not, so the alphabet is
-decided once per clip ([`phone_alphabet()`](#cutan.audio.phones.phone_alphabet)).
+`ə`). The take’s record states which (`AudioClip.phone_alphabet`, an#721) and
+that wins; a clip without it has the alphabet decided once per clip from its
+labels ([`phone_alphabet()`](#cutan.audio.phones.phone_alphabet)).
 
 [`phones_track()`](#cutan.audio.phones.phones_track) is what a lip-sync provider calls: the clip’s track from its
 phones, or `None` to align some other way. A word the aligner could not
@@ -37,7 +38,7 @@ word-timing rule does (`an.audio.lipsync.word_timings_to_visemes`).
 
 | [`clip_timings`](#cutan.audio.phones.clip_timings)(audio, field)                      | `audio`'s `words` or `phones` as a list of `(label, start_s, end_s)`; `None` when it has none (or its `an` predates the field).                                                                                                                          |
 |--------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`phone_alphabet`](#cutan.audio.phones.phone_alphabet)(phones)                          | `"arpabet"` when every phone is ARPAbet as aligners write it (ASCII, one case throughout, each in [`ARPABET_TO_VISEME`](#cutan.audio.phones.ARPABET_TO_VISEME) once its stress digit is dropped), else `"ipa"`.                                    |
+| [`phone_alphabet`](#cutan.audio.phones.phone_alphabet)(phones)                          | `"arpabet"` when every phone is ARPAbet as aligners write it (ASCII, one case throughout, each in `an`'s `ARPABET_PHONES` once its stress digit is dropped), else `"ipa"`.                                                                               |
 | [`phone_viseme`](#cutan.audio.phones.phone_viseme)(phone, \*[, alphabet])             | The Rhubarb shape of one phone in `alphabet`; `REST_VISEME` for a silence; `None` for a phone the table does not know.                                                                                                                                   |
 | [`phones_to_visemes`](#cutan.audio.phones.phones_to_visemes)(phones, \*, total_duration)   | A viseme track from phone timings: each phone's shape at its start (in the clip's [`phone_alphabet()`](#cutan.audio.phones.phone_alphabet)), the mouth closed at a silence, at a pause longer than `min_gap_for_rest` and after the last sound. |
 | [`phones_track`](#cutan.audio.phones.phones_track)(audio, \*[, phone_to_viseme, ...]) | The mouth track of a clip whose phones are timed (`AudioClip.phones`, a take timed by a forced aligner, an#491), carrying the clip's words too; `None` when it has no phones, or one `phone_to_viseme` does not know.                                    |
@@ -103,9 +104,11 @@ True
 ### cutan.audio.phones.phone_alphabet(phones)
 
 `"arpabet"` when every phone is ARPAbet as aligners write it (ASCII, one
-case throughout, each in [`ARPABET_TO_VISEME`](#cutan.audio.phones.ARPABET_TO_VISEME) once its stress digit is
+case throughout, each in `an`’s `ARPABET_PHONES` once its stress digit is
 dropped), else `"ipa"`. Decided per clip: a SAMPA `V` (the vowel of
-*love*) beside a lowercase `l` is not ARPAbet `V`.
+*love*) beside a lowercase `l` is not ARPAbet `V`. The rule is `an`’s
+(`phone_alphabet_of()`), which says `None` where
+it cannot tell; this lip-sync reads that as IPA.
 
 ```pycon
 >>> phone_alphabet(["HH", "AH0", "L"]), phone_alphabet(["hh", "ah0"])
@@ -132,12 +135,15 @@ silence; `None` for a phone the table does not know.
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
-### cutan.audio.phones.phones_to_visemes(phones, \*, total_duration, words=(), phone_to_viseme=<function phone_viseme>, char_to_viseme=None, rest_viseme='X', min_gap_for_rest=0.2)
+### cutan.audio.phones.phones_to_visemes(phones, \*, total_duration, words=(), phone_to_viseme=<function phone_viseme>, char_to_viseme=None, rest_viseme='X', min_gap_for_rest=0.2, alphabet=None)
 
 A viseme track from phone timings: each phone’s shape at its start (in the
 clip’s [`phone_alphabet()`](#cutan.audio.phones.phone_alphabet)), the mouth closed at a silence, at a pause
 longer than `min_gap_for_rest` and after the last sound. A word of `words`
 with no phone under it is spoken by its letters (`char_to_viseme`).
+
+`alphabet` is the take’s recorded one (`AudioClip.phone_alphabet`); with
+none, the clip’s labels decide ([`phone_alphabet()`](#cutan.audio.phones.phone_alphabet)).
 
 `None` when a phone is one `phone_to_viseme` does not know: a phone set
 this table was not written for is better spread by its words than guessed.
