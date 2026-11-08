@@ -373,8 +373,14 @@ def test_the_preview_path_carries_it_too():
     import inspect
 
     import an.preview as preview_mod
+    from an.ir.schema import Meta, Shot
+    from an.stage.compile import rendered_compile_args
 
-    assert "default_easing=scene.meta.default_easing" in inspect.getsource(preview_mod)
+    # The preview takes its compile keywords from `rendered_compile_args`
+    # (an#713), which reads the scene's default easing off its meta.
+    assert "rendered_compile_args" in inspect.getsource(preview_mod)
+    args = rendered_compile_args(Shot(id="s"), Meta(default_easing="linear"), {})
+    assert args["default_easing"] == "linear", args
 
 
 @pytest.mark.browser

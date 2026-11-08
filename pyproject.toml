@@ -31,6 +31,7 @@ classifiers = [
 # (`cutan.REQUIRED_AN_API_LEVEL`, checked at import).
 dependencies = [
     "an",
+    "dol",
     "pyyaml",
     "numpy",
     "pillow",
