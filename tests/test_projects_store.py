@@ -8,6 +8,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
+import os
+
 import pytest
 from an.project import PROJECT_GITIGNORE, gitignore_matcher
 
@@ -412,6 +414,7 @@ def test_prune_deletes_the_stores_copies_of_what_a_push_keeps_local(tmp_path):
     assert prune_project("p1", settings=S3, store=store) == ()
 
 
+@pytest.mark.skipif(os.name == "nt", reason="a backslash cannot be in a Windows file name")
 def test_a_path_the_matcher_cannot_read_is_kept_not_fatal(tmp_path):
     """A file name with a backslash (legal on macOS/Linux) neither aborts the push
     nor is read as excluded; a bad exclude line is refused before the store is touched."""
