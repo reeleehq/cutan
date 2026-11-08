@@ -73,7 +73,8 @@ PROJECT_STORE_RECORD: str = ".an/projects_store.json"
 #: Level 13: the names cutan's checks and pack read, public (an#710): ``an.ir.validate.rig_scope``,
 #: ``an.semantic.matcher.lookup_method`` and ``as_choice``, ``an.audio.loudness.voice_loudness_offset``.
 #: Level 14: ``EntityKind.shot_sizes`` (cutan#106), the rig's own bands for a viewpoint's size.
-REQUIRED_AN_API_LEVEL: int = 14
+#: Level 15: ``JsonSidecarStore.write_sidecar``, the atomic sidecar write (an#688, cutan#181).
+REQUIRED_AN_API_LEVEL: int = 15
 
 
 def require_an() -> None:
