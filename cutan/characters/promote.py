@@ -9,6 +9,7 @@ character. This is the v0.2 deliverable per research §5.3.
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Any, Optional
 
@@ -28,6 +29,8 @@ from cutan.characters.svg_utils import (
     normalize_svg,
     write_svg,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def promote(
@@ -73,6 +76,8 @@ def promote(
     """
     pdir = Path(project_dir)
     chars_dir = pdir / "assets" / "characters"
+    if not pdir.is_dir():
+        raise FileNotFoundError(pdir)
     # A project never `an init`'d has no characters folder yet (an#696: the
     # stores make folders on the first write): that reads as "no characters",
     # exactly as an empty folder does; the writes below make it.
@@ -80,6 +85,12 @@ def promote(
     if src is None or not src.exists():
         # Fall back to building from scratch — no inline source means we
         # treat the entity as a name and generate a fresh DiceBear character.
+        logger.warning(
+            "promote: no source for %r under %s (%s); generating a new character",
+            entity,
+            chars_dir,
+            "no characters yet" if not chars_dir.exists() else "no such entity",
+        )
         return new_character(
             chars_dir,
             name=as_,

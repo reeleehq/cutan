@@ -374,6 +374,15 @@ class TestPromote:
         assert desc == tmp_path / "assets" / "characters" / "amy-v1" / "character.json"
         assert desc.exists()
 
+    def test_promote_names_what_it_did_when_there_is_no_source(self, tmp_path, caplog):
+        with caplog.at_level("WARNING", logger="cutan.characters.promote"):
+            promote(tmp_path, entity="amy", as_="amy-v1", use_dicebear=False)
+        assert "no characters yet" in caplog.text
+
+    def test_promote_refuses_a_project_that_does_not_exist(self, tmp_path):
+        with pytest.raises(FileNotFoundError):
+            promote(tmp_path / "typo", entity="amy", as_="amy-v1", use_dicebear=False)
+
     def test_promote_uses_existing_svg_dummy(self, tmp_path):
         # placeholder so the next method's name doesn't collide.
         pass
