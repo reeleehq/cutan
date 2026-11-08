@@ -358,18 +358,20 @@ def _cut_frames_from_shots(shot_durations: Sequence[float], fps: float, n: int):
     return sorted({int(b) for b in bounds if 0 < b < n})
 
 
-def _cut_frames_from_pixels(frames: np.ndarray, step_diff: np.ndarray) -> list[int]:
-    q = (frames >> HISTOGRAM_BITS_DROPPED).astype(np.int32)
-    bins = 256 >> HISTOGRAM_BITS_DROPPED
-    key = (q[..., 0] * bins + q[..., 1]) * bins + q[..., 2]
-    per_frame = key.reshape(len(frames), -1)
-    hists = np.stack([np.bincount(k, minlength=bins**3) / k.size for k in per_frame])
-    hist_l1 = np.abs(hists[1:] - hists[:-1]).sum(axis=1)
-    cuts: list[int] = []
-    for i in np.flatnonzero((hist_l1 > CUT_HISTOGRAM_L1) & (step_diff > CUT_MEAN_DIFF)):
-        if not cuts or (i + 1) - cuts[-1] > CUT_DEDUPE_FRAMES:
-            cuts.append(int(i + 1))
-    return cuts
+def _cut_frames_from_pixels(frames: np.ndarray) -> list[int]:
+    """Frame indices where a cut lands, by colour-histogram jumps. The detector
+    is mixing's (``mixing.shot_changes``, light: numpy only); the calibration
+    (the ``CUT_*`` constants) stays here, passed explicitly."""
+    from mixing.shot_changes import histogram_changes, histogram_cut_indices
+
+    changes = histogram_changes(frames, bits_dropped=HISTOGRAM_BITS_DROPPED)
+    steps = histogram_cut_indices(
+        changes,
+        l1=CUT_HISTOGRAM_L1,
+        mean_diff=CUT_MEAN_DIFF,
+        dedupe_frames=CUT_DEDUPE_FRAMES,
+    )
+    return [int(i) + 1 for i in steps]  # step i lies between frames i and i + 1
 
 
 def _palette_stats(frames: np.ndarray) -> tuple[float, float, float]:
@@ -499,7 +501,7 @@ def measure_style(
         cuts = _cut_frames_from_shots(shot_durations, fps, n)
         cut_source = "shots"
     else:
-        cuts = _cut_frames_from_pixels(frames, step_diff)
+        cuts = _cut_frames_from_pixels(frames)
         cut_source = "pixels"
     duration = n / fps
     bounds = [0, *cuts, n]
@@ -585,7 +587,7 @@ def measure_shots(
     if shot_durations:
         cuts = _cut_frames_from_shots(shot_durations, fps, n)
     else:
-        cuts = _cut_frames_from_pixels(frames, step_diff)
+        cuts = _cut_frames_from_pixels(frames)
     bounds = [0, *cuts, n]
     ids = list(shot_ids or [])
     rows = []
