@@ -32,6 +32,7 @@ classifiers = [
 dependencies = [
     "an",
     "dol",
+    "mixing>=0.0.111",
     "pyyaml",
     "numpy",
     "pillow",
