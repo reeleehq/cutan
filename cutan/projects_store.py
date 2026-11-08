@@ -37,10 +37,9 @@ from collections.abc import MutableMapping
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from fnmatch import fnmatchcase
 from typing import Iterable, Mapping, Optional
 
-from an.project import PROJECT_GITIGNORE
+from an.project import PROJECT_GITIGNORE, gitignore_matcher
 
 from . import LIBRARY_NAME, PROJECT_STORE_RECORD
 
@@ -58,7 +57,7 @@ STORE_RECORD: str = PROJECT_STORE_RECORD
 #: scratch; a repository is not project content; and every line ``an init``
 #: keeps out of git (``an.project.PROJECT_GITIGNORE``: render reports, probes, the
 #: options manifests' file locks) is read from ``an``, so a line it adds there is
-#: kept local here too. Each entry is a ``.gitignore`` line (:func:`_gitignore_matcher`).
+#: kept local here too. Each entry is a ``.gitignore`` line (read by ``an.project.gitignore_matcher``).
 DEFAULT_PUSH_EXCLUDES: tuple[str, ...] = tuple(
     dict.fromkeys(
         (
@@ -358,69 +357,6 @@ class PushReport:
         return text
 
 
-def _gitignore_matcher(line: str):
-    """``rel -> bool`` for one ``.gitignore`` line, by git's rules: a line with a
-    ``/`` before its end is anchored at the project root, one without matches a
-    name at any depth; a trailing ``/`` matches folders only; wildcards never
-    cross a ``/``; a matched folder covers everything under it; case counts.
-    What it does not read the way git does is refused rather than misread (a
-    line misread could push what it should keep): negation (``!``), comments
-    (``#``), ``**``, escapes (``\\``), ``[^...]`` and surrounding spaces.
-
-    >>> _gitignore_matcher("artifacts/v/*.lock")("artifacts/v/a.json.lock")
-    True
-    >>> _gitignore_matcher("*.lock")("deep/in/x.lock"), _gitignore_matcher("probes")("probes/x.png")
-    (True, True)
-    >>> _gitignore_matcher("cache/")("cache"), _gitignore_matcher("a/*/c")("a/b/c/d")
-    (False, True)
-    """
-    if (
-        line != line.strip()
-        or line.startswith(("!", "#"))
-        or any(token in line for token in ("**", "\\", "[^"))
-    ):
-        raise ValueError(
-            "an exclude line cannot use '!', '#', '**', '\\', '[^' or surrounding "
-            f"spaces (got {line!r})"
-        )
-    folders_only = line.endswith("/")
-    pattern = line.rstrip("/")
-    anchored = "/" in pattern
-    pattern = pattern.lstrip("/")
-    depth = pattern.count("/")
-
-    def matches(rel: str) -> bool:
-        parts = rel.split("/")
-        # each folder holding ``rel`` (a matched folder covers its contents), then rel
-        for n in range(1, len(parts) + (0 if folders_only else 1)):
-            if anchored:
-                if n - 1 == depth and fnmatchcase("/".join(parts[:n]), pattern):
-                    return True
-            elif fnmatchcase(parts[n - 1], pattern):
-                return True
-        return False
-
-    return matches
-
-
-def _excluder(exclude: Iterable[str]):
-    """``rel -> bool``: whether any of ``exclude``, each a ``.gitignore`` line
-    (:func:`_gitignore_matcher`), covers the project-relative POSIX path ``rel``.
-
-    >>> keep = _excluder(("artifacts/shot_cache/", "notes.txt", "artifacts/v/*.lock"))
-    >>> keep("artifacts/shot_cache/blobs/x"), keep("notes.txt"), keep("artifacts/audio/a.wav")
-    (True, True, False)
-    >>> keep("artifacts/v/a.json.lock"), keep("artifacts/v/a.json"), keep("artifacts/v/sub/a.lock")
-    (True, False, False)
-    """
-    matchers = tuple(_gitignore_matcher(line) for line in exclude)
-
-    def excluded(rel: str) -> bool:
-        return any(m(rel) for m in matchers)
-
-    return excluded
-
-
 def _same(a: Optional[dict], b: Optional[dict]) -> bool:
     """Two record entries name the same bytes (by sha256)."""
     return a is not None and b is not None and a.get("sha256") == b.get("sha256")
@@ -466,7 +402,7 @@ def push_project(
     )
     if not folder.is_dir():
         raise FileNotFoundError(f"no project folder to push at {folder}")
-    excluded = _excluder(exclude)
+    excluded = gitignore_matcher(exclude)
     local_files = sorted(p for p in folder.rglob("*") if p.is_file())
     rels = [p.relative_to(folder).as_posix() for p in local_files]
     if own_folder and folder.resolve() == (_local_root() / project_id).resolve():
@@ -605,7 +541,7 @@ def prune_project(
         return ()
     store = projects_store(s) if store is None else store
     prefix = _project_prefix(project_id)
-    excluded = _excluder(exclude)
+    excluded = gitignore_matcher(exclude)
     gone = tuple(
         sorted(
             key[len(prefix) :]

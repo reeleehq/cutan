@@ -9,12 +9,11 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from an.project import PROJECT_GITIGNORE
+from an.project import PROJECT_GITIGNORE, gitignore_matcher
 
 import cutan.projects_store as module
 from cutan import PROJECT_STORE_RECORD
 from cutan.projects_store import (
-    _excluder,
     DEFAULT_PUSH_EXCLUDES,
     STORE_RECORD,
     ProjectsStoreSettings,
@@ -107,24 +106,14 @@ _GIT_SAMPLE_PATHS = (
     "deep/probes/x.png",
     "a/b/c/d",
 )
-_GIT_SAMPLE_LINES = (
-    "*.lock",
-    "probes",
-    "a/*/c",
-    "artifacts/v?ice_options/[ab].json",
-    "/scene.md",
-)
 
 
 @pytest.mark.skipif(shutil.which("git") is None, reason="needs git")
-@pytest.mark.parametrize(
-    "lines",
-    [PROJECT_GITIGNORE, DEFAULT_PUSH_EXCLUDES, _GIT_SAMPLE_LINES],
-    ids=["an-gitignore", "push-excludes", "shapes"],
-)
-def test_the_excluder_agrees_with_git_check_ignore(tmp_path, lines):
-    """Each exclude line means what it means to git, for whatever line ``an``
-    adds next (the drift this list once suffered: an#587's lock pattern)."""
+def test_the_push_excludes_agree_with_git_check_ignore(tmp_path):
+    """Each default exclude line means what it means to git (the drift this list
+    once suffered: an#587's lock pattern). The matcher's own agreement with git
+    is ``an``'s test (an#725); this one is about OUR list."""
+    lines = DEFAULT_PUSH_EXCLUDES
     subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
     # bytes, NUL-separated: no newline translation on Windows, no path quoting
     (tmp_path / ".gitignore").write_bytes("".join(f"{line}\n" for line in lines).encode())
@@ -135,14 +124,8 @@ def test_the_excluder_agrees_with_git_check_ignore(tmp_path, lines):
         capture_output=True,
     )
     ignored = {p for p in got.stdout.decode().split("\0") if p}
-    excluded = _excluder(lines)
+    excluded = gitignore_matcher(lines)
     assert {p for p in _GIT_SAMPLE_PATHS if excluded(p)} == ignored
-
-
-def test_an_exclude_line_it_cannot_honour_is_refused():
-    for line in ("!keep.me", "artifacts/**/x", "# note", "\\*.md", "[^a].txt", "foo "):
-        with pytest.raises(ValueError, match="cannot use"):
-            _excluder((line,))
 
 
 # ------------------------------------------------------------ the write half
