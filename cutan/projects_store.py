@@ -357,6 +357,30 @@ class PushReport:
         return text
 
 
+def _excluder(exclude: Iterable[str]):
+    """``an``'s ``gitignore_matcher`` over ``exclude``, for paths a store may hold.
+
+    The matcher refuses a path that is not a plain project-relative POSIX path
+    (a backslash in a file name, ``//`` in a key); such a path is no ``.gitignore``
+    line's business, so it is not excluded (it was pushed before ``an``'s matcher,
+    and still is) rather than aborting a whole push or prune. Bad ``exclude`` lines
+    still raise, here, before anything is touched.
+
+    >>> keep = _excluder(("*.lock",))
+    >>> keep("a/x.lock"), keep("a\\\\x.lock"), keep("a//x.lock")
+    (True, False, False)
+    """
+    matches = gitignore_matcher(exclude)
+
+    def excluded(rel: str) -> bool:
+        try:
+            return matches(rel)
+        except ValueError:
+            return False
+
+    return excluded
+
+
 def _same(a: Optional[dict], b: Optional[dict]) -> bool:
     """Two record entries name the same bytes (by sha256)."""
     return a is not None and b is not None and a.get("sha256") == b.get("sha256")
@@ -402,7 +426,7 @@ def push_project(
     )
     if not folder.is_dir():
         raise FileNotFoundError(f"no project folder to push at {folder}")
-    excluded = gitignore_matcher(exclude)
+    excluded = _excluder(exclude)
     local_files = sorted(p for p in folder.rglob("*") if p.is_file())
     rels = [p.relative_to(folder).as_posix() for p in local_files]
     if own_folder and folder.resolve() == (_local_root() / project_id).resolve():
@@ -541,7 +565,7 @@ def prune_project(
         return ()
     store = projects_store(s) if store is None else store
     prefix = _project_prefix(project_id)
-    excluded = gitignore_matcher(exclude)
+    excluded = _excluder(exclude)
     gone = tuple(
         sorted(
             key[len(prefix) :]

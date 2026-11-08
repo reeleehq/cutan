@@ -410,3 +410,15 @@ def test_prune_deletes_the_stores_copies_of_what_a_push_keeps_local(tmp_path):
     out = materialize_project("p1", settings=S3, store=store, cache=tmp_path / "other")
     assert not (out / lock).exists(), "so no pull brings it back"
     assert prune_project("p1", settings=S3, store=store) == ()
+
+
+def test_a_path_the_matcher_cannot_read_is_kept_not_fatal(tmp_path):
+    """A file name with a backslash (legal on macOS/Linux) neither aborts the push
+    nor is read as excluded; a bad exclude line is refused before the store is touched."""
+    folder = _project(tmp_path)
+    (folder / "odd\\name.txt").write_bytes(b"x")
+    store: dict = {}
+    _push("p1", folder, store)
+    assert "p1/odd\\name.txt" in store
+    with pytest.raises(ValueError, match="cannot use"):
+        push_project("p2", folder=folder, store={}, exclude=("!keep",))
