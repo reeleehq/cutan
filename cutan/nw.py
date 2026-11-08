@@ -74,7 +74,8 @@ FILM_SCHEMA_URI = "annot://schema/cutout-film/v1"
 SCENE_FILES: tuple[str, ...] = ("scene.md", "ir/scene.json")
 ATTRIBUTION = "agent:cutan"
 #: What generated a film record, in lacing's ``<prefix>:<name>[@<version>]`` grammar
-#: (``lacing.GENERATOR_PREFIXES``): the render is a processor, named by its entry point.
+#: (``lacing.GENERATOR_PREFIXES``): the render is a processor, named by its entry point. Not
+#: ``transform:``: nw reads that prefix as the output of one of its own Transforms.
 FILM_GENERATOR = "processor:an.render.render_project"
 
 

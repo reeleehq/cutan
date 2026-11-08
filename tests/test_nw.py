@@ -93,6 +93,7 @@ def test_a_host_creates_a_project_where_it_asks_and_reopens_it_by_path(tmp_path)
 
 
 @needs_storage
+@pytest.mark.filterwarnings("error::lacing.GeneratorIdWarning")
 def test_render_records_a_film_that_goes_stale_when_the_scene_changes(
     tmp_path, monkeypatch
 ):
