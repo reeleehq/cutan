@@ -98,7 +98,7 @@
 - [cutan.verify.regions](_autosummary/cutan.verify.regions.html.md): Mouth and body cadence apart: “mouths on ones, bodies on twos” made measurable (cutan#80).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-08 21:59 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-08 22:15 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

@@ -645,7 +645,7 @@ no-op on the second pass.
 Promote `entity` from `project_dir`’s inline assets into the mall.
 
 * **Parameters:**
-  * **project_dir** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)) – Path to an `an` project (must contain `assets/characters/`).
+  * **project_dir** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)) – Path to an `an` project (`assets/characters/` need not exist yet).
   * **entity** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Inline entity id used inside the scene (the directory under
     `assets/characters/<entity>`, or the SVG file at
     `assets/characters/<entity>.svg`).

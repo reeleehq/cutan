@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-08T21:59:38Z",
+  "built_at": "2026-11-08T22:15:42Z",
   "package": {
     "name": "cutan",
-    "version": "0.0.104",
+    "version": "0.0.105",
     "display_name": "cutan",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "8dd91546f81137ef64efca5a821f3767d7292595",
-    "short_commit": "8dd9154",
+    "commit": "28d7f589e74a22531084efa72e5fa88da0e46c97",
+    "short_commit": "28d7f58",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/cutan",
-    "commit_url": "https://github.com/reeleehq/cutan/commit/8dd91546f81137ef64efca5a821f3767d7292595",
+    "commit_url": "https://github.com/reeleehq/cutan/commit/28d7f589e74a22531084efa72e5fa88da0e46c97",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/cutan",
-    "sha": "8dd91546f81137ef64efca5a821f3767d7292595",
+    "sha": "28d7f589e74a22531084efa72e5fa88da0e46c97",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "42527343263",
-    "run_url": "https://github.com/reeleehq/cutan/actions/runs/42527343263",
+    "run_id": "42528676384",
+    "run_url": "https://github.com/reeleehq/cutan/actions/runs/42528676384",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -60,11 +60,11 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.104",
+    "latest": "0.0.105",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 8dd91546f81137ef64efca5a821f3767d7292595\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 28d7f589e74a22531084efa72e5fa88da0e46c97\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,
