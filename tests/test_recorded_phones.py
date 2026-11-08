@@ -171,3 +171,44 @@ def test_a_silence_label_does_not_cover_a_word_and_a_zero_length_word_adds_nothi
     assert codes and set(codes) - {"R", "X"}  # the name is spoken
     assert not [v for v in got if v.time == 0.7]
     assert {v.code for v in got} <= {"R", "A", "B", "C", "D", "E", "F", "G", "H"}
+
+
+def test_cutan_holds_ans_arpabet_inventory_not_its_own():
+    from an.audio.transcripts import ARPABET_PHONES
+
+    assert set(ARPABET_TO_VISEME) == set(ARPABET_PHONES)
+
+
+def test_a_takes_recorded_alphabet_beats_the_guess():
+    # Labels that read as IPA by the clip's own rule ("l", "V" in one case mix)...
+    phones = [("l", 0.0, 0.1), ("V", 0.1, 0.2)]
+    assert phone_alphabet(p for p, _, _ in phones) == "ipa"
+    # ...are mapped as ARPAbet when the take's record says so: L is H, V is G.
+    got = phones_to_visemes(phones, total_duration=0.2, alphabet="arpabet")
+    assert [v.code for v in got] == ["X", "H", "G", "X"]
+
+
+@pytest.mark.skipif(
+    "phone_alphabet" not in getattr(AudioClip, "__dataclass_fields__", {}),
+    reason="this an has no AudioClip.phone_alphabet",
+)
+def test_phones_track_reads_the_clips_recorded_alphabet():
+    from cutan.audio.phones import phones_track
+
+    clip = AudioClip(
+        duration=0.2, phones=[("l", 0.0, 0.1), ("V", 0.1, 0.2)], phone_alphabet="arpabet"
+    )
+    assert [v.code for v in phones_track(clip).visemes] == ["X", "H", "G", "X"]
+
+
+@pytest.mark.parametrize("recorded", [None, "", "garbage"])
+def test_an_absent_or_unknown_recorded_alphabet_is_guessed(recorded):
+    got = phones_to_visemes(
+        [("ae1", 0.0, 0.1), ("er0", 0.1, 0.2)], total_duration=0.2, alphabet=recorded
+    )
+    assert [v.code for v in got] == ["X", "C", "E", "X"]
+
+
+def test_the_recorded_alphabet_is_read_case_insensitively():
+    got = phones_to_visemes([("l", 0.0, 0.1)], total_duration=0.1, alphabet="ARPABET")
+    assert [v.code for v in got] == ["X", "H", "X"]

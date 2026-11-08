@@ -3,8 +3,9 @@
 A recorded take imported with a forced aligner's output carries its phones,
 ``AudioClip.phones``: ``(phone, start_s, end_s)`` from the clip's start (an#491),
 in ARPAbet (MFA's English models: ``HH``, ``AH0``) or IPA (``mfa:ipa``: ``h``,
-``ə``). The take's record knows which, but the clip does not, so the alphabet is
-decided once per clip (:func:`phone_alphabet`).
+``ə``). The take's record states which (``AudioClip.phone_alphabet``, an#721) and
+that wins; a clip without it has the alphabet decided once per clip from its
+labels (:func:`phone_alphabet`).
 
 :func:`phones_track` is what a lip-sync provider calls: the clip's track from its
 phones, or ``None`` to align some other way. A word the aligner could not
@@ -25,6 +26,7 @@ import unicodedata
 from typing import Callable, Iterable, Mapping, Optional, Sequence
 
 from an.audio.lipsync import Viseme, VisemeTrack
+from an.audio.transcripts import phone_alphabet_of
 from an.audio.tts import AudioClip
 
 #: ``(label, start_s, end_s)``, as ``AudioClip.phones`` and ``.words`` hold them.
@@ -88,6 +90,9 @@ IPA_TO_VISEME: dict[str, str] = {
     "ʔ": "B",
 }  # fmt: skip
 
+#: The alphabets a take's record may state; anything else is guessed from the labels.
+_ALPHABETS: frozenset[str] = frozenset({"arpabet", "ipa"})
+
 #: Marks an IPA phone may carry that do not change its mouth shape.
 _IPA_MODIFIERS: frozenset[str] = frozenset("ːˑˈˌʲʰʷˠˤ")
 
@@ -110,23 +115,18 @@ def _ipa_base(phone: str) -> str:
 
 def phone_alphabet(phones: Iterable[str]) -> str:
     """``"arpabet"`` when every phone is ARPAbet as aligners write it (ASCII, one
-    case throughout, each in :data:`ARPABET_TO_VISEME` once its stress digit is
+    case throughout, each in ``an``'s ``ARPABET_PHONES`` once its stress digit is
     dropped), else ``"ipa"``. Decided per clip: a SAMPA ``V`` (the vowel of
-    *love*) beside a lowercase ``l`` is not ARPAbet ``V``.
+    *love*) beside a lowercase ``l`` is not ARPAbet ``V``. The rule is ``an``'s
+    (:func:`~an.audio.transcripts.phone_alphabet_of`), which says ``None`` where
+    it cannot tell; this lip-sync reads that as IPA.
 
     >>> phone_alphabet(["HH", "AH0", "L"]), phone_alphabet(["hh", "ah0"])
     ('arpabet', 'arpabet')
     >>> phone_alphabet(["l", "V", "v"]), phone_alphabet(["h", "ə", "l"])
     ('ipa', 'ipa')
     """
-    spoken = [p for p in phones if not _is_silence(p)]
-    letters = [p.rstrip("012") for p in spoken]
-    arpabet = (
-        bool(spoken)
-        and all(p.isascii() and _arpabet_base(p) in ARPABET_TO_VISEME for p in spoken)
-        and (all(p.isupper() for p in letters) or all(p.islower() for p in letters))
-    )
-    return "arpabet" if arpabet else "ipa"
+    return phone_alphabet_of(p for p in phones if not _is_silence(p)) or "ipa"
 
 
 def phone_viseme(phone: str, *, alphabet: str = "arpabet") -> Optional[str]:
@@ -200,11 +200,15 @@ def phones_to_visemes(
     char_to_viseme: Optional[Mapping[str, str]] = None,
     rest_viseme: str = REST_VISEME,
     min_gap_for_rest: float = MIN_GAP_FOR_REST_S,
+    alphabet: Optional[str] = None,
 ) -> Optional[list[Viseme]]:
     """A viseme track from phone timings: each phone's shape at its start (in the
     clip's :func:`phone_alphabet`), the mouth closed at a silence, at a pause
     longer than ``min_gap_for_rest`` and after the last sound. A word of ``words``
     with no phone under it is spoken by its letters (``char_to_viseme``).
+
+    ``alphabet`` is the take's recorded one (``AudioClip.phone_alphabet``); with
+    none, the clip's labels decide (:func:`phone_alphabet`).
 
     ``None`` when a phone is one ``phone_to_viseme`` does not know: a phone set
     this table was not written for is better spread by its words than guessed.
@@ -216,7 +220,11 @@ def phones_to_visemes(
     [(0.0, 'X'), (0.0, 'A'), (0.1, 'D'), (0.3, 'X'), (0.6, 'A'), (0.7, 'X')]
     """
     phones = list(phones)
-    alphabet = phone_alphabet(p for p, _, _ in phones)
+    alphabet = (
+        str(alphabet).lower()
+        if str(alphabet).lower() in _ALPHABETS
+        else phone_alphabet(p for p, _, _ in phones)
+    )
     segments: list[Timing] = []
     for phone, start, stop in phones:
         silent = _is_silence(str(phone))
@@ -283,6 +291,7 @@ def phones_track(
         phone_to_viseme=phone_to_viseme,
         char_to_viseme=char_to_viseme,
         rest_viseme=rest_viseme,
+        alphabet=getattr(audio, "phone_alphabet", None),
     )
     if visemes is None:
         return None
