@@ -200,13 +200,13 @@
 </span><span id="line-15"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 </span><span id="line-16">
 </span><span id="line-17"><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-</span><span id="line-18"><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-</span><span id="line-19"><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">MutableMapping</span>
-</span><span id="line-20"><span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
-</span><span id="line-21"><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-</span><span id="line-22"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">runtime_checkable</span>
-</span><span id="line-23">
-</span><span id="line-24"><span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">atomic_write</span><span class="p">,</span> <span class="n">file_lock</span>
+</span><span id="line-18"><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">MutableMapping</span>
+</span><span id="line-19"><span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+</span><span id="line-20"><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+</span><span id="line-21"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">runtime_checkable</span>
+</span><span id="line-22">
+</span><span id="line-23"><span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">atomic_write</span><span class="p">,</span> <span class="n">file_lock</span>
+</span><span id="line-24"><span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">interrupted_writes</span> <span class="k">as</span> <span class="n">_dol_interrupted_writes</span>
 </span><span id="line-25">
 </span><span id="line-26"><span class="c1">#: File and folder names an operating system or file manager drops into any</span>
 </span><span id="line-27"><span class="c1">#: folder: never an asset. Hidden names (a leading ``.``: ``.DS_Store``,</span>
@@ -426,240 +426,288 @@
 </span><span id="line-241">    <span class="k">return</span> <span class="n">out</span>
 </span><span id="line-242">
 </span><span id="line-243">
-</span><span id="line-244"><span class="c1">#: The name ``dol.atomic_write`` stages a write under, beside its target:</span>
-</span><span id="line-245"><span class="c1">#: ``.&lt;name&gt;.&lt;8 hex&gt;.tmp``. A process killed mid-write leaves it behind.</span>
-</span><span id="line-246"><span class="n">ATOMIC_WRITE_TEMP</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\..+\.[0-9a-f]</span><span class="si">{8}</span><span class="s2">\.tmp"</span><span class="p">)</span>
-</span><span id="line-247">
+</span><span id="line-244"><span class="nd">@runtime_checkable</span>
+</span><span id="line-245"><span class="k">class</span><span class="w"> </span><span class="nc">ListsInterruptedWrites</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+</span><span id="line-246"><span class="w">    </span><span class="sd">"""A store that can list the temp files killed writes left in it (an#674):</span>
+</span><span id="line-247"><span class="sd">    what ``an cache gc`` collects them from."""</span>
 </span><span id="line-248">
-</span><span id="line-249"><span class="nd">@runtime_checkable</span>
-</span><span id="line-250"><span class="k">class</span><span class="w"> </span><span class="nc">ListsInterruptedWrites</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-</span><span id="line-251"><span class="w">    </span><span class="sd">"""A store that can list the temp files killed writes left in it (an#674):</span>
-</span><span id="line-252"><span class="sd">    what ``an cache gc`` collects them from."""</span>
-</span><span id="line-253">
-</span><span id="line-254">    <span class="k">def</span><span class="w"> </span><span class="nf">interrupted_writes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span> <span class="o">...</span>
-</span><span id="line-255">
-</span><span id="line-256">
-</span><span id="line-257"><span class="k">def</span><span class="w"> </span><span class="nf">interrupted_writes</span><span class="p">(</span><span class="n">folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-</span><span id="line-258"><span class="w">    </span><span class="sd">"""The temp files an atomic write killed mid-way left directly in ``folder``</span>
-</span><span id="line-259"><span class="sd">    (an#674): never a key, so nothing lists or deletes them but ``an cache gc``.</span>
-</span><span id="line-260">
-</span><span id="line-261"><span class="sd">    &gt;&gt;&gt; import tempfile</span>
-</span><span id="line-262"><span class="sd">    &gt;&gt;&gt; with tempfile.TemporaryDirectory() as d:</span>
-</span><span id="line-263"><span class="sd">    ...     for name in ("k.mp4", ".k.mp4.ab12cd34.tmp", ".DS_Store", "x.tmp"):</span>
-</span><span id="line-264"><span class="sd">    ...         _ = (Path(d) / name).write_bytes(b"")</span>
-</span><span id="line-265"><span class="sd">    ...     [p.name for p in interrupted_writes(d)]</span>
-</span><span id="line-266"><span class="sd">    ['.k.mp4.ab12cd34.tmp']</span>
-</span><span id="line-267"><span class="sd">    """</span>
-</span><span id="line-268">    <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
-</span><span id="line-269">    <span class="k">if</span> <span class="ow">not</span> <span class="n">root</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-</span><span id="line-270">        <span class="k">return</span> <span class="p">[]</span>
-</span><span id="line-271">    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
-</span><span id="line-272">        <span class="n">child</span>
-</span><span id="line-273">        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
-</span><span id="line-274">        <span class="k">if</span> <span class="n">ATOMIC_WRITE_TEMP</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">child</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
-</span><span id="line-275">    <span class="p">)</span>
-</span><span id="line-276">
+</span><span id="line-249">    <span class="k">def</span><span class="w"> </span><span class="nf">interrupted_writes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span> <span class="o">...</span>
+</span><span id="line-250">
+</span><span id="line-251">
+</span><span id="line-252"><span class="k">def</span><span class="w"> </span><span class="nf">interrupted_writes</span><span class="p">(</span><span class="n">folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+</span><span id="line-253"><span class="w">    </span><span class="sd">"""The temp files an atomic write killed mid-way left in ``folder`` (an#674),</span>
+</span><span id="line-254"><span class="sd">    and with ``recursive`` in its subfolders (an#688): never a key, so nothing</span>
+</span><span id="line-255"><span class="sd">    lists or deletes them but ``an cache gc``. ``dol.interrupted_writes``, as</span>
+</span><span id="line-256"><span class="sd">    paths.</span>
+</span><span id="line-257">
+</span><span id="line-258"><span class="sd">    &gt;&gt;&gt; import tempfile</span>
+</span><span id="line-259"><span class="sd">    &gt;&gt;&gt; with tempfile.TemporaryDirectory() as d:</span>
+</span><span id="line-260"><span class="sd">    ...     for name in ("k.mp4", ".k.mp4.ab12cd34.tmp", ".DS_Store", "x.tmp"):</span>
+</span><span id="line-261"><span class="sd">    ...         _ = (Path(d) / name).write_bytes(b"")</span>
+</span><span id="line-262"><span class="sd">    ...     [p.name for p in interrupted_writes(d)]</span>
+</span><span id="line-263"><span class="sd">    ['.k.mp4.ab12cd34.tmp']</span>
+</span><span id="line-264"><span class="sd">    """</span>
+</span><span id="line-265">    <span class="k">return</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_dol_interrupted_writes</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="n">recursive</span><span class="p">)]</span>
+</span><span id="line-266">
+</span><span id="line-267">
+</span><span id="line-268"><span class="k">class</span><span class="w"> </span><span class="nc">LazyFolder</span><span class="p">:</span>
+</span><span id="line-269"><span class="w">    </span><span class="sd">"""The one folder rule of an's file stores (an#696): the store's folder is</span>
+</span><span id="line-270"><span class="sd">    made by its first write, and a missing folder lists as empty, so a mall</span>
+</span><span id="line-271"><span class="sd">    over an empty project, or a host scanning many folders, lays out nothing.</span>
+</span><span id="line-272"><span class="sd">    ``ensure=True`` makes the folder at once (``an init``).</span>
+</span><span id="line-273">
+</span><span id="line-274"><span class="sd">    The base of :class:`JsonDirStore`, :class:`JsonSidecarStore` and</span>
+</span><span id="line-275"><span class="sd">    ``an.stores.artifacts._BlobStore``, which list their keys through</span>
+</span><span id="line-276"><span class="sd">    :meth:`_listed`.</span>
 </span><span id="line-277">
-</span><span id="line-278"><span class="k">class</span><span class="w"> </span><span class="nc">JsonDirStore</span><span class="p">(</span><span class="n">MutableMapping</span><span class="p">):</span>
-</span><span id="line-279"><span class="w">    </span><span class="sd">"""`MutableMapping` of name -&gt; JSON document, stored as ``&lt;name&gt;.json`` files.</span>
-</span><span id="line-280">
-</span><span id="line-281"><span class="sd">    Backed by the filesystem under ``root_dir``. Keys are the file stems; values</span>
-</span><span id="line-282"><span class="sd">    are arbitrary JSON-serializable Python objects. ``__contains__``, ``__iter__``,</span>
-</span><span id="line-283"><span class="sd">    and ``__len__`` are derived from directory listing. Exported from</span>
-</span><span id="line-284"><span class="sd">    :mod:`an.stores` for hosts (an#664): a write is atomic and :meth:`locked`</span>
-</span><span id="line-285"><span class="sd">    is the contract for a read, change and write shared with other processes.</span>
+</span><span id="line-278"><span class="sd">    &gt;&gt;&gt; import tempfile</span>
+</span><span id="line-279"><span class="sd">    &gt;&gt;&gt; d = Path(tempfile.mkdtemp()) / "kept"</span>
+</span><span id="line-280"><span class="sd">    &gt;&gt;&gt; folder = LazyFolder(d)</span>
+</span><span id="line-281"><span class="sd">    &gt;&gt;&gt; folder._listed("*.json"), d.exists()</span>
+</span><span id="line-282"><span class="sd">    ([], False)</span>
+</span><span id="line-283"><span class="sd">    &gt;&gt;&gt; _ = LazyFolder(d, ensure=True); d.is_dir()</span>
+</span><span id="line-284"><span class="sd">    True</span>
+</span><span id="line-285"><span class="sd">    """</span>
 </span><span id="line-286">
-</span><span id="line-287"><span class="sd">    ``create=False`` leaves the folder to the first write or lock, so a host</span>
-</span><span id="line-288"><span class="sd">    can scan many folders through the store without leaving an empty one in</span>
-</span><span id="line-289"><span class="sd">    each; a missing folder reads as an empty store.</span>
-</span><span id="line-290">
-</span><span id="line-291"><span class="sd">    &gt;&gt;&gt; import tempfile</span>
-</span><span id="line-292"><span class="sd">    &gt;&gt;&gt; d = Path(tempfile.mkdtemp()) / "voice_options"</span>
-</span><span id="line-293"><span class="sd">    &gt;&gt;&gt; store = JsonDirStore(d, create=False)</span>
-</span><span id="line-294"><span class="sd">    &gt;&gt;&gt; list(store), "jerry" in store, d.exists()</span>
-</span><span id="line-295"><span class="sd">    ([], False, False)</span>
-</span><span id="line-296"><span class="sd">    &gt;&gt;&gt; store["jerry"] = {"options": []}</span>
-</span><span id="line-297"><span class="sd">    &gt;&gt;&gt; list(store), d.exists()</span>
-</span><span id="line-298"><span class="sd">    (['jerry'], True)</span>
-</span><span id="line-299"><span class="sd">    """</span>
-</span><span id="line-300">
-</span><span id="line-301">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">create</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-302">        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root_dir</span><span class="p">)</span>
-</span><span id="line-303">        <span class="k">if</span> <span class="n">create</span><span class="p">:</span>
-</span><span id="line-304">            <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-305">
-</span><span id="line-306">    <span class="k">def</span><span class="w"> </span><span class="nf">_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-307">        <span class="k">if</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
-</span><span id="line-308">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"invalid key: </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-309">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">.json"</span>
-</span><span id="line-310">
-</span><span id="line-311">    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-</span><span id="line-312">        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-313">        <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="line-314">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-315">        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-287">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">ensure</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-288">        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root_dir</span><span class="p">)</span>
+</span><span id="line-289">        <span class="k">if</span> <span class="n">ensure</span><span class="p">:</span>
+</span><span id="line-290">            <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-291">
+</span><span id="line-292">    <span class="k">def</span><span class="w"> </span><span class="nf">_listed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"*"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+</span><span id="line-293"><span class="w">        </span><span class="sd">"""The folder's children matching ``pattern``, sorted: none while the</span>
+</span><span id="line-294"><span class="sd">        folder is not there."""</span>
+</span><span id="line-295">        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">pattern</span><span class="p">))</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="k">else</span> <span class="p">[]</span>
+</span><span id="line-296">
+</span><span id="line-297">    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="line-298">        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">)</span>
+</span><span id="line-299">
+</span><span id="line-300">    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-301">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">)</span><span class="si">!r}</span><span class="s2">)"</span>
+</span><span id="line-302">
+</span><span id="line-303">
+</span><span id="line-304"><span class="k">class</span><span class="w"> </span><span class="nc">JsonDirStore</span><span class="p">(</span><span class="n">LazyFolder</span><span class="p">,</span> <span class="n">MutableMapping</span><span class="p">):</span>
+</span><span id="line-305"><span class="w">    </span><span class="sd">"""`MutableMapping` of name -&gt; JSON document, stored as ``&lt;name&gt;.json`` files.</span>
+</span><span id="line-306">
+</span><span id="line-307"><span class="sd">    Backed by the filesystem under ``root_dir``. Keys are the file stems; values</span>
+</span><span id="line-308"><span class="sd">    are arbitrary JSON-serializable Python objects. ``__contains__``, ``__iter__``,</span>
+</span><span id="line-309"><span class="sd">    and ``__len__`` are derived from directory listing. Exported from</span>
+</span><span id="line-310"><span class="sd">    :mod:`an.stores` for hosts (an#664): a write is atomic and :meth:`locked`</span>
+</span><span id="line-311"><span class="sd">    is the contract for a read, change and write shared with other processes.</span>
+</span><span id="line-312">
+</span><span id="line-313"><span class="sd">    Its folder follows :class:`LazyFolder`'s rule (an#696): made by the first</span>
+</span><span id="line-314"><span class="sd">    write or lock, so a host can scan many folders through the store without</span>
+</span><span id="line-315"><span class="sd">    leaving an empty one in each.</span>
 </span><span id="line-316">
-</span><span id="line-317">    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-318">        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-319">        <span class="n">p</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-320">        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
-</span><span id="line-321">        <span class="n">atomic_write</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">))</span>  <span class="c1"># a reader never sees half a document</span>
-</span><span id="line-322">
-</span><span id="line-323">    <span class="nd">@contextmanager</span>
-</span><span id="line-324">    <span class="k">def</span><span class="w"> </span><span class="nf">locked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
-</span><span id="line-325"><span class="w">        </span><span class="sd">"""Hold ``key``'s file lock (``&lt;key&gt;.json.lock``): a read, change and</span>
-</span><span id="line-326"><span class="sd">        write of ``key`` inside it is one step for every process that takes it</span>
-</span><span id="line-327"><span class="sd">        too (an#587). The lock file and the atomic write's temp file are never</span>
-</span><span id="line-328"><span class="sd">        keys.</span>
-</span><span id="line-329">
-</span><span id="line-330"><span class="sd">        &gt;&gt;&gt; import tempfile</span>
-</span><span id="line-331"><span class="sd">        &gt;&gt;&gt; store = JsonDirStore(tempfile.mkdtemp())</span>
-</span><span id="line-332"><span class="sd">        &gt;&gt;&gt; with store.locked("jerry"):</span>
-</span><span id="line-333"><span class="sd">        ...     store["jerry"] = {"options": []}</span>
-</span><span id="line-334"><span class="sd">        &gt;&gt;&gt; list(store), store["jerry"]</span>
-</span><span id="line-335"><span class="sd">        (['jerry'], {'options': []})</span>
-</span><span id="line-336"><span class="sd">        """</span>
-</span><span id="line-337">        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-338">        <span class="n">p</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-339">        <span class="k">with</span> <span class="n">file_lock</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
-</span><span id="line-340">            <span class="k">yield</span>
-</span><span id="line-341">
-</span><span id="line-342">    <span class="k">def</span><span class="w"> </span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-343">        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-344">        <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="line-345">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-346">        <span class="n">p</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
-</span><span id="line-347">
-</span><span id="line-348">    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-349">        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.json"</span><span class="p">)):</span>
-</span><span id="line-350">            <span class="k">yield</span> <span class="n">child</span><span class="o">.</span><span class="n">stem</span>
-</span><span id="line-351">
-</span><span id="line-352">    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span><span id="line-353">        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">)</span>
-</span><span id="line-354">
-</span><span id="line-355">    <span class="k">def</span><span class="w"> </span><span class="nf">interrupted_writes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-</span><span id="line-356"><span class="w">        </span><span class="sd">"""The temp files killed writes left in this store's folder (an#674)."""</span>
-</span><span id="line-357">        <span class="k">return</span> <span class="n">interrupted_writes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">)</span>
-</span><span id="line-358">
-</span><span id="line-359">    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-360">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">)</span><span class="si">!r}</span><span class="s2">)"</span>
-</span><span id="line-361">
+</span><span id="line-317"><span class="sd">    &gt;&gt;&gt; import tempfile</span>
+</span><span id="line-318"><span class="sd">    &gt;&gt;&gt; d = Path(tempfile.mkdtemp()) / "voice_options"</span>
+</span><span id="line-319"><span class="sd">    &gt;&gt;&gt; store = JsonDirStore(d)</span>
+</span><span id="line-320"><span class="sd">    &gt;&gt;&gt; list(store), "jerry" in store, d.exists()</span>
+</span><span id="line-321"><span class="sd">    ([], False, False)</span>
+</span><span id="line-322"><span class="sd">    &gt;&gt;&gt; store["jerry"] = {"options": []}</span>
+</span><span id="line-323"><span class="sd">    &gt;&gt;&gt; list(store), d.exists()</span>
+</span><span id="line-324"><span class="sd">    (['jerry'], True)</span>
+</span><span id="line-325"><span class="sd">    """</span>
+</span><span id="line-326">
+</span><span id="line-327">    <span class="k">def</span><span class="w"> </span><span class="nf">_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-328">        <span class="k">if</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
+</span><span id="line-329">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"invalid key: </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-330">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">.json"</span>
+</span><span id="line-331">
+</span><span id="line-332">    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+</span><span id="line-333">        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-334">        <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="line-335">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-336">        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-337">
+</span><span id="line-338">    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-339">        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-340">        <span class="n">p</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-341">        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
+</span><span id="line-342">        <span class="n">atomic_write</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">))</span>  <span class="c1"># a reader never sees half a document</span>
+</span><span id="line-343">
+</span><span id="line-344">    <span class="nd">@contextmanager</span>
+</span><span id="line-345">    <span class="k">def</span><span class="w"> </span><span class="nf">locked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
+</span><span id="line-346"><span class="w">        </span><span class="sd">"""Hold ``key``'s file lock (``&lt;key&gt;.json.lock``): a read, change and</span>
+</span><span id="line-347"><span class="sd">        write of ``key`` inside it is one step for every process that takes it</span>
+</span><span id="line-348"><span class="sd">        too (an#587). The lock file and the atomic write's temp file are never</span>
+</span><span id="line-349"><span class="sd">        keys.</span>
+</span><span id="line-350">
+</span><span id="line-351"><span class="sd">        &gt;&gt;&gt; import tempfile</span>
+</span><span id="line-352"><span class="sd">        &gt;&gt;&gt; store = JsonDirStore(tempfile.mkdtemp())</span>
+</span><span id="line-353"><span class="sd">        &gt;&gt;&gt; with store.locked("jerry"):</span>
+</span><span id="line-354"><span class="sd">        ...     store["jerry"] = {"options": []}</span>
+</span><span id="line-355"><span class="sd">        &gt;&gt;&gt; list(store), store["jerry"]</span>
+</span><span id="line-356"><span class="sd">        (['jerry'], {'options': []})</span>
+</span><span id="line-357"><span class="sd">        """</span>
+</span><span id="line-358">        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-359">        <span class="n">p</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-360">        <span class="k">with</span> <span class="n">file_lock</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+</span><span id="line-361">            <span class="k">yield</span>
 </span><span id="line-362">
-</span><span id="line-363"><span class="k">class</span><span class="w"> </span><span class="nc">JsonSidecarStore</span><span class="p">(</span><span class="n">MutableMapping</span><span class="p">):</span>
-</span><span id="line-364"><span class="w">    </span><span class="sd">"""`MutableMapping` of name -&gt; dict, where each entry is a directory containing</span>
-</span><span id="line-365"><span class="sd">    ``meta.json`` plus optional binary sidecars.</span>
-</span><span id="line-366">
-</span><span id="line-367"><span class="sd">    Reading returns the parsed ``meta.json``. Writing replaces ``meta.json``;</span>
-</span><span id="line-368"><span class="sd">    sidecars must be written separately by the caller (use ``sidecar_path(key, name)``).</span>
-</span><span id="line-369"><span class="sd">    Deleting removes the whole directory.</span>
-</span><span id="line-370"><span class="sd">    """</span>
-</span><span id="line-371">
-</span><span id="line-372">    <span class="n">META_NAME</span> <span class="o">=</span> <span class="s2">"meta.json"</span>
-</span><span id="line-373">
-</span><span id="line-374">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-375">        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root_dir</span><span class="p">)</span>
-</span><span id="line-376">        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-363">    <span class="k">def</span><span class="w"> </span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-364">        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-365">        <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="line-366">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-367">        <span class="n">p</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+</span><span id="line-368">
+</span><span id="line-369">    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-370">        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_listed</span><span class="p">(</span><span class="s2">"*.json"</span><span class="p">):</span>
+</span><span id="line-371">            <span class="k">yield</span> <span class="n">child</span><span class="o">.</span><span class="n">stem</span>
+</span><span id="line-372">
+</span><span id="line-373">    <span class="k">def</span><span class="w"> </span><span class="nf">interrupted_writes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+</span><span id="line-374"><span class="w">        </span><span class="sd">"""The temp files killed writes left in this store's folder (an#674)."""</span>
+</span><span id="line-375">        <span class="k">return</span> <span class="n">interrupted_writes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">)</span>
+</span><span id="line-376">
 </span><span id="line-377">
-</span><span id="line-378">    <span class="k">def</span><span class="w"> </span><span class="nf">_entry_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-379">        <span class="k">if</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
-</span><span id="line-380">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"invalid key: </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-381">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">/</span> <span class="n">key</span>
-</span><span id="line-382">
-</span><span id="line-383">    <span class="k">def</span><span class="w"> </span><span class="nf">sidecar_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-384">        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry_dir</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-385">        <span class="n">d</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-386">        <span class="k">return</span> <span class="n">d</span> <span class="o">/</span> <span class="n">name</span>
-</span><span id="line-387">
-</span><span id="line-388">    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="line-389">        <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry_dir</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">META_NAME</span>
-</span><span id="line-390">        <span class="k">if</span> <span class="ow">not</span> <span class="n">meta</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="line-391">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-392">        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
-</span><span id="line-393">
-</span><span id="line-394">    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-395">        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry_dir</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-396">        <span class="n">d</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-397">        <span class="p">(</span><span class="n">d</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">META_NAME</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
-</span><span id="line-398">            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-399">            <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span>
-</span><span id="line-400">        <span class="p">)</span>
-</span><span id="line-401">
-</span><span id="line-402">    <span class="k">def</span><span class="w"> </span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-403">        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry_dir</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-404">        <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="line-405">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-406">        <span class="c1"># Remove the directory and all sidecars.</span>
-</span><span id="line-407">        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">):</span>
-</span><span id="line-408">            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span id="line-409">                <span class="n">child</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
-</span><span id="line-410">        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="line-411">            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-</span><span id="line-412">                <span class="n">child</span><span class="o">.</span><span class="n">rmdir</span><span class="p">()</span>
-</span><span id="line-413">        <span class="n">d</span><span class="o">.</span><span class="n">rmdir</span><span class="p">()</span>
-</span><span id="line-414">
-</span><span id="line-415">    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-416">        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
-</span><span id="line-417">            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="n">child</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">META_NAME</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="line-418">                <span class="k">yield</span> <span class="n">child</span><span class="o">.</span><span class="n">name</span>
-</span><span id="line-419">
-</span><span id="line-420">    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span><span id="line-421">        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">)</span>
-</span><span id="line-422">
-</span><span id="line-423">    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-424">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">)</span><span class="si">!r}</span><span class="s2">)"</span>
-</span><span id="line-425">
-</span><span id="line-426">
-</span><span id="line-427"><span class="k">class</span><span class="w"> </span><span class="nc">AudioSidecarStore</span><span class="p">(</span><span class="n">JsonSidecarStore</span><span class="p">):</span>
-</span><span id="line-428"><span class="w">    </span><span class="sd">"""A :class:`JsonSidecarStore` whose entries carry one WAV sidecar.</span>
-</span><span id="line-429">
-</span><span id="line-430"><span class="sd">    The metadata is the mapping's value; the audio is read and written through</span>
-</span><span id="line-431"><span class="sd">    :meth:`read_audio` / :meth:`write_audio`, so no caller builds a path by hand</span>
-</span><span id="line-432"><span class="sd">    (pillar 7). Sounds (``an.stores.sounds``) and recorded takes</span>
-</span><span id="line-433"><span class="sd">    (``an.stores.recordings``) are the two.</span>
-</span><span id="line-434">
-</span><span id="line-435"><span class="sd">    &gt;&gt;&gt; import tempfile</span>
-</span><span id="line-436"><span class="sd">    &gt;&gt;&gt; with tempfile.TemporaryDirectory() as d:</span>
-</span><span id="line-437"><span class="sd">    ...     store = AudioSidecarStore(d)</span>
-</span><span id="line-438"><span class="sd">    ...     store['x'] = {'description': 'a take'}</span>
-</span><span id="line-439"><span class="sd">    ...     store.write_audio('x', b'RIFF....')</span>
-</span><span id="line-440"><span class="sd">    ...     store.read_audio('x')</span>
-</span><span id="line-441"><span class="sd">    b'RIFF....'</span>
-</span><span id="line-442"><span class="sd">    """</span>
-</span><span id="line-443">
-</span><span id="line-444">    <span class="c1">#: The sidecar holding the audio bytes. WAV only: a header states the length</span>
-</span><span id="line-445">    <span class="c1">#: without decoding anything.</span>
-</span><span id="line-446">    <span class="n">AUDIO_NAME</span> <span class="o">=</span> <span class="s2">"audio.wav"</span>
-</span><span id="line-447">    <span class="c1">#: What an entry is called in error messages.</span>
-</span><span id="line-448">    <span class="n">ENTRY_NOUN</span> <span class="o">=</span> <span class="s2">"entry"</span>
-</span><span id="line-449">
-</span><span id="line-450">    <span class="k">def</span><span class="w"> </span><span class="nf">read_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-</span><span id="line-451">        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry_dir</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUDIO_NAME</span>
-</span><span id="line-452">        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="line-453">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ENTRY_NOUN</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> has no audio sidecar"</span><span class="p">)</span>
-</span><span id="line-454">        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span>
+</span><span id="line-378"><span class="k">class</span><span class="w"> </span><span class="nc">JsonSidecarStore</span><span class="p">(</span><span class="n">LazyFolder</span><span class="p">,</span> <span class="n">MutableMapping</span><span class="p">):</span>
+</span><span id="line-379"><span class="w">    </span><span class="sd">"""`MutableMapping` of name -&gt; dict, where each entry is a directory containing</span>
+</span><span id="line-380"><span class="sd">    ``meta.json`` plus optional binary sidecars.</span>
+</span><span id="line-381">
+</span><span id="line-382"><span class="sd">    Reading returns the parsed ``meta.json``. Writing replaces ``meta.json``;</span>
+</span><span id="line-383"><span class="sd">    sidecars are written separately by the caller, atomically through</span>
+</span><span id="line-384"><span class="sd">    :meth:`write_sidecar` (``sidecar_path(key, name)`` is where one lives).</span>
+</span><span id="line-385"><span class="sd">    Deleting removes the whole directory. The store's folder, and an entry's,</span>
+</span><span id="line-386"><span class="sd">    follow :class:`LazyFolder`'s rule (an#696): made by the first write, never</span>
+</span><span id="line-387"><span class="sd">    by a read.</span>
+</span><span id="line-388">
+</span><span id="line-389"><span class="sd">    &gt;&gt;&gt; import tempfile</span>
+</span><span id="line-390"><span class="sd">    &gt;&gt;&gt; d = Path(tempfile.mkdtemp()) / "props"</span>
+</span><span id="line-391"><span class="sd">    &gt;&gt;&gt; store = JsonSidecarStore(d)</span>
+</span><span id="line-392"><span class="sd">    &gt;&gt;&gt; list(store), "lamp" in store, store.sidecar_path("lamp", "x.svg").name</span>
+</span><span id="line-393"><span class="sd">    ([], False, 'x.svg')</span>
+</span><span id="line-394"><span class="sd">    &gt;&gt;&gt; d.exists()</span>
+</span><span id="line-395"><span class="sd">    False</span>
+</span><span id="line-396"><span class="sd">    """</span>
+</span><span id="line-397">
+</span><span id="line-398">    <span class="n">META_NAME</span> <span class="o">=</span> <span class="s2">"meta.json"</span>
+</span><span id="line-399">
+</span><span id="line-400">    <span class="k">def</span><span class="w"> </span><span class="nf">_entry_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-401">        <span class="k">if</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
+</span><span id="line-402">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"invalid key: </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-403">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">/</span> <span class="n">key</span>
+</span><span id="line-404">
+</span><span id="line-405">    <span class="k">def</span><span class="w"> </span><span class="nf">sidecar_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-406"><span class="w">        </span><span class="sd">"""Where the sidecar ``name`` of ``key`` lives. Pure (an#696): nothing</span>
+</span><span id="line-407"><span class="sd">        is made, so a read through it leaves no folder; a caller writing there</span>
+</span><span id="line-408"><span class="sd">        makes the parent, as :meth:`write_sidecar` does."""</span>
+</span><span id="line-409">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry_dir</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">/</span> <span class="n">name</span>
+</span><span id="line-410">
+</span><span id="line-411">    <span class="k">def</span><span class="w"> </span><span class="nf">write_sidecar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-412"><span class="w">        </span><span class="sd">"""Write the sidecar ``name`` of ``key`` atomically (an#688): a write</span>
+</span><span id="line-413"><span class="sd">        killed mid-way keeps the previous file, and leaves a temp</span>
+</span><span id="line-414"><span class="sd">        :meth:`interrupted_writes` lists. ``name`` may hold a folder</span>
+</span><span id="line-415"><span class="sd">        (``parts/arm.svg``), made as needed.</span>
+</span><span id="line-416">
+</span><span id="line-417"><span class="sd">        &gt;&gt;&gt; import tempfile</span>
+</span><span id="line-418"><span class="sd">        &gt;&gt;&gt; with tempfile.TemporaryDirectory() as d:</span>
+</span><span id="line-419"><span class="sd">        ...     store = JsonSidecarStore(d)</span>
+</span><span id="line-420"><span class="sd">        ...     store.write_sidecar('x', 'parts/arm.svg', b'&lt;svg/&gt;')</span>
+</span><span id="line-421"><span class="sd">        ...     (Path(d) / 'x' / 'parts' / 'arm.svg').read_bytes()</span>
+</span><span id="line-422"><span class="sd">        b'&lt;svg/&gt;'</span>
+</span><span id="line-423"><span class="sd">        """</span>
+</span><span id="line-424">        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sidecar_path</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+</span><span id="line-425">        <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-426">        <span class="n">atomic_write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</span><span id="line-427">
+</span><span id="line-428">    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="line-429">        <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry_dir</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">META_NAME</span>
+</span><span id="line-430">        <span class="k">if</span> <span class="ow">not</span> <span class="n">meta</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="line-431">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-432">        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-433">
+</span><span id="line-434">    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-435">        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
+</span><span id="line-436">        <span class="bp">self</span><span class="o">.</span><span class="n">write_sidecar</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">META_NAME</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-437">
+</span><span id="line-438">    <span class="k">def</span><span class="w"> </span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-439">        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry_dir</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-440">        <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="line-441">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-442">        <span class="c1"># Remove the directory and all sidecars.</span>
+</span><span id="line-443">        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">):</span>
+</span><span id="line-444">            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span id="line-445">                <span class="n">child</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+</span><span id="line-446">        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+</span><span id="line-447">            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+</span><span id="line-448">                <span class="n">child</span><span class="o">.</span><span class="n">rmdir</span><span class="p">()</span>
+</span><span id="line-449">        <span class="n">d</span><span class="o">.</span><span class="n">rmdir</span><span class="p">()</span>
+</span><span id="line-450">
+</span><span id="line-451">    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-452">        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_listed</span><span class="p">():</span>
+</span><span id="line-453">            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="n">child</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">META_NAME</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="line-454">                <span class="k">yield</span> <span class="n">child</span><span class="o">.</span><span class="n">name</span>
 </span><span id="line-455">
-</span><span id="line-456">    <span class="k">def</span><span class="w"> </span><span class="nf">write_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-457">        <span class="bp">self</span><span class="o">.</span><span class="n">sidecar_path</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUDIO_NAME</span><span class="p">)</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span><span id="line-458">
-</span><span id="line-459">
+</span><span id="line-456">    <span class="k">def</span><span class="w"> </span><span class="nf">interrupted_writes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+</span><span id="line-457"><span class="w">        </span><span class="sd">"""The temp files killed writes left in the entry folders and below</span>
+</span><span id="line-458"><span class="sd">        (an#688), where ``meta.json`` and the sidecars are written: what</span>
+</span><span id="line-459"><span class="sd">        ``an cache gc`` collects. A folder whose first write was killed is no</span>
+</span><span id="line-460"><span class="sd">        key, but its temp is listed all the same.</span>
+</span><span id="line-461">
+</span><span id="line-462"><span class="sd">        &gt;&gt;&gt; import tempfile</span>
+</span><span id="line-463"><span class="sd">        &gt;&gt;&gt; with tempfile.TemporaryDirectory() as d:</span>
+</span><span id="line-464"><span class="sd">        ...     store = JsonSidecarStore(d)</span>
+</span><span id="line-465"><span class="sd">        ...     store['x'] = {'a': 1}</span>
+</span><span id="line-466"><span class="sd">        ...     _ = (Path(d) / 'x' / '.meta.json.ab12cd34.tmp').write_bytes(b'{')</span>
+</span><span id="line-467"><span class="sd">        ...     _ = (Path(d) / 'y').mkdir()</span>
+</span><span id="line-468"><span class="sd">        ...     _ = (Path(d) / 'y' / '.meta.json.0123abcd.tmp').write_bytes(b'')</span>
+</span><span id="line-469"><span class="sd">        ...     list(store), sorted(p.parent.name for p in store.interrupted_writes())</span>
+</span><span id="line-470"><span class="sd">        (['x'], ['x', 'y'])</span>
+</span><span id="line-471"><span class="sd">        """</span>
+</span><span id="line-472">        <span class="k">return</span> <span class="n">interrupted_writes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-473">
+</span><span id="line-474">
+</span><span id="line-475"><span class="k">class</span><span class="w"> </span><span class="nc">AudioSidecarStore</span><span class="p">(</span><span class="n">JsonSidecarStore</span><span class="p">):</span>
+</span><span id="line-476"><span class="w">    </span><span class="sd">"""A :class:`JsonSidecarStore` whose entries carry one WAV sidecar.</span>
+</span><span id="line-477">
+</span><span id="line-478"><span class="sd">    The metadata is the mapping's value; the audio is read and written through</span>
+</span><span id="line-479"><span class="sd">    :meth:`read_audio` / :meth:`write_audio`, so no caller builds a path by hand</span>
+</span><span id="line-480"><span class="sd">    (pillar 7). Sounds (``an.stores.sounds``) and recorded takes</span>
+</span><span id="line-481"><span class="sd">    (``an.stores.recordings``) are the two.</span>
+</span><span id="line-482">
+</span><span id="line-483"><span class="sd">    &gt;&gt;&gt; import tempfile</span>
+</span><span id="line-484"><span class="sd">    &gt;&gt;&gt; with tempfile.TemporaryDirectory() as d:</span>
+</span><span id="line-485"><span class="sd">    ...     store = AudioSidecarStore(d)</span>
+</span><span id="line-486"><span class="sd">    ...     store['x'] = {'description': 'a take'}</span>
+</span><span id="line-487"><span class="sd">    ...     store.write_audio('x', b'RIFF....')</span>
+</span><span id="line-488"><span class="sd">    ...     store.read_audio('x')</span>
+</span><span id="line-489"><span class="sd">    b'RIFF....'</span>
+</span><span id="line-490"><span class="sd">    """</span>
+</span><span id="line-491">
+</span><span id="line-492">    <span class="c1">#: The sidecar holding the audio bytes. WAV only: a header states the length</span>
+</span><span id="line-493">    <span class="c1">#: without decoding anything.</span>
+</span><span id="line-494">    <span class="n">AUDIO_NAME</span> <span class="o">=</span> <span class="s2">"audio.wav"</span>
+</span><span id="line-495">    <span class="c1">#: What an entry is called in error messages.</span>
+</span><span id="line-496">    <span class="n">ENTRY_NOUN</span> <span class="o">=</span> <span class="s2">"entry"</span>
+</span><span id="line-497">
+</span><span id="line-498">    <span class="k">def</span><span class="w"> </span><span class="nf">read_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+</span><span id="line-499">        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry_dir</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUDIO_NAME</span>
+</span><span id="line-500">        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="line-501">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ENTRY_NOUN</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> has no audio sidecar"</span><span class="p">)</span>
+</span><span id="line-502">        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span>
+</span><span id="line-503">
+</span><span id="line-504">    <span class="k">def</span><span class="w"> </span><span class="nf">write_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-505">        <span class="bp">self</span><span class="o">.</span><span class="n">write_sidecar</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUDIO_NAME</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</span><span id="line-506">
+</span><span id="line-507">
 <div class="viewcode-block" id="art_exists_for">
 <a class="viewcode-back" href="../../../_autosummary/cutan.characters.play.html#cutan.characters.play.art_exists_for">[docs]</a>
-</span><span id="line-460"><span class="k">def</span><span class="w"> </span><span class="nf">art_exists_for</span><span class="p">(</span><span class="n">characters_store</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">ref</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-461"><span class="w">    </span><span class="sd">"""``rel_path -&gt; is the art on disk``, for a character in a filesystem</span>
-</span><span id="line-462"><span class="sd">    store; ``None`` when the store has no root to look under (a dict, a</span>
-</span><span id="line-463"><span class="sd">    fake) — a store that can answer nothing must assume presence, not absence,</span>
-</span><span id="line-464"><span class="sd">    exactly as the rig builder's part probe does.</span>
-</span><span id="line-465"><span class="sd">    """</span>
-</span><span id="line-466">    <span class="n">root</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">characters_store</span><span class="p">,</span> <span class="s2">"_root"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-467">    <span class="k">if</span> <span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-468">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-469">    <span class="n">base</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">/</span> <span class="n">ref</span>
-</span><span id="line-470">
-</span><span id="line-471">    <span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span><span class="n">rel_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-472">        <span class="n">path</span> <span class="o">=</span> <span class="n">inside_folder</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">rel_path</span><span class="p">)</span>  <span class="c1"># outside the folder: not art (an#483)</span>
-</span><span id="line-473">        <span class="k">return</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
-</span><span id="line-474">
-</span><span id="line-475">    <span class="k">return</span> <span class="n">exists</span></div>
+</span><span id="line-508"><span class="k">def</span><span class="w"> </span><span class="nf">art_exists_for</span><span class="p">(</span><span class="n">characters_store</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">ref</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-509"><span class="w">    </span><span class="sd">"""``rel_path -&gt; is the art on disk``, for a character in a filesystem</span>
+</span><span id="line-510"><span class="sd">    store; ``None`` when the store has no root to look under (a dict, a</span>
+</span><span id="line-511"><span class="sd">    fake) — a store that can answer nothing must assume presence, not absence,</span>
+</span><span id="line-512"><span class="sd">    exactly as the rig builder's part probe does.</span>
+</span><span id="line-513"><span class="sd">    """</span>
+</span><span id="line-514">    <span class="n">root</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">characters_store</span><span class="p">,</span> <span class="s2">"_root"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-515">    <span class="k">if</span> <span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-516">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-517">    <span class="n">base</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">/</span> <span class="n">ref</span>
+</span><span id="line-518">
+</span><span id="line-519">    <span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span><span class="n">rel_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-520">        <span class="n">path</span> <span class="o">=</span> <span class="n">inside_folder</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">rel_path</span><span class="p">)</span>  <span class="c1"># outside the folder: not art (an#483)</span>
+</span><span id="line-521">        <span class="k">return</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
+</span><span id="line-522">
+</span><span id="line-523">    <span class="k">return</span> <span class="n">exists</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -674,7 +722,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=97d53703"></script>
+    <script src="../../../_static/documentation_options.js?v=5c5ca7ce"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

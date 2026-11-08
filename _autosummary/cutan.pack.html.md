@@ -147,7 +147,7 @@ backslash continues a line.
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
 
-### cutan.pack.check_pack(pack_dir, , workdir=None, an_command=('/opt/hostedtoolcache/Python/3.12.15/x64/bin/python', '-P', '-m', 'an'), python=None, timeout=300.0, deadline=900.0, child_limits=None)
+### cutan.pack.check_pack(pack_dir, , workdir=None, an_command=('/opt/hostedtoolcache/Python/3.12.16/x64/bin/python', '-P', '-m', 'an'), python=None, timeout=300.0, deadline=900.0, child_limits=None)
 
 Check the production pack at `pack_dir`; return a [`PackReport`](#cutan.pack.PackReport).
 
@@ -184,7 +184,7 @@ A pack that cannot be checked at all gives a report with one failed
 * **Return type:**
   [`PackReport`](#cutan.pack.PackReport)
 
-### cutan.pack.import_pack(pack_dir, project_dir=None, , dry_run=False, an_command=('/opt/hostedtoolcache/Python/3.12.15/x64/bin/python', '-P', '-m', 'an'), timeout=300.0, deadline=900.0)
+### cutan.pack.import_pack(pack_dir, project_dir=None, , dry_run=False, an_command=('/opt/hostedtoolcache/Python/3.12.16/x64/bin/python', '-P', '-m', 'an'), timeout=300.0, deadline=900.0)
 
 Turn a production pack into a project: [`check_pack()`](#cutan.pack.check_pack)’s steps on a
 real project at `project_dir` (default: `<pack name>-project` in the

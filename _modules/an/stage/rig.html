@@ -1359,13 +1359,13 @@
 </span><span id="line-1156">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">art_prefix</span><span class="si">}{</span><span class="n">ref</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">rel_path</span><span class="si">}</span><span class="s2">"</span>
 </span><span id="line-1157">
 </span><span id="line-1158">
-</span><span id="line-1159"><span class="k">def</span><span class="w"> </span><span class="nf">_asset_file</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">ref_and_rel</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-1159"><span class="k">def</span><span class="w"> </span><span class="nf">asset_file</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">ref_and_rel</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="line-1160"><span class="w">    </span><span class="sd">"""``&lt;store root&gt;/&lt;ref&gt;/&lt;rel&gt;`` when ``rel`` stays inside the asset ``ref``'s</span>
 </span><span id="line-1161"><span class="sd">    own folder (:func:`an.stores._common.inside_folder`), else ``None``.</span>
 </span><span id="line-1162">
-</span><span id="line-1163"><span class="sd">    &gt;&gt;&gt; _asset_file("/store", "maya/parts/head.svg").as_posix()</span>
+</span><span id="line-1163"><span class="sd">    &gt;&gt;&gt; asset_file("/store", "maya/parts/head.svg").as_posix()</span>
 </span><span id="line-1164"><span class="sd">    '/store/maya/parts/head.svg'</span>
-</span><span id="line-1165"><span class="sd">    &gt;&gt;&gt; _asset_file("/store", "maya/../other/head.svg") is None, _asset_file("/store", "maya") is None</span>
+</span><span id="line-1165"><span class="sd">    &gt;&gt;&gt; asset_file("/store", "maya/../other/head.svg") is None, asset_file("/store", "maya") is None</span>
 </span><span id="line-1166"><span class="sd">    (True, True)</span>
 </span><span id="line-1167"><span class="sd">    """</span>
 </span><span id="line-1168">    <span class="n">ref</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">rel</span> <span class="o">=</span> <span class="n">ref_and_rel</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
@@ -1421,7 +1421,7 @@
 </span><span id="line-1218">        <span class="c1"># A `path` that leaves the ASSET's folder (`..`, absolute, a link to a</span>
 </span><span id="line-1219">        <span class="c1"># sibling asset) is not art the stage may read: absent, never followed</span>
 </span><span id="line-1220">        <span class="c1"># (an#483). `src` is `&lt;prefix&gt;&lt;ref&gt;/&lt;rel&gt;`; the folder is the ref's.</span>
-</span><span id="line-1221">        <span class="n">path</span> <span class="o">=</span> <span class="n">_asset_file</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">src</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:])</span>
+</span><span id="line-1221">        <span class="n">path</span> <span class="o">=</span> <span class="n">asset_file</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">src</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">:])</span>
 </span><span id="line-1222">        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
 </span><span id="line-1223">            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
 </span><span id="line-1224">        <span class="k">try</span><span class="p">:</span>
@@ -1453,7 +1453,7 @@
 </span><span id="line-1250">    <span class="k">def</span><span class="w"> </span><span class="nf">digest</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="line-1251">        <span class="k">if</span> <span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">is_raster</span><span class="p">(</span><span class="n">src</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">src</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">art_prefix</span><span class="p">):</span>
 </span><span id="line-1252">            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-1253">        <span class="n">path</span> <span class="o">=</span> <span class="n">_asset_file</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">src</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">art_prefix</span><span class="p">)</span> <span class="p">:])</span>
+</span><span id="line-1253">        <span class="n">path</span> <span class="o">=</span> <span class="n">asset_file</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">src</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">art_prefix</span><span class="p">)</span> <span class="p">:])</span>
 </span><span id="line-1254">        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="line-1255">            <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># outside the asset's folder: the probe calls it absent</span>
 </span><span id="line-1256">        <span class="k">try</span><span class="p">:</span>
@@ -2297,6 +2297,10 @@
 </span><span id="line-2094">                <span class="s2">"y"</span><span class="p">:</span> <span class="n">dy</span><span class="p">,</span>
 </span><span id="line-2095">            <span class="p">}</span>
 </span><span id="line-2096">    <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-2097">
+</span><span id="line-2098">
+</span><span id="line-2099"><span class="c1">#: The private spellings genre packages imported before they were public (API level &lt; 16); removed by an#747.</span>
+</span><span id="line-2100"><span class="n">_asset_file</span> <span class="o">=</span> <span class="n">asset_file</span>
 </span></code></pre></div>
     </div></div>
           </main>
@@ -2310,7 +2314,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=97d53703"></script>
+    <script src="../../../_static/documentation_options.js?v=5c5ca7ce"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

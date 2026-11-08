@@ -658,228 +658,226 @@
 </span><span id="line-455">    <span class="k">for</span> <span class="n">art</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">props</span><span class="p">:</span>
 </span><span id="line-456">        <span class="n">store</span><span class="p">[</span><span class="n">art</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span> <span class="o">=</span> <span class="n">art</span><span class="o">.</span><span class="n">descriptor</span>
 </span><span id="line-457">        <span class="k">for</span> <span class="n">rel</span><span class="p">,</span> <span class="n">svg</span> <span class="ow">in</span> <span class="n">art</span><span class="o">.</span><span class="n">parts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="line-458">            <span class="n">path</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">sidecar_path</span><span class="p">(</span><span class="n">art</span><span class="o">.</span><span class="n">ref</span><span class="p">,</span> <span class="n">rel</span><span class="p">)</span>
-</span><span id="line-459">            <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-460">            <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">svg</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
-</span><span id="line-461">
-</span><span id="line-462">
-</span><span id="line-463"><span class="k">def</span><span class="w"> </span><span class="nf">_package_version</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-464">    <span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">PackageNotFoundError</span><span class="p">,</span> <span class="n">version</span>
-</span><span id="line-465">
-</span><span id="line-466">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-467">        <span class="k">return</span> <span class="n">version</span><span class="p">(</span><span class="s2">"an"</span><span class="p">)</span>
-</span><span id="line-468">    <span class="k">except</span> <span class="n">PackageNotFoundError</span><span class="p">:</span>  <span class="c1"># pragma: no cover - source checkout without metadata</span>
-</span><span id="line-469">        <span class="k">return</span> <span class="s2">"unknown"</span>
-</span><span id="line-470">
-</span><span id="line-471">
+</span><span id="line-458">            <span class="n">store</span><span class="o">.</span><span class="n">write_sidecar</span><span class="p">(</span><span class="n">art</span><span class="o">.</span><span class="n">ref</span><span class="p">,</span> <span class="n">rel</span><span class="p">,</span> <span class="n">svg</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-459">
+</span><span id="line-460">
+</span><span id="line-461"><span class="k">def</span><span class="w"> </span><span class="nf">_package_version</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-462">    <span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">PackageNotFoundError</span><span class="p">,</span> <span class="n">version</span>
+</span><span id="line-463">
+</span><span id="line-464">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-465">        <span class="k">return</span> <span class="n">version</span><span class="p">(</span><span class="s2">"an"</span><span class="p">)</span>
+</span><span id="line-466">    <span class="k">except</span> <span class="n">PackageNotFoundError</span><span class="p">:</span>  <span class="c1"># pragma: no cover - source checkout without metadata</span>
+</span><span id="line-467">        <span class="k">return</span> <span class="s2">"unknown"</span>
+</span><span id="line-468">
+</span><span id="line-469">
 <div class="viewcode-block" id="write_impact_clip">
 <a class="viewcode-back" href="../../../_autosummary/cutan.impacts.clip.html#cutan.impacts.write_impact_clip">[docs]</a>
-</span><span id="line-472"><span class="k">def</span><span class="w"> </span><span class="nf">write_impact_clip</span><span class="p">(</span>
-</span><span id="line-473">    <span class="n">spec</span><span class="p">:</span> <span class="n">ImpactClipSpec</span><span class="p">,</span>
-</span><span id="line-474">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
-</span><span id="line-475">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-476">    <span class="n">render</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="line-477">    <span class="n">clip_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-478"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-479"><span class="w">    </span><span class="sd">"""Write one clip into ``out_dir / (clip_dir or spec.clip_id)``; return that dir.</span>
-</span><span id="line-480">
-</span><span id="line-481"><span class="sd">    With ``render=False`` everything but ``clip.mp4`` is written, and no</span>
-</span><span id="line-482"><span class="sd">    browser is needed: the keypoints and the truth come from the compiled</span>
-</span><span id="line-483"><span class="sd">    document, not from the pixels.</span>
-</span><span id="line-484"><span class="sd">    """</span>
-</span><span id="line-485">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.compile</span><span class="w"> </span><span class="kn">import</span> <span class="n">compile_shot</span>
-</span><span id="line-486">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stores</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_project_mall</span>
-</span><span id="line-487">
-</span><span id="line-488">    <span class="n">plan</span> <span class="o">=</span> <span class="n">plan_impact_clip</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
-</span><span id="line-489">    <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="n">clip_dir</span> <span class="ow">or</span> <span class="n">spec</span><span class="o">.</span><span class="n">clip_id</span><span class="p">)</span>
-</span><span id="line-490">    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"an-impacts-"</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
-</span><span id="line-491">        <span class="n">mall</span> <span class="o">=</span> <span class="n">build_project_mall</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">ensure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-492">        <span class="n">_install_props</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">mall</span><span class="p">)</span>
-</span><span id="line-493">        <span class="n">compiled</span> <span class="o">=</span> <span class="n">compile_shot</span><span class="p">(</span>
-</span><span id="line-494">            <span class="n">plan</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span>
-</span><span id="line-495">            <span class="n">mall</span><span class="o">=</span><span class="n">mall</span><span class="p">,</span>
-</span><span id="line-496">            <span class="n">fps</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">fps</span><span class="p">)),</span>  <span class="c1"># what CutoutRenderer compiles at, too</span>
-</span><span id="line-497">            <span class="n">width</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-</span><span id="line-498">            <span class="n">height</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-</span><span id="line-499">            <span class="n">strict_assets</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="line-500">        <span class="p">)</span>
-</span><span id="line-501">        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-502">            <span class="s2">"generator"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="line-503">                <span class="s2">"package"</span><span class="p">:</span> <span class="s2">"an"</span><span class="p">,</span>
-</span><span id="line-504">                <span class="s2">"version"</span><span class="p">:</span> <span class="n">_package_version</span><span class="p">(),</span>
-</span><span id="line-505">                <span class="s2">"module"</span><span class="p">:</span> <span class="vm">__name__</span><span class="p">,</span>
-</span><span id="line-506">            <span class="p">},</span>
-</span><span id="line-507">            <span class="s2">"spec"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
-</span><span id="line-508">            <span class="s2">"clock"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">clock</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
-</span><span id="line-509">            <span class="s2">"tempo"</span><span class="p">:</span> <span class="n">tempo_map</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">tempo</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
-</span><span id="line-510">            <span class="s2">"clip"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="line-511">                <span class="s2">"duration"</span><span class="p">:</span> <span class="n">plan</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
-</span><span id="line-512">                <span class="s2">"fps"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">fps</span><span class="p">,</span>
-</span><span id="line-513">                <span class="s2">"width"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-</span><span id="line-514">                <span class="s2">"height"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-</span><span id="line-515">                <span class="s2">"frame_count"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">frames</span><span class="p">),</span>
-</span><span id="line-516">                <span class="s2">"rendered"</span><span class="p">:</span> <span class="n">render</span><span class="p">,</span>
-</span><span id="line-517">                <span class="s2">"files"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="line-518">                    <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">CLIP_FILES</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">render</span> <span class="ow">or</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">"video"</span>
-</span><span id="line-519">                <span class="p">},</span>
-</span><span id="line-520">            <span class="p">},</span>
-</span><span id="line-521">        <span class="p">}</span>
-</span><span id="line-522">        <span class="n">truth</span> <span class="o">=</span> <span class="n">ground_truth</span><span class="p">(</span>
-</span><span id="line-523">            <span class="n">scene</span><span class="o">=</span><span class="n">compiled</span><span class="p">,</span>
-</span><span id="line-524">            <span class="n">obj</span><span class="o">=</span><span class="n">plan</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span>
-</span><span id="line-525">            <span class="n">stroke</span><span class="o">=</span><span class="n">plan</span><span class="o">.</span><span class="n">stroke</span><span class="p">,</span>
-</span><span id="line-526">            <span class="n">events</span><span class="o">=</span><span class="n">plan</span><span class="o">.</span><span class="n">events</span><span class="p">,</span>
-</span><span id="line-527">            <span class="n">frames</span><span class="o">=</span><span class="n">plan</span><span class="o">.</span><span class="n">frames</span><span class="p">,</span>
-</span><span id="line-528">            <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span>
-</span><span id="line-529">        <span class="p">)</span>
-</span><span id="line-530">        <span class="n">video</span> <span class="o">=</span> <span class="n">_render</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">mall</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">compiled</span><span class="p">)</span> <span class="k">if</span> <span class="n">render</span> <span class="k">else</span> <span class="kc">None</span>
-</span><span id="line-531">        <span class="c1"># Nothing is written until the truth has passed every check and the</span>
-</span><span id="line-532">        <span class="c1"># video (if any) exists, so a refused or failed clip leaves nothing</span>
-</span><span id="line-533">        <span class="c1"># behind that looks like a clip.</span>
-</span><span id="line-534">        <span class="n">target</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-535">        <span class="n">stale</span> <span class="o">=</span> <span class="n">target</span> <span class="o">/</span> <span class="n">CLIP_FILES</span><span class="p">[</span><span class="s2">"video"</span><span class="p">]</span>
-</span><span id="line-536">        <span class="k">if</span> <span class="n">video</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-537">            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="n">stale</span><span class="p">)</span>
-</span><span id="line-538">        <span class="k">elif</span> <span class="n">stale</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="line-539">            <span class="n">stale</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>  <span class="c1"># a truth saying `rendered: false` beside an old video</span>
-</span><span id="line-540">    <span class="n">_write_json</span><span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">CLIP_FILES</span><span class="p">[</span><span class="s2">"truth"</span><span class="p">],</span> <span class="n">truth</span><span class="p">)</span>
-</span><span id="line-541">    <span class="n">_write_json</span><span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">CLIP_FILES</span><span class="p">[</span><span class="s2">"scene"</span><span class="p">],</span> <span class="n">plan</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"json"</span><span class="p">))</span>
-</span><span id="line-542">    <span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">CLIP_FILES</span><span class="p">[</span><span class="s2">"keypoints"</span><span class="p">])</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
-</span><span id="line-543">        <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">keypoint_lines</span><span class="p">(</span><span class="n">truth</span><span class="p">)),</span>
-</span><span id="line-544">        <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span>
-</span><span id="line-545">    <span class="p">)</span>
-</span><span id="line-546">    <span class="n">buf</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
-</span><span id="line-547">    <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">lineterminator</span><span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span>
-</span><span id="line-548">        <span class="n">trajectory_rows</span><span class="p">(</span>
-</span><span id="line-549">            <span class="n">scene</span><span class="o">=</span><span class="n">compiled</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">plan</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">stroke</span><span class="o">=</span><span class="n">plan</span><span class="o">.</span><span class="n">stroke</span><span class="p">,</span> <span class="n">hz</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">trajectory_hz</span>
-</span><span id="line-550">        <span class="p">)</span>
-</span><span id="line-551">    <span class="p">)</span>
-</span><span id="line-552">    <span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">CLIP_FILES</span><span class="p">[</span><span class="s2">"trajectory"</span><span class="p">])</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
-</span><span id="line-553">    <span class="k">return</span> <span class="n">target</span></div>
+</span><span id="line-470"><span class="k">def</span><span class="w"> </span><span class="nf">write_impact_clip</span><span class="p">(</span>
+</span><span id="line-471">    <span class="n">spec</span><span class="p">:</span> <span class="n">ImpactClipSpec</span><span class="p">,</span>
+</span><span id="line-472">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+</span><span id="line-473">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-474">    <span class="n">render</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="line-475">    <span class="n">clip_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-476"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-477"><span class="w">    </span><span class="sd">"""Write one clip into ``out_dir / (clip_dir or spec.clip_id)``; return that dir.</span>
+</span><span id="line-478">
+</span><span id="line-479"><span class="sd">    With ``render=False`` everything but ``clip.mp4`` is written, and no</span>
+</span><span id="line-480"><span class="sd">    browser is needed: the keypoints and the truth come from the compiled</span>
+</span><span id="line-481"><span class="sd">    document, not from the pixels.</span>
+</span><span id="line-482"><span class="sd">    """</span>
+</span><span id="line-483">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.compile</span><span class="w"> </span><span class="kn">import</span> <span class="n">compile_shot</span>
+</span><span id="line-484">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stores</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_project_mall</span>
+</span><span id="line-485">
+</span><span id="line-486">    <span class="n">plan</span> <span class="o">=</span> <span class="n">plan_impact_clip</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+</span><span id="line-487">    <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="n">clip_dir</span> <span class="ow">or</span> <span class="n">spec</span><span class="o">.</span><span class="n">clip_id</span><span class="p">)</span>
+</span><span id="line-488">    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"an-impacts-"</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+</span><span id="line-489">        <span class="n">mall</span> <span class="o">=</span> <span class="n">build_project_mall</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">ensure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-490">        <span class="n">_install_props</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">mall</span><span class="p">)</span>
+</span><span id="line-491">        <span class="n">compiled</span> <span class="o">=</span> <span class="n">compile_shot</span><span class="p">(</span>
+</span><span id="line-492">            <span class="n">plan</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span>
+</span><span id="line-493">            <span class="n">mall</span><span class="o">=</span><span class="n">mall</span><span class="p">,</span>
+</span><span id="line-494">            <span class="n">fps</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">fps</span><span class="p">)),</span>  <span class="c1"># what CutoutRenderer compiles at, too</span>
+</span><span id="line-495">            <span class="n">width</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+</span><span id="line-496">            <span class="n">height</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+</span><span id="line-497">            <span class="n">strict_assets</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="line-498">        <span class="p">)</span>
+</span><span id="line-499">        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-500">            <span class="s2">"generator"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-501">                <span class="s2">"package"</span><span class="p">:</span> <span class="s2">"an"</span><span class="p">,</span>
+</span><span id="line-502">                <span class="s2">"version"</span><span class="p">:</span> <span class="n">_package_version</span><span class="p">(),</span>
+</span><span id="line-503">                <span class="s2">"module"</span><span class="p">:</span> <span class="vm">__name__</span><span class="p">,</span>
+</span><span id="line-504">            <span class="p">},</span>
+</span><span id="line-505">            <span class="s2">"spec"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+</span><span id="line-506">            <span class="s2">"clock"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">clock</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+</span><span id="line-507">            <span class="s2">"tempo"</span><span class="p">:</span> <span class="n">tempo_map</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">tempo</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+</span><span id="line-508">            <span class="s2">"clip"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-509">                <span class="s2">"duration"</span><span class="p">:</span> <span class="n">plan</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+</span><span id="line-510">                <span class="s2">"fps"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">fps</span><span class="p">,</span>
+</span><span id="line-511">                <span class="s2">"width"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+</span><span id="line-512">                <span class="s2">"height"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+</span><span id="line-513">                <span class="s2">"frame_count"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">frames</span><span class="p">),</span>
+</span><span id="line-514">                <span class="s2">"rendered"</span><span class="p">:</span> <span class="n">render</span><span class="p">,</span>
+</span><span id="line-515">                <span class="s2">"files"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-516">                    <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">CLIP_FILES</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">render</span> <span class="ow">or</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">"video"</span>
+</span><span id="line-517">                <span class="p">},</span>
+</span><span id="line-518">            <span class="p">},</span>
+</span><span id="line-519">        <span class="p">}</span>
+</span><span id="line-520">        <span class="n">truth</span> <span class="o">=</span> <span class="n">ground_truth</span><span class="p">(</span>
+</span><span id="line-521">            <span class="n">scene</span><span class="o">=</span><span class="n">compiled</span><span class="p">,</span>
+</span><span id="line-522">            <span class="n">obj</span><span class="o">=</span><span class="n">plan</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span>
+</span><span id="line-523">            <span class="n">stroke</span><span class="o">=</span><span class="n">plan</span><span class="o">.</span><span class="n">stroke</span><span class="p">,</span>
+</span><span id="line-524">            <span class="n">events</span><span class="o">=</span><span class="n">plan</span><span class="o">.</span><span class="n">events</span><span class="p">,</span>
+</span><span id="line-525">            <span class="n">frames</span><span class="o">=</span><span class="n">plan</span><span class="o">.</span><span class="n">frames</span><span class="p">,</span>
+</span><span id="line-526">            <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span>
+</span><span id="line-527">        <span class="p">)</span>
+</span><span id="line-528">        <span class="n">video</span> <span class="o">=</span> <span class="n">_render</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">mall</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">compiled</span><span class="p">)</span> <span class="k">if</span> <span class="n">render</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span id="line-529">        <span class="c1"># Nothing is written until the truth has passed every check and the</span>
+</span><span id="line-530">        <span class="c1"># video (if any) exists, so a refused or failed clip leaves nothing</span>
+</span><span id="line-531">        <span class="c1"># behind that looks like a clip.</span>
+</span><span id="line-532">        <span class="n">target</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-533">        <span class="n">stale</span> <span class="o">=</span> <span class="n">target</span> <span class="o">/</span> <span class="n">CLIP_FILES</span><span class="p">[</span><span class="s2">"video"</span><span class="p">]</span>
+</span><span id="line-534">        <span class="k">if</span> <span class="n">video</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-535">            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="n">stale</span><span class="p">)</span>
+</span><span id="line-536">        <span class="k">elif</span> <span class="n">stale</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="line-537">            <span class="n">stale</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>  <span class="c1"># a truth saying `rendered: false` beside an old video</span>
+</span><span id="line-538">    <span class="n">_write_json</span><span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">CLIP_FILES</span><span class="p">[</span><span class="s2">"truth"</span><span class="p">],</span> <span class="n">truth</span><span class="p">)</span>
+</span><span id="line-539">    <span class="n">_write_json</span><span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">CLIP_FILES</span><span class="p">[</span><span class="s2">"scene"</span><span class="p">],</span> <span class="n">plan</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"json"</span><span class="p">))</span>
+</span><span id="line-540">    <span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">CLIP_FILES</span><span class="p">[</span><span class="s2">"keypoints"</span><span class="p">])</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+</span><span id="line-541">        <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">keypoint_lines</span><span class="p">(</span><span class="n">truth</span><span class="p">)),</span>
+</span><span id="line-542">        <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span>
+</span><span id="line-543">    <span class="p">)</span>
+</span><span id="line-544">    <span class="n">buf</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+</span><span id="line-545">    <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">lineterminator</span><span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span>
+</span><span id="line-546">        <span class="n">trajectory_rows</span><span class="p">(</span>
+</span><span id="line-547">            <span class="n">scene</span><span class="o">=</span><span class="n">compiled</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">plan</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">stroke</span><span class="o">=</span><span class="n">plan</span><span class="o">.</span><span class="n">stroke</span><span class="p">,</span> <span class="n">hz</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">trajectory_hz</span>
+</span><span id="line-548">        <span class="p">)</span>
+</span><span id="line-549">    <span class="p">)</span>
+</span><span id="line-550">    <span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">CLIP_FILES</span><span class="p">[</span><span class="s2">"trajectory"</span><span class="p">])</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span><span id="line-551">    <span class="k">return</span> <span class="n">target</span></div>
 
-</span><span id="line-554">
-</span><span id="line-555">
-</span><span id="line-556"><span class="k">def</span><span class="w"> </span><span class="nf">_render</span><span class="p">(</span><span class="n">plan</span><span class="p">:</span> <span class="n">ImpactPlan</span><span class="p">,</span> <span class="n">mall</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">tmp</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">compiled</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-557"><span class="w">    </span><span class="sd">"""Render the shot; refuse if the renderer drew a different document.</span>
-</span><span id="line-558">
-</span><span id="line-559"><span class="sd">    `CutoutRenderer` compiles the shot itself, from arguments it rebuilds out of</span>
-</span><span id="line-560"><span class="sd">    the `RenderContext`. Today that is the same document the truth was read</span>
-</span><span id="line-561"><span class="sd">    from; if a renderer default ever changes (stepped timing switched on, say),</span>
-</span><span id="line-562"><span class="sd">    the video would change and the truth would not — so the document the</span>
-</span><span id="line-563"><span class="sd">    renderer STAGED is compared with the truth's, and a difference raises.</span>
-</span><span id="line-564"><span class="sd">    """</span>
-</span><span id="line-565">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.adapters._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">RenderContext</span>
-</span><span id="line-566">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.render</span><span class="w"> </span><span class="kn">import</span> <span class="n">CutoutRenderer</span>
-</span><span id="line-567">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.serialize</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_dict</span>
-</span><span id="line-568">
-</span><span id="line-569">    <span class="n">spec</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">spec</span>
-</span><span id="line-570">    <span class="c1"># An integral rate goes in as an int, so the mux argv is the ordinary one.</span>
-</span><span id="line-571">    <span class="n">fps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">fps</span><span class="p">)</span> <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">fps</span><span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="k">else</span> <span class="n">spec</span><span class="o">.</span><span class="n">fps</span>
-</span><span id="line-572">    <span class="n">result</span> <span class="o">=</span> <span class="n">CutoutRenderer</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
-</span><span id="line-573">        <span class="n">plan</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span>
-</span><span id="line-574">        <span class="n">RenderContext</span><span class="p">(</span>
-</span><span id="line-575">            <span class="n">mall</span><span class="o">=</span><span class="n">mall</span><span class="p">,</span>
-</span><span id="line-576">            <span class="n">work_dir</span><span class="o">=</span><span class="n">tmp</span> <span class="o">/</span> <span class="s2">"work"</span><span class="p">,</span>
-</span><span id="line-577">            <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]</span>
-</span><span id="line-578">            <span class="n">resolution</span><span class="o">=</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
-</span><span id="line-579">            <span class="n">strict_assets</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="line-580">            <span class="n">frame_samples</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">samples</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">frames</span><span class="p">),</span>
-</span><span id="line-581">        <span class="p">),</span>
-</span><span id="line-582">    <span class="p">)</span>
-</span><span id="line-583">    <span class="n">staged</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">mp4_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"runtime"</span> <span class="o">/</span> <span class="s2">"scene.json"</span>
-</span><span id="line-584">    <span class="n">drawn</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">staged</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
-</span><span id="line-585">    <span class="k">if</span> <span class="n">drawn</span> <span class="o">!=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">to_dict</span><span class="p">(</span><span class="n">compiled</span><span class="p">),</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)):</span>
-</span><span id="line-586">        <span class="k">raise</span> <span class="n">TruthMismatch</span><span class="p">(</span>
-</span><span id="line-587">            <span class="s2">"the renderer staged a different document from the one the ground truth "</span>
-</span><span id="line-588">            <span class="s2">"was read from (a renderer default — stepped timing, a style pack — "</span>
-</span><span id="line-589">            <span class="s2">"changed what it compiles); the video and the sidecar would disagree"</span>
-</span><span id="line-590">        <span class="p">)</span>
-</span><span id="line-591">    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">provenance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"frame_samples"</span><span class="p">)</span> <span class="o">!=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">samples</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">frames</span><span class="p">]:</span>
-</span><span id="line-592">        <span class="k">raise</span> <span class="n">TruthMismatch</span><span class="p">(</span>
-</span><span id="line-593">            <span class="s2">"the renderer did not capture the instants the truth records"</span>
-</span><span id="line-594">        <span class="p">)</span>
-</span><span id="line-595">    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">mp4_path</span>
-</span><span id="line-596">
-</span><span id="line-597">
-</span><span id="line-598"><span class="k">def</span><span class="w"> </span><span class="nf">_write_json</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-599">    <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
-</span><span id="line-600">
-</span><span id="line-601">
-</span><span id="line-602"><span class="c1">#: A harder default for scoring estimators: an accelerando with accents and</span>
-</span><span id="line-603"><span class="c1">#: human, slightly drifting timing. What :func:`impact_set_specs` varies the</span>
-</span><span id="line-604"><span class="c1">#: camera and the object over.</span>
-</span><span id="line-605"><span class="n">BENCHMARK_SPEC</span> <span class="o">=</span> <span class="n">ImpactClipSpec</span><span class="p">(</span>
-</span><span id="line-606">    <span class="n">tempo</span><span class="o">=</span><span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">96.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">132.0</span><span class="p">)),</span>
-</span><span id="line-607">    <span class="n">beats</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
-</span><span id="line-608">    <span class="n">pattern</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
-</span><span id="line-609">    <span class="n">jitter_sd</span><span class="o">=</span><span class="mf">0.012</span><span class="p">,</span>
-</span><span id="line-610">    <span class="n">jitter_rho</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
-</span><span id="line-611"><span class="p">)</span>
-</span><span id="line-612">
-</span><span id="line-613">
+</span><span id="line-552">
+</span><span id="line-553">
+</span><span id="line-554"><span class="k">def</span><span class="w"> </span><span class="nf">_render</span><span class="p">(</span><span class="n">plan</span><span class="p">:</span> <span class="n">ImpactPlan</span><span class="p">,</span> <span class="n">mall</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">tmp</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">compiled</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-555"><span class="w">    </span><span class="sd">"""Render the shot; refuse if the renderer drew a different document.</span>
+</span><span id="line-556">
+</span><span id="line-557"><span class="sd">    `CutoutRenderer` compiles the shot itself, from arguments it rebuilds out of</span>
+</span><span id="line-558"><span class="sd">    the `RenderContext`. Today that is the same document the truth was read</span>
+</span><span id="line-559"><span class="sd">    from; if a renderer default ever changes (stepped timing switched on, say),</span>
+</span><span id="line-560"><span class="sd">    the video would change and the truth would not — so the document the</span>
+</span><span id="line-561"><span class="sd">    renderer STAGED is compared with the truth's, and a difference raises.</span>
+</span><span id="line-562"><span class="sd">    """</span>
+</span><span id="line-563">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.adapters._base</span><span class="w"> </span><span class="kn">import</span> <span class="n">RenderContext</span>
+</span><span id="line-564">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.render</span><span class="w"> </span><span class="kn">import</span> <span class="n">CutoutRenderer</span>
+</span><span id="line-565">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.serialize</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_dict</span>
+</span><span id="line-566">
+</span><span id="line-567">    <span class="n">spec</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">spec</span>
+</span><span id="line-568">    <span class="c1"># An integral rate goes in as an int, so the mux argv is the ordinary one.</span>
+</span><span id="line-569">    <span class="n">fps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">fps</span><span class="p">)</span> <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">fps</span><span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="k">else</span> <span class="n">spec</span><span class="o">.</span><span class="n">fps</span>
+</span><span id="line-570">    <span class="n">result</span> <span class="o">=</span> <span class="n">CutoutRenderer</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+</span><span id="line-571">        <span class="n">plan</span><span class="o">.</span><span class="n">shot</span><span class="p">,</span>
+</span><span id="line-572">        <span class="n">RenderContext</span><span class="p">(</span>
+</span><span id="line-573">            <span class="n">mall</span><span class="o">=</span><span class="n">mall</span><span class="p">,</span>
+</span><span id="line-574">            <span class="n">work_dir</span><span class="o">=</span><span class="n">tmp</span> <span class="o">/</span> <span class="s2">"work"</span><span class="p">,</span>
+</span><span id="line-575">            <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]</span>
+</span><span id="line-576">            <span class="n">resolution</span><span class="o">=</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
+</span><span id="line-577">            <span class="n">strict_assets</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="line-578">            <span class="n">frame_samples</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">samples</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">frames</span><span class="p">),</span>
+</span><span id="line-579">        <span class="p">),</span>
+</span><span id="line-580">    <span class="p">)</span>
+</span><span id="line-581">    <span class="n">staged</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">mp4_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"runtime"</span> <span class="o">/</span> <span class="s2">"scene.json"</span>
+</span><span id="line-582">    <span class="n">drawn</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">staged</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</span><span id="line-583">    <span class="k">if</span> <span class="n">drawn</span> <span class="o">!=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">to_dict</span><span class="p">(</span><span class="n">compiled</span><span class="p">),</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)):</span>
+</span><span id="line-584">        <span class="k">raise</span> <span class="n">TruthMismatch</span><span class="p">(</span>
+</span><span id="line-585">            <span class="s2">"the renderer staged a different document from the one the ground truth "</span>
+</span><span id="line-586">            <span class="s2">"was read from (a renderer default — stepped timing, a style pack — "</span>
+</span><span id="line-587">            <span class="s2">"changed what it compiles); the video and the sidecar would disagree"</span>
+</span><span id="line-588">        <span class="p">)</span>
+</span><span id="line-589">    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">provenance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"frame_samples"</span><span class="p">)</span> <span class="o">!=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">samples</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">frames</span><span class="p">]:</span>
+</span><span id="line-590">        <span class="k">raise</span> <span class="n">TruthMismatch</span><span class="p">(</span>
+</span><span id="line-591">            <span class="s2">"the renderer did not capture the instants the truth records"</span>
+</span><span id="line-592">        <span class="p">)</span>
+</span><span id="line-593">    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">mp4_path</span>
+</span><span id="line-594">
+</span><span id="line-595">
+</span><span id="line-596"><span class="k">def</span><span class="w"> </span><span class="nf">_write_json</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-597">    <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span><span id="line-598">
+</span><span id="line-599">
+</span><span id="line-600"><span class="c1">#: A harder default for scoring estimators: an accelerando with accents and</span>
+</span><span id="line-601"><span class="c1">#: human, slightly drifting timing. What :func:`impact_set_specs` varies the</span>
+</span><span id="line-602"><span class="c1">#: camera and the object over.</span>
+</span><span id="line-603"><span class="n">BENCHMARK_SPEC</span> <span class="o">=</span> <span class="n">ImpactClipSpec</span><span class="p">(</span>
+</span><span id="line-604">    <span class="n">tempo</span><span class="o">=</span><span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">96.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">132.0</span><span class="p">)),</span>
+</span><span id="line-605">    <span class="n">beats</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+</span><span id="line-606">    <span class="n">pattern</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
+</span><span id="line-607">    <span class="n">jitter_sd</span><span class="o">=</span><span class="mf">0.012</span><span class="p">,</span>
+</span><span id="line-608">    <span class="n">jitter_rho</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+</span><span id="line-609"><span class="p">)</span>
+</span><span id="line-610">
+</span><span id="line-611">
 <div class="viewcode-block" id="impact_set_specs">
 <a class="viewcode-back" href="../../../_autosummary/cutan.impacts.clip.html#cutan.impacts.impact_set_specs">[docs]</a>
-</span><span id="line-614"><span class="k">def</span><span class="w"> </span><span class="nf">impact_set_specs</span><span class="p">(</span>
-</span><span id="line-615">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-616">    <span class="n">base</span><span class="p">:</span> <span class="n">ImpactClipSpec</span> <span class="o">=</span> <span class="n">BENCHMARK_SPEC</span><span class="p">,</span>
-</span><span id="line-617">    <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"stick"</span><span class="p">,</span> <span class="s2">"ball"</span><span class="p">),</span>
-</span><span id="line-618">    <span class="n">kinds</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"surface"</span><span class="p">,</span> <span class="s2">"air"</span><span class="p">),</span>
-</span><span id="line-619">    <span class="n">fps</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>
-</span><span id="line-620">    <span class="n">exposures</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
-</span><span id="line-621">    <span class="n">timestamp_jitter_sds</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,),</span>
-</span><span id="line-622">    <span class="n">seeds</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,),</span>
-</span><span id="line-623"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ImpactClipSpec</span><span class="p">]:</span>
-</span><span id="line-624"><span class="w">    </span><span class="sd">"""The cartesian product of the given axes over ``base``.</span>
-</span><span id="line-625">
-</span><span id="line-626"><span class="sd">    &gt;&gt;&gt; len(impact_set_specs())</span>
-</span><span id="line-627"><span class="sd">    24</span>
-</span><span id="line-628"><span class="sd">    &gt;&gt;&gt; {s.seed for s in impact_set_specs(seeds=(0, 1), fps=(30,))}</span>
-</span><span id="line-629"><span class="sd">    {0, 1}</span>
-</span><span id="line-630"><span class="sd">    """</span>
-</span><span id="line-631">    <span class="k">return</span> <span class="p">[</span>
-</span><span id="line-632">        <span class="n">replace</span><span class="p">(</span>
-</span><span id="line-633">            <span class="n">base</span><span class="p">,</span>
-</span><span id="line-634">            <span class="nb">object</span><span class="o">=</span><span class="n">o</span><span class="p">,</span>
-</span><span id="line-635">            <span class="n">kind</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
-</span><span id="line-636">            <span class="n">fps</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
-</span><span id="line-637">            <span class="n">exposure</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
-</span><span id="line-638">            <span class="n">timestamp_jitter_sd</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">j</span><span class="p">),</span>
-</span><span id="line-639">            <span class="n">seed</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">),</span>
-</span><span id="line-640">        <span class="p">)</span>
-</span><span id="line-641">        <span class="k">for</span> <span class="n">o</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span>
-</span><span id="line-642">            <span class="n">objects</span><span class="p">,</span> <span class="n">kinds</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">exposures</span><span class="p">,</span> <span class="n">timestamp_jitter_sds</span><span class="p">,</span> <span class="n">seeds</span>
-</span><span id="line-643">        <span class="p">)</span>
-</span><span id="line-644">    <span class="p">]</span></div>
+</span><span id="line-612"><span class="k">def</span><span class="w"> </span><span class="nf">impact_set_specs</span><span class="p">(</span>
+</span><span id="line-613">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-614">    <span class="n">base</span><span class="p">:</span> <span class="n">ImpactClipSpec</span> <span class="o">=</span> <span class="n">BENCHMARK_SPEC</span><span class="p">,</span>
+</span><span id="line-615">    <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"stick"</span><span class="p">,</span> <span class="s2">"ball"</span><span class="p">),</span>
+</span><span id="line-616">    <span class="n">kinds</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"surface"</span><span class="p">,</span> <span class="s2">"air"</span><span class="p">),</span>
+</span><span id="line-617">    <span class="n">fps</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>
+</span><span id="line-618">    <span class="n">exposures</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+</span><span id="line-619">    <span class="n">timestamp_jitter_sds</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,),</span>
+</span><span id="line-620">    <span class="n">seeds</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,),</span>
+</span><span id="line-621"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ImpactClipSpec</span><span class="p">]:</span>
+</span><span id="line-622"><span class="w">    </span><span class="sd">"""The cartesian product of the given axes over ``base``.</span>
+</span><span id="line-623">
+</span><span id="line-624"><span class="sd">    &gt;&gt;&gt; len(impact_set_specs())</span>
+</span><span id="line-625"><span class="sd">    24</span>
+</span><span id="line-626"><span class="sd">    &gt;&gt;&gt; {s.seed for s in impact_set_specs(seeds=(0, 1), fps=(30,))}</span>
+</span><span id="line-627"><span class="sd">    {0, 1}</span>
+</span><span id="line-628"><span class="sd">    """</span>
+</span><span id="line-629">    <span class="k">return</span> <span class="p">[</span>
+</span><span id="line-630">        <span class="n">replace</span><span class="p">(</span>
+</span><span id="line-631">            <span class="n">base</span><span class="p">,</span>
+</span><span id="line-632">            <span class="nb">object</span><span class="o">=</span><span class="n">o</span><span class="p">,</span>
+</span><span id="line-633">            <span class="n">kind</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+</span><span id="line-634">            <span class="n">fps</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+</span><span id="line-635">            <span class="n">exposure</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+</span><span id="line-636">            <span class="n">timestamp_jitter_sd</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">j</span><span class="p">),</span>
+</span><span id="line-637">            <span class="n">seed</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">),</span>
+</span><span id="line-638">        <span class="p">)</span>
+</span><span id="line-639">        <span class="k">for</span> <span class="n">o</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span>
+</span><span id="line-640">            <span class="n">objects</span><span class="p">,</span> <span class="n">kinds</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">exposures</span><span class="p">,</span> <span class="n">timestamp_jitter_sds</span><span class="p">,</span> <span class="n">seeds</span>
+</span><span id="line-641">        <span class="p">)</span>
+</span><span id="line-642">    <span class="p">]</span></div>
 
-</span><span id="line-645">
-</span><span id="line-646">
+</span><span id="line-643">
+</span><span id="line-644">
 <div class="viewcode-block" id="write_impact_set">
 <a class="viewcode-back" href="../../../_autosummary/cutan.impacts.clip.html#cutan.impacts.write_impact_set">[docs]</a>
-</span><span id="line-647"><span class="k">def</span><span class="w"> </span><span class="nf">write_impact_set</span><span class="p">(</span>
-</span><span id="line-648">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
-</span><span id="line-649">    <span class="n">specs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ImpactClipSpec</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-650">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-651">    <span class="n">render</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="line-652">    <span class="n">progress</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-653"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span id="line-654"><span class="w">    </span><span class="sd">"""Write every clip in ``specs`` (default: :func:`impact_set_specs`) plus ``index.json``.</span>
-</span><span id="line-655">
-</span><span id="line-656"><span class="sd">    ``progress``, if given, is called with ``(i, n, clip_dir)`` after each clip.</span>
-</span><span id="line-657"><span class="sd">    """</span>
-</span><span id="line-658">    <span class="n">specs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">specs</span><span class="p">)</span> <span class="k">if</span> <span class="n">specs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">impact_set_specs</span><span class="p">()</span>
-</span><span id="line-659">    <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
-</span><span id="line-660">    <span class="n">root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-661">    <span class="n">index</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-662">    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">spec</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">specs</span><span class="p">):</span>
-</span><span id="line-663">        <span class="n">clip</span> <span class="o">=</span> <span class="n">write_impact_clip</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">)</span>
-</span><span id="line-664">        <span class="n">index</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"clip"</span><span class="p">:</span> <span class="n">clip</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"spec"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()})</span>
-</span><span id="line-665">        <span class="k">if</span> <span class="n">progress</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-666">            <span class="n">progress</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">specs</span><span class="p">),</span> <span class="n">clip</span><span class="p">)</span>
-</span><span id="line-667">    <span class="n">_write_json</span><span class="p">(</span>
-</span><span id="line-668">        <span class="n">root</span> <span class="o">/</span> <span class="s2">"index.json"</span><span class="p">,</span>
-</span><span id="line-669">        <span class="p">{</span><span class="s2">"generator"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"package"</span><span class="p">:</span> <span class="s2">"an"</span><span class="p">,</span> <span class="s2">"version"</span><span class="p">:</span> <span class="n">_package_version</span><span class="p">()},</span> <span class="s2">"clips"</span><span class="p">:</span> <span class="n">index</span><span class="p">},</span>
-</span><span id="line-670">    <span class="p">)</span>
-</span><span id="line-671">    <span class="k">return</span> <span class="n">root</span></div>
+</span><span id="line-645"><span class="k">def</span><span class="w"> </span><span class="nf">write_impact_set</span><span class="p">(</span>
+</span><span id="line-646">    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+</span><span id="line-647">    <span class="n">specs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ImpactClipSpec</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-648">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-649">    <span class="n">render</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="line-650">    <span class="n">progress</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-651"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span id="line-652"><span class="w">    </span><span class="sd">"""Write every clip in ``specs`` (default: :func:`impact_set_specs`) plus ``index.json``.</span>
+</span><span id="line-653">
+</span><span id="line-654"><span class="sd">    ``progress``, if given, is called with ``(i, n, clip_dir)`` after each clip.</span>
+</span><span id="line-655"><span class="sd">    """</span>
+</span><span id="line-656">    <span class="n">specs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">specs</span><span class="p">)</span> <span class="k">if</span> <span class="n">specs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">impact_set_specs</span><span class="p">()</span>
+</span><span id="line-657">    <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+</span><span id="line-658">    <span class="n">root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-659">    <span class="n">index</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-660">    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">spec</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">specs</span><span class="p">):</span>
+</span><span id="line-661">        <span class="n">clip</span> <span class="o">=</span> <span class="n">write_impact_clip</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">)</span>
+</span><span id="line-662">        <span class="n">index</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"clip"</span><span class="p">:</span> <span class="n">clip</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"spec"</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()})</span>
+</span><span id="line-663">        <span class="k">if</span> <span class="n">progress</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-664">            <span class="n">progress</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">specs</span><span class="p">),</span> <span class="n">clip</span><span class="p">)</span>
+</span><span id="line-665">    <span class="n">_write_json</span><span class="p">(</span>
+</span><span id="line-666">        <span class="n">root</span> <span class="o">/</span> <span class="s2">"index.json"</span><span class="p">,</span>
+</span><span id="line-667">        <span class="p">{</span><span class="s2">"generator"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"package"</span><span class="p">:</span> <span class="s2">"an"</span><span class="p">,</span> <span class="s2">"version"</span><span class="p">:</span> <span class="n">_package_version</span><span class="p">()},</span> <span class="s2">"clips"</span><span class="p">:</span> <span class="n">index</span><span class="p">},</span>
+</span><span id="line-668">    <span class="p">)</span>
+</span><span id="line-669">    <span class="k">return</span> <span class="n">root</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -894,7 +892,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=97d53703"></script>
+    <script src="../../../_static/documentation_options.js?v=5c5ca7ce"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
