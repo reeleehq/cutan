@@ -455,9 +455,7 @@ def _install_props(plan: ImpactPlan, mall: dict) -> None:
     for art in plan.props:
         store[art.ref] = art.descriptor
         for rel, svg in art.parts.items():
-            path = store.sidecar_path(art.ref, rel)
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(svg, encoding="utf-8")
+            store.write_sidecar(art.ref, rel, svg.encode("utf-8"))
 
 
 def _package_version() -> str:

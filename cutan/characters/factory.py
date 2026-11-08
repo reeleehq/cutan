@@ -80,6 +80,7 @@ from cutan.characters.brows import (
     seat_above_brows,
 )
 from an.stores._common import inside_folder
+from dol import atomic_write
 from cutan.characters.colour_roles import distinct_literal, normalise_hex
 from cutan.characters.patterns import (
     ClothingPattern,
@@ -811,7 +812,7 @@ def stand_on_feet(char_dir: str | Path, *, undo: bool = False) -> dict[str, Any]
             migrate(dict(raw), kind=CHARACTER_DOCUMENT_KIND.name)
         )
     )
-    path.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
+    atomic_write(path, (json.dumps(raw, indent=2) + "\n").encode("utf-8"))
     return {
         "before": before,
         "after": after,
