@@ -45,7 +45,7 @@ def promote(
     Parameters
     ----------
     project_dir
-        Path to an ``an`` project (must contain ``assets/characters/``).
+        Path to an ``an`` project (``assets/characters/`` need not exist yet).
     entity
         Inline entity id used inside the scene (the directory under
         ``assets/characters/<entity>``, or the SVG file at
@@ -73,9 +73,9 @@ def promote(
     """
     pdir = Path(project_dir)
     chars_dir = pdir / "assets" / "characters"
-    if not chars_dir.exists():
-        raise FileNotFoundError(chars_dir)
-
+    # A project never `an init`'d has no characters folder yet (an#696: the
+    # stores make folders on the first write): that reads as "no characters",
+    # exactly as an empty folder does; the writes below make it.
     src = _resolve_source(chars_dir, entity, source_svg)
     if src is None or not src.exists():
         # Fall back to building from scratch — no inline source means we
