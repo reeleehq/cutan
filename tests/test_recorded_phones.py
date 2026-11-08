@@ -199,3 +199,16 @@ def test_phones_track_reads_the_clips_recorded_alphabet():
         duration=0.2, phones=[("l", 0.0, 0.1), ("V", 0.1, 0.2)], phone_alphabet="arpabet"
     )
     assert [v.code for v in phones_track(clip).visemes] == ["X", "H", "G", "X"]
+
+
+@pytest.mark.parametrize("recorded", [None, "", "garbage"])
+def test_an_absent_or_unknown_recorded_alphabet_is_guessed(recorded):
+    got = phones_to_visemes(
+        [("ae1", 0.0, 0.1), ("er0", 0.1, 0.2)], total_duration=0.2, alphabet=recorded
+    )
+    assert [v.code for v in got] == ["X", "C", "E", "X"]
+
+
+def test_the_recorded_alphabet_is_read_case_insensitively():
+    got = phones_to_visemes([("l", 0.0, 0.1)], total_duration=0.1, alphabet="ARPABET")
+    assert [v.code for v in got] == ["X", "H", "X"]

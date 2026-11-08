@@ -3,8 +3,9 @@
 A recorded take imported with a forced aligner's output carries its phones,
 ``AudioClip.phones``: ``(phone, start_s, end_s)`` from the clip's start (an#491),
 in ARPAbet (MFA's English models: ``HH``, ``AH0``) or IPA (``mfa:ipa``: ``h``,
-``ə``). The take's record knows which, but the clip does not, so the alphabet is
-decided once per clip (:func:`phone_alphabet`).
+``ə``). The take's record states which (``AudioClip.phone_alphabet``, an#721) and
+that wins; a clip without it has the alphabet decided once per clip from its
+labels (:func:`phone_alphabet`).
 
 :func:`phones_track` is what a lip-sync provider calls: the clip's track from its
 phones, or ``None`` to align some other way. A word the aligner could not
@@ -88,6 +89,9 @@ IPA_TO_VISEME: dict[str, str] = {
     "g": "B", "ŋ": "B", "j": "B", "c": "B", "ɟ": "B", "ç": "B", "ɲ": "B",
     "ʔ": "B",
 }  # fmt: skip
+
+#: The alphabets a take's record may state; anything else is guessed from the labels.
+_ALPHABETS: frozenset[str] = frozenset({"arpabet", "ipa"})
 
 #: Marks an IPA phone may carry that do not change its mouth shape.
 _IPA_MODIFIERS: frozenset[str] = frozenset("ːˑˈˌʲʰʷˠˤ")
@@ -216,7 +220,11 @@ def phones_to_visemes(
     [(0.0, 'X'), (0.0, 'A'), (0.1, 'D'), (0.3, 'X'), (0.6, 'A'), (0.7, 'X')]
     """
     phones = list(phones)
-    alphabet = alphabet or phone_alphabet(p for p, _, _ in phones)
+    alphabet = (
+        str(alphabet).lower()
+        if str(alphabet).lower() in _ALPHABETS
+        else phone_alphabet(p for p, _, _ in phones)
+    )
     segments: list[Timing] = []
     for phone, start, stop in phones:
         silent = _is_silence(str(phone))
