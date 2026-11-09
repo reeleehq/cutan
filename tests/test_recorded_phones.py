@@ -136,8 +136,9 @@ def test_a_word_with_no_phones_under_it_is_spoken_by_its_letters():
     track = OfflineLipSync().align(clip, "hi gwendolyn")
     in_name = [v for v in track.visemes if 0.3 <= v.time < 0.9]
     assert len(in_name) >= 3 and all(v.code != "X" for v in in_name)
-    assert [(round(v.time, 6), v.code) for v in track.visemes][:3] == [
-        (0.0, "X"), (0.0, "C"), (0.1, "D")
+    # HH takes the shape of the AY after it (D), so the breath does not flash a C
+    assert [(round(v.time, 6), v.code) for v in track.visemes][:2] == [
+        (0.0, "X"), (0.0, "D")
     ]  # fmt: skip
 
 
@@ -212,3 +213,33 @@ def test_an_absent_or_unknown_recorded_alphabet_is_guessed(recorded):
 def test_the_recorded_alphabet_is_read_case_insensitively():
     got = phones_to_visemes([("l", 0.0, 0.1)], total_duration=0.1, alphabet="ARPABET")
     assert [v.code for v in got] == ["X", "H", "X"]
+
+
+def test_hh_takes_the_shape_of_the_phone_after_it():
+    got = phones_to_visemes(
+        [("HH", 0.0, 0.1), ("AA1", 0.1, 0.3)], total_duration=0.3, alphabet="arpabet"
+    )
+    assert [(v.time, v.code) for v in got] == [(0.0, "X"), (0.0, "D"), (0.3, "X")]
+    # ...and kept as its own at the end, where nothing follows it
+    got = phones_to_visemes([("HH", 0.0, 0.1)], total_duration=0.1, alphabet="arpabet")
+    assert [v.code for v in got] == ["X", "C", "X"]
+
+
+def test_a_tongue_only_consonant_can_be_weighed_low_by_the_phone_not_the_letter():
+    from cutan.audio.phones import TONGUE_ONLY_INTENSITY
+
+    phones = [("IY1", 0.0, 0.1), ("T", 0.1, 0.2)]  # both are Rhubarb B
+    flat = phones_to_visemes(phones, total_duration=0.2, alphabet="arpabet")
+    assert {v.intensity for v in flat} == {1.0}  # the default: unchanged
+    weighed = phones_to_visemes(
+        phones + [("AA1", 0.2, 0.3)],
+        total_duration=0.3,
+        alphabet="arpabet",
+        intensity_of=TONGUE_ONLY_INTENSITY,
+    )
+    assert {v.code: v.intensity for v in weighed}["B"] == 1.0  # the EE vowel
+    t_only = phones_to_visemes(
+        [("T", 0.0, 0.1)], total_duration=0.1, alphabet="arpabet",
+        intensity_of=TONGUE_ONLY_INTENSITY,
+    )
+    assert [v.intensity for v in t_only if v.code == "B"] == [0.4]
