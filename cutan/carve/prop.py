@@ -43,6 +43,7 @@ carving's source is kept beside it as ``extra.carved_from`` either way.
 """
 
 from __future__ import annotations
+from dol import atomic_write
 
 import json
 import math
@@ -383,6 +384,17 @@ def write_prop(
     )  # fails before any file is written
     (folder / "parts").mkdir(parents=True, exist_ok=True)
     for path, image in images.items():
-        image.save(folder / path)
-    (folder / "prop.json").write_text(text, "utf-8")
+        _save_image(image, folder / path)
+    atomic_write(folder / "prop.json", text.encode("utf-8"))
     return doc
+
+
+def _save_image(image: Any, path: Path) -> None:
+    """``image`` to ``path`` (its format from the suffix, as ``Image.save``), atomically."""
+    import io
+
+    from PIL import Image
+
+    buf = io.BytesIO()
+    image.save(buf, format=Image.registered_extensions()[Path(path).suffix.lower()])
+    atomic_write(path, buf.getvalue())

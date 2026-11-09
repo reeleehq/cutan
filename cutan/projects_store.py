@@ -28,6 +28,7 @@ Configuration (environment; the first match wins, ``CUTAN_HOME`` always forces l
 """
 
 from __future__ import annotations
+from dol import atomic_write
 
 import hashlib
 import json
@@ -213,7 +214,7 @@ def _write_record(folder: Path, record: dict) -> bytes:
     path = Path(folder) / STORE_RECORD
     path.parent.mkdir(parents=True, exist_ok=True)
     data = _record_bytes(record)
-    path.write_bytes(data)
+    atomic_write(path, data)
     return data
 
 
@@ -292,7 +293,7 @@ def materialize_project(
         else:
             data = store[key]
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(data)
+        atomic_write(target, data)
     dest.mkdir(parents=True, exist_ok=True)
     _record_store(dest, s)
     return dest

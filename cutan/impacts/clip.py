@@ -28,6 +28,7 @@ the video (optional — the truth and keypoints need no browser), and writes:
 """
 
 from __future__ import annotations
+from dol import atomic_write
 
 import csv
 import hashlib
@@ -537,9 +538,9 @@ def write_impact_clip(
             stale.unlink()  # a truth saying `rendered: false` beside an old video
     _write_json(target / CLIP_FILES["truth"], truth)
     _write_json(target / CLIP_FILES["scene"], plan.scene.model_dump(mode="json"))
-    (target / CLIP_FILES["keypoints"]).write_text(
+    _write_text(
+        target / CLIP_FILES["keypoints"],
         "".join(json.dumps(line) + "\n" for line in keypoint_lines(truth)),
-        encoding="utf-8",
     )
     buf = io.StringIO()
     csv.writer(buf, lineterminator="\n").writerows(
@@ -547,7 +548,7 @@ def write_impact_clip(
             scene=compiled, obj=plan.obj, stroke=plan.stroke, hz=spec.trajectory_hz
         )
     )
-    (target / CLIP_FILES["trajectory"]).write_text(buf.getvalue(), encoding="utf-8")
+    _write_text(target / CLIP_FILES["trajectory"], buf.getvalue())
     return target
 
 
@@ -593,8 +594,13 @@ def _render(plan: ImpactPlan, mall: dict, tmp: Path, compiled: Any) -> Path:
     return result.mp4_path
 
 
+def _write_text(path: Path, text: str) -> None:
+    """``text`` to ``path``, atomically: a clip's file is whole or the previous one (cutan#188)."""
+    atomic_write(path, text.encode("utf-8"))
+
+
 def _write_json(path: Path, doc: Any) -> None:
-    path.write_text(json.dumps(doc, indent=1) + "\n", encoding="utf-8")
+    _write_text(path, json.dumps(doc, indent=1) + "\n")
 
 
 #: A harder default for scoring estimators: an accelerando with accents and
