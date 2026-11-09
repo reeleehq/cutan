@@ -389,4 +389,3 @@ def write_prop(
         save_png(image, folder / path)
     atomic_write(folder / "prop.json", text.encode("utf-8"))
     return doc
-
