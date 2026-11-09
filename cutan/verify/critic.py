@@ -454,6 +454,23 @@ def _plate_png(path: Any, *, max_side: int = PLATE_MAX_SIDE) -> bytes:
     return buf.getvalue()
 
 
+class _ReadableEnvironments:
+    """The environments store as ``planes_at_infinity`` reads it: an environment
+    whose document cannot be read is absent (``KeyError``), not fatal. ``an``'s
+    reader catches only ``KeyError``/``TypeError``, so one corrupt ``meta.json``
+    would stop the critic from judging any plate; that descriptor is another
+    check's to report."""
+
+    def __init__(self, store: Any):
+        self._store = store
+
+    def __getitem__(self, ref: str) -> Any:
+        try:
+            return self._store[ref]
+        except Exception as error:  # noqa: BLE001
+            raise KeyError(ref) from error
+
+
 def _far_plates(project: Any) -> list[tuple[str, str, Any, str]]:
     """``(where, "member/plane", plate path or None, why not)`` of each plane the
     world has at infinity (``an.ir.world.planes_at_infinity``, the rule ``an
@@ -471,7 +488,9 @@ def _far_plates(project: Any) -> list[tuple[str, str, Any, str]]:
     root = getattr(env_store, "_root", None)
     members = {m.id: m for m in world.members} if world is not None else {}
     out = []
-    for far in planes_at_infinity(world, env_store):
+    for far in planes_at_infinity(
+        world, None if env_store is None else _ReadableEnvironments(env_store)
+    ):
         member_id, plane_name, name, where = far.member, far.plane, far.path, far.ir_path
         member = members.get(member_id)
         path, why = None, "its file cannot be read in its environment's folder"
@@ -509,7 +528,7 @@ def critique_far_plates(
     model: str | None = None,
     max_side: int = PLATE_MAX_SIDE,
 ) -> CritiqueReport:
-    """Ask whether each ``far`` plate of ``project``'s travel holds anything near
+    """Ask whether each plane at infinity of ``project``'s world holds anything near
     (cutan#166): a tree baked into a plate stands still while the streams move.
 
     The plate's own image is judged, not a render: no probe, one call per plate
@@ -552,7 +571,7 @@ def critique_far_plates(
             subject=f"plate {name!r}",
             context=f"plate {name!r}",
             advice=(
-                "A plate the travel lists `far` must hold only what is at infinity: "
+                "A plane at infinity (listed `far` by the travel, or in a frame coupled `far`) must hold only what is far away: "
                 "move what is near to a stream, or onto a `vehicle` plate."
             ),
         )

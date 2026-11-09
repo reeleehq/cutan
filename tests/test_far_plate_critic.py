@@ -135,3 +135,29 @@ def test_a_plane_far_only_by_its_frame_is_judged_too(project):
     assert [p.path for p in planes_at_infinity(world, project.mall["environments"])] == ["set/sky"]
     # the finding points at the world member that puts the plane in the frame
     assert any(f[0] == "warning" and f[1] == "world/members/0" for f in report.findings)
+
+
+def test_a_plane_listed_and_in_a_far_frame_is_judged_once(project):
+    from an.ir.schema import Frame
+
+    world = project.scene.world
+    world.travel.plates["far"] = ["set/sky"]
+    world.members[0] = WorldMember(
+        kind="environment", id="set", store="environments", ref="road",
+        planes={"sky": "horizon"},
+    )
+    world.frames = {"far": Frame(coupling="far"), "horizon": Frame(parent="far")}
+    report = critique_far_plates(project, judge=Judge(GOOD))
+    assert [c["plate"] for c in report.calls] == ["set/sky"]
+
+
+def test_a_corrupt_environment_does_not_stop_the_critic(project):
+    root = Path(project.mall["environments"]._root)
+    other = root / "broken"
+    other.mkdir()
+    (other / "meta.json").write_text("{not json")
+    project.scene.world.members.append(
+        WorldMember(kind="environment", id="bad", store="environments", ref="broken")
+    )
+    report = critique_far_plates(project, judge=Judge(GOOD))
+    assert [c["plate"] for c in report.calls] == ["set/sky", "set/verge"]

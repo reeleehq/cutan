@@ -60,7 +60,7 @@ def generate(
 
 
 def critique_plates(project: str = ".", model: str = "") -> str:
-    """Ask a vision model whether each plate a travel lists `far` holds anything near (a tree, a pole, the road close up), which would stand still while the scenery streams past (a paid call per plate; warnings, never the gate).
+    """Ask a vision model whether each plane at infinity (a plate the travel lists `far`, or one in a frame coupled `far`) holds anything near (a tree, a pole, the road close up), which would stand still while the scenery streams past (a paid call per plate; warnings, never the gate).
 
     project: the project folder
     model: the vision model (default: an's vision judge's)
