@@ -216,7 +216,9 @@ def _keyframes(
             out.append(Viseme(time=start, code=code, intensity=strength))
             previous = code
         elif code != rest_viseme and strength > out[-1].intensity:
-            out[-1] = Viseme(time=out[-1].time, code=code, intensity=strength)  # one cue for both phones: the stronger one's
+            out[-1] = Viseme(
+                time=out[-1].time, code=code, intensity=strength
+            )  # one cue for both phones: the stronger one's
         prev_end = max(prev_end, stop)
     if previous != rest_viseme and prev_end < end:
         out.append(Viseme(time=prev_end, code=rest_viseme))
