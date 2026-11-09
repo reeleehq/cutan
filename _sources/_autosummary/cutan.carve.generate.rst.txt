@@ -11,6 +11,8 @@ cutan.carve.generate
       DEFAULT_MODEL
       DEFAULT_QUALITY
       OPENAI_OUTPUT_LICENSE
+      AI_DISCLOSURE
+      PROVIDER_NAMES
       SOURCES_FILE
       KEYS
       ImageGenerator
