@@ -55,3 +55,25 @@ def test_a_killed_project_record_write_keeps_the_previous_record(tmp_path, kille
     with pytest.raises(OSError):
         _write_record(tmp_path, {"project_id": "p", "files": {}})
     assert record.read_bytes() == b"{}"
+
+
+def test_a_killed_png_save_keeps_the_previous_picture(tmp_path, killed_before_replace):
+    from PIL import Image
+
+    from cutan.carve.files import save_png
+
+    picture = tmp_path / "a.png"
+    Image.new("RGBA", (2, 2), (1, 2, 3, 255)).save(picture)
+    before = picture.read_bytes()
+    with pytest.raises(OSError):
+        save_png(Image.new("RGBA", (2, 2), (9, 9, 9, 255)), picture)
+    assert picture.read_bytes() == before
+
+
+def test_a_killed_write_leaves_a_temp_the_push_keeps_local(tmp_path, killed_before_replace):
+    """A write killed for real (not by a patched replace) leaves `.name.<hex>.tmp`;
+    the push excludes it so a half-written file is never uploaded."""
+    from cutan.projects_store import DEFAULT_PUSH_EXCLUDES
+    from an.project import gitignore_matcher
+
+    assert gitignore_matcher(DEFAULT_PUSH_EXCLUDES)("artifacts/audio/.a.wav.3f9c1d.tmp")

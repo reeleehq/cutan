@@ -91,5 +91,5 @@ def write_derived_text(
     if log is None or log.get(key) == hashlib.sha256(source).hexdigest():
         write_text(path, text, encoding=encoding)
         return
-    path.write_bytes(text.replace("\n", os.linesep).encode(encoding))
+    atomic_write(path, text.replace("\n", os.linesep).encode(encoding))
     log.pop(key, None)

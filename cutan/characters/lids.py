@@ -30,6 +30,7 @@ from pathlib import Path
 
 from an.stores._common import ASSET_REF_RULE, inside_folder
 
+from cutan.characters import drawn
 from cutan.characters.descriptor_io import read_raw, validate_raw, write_descriptor
 
 __all__ = [
@@ -201,5 +202,5 @@ def add_half_lid(
     raw["asset_sets"][_EYELID_SET] = {**eyelid, "HALF": HALF_ATTACHMENT}
     desc = validate_raw(raw)  # the last thing that can fail: nothing is written yet
     for file, svg in pending:
-        file.write_text(svg, encoding="utf-8")
+        drawn.write_text(file, svg)  # logged with the other drawn parts
     return write_descriptor(char_dir, desc)

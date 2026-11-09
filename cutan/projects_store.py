@@ -64,6 +64,7 @@ DEFAULT_PUSH_EXCLUDES: tuple[str, ...] = tuple(
         (
             ".git/",
             ".an/render_work/",
+            ".*.tmp",  # an interrupted atomic write's hidden temp (dol.atomic_write)
             "artifacts/shot_cache/",
             "artifacts/shots/",
             *PROJECT_GITIGNORE,
