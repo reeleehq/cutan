@@ -222,287 +222,340 @@
 </span><span id="line-31">
 </span><span id="line-32"><span class="c1">#: ``(label, start_s, end_s)``, as ``AudioClip.phones`` and ``.words`` hold them.</span>
 </span><span id="line-33"><span class="n">Timing</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
-</span><span id="line-34"><span class="c1">#: ``phone_to_viseme(phone, *, alphabet)``: a Rhubarb shape, or ``None`` when</span>
-</span><span id="line-35"><span class="c1">#: unknown (``alphabet`` is the clip's, :func:`phone_alphabet`). Silences never</span>
-</span><span id="line-36"><span class="c1">#: reach it: they are the rest shape.</span>
-</span><span id="line-37"><span class="n">PhoneToViseme</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
-</span><span id="line-38">
-</span><span id="line-39"><span class="n">REST_VISEME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"X"</span>
-</span><span id="line-40"><span class="c1">#: The letter shape a word's unknown letter takes (the word-timing rule's).</span>
-</span><span id="line-41"><span class="n">DEFAULT_LETTER_VISEME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"C"</span>
-</span><span id="line-42">
-</span><span id="line-43"><span class="c1">#: A pause between two phones longer than this closes the mouth (seconds): the</span>
-</span><span id="line-44"><span class="c1">#: word-timing rule's value (``an.audio.lipsync``'s minimum word gap for a rest).</span>
-</span><span id="line-45"><span class="n">MIN_GAP_FOR_REST_S</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.20</span>
-</span><span id="line-46">
-</span><span id="line-47"><span class="c1">#: Silence and noise labels, should a clip carry them (``an`` drops these when it</span>
-</span><span id="line-48"><span class="c1">#: reads a TextGrid: ``an.audio.transcripts``' silence labels).</span>
-</span><span id="line-49"><span class="n">SILENCES</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">""</span><span class="p">,</span> <span class="s2">"sil"</span><span class="p">,</span> <span class="s2">"sp"</span><span class="p">,</span> <span class="s2">"spn"</span><span class="p">,</span> <span class="s2">"oov"</span><span class="p">})</span>
-</span><span id="line-50">
-</span><span id="line-51"><span class="c1"># Rhubarb's shapes: A closed (P B M), B clenched teeth (most consonants, EE),</span>
-</span><span id="line-52"><span class="c1"># C open (EH, AE, AH), D wide (AA), E slightly rounded (AO, ER), F puckered (UW,</span>
-</span><span id="line-53"><span class="c1"># OW, W), G teeth on lip (F V), H tongue raised (L).</span>
-</span><span id="line-54">
-</span><span id="line-55"><span class="c1">#: ARPAbet (stress digits removed) to a Rhubarb shape.</span>
-</span><span id="line-56"><span class="n">ARPABET_TO_VISEME</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-57">    <span class="c1"># vowels</span>
-</span><span id="line-58">    <span class="s2">"AA"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span> <span class="s2">"AE"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"AH"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"AO"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"AW"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span> <span class="s2">"AY"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span>
-</span><span id="line-59">    <span class="s2">"EH"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"ER"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"EY"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"IH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"IY"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"OW"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span>
-</span><span id="line-60">    <span class="s2">"OY"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"UH"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"UW"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span>
-</span><span id="line-61">    <span class="c1"># consonants</span>
-</span><span id="line-62">    <span class="s2">"P"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span> <span class="s2">"M"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span>
-</span><span id="line-63">    <span class="s2">"F"</span><span class="p">:</span> <span class="s2">"G"</span><span class="p">,</span> <span class="s2">"V"</span><span class="p">:</span> <span class="s2">"G"</span><span class="p">,</span>
-</span><span id="line-64">    <span class="s2">"L"</span><span class="p">:</span> <span class="s2">"H"</span><span class="p">,</span>
-</span><span id="line-65">    <span class="s2">"W"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span>
-</span><span id="line-66">    <span class="s2">"HH"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span>
-</span><span id="line-67">    <span class="s2">"CH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"JH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"SH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ZH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"TH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"DH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
-</span><span id="line-68">    <span class="s2">"D"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"T"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"N"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"S"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"Z"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"R"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
-</span><span id="line-69">    <span class="s2">"K"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"G"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"NG"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"Y"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
-</span><span id="line-70"><span class="p">}</span>  <span class="c1"># fmt: skip</span>
-</span><span id="line-71">
-</span><span id="line-72"><span class="c1">#: IPA (diacritics, length and stress marks removed) to a Rhubarb shape. A</span>
-</span><span id="line-73"><span class="c1">#: phone not in it is read by its first symbol (``aj`` as ``a``, ``tʃ`` as ``t``).</span>
-</span><span id="line-74"><span class="n">IPA_TO_VISEME</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-75">    <span class="c1"># vowels</span>
-</span><span id="line-76">    <span class="s2">"a"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span> <span class="s2">"ɑ"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span> <span class="s2">"ɒ"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span>
-</span><span id="line-77">    <span class="s2">"æ"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"ɛ"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"e"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"ə"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"ʌ"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"ɐ"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span>
-</span><span id="line-78">    <span class="s2">"ɜ"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"ɝ"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"ɚ"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"ɔ"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span>
-</span><span id="line-79">    <span class="s2">"o"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"u"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"ʊ"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"ʉ"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"əw"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"əʊ"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span>
-</span><span id="line-80">    <span class="s2">"i"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ɪ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
-</span><span id="line-81">    <span class="c1"># consonants</span>
-</span><span id="line-82">    <span class="s2">"p"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span> <span class="s2">"m"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span>
-</span><span id="line-83">    <span class="s2">"f"</span><span class="p">:</span> <span class="s2">"G"</span><span class="p">,</span> <span class="s2">"v"</span><span class="p">:</span> <span class="s2">"G"</span><span class="p">,</span> <span class="s2">"ɱ"</span><span class="p">:</span> <span class="s2">"G"</span><span class="p">,</span>
-</span><span id="line-84">    <span class="s2">"l"</span><span class="p">:</span> <span class="s2">"H"</span><span class="p">,</span> <span class="s2">"ɫ"</span><span class="p">:</span> <span class="s2">"H"</span><span class="p">,</span> <span class="s2">"ʎ"</span><span class="p">:</span> <span class="s2">"H"</span><span class="p">,</span>
-</span><span id="line-85">    <span class="s2">"w"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span>
-</span><span id="line-86">    <span class="s2">"h"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span>
-</span><span id="line-87">    <span class="s2">"θ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ð"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"s"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"n"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
-</span><span id="line-88">    <span class="s2">"ɾ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ɹ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ʃ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ʒ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"k"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ɡ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
-</span><span id="line-89">    <span class="s2">"g"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ŋ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"j"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ɟ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ç"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ɲ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
-</span><span id="line-90">    <span class="s2">"ʔ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
-</span><span id="line-91"><span class="p">}</span>  <span class="c1"># fmt: skip</span>
-</span><span id="line-92">
-</span><span id="line-93"><span class="c1">#: The alphabets a take's record may state; anything else is guessed from the labels.</span>
-</span><span id="line-94"><span class="n">_ALPHABETS</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"arpabet"</span><span class="p">,</span> <span class="s2">"ipa"</span><span class="p">})</span>
-</span><span id="line-95">
-</span><span id="line-96"><span class="c1">#: Marks an IPA phone may carry that do not change its mouth shape.</span>
-</span><span id="line-97"><span class="n">_IPA_MODIFIERS</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="s2">"ːˑˈˌʲʰʷˠˤ"</span><span class="p">)</span>
-</span><span id="line-98">
-</span><span id="line-99">
-</span><span id="line-100"><span class="k">def</span><span class="w"> </span><span class="nf">_is_silence</span><span class="p">(</span><span class="n">phone</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-101">    <span class="k">return</span> <span class="n">phone</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">SILENCES</span>
-</span><span id="line-102">
-</span><span id="line-103">
-</span><span id="line-104"><span class="k">def</span><span class="w"> </span><span class="nf">_arpabet_base</span><span class="p">(</span><span class="n">phone</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-105">    <span class="k">return</span> <span class="n">phone</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"012"</span><span class="p">)</span>
-</span><span id="line-106">
-</span><span id="line-107">
-</span><span id="line-108"><span class="k">def</span><span class="w"> </span><span class="nf">_ipa_base</span><span class="p">(</span><span class="n">phone</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-109">    <span class="k">return</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span><span id="line-110">        <span class="n">ch</span>
-</span><span id="line-111">        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">"NFD"</span><span class="p">,</span> <span class="n">phone</span><span class="p">)</span>
-</span><span id="line-112">        <span class="k">if</span> <span class="n">ch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_IPA_MODIFIERS</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">combining</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
-</span><span id="line-113">    <span class="p">)</span>
-</span><span id="line-114">
-</span><span id="line-115">
+</span><span id="line-34"><span class="c1">#: ``(shape, start_s, end_s[, intensity])``: a mouth shape over a span.</span>
+</span><span id="line-35"><span class="n">Segment</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+</span><span id="line-36"><span class="c1">#: ``phone_to_viseme(phone, *, alphabet)``: a Rhubarb shape, or ``None`` when</span>
+</span><span id="line-37"><span class="c1">#: unknown (``alphabet`` is the clip's, :func:`phone_alphabet`). Silences never</span>
+</span><span id="line-38"><span class="c1">#: reach it: they are the rest shape.</span>
+</span><span id="line-39"><span class="n">PhoneToViseme</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+</span><span id="line-40">
+</span><span id="line-41"><span class="n">REST_VISEME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"X"</span>
+</span><span id="line-42"><span class="c1">#: The letter shape a word's unknown letter takes (the word-timing rule's).</span>
+</span><span id="line-43"><span class="n">DEFAULT_LETTER_VISEME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"C"</span>
+</span><span id="line-44">
+</span><span id="line-45"><span class="c1">#: A pause between two phones longer than this closes the mouth (seconds): the</span>
+</span><span id="line-46"><span class="c1">#: word-timing rule's value (``an.audio.lipsync``'s minimum word gap for a rest).</span>
+</span><span id="line-47"><span class="n">MIN_GAP_FOR_REST_S</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.20</span>
+</span><span id="line-48">
+</span><span id="line-49"><span class="c1">#: Silence and noise labels, should a clip carry them (``an`` drops these when it</span>
+</span><span id="line-50"><span class="c1">#: reads a TextGrid: ``an.audio.transcripts``' silence labels).</span>
+</span><span id="line-51"><span class="n">SILENCES</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">""</span><span class="p">,</span> <span class="s2">"sil"</span><span class="p">,</span> <span class="s2">"sp"</span><span class="p">,</span> <span class="s2">"spn"</span><span class="p">,</span> <span class="s2">"oov"</span><span class="p">})</span>
+</span><span id="line-52">
+</span><span id="line-53"><span class="c1"># Rhubarb's shapes: A closed (P B M), B clenched teeth (most consonants, EE),</span>
+</span><span id="line-54"><span class="c1"># C open (EH, AE, AH), D wide (AA), E slightly rounded (AO, ER), F puckered (UW,</span>
+</span><span id="line-55"><span class="c1"># OW, W), G teeth on lip (F V), H tongue raised (L).</span>
+</span><span id="line-56">
+</span><span id="line-57"><span class="c1">#: ARPAbet (stress digits removed) to a Rhubarb shape.</span>
+</span><span id="line-58"><span class="n">ARPABET_TO_VISEME</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-59">    <span class="c1"># vowels</span>
+</span><span id="line-60">    <span class="s2">"AA"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span> <span class="s2">"AE"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"AH"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"AO"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"AW"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span> <span class="s2">"AY"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span>
+</span><span id="line-61">    <span class="s2">"EH"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"ER"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"EY"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"IH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"IY"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"OW"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span>
+</span><span id="line-62">    <span class="s2">"OY"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"UH"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"UW"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span>
+</span><span id="line-63">    <span class="c1"># consonants</span>
+</span><span id="line-64">    <span class="s2">"P"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span> <span class="s2">"B"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span> <span class="s2">"M"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span>
+</span><span id="line-65">    <span class="s2">"F"</span><span class="p">:</span> <span class="s2">"G"</span><span class="p">,</span> <span class="s2">"V"</span><span class="p">:</span> <span class="s2">"G"</span><span class="p">,</span>
+</span><span id="line-66">    <span class="s2">"L"</span><span class="p">:</span> <span class="s2">"H"</span><span class="p">,</span>
+</span><span id="line-67">    <span class="s2">"W"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span>
+</span><span id="line-68">    <span class="s2">"HH"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span>
+</span><span id="line-69">    <span class="s2">"CH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"JH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"SH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ZH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"TH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"DH"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
+</span><span id="line-70">    <span class="s2">"D"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"T"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"N"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"S"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"Z"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"R"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
+</span><span id="line-71">    <span class="s2">"K"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"G"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"NG"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"Y"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
+</span><span id="line-72"><span class="p">}</span>  <span class="c1"># fmt: skip</span>
+</span><span id="line-73">
+</span><span id="line-74"><span class="c1">#: IPA (diacritics, length and stress marks removed) to a Rhubarb shape. A</span>
+</span><span id="line-75"><span class="c1">#: phone not in it is read by its first symbol (``aj`` as ``a``, ``tʃ`` as ``t``).</span>
+</span><span id="line-76"><span class="n">IPA_TO_VISEME</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-77">    <span class="c1"># vowels</span>
+</span><span id="line-78">    <span class="s2">"a"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span> <span class="s2">"ɑ"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span> <span class="s2">"ɒ"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span>
+</span><span id="line-79">    <span class="s2">"æ"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"ɛ"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"e"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"ə"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"ʌ"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"ɐ"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span>
+</span><span id="line-80">    <span class="s2">"ɜ"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"ɝ"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"ɚ"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"ɔ"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span>
+</span><span id="line-81">    <span class="s2">"o"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"u"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"ʊ"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"ʉ"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"əw"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"əʊ"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span>
+</span><span id="line-82">    <span class="s2">"i"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ɪ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
+</span><span id="line-83">    <span class="c1"># consonants</span>
+</span><span id="line-84">    <span class="s2">"p"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span> <span class="s2">"m"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span>
+</span><span id="line-85">    <span class="s2">"f"</span><span class="p">:</span> <span class="s2">"G"</span><span class="p">,</span> <span class="s2">"v"</span><span class="p">:</span> <span class="s2">"G"</span><span class="p">,</span> <span class="s2">"ɱ"</span><span class="p">:</span> <span class="s2">"G"</span><span class="p">,</span>
+</span><span id="line-86">    <span class="s2">"l"</span><span class="p">:</span> <span class="s2">"H"</span><span class="p">,</span> <span class="s2">"ɫ"</span><span class="p">:</span> <span class="s2">"H"</span><span class="p">,</span> <span class="s2">"ʎ"</span><span class="p">:</span> <span class="s2">"H"</span><span class="p">,</span>
+</span><span id="line-87">    <span class="s2">"w"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span>
+</span><span id="line-88">    <span class="s2">"h"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span>
+</span><span id="line-89">    <span class="s2">"θ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ð"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"s"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"n"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
+</span><span id="line-90">    <span class="s2">"ɾ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ɹ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ʃ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ʒ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"k"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ɡ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
+</span><span id="line-91">    <span class="s2">"g"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ŋ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"j"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ɟ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ç"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"ɲ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
+</span><span id="line-92">    <span class="s2">"ʔ"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span>
+</span><span id="line-93"><span class="p">}</span>  <span class="c1"># fmt: skip</span>
+</span><span id="line-94">
+</span><span id="line-95"><span class="c1">#: The alphabets a take's record may state; anything else is guessed from the labels.</span>
+</span><span id="line-96"><span class="n">_ALPHABETS</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"arpabet"</span><span class="p">,</span> <span class="s2">"ipa"</span><span class="p">})</span>
+</span><span id="line-97">
+</span><span id="line-98"><span class="c1">#: How strongly a phone's shape holds against its neighbours in the co-articulation</span>
+</span><span id="line-99"><span class="c1">#: vote (``Viseme.intensity``; the vote weighs ``DOMINANCE[shape] x intensity``,</span>
+</span><span id="line-100"><span class="c1">#: ``cutan.compile.coarticulate``). Rhubarb's ``B`` codes both the EE vowel (lips</span>
+</span><span id="line-101"><span class="c1">#: spread) and the tongue-only consonants (T D N K...), which barely move the</span>
+</span><span id="line-102"><span class="c1">#: lips (JALI, Edwards et al. 2016: "tongue-only visemes have no influence on</span>
+</span><span id="line-103"><span class="c1">#: the lips"); the letter alone cannot say, the phone can. Keyed by the phone's</span>
+</span><span id="line-104"><span class="c1">#: base in either alphabet (ARPAbet upper case, IPA as written); a phone not</span>
+</span><span id="line-105"><span class="c1">#: listed is 1.0. Values are art direction (cutan#157): a measurement, not a</span>
+</span><span id="line-106"><span class="c1">#: sourced number.</span>
+</span><span id="line-107"><span class="n">TONGUE_ONLY_INTENSITY</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-108">    <span class="o">**</span><span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="mf">0.4</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="s2">"D"</span><span class="p">,</span> <span class="s2">"N"</span><span class="p">,</span> <span class="s2">"K"</span><span class="p">,</span> <span class="s2">"G"</span><span class="p">,</span> <span class="s2">"NG"</span><span class="p">,</span> <span class="s2">"S"</span><span class="p">,</span> <span class="s2">"Z"</span><span class="p">,</span> <span class="s2">"L"</span><span class="p">)},</span>
+</span><span id="line-109">    <span class="o">**</span><span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="mf">0.4</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"t"</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">,</span> <span class="s2">"n"</span><span class="p">,</span> <span class="s2">"k"</span><span class="p">,</span> <span class="s2">"ɡ"</span><span class="p">,</span> <span class="s2">"g"</span><span class="p">,</span> <span class="s2">"ŋ"</span><span class="p">,</span> <span class="s2">"s"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">,</span> <span class="s2">"l"</span><span class="p">)},</span>
+</span><span id="line-110"><span class="p">}</span>
+</span><span id="line-111"><span class="c1">#: The default: every cue at full intensity, the track as before cutan#157. Not</span>
+</span><span id="line-112"><span class="c1">#: :data:`TONGUE_ONLY_INTENSITY` until a legibility judgement says it reads</span>
+</span><span id="line-113"><span class="c1">#: better: on random ARPAbet lines it changes the shown track in 11% of lines</span>
+</span><span id="line-114"><span class="c1">#: (a vowel's shape wins where a tongue-only consonant's did, but not always the</span>
+</span><span id="line-115"><span class="c1">#: better one), and only the cassetted judge can say which reads better.</span>
+</span><span id="line-116"><span class="n">NO_INTENSITY</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-117"><span class="c1">#: The phones that take the shape of the phone after them: ``HH`` is a breath</span>
+</span><span id="line-118"><span class="c1">#: before the vowel (Rhubarb draws it so), not a mouth shape of its own.</span>
+</span><span id="line-119"><span class="n">TAKES_NEXT_SHAPE</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"HH"</span><span class="p">,</span> <span class="s2">"h"</span><span class="p">,</span> <span class="s2">"ɦ"</span><span class="p">})</span>
+</span><span id="line-120">
+</span><span id="line-121"><span class="c1">#: Marks an IPA phone may carry that do not change its mouth shape.</span>
+</span><span id="line-122"><span class="n">_IPA_MODIFIERS</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="s2">"ːˑˈˌʲʰʷˠˤ"</span><span class="p">)</span>
+</span><span id="line-123">
+</span><span id="line-124">
+</span><span id="line-125"><span class="k">def</span><span class="w"> </span><span class="nf">_is_silence</span><span class="p">(</span><span class="n">phone</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-126">    <span class="k">return</span> <span class="n">phone</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">SILENCES</span>
+</span><span id="line-127">
+</span><span id="line-128">
+</span><span id="line-129"><span class="k">def</span><span class="w"> </span><span class="nf">_arpabet_base</span><span class="p">(</span><span class="n">phone</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-130">    <span class="k">return</span> <span class="n">phone</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"012"</span><span class="p">)</span>
+</span><span id="line-131">
+</span><span id="line-132">
+</span><span id="line-133"><span class="k">def</span><span class="w"> </span><span class="nf">_ipa_base</span><span class="p">(</span><span class="n">phone</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-134">    <span class="k">return</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span><span id="line-135">        <span class="n">ch</span>
+</span><span id="line-136">        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">"NFD"</span><span class="p">,</span> <span class="n">phone</span><span class="p">)</span>
+</span><span id="line-137">        <span class="k">if</span> <span class="n">ch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_IPA_MODIFIERS</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">combining</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+</span><span id="line-138">    <span class="p">)</span>
+</span><span id="line-139">
+</span><span id="line-140">
 <div class="viewcode-block" id="phone_alphabet">
 <a class="viewcode-back" href="../../../_autosummary/cutan.audio.phones.html#cutan.audio.phones.phone_alphabet">[docs]</a>
-</span><span id="line-116"><span class="k">def</span><span class="w"> </span><span class="nf">phone_alphabet</span><span class="p">(</span><span class="n">phones</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-117"><span class="w">    </span><span class="sd">"""``"arpabet"`` when every phone is ARPAbet as aligners write it (ASCII, one</span>
-</span><span id="line-118"><span class="sd">    case throughout, each in ``an``'s ``ARPABET_PHONES`` once its stress digit is</span>
-</span><span id="line-119"><span class="sd">    dropped), else ``"ipa"``. Decided per clip: a SAMPA ``V`` (the vowel of</span>
-</span><span id="line-120"><span class="sd">    *love*) beside a lowercase ``l`` is not ARPAbet ``V``. The rule is ``an``'s</span>
-</span><span id="line-121"><span class="sd">    (:func:`~an.audio.transcripts.phone_alphabet_of`), which says ``None`` where</span>
-</span><span id="line-122"><span class="sd">    it cannot tell; this lip-sync reads that as IPA.</span>
-</span><span id="line-123">
-</span><span id="line-124"><span class="sd">    &gt;&gt;&gt; phone_alphabet(["HH", "AH0", "L"]), phone_alphabet(["hh", "ah0"])</span>
-</span><span id="line-125"><span class="sd">    ('arpabet', 'arpabet')</span>
-</span><span id="line-126"><span class="sd">    &gt;&gt;&gt; phone_alphabet(["l", "V", "v"]), phone_alphabet(["h", "ə", "l"])</span>
-</span><span id="line-127"><span class="sd">    ('ipa', 'ipa')</span>
-</span><span id="line-128"><span class="sd">    """</span>
-</span><span id="line-129">    <span class="k">return</span> <span class="n">phone_alphabet_of</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">phones</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_silence</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="ow">or</span> <span class="s2">"ipa"</span></div>
+</span><span id="line-141"><span class="k">def</span><span class="w"> </span><span class="nf">phone_alphabet</span><span class="p">(</span><span class="n">phones</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-142"><span class="w">    </span><span class="sd">"""``"arpabet"`` when every phone is ARPAbet as aligners write it (ASCII, one</span>
+</span><span id="line-143"><span class="sd">    case throughout, each in ``an``'s ``ARPABET_PHONES`` once its stress digit is</span>
+</span><span id="line-144"><span class="sd">    dropped), else ``"ipa"``. Decided per clip: a SAMPA ``V`` (the vowel of</span>
+</span><span id="line-145"><span class="sd">    *love*) beside a lowercase ``l`` is not ARPAbet ``V``. The rule is ``an``'s</span>
+</span><span id="line-146"><span class="sd">    (:func:`~an.audio.transcripts.phone_alphabet_of`), which says ``None`` where</span>
+</span><span id="line-147"><span class="sd">    it cannot tell; this lip-sync reads that as IPA.</span>
+</span><span id="line-148">
+</span><span id="line-149"><span class="sd">    &gt;&gt;&gt; phone_alphabet(["HH", "AH0", "L"]), phone_alphabet(["hh", "ah0"])</span>
+</span><span id="line-150"><span class="sd">    ('arpabet', 'arpabet')</span>
+</span><span id="line-151"><span class="sd">    &gt;&gt;&gt; phone_alphabet(["l", "V", "v"]), phone_alphabet(["h", "ə", "l"])</span>
+</span><span id="line-152"><span class="sd">    ('ipa', 'ipa')</span>
+</span><span id="line-153"><span class="sd">    """</span>
+</span><span id="line-154">    <span class="k">return</span> <span class="n">phone_alphabet_of</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">phones</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_silence</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="ow">or</span> <span class="s2">"ipa"</span></div>
 
-</span><span id="line-130">
-</span><span id="line-131">
+</span><span id="line-155">
+</span><span id="line-156">
 <div class="viewcode-block" id="phone_viseme">
 <a class="viewcode-back" href="../../../_autosummary/cutan.audio.phones.html#cutan.audio.phones.phone_viseme">[docs]</a>
-</span><span id="line-132"><span class="k">def</span><span class="w"> </span><span class="nf">phone_viseme</span><span class="p">(</span><span class="n">phone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"arpabet"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-133"><span class="w">    </span><span class="sd">"""The Rhubarb shape of one phone in ``alphabet``; :data:`REST_VISEME` for a</span>
-</span><span id="line-134"><span class="sd">    silence; ``None`` for a phone the table does not know.</span>
-</span><span id="line-135">
-</span><span id="line-136"><span class="sd">    &gt;&gt;&gt; phone_viseme("AA1"), phone_viseme("M"), phone_viseme("sil"), phone_viseme("Q9")</span>
-</span><span id="line-137"><span class="sd">    ('D', 'A', 'X', None)</span>
-</span><span id="line-138"><span class="sd">    &gt;&gt;&gt; [phone_viseme(p, alphabet="ipa") for p in ("tʃ", "iː", "əw", "ʘ")]</span>
-</span><span id="line-139"><span class="sd">    ['B', 'B', 'F', None]</span>
-</span><span id="line-140"><span class="sd">    """</span>
-</span><span id="line-141">    <span class="k">if</span> <span class="n">_is_silence</span><span class="p">(</span><span class="n">phone</span><span class="p">):</span>
-</span><span id="line-142">        <span class="k">return</span> <span class="n">REST_VISEME</span>
-</span><span id="line-143">    <span class="k">if</span> <span class="n">alphabet</span> <span class="o">==</span> <span class="s2">"arpabet"</span><span class="p">:</span>
-</span><span id="line-144">        <span class="k">return</span> <span class="n">ARPABET_TO_VISEME</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_arpabet_base</span><span class="p">(</span><span class="n">phone</span><span class="p">))</span>
-</span><span id="line-145">    <span class="n">base</span> <span class="o">=</span> <span class="n">_ipa_base</span><span class="p">(</span><span class="n">phone</span><span class="p">)</span>
-</span><span id="line-146">    <span class="k">return</span> <span class="n">IPA_TO_VISEME</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">base</span><span class="p">)</span> <span class="ow">or</span> <span class="n">IPA_TO_VISEME</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">base</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span></div>
-
-</span><span id="line-147">
-</span><span id="line-148">
-</span><span id="line-149"><span class="k">def</span><span class="w"> </span><span class="nf">_letter_segments</span><span class="p">(</span><span class="n">word</span><span class="p">:</span> <span class="n">Timing</span><span class="p">,</span> <span class="n">char_to_viseme</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Timing</span><span class="p">]:</span>
-</span><span id="line-150"><span class="w">    </span><span class="sd">"""A word's letters as ``(shape, start, end)`` spread evenly over its span</span>
-</span><span id="line-151"><span class="sd">    (repeated shapes merged): the word-timing rule, for a word with no phones."""</span>
-</span><span id="line-152">    <span class="n">text</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">word</span>
-</span><span id="line-153">    <span class="n">codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-154">    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
-</span><span id="line-155">        <span class="n">code</span> <span class="o">=</span> <span class="n">char_to_viseme</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">DEFAULT_LETTER_VISEME</span><span class="p">)</span> <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span>
-</span><span id="line-156">        <span class="k">if</span> <span class="n">code</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">codes</span> <span class="ow">or</span> <span class="n">codes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">code</span><span class="p">):</span>
-</span><span id="line-157">            <span class="n">codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
-</span><span id="line-158">    <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="line-159">    <span class="k">return</span> <span class="p">[(</span><span class="n">c</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">step</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">step</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">codes</span><span class="p">)]</span>
+</span><span id="line-157"><span class="k">def</span><span class="w"> </span><span class="nf">phone_viseme</span><span class="p">(</span><span class="n">phone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"arpabet"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-158"><span class="w">    </span><span class="sd">"""The Rhubarb shape of one phone in ``alphabet``; :data:`REST_VISEME` for a</span>
+</span><span id="line-159"><span class="sd">    silence; ``None`` for a phone the table does not know.</span>
 </span><span id="line-160">
-</span><span id="line-161">
-</span><span id="line-162"><span class="k">def</span><span class="w"> </span><span class="nf">_keyframes</span><span class="p">(</span>
-</span><span id="line-163">    <span class="n">segments</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Timing</span><span class="p">],</span>
-</span><span id="line-164">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-165">    <span class="n">total_duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="line-166">    <span class="n">rest_viseme</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-167">    <span class="n">min_gap_for_rest</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="line-168"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Viseme</span><span class="p">]:</span>
-</span><span id="line-169"><span class="w">    </span><span class="sd">"""Rest at 0; a keyframe where the shape changes, at a segment's start; rest</span>
-</span><span id="line-170"><span class="sd">    after a pause longer than ``min_gap_for_rest`` and after the last segment;</span>
-</span><span id="line-171"><span class="sd">    rest at ``total_duration``. Times clamped to ``[0, total_duration]``."""</span>
-</span><span id="line-172">    <span class="n">end</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">total_duration</span><span class="p">)</span>
+</span><span id="line-161"><span class="sd">    &gt;&gt;&gt; phone_viseme("AA1"), phone_viseme("M"), phone_viseme("sil"), phone_viseme("Q9")</span>
+</span><span id="line-162"><span class="sd">    ('D', 'A', 'X', None)</span>
+</span><span id="line-163"><span class="sd">    &gt;&gt;&gt; [phone_viseme(p, alphabet="ipa") for p in ("tʃ", "iː", "əw", "ʘ")]</span>
+</span><span id="line-164"><span class="sd">    ['B', 'B', 'F', None]</span>
+</span><span id="line-165"><span class="sd">    """</span>
+</span><span id="line-166">    <span class="k">if</span> <span class="n">_is_silence</span><span class="p">(</span><span class="n">phone</span><span class="p">):</span>
+</span><span id="line-167">        <span class="k">return</span> <span class="n">REST_VISEME</span>
+</span><span id="line-168">    <span class="k">if</span> <span class="n">alphabet</span> <span class="o">==</span> <span class="s2">"arpabet"</span><span class="p">:</span>
+</span><span id="line-169">        <span class="k">return</span> <span class="n">ARPABET_TO_VISEME</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_arpabet_base</span><span class="p">(</span><span class="n">phone</span><span class="p">))</span>
+</span><span id="line-170">    <span class="n">base</span> <span class="o">=</span> <span class="n">_ipa_base</span><span class="p">(</span><span class="n">phone</span><span class="p">)</span>
+</span><span id="line-171">    <span class="k">return</span> <span class="n">IPA_TO_VISEME</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">base</span><span class="p">)</span> <span class="ow">or</span> <span class="n">IPA_TO_VISEME</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">base</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span></div>
+
+</span><span id="line-172">
 </span><span id="line-173">
-</span><span id="line-174">    <span class="k">def</span><span class="w"> </span><span class="nf">clamp</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="line-175">        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">end</span><span class="p">))</span>
-</span><span id="line-176">
-</span><span id="line-177">    <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">)]</span>
-</span><span id="line-178">    <span class="n">previous</span><span class="p">,</span> <span class="n">prev_end</span> <span class="o">=</span> <span class="n">rest_viseme</span><span class="p">,</span> <span class="mf">0.0</span>
-</span><span id="line-179">    <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-</span><span id="line-180">        <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">clamp</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="n">clamp</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
-</span><span id="line-181">        <span class="k">if</span> <span class="n">start</span> <span class="o">-</span> <span class="n">prev_end</span> <span class="o">&gt;</span> <span class="n">min_gap_for_rest</span> <span class="ow">and</span> <span class="n">previous</span> <span class="o">!=</span> <span class="n">rest_viseme</span><span class="p">:</span>
-</span><span id="line-182">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">prev_end</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">))</span>
-</span><span id="line-183">            <span class="n">previous</span> <span class="o">=</span> <span class="n">rest_viseme</span>
-</span><span id="line-184">        <span class="k">if</span> <span class="n">code</span> <span class="o">!=</span> <span class="n">previous</span><span class="p">:</span>
-</span><span id="line-185">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">code</span><span class="p">))</span>
-</span><span id="line-186">            <span class="n">previous</span> <span class="o">=</span> <span class="n">code</span>
-</span><span id="line-187">        <span class="n">prev_end</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">prev_end</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
-</span><span id="line-188">    <span class="k">if</span> <span class="n">previous</span> <span class="o">!=</span> <span class="n">rest_viseme</span> <span class="ow">and</span> <span class="n">prev_end</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
-</span><span id="line-189">        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">prev_end</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">))</span>
-</span><span id="line-190">    <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">))</span>
-</span><span id="line-191">    <span class="k">return</span> <span class="n">out</span>
-</span><span id="line-192">
-</span><span id="line-193">
+</span><span id="line-174"><span class="k">def</span><span class="w"> </span><span class="nf">_letter_segments</span><span class="p">(</span><span class="n">word</span><span class="p">:</span> <span class="n">Timing</span><span class="p">,</span> <span class="n">char_to_viseme</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Timing</span><span class="p">]:</span>
+</span><span id="line-175"><span class="w">    </span><span class="sd">"""A word's letters as ``(shape, start, end)`` spread evenly over its span</span>
+</span><span id="line-176"><span class="sd">    (repeated shapes merged): the word-timing rule, for a word with no phones."""</span>
+</span><span id="line-177">    <span class="n">text</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">word</span>
+</span><span id="line-178">    <span class="n">codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-179">    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+</span><span id="line-180">        <span class="n">code</span> <span class="o">=</span> <span class="n">char_to_viseme</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">DEFAULT_LETTER_VISEME</span><span class="p">)</span> <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span id="line-181">        <span class="k">if</span> <span class="n">code</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">codes</span> <span class="ow">or</span> <span class="n">codes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">code</span><span class="p">):</span>
+</span><span id="line-182">            <span class="n">codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+</span><span id="line-183">    <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="line-184">    <span class="k">return</span> <span class="p">[(</span><span class="n">c</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">step</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">step</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">codes</span><span class="p">)]</span>
+</span><span id="line-185">
+</span><span id="line-186">
+</span><span id="line-187"><span class="k">def</span><span class="w"> </span><span class="nf">_phone_base</span><span class="p">(</span><span class="n">phone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-188"><span class="w">    </span><span class="sd">"""The phone without its stress digit (ARPAbet, upper case) or modifiers (IPA)."""</span>
+</span><span id="line-189">    <span class="k">return</span> <span class="n">_arpabet_base</span><span class="p">(</span><span class="n">phone</span><span class="p">)</span> <span class="k">if</span> <span class="n">alphabet</span> <span class="o">==</span> <span class="s2">"arpabet"</span> <span class="k">else</span> <span class="n">_ipa_base</span><span class="p">(</span><span class="n">phone</span><span class="p">)</span>
+</span><span id="line-190">
+</span><span id="line-191">
+</span><span id="line-192"><span class="k">def</span><span class="w"> </span><span class="nf">_keyframes</span><span class="p">(</span>
+</span><span id="line-193">    <span class="n">segments</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Segment</span><span class="p">],</span>
+</span><span id="line-194">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-195">    <span class="n">total_duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="line-196">    <span class="n">rest_viseme</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-197">    <span class="n">min_gap_for_rest</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="line-198"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Viseme</span><span class="p">]:</span>
+</span><span id="line-199"><span class="w">    </span><span class="sd">"""Rest at 0; a keyframe where the shape changes, at a segment's start; rest</span>
+</span><span id="line-200"><span class="sd">    after a pause longer than ``min_gap_for_rest`` and after the last segment;</span>
+</span><span id="line-201"><span class="sd">    rest at ``total_duration``. Times clamped to ``[0, total_duration]``."""</span>
+</span><span id="line-202">    <span class="n">end</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">total_duration</span><span class="p">)</span>
+</span><span id="line-203">
+</span><span id="line-204">    <span class="k">def</span><span class="w"> </span><span class="nf">clamp</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="line-205">        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">end</span><span class="p">))</span>
+</span><span id="line-206">
+</span><span id="line-207">    <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">)]</span>
+</span><span id="line-208">    <span class="n">previous</span><span class="p">,</span> <span class="n">prev_end</span> <span class="o">=</span> <span class="n">rest_viseme</span><span class="p">,</span> <span class="mf">0.0</span>
+</span><span id="line-209">    <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="o">*</span><span class="n">weight</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+</span><span id="line-210">        <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">clamp</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="n">clamp</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
+</span><span id="line-211">        <span class="k">if</span> <span class="n">start</span> <span class="o">-</span> <span class="n">prev_end</span> <span class="o">&gt;</span> <span class="n">min_gap_for_rest</span> <span class="ow">and</span> <span class="n">previous</span> <span class="o">!=</span> <span class="n">rest_viseme</span><span class="p">:</span>
+</span><span id="line-212">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">prev_end</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">))</span>
+</span><span id="line-213">            <span class="n">previous</span> <span class="o">=</span> <span class="n">rest_viseme</span>
+</span><span id="line-214">        <span class="n">strength</span> <span class="o">=</span> <span class="p">(</span><span class="n">weight</span> <span class="ow">or</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="line-215">        <span class="k">if</span> <span class="n">code</span> <span class="o">!=</span> <span class="n">previous</span><span class="p">:</span>
+</span><span id="line-216">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">code</span><span class="p">,</span> <span class="n">intensity</span><span class="o">=</span><span class="n">strength</span><span class="p">))</span>
+</span><span id="line-217">            <span class="n">previous</span> <span class="o">=</span> <span class="n">code</span>
+</span><span id="line-218">        <span class="k">elif</span> <span class="n">code</span> <span class="o">!=</span> <span class="n">rest_viseme</span> <span class="ow">and</span> <span class="n">strength</span> <span class="o">&gt;</span> <span class="n">out</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">intensity</span><span class="p">:</span>
+</span><span id="line-219">            <span class="n">out</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">out</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">code</span><span class="p">,</span> <span class="n">intensity</span><span class="o">=</span><span class="n">strength</span><span class="p">)</span>  <span class="c1"># one cue for both phones: the stronger one's</span>
+</span><span id="line-220">        <span class="n">prev_end</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">prev_end</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
+</span><span id="line-221">    <span class="k">if</span> <span class="n">previous</span> <span class="o">!=</span> <span class="n">rest_viseme</span> <span class="ow">and</span> <span class="n">prev_end</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
+</span><span id="line-222">        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">prev_end</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">))</span>
+</span><span id="line-223">    <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Viseme</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">))</span>
+</span><span id="line-224">    <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-225">
+</span><span id="line-226">
 <div class="viewcode-block" id="phones_to_visemes">
 <a class="viewcode-back" href="../../../_autosummary/cutan.audio.phones.html#cutan.audio.phones.phones_to_visemes">[docs]</a>
-</span><span id="line-194"><span class="k">def</span><span class="w"> </span><span class="nf">phones_to_visemes</span><span class="p">(</span>
-</span><span id="line-195">    <span class="n">phones</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Timing</span><span class="p">],</span>
-</span><span id="line-196">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-197">    <span class="n">total_duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="line-198">    <span class="n">words</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Timing</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-</span><span id="line-199">    <span class="n">phone_to_viseme</span><span class="p">:</span> <span class="n">PhoneToViseme</span> <span class="o">=</span> <span class="n">phone_viseme</span><span class="p">,</span>
-</span><span id="line-200">    <span class="n">char_to_viseme</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-201">    <span class="n">rest_viseme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">REST_VISEME</span><span class="p">,</span>
-</span><span id="line-202">    <span class="n">min_gap_for_rest</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MIN_GAP_FOR_REST_S</span><span class="p">,</span>
-</span><span id="line-203">    <span class="n">alphabet</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-204"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Viseme</span><span class="p">]]:</span>
-</span><span id="line-205"><span class="w">    </span><span class="sd">"""A viseme track from phone timings: each phone's shape at its start (in the</span>
-</span><span id="line-206"><span class="sd">    clip's :func:`phone_alphabet`), the mouth closed at a silence, at a pause</span>
-</span><span id="line-207"><span class="sd">    longer than ``min_gap_for_rest`` and after the last sound. A word of ``words``</span>
-</span><span id="line-208"><span class="sd">    with no phone under it is spoken by its letters (``char_to_viseme``).</span>
-</span><span id="line-209">
-</span><span id="line-210"><span class="sd">    ``alphabet`` is the take's recorded one (``AudioClip.phone_alphabet``); with</span>
-</span><span id="line-211"><span class="sd">    none, the clip's labels decide (:func:`phone_alphabet`).</span>
-</span><span id="line-212">
-</span><span id="line-213"><span class="sd">    ``None`` when a phone is one ``phone_to_viseme`` does not know: a phone set</span>
-</span><span id="line-214"><span class="sd">    this table was not written for is better spread by its words than guessed.</span>
-</span><span id="line-215">
-</span><span id="line-216"><span class="sd">    &gt;&gt;&gt; phones_to_visemes([("ʘ", 0.0, 0.1)], total_duration=1.0) is None</span>
-</span><span id="line-217"><span class="sd">    True</span>
-</span><span id="line-218"><span class="sd">    &gt;&gt;&gt; [(v.time, v.code) for v in phones_to_visemes(</span>
-</span><span id="line-219"><span class="sd">    ...     [("M", 0.0, 0.1), ("AA1", 0.1, 0.3), ("P", 0.6, 0.7)], total_duration=0.7)]</span>
-</span><span id="line-220"><span class="sd">    [(0.0, 'X'), (0.0, 'A'), (0.1, 'D'), (0.3, 'X'), (0.6, 'A'), (0.7, 'X')]</span>
-</span><span id="line-221"><span class="sd">    """</span>
-</span><span id="line-222">    <span class="n">phones</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">phones</span><span class="p">)</span>
-</span><span id="line-223">    <span class="n">alphabet</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-224">        <span class="nb">str</span><span class="p">(</span><span class="n">alphabet</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-</span><span id="line-225">        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">alphabet</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">_ALPHABETS</span>
-</span><span id="line-226">        <span class="k">else</span> <span class="n">phone_alphabet</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">phones</span><span class="p">)</span>
-</span><span id="line-227">    <span class="p">)</span>
-</span><span id="line-228">    <span class="n">segments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Timing</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-229">    <span class="k">for</span> <span class="n">phone</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="ow">in</span> <span class="n">phones</span><span class="p">:</span>
-</span><span id="line-230">        <span class="n">silent</span> <span class="o">=</span> <span class="n">_is_silence</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">phone</span><span class="p">))</span>
-</span><span id="line-231">        <span class="n">code</span> <span class="o">=</span> <span class="n">rest_viseme</span> <span class="k">if</span> <span class="n">silent</span> <span class="k">else</span> <span class="n">phone_to_viseme</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">phone</span><span class="p">),</span> <span class="n">alphabet</span><span class="o">=</span><span class="n">alphabet</span><span class="p">)</span>
-</span><span id="line-232">        <span class="k">if</span> <span class="n">code</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-233">            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-234">        <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">code</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">stop</span><span class="p">)))</span>
-</span><span id="line-235">    <span class="n">spoken</span> <span class="o">=</span> <span class="p">[(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">phones</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_silence</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))]</span>
-</span><span id="line-236">    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
-</span><span id="line-237">        <span class="k">if</span> <span class="n">word</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">word</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
-</span><span id="line-238">            <span class="n">word</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">word</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">spoken</span>
-</span><span id="line-239">        <span class="p">):</span>
-</span><span id="line-240">            <span class="n">segments</span> <span class="o">+=</span> <span class="n">_letter_segments</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">char_to_viseme</span> <span class="ow">or</span> <span class="p">{})</span>
-</span><span id="line-241">    <span class="k">return</span> <span class="n">_keyframes</span><span class="p">(</span>
-</span><span id="line-242">        <span class="n">segments</span><span class="p">,</span>
-</span><span id="line-243">        <span class="n">total_duration</span><span class="o">=</span><span class="n">total_duration</span><span class="p">,</span>
-</span><span id="line-244">        <span class="n">rest_viseme</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">,</span>
-</span><span id="line-245">        <span class="n">min_gap_for_rest</span><span class="o">=</span><span class="n">min_gap_for_rest</span><span class="p">,</span>
-</span><span id="line-246">    <span class="p">)</span></div>
-
+</span><span id="line-227"><span class="k">def</span><span class="w"> </span><span class="nf">phones_to_visemes</span><span class="p">(</span>
+</span><span id="line-228">    <span class="n">phones</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Timing</span><span class="p">],</span>
+</span><span id="line-229">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-230">    <span class="n">total_duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="line-231">    <span class="n">words</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Timing</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+</span><span id="line-232">    <span class="n">phone_to_viseme</span><span class="p">:</span> <span class="n">PhoneToViseme</span> <span class="o">=</span> <span class="n">phone_viseme</span><span class="p">,</span>
+</span><span id="line-233">    <span class="n">char_to_viseme</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-234">    <span class="n">rest_viseme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">REST_VISEME</span><span class="p">,</span>
+</span><span id="line-235">    <span class="n">min_gap_for_rest</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MIN_GAP_FOR_REST_S</span><span class="p">,</span>
+</span><span id="line-236">    <span class="n">alphabet</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-237">    <span class="n">intensity_of</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">NO_INTENSITY</span><span class="p">,</span>
+</span><span id="line-238">    <span class="n">takes_next_shape</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">TAKES_NEXT_SHAPE</span><span class="p">,</span>
+</span><span id="line-239"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Viseme</span><span class="p">]]:</span>
+</span><span id="line-240"><span class="w">    </span><span class="sd">"""A viseme track from phone timings: each phone's shape at its start (in the</span>
+</span><span id="line-241"><span class="sd">    clip's :func:`phone_alphabet`), the mouth closed at a silence, at a pause</span>
+</span><span id="line-242"><span class="sd">    longer than ``min_gap_for_rest`` and after the last sound. A word of ``words``</span>
+</span><span id="line-243"><span class="sd">    with no phone under it is spoken by its letters (``char_to_viseme``).</span>
+</span><span id="line-244">
+</span><span id="line-245"><span class="sd">    ``alphabet`` is the take's recorded one (``AudioClip.phone_alphabet``); with</span>
+</span><span id="line-246"><span class="sd">    none, the clip's labels decide (:func:`phone_alphabet`).</span>
 </span><span id="line-247">
-</span><span id="line-248">
+</span><span id="line-248"><span class="sd">    ``intensity_of`` maps a phone (its base: stress and modifiers dropped) to the</span>
+</span><span id="line-249"><span class="sd">    ``Viseme.intensity`` of its cue, so the co-articulation vote lets a vowel's</span>
+</span><span id="line-250"><span class="sd">    ``B`` beat a tongue-only consonant's (cutan#157); pass :data:`TONGUE_ONLY_INTENSITY` to weigh tongue-only consonants low (off by</span>
+</span><span id="line-251"><span class="sd">    default: unmeasured). A phone of ``takes_next_shape`` (``HH``) shows the shape of the next</span>
+</span><span id="line-252"><span class="sd">    spoken phone, kept as its own only at the end.</span>
+</span><span id="line-253">
+</span><span id="line-254"><span class="sd">    ``None`` when a phone is one ``phone_to_viseme`` does not know: a phone set</span>
+</span><span id="line-255"><span class="sd">    this table was not written for is better spread by its words than guessed.</span>
+</span><span id="line-256">
+</span><span id="line-257"><span class="sd">    &gt;&gt;&gt; phones_to_visemes([("ʘ", 0.0, 0.1)], total_duration=1.0) is None</span>
+</span><span id="line-258"><span class="sd">    True</span>
+</span><span id="line-259"><span class="sd">    &gt;&gt;&gt; [(v.time, v.code) for v in phones_to_visemes(</span>
+</span><span id="line-260"><span class="sd">    ...     [("M", 0.0, 0.1), ("AA1", 0.1, 0.3), ("P", 0.6, 0.7)], total_duration=0.7)]</span>
+</span><span id="line-261"><span class="sd">    [(0.0, 'X'), (0.0, 'A'), (0.1, 'D'), (0.3, 'X'), (0.6, 'A'), (0.7, 'X')]</span>
+</span><span id="line-262"><span class="sd">    """</span>
+</span><span id="line-263">    <span class="n">phones</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">phones</span><span class="p">)</span>
+</span><span id="line-264">    <span class="n">alphabet</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-265">        <span class="nb">str</span><span class="p">(</span><span class="n">alphabet</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="line-266">        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">alphabet</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">_ALPHABETS</span>
+</span><span id="line-267">        <span class="k">else</span> <span class="n">phone_alphabet</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">phones</span><span class="p">)</span>
+</span><span id="line-268">    <span class="p">)</span>
+</span><span id="line-269">    <span class="n">segments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Segment</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-270">    <span class="k">for</span> <span class="n">phone</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="ow">in</span> <span class="n">phones</span><span class="p">:</span>
+</span><span id="line-271">        <span class="n">silent</span> <span class="o">=</span> <span class="n">_is_silence</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">phone</span><span class="p">))</span>
+</span><span id="line-272">        <span class="n">code</span> <span class="o">=</span> <span class="n">rest_viseme</span> <span class="k">if</span> <span class="n">silent</span> <span class="k">else</span> <span class="n">phone_to_viseme</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">phone</span><span class="p">),</span> <span class="n">alphabet</span><span class="o">=</span><span class="n">alphabet</span><span class="p">)</span>
+</span><span id="line-273">        <span class="k">if</span> <span class="n">code</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-274">            <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-275">        <span class="n">base</span> <span class="o">=</span> <span class="n">_phone_base</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">phone</span><span class="p">),</span> <span class="n">alphabet</span><span class="p">)</span>
+</span><span id="line-276">        <span class="n">weight</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">silent</span> <span class="k">else</span> <span class="n">intensity_of</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</span><span id="line-277">        <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">code</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">stop</span><span class="p">),</span> <span class="n">weight</span><span class="p">))</span>
+</span><span id="line-278">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phones</span><span class="p">))):</span>  <span class="c1"># reversed: a run of HH takes the last one's</span>
+</span><span id="line-279">        <span class="n">phone</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">phones</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+</span><span id="line-280">        <span class="k">if</span> <span class="n">_phone_base</span><span class="p">(</span><span class="n">phone</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">takes_next_shape</span><span class="p">:</span>
+</span><span id="line-281">            <span class="k">continue</span>
+</span><span id="line-282">        <span class="c1"># the next phone, if it follows at once: across a silence the breath is its own</span>
+</span><span id="line-283">        <span class="n">following</span> <span class="o">=</span> <span class="n">phones</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">phones</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span id="line-284">        <span class="k">if</span> <span class="n">following</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_silence</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">following</span><span class="p">)):</span>
+</span><span id="line-285">            <span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">segments</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span>
+</span><span id="line-286">    <span class="n">spoken</span> <span class="o">=</span> <span class="p">[(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">phones</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_silence</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))]</span>
+</span><span id="line-287">    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
+</span><span id="line-288">        <span class="k">if</span> <span class="n">word</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">word</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
+</span><span id="line-289">            <span class="n">word</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">word</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">spoken</span>
+</span><span id="line-290">        <span class="p">):</span>
+</span><span id="line-291">            <span class="n">segments</span> <span class="o">+=</span> <span class="n">_letter_segments</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">char_to_viseme</span> <span class="ow">or</span> <span class="p">{})</span>
+</span><span id="line-292">    <span class="k">return</span> <span class="n">_keyframes</span><span class="p">(</span>
+</span><span id="line-293">        <span class="n">segments</span><span class="p">,</span>
+</span><span id="line-294">        <span class="n">total_duration</span><span class="o">=</span><span class="n">total_duration</span><span class="p">,</span>
+</span><span id="line-295">        <span class="n">rest_viseme</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">,</span>
+</span><span id="line-296">        <span class="n">min_gap_for_rest</span><span class="o">=</span><span class="n">min_gap_for_rest</span><span class="p">,</span>
+</span><span id="line-297">    <span class="p">)</span></div>
+
+</span><span id="line-298">
+</span><span id="line-299">
 <div class="viewcode-block" id="clip_timings">
 <a class="viewcode-back" href="../../../_autosummary/cutan.audio.phones.html#cutan.audio.phones.clip_timings">[docs]</a>
-</span><span id="line-249"><span class="k">def</span><span class="w"> </span><span class="nf">clip_timings</span><span class="p">(</span><span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Timing</span><span class="p">]]:</span>
-</span><span id="line-250"><span class="w">    </span><span class="sd">"""``audio``'s ``words`` or ``phones`` as a list of ``(label, start_s, end_s)``;</span>
-</span><span id="line-251"><span class="sd">    ``None`` when it has none (or its ``an`` predates the field).</span>
-</span><span id="line-252">
-</span><span id="line-253"><span class="sd">    &gt;&gt;&gt; clip_timings(AudioClip(duration=1.0, phones=[("M", 0, 0.1)]), "phones")</span>
-</span><span id="line-254"><span class="sd">    [('M', 0.0, 0.1)]</span>
-</span><span id="line-255"><span class="sd">    &gt;&gt;&gt; clip_timings(AudioClip(duration=1.0), "phones") is None</span>
-</span><span id="line-256"><span class="sd">    True</span>
-</span><span id="line-257"><span class="sd">    """</span>
-</span><span id="line-258">    <span class="n">timings</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-259">    <span class="k">if</span> <span class="ow">not</span> <span class="n">timings</span><span class="p">:</span>
-</span><span id="line-260">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-261">    <span class="k">return</span> <span class="p">[(</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">timings</span><span class="p">]</span></div>
+</span><span id="line-300"><span class="k">def</span><span class="w"> </span><span class="nf">clip_timings</span><span class="p">(</span><span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Timing</span><span class="p">]]:</span>
+</span><span id="line-301"><span class="w">    </span><span class="sd">"""``audio``'s ``words`` or ``phones`` as a list of ``(label, start_s, end_s)``;</span>
+</span><span id="line-302"><span class="sd">    ``None`` when it has none (or its ``an`` predates the field).</span>
+</span><span id="line-303">
+</span><span id="line-304"><span class="sd">    &gt;&gt;&gt; clip_timings(AudioClip(duration=1.0, phones=[("M", 0, 0.1)]), "phones")</span>
+</span><span id="line-305"><span class="sd">    [('M', 0.0, 0.1)]</span>
+</span><span id="line-306"><span class="sd">    &gt;&gt;&gt; clip_timings(AudioClip(duration=1.0), "phones") is None</span>
+</span><span id="line-307"><span class="sd">    True</span>
+</span><span id="line-308"><span class="sd">    """</span>
+</span><span id="line-309">    <span class="n">timings</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-310">    <span class="k">if</span> <span class="ow">not</span> <span class="n">timings</span><span class="p">:</span>
+</span><span id="line-311">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-312">    <span class="k">return</span> <span class="p">[(</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">timings</span><span class="p">]</span></div>
 
-</span><span id="line-262">
-</span><span id="line-263">
+</span><span id="line-313">
+</span><span id="line-314">
 <div class="viewcode-block" id="phones_track">
 <a class="viewcode-back" href="../../../_autosummary/cutan.audio.phones.html#cutan.audio.phones.phones_track">[docs]</a>
-</span><span id="line-264"><span class="k">def</span><span class="w"> </span><span class="nf">phones_track</span><span class="p">(</span>
-</span><span id="line-265">    <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span>
-</span><span id="line-266">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-267">    <span class="n">phone_to_viseme</span><span class="p">:</span> <span class="n">PhoneToViseme</span> <span class="o">=</span> <span class="n">phone_viseme</span><span class="p">,</span>
-</span><span id="line-268">    <span class="n">char_to_viseme</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-269">    <span class="n">rest_viseme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">REST_VISEME</span><span class="p">,</span>
-</span><span id="line-270">    <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span><span class="p">,</span>
-</span><span id="line-271"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VisemeTrack</span><span class="p">]:</span>
-</span><span id="line-272"><span class="w">    </span><span class="sd">"""The mouth track of a clip whose phones are timed (``AudioClip.phones``, a</span>
-</span><span id="line-273"><span class="sd">    take timed by a forced aligner, an#491), carrying the clip's words too;</span>
-</span><span id="line-274"><span class="sd">    ``None`` when it has no phones, or one ``phone_to_viseme`` does not know.</span>
-</span><span id="line-275">
-</span><span id="line-276"><span class="sd">    &gt;&gt;&gt; clip = AudioClip(duration=0.5, phones=[("M", 0.1, 0.2)], words=[("m", 0.1, 0.2)])</span>
-</span><span id="line-277"><span class="sd">    &gt;&gt;&gt; track = phones_track(clip)</span>
-</span><span id="line-278"><span class="sd">    &gt;&gt;&gt; [v.code for v in track.visemes], track.words</span>
-</span><span id="line-279"><span class="sd">    (['X', 'A', 'X', 'X'], [('m', 0.1, 0.2)])</span>
-</span><span id="line-280"><span class="sd">    &gt;&gt;&gt; phones_track(AudioClip(duration=0.5)) is None</span>
-</span><span id="line-281"><span class="sd">    True</span>
-</span><span id="line-282"><span class="sd">    """</span>
-</span><span id="line-283">    <span class="n">phones</span> <span class="o">=</span> <span class="n">clip_timings</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="s2">"phones"</span><span class="p">)</span>
-</span><span id="line-284">    <span class="k">if</span> <span class="ow">not</span> <span class="n">phones</span><span class="p">:</span>
-</span><span id="line-285">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-286">    <span class="n">words</span> <span class="o">=</span> <span class="n">clip_timings</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="s2">"words"</span><span class="p">)</span>
-</span><span id="line-287">    <span class="n">visemes</span> <span class="o">=</span> <span class="n">phones_to_visemes</span><span class="p">(</span>
-</span><span id="line-288">        <span class="n">phones</span><span class="p">,</span>
-</span><span id="line-289">        <span class="n">total_duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
-</span><span id="line-290">        <span class="n">words</span><span class="o">=</span><span class="n">words</span> <span class="ow">or</span> <span class="p">(),</span>
-</span><span id="line-291">        <span class="n">phone_to_viseme</span><span class="o">=</span><span class="n">phone_to_viseme</span><span class="p">,</span>
-</span><span id="line-292">        <span class="n">char_to_viseme</span><span class="o">=</span><span class="n">char_to_viseme</span><span class="p">,</span>
-</span><span id="line-293">        <span class="n">rest_viseme</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">,</span>
-</span><span id="line-294">        <span class="n">alphabet</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="s2">"phone_alphabet"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-</span><span id="line-295">    <span class="p">)</span>
-</span><span id="line-296">    <span class="k">if</span> <span class="n">visemes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-297">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-298">    <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
-</span><span id="line-299">        <span class="n">visemes</span><span class="o">=</span><span class="n">visemes</span><span class="p">,</span> <span class="n">convention</span><span class="o">=</span><span class="n">convention</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">words</span><span class="o">=</span><span class="n">words</span>
-</span><span id="line-300">    <span class="p">)</span></div>
+</span><span id="line-315"><span class="k">def</span><span class="w"> </span><span class="nf">phones_track</span><span class="p">(</span>
+</span><span id="line-316">    <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span>
+</span><span id="line-317">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-318">    <span class="n">phone_to_viseme</span><span class="p">:</span> <span class="n">PhoneToViseme</span> <span class="o">=</span> <span class="n">phone_viseme</span><span class="p">,</span>
+</span><span id="line-319">    <span class="n">char_to_viseme</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-320">    <span class="n">rest_viseme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">REST_VISEME</span><span class="p">,</span>
+</span><span id="line-321">    <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span><span class="p">,</span>
+</span><span id="line-322">    <span class="n">intensity_of</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">NO_INTENSITY</span><span class="p">,</span>
+</span><span id="line-323"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VisemeTrack</span><span class="p">]:</span>
+</span><span id="line-324"><span class="w">    </span><span class="sd">"""The mouth track of a clip whose phones are timed (``AudioClip.phones``, a</span>
+</span><span id="line-325"><span class="sd">    take timed by a forced aligner, an#491), carrying the clip's words too;</span>
+</span><span id="line-326"><span class="sd">    ``None`` when it has no phones, or one ``phone_to_viseme`` does not know.</span>
+</span><span id="line-327">
+</span><span id="line-328"><span class="sd">    &gt;&gt;&gt; clip = AudioClip(duration=0.5, phones=[("M", 0.1, 0.2)], words=[("m", 0.1, 0.2)])</span>
+</span><span id="line-329"><span class="sd">    &gt;&gt;&gt; track = phones_track(clip)</span>
+</span><span id="line-330"><span class="sd">    &gt;&gt;&gt; [v.code for v in track.visemes], track.words</span>
+</span><span id="line-331"><span class="sd">    (['X', 'A', 'X', 'X'], [('m', 0.1, 0.2)])</span>
+</span><span id="line-332"><span class="sd">    &gt;&gt;&gt; phones_track(AudioClip(duration=0.5)) is None</span>
+</span><span id="line-333"><span class="sd">    True</span>
+</span><span id="line-334"><span class="sd">    """</span>
+</span><span id="line-335">    <span class="n">phones</span> <span class="o">=</span> <span class="n">clip_timings</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="s2">"phones"</span><span class="p">)</span>
+</span><span id="line-336">    <span class="k">if</span> <span class="ow">not</span> <span class="n">phones</span><span class="p">:</span>
+</span><span id="line-337">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-338">    <span class="n">words</span> <span class="o">=</span> <span class="n">clip_timings</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="s2">"words"</span><span class="p">)</span>
+</span><span id="line-339">    <span class="n">visemes</span> <span class="o">=</span> <span class="n">phones_to_visemes</span><span class="p">(</span>
+</span><span id="line-340">        <span class="n">phones</span><span class="p">,</span>
+</span><span id="line-341">        <span class="n">total_duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+</span><span id="line-342">        <span class="n">words</span><span class="o">=</span><span class="n">words</span> <span class="ow">or</span> <span class="p">(),</span>
+</span><span id="line-343">        <span class="n">phone_to_viseme</span><span class="o">=</span><span class="n">phone_to_viseme</span><span class="p">,</span>
+</span><span id="line-344">        <span class="n">char_to_viseme</span><span class="o">=</span><span class="n">char_to_viseme</span><span class="p">,</span>
+</span><span id="line-345">        <span class="n">rest_viseme</span><span class="o">=</span><span class="n">rest_viseme</span><span class="p">,</span>
+</span><span id="line-346">        <span class="n">alphabet</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="s2">"phone_alphabet"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+</span><span id="line-347">        <span class="n">intensity_of</span><span class="o">=</span><span class="n">intensity_of</span><span class="p">,</span>
+</span><span id="line-348">    <span class="p">)</span>
+</span><span id="line-349">    <span class="k">if</span> <span class="n">visemes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-350">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-351">    <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
+</span><span id="line-352">        <span class="n">visemes</span><span class="o">=</span><span class="n">visemes</span><span class="p">,</span> <span class="n">convention</span><span class="o">=</span><span class="n">convention</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">words</span><span class="o">=</span><span class="n">words</span>
+</span><span id="line-353">    <span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -517,7 +570,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=27c60a7f"></script>
+    <script src="../../../_static/documentation_options.js?v=c4e26d2d"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

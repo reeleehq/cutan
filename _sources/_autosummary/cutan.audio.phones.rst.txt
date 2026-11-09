@@ -9,12 +9,16 @@ cutan.audio.phones
    .. autosummary::
    
       Timing
+      Segment
       PhoneToViseme
       DEFAULT_LETTER_VISEME
       MIN_GAP_FOR_REST_S
       SILENCES
       ARPABET_TO_VISEME
       IPA_TO_VISEME
+      TONGUE_ONLY_INTENSITY
+      NO_INTENSITY
+      TAKES_NEXT_SHAPE
    
    .. rubric:: Functions
 

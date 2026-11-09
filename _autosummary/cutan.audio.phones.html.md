@@ -25,14 +25,18 @@ word-timing rule does (`an.audio.lipsync.word_timings_to_visemes`).
 
 ### Module Attributes
 
-| [`Timing`](#cutan.audio.phones.Timing)                | `(label, start_s, end_s)`, as `AudioClip.phones` and `.words` hold them.                                                                |
-|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| [`PhoneToViseme`](#cutan.audio.phones.PhoneToViseme)         | a Rhubarb shape, or `None` when unknown (`alphabet` is the clip's, [`phone_alphabet()`](#cutan.audio.phones.phone_alphabet)).  |
-| [`DEFAULT_LETTER_VISEME`](#cutan.audio.phones.DEFAULT_LETTER_VISEME) | The letter shape a word's unknown letter takes (the word-timing rule's).                                                                |
-| [`MIN_GAP_FOR_REST_S`](#cutan.audio.phones.MIN_GAP_FOR_REST_S)    | the word-timing rule's value (`an.audio.lipsync`'s minimum word gap for a rest).                                                        |
-| [`SILENCES`](#cutan.audio.phones.SILENCES)              | Silence and noise labels, should a clip carry them (`an` drops these when it reads a TextGrid: `an.audio.transcripts`' silence labels). |
-| [`ARPABET_TO_VISEME`](#cutan.audio.phones.ARPABET_TO_VISEME)     | ARPAbet (stress digits removed) to a Rhubarb shape.                                                                                     |
-| [`IPA_TO_VISEME`](#cutan.audio.phones.IPA_TO_VISEME)         | IPA (diacritics, length and stress marks removed) to a Rhubarb shape.                                                                   |
+| [`Timing`](#cutan.audio.phones.Timing)                | `(label, start_s, end_s)`, as `AudioClip.phones` and `.words` hold them.                                                                                                                  |
+|------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`Segment`](#cutan.audio.phones.Segment)               | a mouth shape over a span.                                                                                                                                                                |
+| [`PhoneToViseme`](#cutan.audio.phones.PhoneToViseme)         | a Rhubarb shape, or `None` when unknown (`alphabet` is the clip's, [`phone_alphabet()`](#cutan.audio.phones.phone_alphabet)).                                                    |
+| [`DEFAULT_LETTER_VISEME`](#cutan.audio.phones.DEFAULT_LETTER_VISEME) | The letter shape a word's unknown letter takes (the word-timing rule's).                                                                                                                  |
+| [`MIN_GAP_FOR_REST_S`](#cutan.audio.phones.MIN_GAP_FOR_REST_S)    | the word-timing rule's value (`an.audio.lipsync`'s minimum word gap for a rest).                                                                                                          |
+| [`SILENCES`](#cutan.audio.phones.SILENCES)              | Silence and noise labels, should a clip carry them (`an` drops these when it reads a TextGrid: `an.audio.transcripts`' silence labels).                                                   |
+| [`ARPABET_TO_VISEME`](#cutan.audio.phones.ARPABET_TO_VISEME)     | ARPAbet (stress digits removed) to a Rhubarb shape.                                                                                                                                       |
+| [`IPA_TO_VISEME`](#cutan.audio.phones.IPA_TO_VISEME)         | IPA (diacritics, length and stress marks removed) to a Rhubarb shape.                                                                                                                     |
+| [`TONGUE_ONLY_INTENSITY`](#cutan.audio.phones.TONGUE_ONLY_INTENSITY) | How strongly a phone's shape holds against its neighbours in the co-articulation vote (`Viseme.intensity`; the vote weighs `DOMINANCE[shape] x intensity`, `cutan.compile.coarticulate`). |
+| [`NO_INTENSITY`](#cutan.audio.phones.NO_INTENSITY)          | every cue at full intensity, the track as before cutan#157.                                                                                                                               |
+| [`TAKES_NEXT_SHAPE`](#cutan.audio.phones.TAKES_NEXT_SHAPE)      | `HH` is a breath before the vowel (Rhubarb draws it so), not a mouth shape of its own.                                                                                                    |
 
 ### Functions
 
@@ -64,6 +68,17 @@ word-timing rule’s value (`an.audio.lipsync`’s minimum word gap for a rest).
 * **Type:**
   A pause between two phones longer than this closes the mouth (seconds)
 
+### cutan.audio.phones.NO_INTENSITY *: [Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]* *= {}*
+
+every cue at full intensity, the track as before cutan#157. Not
+[`TONGUE_ONLY_INTENSITY`](#cutan.audio.phones.TONGUE_ONLY_INTENSITY) until a legibility judgement says it reads
+better: on random ARPAbet lines it changes the shown track in 11% of lines
+(a vowel’s shape wins where a tongue-only consonant’s did, but not always the
+better one), and only the cassetted judge can say which reads better.
+
+* **Type:**
+  The default
+
 ### cutan.audio.phones.PhoneToViseme
 
 a Rhubarb shape, or `None` when
@@ -79,6 +94,33 @@ alias of `Callable`[[…], [`str`](https://docs.python.org/3/builtins/stdtypes.h
 
 Silence and noise labels, should a clip carry them (`an` drops these when it
 reads a TextGrid: `an.audio.transcripts`’ silence labels).
+
+### cutan.audio.phones.Segment *= tuple[str, float, float] | tuple[str, float, float, float]*
+
+a mouth shape over a span.
+
+* **Type:**
+  `(shape, start_s, end_s[, intensity])`
+
+### cutan.audio.phones.TAKES_NEXT_SHAPE *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'HH', 'h', 'ɦ'})*
+
+`HH` is a breath
+before the vowel (Rhubarb draws it so), not a mouth shape of its own.
+
+* **Type:**
+  The phones that take the shape of the phone after them
+
+### cutan.audio.phones.TONGUE_ONLY_INTENSITY *: [Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]* *= {'D': 0.4, 'G': 0.4, 'K': 0.4, 'L': 0.4, 'N': 0.4, 'NG': 0.4, 'S': 0.4, 'T': 0.4, 'Z': 0.4, 'd': 0.4, 'g': 0.4, 'k': 0.4, 'l': 0.4, 'n': 0.4, 's': 0.4, 't': 0.4, 'z': 0.4, 'ŋ': 0.4, 'ɡ': 0.4}*
+
+How strongly a phone’s shape holds against its neighbours in the co-articulation
+vote (`Viseme.intensity`; the vote weighs `DOMINANCE[shape] x intensity`,
+`cutan.compile.coarticulate`). Rhubarb’s `B` codes both the EE vowel (lips
+spread) and the tongue-only consonants (T D N K…), which barely move the
+lips (JALI, Edwards et al. 2016: “tongue-only visemes have no influence on
+the lips”); the letter alone cannot say, the phone can. Keyed by the phone’s
+base in either alphabet (ARPAbet upper case, IPA as written); a phone not
+listed is 1.0. Values are art direction (cutan#157): a measurement, not a
+sourced number.
 
 ### cutan.audio.phones.Timing
 
@@ -135,7 +177,7 @@ silence; `None` for a phone the table does not know.
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
-### cutan.audio.phones.phones_to_visemes(phones, \*, total_duration, words=(), phone_to_viseme=<function phone_viseme>, char_to_viseme=None, rest_viseme='X', min_gap_for_rest=0.2, alphabet=None)
+### cutan.audio.phones.phones_to_visemes(phones, \*, total_duration, words=(), phone_to_viseme=<function phone_viseme>, char_to_viseme=None, rest_viseme='X', min_gap_for_rest=0.2, alphabet=None, intensity_of={}, takes_next_shape=frozenset({'HH', 'h', 'ɦ'}))
 
 A viseme track from phone timings: each phone’s shape at its start (in the
 clip’s [`phone_alphabet()`](#cutan.audio.phones.phone_alphabet)), the mouth closed at a silence, at a pause
@@ -144,6 +186,12 @@ with no phone under it is spoken by its letters (`char_to_viseme`).
 
 `alphabet` is the take’s recorded one (`AudioClip.phone_alphabet`); with
 none, the clip’s labels decide ([`phone_alphabet()`](#cutan.audio.phones.phone_alphabet)).
+
+`intensity_of` maps a phone (its base: stress and modifiers dropped) to the
+`Viseme.intensity` of its cue, so the co-articulation vote lets a vowel’s
+`B` beat a tongue-only consonant’s (cutan#157); pass [`TONGUE_ONLY_INTENSITY`](#cutan.audio.phones.TONGUE_ONLY_INTENSITY) to weigh tongue-only consonants low (off by
+default: unmeasured). A phone of `takes_next_shape` (`HH`) shows the shape of the next
+spoken phone, kept as its own only at the end.
 
 `None` when a phone is one `phone_to_viseme` does not know: a phone set
 this table was not written for is better spread by its words than guessed.
@@ -159,7 +207,7 @@ True
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[`Viseme`]]
 
-### cutan.audio.phones.phones_track(audio, \*, phone_to_viseme=<function phone_viseme>, char_to_viseme=None, rest_viseme='X', convention='rhubarb')
+### cutan.audio.phones.phones_track(audio, \*, phone_to_viseme=<function phone_viseme>, char_to_viseme=None, rest_viseme='X', convention='rhubarb', intensity_of={})
 
 The mouth track of a clip whose phones are timed (`AudioClip.phones`, a
 take timed by a forced aligner, an#491), carrying the clip’s words too;
