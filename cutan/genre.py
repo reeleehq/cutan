@@ -293,6 +293,16 @@ CUTOUT = Genre(
             order=10,
             description="a view does not silently reset across a cut",
         ),
+        SemanticCheck(
+            "cutout.eyeline",
+            _checks.check_eyeline,
+            stage="finish",
+            order=20,
+            description=(
+                "two characters in an exchange look at each other: a speaker faces "
+                "the one it speaks to, and a shot/reverse-shot pair keeps the line (cutan#173)"
+            ),
+        ),
     ),
     dialogue_sugar=(EMOTION,),
     capabilities=CHARACTER_CAPABILITIES,

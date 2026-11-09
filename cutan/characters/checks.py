@@ -7,7 +7,7 @@ Moved from ``an.ir.validate`` (an#225, an#246): the core's validator runs whatev
 from __future__ import annotations
 
 
-from typing import Any, Mapping
+from typing import Any, Mapping, Optional
 
 from pydantic import ValidationError
 
@@ -38,7 +38,15 @@ from cutan.expression.binding import (
 )
 from an.ir.compose import flatten
 from an.ir.migrate import migrate
+from an.ir.validate import _dialogue_layout  # an has no public layout yet
 from an.ir.schema import SceneIR
+from cutan.verify.eyeline import (
+    REST_DIRECTION,
+    UNJUDGED_VIEWS,
+    Presence,
+    cut_findings,
+    shot_findings,
+)
 
 from an.ir.validate import (  # noqa: E402
     ValidationContext,
@@ -760,6 +768,60 @@ def check_view_continuity(ctx: ValidationContext) -> None:
     """The cut-out genre's view-across-a-cut warning (:func:`_check_view_continuity`)."""
     resolved = [_turns_of(ctx, i, shot) for i, shot in enumerate(ctx.scene.timeline)]
     _check_view_continuity(ctx.scene, ctx.report, resolved)
+
+
+def _presence(
+    shot, events, entity, t: float, *, speaker: Optional[str], rest_direction: str
+) -> "Presence":
+    """``entity`` of ``shot`` as the eyeline rules see it at ``t``."""
+    facing = facing_at(events, entity.id, t)
+    judged = facing.view not in UNJUDGED_VIEWS
+    at = entity.stage.at if entity.stage is not None else None
+    return Presence(
+        entity.id,
+        direction=(facing.direction or rest_direction) if judged else None,
+        x=float(at[0]) if at else None,
+        speaks=entity.id == speaker,
+    )
+
+
+def check_eyeline(
+    ctx: ValidationContext, *, rest_direction: str = REST_DIRECTION
+) -> None:
+    """The cut-out genre's eyeline warnings (:mod:`cutan.verify.eyeline`): a speaker
+    facing away from the one character it speaks to, and a shot/reverse-shot pair
+    whose speakers face the same way. ``rest_direction`` is what a character faces
+    when nothing set it."""
+    resolved = [_turns_of(ctx, i, shot) for i, shot in enumerate(ctx.scene.timeline)]
+    if any(r is None for r in resolved):
+        return  # no characters store: the check did not run
+    timeline = ctx.scene.timeline
+    chars = [[e for e in shot.entities if e.kind == "character"] for shot in timeline]
+    # where each line WILL play (an's own layout rule: `at`, else back to back plus
+    # `pause`), not its stamp: a line is judged by how its speaker faces THEN
+    lines = [list(_dialogue_layout(shot)) for shot in timeline]
+
+    def present_at(i: int, t: float, speaker: str) -> list[Presence]:
+        return [
+            _presence(timeline[i], resolved[i][0].events, e, t, speaker=speaker,
+                      rest_direction=rest_direction)
+            for e in chars[i]
+        ]
+
+    for i, shot in enumerate(timeline):
+        for k, line, start, _end, _estimated in lines[i]:
+            for f in shot_findings(present_at(i, start, line.speaker)):
+                ctx.report.add("warning", f"timeline/{i}/dialogue/{k}", f.message)
+    for i in range(1, len(timeline)):
+        if not (lines[i - 1] and lines[i]):
+            continue
+        _, last, last_start, *_ = lines[i - 1][-1]
+        _, first, first_start, *_ = lines[i][0]
+        before = present_at(i - 1, last_start, last.speaker)
+        after = present_at(i, first_start, first.speaker)
+        if before and after and before[0].speaks and after[0].speaks:
+            for f in cut_findings(before, after):
+                ctx.report.add("warning", f"timeline/{i}/entities", f.message)
 
 
 class CharacterSwapChecks:
