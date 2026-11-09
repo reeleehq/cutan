@@ -186,15 +186,21 @@ def check_eyeline(
     def rest_view_of(entity: Any) -> str:
         doc = _rig_document(entity, ctx.stores)
         try:
-            return CharacterDescriptor.model_validate(doc).rest_view if doc else DFLT_VIEW
+            return (
+                CharacterDescriptor.model_validate(doc).rest_view if doc else DFLT_VIEW
+            )
         except Exception:  # noqa: BLE001 - a malformed descriptor is the play check's to report
             return DFLT_VIEW
 
     def present_at(i: int, t: float, speaker: str) -> list[Presence]:
         return [
             _presence(
-                e, resolved[i][0].events, t, speaker=speaker,
-                rest_view=rest_view_of(e), directional_views=directional_views,
+                e,
+                resolved[i][0].events,
+                t,
+                speaker=speaker,
+                rest_view=rest_view_of(e),
+                directional_views=directional_views,
                 rest_direction=rest_direction,
             )
             for e in chars[i]
@@ -202,7 +208,9 @@ def check_eyeline(
 
     for i in range(len(shots)):
         for k, line, start, end, _estimated in lines[i]:
-            at_start = {f.entity for f in shot_findings(present_at(i, start, line.speaker))}
+            at_start = {
+                f.entity for f in shot_findings(present_at(i, start, line.speaker))
+            }
             for f in shot_findings(present_at(i, end, line.speaker)):
                 if f.entity in at_start:  # wrong all through the line
                     ctx.report.add("warning", f"timeline/{i}/dialogue/{k}", f.message)
