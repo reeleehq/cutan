@@ -491,7 +491,12 @@ def _far_plates(project: Any) -> list[tuple[str, str, Any, str]]:
     for far in planes_at_infinity(
         world, None if env_store is None else _ReadableEnvironments(env_store)
     ):
-        member_id, plane_name, name, where = far.member, far.plane, far.path, far.ir_path
+        member_id, plane_name, name, where = (
+            far.member,
+            far.plane,
+            far.path,
+            far.ir_path,
+        )
         member = members.get(member_id)
         path, why = None, "its file cannot be read in its environment's folder"
         if member is None or member.kind != "environment" or root is None:
