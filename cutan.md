@@ -1,4 +1,4 @@
-> built 2026-11-09 00:44 UTC from de951c9 (main) · cutan 0.0.110. Details: build_info.json
+> built 2026-11-09 01:00 UTC from 4207ba0 (main) · cutan 0.0.111. Details: build_info.json
 
 # index.html.md
 
@@ -272,13 +272,13 @@ each image becomes `<name>.png` with its provenance in `art_sources.json`.
 
 ### Functions
 
-| [`generate`](_autosummary/cutan.art_cli.html.md#cutan.art_cli.generate)(spec, out[, only, keep_raw, ...])   | Generate each image of a spec with an image model, key its backdrop colour to alpha, fit it, and write it with its provenance.                                                                                                |
-|-----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`critique_plates`](_autosummary/cutan.art_cli.html.md#cutan.art_cli.critique_plates)([project, model])            | Ask a vision model whether each plate a travel lists `far` holds anything near (a tree, a pole, the road close up), which would stand still while the scenery streams past (a paid call per plate; warnings, never the gate). |
+| [`generate`](_autosummary/cutan.art_cli.html.md#cutan.art_cli.generate)(spec, out[, only, keep_raw, ...])   | Generate each image of a spec with an image model, key its backdrop colour to alpha, fit it, and write it with its provenance.                                                                                                                                                         |
+|-----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`critique_plates`](_autosummary/cutan.art_cli.html.md#cutan.art_cli.critique_plates)([project, model])            | Ask a vision model whether each plane at infinity (a plate the travel lists `far`, or one in a frame coupled `far`) holds anything near (a tree, a pole, the road close up), which would stand still while the scenery streams past (a paid call per plate; warnings, never the gate). |
 
 ### cutan.art_cli.critique_plates(project='.', model='')
 
-Ask a vision model whether each plate a travel lists `far` holds anything near (a tree, a pole, the road close up), which would stand still while the scenery streams past (a paid call per plate; warnings, never the gate).
+Ask a vision model whether each plane at infinity (a plate the travel lists `far`, or one in a frame coupled `far`) holds anything near (a tree, a pole, the road close up), which would stand still while the scenery streams past (a paid call per plate; warnings, never the gate).
 
 project: the project folder
 model: the vision model (default: an’s vision judge’s)
@@ -1015,7 +1015,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'rect', 'eye', 'mouth', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'ellipse', 'eye', 'rect'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -12286,7 +12286,7 @@ cutan#91). Pushed with the project, so it is a key of the store too.
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
-### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 15*
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 17*
 
 The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
 it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
@@ -12310,7 +12310,9 @@ Level 11: the first level whose every release ships `an.stage.solve.solve_report
 Level 13: the names cutan’s checks and pack read, public (an#710): `an.ir.validate.rig_scope`,
 `an.semantic.matcher.lookup_method` and `as_choice`, `an.audio.loudness.voice_loudness_offset`.
 Level 14: `EntityKind.shot_sizes` (cutan#106), the rig’s own bands for a viewpoint’s size.
-Level 15: `JsonSidecarStore.write_sidecar`, the atomic sidecar write (an#688, cutan#181).
+Level 15: `an.project.gitignore_matcher` (an#725, cutan#185); also the first level
+after `JsonSidecarStore.write_sidecar` (an#688, cutan#181), `phone_alphabet_of` (an#721).
+Level 17: `an.ir.world.planes_at_infinity` (an#735), the far-plate critic’s set (cutan#177).
 
 ### cutan.require_an()
 
@@ -15692,7 +15694,7 @@ and the frame source as keywords. A configured judge that fails is a failure (an
 
 | [`critique_body_props`](_autosummary/cutan.verify.critic.html.md#cutan.verify.critic.critique_body_props)(project, \*[, judge, ...])   | Ask each body-depicting prop of `project`'s shots its view's checklist.                                                                                            |
 |---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`critique_far_plates`](_autosummary/cutan.verify.critic.html.md#cutan.verify.critic.critique_far_plates)(project, \*[, judge, ...])   | Ask whether each `far` plate of `project`'s travel holds anything near (cutan#166): a tree baked into a plate stands still while the streams move.                 |
+| [`critique_far_plates`](_autosummary/cutan.verify.critic.html.md#cutan.verify.critic.critique_far_plates)(project, \*[, judge, ...])   | Ask whether each plane at infinity of `project`'s world holds anything near (cutan#166): a tree baked into a plate stands still while the streams move.            |
 | [`checklist_for`](_autosummary/cutan.verify.critic.html.md#cutan.verify.critic.checklist_for)(view[, checklists])                | The questions for a prop declared in `view`: a mapping's entry for it (else its `"*"`), or `checklists` itself when it is one list.                                |
 | [`checklist_prompt`](_autosummary/cutan.verify.critic.html.md#cutan.verify.critic.checklist_prompt)(checklist, \*, prop, character) | The prompt asking `checklist` about `prop` held by `character`.                                                                                                    |
 | [`parse_answers`](_autosummary/cutan.verify.critic.html.md#cutan.verify.critic.parse_answers)(reply, checklist)                  | The answers in a judge's reply, one per question (`answer` is `yes`, `no` or `unsure`: read from its leading word); `None` when the reply holds no answers at all. |
@@ -15784,15 +15786,16 @@ off screen by design, so it is).
 
 ### cutan.verify.critic.critique_far_plates(project, , judge=None, checklist=(Question(text='Does the picture show the ground or a road close to the viewer?', expected='no'), Question(text="Are there trees, poles, fences, signs or buildings near the viewer: large, or cut off by the picture's edges?", expected='no'), Question(text='Is everything shown far away: sky, horizon, distant hills or mountains?', expected='yes')), model=None, max_side=1024)
 
-Ask whether each `far` plate of `project`’s travel holds anything near
+Ask whether each plane at infinity of `project`’s world holds anything near
 (cutan#166): a tree baked into a plate stands still while the streams move.
 
 The plate’s own image is judged, not a render: no probe, one call per plate
 (at most `max_side` px long; a plane’s `fit` never crops, so the image
 holds everything a pan could show). An SVG plate (drawn by hand, its content
 known to its author) and a plane with no picture are not judged, each said
-as an `info`. Only the plates a travel LISTS `far` are judged; a plane at
-infinity because its frame is coupled `far` is not yet (cutan#177).
+as an `info`. Every plane the world has at infinity is judged
+(`an.ir.world.planes_at_infinity`: listed `far` by the travel, or in a
+frame coupled `far`), the same set `an validate` pins to parallax 0.
 Findings and calls as [`critique_body_props()`](_autosummary/cutan.verify.critic.html.md#cutan.verify.critic.critique_body_props).
 
 * **Return type:**
@@ -16278,7 +16281,7 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-11-09 00:44 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/de951c9a8b051d467f8cbf000e631efcb9195be5"><code>de951c9</code></a> on branch <code>main</code>, for **cutan 0.0.110** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-09 01:00 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/4207ba0802f64d419882ddb0526db38dfe82d858"><code>4207ba0</code></a> on branch <code>main</code>, for **cutan 0.0.111** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -16287,7 +16290,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/de951c9a8b051d467f8cbf000e631efcb9195be5"><code>de951c9a8b051d467f8cbf000e631efcb9195be5</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/4207ba0802f64d419882ddb0526db38dfe82d858"><code>4207ba0802f64d419882ddb0526db38dfe82d858</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -16298,9 +16301,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/42541101000">42541101000</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/42542608886">42542608886</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>de951c9a8b051d467f8cbf000e631efcb9195be5</code> (in the history of the built commit) |
+| Event commit | <code>4207ba0802f64d419882ddb0526db38dfe82d858</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -16325,13 +16328,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.110/">0.0.110</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.111/">0.0.111</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout de951c9a8b051d467f8cbf000e631efcb9195be5
+git checkout 4207ba0802f64d419882ddb0526db38dfe82d858
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
