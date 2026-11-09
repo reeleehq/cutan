@@ -56,7 +56,11 @@ from typing import Any, Literal, Optional, Union
 import numpy as np
 from PIL import Image
 
+from dol import atomic_write
+
 from an.ir.assets import AssetSource
+
+from cutan.carve.files import save_png
 
 #: The model :class:`AixGenerator` asks for when the spec names none.
 DEFAULT_MODEL: str = "gpt-image-2"
@@ -540,7 +544,7 @@ def generate_art(
                 )
             )
             image = drawn.image
-            _save(image, raw)
+            save_png(image, raw)
             # record it now: the paid image has its provenance even if what follows fails
             recorded[entry] = art_source(s, generator, drawn.facts).model_dump(
                 mode="json", exclude_none=True
@@ -561,7 +565,7 @@ def generate_art(
             image = key_backdrop(image, s.key)
         if s.fit:
             image = cover_fit(image, s.fit)
-        _save(image, path)
+        save_png(image, path)
         source = source.model_copy(
             update={"sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
         )
@@ -571,13 +575,6 @@ def generate_art(
             raw.unlink()
         made.append(GeneratedArt(s.name, path, source, image.size))
     return made
-
-
-def _save(image: Image.Image, path: Path) -> None:
-    """Write ``path`` whole or not at all: a crash never leaves half a PNG to be kept."""
-    tmp = path.with_name(path.name + ".part")
-    image.save(tmp, format="PNG")
-    os.replace(tmp, path)
 
 
 def _source(entry: Any) -> Optional[AssetSource]:
@@ -686,8 +683,6 @@ def _read_sources(out: Path) -> dict[str, Any]:
 
 def _write_sources(out: Path, sources: Mapping[str, Any]) -> None:
     record = out / SOURCES_FILE
-    tmp = record.with_name(record.name + ".part")
-    tmp.write_text(
-        json.dumps(sources, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    atomic_write(
+        record, (json.dumps(sources, indent=2, sort_keys=True) + "\n").encode("utf-8")
     )
-    os.replace(tmp, record)

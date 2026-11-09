@@ -43,6 +43,9 @@ carving's source is kept beside it as ``extra.carved_from`` either way.
 """
 
 from __future__ import annotations
+from dol import atomic_write
+
+from cutan.carve.files import save_png
 
 import json
 import math
@@ -383,6 +386,7 @@ def write_prop(
     )  # fails before any file is written
     (folder / "parts").mkdir(parents=True, exist_ok=True)
     for path, image in images.items():
-        image.save(folder / path)
-    (folder / "prop.json").write_text(text, "utf-8")
+        save_png(image, folder / path)
+    atomic_write(folder / "prop.json", text.encode("utf-8"))
     return doc
+

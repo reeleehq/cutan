@@ -23,6 +23,7 @@ beside a descriptor that then failed to validate). This is that cycle once:
 """
 
 from __future__ import annotations
+from dol import atomic_write
 
 import json
 from pathlib import Path
@@ -75,7 +76,7 @@ def write_descriptor(char_dir: str | Path, desc) -> Path:
     validate assignments), so an invalid edit writes nothing."""
     desc = type(desc).model_validate(desc.model_dump())
     path = descriptor_path(char_dir)
-    path.write_text(desc.model_dump_json(indent=2), encoding="utf-8")
+    atomic_write(path, desc.model_dump_json(indent=2).encode("utf-8"))
     return path
 
 

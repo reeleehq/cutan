@@ -20,6 +20,7 @@ True
 from __future__ import annotations
 
 import hashlib
+from dol import atomic_write
 import os
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -54,7 +55,7 @@ def drawing() -> Iterator[dict[str, str]]:
 def write_bytes(path: str | os.PathLike, data: bytes) -> None:
     """Write ``data`` to ``path``, logging its digest if a :func:`drawing` is open."""
     path = Path(path)
-    path.write_bytes(data)
+    atomic_write(path, data)  # a killed write keeps the previous file (cutan#188)
     log = _LOG.get()
     if log is not None:
         log[str(path.resolve())] = hashlib.sha256(data).hexdigest()
@@ -90,5 +91,5 @@ def write_derived_text(
     if log is None or log.get(key) == hashlib.sha256(source).hexdigest():
         write_text(path, text, encoding=encoding)
         return
-    path.write_bytes(text.replace("\n", os.linesep).encode(encoding))
+    atomic_write(path, text.replace("\n", os.linesep).encode(encoding))
     log.pop(key, None)

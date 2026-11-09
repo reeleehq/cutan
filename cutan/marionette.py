@@ -35,6 +35,8 @@ joints, and the style pack's gravity (``meta.style_pack: marionette``):
 
 from __future__ import annotations
 
+from dol import atomic_write
+
 import json
 from collections.abc import Mapping, Sequence
 from pathlib import Path
@@ -190,12 +192,12 @@ def write_control_bar(
             }
         },
     }
-    (folder / "prop.json").write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    atomic_write(folder / "prop.json", json.dumps(doc, indent=2).encode("utf-8"))
     svg = (
         '<svg xmlns="http://www.w3.org/2000/svg" '
         f'viewBox="0 0 {width:g} {height:g}" width="{width:g}" height="{height:g}">'
         f'<rect width="{width:g}" height="{height:g}" rx="{height / 2:g}" fill="{colour}" '
         'stroke="#222" stroke-width="2"/></svg>'
     )
-    (folder / "parts" / "bar.svg").write_text(svg, encoding="utf-8")
+    atomic_write(folder / "parts" / "bar.svg", svg.encode("utf-8"))
     return folder
