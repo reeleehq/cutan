@@ -219,7 +219,7 @@ the shot archive re-render from the project; the render work dirs are a run’s
 scratch; a repository is not project content; and every line <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">init</span></code>
 keeps out of git (<code class="docutils literal notranslate"><span class="pre">an.project.PROJECT_GITIGNORE</span></code>: render reports, probes, the
 options manifests’ file locks) is read from <code class="docutils literal notranslate"><span class="pre">an</span></code>, so a line it adds there is
-kept local here too. Each entry is a <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> line (<code class="xref py py-func docutils literal notranslate"><span class="pre">_gitignore_matcher()</span></code>).</p>
+kept local here too. Each entry is a <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> line (read by <code class="docutils literal notranslate"><span class="pre">an.project.gitignore_matcher</span></code>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>What a push keeps on the machine that made it</p>
@@ -421,7 +421,7 @@ when anything changed, to the store.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=6ba42da4"></script>
+<script src="../_static/documentation_options.js?v=83be8e66"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

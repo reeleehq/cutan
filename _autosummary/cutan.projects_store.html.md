@@ -59,7 +59,7 @@ the shot archive re-render from the project; the render work dirs are a run’s
 scratch; a repository is not project content; and every line `an init`
 keeps out of git (`an.project.PROJECT_GITIGNORE`: render reports, probes, the
 options manifests’ file locks) is read from `an`, so a line it adds there is
-kept local here too. Each entry is a `.gitignore` line (`_gitignore_matcher()`).
+kept local here too. Each entry is a `.gitignore` line (read by `an.project.gitignore_matcher`).
 
 * **Type:**
   What a push keeps on the machine that made it
