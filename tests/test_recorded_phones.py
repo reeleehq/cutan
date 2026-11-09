@@ -243,3 +243,25 @@ def test_a_tongue_only_consonant_can_be_weighed_low_by_the_phone_not_the_letter(
         intensity_of=TONGUE_ONLY_INTENSITY,
     )
     assert [v.intensity for v in t_only if v.code == "B"] == [0.4]
+
+
+def test_hh_runs_and_silences():
+    kw = dict(alphabet="arpabet")
+    run = phones_to_visemes(
+        [("HH", 0.0, 0.1), ("HH", 0.1, 0.2), ("AA1", 0.2, 0.4)], total_duration=0.4, **kw
+    )
+    assert [v.code for v in run] == ["X", "D", "X"]  # both take the vowel's
+    gap = phones_to_visemes(
+        [("HH", 0.0, 0.1), ("sil", 0.1, 0.6), ("AA1", 0.6, 0.8)], total_duration=0.8, **kw
+    )
+    assert [v.code for v in gap][:3] == ["X", "C", "X"]  # a breath before a pause stays
+
+
+def test_a_merged_consonant_and_vowel_keep_the_stronger_intensity():
+    from cutan.audio.phones import TONGUE_ONLY_INTENSITY
+
+    got = phones_to_visemes(
+        [("T", 0.0, 0.1), ("IY1", 0.1, 0.3)],  # both B: one cue
+        total_duration=0.3, alphabet="arpabet", intensity_of=TONGUE_ONLY_INTENSITY,
+    )
+    assert [(v.code, v.intensity) for v in got if v.code == "B"] == [("B", 1.0)]

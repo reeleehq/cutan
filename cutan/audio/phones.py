@@ -32,7 +32,7 @@ from an.audio.tts import AudioClip
 #: ``(label, start_s, end_s)``, as ``AudioClip.phones`` and ``.words`` hold them.
 Timing = tuple[str, float, float]
 #: ``(shape, start_s, end_s[, intensity])``: a mouth shape over a span.
-Segment = tuple
+Segment = tuple[str, float, float] | tuple[str, float, float, float]
 #: ``phone_to_viseme(phone, *, alphabet)``: a Rhubarb shape, or ``None`` when
 #: unknown (``alphabet`` is the clip's, :func:`phone_alphabet`). Silences never
 #: reach it: they are the rest shape.
@@ -116,7 +116,7 @@ TONGUE_ONLY_INTENSITY: Mapping[str, float] = {
 NO_INTENSITY: Mapping[str, float] = {}
 #: The phones that take the shape of the phone after them: ``HH`` is a breath
 #: before the vowel (Rhubarb draws it so), not a mouth shape of its own.
-TAKES_NEXT_SHAPE: frozenset[str] = frozenset({"HH", "h"})
+TAKES_NEXT_SHAPE: frozenset[str] = frozenset({"HH", "h", "ɦ"})
 
 #: Marks an IPA phone may carry that do not change its mouth shape.
 _IPA_MODIFIERS: frozenset[str] = frozenset("ːˑˈˌʲʰʷˠˤ")
@@ -211,9 +211,12 @@ def _keyframes(
         if start - prev_end > min_gap_for_rest and previous != rest_viseme:
             out.append(Viseme(time=prev_end, code=rest_viseme))
             previous = rest_viseme
+        strength = (weight or [1.0])[0]
         if code != previous:
-            out.append(Viseme(time=start, code=code, intensity=(weight or [1.0])[0]))
+            out.append(Viseme(time=start, code=code, intensity=strength))
             previous = code
+        elif code != rest_viseme and strength > out[-1].intensity:
+            out[-1] = Viseme(time=out[-1].time, code=code, intensity=strength)  # one cue for both phones: the stronger one's
         prev_end = max(prev_end, stop)
     if previous != rest_viseme and prev_end < end:
         out.append(Viseme(time=prev_end, code=rest_viseme))
@@ -272,11 +275,14 @@ def phones_to_visemes(
         base = _phone_base(str(phone), alphabet)
         weight = 1.0 if silent else intensity_of.get(base, 1.0)
         segments.append((code, float(start), float(stop), weight))
-    for i, (phone, _, _) in enumerate(phones):
-        if _phone_base(str(phone), alphabet) in takes_next_shape:
-            nxt = next((j for j in range(i + 1, len(phones)) if not _is_silence(str(phones[j][0]))), None)
-            if nxt is not None and segments[nxt][0] != rest_viseme:
-                segments[i] = (segments[nxt][0], *segments[i][1:])
+    for i in reversed(range(len(phones))):  # reversed: a run of HH takes the last one's
+        phone = str(phones[i][0])
+        if _phone_base(phone, alphabet) not in takes_next_shape:
+            continue
+        # the next phone, if it follows at once: across a silence the breath is its own
+        following = phones[i + 1][0] if i + 1 < len(phones) else None
+        if following is not None and not _is_silence(str(following)):
+            segments[i] = (segments[i + 1][0], *segments[i][1:])
     spoken = [(s, e) for p, s, e in phones if not _is_silence(str(p))]
     for word in words:
         if word[2] > word[1] and not any(
@@ -313,6 +319,7 @@ def phones_track(
     char_to_viseme: Optional[Mapping[str, str]] = None,
     rest_viseme: str = REST_VISEME,
     convention: str = "rhubarb",
+    intensity_of: Mapping[str, float] = NO_INTENSITY,
 ) -> Optional[VisemeTrack]:
     """The mouth track of a clip whose phones are timed (``AudioClip.phones``, a
     take timed by a forced aligner, an#491), carrying the clip's words too;
@@ -337,6 +344,7 @@ def phones_track(
         char_to_viseme=char_to_viseme,
         rest_viseme=rest_viseme,
         alphabet=getattr(audio, "phone_alphabet", None),
+        intensity_of=intensity_of,
     )
     if visemes is None:
         return None
