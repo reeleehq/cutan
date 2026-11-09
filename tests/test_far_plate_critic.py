@@ -110,3 +110,28 @@ def test_the_cli_says_when_nothing_was_judged(project, monkeypatch):
 
     monkeypatch.setattr(critic, "critique_far_plates", lambda project, model=None: critic.CritiqueReport())
     assert art_cli.critique_plates(".") == "0 judge calls"
+
+
+def test_a_plane_far_only_by_its_frame_is_judged_too(project):
+    """cutan#177: the critic judges the set `an validate` pins to infinity
+    (`an.ir.world.planes_at_infinity`), not only the planes the travel lists."""
+    from an.ir.schema import Frame
+    from an.ir.world import planes_at_infinity
+
+    world = project.scene.world
+    world.travel.plates["far"] = []
+    world.members[0] = WorldMember(
+        kind="environment", id="set", store="environments", ref="road",
+        planes={"sky": "horizon"},
+    )
+    world.frames = {
+        "car": Frame(),
+        "far": Frame(parent="car", coupling="far"),
+        "horizon": Frame(parent="far"),
+    }
+    judge = Judge(TREES)
+    report = critique_far_plates(project, judge=judge)
+    assert [c["plate"] for c in report.calls] == ["set/sky"]
+    assert [p.path for p in planes_at_infinity(world, project.mall["environments"])] == ["set/sky"]
+    # the finding points at the world member that puts the plane in the frame
+    assert any(f[0] == "warning" and f[1] == "world/members/0" for f in report.findings)
