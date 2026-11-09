@@ -73,6 +73,10 @@ FILM_SCHEMA_URI = "annot://schema/cutout-film/v1"
 #: the IR the renderer reads; ``scene.md`` is what a person edits.
 SCENE_FILES: tuple[str, ...] = ("scene.md", "ir/scene.json")
 ATTRIBUTION = "agent:cutan"
+#: What generated a film record, in lacing's ``<prefix>:<name>[@<version>]`` grammar
+#: (``lacing.GENERATOR_PREFIXES``): the render is a processor, named by its entry point. Not
+#: ``transform:``: nw reads that prefix as the output of one of its own Transforms.
+FILM_GENERATOR = "processor:an.render.render_project"
 
 
 CUTOUT_ANIMATION = register_genre(
@@ -214,7 +218,7 @@ def _record_film(project, scene_id, output: Path, *, output_name: str):
         },
         body_schema_uri=FILM_SCHEMA_URI,
         provenance=Provenance(
-            was_generated_by="an.render.render_project",
+            was_generated_by=FILM_GENERATOR,
             was_attributed_to=ATTRIBUTION,
             was_derived_from=[scene_id],
             generated_at_time=RationalTime.now(),

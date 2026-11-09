@@ -93,6 +93,7 @@ def test_a_host_creates_a_project_where_it_asks_and_reopens_it_by_path(tmp_path)
 
 
 @needs_storage
+@pytest.mark.filterwarnings("error::lacing.GeneratorIdWarning")
 def test_render_records_a_film_that_goes_stale_when_the_scene_changes(
     tmp_path, monkeypatch
 ):
@@ -123,3 +124,11 @@ def test_render_records_a_film_that_goes_stale_when_the_scene_changes(
     assert status.run(proj, {})["films"][0]["stale"] is True
     nw.genre_op(CUTOUT_ANIMATION_SLUG, "render").run(proj, {})
     assert [f["stale"] for f in status.run(proj, {})["films"]] == [False]
+
+
+def test_the_film_generator_id_follows_lacings_grammar():
+    from lacing import generator_id_findings
+
+    from cutan.nw import FILM_GENERATOR
+
+    assert generator_id_findings(FILM_GENERATOR) == []
