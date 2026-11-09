@@ -47,6 +47,7 @@ from an.genres import CompilePass, Genre, RuntimeScript, SemanticCheck
 from cutan.styles.copies import check_style_copies
 from cutan.styles.policy import check_shot_policy
 from cutan.verify.cadence import check_cadence
+from cutan.verify.eyeline import check_eyeline
 
 from cutan import GENRE_NAME, LIBRARY_NAME, require_an
 from cutan.characters import checks as _checks
@@ -295,7 +296,7 @@ CUTOUT = Genre(
         ),
         SemanticCheck(
             "cutout.eyeline",
-            _checks.check_eyeline,
+            check_eyeline,
             stage="finish",
             order=20,
             description=(

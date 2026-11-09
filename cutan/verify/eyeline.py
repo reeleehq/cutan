@@ -13,9 +13,14 @@ carries (:func:`cutan.characters.play.facing_at`):
   makes the cut jump the line, and the pair read as one looking past the other.
 
 The rules are pure functions over small records (:class:`Presence`), so they are
-tested without a store or a scene; :func:`eyeline_findings` is the adapter from a
+tested without a store or a scene; :func:`check_eyeline` is the adapter from a
 scene's resolved timelines, and ``cutout.eyeline`` registers it on the genre.
-Facing that is not a direction (a ``back`` view, no facing known) is not judged.
+
+Only a view that SHOWS a direction is judged (:data:`DIRECTIONAL_VIEWS`: the profile
+and the three-quarter). A ``front`` character looks at the camera, and mirroring it
+is invisible as an eyeline (gaze, not facing, directs it); a ``back`` one looks away
+from it. Lines are judged at their start AND end, and warned only when the speaker
+faces wrongly at both: a turn toward the listener during the line is the author's fix.
 
 >>> a = Presence("ana", direction="right", x=-1.0, speaks=True)
 >>> b = Presence("ben", direction="left", x=1.0)
@@ -30,12 +35,17 @@ Facing that is not a direction (a ``back`` view, no facing known) is not judged.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import Any, Callable, Optional, Sequence
 
-#: What a character faces when nothing set it: the rig's rest (``scale_x`` > 0).
+from cutan.characters.checks import _rig_document, _turns_of
+from cutan.characters.play import facing_at
+from cutan.characters.schema import DFLT_VIEW, CharacterDescriptor
+
+#: What a character faces when nothing set it: the rig's rest (``scale_x`` > 0; the
+#: factory draws its profile facing the viewer's right).
 REST_DIRECTION: str = "right"
-#: Views whose facing is not a direction on screen (the character shows its back).
-UNJUDGED_VIEWS: frozenset[str] = frozenset({"back"})
+#: The views that show a direction on screen; any other view is not judged.
+DIRECTIONAL_VIEWS: frozenset[str] = frozenset({"side", "three_quarter"})
 _OPPOSITE = {"left": "right", "right": "left"}
 
 
@@ -115,9 +125,103 @@ def cut_findings(
     ]
 
 
+def _presence(
+    entity: Any,
+    events: Any,
+    t: float,
+    *,
+    speaker: str | None,
+    rest_view: str,
+    directional_views: frozenset[str],
+    rest_direction: str,
+) -> Presence:
+    """``entity`` of a shot as the rules see it at ``t``."""
+    facing = facing_at(events, entity.id, t)
+    view = facing.view or rest_view
+    at = entity.stage.at if entity.stage is not None else None
+    return Presence(
+        entity.id,
+        direction=(facing.direction or rest_direction)
+        if view in directional_views
+        else None,
+        x=float(at[0]) if at else None,
+        speaks=entity.id == speaker,
+    )
+
+
+def _share_a_place(a: Any, b: Any) -> bool:
+    """Whether two shots show the same set: a non-character entity (an environment,
+    a prop) with the same ``ref`` in both. Two single-character shots in different
+    places are two scenes, not a shot and its reverse."""
+
+    def places(shot: Any) -> set[tuple[str, str]]:
+        return {(e.kind, e.ref) for e in shot.entities if e.kind != "character"}
+
+    return bool(places(a) & places(b))
+
+
+def check_eyeline(
+    ctx: Any,
+    *,
+    directional_views: frozenset[str] = DIRECTIONAL_VIEWS,
+    rest_direction: str = REST_DIRECTION,
+    share_a_place: Callable[[Any, Any], bool] = _share_a_place,
+) -> None:
+    """The cut-out genre's eyeline warnings: a speaker facing away from the one
+    character it speaks to, and a shot/reverse-shot pair whose speakers face the
+    same way. Needs the characters store, like the other turn checks (without it
+    the check did not run). Keyword-only parameters are the seams a host
+    registers its own check with (``functools.partial``): the views that show a
+    direction, what a character faces at rest, and what makes two shots one place.
+    """
+    from an.ir.validate import _dialogue_layout  # TODO an#767: a public layout
+
+    shots = ctx.shots
+    resolved = [_turns_of(ctx, i, shot) for i, shot in enumerate(shots)]
+    if any(r is None for r in resolved):
+        return
+    chars = [[e for e in shot.entities if e.kind == "character"] for shot in shots]
+    lines = [list(_dialogue_layout(shot)) for shot in shots]
+
+    def rest_view_of(entity: Any) -> str:
+        doc = _rig_document(entity, ctx.stores)
+        try:
+            return CharacterDescriptor.model_validate(doc).rest_view if doc else DFLT_VIEW
+        except Exception:  # noqa: BLE001 - a malformed descriptor is the play check's to report
+            return DFLT_VIEW
+
+    def present_at(i: int, t: float, speaker: str) -> list[Presence]:
+        return [
+            _presence(
+                e, resolved[i][0].events, t, speaker=speaker,
+                rest_view=rest_view_of(e), directional_views=directional_views,
+                rest_direction=rest_direction,
+            )
+            for e in chars[i]
+        ]
+
+    for i in range(len(shots)):
+        for k, line, start, end, _estimated in lines[i]:
+            at_start = {f.entity for f in shot_findings(present_at(i, start, line.speaker))}
+            for f in shot_findings(present_at(i, end, line.speaker)):
+                if f.entity in at_start:  # wrong all through the line
+                    ctx.report.add("warning", f"timeline/{i}/dialogue/{k}", f.message)
+    for i in range(1, len(shots)):
+        if not (lines[i - 1] and lines[i]) or not share_a_place(shots[i - 1], shots[i]):
+            continue
+        _, last, last_start, *_ = lines[i - 1][-1]
+        _, first, first_start, *_ = lines[i][0]
+        before = present_at(i - 1, last_start, last.speaker)
+        after = present_at(i, first_start, first.speaker)
+        if before and after and before[0].speaks and after[0].speaks:
+            for f in cut_findings(before, after):
+                ctx.report.add("warning", f"timeline/{i}/entities", f.message)
+
+
 __all__ = [
+    "DIRECTIONAL_VIEWS",
+    "check_eyeline",
     "REST_DIRECTION",
-    "UNJUDGED_VIEWS",
     "EyelineFinding",
     "Presence",
     "cut_findings",

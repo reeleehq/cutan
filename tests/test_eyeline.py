@@ -25,13 +25,18 @@ def project():
         yield root
 
 
-def _shot(shot_id, *entities, actions=(), speaker=None, duration=2.0):
-    """``entities``: ``(id, x)`` or ``(id, x, facing_left)``."""
+def _shot(shot_id, *entities, actions=(), speaker=None, duration=2.0, profile=True, env=None):
+    """``entities``: ``(id, x)`` or ``(id, x, facing_left)``; each is shown in
+    profile (the ``side`` view), the only kind of view whose facing is judged."""
     refs, acts = [], list(actions)
+    if env:
+        refs.append(AssetRef(kind="environment", id="set", store="environments", ref=env))
     for e in entities:
         name, x, *left = e
         stage = {"at": (x, 0.0)} if x is not None else None
         refs.append(AssetRef(kind="character", id=name, store="characters", ref=name, stage=stage))
+        if profile:
+            acts.append(SetAction(target=name, property="view", value="side", at=0.0))
         if left and left[0]:
             acts.append(SetAction(target=name, property="scale_x", value=-1.0, at=0.0))
     dialogue = [Dialogue(speaker=speaker, text="hello")] if speaker else []
@@ -86,11 +91,11 @@ def test_a_reverse_shot_facing_the_same_way_jumps_the_line():
 
 
 def test_validate_warns_when_a_pair_of_shots_jumps_the_line(project):
-    a = _shot("a", ("ned", None), speaker="ned")
-    b = _shot("b", ("carl", None), speaker="carl")
+    a = _shot("a", ("ned", None), speaker="ned", env="bus_stop")
+    b = _shot("b", ("carl", None), speaker="carl", env="bus_stop")
     (msg,) = _eyeline(project, a, b)
     assert "'ned' faces right and 'carl' answers facing right" in msg
-    turned = _shot("b", ("carl", None, True), speaker="carl")
+    turned = _shot("b", ("carl", None, True), speaker="carl", env="bus_stop")
     assert _eyeline(project, a, turned) == []
 
 
@@ -100,3 +105,28 @@ def test_validate_warns_when_a_speaker_looks_away_from_the_other_in_the_shot(pro
     assert "'ned' speaks to 'carl'" in msg and "right" in msg
     toward = _shot("s", ("ned", -1.0), ("carl", 1.0, True), speaker="ned")
     assert _eyeline(project, toward) == []
+
+
+def test_a_front_view_character_is_not_judged_by_its_mirror(project):
+    """A factory character rests facing the camera; mirroring it is no eyeline."""
+    a = _shot("a", ("ned", -1.0), ("carl", 1.0), speaker="carl", profile=False)
+    assert _eyeline(project, a) == []
+    c1 = _shot("a", ("ned", None), speaker="ned", profile=False)
+    c2 = _shot("b", ("carl", None), speaker="carl", profile=False)
+    assert _eyeline(project, c1, c2) == []
+
+
+def test_a_speaker_who_turns_to_the_listener_during_the_line_is_not_warned(project):
+    turning = _shot(
+        "s", ("ned", -1.0, True), ("carl", 1.0), speaker="ned",
+        actions=[SetAction(target="ned", property="scale_x", value=1.0, at=0.3)],
+    )
+    assert _eyeline(project, turning) == []
+
+
+def test_two_shots_in_different_places_are_not_a_shot_and_its_reverse(project):
+    a = _shot("a", ("ned", None), speaker="ned", env="bus_stop")
+    b = _shot("b", ("carl", None), speaker="carl", env="kitchen")
+    assert _eyeline(project, a, b) == []
+    same = _shot("b", ("carl", None), speaker="carl", env="bus_stop")
+    assert len(_eyeline(project, a, same)) == 1
