@@ -69,9 +69,17 @@ DEFAULT_SIZE: str = "1536x1024"
 #: and not every model has it).
 DEFAULT_QUALITY: Optional[str] = None
 #: The licence code of OpenAI's image output, which its terms assign to the user.
-#: ``an``'s licence classes do not know it yet (reeleehq/an#728), so ``an
-#: credits`` reports it as unknown until they do.
+#: ``an``'s licence classes treat it as an ATTRIBUTION (reeleehq/an#728: the terms
+#: ask that shared content say it is AI-generated), so ``an credits`` lists the
+#: asset under "must be displayed" with the sentence :data:`AI_DISCLOSURE` fills.
 OPENAI_OUTPUT_LICENSE: str = "openai-output-owned"
+#: The attribution sentence recorded with a generated image (cutan#183):
+#: ``{provider}`` is the provider's display name (:data:`PROVIDER_NAMES`),
+#: ``{model}`` the model that made it. Harmless where a provider's licence needs
+#: none (it is only read where the licence class asks for an attribution).
+AI_DISCLOSURE: str = "Images generated with {provider} {model}"
+#: How a provider id reads in a sentence; any other reads as written.
+PROVIDER_NAMES: Mapping[str, str] = {"openai": "OpenAI"}
 #: Where each generated image's provenance is written, beside the images.
 SOURCES_FILE: str = "art_sources.json"
 #: Named key colours, as the ``chroma`` matte's recipe: a hue band in degrees,
@@ -409,7 +417,12 @@ def cover_fit(image: Image.Image, size: tuple[int, int]) -> Image.Image:
 
 
 def art_source(
-    spec: ArtSpec, generator: ImageGenerator, facts: Optional[Mapping[str, Any]] = None
+    spec: ArtSpec,
+    generator: ImageGenerator,
+    facts: Optional[Mapping[str, Any]] = None,
+    *,
+    disclosure: Optional[str] = AI_DISCLOSURE,
+    provider_names: Mapping[str, str] = PROVIDER_NAMES,
 ) -> AssetSource:
     """The provenance of ``spec``'s image as ``generator`` made it; ``facts`` are
     what the provider said about this image (:class:`Generated`): the model it
@@ -419,6 +432,10 @@ def art_source(
     >>> s = art_source(ArtSpec(name="road", prompt="a road"), g)
     >>> s.provider, s.id, s.license, s.extra["prompt"]
     ('openai', 'gpt-image-2', 'openai-output-owned', 'a road')
+    >>> s.attribution
+    'Images generated with OpenAI gpt-image-2'
+    >>> art_source(ArtSpec(name="road", prompt="a road"), g, disclosure=None).attribution is None
+    True
     """
     facts = dict(facts or {})
     model = facts.get("model") or spec.model or getattr(generator, "model", None)
@@ -432,10 +449,18 @@ def art_source(
         }
     )
     quality = spec.quality or getattr(generator, "quality", None)
+    provider = who.get("provider") or "generated"
     return AssetSource(
-        provider=who.get("provider") or "generated",
+        provider=provider,
         id=model,
         license=who.get("license"),
+        attribution=(
+            disclosure.format(
+                provider=provider_names.get(provider, provider), model=model or "image model"
+            )
+            if disclosure
+            else None
+        ),
         extra={
             "prompt": spec.prompt,
             "model": model,

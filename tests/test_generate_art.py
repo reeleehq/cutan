@@ -314,3 +314,17 @@ def test_what_the_provider_said_is_recorded(tmp_path):
     assert road.source.id == "toy-1.5" and road.source.extra["revised_prompt"] == "a red road"
     record = json.loads((tmp_path / G.SOURCES_FILE).read_text())["road.png"]
     assert record["extra"]["model"] == "toy-1.5"
+
+
+def test_a_generated_plate_is_owed_in_an_credits_with_its_sentence():
+    """cutan#183: OpenAI output is an attribution (an#728); the sentence is recorded, so
+    `an credits` lists the plate under MUST BE DISPLAYED with it, not as owing something
+    never written."""
+    from an.credits import CreditEntry, CreditsReport
+
+    from cutan.carve.generate import AixGenerator, ArtSpec, art_source
+
+    source = art_source(ArtSpec(name="road", prompt="a road"), AixGenerator())
+    assert source.attribution == "Images generated with OpenAI gpt-image-2"
+    text = CreditsReport(entries=[CreditEntry(asset="plates/road.png", source=source)]).format()
+    assert "MUST BE DISPLAYED" in text and "Images generated with OpenAI gpt-image-2" in text
