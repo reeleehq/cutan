@@ -798,6 +798,7 @@ The video id of a YouTube URL, else `None`.
 
 | [`core`](cutan.carve.core.html.md#module-cutan.carve.core)             | The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.   |
 |-------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| [`files`](cutan.carve.files.html.md#module-cutan.carve.files)           | Whole-or-nothing file writes for the carve and generate steps (cutan#188).                             |
 | [`generate`](cutan.carve.generate.html.md#module-cutan.carve.generate)     | Generated art: a prompt in, a keyed, fitted, provenance-carrying plate or part out (cutan#100).        |
 | [`head`](cutan.carve.head.html.md#module-cutan.carve.head)             | Head mode: a face located, the neck cut under the jaw, the head normalised on a fixed canvas.          |
 | [`mattes`](cutan.carve.mattes.html.md#module-cutan.carve.mattes)         | Matte strategies: which pixels of an image are the subject.                                            |

@@ -51,7 +51,7 @@ Configuration (environment; the first match wins, `CUTAN_HOME` always forces loc
 |--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
 | [`PushReport`](#cutan.projects_store.PushReport)(project_id, folder, written, ...)    | What one [`push_project()`](#cutan.projects_store.push_project) did, as relative paths. |
 
-### cutan.projects_store.DEFAULT_PUSH_EXCLUDES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('.git/', '.an/render_work/', 'artifacts/shot_cache/', 'artifacts/shots/', 'artifacts/render_reports/', 'artifacts/probes/', 'artifacts/voice_options/\*.lock')*
+### cutan.projects_store.DEFAULT_PUSH_EXCLUDES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('.git/', '.an/render_work/', '.\*.tmp', 'artifacts/shot_cache/', 'artifacts/shots/', 'artifacts/render_reports/', 'artifacts/probes/', 'artifacts/voice_options/\*.lock')*
 
 derived or transient output,
 keyed by that machine or re-made from the project. The shot cache (an#242) and
@@ -175,7 +175,7 @@ nothing is pruned.
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
 
-### cutan.projects_store.push_project(project_id, , folder=None, settings=None, store=None, delete_missing=False, exclude=('.git/', '.an/render_work/', 'artifacts/shot_cache/', 'artifacts/shots/', 'artifacts/render_reports/', 'artifacts/probes/', 'artifacts/voice_options/\*.lock'), force=False, cache=None)
+### cutan.projects_store.push_project(project_id, , folder=None, settings=None, store=None, delete_missing=False, exclude=('.git/', '.an/render_work/', '.\*.tmp', 'artifacts/shot_cache/', 'artifacts/shots/', 'artifacts/render_reports/', 'artifacts/probes/', 'artifacts/voice_options/\*.lock'), force=False, cache=None)
 
 Write `folder`’s files to the store under `project_id/`: the inverse of
 [`materialize_project()`](#cutan.projects_store.materialize_project) (cutan#91).

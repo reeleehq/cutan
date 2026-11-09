@@ -18,6 +18,7 @@
 - [cutan.body_attachment](cutan.body_attachment.html.md): Props that depict part of a character’s body: the declaration, the geometry, the placement.
 - [cutan.carve](cutan.carve.html.md): Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cuta...
 - [cutan.carve.core](cutan.carve.core.html.md): The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.
+- [cutan.carve.files](cutan.carve.files.html.md): Whole-or-nothing file writes for the carve and generate steps (cutan#188).
 - [cutan.carve.generate](cutan.carve.generate.html.md): Generated art: a prompt in, a keyed, fitted, provenance-carrying plate or part out (cutan#100).
 - [cutan.carve.head](cutan.carve.head.html.md): Head mode: a face located, the neck cut under the jaw, the head normalised on a fixed canvas.
 - [cutan.carve.mattes](cutan.carve.mattes.html.md): Matte strategies: which pixels of an image are the subject.

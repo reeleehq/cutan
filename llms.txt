@@ -20,6 +20,7 @@
 - [cutan.body_attachment](_autosummary/cutan.body_attachment.html.md): Props that depict part of a character’s body: the declaration, the geometry, the placement.
 - [cutan.carve](_autosummary/cutan.carve.html.md): Carve: a photo or a video frame in, a matted, normalised, provenance-carrying cut-out part out (cuta...
 - [cutan.carve.core](_autosummary/cutan.carve.core.html.md): The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.
+- [cutan.carve.files](_autosummary/cutan.carve.files.html.md): Whole-or-nothing file writes for the carve and generate steps (cutan#188).
 - [cutan.carve.generate](_autosummary/cutan.carve.generate.html.md): Generated art: a prompt in, a keyed, fitted, provenance-carrying plate or part out (cutan#100).
 - [cutan.carve.head](_autosummary/cutan.carve.head.html.md): Head mode: a face located, the neck cut under the jaw, the head normalised on a fixed canvas.
 - [cutan.carve.mattes](_autosummary/cutan.carve.mattes.html.md): Matte strategies: which pixels of an image are the subject.
@@ -99,7 +100,7 @@
 - [cutan.verify.regions](_autosummary/cutan.verify.regions.html.md): Mouth and body cadence apart: “mouths on ones, bodies on twos” made measurable (cutan#80).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-09 01:39 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-09 02:08 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 
