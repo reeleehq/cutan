@@ -454,27 +454,45 @@ def _plate_png(path: Any, *, max_side: int = PLATE_MAX_SIDE) -> bytes:
     return buf.getvalue()
 
 
+class _ReadableEnvironments:
+    """The environments store as ``planes_at_infinity`` reads it: an environment
+    whose document cannot be read is absent (``KeyError``), not fatal. ``an``'s
+    reader catches only ``KeyError``/``TypeError``, so one corrupt ``meta.json``
+    would stop the critic from judging any plate; that descriptor is another
+    check's to report."""
+
+    def __init__(self, store: Any):
+        self._store = store
+
+    def __getitem__(self, ref: str) -> Any:
+        try:
+            return self._store[ref]
+        except Exception as error:  # noqa: BLE001
+            raise KeyError(ref) from error
+
+
 def _far_plates(project: Any) -> list[tuple[str, str, Any, str]]:
-    """``(where, "member/plane", plate path or None, why not)`` of each plane a
-    travel lists ``far``; the path is ``None`` (and ``why not`` says why) when
+    """``(where, "member/plane", plate path or None, why not)`` of each plane the
+    world has at infinity (``an.ir.world.planes_at_infinity``, the rule ``an
+    validate`` checks by: listed ``far`` under the travel's plates, or in a frame
+    coupled ``far``); the path is ``None`` (and ``why not`` says why) when
     the plane has no image (a fill, a gradient), its member is not an
     environment, or its file cannot be read inside its environment's folder."""
     from an.ir.migrate import migrate
     from an.stage.environments import ENVIRONMENT_DOCUMENT_KIND, EnvironmentDescriptor
+    from an.ir.world import planes_at_infinity
     from an.stores._common import inside_folder
 
     world = getattr(project.scene, "world", None)
-    travel = getattr(world, "travel", None) if world is not None else None
-    if travel is None:
-        return []
     env_store = project.mall.get("environments")
     root = getattr(env_store, "_root", None)
-    members = {m.id: m for m in world.members}
+    members = {m.id: m for m in world.members} if world is not None else {}
     out = []
-    for k, name in enumerate(travel.plates.get("far", ())):
-        member_id, _, plane_name = name.partition("/")
+    for far in planes_at_infinity(
+        world, None if env_store is None else _ReadableEnvironments(env_store)
+    ):
+        member_id, plane_name, name, where = far.member, far.plane, far.path, far.ir_path
         member = members.get(member_id)
-        where = f"world/travel/plates/far/{k}"
         path, why = None, "its file cannot be read in its environment's folder"
         if member is None or member.kind != "environment" or root is None:
             why = (
@@ -510,15 +528,16 @@ def critique_far_plates(
     model: str | None = None,
     max_side: int = PLATE_MAX_SIDE,
 ) -> CritiqueReport:
-    """Ask whether each ``far`` plate of ``project``'s travel holds anything near
+    """Ask whether each plane at infinity of ``project``'s world holds anything near
     (cutan#166): a tree baked into a plate stands still while the streams move.
 
     The plate's own image is judged, not a render: no probe, one call per plate
     (at most ``max_side`` px long; a plane's ``fit`` never crops, so the image
     holds everything a pan could show). An SVG plate (drawn by hand, its content
     known to its author) and a plane with no picture are not judged, each said
-    as an ``info``. Only the plates a travel LISTS ``far`` are judged; a plane at
-    infinity because its frame is coupled ``far`` is not yet (cutan#177).
+    as an ``info``. Every plane the world has at infinity is judged
+    (``an.ir.world.planes_at_infinity``: listed ``far`` by the travel, or in a
+    frame coupled ``far``), the same set ``an validate`` pins to parallax 0.
     Findings and calls as :func:`critique_body_props`.
     """
     from an.project import load
@@ -552,7 +571,7 @@ def critique_far_plates(
             subject=f"plate {name!r}",
             context=f"plate {name!r}",
             advice=(
-                "A plate the travel lists `far` must hold only what is at infinity: "
+                "A plane at infinity (listed `far` by the travel, or in a frame coupled `far`) must hold only what is far away: "
                 "move what is near to a stream, or onto a `vehicle` plate."
             ),
         )
