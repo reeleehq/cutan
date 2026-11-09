@@ -13,5 +13,6 @@ cutan.verify
    body
    cadence
    critic
+   eyeline
    regions
    style

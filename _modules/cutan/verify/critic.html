@@ -697,93 +697,98 @@
 </span><span id="line-491">    <span class="k">for</span> <span class="n">far</span> <span class="ow">in</span> <span class="n">planes_at_infinity</span><span class="p">(</span>
 </span><span id="line-492">        <span class="n">world</span><span class="p">,</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">env_store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_ReadableEnvironments</span><span class="p">(</span><span class="n">env_store</span><span class="p">)</span>
 </span><span id="line-493">    <span class="p">):</span>
-</span><span id="line-494">        <span class="n">member_id</span><span class="p">,</span> <span class="n">plane_name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">where</span> <span class="o">=</span> <span class="n">far</span><span class="o">.</span><span class="n">member</span><span class="p">,</span> <span class="n">far</span><span class="o">.</span><span class="n">plane</span><span class="p">,</span> <span class="n">far</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">far</span><span class="o">.</span><span class="n">ir_path</span>
-</span><span id="line-495">        <span class="n">member</span> <span class="o">=</span> <span class="n">members</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">member_id</span><span class="p">)</span>
-</span><span id="line-496">        <span class="n">path</span><span class="p">,</span> <span class="n">why</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"its file cannot be read in its environment's folder"</span>
-</span><span id="line-497">        <span class="k">if</span> <span class="n">member</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">member</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s2">"environment"</span> <span class="ow">or</span> <span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-498">            <span class="n">why</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-499">                <span class="s2">"it is not a plane of an environment in the world"</span>
-</span><span id="line-500">                <span class="k">if</span> <span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="line-501">                <span class="k">else</span> <span class="s2">"the environments store has no folder"</span>
-</span><span id="line-502">            <span class="p">)</span>
-</span><span id="line-503">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">where</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">why</span><span class="p">))</span>
-</span><span id="line-504">            <span class="k">continue</span>
-</span><span id="line-505">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-506">            <span class="n">raw</span> <span class="o">=</span> <span class="n">env_store</span><span class="p">[</span><span class="n">member</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span>
-</span><span id="line-507">            <span class="n">env</span> <span class="o">=</span> <span class="n">EnvironmentDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
-</span><span id="line-508">                <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">raw</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="n">ENVIRONMENT_DOCUMENT_KIND</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-</span><span id="line-509">            <span class="p">)</span>
-</span><span id="line-510">            <span class="n">plane</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">planes</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">plane_name</span><span class="p">)</span>
-</span><span id="line-511">            <span class="k">if</span> <span class="n">plane</span><span class="o">.</span><span class="n">art</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s2">"image"</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">plane</span><span class="o">.</span><span class="n">art</span><span class="o">.</span><span class="n">src</span><span class="p">:</span>
-</span><span id="line-512">                <span class="n">why</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"it is a </span><span class="si">{</span><span class="n">plane</span><span class="o">.</span><span class="n">art</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">, not a picture"</span>
-</span><span id="line-513">            <span class="k">else</span><span class="p">:</span>
-</span><span id="line-514">                <span class="n">path</span> <span class="o">=</span> <span class="n">inside_folder</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">ref</span><span class="p">),</span> <span class="n">plane</span><span class="o">.</span><span class="n">art</span><span class="o">.</span><span class="n">src</span><span class="p">)</span>
-</span><span id="line-515">        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
-</span><span id="line-516">            <span class="n">why</span> <span class="o">=</span> <span class="s2">"its environment has no such plane"</span>
-</span><span id="line-517">        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - a malformed environment is another check's to report</span>
-</span><span id="line-518">            <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-519">        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">where</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">why</span><span class="p">))</span>
-</span><span id="line-520">    <span class="k">return</span> <span class="n">out</span>
-</span><span id="line-521">
-</span><span id="line-522">
+</span><span id="line-494">        <span class="n">member_id</span><span class="p">,</span> <span class="n">plane_name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">where</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-495">            <span class="n">far</span><span class="o">.</span><span class="n">member</span><span class="p">,</span>
+</span><span id="line-496">            <span class="n">far</span><span class="o">.</span><span class="n">plane</span><span class="p">,</span>
+</span><span id="line-497">            <span class="n">far</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+</span><span id="line-498">            <span class="n">far</span><span class="o">.</span><span class="n">ir_path</span><span class="p">,</span>
+</span><span id="line-499">        <span class="p">)</span>
+</span><span id="line-500">        <span class="n">member</span> <span class="o">=</span> <span class="n">members</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">member_id</span><span class="p">)</span>
+</span><span id="line-501">        <span class="n">path</span><span class="p">,</span> <span class="n">why</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"its file cannot be read in its environment's folder"</span>
+</span><span id="line-502">        <span class="k">if</span> <span class="n">member</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">member</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s2">"environment"</span> <span class="ow">or</span> <span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-503">            <span class="n">why</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-504">                <span class="s2">"it is not a plane of an environment in the world"</span>
+</span><span id="line-505">                <span class="k">if</span> <span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="line-506">                <span class="k">else</span> <span class="s2">"the environments store has no folder"</span>
+</span><span id="line-507">            <span class="p">)</span>
+</span><span id="line-508">            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">where</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">why</span><span class="p">))</span>
+</span><span id="line-509">            <span class="k">continue</span>
+</span><span id="line-510">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-511">            <span class="n">raw</span> <span class="o">=</span> <span class="n">env_store</span><span class="p">[</span><span class="n">member</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span>
+</span><span id="line-512">            <span class="n">env</span> <span class="o">=</span> <span class="n">EnvironmentDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
+</span><span id="line-513">                <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">raw</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="n">ENVIRONMENT_DOCUMENT_KIND</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-514">            <span class="p">)</span>
+</span><span id="line-515">            <span class="n">plane</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">planes</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">plane_name</span><span class="p">)</span>
+</span><span id="line-516">            <span class="k">if</span> <span class="n">plane</span><span class="o">.</span><span class="n">art</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s2">"image"</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">plane</span><span class="o">.</span><span class="n">art</span><span class="o">.</span><span class="n">src</span><span class="p">:</span>
+</span><span id="line-517">                <span class="n">why</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"it is a </span><span class="si">{</span><span class="n">plane</span><span class="o">.</span><span class="n">art</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">, not a picture"</span>
+</span><span id="line-518">            <span class="k">else</span><span class="p">:</span>
+</span><span id="line-519">                <span class="n">path</span> <span class="o">=</span> <span class="n">inside_folder</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">ref</span><span class="p">),</span> <span class="n">plane</span><span class="o">.</span><span class="n">art</span><span class="o">.</span><span class="n">src</span><span class="p">)</span>
+</span><span id="line-520">        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+</span><span id="line-521">            <span class="n">why</span> <span class="o">=</span> <span class="s2">"its environment has no such plane"</span>
+</span><span id="line-522">        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - a malformed environment is another check's to report</span>
+</span><span id="line-523">            <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-524">        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">where</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">why</span><span class="p">))</span>
+</span><span id="line-525">    <span class="k">return</span> <span class="n">out</span>
+</span><span id="line-526">
+</span><span id="line-527">
 <div class="viewcode-block" id="critique_far_plates">
 <a class="viewcode-back" href="../../../_autosummary/cutan.verify.critic.html#cutan.verify.critic.critique_far_plates">[docs]</a>
-</span><span id="line-523"><span class="k">def</span><span class="w"> </span><span class="nf">critique_far_plates</span><span class="p">(</span>
-</span><span id="line-524">    <span class="n">project</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-</span><span id="line-525">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-526">    <span class="n">judge</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-527">    <span class="n">checklist</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Question</span><span class="p">]</span> <span class="o">=</span> <span class="n">FAR_PLATE_CHECKLIST</span><span class="p">,</span>
-</span><span id="line-528">    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-529">    <span class="n">max_side</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLATE_MAX_SIDE</span><span class="p">,</span>
-</span><span id="line-530"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CritiqueReport</span><span class="p">:</span>
-</span><span id="line-531"><span class="w">    </span><span class="sd">"""Ask whether each plane at infinity of ``project``'s world holds anything near</span>
-</span><span id="line-532"><span class="sd">    (cutan#166): a tree baked into a plate stands still while the streams move.</span>
-</span><span id="line-533">
-</span><span id="line-534"><span class="sd">    The plate's own image is judged, not a render: no probe, one call per plate</span>
-</span><span id="line-535"><span class="sd">    (at most ``max_side`` px long; a plane's ``fit`` never crops, so the image</span>
-</span><span id="line-536"><span class="sd">    holds everything a pan could show). An SVG plate (drawn by hand, its content</span>
-</span><span id="line-537"><span class="sd">    known to its author) and a plane with no picture are not judged, each said</span>
-</span><span id="line-538"><span class="sd">    as an ``info``. Every plane the world has at infinity is judged</span>
-</span><span id="line-539"><span class="sd">    (``an.ir.world.planes_at_infinity``: listed ``far`` by the travel, or in a</span>
-</span><span id="line-540"><span class="sd">    frame coupled ``far``), the same set ``an validate`` pins to parallax 0.</span>
-</span><span id="line-541"><span class="sd">    Findings and calls as :func:`critique_body_props`.</span>
-</span><span id="line-542"><span class="sd">    """</span>
-</span><span id="line-543">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.project</span><span class="w"> </span><span class="kn">import</span> <span class="n">load</span>
-</span><span id="line-544">
-</span><span id="line-545">    <span class="n">project</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">project</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="s2">"scene"</span><span class="p">)</span> <span class="k">else</span> <span class="n">project</span>
-</span><span id="line-546">    <span class="n">report</span> <span class="o">=</span> <span class="n">CritiqueReport</span><span class="p">()</span>
-</span><span id="line-547">    <span class="n">custom</span> <span class="o">=</span> <span class="n">judge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="line-548">    <span class="k">for</span> <span class="n">where</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">why</span> <span class="ow">in</span> <span class="n">_far_plates</span><span class="p">(</span><span class="n">project</span><span class="p">):</span>
-</span><span id="line-549">        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">".svg"</span><span class="p">:</span>
-</span><span id="line-550">            <span class="n">reason</span> <span class="o">=</span> <span class="s2">"it is an SVG, drawn by hand"</span> <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">why</span>
-</span><span id="line-551">            <span class="n">report</span><span class="o">.</span><span class="n">findings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-552">                <span class="p">(</span><span class="s2">"info"</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"far plate </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> not judged: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-553">            <span class="p">)</span>
-</span><span id="line-554">            <span class="k">continue</span>
-</span><span id="line-555">        <span class="k">if</span> <span class="n">judge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-556">            <span class="n">judge</span> <span class="o">=</span> <span class="n">_checked_default_judge</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">report</span><span class="p">,</span> <span class="s2">"far-plate critic"</span><span class="p">)</span>
-</span><span id="line-557">            <span class="k">if</span> <span class="n">judge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-558">                <span class="k">return</span> <span class="n">report</span>
-</span><span id="line-559">        <span class="n">questions</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">checklist</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-</span><span id="line-560">        <span class="n">_ask</span><span class="p">(</span>
-</span><span id="line-561">            <span class="n">report</span><span class="p">,</span>
-</span><span id="line-562">            <span class="n">judge</span><span class="o">=</span><span class="n">judge</span><span class="p">,</span>
-</span><span id="line-563">            <span class="n">images</span><span class="o">=</span><span class="k">lambda</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">:</span> <span class="p">[</span><span class="n">_plate_png</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">max_side</span><span class="o">=</span><span class="n">max_side</span><span class="p">)],</span>
-</span><span id="line-564">            <span class="n">prompt</span><span class="o">=</span><span class="n">_PLATE_PROMPT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">questions</span><span class="o">=</span><span class="n">questions</span><span class="p">),</span>
-</span><span id="line-565">            <span class="n">checklist</span><span class="o">=</span><span class="n">checklist</span><span class="p">,</span>
-</span><span id="line-566">            <span class="n">fill</span><span class="o">=</span><span class="p">{},</span>
-</span><span id="line-567">            <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span>
-</span><span id="line-568">            <span class="n">call</span><span class="o">=</span><span class="p">{</span><span class="s2">"plate"</span><span class="p">:</span> <span class="n">name</span><span class="p">},</span>
-</span><span id="line-569">            <span class="n">model</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">custom</span> <span class="k">else</span> <span class="n">model</span><span class="p">,</span>
-</span><span id="line-570">            <span class="n">label</span><span class="o">=</span><span class="s2">"far-plate critic"</span><span class="p">,</span>
-</span><span id="line-571">            <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s2">"plate </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-572">            <span class="n">context</span><span class="o">=</span><span class="sa">f</span><span class="s2">"plate </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-573">            <span class="n">advice</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-574">                <span class="s2">"A plane at infinity (listed `far` by the travel, or in a frame coupled `far`) must hold only what is far away: "</span>
-</span><span id="line-575">                <span class="s2">"move what is near to a stream, or onto a `vehicle` plate."</span>
-</span><span id="line-576">            <span class="p">),</span>
-</span><span id="line-577">        <span class="p">)</span>
-</span><span id="line-578">    <span class="k">return</span> <span class="n">report</span></div>
+</span><span id="line-528"><span class="k">def</span><span class="w"> </span><span class="nf">critique_far_plates</span><span class="p">(</span>
+</span><span id="line-529">    <span class="n">project</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="line-530">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-531">    <span class="n">judge</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-532">    <span class="n">checklist</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Question</span><span class="p">]</span> <span class="o">=</span> <span class="n">FAR_PLATE_CHECKLIST</span><span class="p">,</span>
+</span><span id="line-533">    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-534">    <span class="n">max_side</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLATE_MAX_SIDE</span><span class="p">,</span>
+</span><span id="line-535"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CritiqueReport</span><span class="p">:</span>
+</span><span id="line-536"><span class="w">    </span><span class="sd">"""Ask whether each plane at infinity of ``project``'s world holds anything near</span>
+</span><span id="line-537"><span class="sd">    (cutan#166): a tree baked into a plate stands still while the streams move.</span>
+</span><span id="line-538">
+</span><span id="line-539"><span class="sd">    The plate's own image is judged, not a render: no probe, one call per plate</span>
+</span><span id="line-540"><span class="sd">    (at most ``max_side`` px long; a plane's ``fit`` never crops, so the image</span>
+</span><span id="line-541"><span class="sd">    holds everything a pan could show). An SVG plate (drawn by hand, its content</span>
+</span><span id="line-542"><span class="sd">    known to its author) and a plane with no picture are not judged, each said</span>
+</span><span id="line-543"><span class="sd">    as an ``info``. Every plane the world has at infinity is judged</span>
+</span><span id="line-544"><span class="sd">    (``an.ir.world.planes_at_infinity``: listed ``far`` by the travel, or in a</span>
+</span><span id="line-545"><span class="sd">    frame coupled ``far``), the same set ``an validate`` pins to parallax 0.</span>
+</span><span id="line-546"><span class="sd">    Findings and calls as :func:`critique_body_props`.</span>
+</span><span id="line-547"><span class="sd">    """</span>
+</span><span id="line-548">    <span class="kn">from</span><span class="w"> </span><span class="nn">an.project</span><span class="w"> </span><span class="kn">import</span> <span class="n">load</span>
+</span><span id="line-549">
+</span><span id="line-550">    <span class="n">project</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">project</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="s2">"scene"</span><span class="p">)</span> <span class="k">else</span> <span class="n">project</span>
+</span><span id="line-551">    <span class="n">report</span> <span class="o">=</span> <span class="n">CritiqueReport</span><span class="p">()</span>
+</span><span id="line-552">    <span class="n">custom</span> <span class="o">=</span> <span class="n">judge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="line-553">    <span class="k">for</span> <span class="n">where</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">why</span> <span class="ow">in</span> <span class="n">_far_plates</span><span class="p">(</span><span class="n">project</span><span class="p">):</span>
+</span><span id="line-554">        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">".svg"</span><span class="p">:</span>
+</span><span id="line-555">            <span class="n">reason</span> <span class="o">=</span> <span class="s2">"it is an SVG, drawn by hand"</span> <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">why</span>
+</span><span id="line-556">            <span class="n">report</span><span class="o">.</span><span class="n">findings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-557">                <span class="p">(</span><span class="s2">"info"</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"far plate </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> not judged: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-558">            <span class="p">)</span>
+</span><span id="line-559">            <span class="k">continue</span>
+</span><span id="line-560">        <span class="k">if</span> <span class="n">judge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-561">            <span class="n">judge</span> <span class="o">=</span> <span class="n">_checked_default_judge</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">report</span><span class="p">,</span> <span class="s2">"far-plate critic"</span><span class="p">)</span>
+</span><span id="line-562">            <span class="k">if</span> <span class="n">judge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-563">                <span class="k">return</span> <span class="n">report</span>
+</span><span id="line-564">        <span class="n">questions</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">checklist</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</span><span id="line-565">        <span class="n">_ask</span><span class="p">(</span>
+</span><span id="line-566">            <span class="n">report</span><span class="p">,</span>
+</span><span id="line-567">            <span class="n">judge</span><span class="o">=</span><span class="n">judge</span><span class="p">,</span>
+</span><span id="line-568">            <span class="n">images</span><span class="o">=</span><span class="k">lambda</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">:</span> <span class="p">[</span><span class="n">_plate_png</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">max_side</span><span class="o">=</span><span class="n">max_side</span><span class="p">)],</span>
+</span><span id="line-569">            <span class="n">prompt</span><span class="o">=</span><span class="n">_PLATE_PROMPT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">questions</span><span class="o">=</span><span class="n">questions</span><span class="p">),</span>
+</span><span id="line-570">            <span class="n">checklist</span><span class="o">=</span><span class="n">checklist</span><span class="p">,</span>
+</span><span id="line-571">            <span class="n">fill</span><span class="o">=</span><span class="p">{},</span>
+</span><span id="line-572">            <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span>
+</span><span id="line-573">            <span class="n">call</span><span class="o">=</span><span class="p">{</span><span class="s2">"plate"</span><span class="p">:</span> <span class="n">name</span><span class="p">},</span>
+</span><span id="line-574">            <span class="n">model</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">custom</span> <span class="k">else</span> <span class="n">model</span><span class="p">,</span>
+</span><span id="line-575">            <span class="n">label</span><span class="o">=</span><span class="s2">"far-plate critic"</span><span class="p">,</span>
+</span><span id="line-576">            <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s2">"plate </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-577">            <span class="n">context</span><span class="o">=</span><span class="sa">f</span><span class="s2">"plate </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-578">            <span class="n">advice</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-579">                <span class="s2">"A plane at infinity (listed `far` by the travel, or in a frame coupled `far`) must hold only what is far away: "</span>
+</span><span id="line-580">                <span class="s2">"move what is near to a stream, or onto a `vehicle` plate."</span>
+</span><span id="line-581">            <span class="p">),</span>
+</span><span id="line-582">        <span class="p">)</span>
+</span><span id="line-583">    <span class="k">return</span> <span class="n">report</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -798,7 +803,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=609ae934"></script>
+    <script src="../../../_static/documentation_options.js?v=5762635e"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -1,4 +1,4 @@
-> built 2026-11-09 01:00 UTC from 4207ba0 (main) · cutan 0.0.111. Details: build_info.json
+> built 2026-11-09 01:39 UTC from c150cbc (main) · cutan 0.0.112. Details: build_info.json
 
 # index.html.md
 
@@ -1015,7 +1015,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'ellipse', 'eye', 'rect'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'eye', 'mouth', 'rect'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -15818,6 +15818,126 @@ True
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 
+# _autosummary/cutan.verify.eyeline.html.md
+
+# cutan.verify.eyeline
+
+The eyeline lint: do two characters in an exchange look at each other?
+
+Two rules, both advisory (a warning is the author’s to override on purpose), both
+about the SIGN a character faces (`scale_x`), the only facing a flat timeline
+carries ([`cutan.characters.play.facing_at()`](_autosummary/cutan.characters.play.html.md#cutan.characters.play.facing_at)):
+
+* **Within a shot** ([`shot_findings()`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.shot_findings)): a character speaking to the one other
+  character on screen should face their side of the frame. `at: [x, y]` places
+  them; a speaker left of the listener who faces left looks away.
+* **Across a cut** ([`cut_findings()`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.cut_findings)): a shot/reverse-shot pair keeps the line
+  (the 180-degree rule). `A` speaks alone in one shot, `B` answers alone in the
+  next; `A` should face one way and `B` the other. Both facing the same way
+  makes the cut jump the line, and the pair read as one looking past the other.
+
+The rules are pure functions over small records ([`Presence`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.Presence)), so they are
+tested without a store or a scene; [`check_eyeline()`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.check_eyeline) is the adapter from a
+scene’s resolved timelines, and `cutout.eyeline` registers it on the genre.
+
+Only a view that SHOWS a direction is judged ([`DIRECTIONAL_VIEWS`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.DIRECTIONAL_VIEWS): the profile
+and the three-quarter). A `front` character looks at the camera, and mirroring it
+is invisible as an eyeline (gaze, not facing, directs it); a `back` one looks away
+from it. Lines are judged at their start AND end, and warned only when the speaker
+faces wrongly at both: a turn toward the listener during the line is the author’s fix.
+
+```pycon
+>>> a = Presence("ana", direction="right", x=-1.0, speaks=True)
+>>> b = Presence("ben", direction="left", x=1.0)
+>>> shot_findings([a, b])
+[]
+>>> [f.entity for f in shot_findings([Presence("ana", "left", -1.0, True), b])]
+['ana']
+>>> cut_findings([a], [Presence("ben", "right", 0.0, True)])[0].entity
+'ben'
+```
+
+### Module Attributes
+
+| [`REST_DIRECTION`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.REST_DIRECTION)    | the rig's rest (`scale_x` > 0; the factory draws its profile facing the viewer's right).   |
+|--------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| [`DIRECTIONAL_VIEWS`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.DIRECTIONAL_VIEWS) | The views that show a direction on screen; any other view is not judged.                   |
+
+### Functions
+
+| [`check_eyeline`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.check_eyeline)(ctx, \*[, directional_views, ...])   | The cut-out genre's eyeline warnings: a speaker facing away from the one character it speaks to, and a shot/reverse-shot pair whose speakers face the same way.   |
+|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`cut_findings`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.cut_findings)(before, after)                        | A shot/reverse-shot pair whose speakers face the same way (the line is jumped).                                                                                   |
+| [`shot_findings`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.shot_findings)(present)                             | A speaker facing away from the one other character in the shot.                                                                                                   |
+
+### Classes
+
+| [`EyelineFinding`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.EyelineFinding)(entity, message)          | One thing to warn about: which entity, and what is wrong with its facing.   |
+|-------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| [`Presence`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.Presence)(entity[, direction, x, speaks]) | A character on screen at one instant of a shot.                             |
+
+### cutan.verify.eyeline.DIRECTIONAL_VIEWS *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'side', 'three_quarter'})*
+
+The views that show a direction on screen; any other view is not judged.
+
+### *class* cutan.verify.eyeline.EyelineFinding(entity, message)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One thing to warn about: which entity, and what is wrong with its facing.
+
+### *class* cutan.verify.eyeline.Presence(entity, direction=None, x=None, speaks=False)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A character on screen at one instant of a shot.
+
+`direction` is `"left"`/`"right"`, or `None` when it is not judged (a
+view that shows no direction); `x` its horizontal screen position, or
+`None` when the shot does not place it; `speaks` whether it is the shot’s
+speaker in the exchange.
+
+### cutan.verify.eyeline.REST_DIRECTION *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'right'*
+
+the rig’s rest (`scale_x` > 0; the
+factory draws its profile facing the viewer’s right).
+
+* **Type:**
+  What a character faces when nothing set it
+
+### cutan.verify.eyeline.check_eyeline(ctx, \*, directional_views=frozenset({'side', 'three_quarter'}), rest_direction='right', share_a_place=<function \_share_a_place>)
+
+The cut-out genre’s eyeline warnings: a speaker facing away from the one
+character it speaks to, and a shot/reverse-shot pair whose speakers face the
+same way. Needs the characters store, like the other turn checks (without it
+the check did not run). Keyword-only parameters are the seams a host
+registers its own check with (`functools.partial`): the views that show a
+direction, what a character faces at rest, and what makes two shots one place.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.verify.eyeline.cut_findings(before, after)
+
+A shot/reverse-shot pair whose speakers face the same way (the line is jumped).
+
+Judged only for a true pair: each shot holds exactly one character, and they
+differ. The finding is on the second shot’s character, the one to turn.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`EyelineFinding`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.EyelineFinding)]
+
+### cutan.verify.eyeline.shot_findings(present)
+
+A speaker facing away from the one other character in the shot.
+
+Judged only with exactly one other character, both placed, at different `x`
+and a known direction: with more people the addressee is not knowable here.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`EyelineFinding`](_autosummary/cutan.verify.eyeline.html.md#cutan.verify.eyeline.EyelineFinding)]
+
+
 # _autosummary/cutan.verify.html.md
 
 # cutan.verify
@@ -15830,6 +15950,7 @@ The cut-out style lint: measures a render against a named style spec.
 |--------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
 | [`cadence`](_autosummary/cutan.verify.cadence.html.md#module-cutan.verify.cadence) | Pre-render cadence lint: the scene's timing against its style spec (catalogue B6, an#519 rank 5).    |
 | [`critic`](_autosummary/cutan.verify.critic.html.md#module-cutan.verify.critic)   | A vision critic for body-depicting props: narrow yes/no questions over probe frames (cutan#95).      |
+| [`eyeline`](_autosummary/cutan.verify.eyeline.html.md#module-cutan.verify.eyeline) | The eyeline lint: do two characters in an exchange look at each other?                               |
 | [`regions`](_autosummary/cutan.verify.regions.html.md#module-cutan.verify.regions) | Mouth and body cadence apart: "mouths on ones, bodies on twos" made measurable (cutan#80).           |
 | [`style`](_autosummary/cutan.verify.style.html.md#module-cutan.verify.style)     | Style lint: measure a render's cadence, cut rate and palette, and compare them to a style's targets. |
 
@@ -16281,7 +16402,7 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-11-09 01:00 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/4207ba0802f64d419882ddb0526db38dfe82d858"><code>4207ba0</code></a> on branch <code>main</code>, for **cutan 0.0.111** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-09 01:39 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/c150cbcf6fb83267d27e6e39772ef6d42af2f819"><code>c150cbc</code></a> on branch <code>main</code>, for **cutan 0.0.112** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -16290,7 +16411,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/4207ba0802f64d419882ddb0526db38dfe82d858"><code>4207ba0802f64d419882ddb0526db38dfe82d858</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/c150cbcf6fb83267d27e6e39772ef6d42af2f819"><code>c150cbcf6fb83267d27e6e39772ef6d42af2f819</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -16301,9 +16422,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/42542608886">42542608886</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/42546103513">42546103513</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>4207ba0802f64d419882ddb0526db38dfe82d858</code> (in the history of the built commit) |
+| Event commit | <code>c150cbcf6fb83267d27e6e39772ef6d42af2f819</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -16328,13 +16449,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.111/">0.0.111</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.112/">0.0.112</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 4207ba0802f64d419882ddb0526db38dfe82d858
+git checkout c150cbcf6fb83267d27e6e39772ef6d42af2f819
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
