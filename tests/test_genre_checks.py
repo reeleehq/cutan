@@ -23,6 +23,7 @@ DECLARED = {
     "cutout.style_copies",
     "cutout.cadence",
     "cutout.view_continuity",
+    "cutout.eyeline",
     "cutout.body_attachment",
     "cutout.body_attachment_consistency",
 }

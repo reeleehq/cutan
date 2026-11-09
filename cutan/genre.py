@@ -47,6 +47,7 @@ from an.genres import CompilePass, Genre, RuntimeScript, SemanticCheck
 from cutan.styles.copies import check_style_copies
 from cutan.styles.policy import check_shot_policy
 from cutan.verify.cadence import check_cadence
+from cutan.verify.eyeline import check_eyeline
 
 from cutan import GENRE_NAME, LIBRARY_NAME, require_an
 from cutan.characters import checks as _checks
@@ -292,6 +293,16 @@ CUTOUT = Genre(
             stage="finish",
             order=10,
             description="a view does not silently reset across a cut",
+        ),
+        SemanticCheck(
+            "cutout.eyeline",
+            check_eyeline,
+            stage="finish",
+            order=20,
+            description=(
+                "two characters in an exchange look at each other: a speaker faces "
+                "the one it speaks to, and a shot/reverse-shot pair keeps the line (cutan#173)"
+            ),
         ),
     ),
     dialogue_sugar=(EMOTION,),
