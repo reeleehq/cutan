@@ -313,7 +313,7 @@ def test_what_the_provider_said_is_recorded(tmp_path):
     (road,) = G.generate_art(SPEC, out_dir=tmp_path, generator=Telling(), only=["road"])
     assert road.source.id == "toy-1.5" and road.source.extra["revised_prompt"] == "a red road"
     record = json.loads((tmp_path / G.SOURCES_FILE).read_text())["road.png"]
-    assert record["extra"]["model"] == "toy-1.5"
+    assert record["extra"]["image_model"] == "toy-1.5"
 
 
 def test_a_generated_plate_is_owed_in_an_credits_with_its_sentence():
@@ -328,3 +328,5 @@ def test_a_generated_plate_is_owed_in_an_credits_with_its_sentence():
     assert source.attribution == "Images generated with OpenAI gpt-image-2"
     text = CreditsReport(entries=[CreditEntry(asset="plates/road.png", source=source)]).format()
     assert "MUST BE DISPLAYED" in text and "Images generated with OpenAI gpt-image-2" in text
+    # not read as a speech take (an's credits key on extra["model"]), so the terms show
+    assert "voice" not in text and "never present it as human-made" in text

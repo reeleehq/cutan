@@ -58,7 +58,7 @@ from PIL import Image
 
 from dol import atomic_write
 
-from an.ir.assets import AssetSource
+from an.ir.assets import AssetSource, license_class
 
 from cutan.carve.files import save_png
 
@@ -422,7 +422,6 @@ def art_source(
     facts: Optional[Mapping[str, Any]] = None,
     *,
     disclosure: Optional[str] = AI_DISCLOSURE,
-    provider_names: Mapping[str, str] = PROVIDER_NAMES,
 ) -> AssetSource:
     """The provenance of ``spec``'s image as ``generator`` made it; ``facts`` are
     what the provider said about this image (:class:`Generated`): the model it
@@ -436,6 +435,8 @@ def art_source(
     'Images generated with OpenAI gpt-image-2'
     >>> art_source(ArtSpec(name="road", prompt="a road"), g, disclosure=None).attribution is None
     True
+    >>> s.extra["image_model"]
+    'gpt-image-2'
     """
     facts = dict(facts or {})
     model = facts.get("model") or spec.model or getattr(generator, "model", None)
@@ -450,20 +451,14 @@ def art_source(
     )
     quality = spec.quality or getattr(generator, "quality", None)
     provider = who.get("provider") or "generated"
-    return AssetSource(
+    source = AssetSource(
         provider=provider,
         id=model,
         license=who.get("license"),
-        attribution=(
-            disclosure.format(
-                provider=provider_names.get(provider, provider), model=model or "image model"
-            )
-            if disclosure
-            else None
-        ),
         extra={
             "prompt": spec.prompt,
-            "model": model,
+            # not "model": an's credits read that key as a speech take's
+            "image_model": model,
             "size": spec.size,
             "background": spec.background,
             **({"quality": quality} if quality else {}),
@@ -475,6 +470,17 @@ def art_source(
             ),
         },
     )
+    if disclosure and license_class(source) == "attribution":
+        # only where the licence asks for a credit: no sentence for a licence that needs none
+        source = source.model_copy(
+            update={
+                "attribution": disclosure.format(
+                    provider=PROVIDER_NAMES.get(provider, provider),
+                    model=model or "image model",
+                )
+            }
+        )
+    return source
 
 
 @dataclass
