@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-11-10
-- **An elbow on a carved rig's one-stroke arms** (cutan#208): `cutan.characters.carved_arms.split_carved_arms(char_dir, elbow_at=0.5)`, which `an character add-forearms <name>` runs when the arms are raster drawings, cuts each stroke across at the elbow (upper part on `arm_*`, a `forearm_*` slot hinged on the stroke's centre line, an ink cap on both halves), adds a slotless `hand_*` bone at the stroke's end and nests the rig by bones; the swap-pose entries that hid a part the posed drawing now draws inside (a face pose hiding `head`) are dropped and reported. `held_by: stu@hand_r` then holds at the end of the drawn forearm and follows its bend (needs an#816). Opt-in, idempotent.
+- **An elbow on a carved rig's one-stroke arms** (cutan#208): `cutan.characters.carved_arms.split_carved_arms(char_dir, elbow_at=0.5)`, which `an character add-forearms <name>` runs when the arms are raster drawings, cuts each stroke across at the elbow (upper part on `arm_*`, a `forearm_*` slot hinged on the stroke's centre line, an ink cap on both halves), adds a slotless `hand_*` bone at the stroke's end and nests the rig by bones; a bone whose drawing a swap pose shows while it hides the part that bone would now draw inside (a drawn face whose pose hides `head`) is moved to that part's parent at the same place, and reported. `held_by: stu@hand_r` then holds at the end of the drawn forearm and follows its bend (needs an#816). Opt-in, idempotent.
 
 ## 2026-10-27
 - **Tests and docs off the moved `an` paths** (an#321): `StyleLintVerifier` and `promote` are imported from `cutan`, ahead of the removal of `an`'s P8 import shims.

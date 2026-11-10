@@ -199,12 +199,20 @@ def test_a_bent_forearm_carries_the_held_item_at_the_stroke_end(tmp_path):
         assert grip == pytest.approx(hand, abs=1.0), actions
 
 
-def test_the_poses_that_hid_the_part_the_face_now_draws_inside_are_dropped(tmp_path):
-    root = _carved_project(tmp_path / "p")
-    report = split_carved_arms(_char(root))
-    assert report.dropped_poses == (("face", "x", "head"),)
-    desc = json.loads((_char(root) / "character.json").read_text(encoding="utf-8"))
-    assert set(desc["swap_poses"]["face"]["x"]) == {"mouth"}  # a sibling on the head stays hidden
+def test_a_drawn_face_whose_pose_hides_the_head_is_hoisted_out_of_it(tmp_path):
+    """Nested by bones, the face would draw inside the head its pose hides: it is
+    moved under the torso at the same place, so the pose shows it and hides the head."""
+    one = _carved_project(tmp_path / "one")
+    two = _carved_project(tmp_path / "two")
+    report = split_carved_arms(_char(two))
+    assert report.hoisted == (("face", "head", "torso"),)
+    desc = json.loads((_char(two) / "character.json").read_text(encoding="utf-8"))
+    assert set(desc["swap_poses"]["face"]["x"]) == {"head", "mouth"}  # the poses are kept
+    swap = [{"kind": "set", "target": "ned", "property": "face", "value": "x", "at": 0.0}]
+    before, after = _compile(one, _shot(actions=swap)), _compile(two, _shot(actions=swap))
+    assert _screen(after, "ned/torso/face") == pytest.approx(_screen(before, "ned/face"), abs=0.01)
+    nodes = dict(walk_children(after.scene))
+    assert "ned/torso/face" in nodes and "ned/torso/head/face" not in nodes
 
 
 def test_the_split_is_idempotent_and_refuses_what_it_cannot_cut(tmp_path):
@@ -227,4 +235,4 @@ def test_the_split_is_idempotent_and_refuses_what_it_cannot_cut(tmp_path):
 def test_the_cli_runs_the_carved_split_on_raster_arms(tmp_path):
     root = _carved_project(tmp_path / "p")
     out = cli_add_forearms("ned", out_dir=str(root / "assets" / "characters"))
-    assert "split the carved arms" in out and "dropped the pose face:x hiding 'head'" in out
+    assert "split the carved arms" in out and "bone 'face' moved from under 'head' to under 'torso'" in out

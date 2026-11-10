@@ -21,11 +21,12 @@ down the side, the forearm across the front):
 
 **Nesting changes what a swap pose hides.** Under ``nesting: bones`` a slot on a
 child bone draws inside its parent's part: the carved persona's ``face`` slot (on
-a ``face`` bone under ``head``) draws inside the head, so a face pose that hides
-the head (``head: {alpha: 0}``, harmless in a flat rig, where the face drew beside
-it) now hides the face as well. :func:`split_carved_arms` drops those entries (a
-pose may not hide a part that the drawing it poses is nested in) and returns what
-it dropped; a drawn face that covers the head needs no hidden head under it.
+a ``face`` bone under ``head``) would draw inside the head, so a face pose that
+hides the head (``head: {alpha: 0}``: the drawn face replaces the round head) would
+hide the face as well. :func:`split_carved_arms` hoists such a bone to the hidden
+part's parent (the ``face`` bone under the torso, at the same rest place), as the
+flat rig drew it, and reports it. A hoisted face does not turn with a tween of the
+head: tween it as well (``stu/torso/face``).
 
 Opt-in, one character at a time; idempotent at the same ``elbow_at``. The new
 part files are derived from the character's own art and keep its provenance (the
@@ -74,11 +75,11 @@ class ArmSplit:
 @dataclass(frozen=True)
 class CarvedArmsReport:
     """What :func:`split_carved_arms` did: the descriptor written, each arm's cut,
-    and the swap-pose entries it dropped (``(set, key, slot)``)."""
+    and the bones it hoisted out of a part a swap pose hides (``(bone, from, to)``)."""
 
     descriptor: Path
     arms: tuple[ArmSplit, ...] = ()
-    dropped_poses: tuple[tuple[str, str, str], ...] = field(default=())
+    hoisted: tuple[tuple[str, str, str], ...] = field(default=())
     already_split: bool = False
 
 
@@ -171,41 +172,67 @@ def _ancestors(bone: str, parent_of: Mapping[str, str | None]):
         cursor = parent_of.get(cursor)
 
 
-def _drop_hiding_ancestors(desc: Any) -> tuple[tuple[str, str, str], ...]:
-    """Drop the swap-pose entries that hide (``alpha`` 0) a part the posed
-    drawing is nested in under ``nesting: bones``; return them."""
-    parent_of = {b.name: b.parent for b in desc.bones}
-    slot_bone = {s.name: s.bone for s in desc.slots}
-    # The part a child bone's slots draw inside: the one named like its bone, else
-    # the first in draw order (the other slots on that bone ride beside it).
+def _primary_slots(desc: Any) -> dict[str, str]:
+    """``{bone: slot}``: the part a child bone's slots draw inside under ``nesting:
+    bones`` (the slot named like the bone, else its first in draw order; the other
+    slots on that bone ride beside it)."""
     primary: dict[str, str] = {}
     for s in sorted(desc.slots, key=lambda x: (x.draw_order, x.name)):
         primary.setdefault(s.bone, s.name)
     for s in desc.slots:
         if s.name == s.bone:
             primary[s.bone] = s.name
+    return primary
+
+
+def _compose(outer: Any, inner: Any) -> dict[str, float]:
+    """``inner``'s rest transform (x, y, rotation_deg, scale) in ``outer``'s parent's frame."""
+    import math
+
+    a = math.radians(outer.rotation_deg)
+    ix, iy = inner.x * outer.scale_x, inner.y * outer.scale_y
+    return {
+        "x": round(outer.x + ix * math.cos(a) - iy * math.sin(a), 6),
+        "y": round(outer.y + ix * math.sin(a) + iy * math.cos(a), 6),
+        "rotation_deg": outer.rotation_deg + inner.rotation_deg,
+        "scale_x": outer.scale_x * inner.scale_x,
+        "scale_y": outer.scale_y * inner.scale_y,
+    }
+
+
+def _hoist_out_of_hidden_parts(desc: Any) -> tuple[tuple[str, str, str], ...]:
+    """Re-parent each bone whose drawing a swap pose SHOWS while the same pose
+    HIDES (``alpha`` 0) a part that bone would draw inside under ``nesting: bones``
+    (a drawn face on a ``face`` bone under the head, whose pose hides the head),
+    to that part's own parent bone, at the same rest place: the flat rig drew it
+    beside the hidden part, and so does the nested one. ``(bone, from, to)`` for each."""
+    bones = {b.name: b for b in desc.bones}
+    slot_bone = {s.name: s.bone for s in desc.slots}
+    primary = _primary_slots(desc)
     skin = desc.skins["default"].slots
-    dropped: list[tuple[str, str, str]] = []
+    hoisted: list[tuple[str, str, str]] = []
     for set_name, per_key in (desc.swap_poses or {}).items():
         mapping = (desc.asset_sets or {}).get(set_name) or {}
         for key, pose in per_key.items():
             attachment = mapping.get(key)
-            drawn_on = [
-                name
-                for name, atts in skin.items()
-                if attachment is not None and attachment in atts
-            ]
-            nest = {
-                primary[a]
-                for slot in drawn_on
-                for a in _ancestors(slot_bone[slot], parent_of)
-                if a in primary
-            }
-            for slot in list(pose):
-                if slot in nest and getattr(pose[slot], "alpha", 1.0) == 0:
-                    dropped.append((set_name, key, slot))
-                    del pose[slot]
-    return tuple(dropped)
+            if attachment is None:
+                continue
+            hidden = {s for s, p in pose.items() if getattr(p, "alpha", 1.0) == 0}
+            for slot in [n for n, atts in skin.items() if attachment in atts]:
+                bone = slot_bone.get(slot)
+                parent_of = {b.name: b.parent for b in bones.values()}
+                chain = list(_ancestors(bone, parent_of))
+                hide_at = [i for i, a in enumerate(chain) if primary.get(a) in hidden]
+                if not hide_at:
+                    continue
+                outer = chain[max(hide_at)]  # the outermost hidden part it draws inside
+                moved = bones[bone]
+                for a in chain[: max(hide_at) + 1]:  # fold the chain up to `outer` into it
+                    moved = moved.model_copy(update={**_compose(bones[a], moved), "parent": bones[a].parent})
+                hoisted.append((bone, bones[bone].parent, moved.parent))
+                bones[bone] = moved
+    desc.bones = [bones[b.name] for b in desc.bones]
+    return tuple(hoisted)
 
 
 def split_carved_arms(
@@ -299,5 +326,5 @@ def split_carved_arms(
     meta["arms"] = "split-carved"
     if elbow_at != CARVED_ELBOW_AT:
         meta["elbow_at"] = elbow_at
-    dropped = _drop_hiding_ancestors(desc)
-    return CarvedArmsReport(write_descriptor(char_dir, desc), tuple(splits), dropped)
+    hoisted = _hoist_out_of_hidden_parts(desc)
+    return CarvedArmsReport(write_descriptor(char_dir, desc), tuple(splits), hoisted)
