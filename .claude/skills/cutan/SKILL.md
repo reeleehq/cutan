@@ -25,6 +25,8 @@ description: Use when making a cut-out animated character video with `an`: rigge
 
 ## Holding things: pick up, carry, put down, hand over, swap (an#502)
 
+**Anything that falls, drops, tips over, knocks something else over, or a character who trips: the `cutan-physics` skill** (and its `cutan-physicist` subagent).
+
 Never fake a hand-over with swap slots on the hands and a free prop flown between them. The core's hold verbs (`an` skill, `references/holding-things.md`) move the item between holders and move the hand to it; this genre names the hands: **`<character>@hand_r`** and **`@hand_l`** (`cutan.characters.hands`: the far end of the arm's chain, the forearm when the rig has an elbow, a `hand_r` part's middle when one is drawn; a `hand_r` bone, when a rig has one, wins). `hand_l` is the viewer's left on the unmirrored rig, so a character mirrored with a negative `scale_x` reaches toward the viewer's left with `hand_r`.
 
 ```yaml
