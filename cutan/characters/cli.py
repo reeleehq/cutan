@@ -394,19 +394,32 @@ def add_forearms(name: str, out_dir: str = "", elbow_at: float = 0.5) -> str:
     and `nesting: bones`, so a forearm follows its upper arm and a `pin` or
     `pull` can drag a hand (`ned/hand_r@hand_r`) to a prop's grip. At rest the
     arm looks as it did. Opt-in; a character made before keeps its one-piece
-    arms. Only an arm the factory drew is split. Idempotent. Run
+    arms. An arm the factory drew is split by the factory; a carved rig's
+    one-stroke raster arms are cut across the stroke instead, with a cap of the
+    stroke's ink on the elbow and a `hand_*` bone at the stroke's end
+    (`cutan.characters.carved_arms`, cutan#208). Idempotent. Run
     `an character add-limits` afterwards for the elbow's range.
 
     name: character id
     out_dir: parent directory; defaults to ./assets/characters
     elbow_at: where the elbow sits on the arm, 0.1 (at the shoulder) to 0.9
     """
+    from cutan.characters.carved_arms import has_raster_arms, split_carved_arms
+    from cutan.characters.descriptor_io import load_descriptor
     from cutan.characters.factory import add_forearms as _add_forearms
 
     char_dir = _resolve_target(out_dir) / name
     if not (char_dir / "character.json").is_file():
         return failed(f"no character at {char_dir}")
     try:
+        if has_raster_arms(load_descriptor(char_dir)):
+            report = split_carved_arms(char_dir, elbow_at=elbow_at)
+            dropped = "".join(
+                f"\n  dropped the pose {set_}:{key} hiding {slot!r} (the {set_} is drawn inside it now)"
+                for set_, key, slot in report.dropped_poses
+            )
+            desc = report.descriptor
+            return f"split the carved arms of {desc.parent} (descriptor: {desc.name}){dropped}"
         desc = _add_forearms(char_dir, elbow_at=elbow_at)
     except ValueError as e:
         return failed(str(e))

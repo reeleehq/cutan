@@ -2750,7 +2750,9 @@ def add_forearms(char_dir: str | Path, *, elbow_at: float = ELBOW_AT) -> Path:
         raise ValueError(
             f"{desc.name!r} {problem}, so its arms cannot be split by the factory. "
             "Draw the forearm and hand, add their bones and slots, and set "
-            "`nesting: bones` (the cutan skill has the recipe)."
+            "`nesting: bones` (the cutan skill has the recipe); a carved rig's "
+            "one-stroke raster arms are split by `cutan.characters.carved_arms."
+            "split_carved_arms` (what `an character add-forearms` runs on them)."
         )
     skin = desc.skins["default"]
     stamped: set[str] = set()
