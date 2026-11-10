@@ -236,7 +236,10 @@ forearm and a hand on each side, with the bones <code class="code docutils liter
 and <code class="code docutils literal notranslate"><span class="pre">nesting:</span> <span class="pre">bones</span></code>, so a forearm follows its upper arm and a <code class="code docutils literal notranslate"><span class="pre">pin</span></code> or
 <code class="code docutils literal notranslate"><span class="pre">pull</span></code> can drag a hand (<code class="code docutils literal notranslate"><span class="pre">ned/hand_r@hand_r</span></code>) to a prop’s grip. At rest the
 arm looks as it did. Opt-in; a character made before keeps its one-piece
-arms. Only an arm the factory drew is split. Idempotent. Run
+arms. An arm the factory drew is split by the factory; a carved rig’s
+one-stroke raster arms are cut across the stroke instead, with a cap of the
+stroke’s ink on the elbow and a <code class="code docutils literal notranslate"><span class="pre">hand_*</span></code> bone at the stroke’s end
+(<code class="code docutils literal notranslate"><span class="pre">cutan.characters.carved_arms</span></code>, cutan#208). Idempotent. Run
 <code class="code docutils literal notranslate"><span class="pre">an</span> <span class="pre">character</span> <span class="pre">add-limits</span></code> afterwards for the elbow’s range.</p>
 <p>name: character id
 out_dir: parent directory; defaults to ./assets/characters
@@ -623,7 +626,7 @@ out_dir: parent directory; defaults to ./assets/characters</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=ab1379f9"></script>
+<script src="../_static/documentation_options.js?v=0f6bfde0"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -1,0 +1,27 @@
+cutan.characters.carved\_arms
+=============================
+
+.. automodule:: cutan.characters.carved_arms
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      CARVED_ELBOW_AT
+      RASTER_SUFFIXES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      has_raster_arms
+      split_carved_arms
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ArmSplit
+      CarvedArmsReport
+   

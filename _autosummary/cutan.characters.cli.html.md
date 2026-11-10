@@ -58,7 +58,10 @@ forearm and a hand on each side, with the bones `forearm_l/r` and `hand_l/r`
 and `nesting: bones`, so a forearm follows its upper arm and a `pin` or
 `pull` can drag a hand (`ned/hand_r@hand_r`) to a prop’s grip. At rest the
 arm looks as it did. Opt-in; a character made before keeps its one-piece
-arms. Only an arm the factory drew is split. Idempotent. Run
+arms. An arm the factory drew is split by the factory; a carved rig’s
+one-stroke raster arms are cut across the stroke instead, with a cap of the
+stroke’s ink on the elbow and a `hand_*` bone at the stroke’s end
+(`cutan.characters.carved_arms`, cutan#208). Idempotent. Run
 `an character add-limits` afterwards for the elbow’s range.
 
 name: character id

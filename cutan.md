@@ -1,4 +1,4 @@
-> built 2026-11-10 15:09 UTC from 5ccddf2 (main) · cutan 0.0.116. Details: build_info.json
+> built 2026-11-10 16:45 UTC from b7a8536 (main) · cutan 0.0.117. Details: build_info.json
 
 # index.html.md
 
@@ -1015,7 +1015,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'rect', 'ellipse', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse', 'mouth', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -4332,6 +4332,124 @@ character’s recorded seat is measured, not re-chosen.
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 
+# _autosummary/cutan.characters.carved_arms.html.md
+
+# cutan.characters.carved_arms
+
+Split a carved character’s one-stroke raster arms at the elbow (cutan#208).
+
+The factory’s [`cutan.characters.factory.add_forearms()`](_autosummary/cutan.characters.factory.html.md#cutan.characters.factory.add_forearms) splits an arm it drew
+itself (an SVG sleeve and a round hand). A character carved from a video frame has
+arms that are pixels: the OverSimplified persona’s arms are one black stroke each,
+a `(` and a `)` beside the body, with no drawn hand. Such an arm can still bend
+at the elbow, the way OverSimplified draws a figure carrying a cup (the upper arm
+down the side, the forearm across the front):
+
+- each arm’s drawing is cut across the stroke at `elbow_at` of its painted
+  length: the upper part keeps the `arm_*` slot and bone, the lower part becomes
+  a `forearm_*` slot on a `forearm_*` bone hinged at the stroke’s centre line
+  on the cut, so at rest the arm looks exactly as it did;
+- both halves get a round cap of the stroke’s own ink on the cut (the stroke’s
+  width, its median colour), so the elbow reads as a joint at any bend instead of
+  showing the flat ends of the cut;
+- the hand is a slotless `hand_*` bone at the end of the stroke (half a stroke
+  width back from its last painted row, on the centre line), so `stu@hand_r`
+  holds things exactly at the end of the drawn arm;
+- the rig turns to `nesting: bones`, so a forearm follows its upper arm.
+
+**Nesting changes what a swap pose hides.** Under `nesting: bones` a slot on a
+child bone draws inside its parent’s part: the carved persona’s `face` slot (on
+a `face` bone under `head`) would draw inside the head, so a face pose that
+hides the head (`head: {alpha: 0}`: the drawn face replaces the round head) would
+hide the face as well. [`split_carved_arms()`](_autosummary/cutan.characters.carved_arms.html.md#cutan.characters.carved_arms.split_carved_arms) hoists such a bone to the hidden
+part’s parent (the `face` bone under the torso, at the same rest place), as the
+flat rig drew it, and reports it. A hoisted face does not turn with a tween of the
+head: tween it as well (`stu/torso/face`).
+
+Opt-in, one character at a time; idempotent at the same `elbow_at`. The new
+part files are derived from the character’s own art and keep its provenance (the
+descriptor’s `source`); `metadata.arms` records `"split-carved"`.
+
+### Module Attributes
+
+| [`CARVED_ELBOW_AT`](_autosummary/cutan.characters.carved_arms.html.md#cutan.characters.carved_arms.CARVED_ELBOW_AT)   | Where the elbow sits on the painted length of the stroke, shoulder to hand.                                                   |
+|--------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| [`RASTER_SUFFIXES`](_autosummary/cutan.characters.carved_arms.html.md#cutan.characters.carved_arms.RASTER_SUFFIXES)   | Part files this module can cut (what [`cutan.carve`](_autosummary/cutan.carve.html.md#module-cutan.carve) writes). |
+
+### Functions
+
+| [`has_raster_arms`](_autosummary/cutan.characters.carved_arms.html.md#cutan.characters.carved_arms.has_raster_arms)(desc)                       | Whether both of `desc`'s arms are drawn as raster images (a carved rig).                   |
+|----------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| [`split_carved_arms`](_autosummary/cutan.characters.carved_arms.html.md#cutan.characters.carved_arms.split_carved_arms)(char_dir, \*[, elbow_at]) | Split a carved character's raster one-stroke arms at the elbow (see the module docstring). |
+
+### Classes
+
+| [`ArmSplit`](_autosummary/cutan.characters.carved_arms.html.md#cutan.characters.carved_arms.ArmSplit)(side, elbow, hand, stroke_width)   | Where one arm was cut, in its drawing's pixels: the elbow (on the stroke's centre line at the cut), the hand (the end of the stroke) and the stroke's width at the elbow.                             |
+|----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`CarvedArmsReport`](_autosummary/cutan.characters.carved_arms.html.md#cutan.characters.carved_arms.CarvedArmsReport)(descriptor[, arms, ...])   | What [`split_carved_arms()`](_autosummary/cutan.characters.carved_arms.html.md#cutan.characters.carved_arms.split_carved_arms) did: the descriptor written, each arm's cut, and the bones it hoisted out of a part a swap pose hides (`(bone, from, to)`). |
+
+### *class* cutan.characters.carved_arms.ArmSplit(side, elbow, hand, stroke_width)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Where one arm was cut, in its drawing’s pixels: the elbow (on the stroke’s
+centre line at the cut), the hand (the end of the stroke) and the stroke’s
+width at the elbow.
+
+### cutan.characters.carved_arms.CARVED_ELBOW_AT *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 0.5*
+
+Where the elbow sits on the painted length of the stroke, shoulder to hand.
+
+### *class* cutan.characters.carved_arms.CarvedArmsReport(descriptor, arms=(), hoisted=(), already_split=False)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+What [`split_carved_arms()`](_autosummary/cutan.characters.carved_arms.html.md#cutan.characters.carved_arms.split_carved_arms) did: the descriptor written, each arm’s cut,
+and the bones it hoisted out of a part a swap pose hides (`(bone, from, to)`).
+
+### cutan.characters.carved_arms.RASTER_SUFFIXES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('.png', '.webp')*
+
+Part files this module can cut (what [`cutan.carve`](_autosummary/cutan.carve.html.md#module-cutan.carve) writes).
+
+### cutan.characters.carved_arms.has_raster_arms(desc)
+
+Whether both of `desc`’s arms are drawn as raster images (a carved rig).
+
+```pycon
+>>> from types import SimpleNamespace as NS
+>>> att = lambda p: {"a": NS(path=p)}
+>>> rig = NS(slots=[NS(name="arm_l", attachment="a"), NS(name="arm_r", attachment="a")],
+...          skins={"default": NS(slots={"arm_l": att("parts/arm_l.png"), "arm_r": att("parts/arm_r.png")})})
+>>> has_raster_arms(rig)
+True
+>>> rig.skins["default"].slots["arm_r"] = att("parts/arm_r.svg")
+>>> has_raster_arms(rig)
+False
+```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+### cutan.characters.carved_arms.split_carved_arms(char_dir, , elbow_at=0.5)
+
+Split a carved character’s raster one-stroke arms at the elbow (see the module docstring).
+
+Writes `parts/arm_<side>_upper.png` and `parts/forearm_<side>.png` next to the
+character’s parts, the bones `forearm_<side>` (hinged at the cut) and
+`hand_<side>` (slotless, at the stroke’s end), the `forearm_<side>` slots
+(drawn just above their upper arm), and `nesting: bones`. Refuses a rig whose
+arms are not raster drawings, one already nested, one whose bones carry a rest
+rotation or scale, an arm drawing with a declared size, not anchored at the top
+of its stroke or crossing it twice on a row, and an `elbow_at` outside 0.1..0.9.
+Every cut is measured before anything is written. Idempotent at the same
+`elbow_at`. Every part path moves under the torso (`stu/arm_r` becomes
+`stu/torso/arm_r`, `stu/head` `stu/torso/head`), and a descriptor animation
+on the torso now carries the arms and the head with it.
+
+* **Return type:**
+  [`CarvedArmsReport`](_autosummary/cutan.characters.carved_arms.html.md#cutan.characters.carved_arms.CarvedArmsReport)
+
+
 # _autosummary/cutan.characters.cast.html.md
 
 # cutan.characters.cast
@@ -4633,7 +4751,10 @@ forearm and a hand on each side, with the bones `forearm_l/r` and `hand_l/r`
 and `nesting: bones`, so a forearm follows its upper arm and a `pin` or
 `pull` can drag a hand (`ned/hand_r@hand_r`) to a prop’s grip. At rest the
 arm looks as it did. Opt-in; a character made before keeps its one-piece
-arms. Only an arm the factory drew is split. Idempotent. Run
+arms. An arm the factory drew is split by the factory; a carved rig’s
+one-stroke raster arms are cut across the stroke instead, with a cap of the
+stroke’s ink on the elbow and a `hand_*` bone at the stroke’s end
+(`cutan.characters.carved_arms`, cutan#208). Idempotent. Run
 `an character add-limits` afterwards for the elbow’s range.
 
 name: character id
@@ -6950,6 +7071,7 @@ namespace as the default, so the output is a valid standalone SVG.
 
 | [`brows`](_autosummary/cutan.characters.brows.html.md#module-cutan.characters.brows)                 | Brow acting: where the brows can go, what may not draw there, and the `face.brows` capability.        |
 |------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| [`carved_arms`](_autosummary/cutan.characters.carved_arms.html.md#module-cutan.characters.carved_arms)     | Split a carved character's one-stroke raster arms at the elbow (cutan#208).                           |
 | [`cast`](_autosummary/cutan.characters.cast.html.md#module-cutan.characters.cast)                   | A cast as data: `cast.yaml`, one entry per character, read by the factory (cutan#87).                 |
 | [`checks`](_autosummary/cutan.characters.checks.html.md#module-cutan.characters.checks)               | The cut-out genre's semantic checks: `play`, `expression`, turns, views and character refs.           |
 | [`cli`](_autosummary/cutan.characters.cli.html.md#module-cutan.characters.cli)                     | User-facing character CLI subcommands.                                                                |
@@ -16453,18 +16575,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-11-10 15:09 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/5ccddf23a83f6bacb27a7147023ef44c3f29dc86"><code>5ccddf2</code></a> on branch <code>main</code>, for **cutan 0.0.116** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-10 16:45 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/b7a8536a2edb1f73cfbb1b726e426e02479c7df5"><code>b7a8536</code></a> on branch <code>main</code>, for **cutan 0.0.117** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.116) is behind the latest release on PyPI (0.0.117): `pip install cutan` gives newer code than these docs describe.
+- The documented version (0.0.117) is behind the latest release on PyPI (0.0.118): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/5ccddf23a83f6bacb27a7147023ef44c3f29dc86"><code>5ccddf23a83f6bacb27a7147023ef44c3f29dc86</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/b7a8536a2edb1f73cfbb1b726e426e02479c7df5"><code>b7a8536a2edb1f73cfbb1b726e426e02479c7df5</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -16475,9 +16597,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/42840098131">42840098131</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/42856599763">42856599763</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>5ccddf23a83f6bacb27a7147023ef44c3f29dc86</code> (in the history of the built commit) |
+| Event commit | <code>b7a8536a2edb1f73cfbb1b726e426e02479c7df5</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -16502,13 +16624,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.117/">0.0.117</a>, newer than the documented version (0.0.116).
+Latest release: <a href="https://pypi.org/project/cutan/0.0.118/">0.0.118</a>, newer than the documented version (0.0.117).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 5ccddf23a83f6bacb27a7147023ef44c3f29dc86
+git checkout b7a8536a2edb1f73cfbb1b726e426e02479c7df5
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

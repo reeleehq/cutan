@@ -45,6 +45,7 @@ cutan.characters
    :recursive:
 
    brows
+   carved_arms
    cast
    checks
    cli

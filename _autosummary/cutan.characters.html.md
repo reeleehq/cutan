@@ -771,6 +771,7 @@ namespace as the default, so the output is a valid standalone SVG.
 
 | [`brows`](cutan.characters.brows.html.md#module-cutan.characters.brows)                 | Brow acting: where the brows can go, what may not draw there, and the `face.brows` capability.        |
 |------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| [`carved_arms`](cutan.characters.carved_arms.html.md#module-cutan.characters.carved_arms)     | Split a carved character's one-stroke raster arms at the elbow (cutan#208).                           |
 | [`cast`](cutan.characters.cast.html.md#module-cutan.characters.cast)                   | A cast as data: `cast.yaml`, one entry per character, read by the factory (cutan#87).                 |
 | [`checks`](cutan.characters.checks.html.md#module-cutan.characters.checks)               | The cut-out genre's semantic checks: `play`, `expression`, turns, views and character refs.           |
 | [`cli`](cutan.characters.cli.html.md#module-cutan.characters.cli)                     | User-facing character CLI subcommands.                                                                |

@@ -32,6 +32,7 @@
 - [cutan.carve.superres](_autosummary/cutan.carve.superres.html.md): Super-resolution strategies: more pixels for a part carved from a low-resolution frame (cutan#110).
 - [cutan.characters](_autosummary/cutan.characters.html.md): Character art system: Spine-shaped descriptor + SVG sidecars.
 - [cutan.characters.brows](_autosummary/cutan.characters.brows.html.md): Brow acting: where the brows can go, what may not draw there, and the &#96;face.brows&#96; capability.
+- [cutan.characters.carved_arms](_autosummary/cutan.characters.carved_arms.html.md): Split a carved character’s one-stroke raster arms at the elbow (cutan#208).
 - [cutan.characters.cast](_autosummary/cutan.characters.cast.html.md): A cast as data: &#96;cast.yaml&#96;, one entry per character, read by the factory (cutan#87).
 - [cutan.characters.checks](_autosummary/cutan.characters.checks.html.md): The cut-out genre’s semantic checks: &#96;play&#96;, &#96;expression&#96;, turns, views and character refs.
 - [cutan.characters.cli](_autosummary/cutan.characters.cli.html.md): User-facing character CLI subcommands.
@@ -100,7 +101,7 @@
 - [cutan.verify.regions](_autosummary/cutan.verify.regions.html.md): Mouth and body cadence apart: “mouths on ones, bodies on twos” made measurable (cutan#80).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-10 15:09 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-10 16:45 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 
