@@ -56,11 +56,27 @@ How swap channels work in the `an` repo — the one generic replacement-animatio
 
 Source: [`.claude/skills/cutan-dev-swap-channels`](https://github.com/thorwhalen/cutan/tree/HEAD/.claude/skills/cutan-dev-swap-channels).
 
+### `cutan-physics`
+
+Make things move physically in a cut-out (an + cutan) scene: an item dropped or let go that must fall and land rather than float, an item tossed, a prop or a figurine knocked over (a camera on a tripod, a statue), a character tripping, a chain reaction where one body knocks the next, a point that must end on a target (a sword tip in an eye), gravity and timing that read as weight, a bounce or a settle, and the sound of a landing on its exact frame. Use whenever a scene or a review says “falls”, “drops”, “lets go”, “floats”, “hovers”, “too slow”, “no weight”, “bounces”, “tips over”, “topples”, “knocks over”, “trips”, “stumbles”, “domino”, “chain reaction”, “physics”, “gravity”, or a sound “late” or “out of sync” with a landing or a hand-over. Routes to an’s machinery (release, topple, solve gravity, joints, support, airborne, event cues) rather than restating it; the cutan-physicist subagent reviews a shot’s physical motion or authors it for one beat.
+
+Source: [`.claude/skills/cutan-physics`](https://github.com/thorwhalen/cutan/tree/HEAD/.claude/skills/cutan-physics).
+
 ### `cutan-style`
 
 Use when the user wants a script or scene made “in the style of” a named cut-out animation look — South Park, OverSimplified, Kurzgesagt, Terry Gilliam / Monty Python, Lotte Reiniger silhouettes, Yuri Norstein / Hedgehog in the Fog — or asks what a style needs, how expensive it is, or whether a render looks like the style. Triggers on “in the style of”, “make it look like South Park”, “OverSimplified-style”, “Kurzgesagt look”, “silhouette film”, “Monty Python cut-outs”, “does this match the style”, “style lint”. Applies a style spec to an `an` scene, renders, measures the render against the spec’s targets, and adjusts.
 
 Source: [`.claude/skills/cutan-style`](https://github.com/thorwhalen/cutan/tree/HEAD/.claude/skills/cutan-style).
+
+## Subagents
+
+Subagents are Markdown files with a frontmatter (`name`, `description`, `tools`) and a system prompt as the body. Copy one into your project’s `.claude/agents/` (or your agent host’s equivalent) to delegate the task it describes.
+
+### `cutan-physicist`
+
+Physics specialist for cut-out (an + cutan) scenes, in a fresh context. Given a scene file and a beat (“Stu drops the musket by the camera”, “the camera falls on Napoleon, whose sabre ends in Hannibal’s eye”), returns the exact actions, overrides and sound cues to author (release, topple, solve gravity, event cues) and the checks to run, measured against the compiled shot; or, as a reviewer, ranked findings on a shot’s physical motion (floating, rising let-gos, eased landings, slow gravity, late sounds, impossible chains). Read-only on the scene: it compiles, probes and validates copies, and never edits the project. Invoke on “make this fall naturally”, “it floats”, “knock it over”, “chain reaction”, “the sound is late on the drop”, “review the physics of this shot”.
+
+Source: [`cutan/data/agents/cutan-physicist.md`](https://github.com/thorwhalen/cutan/tree/HEAD/cutan/data/agents/cutan-physicist.md); tools: `Bash, Read, Grep, Glob`.
 
 ## Instruction files
 
