@@ -414,13 +414,20 @@ def add_forearms(name: str, out_dir: str = "", elbow_at: float = 0.5) -> str:
     try:
         if has_raster_arms(load_descriptor(char_dir)):
             report = split_carved_arms(char_dir, elbow_at=elbow_at)
+            if report.already_split:
+                return f"{char_dir} is already split at the elbow: nothing changed"
             moved = "".join(
                 f"\n  bone {bone!r} moved from under {old!r} to under {new!r}, at the same place "
                 "(a swap pose hides the part it would draw inside); tween it with that part"
                 for bone, old, new in report.hoisted
             )
             desc = report.descriptor
-            return f"split the carved arms of {desc.parent} (descriptor: {desc.name}){moved}"
+            return (
+                f"split the carved arms of {desc.parent} (descriptor: {desc.name}); the rig "
+                f"now nests by bones, so its part paths move under the torso ({name}/arm_r is "
+                f"{name}/torso/arm_r, the forearm {name}/torso/arm_r/forearm_r, {name}/head "
+                f"{name}/torso/head){moved}"
+            )
         desc = _add_forearms(char_dir, elbow_at=elbow_at)
     except ValueError as e:
         return failed(str(e))

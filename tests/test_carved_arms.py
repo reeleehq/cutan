@@ -39,7 +39,9 @@ def _stroke_png(path: Path, *, bulge_right: bool) -> None:
     xs = np.linspace(0, 1, 60)
     pts = [
         (
-            (7 + 20 * np.sin(np.pi * t)) if bulge_right else (ARM_W - 7 - 20 * np.sin(np.pi * t)),
+            (7 + 20 * np.sin(np.pi * t))
+            if bulge_right
+            else (ARM_W - 7 - 20 * np.sin(np.pi * t)),
             6 + t * (ARM_H - 12),
         )
         for t in xs
@@ -58,7 +60,9 @@ def _carved_project(root: Path) -> Path:
     char = chars / "ned"
     _stroke_png(char / "parts" / "arm_r.png", bulge_right=True)
     _stroke_png(char / "parts" / "arm_l.png", bulge_right=False)
-    Image.new("RGBA", (40, 40), (255, 255, 255, 255)).save(char / "parts" / "face_x.png")
+    Image.new("RGBA", (40, 40), (255, 255, 255, 255)).save(
+        char / "parts" / "face_x.png"
+    )
     desc = json.loads((char / "character.json").read_text(encoding="utf-8"))
     skin = desc["skins"]["default"]["slots"]
     for side in "lr":
@@ -68,7 +72,9 @@ def _carved_project(root: Path) -> Path:
         )
     # a drawn face on a `face` bone under the head, whose pose hides the head and the mouth
     desc["bones"].append({"name": "face", "parent": "head", "x": 0.0, "y": 0.0})
-    desc["slots"].append({"name": "face", "bone": "face", "draw_order": 50, "attachment": "face_none"})
+    desc["slots"].append(
+        {"name": "face", "bone": "face", "draw_order": 50, "attachment": "face_none"}
+    )
     skin["face"] = {
         "face_none": {"path": "parts/face_x.png", "anchor": [0.5, 0.5]},
         "face_x": {"path": "parts/face_x.png", "anchor": [0.5, 0.5]},
@@ -91,14 +97,21 @@ def _compile(root: Path, shot: Shot):
         return compile_shot(shot, load(root).mall, fps=24, width=W, height=H)
 
 
-def _shot(entities: list[dict] | None = None, actions: list[dict] | None = None, **extra) -> Shot:
+def _shot(
+    entities: list[dict] | None = None, actions: list[dict] | None = None, **extra
+) -> Shot:
     return Shot.model_validate(
         {
             "id": "s",
             "duration": 1.0,
             "entities": [
-                {"kind": "character", "id": "ned", "store": "characters", "ref": "ned",
-                 "stage": {"at": [0, 150]}},
+                {
+                    "kind": "character",
+                    "id": "ned",
+                    "store": "characters",
+                    "ref": "ned",
+                    "stage": {"at": [0, 150]},
+                },
                 *(entities or []),
             ],
             "actions": actions or [],
@@ -107,7 +120,9 @@ def _shot(entities: list[dict] | None = None, actions: list[dict] | None = None,
     )
 
 
-def _screen(doc, path: str, local_fraction: tuple[float, float] | None = None, *, t: float = 0.0):
+def _screen(
+    doc, path: str, local_fraction: tuple[float, float] | None = None, *, t: float = 0.0
+):
     nodes = dict(walk_children(doc.scene))
     pose = evaluate_timeline(timeline_from_scene(doc), t)
     if local_fraction is None:
@@ -121,7 +136,9 @@ def _screen(doc, path: str, local_fraction: tuple[float, float] | None = None, *
 def test_a_carved_rig_has_raster_arms_and_a_factory_rig_does_not(tmp_path):
     root = tmp_path / "f"
     init(root)
-    new_character(root / "assets/characters", name="ned", seed="ned", use_dicebear=False)
+    new_character(
+        root / "assets/characters", name="ned", seed="ned", use_dicebear=False
+    )
     assert not has_raster_arms(load_descriptor(_char(root)))
     assert has_raster_arms(load_descriptor(_char(_carved_project(tmp_path / "c"))))
 
@@ -136,8 +153,12 @@ def test_the_split_adds_forearms_hand_bones_and_nests_by_bones(tmp_path):
     for side in "lr":
         assert bones[f"forearm_{side}"]["parent"] == f"arm_{side}"
         assert bones[f"hand_{side}"]["parent"] == f"forearm_{side}"
-        assert f"hand_{side}" not in slots  # the hand is the stroke's end, not a drawing
-        assert slots[f"forearm_{side}"]["draw_order"] == slots[f"arm_{side}"]["draw_order"]
+        assert (
+            f"hand_{side}" not in slots
+        )  # the hand is the stroke's end, not a drawing
+        assert (
+            slots[f"forearm_{side}"]["draw_order"] == slots[f"arm_{side}"]["draw_order"]
+        )
         for name in (f"arm_{side}_upper.png", f"forearm_{side}.png"):
             assert (_char(root) / "parts" / name).is_file()
     r = next(a for a in report.arms if a.side == "r")
@@ -155,7 +176,9 @@ def test_the_two_halves_are_the_stroke_with_a_cap_on_the_elbow(tmp_path):
     up = np.array(Image.open(parts / "arm_r_upper.png"))[:, :, 3] > 128
     fo = np.array(Image.open(parts / "forearm_r.png"))[:, :, 3] > 128
     ex, ey = next(a for a in report.arms if a.side == "r").elbow
-    assert ((up | fo) == original).mean() > 0.995  # nothing lost, little added (the caps)
+    assert (
+        (up | fo) == original
+    ).mean() > 0.995  # nothing lost, little added (the caps)
     assert up[int(ey), int(ex)] and fo[int(ey), int(ex)]  # both halves carry the joint
     assert not up[int(ey) + STROKE :].any() and not fo[: int(ey) - STROKE].any()
 
@@ -168,10 +191,14 @@ def test_the_split_arm_is_the_one_piece_arm_at_rest(tmp_path):
     r = next(a for a in report.arms if a.side == "r")
     before = _compile(one, _shot())
     after = _compile(two, _shot())
-    elbow_on_arm = _screen(before, "ned/arm_r", (r.elbow[0] / ARM_W, r.elbow[1] / ARM_H))
+    elbow_on_arm = _screen(
+        before, "ned/arm_r", (r.elbow[0] / ARM_W, r.elbow[1] / ARM_H)
+    )
     elbow_pivot = _screen(after, "ned/torso/arm_r/forearm_r")
     assert elbow_pivot == pytest.approx(elbow_on_arm, abs=0.05)
-    assert _screen(before, "ned/head") == pytest.approx(_screen(after, "ned/torso/head"), abs=0.01)
+    assert _screen(before, "ned/head") == pytest.approx(
+        _screen(after, "ned/torso/head"), abs=0.01
+    )
 
 
 def test_a_bent_forearm_carries_the_held_item_at_the_stroke_end(tmp_path):
@@ -182,19 +209,67 @@ def test_a_bent_forearm_carries_the_held_item_at_the_stroke_end(tmp_path):
     cup = root / "assets/props/cup"
     (cup / "parts").mkdir(parents=True)
     Image.new("RGBA", (40, 40), (200, 200, 200, 255)).save(cup / "parts/body.png")
-    (cup / "prop.json").write_text(json.dumps({
-        "kind": "PropDescriptor", "schema_version": "0.2.0", "name": "cup",
-        "view_box": [0, 0, 40, 40], "origin": [20.0, 20.0],
-        "bones": [{"name": "root", "x": 20.0, "y": 20.0}, {"name": "grip", "parent": "root", "x": 0.0, "y": 0.0}],
-        "slots": [{"name": "body", "bone": "root", "draw_order": 0, "attachment": "body"}],
-        "skins": {"default": {"name": "default", "slots": {"body": {"body": {"path": "parts/body.png", "anchor": [0.5, 0.5]}}}}},
-    }), encoding="utf-8")
-    cup_entity = {"kind": "prop", "id": "cup", "store": "props", "ref": "cup",
-                  "stage": {"at": [300, 0], "scale": 0.5}, "overrides": {"held_by": "ned@hand_r"}}
-    bend = [{"kind": "set", "target": "ned/torso/arm_r/forearm_r", "property": "rotation", "value": 1.4, "at": 0.0}]
+    (cup / "prop.json").write_text(
+        json.dumps(
+            {
+                "kind": "PropDescriptor",
+                "schema_version": "0.2.0",
+                "name": "cup",
+                "view_box": [0, 0, 40, 40],
+                "origin": [20.0, 20.0],
+                "bones": [
+                    {"name": "root", "x": 20.0, "y": 20.0},
+                    {"name": "grip", "parent": "root", "x": 0.0, "y": 0.0},
+                ],
+                "slots": [
+                    {
+                        "name": "body",
+                        "bone": "root",
+                        "draw_order": 0,
+                        "attachment": "body",
+                    }
+                ],
+                "skins": {
+                    "default": {
+                        "name": "default",
+                        "slots": {
+                            "body": {
+                                "body": {"path": "parts/body.png", "anchor": [0.5, 0.5]}
+                            }
+                        },
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    cup_entity = {
+        "kind": "prop",
+        "id": "cup",
+        "store": "props",
+        "ref": "cup",
+        "stage": {"at": [300, 0], "scale": 0.5},
+        "overrides": {"held_by": "ned@hand_r"},
+    }
+    bend = [
+        {
+            "kind": "set",
+            "target": "ned/torso/arm_r/forearm_r",
+            "property": "rotation",
+            "value": 1.4,
+            "at": 0.0,
+        }
+    ]
     for actions in ([], bend):
-        doc = _compile(root, _shot([cup_entity], actions, solve={"ground": 300, "mode": "pose"}))
-        hand = _screen(doc, "ned/torso/arm_r/forearm_r", (r.hand[0] / ARM_W, r.hand[1] / ARM_H), t=0.5)
+        doc = _compile(
+            root, _shot([cup_entity], actions, solve={"ground": 300, "mode": "pose"})
+        )
+        hand = _screen(
+            doc,
+            "ned/torso/arm_r/forearm_r",
+            (r.hand[0] / ARM_W, r.hand[1] / ARM_H),
+            t=0.5,
+        )
         grip = _screen(doc, "cup", None, t=0.5)
         assert grip == pytest.approx(hand, abs=1.0), actions
 
@@ -207,10 +282,20 @@ def test_a_drawn_face_whose_pose_hides_the_head_is_hoisted_out_of_it(tmp_path):
     report = split_carved_arms(_char(two))
     assert report.hoisted == (("face", "head", "torso"),)
     desc = json.loads((_char(two) / "character.json").read_text(encoding="utf-8"))
-    assert set(desc["swap_poses"]["face"]["x"]) == {"head", "mouth"}  # the poses are kept
-    swap = [{"kind": "set", "target": "ned", "property": "face", "value": "x", "at": 0.0}]
-    before, after = _compile(one, _shot(actions=swap)), _compile(two, _shot(actions=swap))
-    assert _screen(after, "ned/torso/face") == pytest.approx(_screen(before, "ned/face"), abs=0.01)
+    assert set(desc["swap_poses"]["face"]["x"]) == {
+        "head",
+        "mouth",
+    }  # the poses are kept
+    swap = [
+        {"kind": "set", "target": "ned", "property": "face", "value": "x", "at": 0.0}
+    ]
+    before, after = (
+        _compile(one, _shot(actions=swap)),
+        _compile(two, _shot(actions=swap)),
+    )
+    assert _screen(after, "ned/torso/face") == pytest.approx(
+        _screen(before, "ned/face"), abs=0.01
+    )
     nodes = dict(walk_children(after.scene))
     assert "ned/torso/face" in nodes and "ned/torso/head/face" not in nodes
 
@@ -227,7 +312,9 @@ def test_the_split_is_idempotent_and_refuses_what_it_cannot_cut(tmp_path):
         split_carved_arms(_char(_carved_project(tmp_path / "q")), elbow_at=0.95)
     factory = tmp_path / "f"
     init(factory)
-    new_character(factory / "assets/characters", name="ned", seed="ned", use_dicebear=False)
+    new_character(
+        factory / "assets/characters", name="ned", seed="ned", use_dicebear=False
+    )
     with pytest.raises(ValueError, match="not raster drawings"):
         split_carved_arms(_char(factory))
 
@@ -235,4 +322,52 @@ def test_the_split_is_idempotent_and_refuses_what_it_cannot_cut(tmp_path):
 def test_the_cli_runs_the_carved_split_on_raster_arms(tmp_path):
     root = _carved_project(tmp_path / "p")
     out = cli_add_forearms("ned", out_dir=str(root / "assets" / "characters"))
-    assert "split the carved arms" in out and "bone 'face' moved from under 'head' to under 'torso'" in out
+    assert (
+        "split the carved arms" in out
+        and "bone 'face' moved from under 'head' to under 'torso'" in out
+    )
+
+
+def _edit(root: Path, change) -> None:
+    p = _char(root) / "character.json"
+    desc = json.loads(p.read_text(encoding="utf-8"))
+    change(desc)
+    p.write_text(json.dumps(desc), encoding="utf-8")
+
+
+def test_the_split_refuses_a_drawing_it_would_misread_and_writes_nothing(tmp_path):
+    def sized(desc):
+        slot = next(s for s in desc["slots"] if s["name"] == "arm_r")
+        desc["skins"]["default"]["slots"]["arm_r"][slot["attachment"]]["width"] = 18
+
+    def rest_turn(desc):
+        next(b for b in desc["bones"] if b["name"] == "arm_l")["rotation_deg"] = 15
+
+    for name, change, match in (
+        ("sized", sized, "declares a size"),
+        ("turned", rest_turn, "rest rotation"),
+    ):
+        root = _carved_project(tmp_path / name)
+        _edit(root, change)
+        with pytest.raises(ValueError, match=match):
+            split_carved_arms(_char(root))
+        assert not (_char(root) / "parts/arm_l_upper.png").exists()
+    root = _carved_project(tmp_path / "curl")
+    arm = Image.open(_char(root) / "parts/arm_r.png")
+    ImageDraw.Draw(arm).rectangle(
+        [0, ARM_H // 2 - 2, 3, ARM_H // 2 + 2], fill=(0, 0, 0, 255)
+    )
+    arm.save(_char(root) / "parts/arm_r.png")
+    with pytest.raises(ValueError, match="more than once"):
+        split_carved_arms(_char(root))
+    assert not (
+        _char(root) / "parts/arm_l_upper.png"
+    ).exists()  # the left was not cut either
+
+
+def test_the_cli_says_when_nothing_changed(tmp_path):
+    root = _carved_project(tmp_path / "p")
+    split_carved_arms(_char(root))
+    assert "nothing changed" in cli_add_forearms(
+        "ned", out_dir=str(root / "assets" / "characters")
+    )

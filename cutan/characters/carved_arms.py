@@ -129,6 +129,11 @@ def _cut_geometry(alpha, elbow_at: float):
         cols = np.where(ink[row])[0]
         if not len(cols):
             raise ValueError(f"the arm's stroke is broken at row {row}: no ink to cut")
+        if (np.diff(cols) > 1).any():
+            raise ValueError(
+                f"row {row} of the arm's drawing crosses the stroke more than once "
+                "(a curl, a cuff, a gap): it is not one stroke to cut; draw the forearm"
+            )
         return (float(cols[0] + cols[-1]) / 2.0, float(cols[-1] - cols[0] + 1))
 
     ex, width = centre(elbow)
@@ -172,19 +177,6 @@ def _ancestors(bone: str, parent_of: Mapping[str, str | None]):
         cursor = parent_of.get(cursor)
 
 
-def _primary_slots(desc: Any) -> dict[str, str]:
-    """``{bone: slot}``: the part a child bone's slots draw inside under ``nesting:
-    bones`` (the slot named like the bone, else its first in draw order; the other
-    slots on that bone ride beside it)."""
-    primary: dict[str, str] = {}
-    for s in sorted(desc.slots, key=lambda x: (x.draw_order, x.name)):
-        primary.setdefault(s.bone, s.name)
-    for s in desc.slots:
-        if s.name == s.bone:
-            primary[s.bone] = s.name
-    return primary
-
-
 def _compose(outer: Any, inner: Any) -> dict[str, float]:
     """``inner``'s rest transform (x, y, rotation_deg, scale) in ``outer``'s parent's frame."""
     import math
@@ -202,13 +194,15 @@ def _compose(outer: Any, inner: Any) -> dict[str, float]:
 
 def _hoist_out_of_hidden_parts(desc: Any) -> tuple[tuple[str, str, str], ...]:
     """Re-parent each bone whose drawing a swap pose SHOWS while the same pose
-    HIDES (``alpha`` 0) a part that bone would draw inside under ``nesting: bones``
-    (a drawn face on a ``face`` bone under the head, whose pose hides the head),
-    to that part's own parent bone, at the same rest place: the flat rig drew it
-    beside the hidden part, and so does the nested one. ``(bone, from, to)`` for each."""
+    HIDES (``alpha`` 0) a part that drawing would nest in under ``nesting: bones``
+    (an's nesting rule, :func:`an.stage.rig.slot_parent_chain`: a drawn face on a
+    ``face`` bone under the head, whose pose hides the head), to that part's own
+    parent bone, at the same rest place: the flat rig drew it beside the hidden
+    part, and so does the nested one. ``(bone, from, to)`` for each."""
+    from an.stage.rig import slot_parent_chain
+
     bones = {b.name: b for b in desc.bones}
     slot_bone = {s.name: s.bone for s in desc.slots}
-    primary = _primary_slots(desc)
     skin = desc.skins["default"].slots
     hoisted: list[tuple[str, str, str]] = []
     for set_name, per_key in (desc.swap_poses or {}).items():
@@ -219,16 +213,29 @@ def _hoist_out_of_hidden_parts(desc: Any) -> tuple[tuple[str, str, str], ...]:
                 continue
             hidden = {s for s, p in pose.items() if getattr(p, "alpha", 1.0) == 0}
             for slot in [n for n, atts in skin.items() if attachment in atts]:
-                bone = slot_bone.get(slot)
-                parent_of = {b.name: b.parent for b in bones.values()}
-                chain = list(_ancestors(bone, parent_of))
-                hide_at = [i for i, a in enumerate(chain) if primary.get(a) in hidden]
-                if not hide_at:
+                desc.bones = list(bones.values())
+                nests_in = slot_parent_chain(desc)
+                containers, cursor, seen = [], nests_in.get(slot), {slot}
+                while cursor is not None and cursor not in seen:
+                    seen.add(cursor)
+                    containers.append(cursor)
+                    cursor = nests_in.get(cursor)
+                hidden_in = [c for c in containers if c in hidden]
+                if not hidden_in:
                     continue
-                outer = chain[max(hide_at)]  # the outermost hidden part it draws inside
-                moved = bones[bone]
-                for a in chain[: max(hide_at) + 1]:  # fold the chain up to `outer` into it
-                    moved = moved.model_copy(update={**_compose(bones[a], moved), "parent": bones[a].parent})
+                stop = slot_bone[hidden_in[-1]]  # the outermost hidden part it nests in
+                bone = slot_bone[slot]
+                moved, cursor = bones[bone], bones[bone].parent
+                while cursor is not None:  # fold the chain up to `stop` into the bone
+                    moved = moved.model_copy(
+                        update={
+                            **_compose(bones[cursor], moved),
+                            "parent": bones[cursor].parent,
+                        }
+                    )
+                    if cursor == stop:
+                        break
+                    cursor = bones[cursor].parent
                 hoisted.append((bone, bones[bone].parent, moved.parent))
                 bones[bone] = moved
     desc.bones = [bones[b.name] for b in desc.bones]
@@ -244,13 +251,18 @@ def split_carved_arms(
     character's parts, the bones ``forearm_<side>`` (hinged at the cut) and
     ``hand_<side>`` (slotless, at the stroke's end), the ``forearm_<side>`` slots
     (drawn just above their upper arm), and ``nesting: bones``. Refuses a rig whose
-    arms are not raster drawings, one already nested, and an ``elbow_at`` outside
-    0.1..0.9. Idempotent at the same ``elbow_at``.
+    arms are not raster drawings, one already nested, one whose bones carry a rest
+    rotation or scale, an arm drawing with a declared size, not anchored at the top
+    of its stroke or crossing it twice on a row, and an ``elbow_at`` outside 0.1..0.9.
+    Every cut is measured before anything is written. Idempotent at the same
+    ``elbow_at``. Every part path moves under the torso (``stu/arm_r`` becomes
+    ``stu/torso/arm_r``, ``stu/head`` ``stu/torso/head``), and a descriptor animation
+    on the torso now carries the arms and the head with it.
     """
     from PIL import Image
 
     from cutan.characters.descriptor_io import load_descriptor, write_descriptor
-    from cutan.characters.schema import Attachment, Bone, Slot
+    from cutan.characters.schema import Bone, Slot
 
     if not 0.1 <= elbow_at <= 0.9:
         raise ValueError(f"elbow_at {elbow_at} must be within 0.1..0.9 of the stroke")
@@ -259,10 +271,13 @@ def split_carved_arms(
     bones = {b.name: b for b in desc.bones}
     meta = desc.metadata
     if all(f"forearm_{s}" in bones for s in SIDES):
-        if meta.get("arms") == "split-carved" and abs(
-            float(meta.get("elbow_at", CARVED_ELBOW_AT)) - elbow_at
-        ) < 1e-9:
-            return CarvedArmsReport(write_descriptor(char_dir, desc), already_split=True)
+        if (
+            meta.get("arms") == "split-carved"
+            and abs(float(meta.get("elbow_at", CARVED_ELBOW_AT)) - elbow_at) < 1e-9
+        ):
+            return CarvedArmsReport(
+                write_descriptor(char_dir, desc), already_split=True
+            )
         raise ValueError(
             f"{desc.name!r}'s arms are already split; split them again from the "
             "unsplit character to cut them elsewhere"
@@ -277,15 +292,42 @@ def split_carved_arms(
     if any(f"hand_{s}" in bones or f"forearm_{s}" in bones for s in SIDES):
         raise ValueError(f"{desc.name!r} has a forearm or a hand bone already")
 
+    from an.stage.rig import bones_carry_a_rest_pose
+
+    if bones_carry_a_rest_pose(desc):
+        raise ValueError(
+            f"{desc.name!r} has a bone with a rest rotation or scale: nesting it by "
+            "bones would move its parts at rest; zero them in the art first"
+        )
+    import numpy as np
+
     skin = desc.skins["default"].slots
+    cuts = {}
+    for side in SIDES:  # every cut is measured before anything is written
+        att = _arm_attachment(desc, side)
+        if att.width is not None or att.height is not None:
+            raise ValueError(
+                f"arm_{side}'s drawing declares a size ({att.width} x {att.height}): "
+                "the cut reads its pixels as view-box units; drop the size first"
+            )
+        img = Image.open(char_dir / att.path).convert("RGBA")
+        geometry = _cut_geometry(np.array(img)[:, :, 3], elbow_at)
+        if (
+            abs(
+                att.anchor[1] * img.size[1]
+                - np.argmax((np.array(img)[:, :, 3] > INK_ALPHA).any(axis=1))
+            )
+            > geometry[2] * 2
+        ):
+            raise ValueError(
+                f"arm_{side}'s drawing is not anchored at the top of its stroke (its "
+                "shoulder): the cut runs shoulder to hand, top to bottom"
+            )
+        cuts[side] = (att, img, geometry)
     splits: list[ArmSplit] = []
     for side in SIDES:
         arm = f"arm_{side}"
-        att = _arm_attachment(desc, side)
-        img = Image.open(char_dir / att.path).convert("RGBA")
-        import numpy as np
-
-        elbow, ex, width, hx, hy = _cut_geometry(np.array(img)[:, :, 3], elbow_at)
+        att, img, (elbow, ex, width, hx, hy) = cuts[side]
         upper, lower = _halves(img, elbow, ex, width)
         w, h = img.size
         up_rel = f"parts/{arm}_upper{Path(att.path).suffix}"
@@ -295,8 +337,15 @@ def split_carved_arms(
         ax, ay = att.anchor[0] * w, att.anchor[1] * h
         slot = next(s for s in desc.slots if s.name == arm)
         skin[arm][slot.attachment] = att.model_copy(update={"path": up_rel})
-        skin[f"forearm_{side}"] = {
-            f"forearm_{side}": Attachment(path=fo_rel, anchor=(ex / w, elbow / h))
+        skin[f"forearm_{side}"] = {  # cut from the arm's drawing: its provenance too
+            f"forearm_{side}": att.model_copy(
+                update={
+                    "path": fo_rel,
+                    "anchor": (ex / w, elbow / h),
+                    "x": 0.0,
+                    "y": 0.0,
+                }
+            )
         }
         desc.bones += [
             Bone(
