@@ -56,6 +56,7 @@ The `cutan` repo's `misc/demos/build_demos.py` `south-park-style` demo applies t
 
 ## What never to do
 
+- Never let a style pass for physics: a dropped, thrown or knocked-over thing in any style falls with weight (the `cutan-physics` skill); a style changes the timing of the performance, not gravity.
 - Never put a `guidance` item in the scene as if it worked (a `voice_fx` key, an `outline` role, a morph across the cut). An outline is `surface.outline` in the pack, never a colour role. Name every one you could not express to the user as omitted.
 - Never claim a render "is in the style of X" without the lint numbers beside the targets.
 - Never commit study footage of a real show or film anywhere (copyright). The targets came from clips kept outside every repository.

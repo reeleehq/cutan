@@ -24,6 +24,7 @@ cutan/runtime/        visuals.js: the procedural mouth and eye, registered throu
 cutan/pack.py         check_pack(): the production-pack checker (cutan#87), run by the skill's validate_pack.py and the reelee connector; import_pack(): the pack into a real project (`an pack import`, pack_cli.py)
 cutan/projects_store.py  the projects kind over disk or S3 (ADR-0024; cutan#88, #91): projects_store(), materialize_project(), push_project(), prune_project(), new_project_dir(); projects_cli.py: `an projects push/pull/prune`
 cutan/bench.py        CUTOUT_FIXTURES and run_bench() over this repo's misc/bench/ corpus
+cutan/data/agents/    shipped subagents: cutan-physicist.md (physical motion: drops, topples, chains, sounds on their frame); link it: ln -s <checkout>/cutan/data/agents/cutan-physicist.md ~/.claude/agents/
 tests/  examples/  misc/bench/{corpus,golden}/  misc/demos/  misc/docs/ (design notes: locomotion_gaits.md)  .claude/skills/
 skills/cutan-production-pack/  a Claude.ai skill for writers (not loaded by Claude Code here): production packs; its tables are generated and checked by tests/test_production_pack_skill.py
 ```
