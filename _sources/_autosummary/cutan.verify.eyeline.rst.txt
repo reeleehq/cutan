@@ -9,7 +9,6 @@ cutan.verify.eyeline
    .. autosummary::
    
       REST_DIRECTION
-      DIRECTIONAL_VIEWS
    
    .. rubric:: Functions
 

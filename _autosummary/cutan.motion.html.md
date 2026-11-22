@@ -119,7 +119,7 @@ built-in placeholder draws arms and no legs: it glides).
 * **Type:**
   Leg and arm node names a walk looks for, in order
 
-### cutan.motion.face_toward(shot, who, other, , view='side', from_direction=None, duration=0.3, mall=None)
+### cutan.motion.face_toward(shot, who, other, , view='side', from_direction=None, duration=0.3, mall=None, faces=None)
 
 [`turn()`](#cutan.motion.turn) `who` to `view`, facing `other` — the direction read
 off the stage, so a profile looks at the other character wherever the
@@ -212,7 +212,7 @@ speech aspect does) each pulse rides whatever the head is doing.
 * **Return type:**
   [`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[`SetAction`, `TweenAction`, `SequenceAction`, `ParallelAction`, `DelayAction`, `LoopAction`, `ExtensionAction`]
 
-### cutan.motion.turn(target, , to='back', direction='right', from_direction=None, duration=0.3, view_set='view', rest=None, step_hz=None)
+### cutan.motion.turn(target, , to='back', direction='right', from_direction=None, duration=0.3, view_set='view', rest=None, step_hz=None, faces=None, from_view=None)
 
 Turn a character to the view `to` — the classic cut-out turn (an#197).
 
@@ -234,6 +234,13 @@ which the compiler fans out to the head and torso and which poses the face
 (the back hides it, the profile keeps one eye). `rest` is the entity’s:
 its `scale_x` magnitude is where the turn opens to.
 
+`faces` is the art’s `metadata.faces` declaration (an#818: `left`, or
+`{swap set: {key: left|right}}`), which the compiler fills in when a turn
+is played by name; `from_view` is the view the turn starts from (also
+filled in), the one the declaration is read under for `from_direction`.
+Art drawn facing left is not mirrored to face left: `scale_x` is negative
+exactly when the art’s declared facing differs from `direction`.
+
 `step_hz` is the shot’s stepped timing (the compiler fills it in when a
 turn is played by name). A turn whose halves are shorter than one step
 cannot show its squash: its stepped frames would sample the edge-on scale,
@@ -250,6 +257,9 @@ turn is the style’s HARD SWAP instead: at its midpoint the view changes and
 >>> [(round(f.start, 3), f.action.property, lands(f.action))  # on twos at 24 fps
 ...  for f in flatten(turn("ned", to="side", duration=0.04, step_hz=12))]
 [(0.02, 'view', 'side'), (0.02, 'scale_x', 1.0)]
+>>> [(round(f.start, 2), f.action.property, lands(f.action))  # art drawn facing left
+...  for f in flatten(turn("stu", to="side", direction="left", faces="left"))]
+[(0.0, 'scale_x', 0.0), (0.15, 'view', 'side'), (0.15, 'scale_x', 1.0), (0.3, 'scale_x', 1.0)]
 ```
 
 * **Return type:**

@@ -60,6 +60,7 @@ several slots.
 | [`DEFAULT_EYELID_MAP`](#cutan.characters.schema.DEFAULT_EYELID_MAP)         | Default eyelid-state → attachment-name mapping, shared by both eye slots.                                                                                                                                                                             |
 | [`VIEW_CHANNEL`](#cutan.characters.schema.VIEW_CHANNEL)               | one KEY per drawn view, projected onto the slots whose art changes with the view (the factory draws the head and the torso), each slot carrying attachments NAMED after the keys.                                                                     |
 | [`VIEWS`](#cutan.characters.schema.VIEWS)                      | The views the factory draws, in turnaround order.                                                                                                                                                                                                     |
+| [`DIRECTIONAL_VIEWS`](#cutan.characters.schema.DIRECTIONAL_VIEWS)          | a front or a back view faces the viewer, so the way it "faces" is not judged.                                                                                                                                                                         |
 | [`DFLT_VIEW`](#cutan.characters.schema.DFLT_VIEW)                  | its default attachments ARE this view.                                                                                                                                                                                                                |
 | [`VIEW_VARIANT_SEP`](#cutan.characters.schema.VIEW_VARIANT_SEP)           | What joins a swap set's name to the view a variant of it serves: `eyelid@side` is the `eyelid` set drawn for the `side` view (an#220), the same separator the expression variants (`viseme@happy`, an#98) use.                                        |
 | [`REQUIRED_PARTS`](#cutan.characters.schema.REQUIRED_PARTS)             | Required body parts.                                                                                                                                                                                                                                  |
@@ -353,6 +354,14 @@ A descriptor whose art is drawn in another view says so in `rest_view`.
 
 * **Type:**
   The view a character shows at rest
+
+### cutan.characters.schema.DIRECTIONAL_VIEWS *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'side', 'three_quarter'})*
+
+a front
+or a back view faces the viewer, so the way it “faces” is not judged.
+
+* **Type:**
+  The views that show a direction (the profile and the three-quarter)
 
 ### cutan.characters.schema.EYELID_CHANNEL *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'eyelid'*
 

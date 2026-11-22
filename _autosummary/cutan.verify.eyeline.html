@@ -154,7 +154,7 @@ makes the cut jump the line, and the pair read as one looking past the other.</p
 <p>The rules are pure functions over small records (<a class="reference internal" href="#cutan.verify.eyeline.Presence" title="cutan.verify.eyeline.Presence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Presence</span></code></a>), so they are
 tested without a store or a scene; <a class="reference internal" href="#cutan.verify.eyeline.check_eyeline" title="cutan.verify.eyeline.check_eyeline"><code class="xref py py-func docutils literal notranslate"><span class="pre">check_eyeline()</span></code></a> is the adapter from a
 sceneâ€™s resolved timelines, and <code class="docutils literal notranslate"><span class="pre">cutout.eyeline</span></code> registers it on the genre.</p>
-<p>Only a view that SHOWS a direction is judged (<a class="reference internal" href="#cutan.verify.eyeline.DIRECTIONAL_VIEWS" title="cutan.verify.eyeline.DIRECTIONAL_VIEWS"><code class="xref py py-data docutils literal notranslate"><span class="pre">DIRECTIONAL_VIEWS</span></code></a>: the profile
+<p>Only a view that SHOWS a direction is judged (<code class="xref py py-data docutils literal notranslate"><span class="pre">DIRECTIONAL_VIEWS</span></code>: the profile
 and the three-quarter). A <code class="docutils literal notranslate"><span class="pre">front</span></code> character looks at the camera, and mirroring it
 is invisible as an eyeline (gaze, not facing, directs it); a <code class="docutils literal notranslate"><span class="pre">back</span></code> one looks away
 from it. Lines are judged at their start AND end, and warned only when the speaker
@@ -174,9 +174,6 @@ faces wrongly at both: a turn toward the listener during the line is the authorâ
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.verify.eyeline.REST_DIRECTION" title="cutan.verify.eyeline.REST_DIRECTION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REST_DIRECTION</span></code></a></p></td>
 <td><p>the rig's rest (<code class="docutils literal notranslate"><span class="pre">scale_x</span></code> &gt; 0; the factory draws its profile facing the viewer's right).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.verify.eyeline.DIRECTIONAL_VIEWS" title="cutan.verify.eyeline.DIRECTIONAL_VIEWS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DIRECTIONAL_VIEWS</span></code></a></p></td>
-<td><p>The views that show a direction on screen; any other view is not judged.</p></td>
 </tr>
 </tbody>
 </table>
@@ -205,11 +202,6 @@ faces wrongly at both: a turn toward the listener during the line is the authorâ
 </tr>
 </tbody>
 </table>
-<dl class="py data">
-<dt class="sig sig-object py" id="cutan.verify.eyeline.DIRECTIONAL_VIEWS">
-<span class="sig-prename descclassname"><span class="pre">cutan.verify.eyeline.</span></span><span class="sig-name descname"><span class="pre">DIRECTIONAL_VIEWS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">frozenset</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'side',</span> <span class="pre">'three_quarter'})</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.verify.eyeline.DIRECTIONAL_VIEWS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.verify.eyeline.DIRECTIONAL_VIEWS'">Â¶</a></dt>
-<dd><p>The views that show a direction on screen; any other view is not judged.</p>
-</dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="cutan.verify.eyeline.EyelineFinding">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cutan.verify.eyeline.</span></span><span class="sig-name descname"><span class="pre">EyelineFinding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/verify/eyeline.html#EyelineFinding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.verify.eyeline.EyelineFinding" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.verify.eyeline.EyelineFinding'">Â¶</a></dt>
@@ -284,7 +276,6 @@ and a known direction: with more people the addressee is not knowable here.</p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
-<li><a :data-current="activeSection === '#cutan.verify.eyeline.DIRECTIONAL_VIEWS'" class="reference internal" href="#cutan.verify.eyeline.DIRECTIONAL_VIEWS"><code class="docutils literal notranslate"><span class="pre">DIRECTIONAL_VIEWS</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.verify.eyeline.EyelineFinding'" class="reference internal" href="#cutan.verify.eyeline.EyelineFinding"><code class="docutils literal notranslate"><span class="pre">EyelineFinding</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.verify.eyeline.Presence'" class="reference internal" href="#cutan.verify.eyeline.Presence"><code class="docutils literal notranslate"><span class="pre">Presence</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.verify.eyeline.REST_DIRECTION'" class="reference internal" href="#cutan.verify.eyeline.REST_DIRECTION"><code class="docutils literal notranslate"><span class="pre">REST_DIRECTION</span></code></a></li>
@@ -304,7 +295,7 @@ and a known direction: with more people the addressee is not knowable here.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=4309da3b"></script>
+<script src="../_static/documentation_options.js?v=cdca99f8"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

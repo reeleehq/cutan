@@ -18,6 +18,7 @@ cutan.characters.schema
       DEFAULT_EYELID_MAP
       VIEW_CHANNEL
       VIEWS
+      DIRECTIONAL_VIEWS
       DFLT_VIEW
       VIEW_VARIANT_SEP
       REQUIRED_PARTS

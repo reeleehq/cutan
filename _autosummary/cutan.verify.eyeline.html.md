@@ -18,7 +18,7 @@ The rules are pure functions over small records ([`Presence`](#cutan.verify.eyel
 tested without a store or a scene; [`check_eyeline()`](#cutan.verify.eyeline.check_eyeline) is the adapter from a
 sceneâ€™s resolved timelines, and `cutout.eyeline` registers it on the genre.
 
-Only a view that SHOWS a direction is judged ([`DIRECTIONAL_VIEWS`](#cutan.verify.eyeline.DIRECTIONAL_VIEWS): the profile
+Only a view that SHOWS a direction is judged (`DIRECTIONAL_VIEWS`: the profile
 and the three-quarter). A `front` character looks at the camera, and mirroring it
 is invisible as an eyeline (gaze, not facing, directs it); a `back` one looks away
 from it. Lines are judged at their start AND end, and warned only when the speaker
@@ -37,9 +37,8 @@ faces wrongly at both: a turn toward the listener during the line is the authorâ
 
 ### Module Attributes
 
-| [`REST_DIRECTION`](#cutan.verify.eyeline.REST_DIRECTION)    | the rig's rest (`scale_x` > 0; the factory draws its profile facing the viewer's right).   |
-|--------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| [`DIRECTIONAL_VIEWS`](#cutan.verify.eyeline.DIRECTIONAL_VIEWS) | The views that show a direction on screen; any other view is not judged.                   |
+| [`REST_DIRECTION`](#cutan.verify.eyeline.REST_DIRECTION)   | the rig's rest (`scale_x` > 0; the factory draws its profile facing the viewer's right).   |
+|-------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
 
 ### Functions
 
@@ -53,10 +52,6 @@ faces wrongly at both: a turn toward the listener during the line is the authorâ
 | [`EyelineFinding`](#cutan.verify.eyeline.EyelineFinding)(entity, message)          | One thing to warn about: which entity, and what is wrong with its facing.   |
 |-------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
 | [`Presence`](#cutan.verify.eyeline.Presence)(entity[, direction, x, speaks]) | A character on screen at one instant of a shot.                             |
-
-### cutan.verify.eyeline.DIRECTIONAL_VIEWS *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= frozenset({'side', 'three_quarter'})*
-
-The views that show a direction on screen; any other view is not judged.
 
 ### *class* cutan.verify.eyeline.EyelineFinding(entity, message)
 

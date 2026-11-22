@@ -213,28 +213,31 @@ several slots.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.VIEWS" title="cutan.characters.schema.VIEWS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VIEWS</span></code></a></p></td>
 <td><p>The views the factory draws, in turnaround order.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.DFLT_VIEW" title="cutan.characters.schema.DFLT_VIEW"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_VIEW</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.DIRECTIONAL_VIEWS" title="cutan.characters.schema.DIRECTIONAL_VIEWS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DIRECTIONAL_VIEWS</span></code></a></p></td>
+<td><p>a front or a back view faces the viewer, so the way it "faces" is not judged.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.DFLT_VIEW" title="cutan.characters.schema.DFLT_VIEW"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_VIEW</span></code></a></p></td>
 <td><p>its default attachments ARE this view.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.VIEW_VARIANT_SEP" title="cutan.characters.schema.VIEW_VARIANT_SEP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VIEW_VARIANT_SEP</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.VIEW_VARIANT_SEP" title="cutan.characters.schema.VIEW_VARIANT_SEP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VIEW_VARIANT_SEP</span></code></a></p></td>
 <td><p>What joins a swap set's name to the view a variant of it serves: <code class="docutils literal notranslate"><span class="pre">eyelid@side</span></code> is the <code class="docutils literal notranslate"><span class="pre">eyelid</span></code> set drawn for the <code class="docutils literal notranslate"><span class="pre">side</span></code> view (an#220), the same separator the expression variants (<code class="docutils literal notranslate"><span class="pre">viseme@happy</span></code>, an#98) use.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.REQUIRED_PARTS" title="cutan.characters.schema.REQUIRED_PARTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REQUIRED_PARTS</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.REQUIRED_PARTS" title="cutan.characters.schema.REQUIRED_PARTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REQUIRED_PARTS</span></code></a></p></td>
 <td><p>Required body parts.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.SLOT_POSE_OFFSETS" title="cutan.characters.schema.SLOT_POSE_OFFSETS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SLOT_POSE_OFFSETS</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.SLOT_POSE_OFFSETS" title="cutan.characters.schema.SLOT_POSE_OFFSETS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SLOT_POSE_OFFSETS</span></code></a></p></td>
 <td><p>The transform properties a <a class="reference internal" href="#cutan.characters.schema.SlotPose" title="cutan.characters.schema.SlotPose"><code class="xref py py-class docutils literal notranslate"><span class="pre">SlotPose</span></code></a> sets, and whether each is an OFFSET added to the rest (in view_box units, so scaled by the rig), an ANGLE added to it (radians, never scaled) or a FACTOR on it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.LEG_LENGTH" title="cutan.characters.schema.LEG_LENGTH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LEG_LENGTH</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.LEG_LENGTH" title="cutan.characters.schema.LEG_LENGTH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LEG_LENGTH</span></code></a></p></td>
 <td><p>Hip to ground in the default rig, in view_box units.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.HEAD_ANCHOR" title="cutan.characters.schema.HEAD_ANCHOR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HEAD_ANCHOR</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.HEAD_ANCHOR" title="cutan.characters.schema.HEAD_ANCHOR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HEAD_ANCHOR</span></code></a></p></td>
 <td><p>the head hangs above the neck, its lower ~fifth overlapping the collar.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.REFERENCE_HEAD_HEIGHT" title="cutan.characters.schema.REFERENCE_HEAD_HEIGHT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REFERENCE_HEAD_HEIGHT</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.REFERENCE_HEAD_HEIGHT" title="cutan.characters.schema.REFERENCE_HEAD_HEIGHT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REFERENCE_HEAD_HEIGHT</span></code></a></p></td>
 <td><p>The head height the default face layout is drawn for, in view_box units — the pre-Wave-4 compiler's 96 px head at k = 345/1024.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.schema.FACE_OFFSETS" title="cutan.characters.schema.FACE_OFFSETS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FACE_OFFSETS</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.schema.FACE_OFFSETS" title="cutan.characters.schema.FACE_OFFSETS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FACE_OFFSETS</span></code></a></p></td>
 <td><p>Where each face part sits relative to the <code class="docutils literal notranslate"><span class="pre">head</span></code> bone, in view_box units.</p></td>
 </tr>
 </tbody>
@@ -569,6 +572,17 @@ A descriptor whose art is drawn in another view says so in <code class="docutils
 </dl>
 </dd></dl>
 <dl class="py data">
+<dt class="sig sig-object py" id="cutan.characters.schema.DIRECTIONAL_VIEWS">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.schema.</span></span><span class="sig-name descname"><span class="pre">DIRECTIONAL_VIEWS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">frozenset</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'side',</span> <span class="pre">'three_quarter'})</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.schema.DIRECTIONAL_VIEWS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.schema.DIRECTIONAL_VIEWS'">¶</a></dt>
+<dd><p>a front
+or a back view faces the viewer, so the way it “faces” is not judged.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The views that show a direction (the profile and the three-quarter)</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py data">
 <dt class="sig sig-object py" id="cutan.characters.schema.EYELID_CHANNEL">
 <span class="sig-prename descclassname"><span class="pre">cutan.characters.schema.</span></span><span class="sig-name descname"><span class="pre">EYELID_CHANNEL</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'eyelid'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.schema.EYELID_CHANNEL" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.schema.EYELID_CHANNEL'">¶</a></dt>
 <dd><p>The swap channel blinks drive. One set serves BOTH eye slots because the
@@ -829,6 +843,7 @@ so the expression variants (an#98) and the view variants never collide.</p>
 <li><a :data-current="activeSection === '#cutan.characters.schema.DEFAULT_EYELID_MAP'" class="reference internal" href="#cutan.characters.schema.DEFAULT_EYELID_MAP"><code class="docutils literal notranslate"><span class="pre">DEFAULT_EYELID_MAP</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.schema.DEFAULT_VISEME_MAP'" class="reference internal" href="#cutan.characters.schema.DEFAULT_VISEME_MAP"><code class="docutils literal notranslate"><span class="pre">DEFAULT_VISEME_MAP</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.schema.DFLT_VIEW'" class="reference internal" href="#cutan.characters.schema.DFLT_VIEW"><code class="docutils literal notranslate"><span class="pre">DFLT_VIEW</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.schema.DIRECTIONAL_VIEWS'" class="reference internal" href="#cutan.characters.schema.DIRECTIONAL_VIEWS"><code class="docutils literal notranslate"><span class="pre">DIRECTIONAL_VIEWS</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.schema.EYELID_CHANNEL'" class="reference internal" href="#cutan.characters.schema.EYELID_CHANNEL"><code class="docutils literal notranslate"><span class="pre">EYELID_CHANNEL</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.schema.FACE_OFFSETS'" class="reference internal" href="#cutan.characters.schema.FACE_OFFSETS"><code class="docutils literal notranslate"><span class="pre">FACE_OFFSETS</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.schema.HEAD_ANCHOR'" class="reference internal" href="#cutan.characters.schema.HEAD_ANCHOR"><code class="docutils literal notranslate"><span class="pre">HEAD_ANCHOR</span></code></a></li>
@@ -866,7 +881,7 @@ so the expression variants (an#98) and the view variants never collide.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=4309da3b"></script>
+<script src="../_static/documentation_options.js?v=cdca99f8"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
