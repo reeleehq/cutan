@@ -45,6 +45,12 @@ Default lip-sync provider: deterministic char-to-viseme mapping.
 
 Implements the `LipSyncProvider` protocol.
 
+#### cache_version *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'phones-1'*
+
+Tracks cached before this provider read a take’s phones (an#491) are
+re-aligned once, never re-synthesised: the core re-keys the cache by it
+(`an.audio.lipsync.lipsync_cache_id`, an#727), the persisted `name` stays.
+
 #### repeatable *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
 
 `an cache gc`

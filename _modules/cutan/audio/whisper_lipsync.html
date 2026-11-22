@@ -228,7 +228,7 @@
 </span><span id="line-37">
 </span><span id="line-38"><span class="c1"># Reuse the offline char→viseme mapping so the two providers stay consistent.</span>
 </span><span id="line-39"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.audio.offline_lipsync</span><span class="w"> </span><span class="kn">import</span> <span class="n">_CHAR_TO_VISEME</span><span class="p">,</span> <span class="n">_REST_VISEME</span><span class="p">,</span> <span class="n">clip_words</span>
-</span><span id="line-40"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.audio.phones</span><span class="w"> </span><span class="kn">import</span> <span class="n">PhoneToViseme</span><span class="p">,</span> <span class="n">phone_viseme</span><span class="p">,</span> <span class="n">phones_track</span>
+</span><span id="line-40"><span class="kn">from</span><span class="w"> </span><span class="nn">an.audio.phones</span><span class="w"> </span><span class="kn">import</span> <span class="n">PhoneToViseme</span><span class="p">,</span> <span class="n">phone_viseme</span><span class="p">,</span> <span class="n">phones_track</span>
 </span><span id="line-41">
 </span><span id="line-42"><span class="n">_DEFAULT_MODEL_SIZE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"tiny"</span>  <span class="c1"># ~75 MB; "base" gives slightly better word-timing</span>
 </span><span id="line-43"><span class="n">_DEFAULT_DEVICE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cpu"</span>

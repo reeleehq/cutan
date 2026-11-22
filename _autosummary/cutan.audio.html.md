@@ -38,6 +38,12 @@ Default lip-sync provider: deterministic char-to-viseme mapping.
 
 Implements the `LipSyncProvider` protocol.
 
+#### cache_version *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'phones-1'*
+
+Tracks cached before this provider read a take’s phones (an#491) are
+re-aligned once, never re-synthesised: the core re-keys the cache by it
+(`an.audio.lipsync.lipsync_cache_id`, an#727), the persisted `name` stays.
+
 #### repeatable *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
 
 `an cache gc`
@@ -122,6 +128,14 @@ pipeline).
   * **min_gap_for_rest** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – minimum inter-word silence (seconds) before
     we insert a rest keyframe. Defaults to `0.20`.
 
+#### cache_version *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'phones-1'*
+
+tracks cached from its
+words alone are re-aligned once.
+
+* **Type:**
+  A clip’s phones are preferred now (an#491, an#727)
+
 #### emits_word_timings *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
 
 Built from words, so the track carries them (an#96).
@@ -149,9 +163,9 @@ Word timings from Whisper, distributed over the mouth shapes.
 
 ### Modules
 
-| [`injectable_lipsync`](cutan.audio.injectable_lipsync.html.md#module-cutan.audio.injectable_lipsync)   | Lip-sync provider that consumes pre-computed word timings.                      |
-|-------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
-| [`offline_lipsync`](cutan.audio.offline_lipsync.html.md#module-cutan.audio.offline_lipsync)         | OfflineLipSync — deterministic transcript → viseme track.                       |
-| [`phones`](cutan.audio.phones.html.md#module-cutan.audio.phones)                           | Phones to mouth shapes: an aligner's phone timings as a Rhubarb viseme track.   |
-| [`rhubarb_lipsync`](cutan.audio.rhubarb_lipsync.html.md#module-cutan.audio.rhubarb_lipsync)         | RhubarbLipSync — calls the rhubarb-lip-sync binary for phoneme-aligned visemes. |
-| [`whisper_lipsync`](cutan.audio.whisper_lipsync.html.md#module-cutan.audio.whisper_lipsync)         | WhisperLipSync — faster-whisper word timestamps → viseme keyframes.             |
+| [`injectable_lipsync`](cutan.audio.injectable_lipsync.html.md#module-cutan.audio.injectable_lipsync)   | Lip-sync provider that consumes pre-computed word timings.                                     |
+|-------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| [`offline_lipsync`](cutan.audio.offline_lipsync.html.md#module-cutan.audio.offline_lipsync)         | OfflineLipSync — deterministic transcript → viseme track.                                      |
+| [`phones`](cutan.audio.phones.html.md#module-cutan.audio.phones)                           | Phones to mouth shapes: the core's tables (`an.audio.phones`), and this genre's art direction. |
+| [`rhubarb_lipsync`](cutan.audio.rhubarb_lipsync.html.md#module-cutan.audio.rhubarb_lipsync)         | RhubarbLipSync — calls the rhubarb-lip-sync binary for phoneme-aligned visemes.                |
+| [`whisper_lipsync`](cutan.audio.whisper_lipsync.html.md#module-cutan.audio.whisper_lipsync)         | WhisperLipSync — faster-whisper word timestamps → viseme keyframes.                            |

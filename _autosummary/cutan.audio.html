@@ -191,6 +191,13 @@ draws mouths. The genre registers these by name as <code class="docutils literal
 <dl class="field-list simple">
 </dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="cutan.audio.OfflineLipSync.cache_version">
+<span class="sig-name descname"><span class="pre">cache_version</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'phones-1'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.audio.OfflineLipSync.cache_version" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.audio.OfflineLipSync.cache_version'">¶</a></dt>
+<dd><p>Tracks cached before this provider read a take’s phones (an#491) are
+re-aligned once, never re-synthesised: the core re-keys the cache by it
+(<code class="docutils literal notranslate"><span class="pre">an.audio.lipsync.lipsync_cache_id</span></code>, an#727), the persisted <code class="docutils literal notranslate"><span class="pre">name</span></code> stays.</p>
+</dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="cutan.audio.OfflineLipSync.repeatable">
 <span class="sig-name descname"><span class="pre">repeatable</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">bool</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.audio.OfflineLipSync.repeatable" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.audio.OfflineLipSync.repeatable'">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">cache</span> <span class="pre">gc</span></code>
@@ -291,6 +298,17 @@ we insert a rest keyframe. Defaults to <code class="docutils literal notranslate
 </dd>
 </dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="cutan.audio.WordTimingsLipSync.cache_version">
+<span class="sig-name descname"><span class="pre">cache_version</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'phones-1'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.audio.WordTimingsLipSync.cache_version" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.audio.WordTimingsLipSync.cache_version'">¶</a></dt>
+<dd><p>tracks cached from its
+words alone are re-aligned once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A clip’s phones are preferred now (an#491, an#727)</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="cutan.audio.WordTimingsLipSync.emits_word_timings">
 <span class="sig-name descname"><span class="pre">emits_word_timings</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">bool</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.audio.WordTimingsLipSync.emits_word_timings" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.audio.WordTimingsLipSync.emits_word_timings'">¶</a></dt>
 <dd><p>Built from words, so the track carries them (an#96).</p>
@@ -336,7 +354,7 @@ we insert a rest keyframe. Defaults to <code class="docutils literal notranslate
 <td><p>OfflineLipSync — deterministic transcript → viseme track.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="cutan.audio.phones.html#module-cutan.audio.phones" title="cutan.audio.phones"><code class="xref py py-obj docutils literal notranslate"><span class="pre">phones</span></code></a></p></td>
-<td><p>Phones to mouth shapes: an aligner's phone timings as a Rhubarb viseme track.</p></td>
+<td><p>Phones to mouth shapes: the core's tables (<code class="docutils literal notranslate"><span class="pre">an.audio.phones</span></code>), and this genre's art direction.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="cutan.audio.rhubarb_lipsync.html#module-cutan.audio.rhubarb_lipsync" title="cutan.audio.rhubarb_lipsync"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rhubarb_lipsync</span></code></a></p></td>
 <td><p>RhubarbLipSync — calls the rhubarb-lip-sync binary for phoneme-aligned visemes.</p></td>
@@ -351,6 +369,7 @@ we insert a rest keyframe. Defaults to <code class="docutils literal notranslate
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
 <li><a :data-current="activeSection === '#cutan.audio.OfflineLipSync'" class="reference internal" href="#cutan.audio.OfflineLipSync"><code class="docutils literal notranslate"><span class="pre">OfflineLipSync</span></code></a><ul>
+<li><a :data-current="activeSection === '#cutan.audio.OfflineLipSync.cache_version'" class="reference internal" href="#cutan.audio.OfflineLipSync.cache_version"><code class="docutils literal notranslate"><span class="pre">OfflineLipSync.cache_version</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.audio.OfflineLipSync.repeatable'" class="reference internal" href="#cutan.audio.OfflineLipSync.repeatable"><code class="docutils literal notranslate"><span class="pre">OfflineLipSync.repeatable</span></code></a></li>
 </ul>
 </li>
@@ -366,6 +385,7 @@ we insert a rest keyframe. Defaults to <code class="docutils literal notranslate
 </ul>
 </li>
 <li><a :data-current="activeSection === '#cutan.audio.WordTimingsLipSync'" class="reference internal" href="#cutan.audio.WordTimingsLipSync"><code class="docutils literal notranslate"><span class="pre">WordTimingsLipSync</span></code></a><ul>
+<li><a :data-current="activeSection === '#cutan.audio.WordTimingsLipSync.cache_version'" class="reference internal" href="#cutan.audio.WordTimingsLipSync.cache_version"><code class="docutils literal notranslate"><span class="pre">WordTimingsLipSync.cache_version</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.audio.WordTimingsLipSync.emits_word_timings'" class="reference internal" href="#cutan.audio.WordTimingsLipSync.emits_word_timings"><code class="docutils literal notranslate"><span class="pre">WordTimingsLipSync.emits_word_timings</span></code></a></li>
 </ul>
 </li>

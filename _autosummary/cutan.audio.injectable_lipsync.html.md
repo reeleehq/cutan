@@ -66,6 +66,14 @@ pipeline).
   * **min_gap_for_rest** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – minimum inter-word silence (seconds) before
     we insert a rest keyframe. Defaults to `0.20`.
 
+#### cache_version *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'phones-1'*
+
+tracks cached from its
+words alone are re-aligned once.
+
+* **Type:**
+  A clip’s phones are preferred now (an#491, an#727)
+
 #### emits_word_timings *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
 
 Built from words, so the track carries them (an#96).

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-22T10:48:21Z",
+  "built_at": "2026-11-22T11:19:31Z",
   "package": {
     "name": "cutan",
     "version": "0.0.121",
@@ -9,26 +9,24 @@
   },
   "git": {
     "available": true,
-    "commit": "39d44896b82a6c62018739efbd4246d348e05548",
-    "short_commit": "39d4489",
+    "commit": "138764fa0852bed781bdfde1ae8d3e8232e240ee",
+    "short_commit": "138764f",
     "branch": "main",
-    "tags": [
-      "0.0.121"
-    ],
+    "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/cutan",
-    "commit_url": "https://github.com/reeleehq/cutan/commit/39d44896b82a6c62018739efbd4246d348e05548",
+    "commit_url": "https://github.com/reeleehq/cutan/commit/138764fa0852bed781bdfde1ae8d3e8232e240ee",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/cutan",
-    "sha": "d6b81e9af6d8e2813e32a4e0bbe829ab4093320c",
+    "sha": "138764fa0852bed781bdfde1ae8d3e8232e240ee",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "45012945226",
-    "run_url": "https://github.com/reeleehq/cutan/actions/runs/45012945226",
+    "run_id": "45015794861",
+    "run_url": "https://github.com/reeleehq/cutan/actions/runs/45015794861",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -58,7 +56,7 @@
   },
   "site": {
     "modules_documented": 93,
-    "objects_documented": 1039
+    "objects_documented": 1029
   },
   "pypi": {
     "checked": true,
@@ -66,7 +64,7 @@
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 39d44896b82a6c62018739efbd4246d348e05548\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/cutan && cd cutan\ngit checkout 138764fa0852bed781bdfde1ae8d3e8232e240ee\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

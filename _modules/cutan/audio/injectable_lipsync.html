@@ -231,92 +231,107 @@
 </span><span id="line-40">    <span class="n">word_timings_to_visemes</span><span class="p">,</span>
 </span><span id="line-41"><span class="p">)</span>
 </span><span id="line-42"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.audio.offline_lipsync</span><span class="w"> </span><span class="kn">import</span> <span class="n">_CHAR_TO_VISEME</span><span class="p">,</span> <span class="n">_REST_VISEME</span>
-</span><span id="line-43"><span class="kn">from</span><span class="w"> </span><span class="nn">an.audio.tts</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioClip</span>
-</span><span id="line-44">
-</span><span id="line-45">
+</span><span id="line-43"><span class="kn">from</span><span class="w"> </span><span class="nn">an.audio.phones</span><span class="w"> </span><span class="kn">import</span> <span class="n">phones_track</span>
+</span><span id="line-44"><span class="kn">from</span><span class="w"> </span><span class="nn">an.audio.tts</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioClip</span>
+</span><span id="line-45"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.audio.phones</span><span class="w"> </span><span class="kn">import</span> <span class="n">PHONES_CACHE_VERSION</span>
+</span><span id="line-46">
+</span><span id="line-47">
 <div class="viewcode-block" id="StaticWordTimings">
 <a class="viewcode-back" href="../../../_autosummary/cutan.audio.injectable_lipsync.html#cutan.audio.StaticWordTimings">[docs]</a>
-</span><span id="line-46"><span class="k">class</span><span class="w"> </span><span class="nc">StaticWordTimings</span><span class="p">:</span>
-</span><span id="line-47"><span class="w">    </span><span class="sd">"""A :class:`WordTimingProvider` over a fixed list of timings."""</span>
-</span><span id="line-48">
-</span><span id="line-49">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"static"</span>
+</span><span id="line-48"><span class="k">class</span><span class="w"> </span><span class="nc">StaticWordTimings</span><span class="p">:</span>
+</span><span id="line-49"><span class="w">    </span><span class="sd">"""A :class:`WordTimingProvider` over a fixed list of timings."""</span>
 </span><span id="line-50">
-</span><span id="line-51">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">words</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">WordTiming</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"static"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-52">        <span class="bp">self</span><span class="o">.</span><span class="n">_words</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
-</span><span id="line-53">        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">label</span>
-</span><span id="line-54">
-</span><span id="line-55">    <span class="k">def</span><span class="w"> </span><span class="nf">words_for</span><span class="p">(</span>
-</span><span id="line-56">        <span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">transcript</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
-</span><span id="line-57">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">WordTiming</span><span class="p">]:</span>
-</span><span id="line-58">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_words</span></div>
+</span><span id="line-51">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"static"</span>
+</span><span id="line-52">
+</span><span id="line-53">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">words</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">WordTiming</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"static"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-54">        <span class="bp">self</span><span class="o">.</span><span class="n">_words</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+</span><span id="line-55">        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">label</span>
+</span><span id="line-56">
+</span><span id="line-57">    <span class="k">def</span><span class="w"> </span><span class="nf">words_for</span><span class="p">(</span>
+</span><span id="line-58">        <span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">transcript</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+</span><span id="line-59">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">WordTiming</span><span class="p">]:</span>
+</span><span id="line-60">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_words</span></div>
 
-</span><span id="line-59">
-</span><span id="line-60">
+</span><span id="line-61">
+</span><span id="line-62">
 <div class="viewcode-block" id="WordTimingsLipSync">
 <a class="viewcode-back" href="../../../_autosummary/cutan.audio.injectable_lipsync.html#cutan.audio.WordTimingsLipSync">[docs]</a>
-</span><span id="line-61"><span class="k">class</span><span class="w"> </span><span class="nc">WordTimingsLipSync</span><span class="p">:</span>
-</span><span id="line-62"><span class="w">    </span><span class="sd">""":class:`LipSyncProvider` driven by a :class:`WordTimingProvider`.</span>
-</span><span id="line-63">
-</span><span id="line-64"><span class="sd">    Skips transcription entirely. Use this when the caller already has</span>
-</span><span id="line-65"><span class="sd">    authoritative word timings (e.g. from a separate lyric-alignment</span>
-</span><span id="line-66"><span class="sd">    pipeline).</span>
-</span><span id="line-67">
-</span><span id="line-68"><span class="sd">    Args:</span>
-</span><span id="line-69"><span class="sd">        provider: any :class:`WordTimingProvider`.</span>
-</span><span id="line-70"><span class="sd">        char_to_viseme: optional override of the character→viseme code</span>
-</span><span id="line-71"><span class="sd">            mapping; defaults to the one shared with</span>
-</span><span id="line-72"><span class="sd">            :class:`OfflineLipSync` / :class:`WhisperLipSync`.</span>
-</span><span id="line-73"><span class="sd">        convention: declared viseme convention string for the produced</span>
-</span><span id="line-74"><span class="sd">            track. Defaults to ``"rhubarb"`` for compatibility with the</span>
-</span><span id="line-75"><span class="sd">            existing cutout adapter.</span>
-</span><span id="line-76"><span class="sd">        rest_viseme: code emitted in silent gaps. Defaults to</span>
-</span><span id="line-77"><span class="sd">            :data:`_REST_VISEME`.</span>
-</span><span id="line-78"><span class="sd">        min_gap_for_rest: minimum inter-word silence (seconds) before</span>
-</span><span id="line-79"><span class="sd">            we insert a rest keyframe. Defaults to ``0.20``.</span>
-</span><span id="line-80"><span class="sd">    """</span>
-</span><span id="line-81">
-</span><span id="line-82">    <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span>
+</span><span id="line-63"><span class="k">class</span><span class="w"> </span><span class="nc">WordTimingsLipSync</span><span class="p">:</span>
+</span><span id="line-64"><span class="w">    </span><span class="sd">""":class:`LipSyncProvider` driven by a :class:`WordTimingProvider`.</span>
+</span><span id="line-65">
+</span><span id="line-66"><span class="sd">    Skips transcription entirely. Use this when the caller already has</span>
+</span><span id="line-67"><span class="sd">    authoritative word timings (e.g. from a separate lyric-alignment</span>
+</span><span id="line-68"><span class="sd">    pipeline).</span>
+</span><span id="line-69">
+</span><span id="line-70"><span class="sd">    Args:</span>
+</span><span id="line-71"><span class="sd">        provider: any :class:`WordTimingProvider`.</span>
+</span><span id="line-72"><span class="sd">        char_to_viseme: optional override of the character→viseme code</span>
+</span><span id="line-73"><span class="sd">            mapping; defaults to the one shared with</span>
+</span><span id="line-74"><span class="sd">            :class:`OfflineLipSync` / :class:`WhisperLipSync`.</span>
+</span><span id="line-75"><span class="sd">        convention: declared viseme convention string for the produced</span>
+</span><span id="line-76"><span class="sd">            track. Defaults to ``"rhubarb"`` for compatibility with the</span>
+</span><span id="line-77"><span class="sd">            existing cutout adapter.</span>
+</span><span id="line-78"><span class="sd">        rest_viseme: code emitted in silent gaps. Defaults to</span>
+</span><span id="line-79"><span class="sd">            :data:`_REST_VISEME`.</span>
+</span><span id="line-80"><span class="sd">        min_gap_for_rest: minimum inter-word silence (seconds) before</span>
+</span><span id="line-81"><span class="sd">            we insert a rest keyframe. Defaults to ``0.20``.</span>
+</span><span id="line-82"><span class="sd">    """</span>
 </span><span id="line-83">
-</span><span id="line-84">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-</span><span id="line-85">        <span class="bp">self</span><span class="p">,</span>
-</span><span id="line-86">        <span class="n">provider</span><span class="p">:</span> <span class="n">WordTimingProvider</span><span class="p">,</span>
-</span><span id="line-87">        <span class="o">*</span><span class="p">,</span>
-</span><span id="line-88">        <span class="n">char_to_viseme</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-89">        <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span><span class="p">,</span>
-</span><span id="line-90">        <span class="n">rest_viseme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_REST_VISEME</span><span class="p">,</span>
-</span><span id="line-91">        <span class="n">min_gap_for_rest</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.20</span><span class="p">,</span>
-</span><span id="line-92">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-93">        <span class="bp">self</span><span class="o">.</span><span class="n">provider</span> <span class="o">=</span> <span class="n">provider</span>
-</span><span id="line-94">        <span class="bp">self</span><span class="o">.</span><span class="n">convention</span> <span class="o">=</span> <span class="n">convention</span>
-</span><span id="line-95">        <span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-96">            <span class="nb">dict</span><span class="p">(</span><span class="n">char_to_viseme</span><span class="p">)</span> <span class="k">if</span> <span class="n">char_to_viseme</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_CHAR_TO_VISEME</span><span class="p">)</span>
-</span><span id="line-97">        <span class="p">)</span>
-</span><span id="line-98">        <span class="bp">self</span><span class="o">.</span><span class="n">_rest</span> <span class="o">=</span> <span class="n">rest_viseme</span>
-</span><span id="line-99">        <span class="bp">self</span><span class="o">.</span><span class="n">_min_gap</span> <span class="o">=</span> <span class="n">min_gap_for_rest</span>
-</span><span id="line-100">
-</span><span id="line-101">    <span class="nd">@property</span>
-</span><span id="line-102">    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-103">        <span class="c1"># Disambiguate cache keys per-provider so swapping providers</span>
-</span><span id="line-104">        <span class="c1"># invalidates the viseme cache.</span>
-</span><span id="line-105">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"word-timings:</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">provider</span><span class="p">,</span><span class="w"> </span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'unknown'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-106">
-</span><span id="line-107">    <span class="c1">#: Built from words, so the track carries them (an#96).</span>
-</span><span id="line-108">    <span class="n">emits_word_timings</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="line-109">
-</span><span id="line-110">    <span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="n">transcript</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VisemeTrack</span><span class="p">:</span>
-</span><span id="line-111">        <span class="n">words</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">provider</span><span class="o">.</span><span class="n">words_for</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">transcript</span><span class="o">=</span><span class="n">transcript</span><span class="p">))</span>
-</span><span id="line-112">        <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
-</span><span id="line-113">            <span class="n">visemes</span><span class="o">=</span><span class="n">word_timings_to_visemes</span><span class="p">(</span>
-</span><span id="line-114">                <span class="n">words</span><span class="p">,</span>
-</span><span id="line-115">                <span class="n">total_duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
-</span><span id="line-116">                <span class="n">char_to_viseme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span><span class="p">,</span>
-</span><span id="line-117">                <span class="n">rest_viseme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rest</span><span class="p">,</span>
-</span><span id="line-118">                <span class="n">min_gap_for_rest</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_min_gap</span><span class="p">,</span>
-</span><span id="line-119">            <span class="p">),</span>
-</span><span id="line-120">            <span class="n">convention</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convention</span><span class="p">,</span>
-</span><span id="line-121">            <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
-</span><span id="line-122">            <span class="n">words</span><span class="o">=</span><span class="n">words</span><span class="p">,</span>
-</span><span id="line-123">        <span class="p">)</span></div>
+</span><span id="line-84">    <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span>
+</span><span id="line-85">    <span class="c1">#: A clip's phones are preferred now (an#491, an#727): tracks cached from its</span>
+</span><span id="line-86">    <span class="c1">#: words alone are re-aligned once.</span>
+</span><span id="line-87">    <span class="n">cache_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">PHONES_CACHE_VERSION</span>
+</span><span id="line-88">
+</span><span id="line-89">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="line-90">        <span class="bp">self</span><span class="p">,</span>
+</span><span id="line-91">        <span class="n">provider</span><span class="p">:</span> <span class="n">WordTimingProvider</span><span class="p">,</span>
+</span><span id="line-92">        <span class="o">*</span><span class="p">,</span>
+</span><span id="line-93">        <span class="n">char_to_viseme</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-94">        <span class="n">convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rhubarb"</span><span class="p">,</span>
+</span><span id="line-95">        <span class="n">rest_viseme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_REST_VISEME</span><span class="p">,</span>
+</span><span id="line-96">        <span class="n">min_gap_for_rest</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.20</span><span class="p">,</span>
+</span><span id="line-97">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-98">        <span class="bp">self</span><span class="o">.</span><span class="n">provider</span> <span class="o">=</span> <span class="n">provider</span>
+</span><span id="line-99">        <span class="bp">self</span><span class="o">.</span><span class="n">convention</span> <span class="o">=</span> <span class="n">convention</span>
+</span><span id="line-100">        <span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-101">            <span class="nb">dict</span><span class="p">(</span><span class="n">char_to_viseme</span><span class="p">)</span> <span class="k">if</span> <span class="n">char_to_viseme</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_CHAR_TO_VISEME</span><span class="p">)</span>
+</span><span id="line-102">        <span class="p">)</span>
+</span><span id="line-103">        <span class="bp">self</span><span class="o">.</span><span class="n">_rest</span> <span class="o">=</span> <span class="n">rest_viseme</span>
+</span><span id="line-104">        <span class="bp">self</span><span class="o">.</span><span class="n">_min_gap</span> <span class="o">=</span> <span class="n">min_gap_for_rest</span>
+</span><span id="line-105">
+</span><span id="line-106">    <span class="nd">@property</span>
+</span><span id="line-107">    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-108">        <span class="c1"># Disambiguate cache keys per-provider so swapping providers</span>
+</span><span id="line-109">        <span class="c1"># invalidates the viseme cache.</span>
+</span><span id="line-110">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"word-timings:</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">provider</span><span class="p">,</span><span class="w"> </span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'unknown'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-111">
+</span><span id="line-112">    <span class="c1">#: Built from words, so the track carries them (an#96).</span>
+</span><span id="line-113">    <span class="n">emits_word_timings</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="line-114">
+</span><span id="line-115">    <span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">:</span> <span class="n">AudioClip</span><span class="p">,</span> <span class="n">transcript</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VisemeTrack</span><span class="p">:</span>
+</span><span id="line-116">        <span class="c1"># A take whose aligner said which sound is when: each phone's own shape</span>
+</span><span id="line-117">        <span class="c1"># (a word with no phones under it keeps its letters).</span>
+</span><span id="line-118">        <span class="n">from_phones</span> <span class="o">=</span> <span class="n">phones_track</span><span class="p">(</span>
+</span><span id="line-119">            <span class="n">audio</span><span class="p">,</span>
+</span><span id="line-120">            <span class="n">char_to_viseme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span><span class="p">,</span>
+</span><span id="line-121">            <span class="n">rest_viseme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rest</span><span class="p">,</span>
+</span><span id="line-122">            <span class="n">convention</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convention</span><span class="p">,</span>
+</span><span id="line-123">        <span class="p">)</span>
+</span><span id="line-124">        <span class="k">if</span> <span class="n">from_phones</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-125">            <span class="k">return</span> <span class="n">from_phones</span>
+</span><span id="line-126">        <span class="n">words</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">provider</span><span class="o">.</span><span class="n">words_for</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">transcript</span><span class="o">=</span><span class="n">transcript</span><span class="p">))</span>
+</span><span id="line-127">        <span class="k">return</span> <span class="n">VisemeTrack</span><span class="p">(</span>
+</span><span id="line-128">            <span class="n">visemes</span><span class="o">=</span><span class="n">word_timings_to_visemes</span><span class="p">(</span>
+</span><span id="line-129">                <span class="n">words</span><span class="p">,</span>
+</span><span id="line-130">                <span class="n">total_duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+</span><span id="line-131">                <span class="n">char_to_viseme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span><span class="p">,</span>
+</span><span id="line-132">                <span class="n">rest_viseme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rest</span><span class="p">,</span>
+</span><span id="line-133">                <span class="n">min_gap_for_rest</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_min_gap</span><span class="p">,</span>
+</span><span id="line-134">            <span class="p">),</span>
+</span><span id="line-135">            <span class="n">convention</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">convention</span><span class="p">,</span>
+</span><span id="line-136">            <span class="n">duration</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+</span><span id="line-137">            <span class="n">words</span><span class="o">=</span><span class="n">words</span><span class="p">,</span>
+</span><span id="line-138">        <span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
