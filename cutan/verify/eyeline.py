@@ -179,14 +179,14 @@ def check_eyeline(
     registers its own check with (``functools.partial``): the views that show a
     direction, what a character faces at rest, and what makes two shots one place.
     """
-    from an.ir.validate import _dialogue_layout  # TODO an#767: a public layout
+    from an.ir import dialogue_layout
 
     shots = ctx.shots
     resolved = [_turns_of(ctx, i, shot) for i, shot in enumerate(shots)]
     if any(r is None for r in resolved):
         return
     chars = [[e for e in shot.entities if e.kind == "character"] for shot in shots]
-    lines = [list(_dialogue_layout(shot)) for shot in shots]
+    lines = [list(dialogue_layout(shot)) for shot in shots]
 
     def rest_view_of(entity: Any) -> str:
         doc = _rig_document(entity, ctx.stores)
