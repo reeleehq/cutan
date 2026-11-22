@@ -245,7 +245,8 @@ def write_prop(
 
     A :class:`~cutan.carve.PartSet` is written with its carving's provenance:
     build one with :func:`~cutan.carve.split_parts` (its parts are cut from
-    that carving), never by hand from other carvings' parts.
+    that carving) or :func:`~cutan.carve.framed`. A part whose pixels come from
+    elsewhere carries its own ``source``, written on its attachment.
 
     The root bone sits at the carving's anchor, and the descriptor declares it
     the rig's ``origin``: the prop stands where it is put by its anchor, whatever
@@ -273,22 +274,23 @@ def write_prop(
     attachments: dict[str, dict] = {}
     images: dict[str, Any] = {}
 
-    def attach(slot: str, bone: str, image, anchor, order: int) -> None:
+    def attach(slot: str, bone: str, image, anchor, order: int, own=None) -> None:
         path = f"parts/{slot}.png"
         images[path] = image
         slots.append(
             {"name": slot, "bone": bone, "draw_order": order, "attachment": slot}
         )
-        attachments[slot] = {
-            slot: {
-                "path": path,
-                "anchor": [float(anchor[0]), float(anchor[1])],
-                "width": round(image.width * unit, 3),
-                "height": round(image.height * unit, 3),
-                "x": 0.0,
-                "y": 0.0,
-            }
+        att: dict[str, Any] = {
+            "path": path,
+            "anchor": [float(anchor[0]), float(anchor[1])],
+            "width": round(image.width * unit, 3),
+            "height": round(image.height * unit, 3),
+            "x": 0.0,
+            "y": 0.0,
         }
+        if own is not None and own != prov:  # pixels from another source (an#220)
+            att["source"] = own.model_dump(mode="json", exclude_none=True)
+        attachments[slot] = {slot: att}
 
     if isinstance(carved, PartSet):
         if carved.base is not None:
@@ -307,7 +309,14 @@ def write_prop(
                     "y": round((py - ay) * unit, 3),
                 }
             )
-            attach(part.name, part.name, part.image, part.anchor, part.draw_order)
+            attach(
+                part.name,
+                part.name,
+                part.image,
+                part.anchor,
+                part.draw_order,
+                own=part.source,
+            )
     else:
         attach(BASE_SLOT, ROOT_BONE, carving.image, carving.anchor, 0)
     asset_sets: dict[str, dict[str, str]] = {}

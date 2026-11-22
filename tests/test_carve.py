@@ -75,8 +75,12 @@ def test_flat_colour_keeps_an_enclosed_backdrop_coloured_interior_and_flags_the_
 
 
 def test_an_unconnected_colour_key_loses_the_enclosed_interior():
-    part = carve(_img("cartoon"), matte=FlatColour(connected=False), point=(160, 150),
-                 fill_holes=False)
+    part = carve(
+        _img("cartoon"),
+        matte=FlatColour(connected=False),
+        point=(160, 150),
+        fill_holes=False,
+    )
     x, y = (round(v) for v in part.to_part([(160, 60)])[0])
     assert 0 <= x < part.size[0] and 0 <= y < part.size[1]
     assert part.alpha[y, x] < 0.5
@@ -104,7 +108,10 @@ def test_a_polygon_and_a_key_combine():
     part = carve(img, matte=Polygon(outline) & FlatColour(), point=(160, 150))
     assert _iou(part, _mask("cartoon")) > 0.97
     assert part.recipe["matte"]["matte"] == "and"
-    assert [m["matte"] for m in part.recipe["matte"]["of"]] == ["polygon", "flat_colour"]
+    assert [m["matte"] for m in part.recipe["matte"]["of"]] == [
+        "polygon",
+        "flat_colour",
+    ]
 
 
 def test_focus_finds_the_sharp_object_on_a_blurred_background():
@@ -120,7 +127,9 @@ def test_any_callable_is_a_matte_and_a_wrong_shape_is_refused():
 
     part = carve(_img("busy"), matte=left_half, keep="all", despill=0)
     assert part.size[0] < 130
-    assert part.recipe["matte"]["ref"].endswith(":test_any_callable_is_a_matte_and_a_wrong_shape_is_refused.<locals>.left_half")
+    assert part.recipe["matte"]["ref"].endswith(
+        ":test_any_callable_is_a_matte_and_a_wrong_shape_is_refused.<locals>.left_half"
+    )
     with pytest.raises(ValueError, match="returned"):
         carve(_img("busy"), matte=lambda rgb, hint: np.ones((3, 3)))
 
@@ -197,12 +206,19 @@ def _clock_parts():
     h, w = clock.alpha.shape
     parts = {}
     for name in ("hour", "minute"):
-        truth = _mask(f"clock_{name}").astype(np.float32)  # an array: the carving's size
+        truth = _mask(f"clock_{name}").astype(
+            np.float32
+        )  # an array: the carving's size
         parts[name] = PartSpec(mask=truth[y0 : y0 + h, x0 : x0 + w], pivot=hub)
     r = 7  # the hub cap, listed last: drawn on top, so it owns the hub's pixels
-    parts["cap"] = PartSpec(mask=[(110 + r * np.cos(t), 110 + r * np.sin(t))
-                                  for t in np.linspace(0, 2 * np.pi, 24)],
-                            pivot=hub, grow=0)
+    parts["cap"] = PartSpec(
+        mask=[
+            (110 + r * np.cos(t), 110 + r * np.sin(t))
+            for t in np.linspace(0, 2 * np.pi, 24)
+        ],
+        pivot=hub,
+        grow=0,
+    )
     return clock, hub, parts
 
 
@@ -218,7 +234,10 @@ def test_split_lifts_the_hands_and_paints_the_face_in_under_them():
     import math
 
     a = math.radians(60)
-    x, y = (round(v) for v in clock.to_part([(110 + 45 * math.sin(a), 110 - 45 * math.cos(a))])[0])
+    x, y = (
+        round(v)
+        for v in clock.to_part([(110 + 45 * math.sin(a), 110 - 45 * math.cos(a))])[0]
+    )
     assert base[y, x, 3] == 255
     assert np.abs(base[y, x, :3].astype(int) - (250, 244, 220)).max() < 30
     for p in split.parts:
@@ -231,7 +250,9 @@ def test_a_split_prop_is_one_bone_per_part_at_its_pivot(tmp_path):
     with pytest.raises(ValueError, match="no provenance"):
         write_prop(split_parts(clock, parts), tmp_path / "nope")
     assert not (tmp_path / "nope" / "parts").exists()  # nothing written on a refusal
-    doc = write_prop(split_parts(clock, parts), tmp_path / "wall-clock", max_side=100, ours=True)
+    doc = write_prop(
+        split_parts(clock, parts), tmp_path / "wall-clock", max_side=100, ours=True
+    )
     assert doc.source is None  # our own drawing: "we made this"
     assert [b.name for b in doc.bones] == ["root", "hour", "minute", "cap"]
     assert [s.name for s in doc.slots] == ["body", "hour", "minute", "cap"]
@@ -239,38 +260,73 @@ def test_a_split_prop_is_one_bone_per_part_at_its_pivot(tmp_path):
     ax, ay = clock.anchor[0] * clock.size[0], clock.anchor[1] * clock.size[1]
     hour = doc.bones[1]
     hx, hy = clock.to_part([hub])[0]
-    assert (hour.x, hour.y) == pytest.approx(((hx - ax) * unit, (hy - ay) * unit), abs=1e-3)
+    assert (hour.x, hour.y) == pytest.approx(
+        ((hx - ax) * unit, (hy - ay) * unit), abs=1e-3
+    )
     for slot in ("body", "hour", "minute", "cap"):
         att = doc.skins["default"].slots[slot][slot]
         assert (tmp_path / "wall-clock" / att.path).is_file()
     # the file is a valid PropDescriptor as written
-    again = PropDescriptor.model_validate_json((tmp_path / "wall-clock" / "prop.json").read_text())
+    again = PropDescriptor.model_validate_json(
+        (tmp_path / "wall-clock" / "prop.json").read_text()
+    )
     assert again == doc
 
 
 def test_a_prop_with_states_is_one_swap_set_on_its_base(tmp_path):
     """A book closed and open: two drawings of one object, swapped by a scene, each with its own credit."""
-    shut = carve(_img("cartoon"), point=(160, 150), detach=3,
-                 source=frame_source("https://www.youtube.com/watch?v=abcdefghijk", t=3, license="all-rights-reserved"))
-    other = frame_source("https://www.youtube.com/watch?v=bcdefghijkl", t=9, license="all-rights-reserved")
-    opened = carve(_img("busy"), matte=GrabCut(box=(60, 30, 180, 185)), point=(120, 120), source=other)
+    shut = carve(
+        _img("cartoon"),
+        point=(160, 150),
+        detach=3,
+        source=frame_source(
+            "https://www.youtube.com/watch?v=abcdefghijk",
+            t=3,
+            license="all-rights-reserved",
+        ),
+    )
+    other = frame_source(
+        "https://www.youtube.com/watch?v=bcdefghijkl",
+        t=9,
+        license="all-rights-reserved",
+    )
+    opened = carve(
+        _img("busy"),
+        matte=GrabCut(box=(60, 30, 180, 185)),
+        point=(120, 120),
+        source=other,
+    )
     with pytest.raises(ValueError, match="distinct"):
         write_prop(shut, tmp_path / "x", states={"default": opened})
     with pytest.raises(ValueError, match="no provenance"):
-        write_prop(shut, tmp_path / "y", states={"open": carve(_img("busy"), point=(120, 120))})
+        write_prop(
+            shut, tmp_path / "y", states={"open": carve(_img("busy"), point=(120, 120))}
+        )
     assert not (tmp_path / "x").exists() and not (tmp_path / "y").exists()
-    doc = write_prop(shut, tmp_path / "book", states={"open": opened, "big": PropState(opened, unit=2.0)},
-                     state="closed")
-    assert doc.asset_sets == {"state": {"closed": "body", "open": "body_open", "big": "body_big"}}
+    doc = write_prop(
+        shut,
+        tmp_path / "book",
+        states={"open": opened, "big": PropState(opened, unit=2.0)},
+        state="closed",
+    )
+    assert doc.asset_sets == {
+        "state": {"closed": "body", "open": "body_open", "big": "body_big"}
+    }
     atts = doc.skins["default"].slots["body"]
     assert atts["body_open"].anchor == pytest.approx(opened.anchor)
-    assert atts["body_open"].width == pytest.approx(opened.size[0])  # same unit: same scale as the base
+    assert atts["body_open"].width == pytest.approx(
+        opened.size[0]
+    )  # same unit: same scale as the base
     assert atts["body_big"].width == pytest.approx(2 * opened.size[0])
-    assert atts["body_open"].source.url.startswith("https://www.youtube.com/watch?v=bcdefghijkl")
+    assert atts["body_open"].source.url.startswith(
+        "https://www.youtube.com/watch?v=bcdefghijkl"
+    )
     assert atts["body"].source is None  # the base is the descriptor's own source
     for a in atts.values():
         assert (tmp_path / "book" / a.path).is_file()
-    again = PropDescriptor.model_validate_json((tmp_path / "book" / "prop.json").read_text())
+    again = PropDescriptor.model_validate_json(
+        (tmp_path / "book" / "prop.json").read_text()
+    )
     assert again == doc
 
 
@@ -280,10 +336,18 @@ def test_a_prop_with_states_is_one_swap_set_on_its_base(tmp_path):
 def test_frame_source_needs_a_licence_and_the_prop_carries_the_recipe(tmp_path):
     with pytest.raises(TypeError):
         frame_source("https://www.youtube.com/watch?v=abc")  # no licence: refused
-    src = frame_source("https://www.youtube.com/watch?v=abcdefghijk", t=12.5,
-                       license="all-rights-reserved", author="Someone")
-    part = carve(_img("busy"), matte=GrabCut(box=(60, 30, 180, 185)), point=(120, 120),
-                 source=src)
+    src = frame_source(
+        "https://www.youtube.com/watch?v=abcdefghijk",
+        t=12.5,
+        license="all-rights-reserved",
+        author="Someone",
+    )
+    part = carve(
+        _img("busy"),
+        matte=GrabCut(box=(60, 30, 180, 185)),
+        point=(120, 120),
+        source=src,
+    )
     doc = write_prop(part, tmp_path / "lamp")
     s = doc.source
     assert s.url.endswith("&t=12") and s.license == "all-rights-reserved"
@@ -299,22 +363,31 @@ def test_frame_source_needs_a_licence_and_the_prop_carries_the_recipe(tmp_path):
 def test_a_published_carving_gets_its_rights_by_construction(tmp_path):
     from an.library import open_library, publish_dir
 
-    src = frame_source("https://www.youtube.com/watch?v=abcdefghijk", t=3,
-                       license="all-rights-reserved")
+    src = frame_source(
+        "https://www.youtube.com/watch?v=abcdefghijk",
+        t=3,
+        license="all-rights-reserved",
+    )
     part = carve(_img("cartoon"), point=(160, 150), detach=3, source=src)
     folder = tmp_path / "figure"
     write_prop(part, folder)
     lib = open_library("cutan", root=tmp_path / "lib")
     res = publish_dir(lib, folder, "prop.figure", origin="carved")
-    record = lib.versions[f"prop.figure@{res.version}"] if hasattr(res, "version") else None
+    record = (
+        lib.versions[f"prop.figure@{res.version}"] if hasattr(res, "version") else None
+    )
     record = record or next(iter(lib.versions.values()))
     assert record["rights"]["publishable"] is False
     assert record["doc"]["source"]["license"] == "all-rights-reserved"
 
 
 def test_write_prop_records_a_given_source_beside_the_recipe(tmp_path):
-    part = carve(_img("busy"), matte=GrabCut(box=(60, 30, 180, 185)), point=(120, 120),
-                 source=frame_source(None, license="cc0-1.0"))
+    part = carve(
+        _img("busy"),
+        matte=GrabCut(box=(60, 30, 180, 185)),
+        point=(120, 120),
+        source=frame_source(None, license="cc0-1.0"),
+    )
     other = AssetSource(provider="studio", license="cc-by-4.0", author="Us")
     doc = write_prop(part, tmp_path / "lamp", source=other)
     assert doc.source.provider == "studio"
@@ -339,7 +412,11 @@ def test_rembg_mattes_a_photo():
     face = part.to_part([(250, 120)])[0]
     assert part.alpha[round(face[1]), round(face[0])] > 0.9
     assert 0.15 < part.quality.coverage < 0.9
-    assert part.recipe["matte"] == {"matte": "rembg", "model": "isnet-general-use", "post_process": True}
+    assert part.recipe["matte"] == {
+        "matte": "rembg",
+        "model": "isnet-general-use",
+        "post_process": True,
+    }
 
 
 # --- the visual check ----------------------------------------------------------
@@ -386,16 +463,22 @@ def test_the_visual_check_sheet_renders(tmp_path):
     empty = np.asarray(_checker((256, 256)).convert("RGB")).astype(int)
     for i in range(6):
         tile = arr[:, 256 * i : 256 * (i + 1)]
-        assert (np.abs(tile - empty).max(axis=2) > 30).mean() > 0.05, f"tile {i} is empty"
+        assert (np.abs(tile - empty).max(axis=2) > 30).mean() > 0.05, (
+            f"tile {i} is empty"
+        )
 
 
 def test_a_colour_selects_a_part_through_an_inverted_key():
     """The clock's hands are its only mid-grey: ``~FlatColour`` selects them."""
     clock = carve(_img("clock"), point=(110, 110))
-    grey = ~FlatColour(colours=[(95, 95, 100)], connected=False, tolerance=12, softness=8)
-    split = split_parts(clock, {"hands": PartSpec(mask=grey, pivot=(110, 110), reach=10)})
+    grey = ~FlatColour(
+        colours=[(95, 95, 100)], connected=False, tolerance=12, softness=8
+    )
+    split = split_parts(
+        clock, {"hands": PartSpec(mask=grey, pivot=(110, 110), reach=10)}
+    )
     hands = split.parts[0]
-    truth = (_mask("clock_hour") | _mask("clock_minute"))
+    truth = _mask("clock_hour") | _mask("clock_minute")
     full = np.zeros(truth.shape, bool)
     x0 = round(clock.offset[0] + hands.origin[0])
     y0 = round(clock.offset[1] + hands.origin[1])
@@ -445,7 +528,9 @@ def test_despill_is_bounded_on_a_large_soft_matte():
     t = time.perf_counter()
     out, share = despill(rgb, alpha, 1)
     assert time.perf_counter() - t < 3.0
-    assert share < 0.02  # the interior (a distance from the edge) is trusted, alpha or not
+    assert (
+        share < 0.02
+    )  # the interior (a distance from the edge) is trusted, alpha or not
     assert np.array_equal(out[600, 1000], rgb[600, 1000])
 
 
@@ -463,8 +548,14 @@ def test_a_split_part_and_its_base_composite_back_without_a_seam():
     img = np.full((60, 80, 3), 250, np.uint8)
     img[10:50, 10:70] = (60, 140, 90)
     square = carve(img, point=(40, 30), despill=0)
-    split = split_parts(square, {"right": PartSpec(mask=[(40.5, 5), (75, 5), (75, 55), (40.5, 55)],
-                                                    pivot=(40, 30))})
+    split = split_parts(
+        square,
+        {
+            "right": PartSpec(
+                mask=[(40.5, 5), (75, 5), (75, 55), (40.5, 55)], pivot=(40, 30)
+            )
+        },
+    )
     base = split.base.copy()
     p = split.parts[0]
     base.alpha_composite(p.image, (round(p.origin[0]), round(p.origin[1])))
@@ -475,16 +566,25 @@ def test_a_split_part_and_its_base_composite_back_without_a_seam():
 
 def test_grabcut_on_an_image_too_small_for_a_frame_says_so():
     with pytest.raises(ValueError, match="frame of background"):
-        GrabCut()(np.zeros((3, 3, 3), np.uint8), __import__("cutan.carve", fromlist=["Hint"]).Hint())
+        GrabCut()(
+            np.zeros((3, 3, 3), np.uint8),
+            __import__("cutan.carve", fromlist=["Hint"]).Hint(),
+        )
 
 
 def test_a_recipe_replays_the_carve_and_a_matte_round_trips_as_data():
     from cutan.carve import Levels, as_matte
 
     img = _img("cartoon")
-    part = carve(img, matte=Polygon([(115, 35), (205, 35), (205, 205), (115, 205)]) & FlatColour(),
-                 point=(160, 150), detach=3)
-    again = carve(img, **json.loads(json.dumps(part.recipe)))  # through JSON, as a batch spec
+    part = carve(
+        img,
+        matte=Polygon([(115, 35), (205, 35), (205, 205), (115, 205)]) & FlatColour(),
+        point=(160, 150),
+        detach=3,
+    )
+    again = carve(
+        img, **json.loads(json.dumps(part.recipe))
+    )  # through JSON, as a batch spec
     assert np.array_equal(np.asarray(again.image), np.asarray(part.image))
     head = carve_head(_img("head"), face=_head_face())
     head_again = carve_head(_img("head"), **json.loads(json.dumps(head.recipe)))
@@ -492,26 +592,41 @@ def test_a_recipe_replays_the_carve_and_a_matte_round_trips_as_data():
     lv = Levels(of=Chroma(width=40), lo=0.3)
     assert as_matte(lv.recipe()).recipe() == lv.recipe()
     fallback = FlatColour(colours=[(1, 2, 3)]).otherwise("chroma")
-    fallback(np.asarray(_img("chroma")), __import__("cutan.carve", fromlist=["Hint"]).Hint())
+    fallback(
+        np.asarray(_img("chroma")), __import__("cutan.carve", fromlist=["Hint"]).Hint()
+    )
     assert fallback.recipe()["used"] in (0, 1)
     with pytest.raises(ValueError, match="cannot be replayed"):
         as_matte({"matte": "callable", "ref": "x:y"})
 
 
 def test_write_prop_refuses_to_loosen_rights_without_a_relicense(tmp_path):
-    src = frame_source("https://www.youtube.com/watch?v=abcdefghijk", t=3,
-                       license="all-rights-reserved")
-    part = carve(_img("busy"), matte=GrabCut(box=(60, 30, 180, 185)), point=(120, 120),
-                 source=src)
+    src = frame_source(
+        "https://www.youtube.com/watch?v=abcdefghijk",
+        t=3,
+        license="all-rights-reserved",
+    )
+    part = carve(
+        _img("busy"),
+        matte=GrabCut(box=(60, 30, 180, 185)),
+        point=(120, 120),
+        source=src,
+    )
     free = AssetSource(provider="us", license="cc0-1.0")
     with pytest.raises(ValueError, match="loosen"):
         write_prop(part, tmp_path / "a", source=free)
-    doc = write_prop(part, tmp_path / "b", source=free,
-                     relicense={"by": "the maintainer", "reason": "redrawn by hand"})
+    doc = write_prop(
+        part,
+        tmp_path / "b",
+        source=free,
+        relicense={"by": "the maintainer", "reason": "redrawn by hand"},
+    )
     assert doc.source.extra["relicensed"]["by"] == "the maintainer"
     assert doc.source.extra["carved_from"]["license"] == "all-rights-reserved"
     stricter = AssetSource(provider="us", license="all-rights-reserved-private-study")
-    assert write_prop(part, tmp_path / "c", source=stricter).source.license.endswith("study")
+    assert write_prop(part, tmp_path / "c", source=stricter).source.license.endswith(
+        "study"
+    )
 
 
 def test_a_carve_from_a_local_file_records_its_name_not_its_path(tmp_path):
@@ -519,11 +634,12 @@ def test_a_carve_from_a_local_file_records_its_name_not_its_path(tmp_path):
     clip.parent.mkdir()
     _img("busy").save(clip)
     src = frame_source(str(clip), license="all-rights-reserved")
-    part = carve(clip, matte=GrabCut(box=(60, 30, 180, 185)), point=(120, 120), source=src)
+    part = carve(
+        clip, matte=GrabCut(box=(60, 30, 180, 185)), point=(120, 120), source=src
+    )
     write_prop(part, tmp_path / "lamp")
     text = (tmp_path / "lamp" / "prop.json").read_text()
     assert str(tmp_path) not in text and "clip.png" in text
-
 
 
 # --- round 2 of the reviews --------------------------------------------------------
@@ -546,13 +662,17 @@ def test_a_registered_third_party_matte_replays_and_an_unregistered_one_says_how
             return a
 
     recipe = LeftHalf(share=0.4).recipe()
-    assert recipe["matte"].endswith(":test_a_registered_third_party_matte_replays_and_an_unregistered_one_says_how.<locals>.LeftHalf")
+    assert recipe["matte"].endswith(
+        ":test_a_registered_third_party_matte_replays_and_an_unregistered_one_says_how.<locals>.LeftHalf"
+    )
     with pytest.raises(ValueError, match="register its class"):
         as_matte(recipe)
     try:
         register_matte(LeftHalf)
         assert LeftHalf(share=0.4).recipe()["matte"] == "left_half_test"
-        assert as_matte(recipe).share == 0.4  # the qualname recorded before registering replays too
+        assert (
+            as_matte(recipe).share == 0.4
+        )  # the qualname recorded before registering replays too
         with pytest.raises(ValueError, match="taken"):
             register_matte(type("Other", (LeftHalf,), {}), name="left_half_test")
     finally:
@@ -577,15 +697,30 @@ def test_a_located_face_is_pinned_in_the_recipe_and_its_locator_recorded():
 
 
 def test_rights_and_privacy_holes_found_in_round_two(tmp_path):
-    src = frame_source("https://www.youtube.com/watch?v=abcdefghijk", license="all-rights-reserved")
-    part = carve(_img("busy"), matte=GrabCut(box=(60, 30, 180, 185)), point=(120, 120), source=src)
+    src = frame_source(
+        "https://www.youtube.com/watch?v=abcdefghijk", license="all-rights-reserved"
+    )
+    part = carve(
+        _img("busy"),
+        matte=GrabCut(box=(60, 30, 180, 185)),
+        point=(120, 120),
+        source=src,
+    )
     free = AssetSource(provider="us", license="cc0-1.0")
-    for empty in ({"by": "", "reason": ""}, {"by": None, "reason": None}, {"by": " ", "reason": "x"}):
+    for empty in (
+        {"by": "", "reason": ""},
+        {"by": None, "reason": None},
+        {"by": " ", "reason": "x"},
+    ):
         with pytest.raises(ValueError, match="loosen"):
             write_prop(part, tmp_path / "x", source=free, relicense=empty)
-    signed = frame_source("https://bob:pw@cdn.example.org/a.png?X-Amz-Signature=abc&X-Amz-Credential=k",
-                          license=None)
-    assert "pw" not in json.dumps(signed.model_dump()) and "Amz" not in json.dumps(signed.model_dump())
+    signed = frame_source(
+        "https://bob:pw@cdn.example.org/a.png?X-Amz-Signature=abc&X-Amz-Credential=k",
+        license=None,
+    )
+    assert "pw" not in json.dumps(signed.model_dump()) and "Amz" not in json.dumps(
+        signed.model_dump()
+    )
     with pytest.raises(ValueError, match="data: URI"):
         frame_source("data:image/png;base64,AAAA", license=None)
 
@@ -595,29 +730,146 @@ def test_write_prop_landmarks_are_the_rigs_named_points(tmp_path):
     given: ``rig_structure``'s anchor of that name sits at the source point."""
     from an.stage.rig import SCENE_PX_PER_VIEW_BOX, rig_structure
 
-    src = frame_source("https://www.youtube.com/watch?v=abcdefghijk", t=3,
-                       license="all-rights-reserved")
+    src = frame_source(
+        "https://www.youtube.com/watch?v=abcdefghijk",
+        t=3,
+        license="all-rights-reserved",
+    )
     part = carve(_img("cartoon"), point=(160, 150), detach=3, source=src)
     grip, tip = (150, 160), (170, 120)
-    doc = write_prop(part, tmp_path / "sabre", max_side=100, landmarks={"grip": grip, "tip": tip})
+    doc = write_prop(
+        part, tmp_path / "sabre", max_side=100, landmarks={"grip": grip, "tip": tip}
+    )
     assert [b.name for b in doc.bones] == ["root", "grip", "tip"]
     assert all(b.parent == "root" for b in doc.bones[1:])
     assert {s.bone for s in doc.slots} == {"root"}  # landmarks draw nothing
-    on_disk = PropDescriptor.model_validate_json((tmp_path / "sabre" / "prop.json").read_text())
+    on_disk = PropDescriptor.model_validate_json(
+        (tmp_path / "sabre" / "prop.json").read_text()
+    )
     anchors = rig_structure(on_disk).anchors
     k = SCENE_PX_PER_VIEW_BOX / doc.view_box[3]
     unit = doc.view_box[3] / part.size[1]
     for name, at in (("grip", grip), ("tip", tip)):
-        (px, py), (ax, ay) = part.to_part([at])[0], (part.anchor[0] * part.size[0], part.anchor[1] * part.size[1])
+        (px, py), (ax, ay) = (
+            part.to_part([at])[0],
+            (part.anchor[0] * part.size[0], part.anchor[1] * part.size[1]),
+        )
         want = ((px - ax) * unit * k, (py - ay) * unit * k)
-        assert np.allclose(anchors[name].offset, want, atol=0.05 * k), (name, anchors[name].offset, want)
+        assert np.allclose(anchors[name].offset, want, atol=0.05 * k), (
+            name,
+            anchors[name].offset,
+            want,
+        )
     # a landmark never moves where the prop stands: the root (its anchor) is the origin
     assert anchors["root"].offset == (0.0, 0.0) and tuple(doc.origin) == (0.0, 0.0)
     with pytest.warns(UserWarning, match="far outside the part"):
         write_prop(part, tmp_path / "slip", landmarks={"grip": (5000, -900)})
-    for bad, match in (({"a@b": grip}, "after '@'"), ({"a:b": grip}, "after '@'"),
-                       ({"root": grip}, "already a bone"), ({"grip": (1,)}, "a point is"),
-                       ({"grip": (float("nan"), 1)}, "finite")):
+    for bad, match in (
+        ({"a@b": grip}, "after '@'"),
+        ({"a:b": grip}, "after '@'"),
+        ({"root": grip}, "already a bone"),
+        ({"grip": (1,)}, "a point is"),
+        ({"grip": (float("nan"), 1)}, "finite"),
+    ):
         with pytest.raises(ValueError, match=match):
             write_prop(part, tmp_path / "x", landmarks=bad, overwrite=True)
     assert [b.name for b in write_prop(part, tmp_path / "plain").bones] == ["root"]
+
+
+# --- a picture in a carved frame (cutan#205) ---------------------------------
+
+
+def _gold_frame():
+    """A carved gold frame (with an old grey picture still in its opening) and its source."""
+    from cutan.carve.mattes import Polygon
+
+    art = np.full((80, 100, 3), 255, np.uint8)
+    art[10:70, 10:90] = (200, 160, 40)
+    art[12:16, 12:16] = (255, 0, 0)  # a red mark in the top-left corner of the moulding
+    art[25:55, 25:75] = (90, 90, 90)
+    src = frame_source(
+        "https://www.youtube.com/watch?v=abcdefghijk",
+        t=4,
+        license="all-rights-reserved",
+    )
+    frame = carve(
+        art,
+        matte=Polygon([(10, 10), (90, 10), (90, 70), (10, 70)]),
+        point=(50, 40),
+        keep="all",
+        feather=0,
+        despill=0,
+        pad=0,
+        source=src,
+    )
+    return frame, (25, 25, 75, 55)
+
+
+def test_nine_slice_keeps_the_corners_and_sizes_the_inside():
+    from cutan.carve import nine_slice, open_frame
+
+    frame, opening = _gold_frame()
+    img, bands = open_frame(frame, opening)
+    L, T, R, B = bands
+    out = nine_slice(img, bands, (200, 30))
+    assert out.size == (200 + L + R, 30 + T + B)
+    a, b = np.asarray(img), np.asarray(out)
+    assert (b[:T, :L] == a[:T, :L]).all()  # the corner, red mark included, as carved
+    assert (b[-B:, -R:] == a[-B:, -R:]).all()
+    assert (
+        b[T:-B, L:-R, 3] == 0
+    ).all()  # the opening is open: nothing of the old picture
+
+
+def test_an_opening_outside_the_frame_is_refused():
+    from cutan.carve import open_frame
+
+    frame, _ = _gold_frame()
+    with pytest.raises(ValueError, match="strictly inside"):
+        open_frame(frame, (0, 0, 200, 200))
+
+
+def test_a_framed_picture_is_one_prop_whose_parts_keep_both_sources(tmp_path):
+    from cutan.carve import DropShadow, framed
+
+    frame, opening = _gold_frame()
+    pic_src = frame_source(
+        "https://www.youtube.com/watch?v=bcdefghijkl",
+        t=9,
+        license="all-rights-reserved",
+    )
+    picture = np.zeros((120, 60, 3), np.uint8)
+    picture[:, :, 2] = 230  # a blue tall picture
+    with pytest.raises(ValueError, match="no provenance"):
+        framed(picture, frame, opening=opening)
+    out = framed(picture, frame, opening=opening, source=pic_src, shadow=DropShadow())
+    assert [p.name for p in out.parts] == ["shadow", "picture", "frame"]
+    pic, fr = out.parts[1], out.parts[2]
+    assert pic.image.size == (60, 120)
+    # the picture sits exactly in the opening of the sized frame
+    L, T = pic.origin[0] - fr.origin[0], pic.origin[1] - fr.origin[1]
+    assert np.asarray(fr.image)[T + 5, L + 5, 3] == 0
+    assert np.asarray(fr.image)[2, 2, 3] == 255
+
+    doc = write_prop(
+        out,
+        tmp_path / "framed",
+        max_side=100,
+        landmarks={"hook": (out.carving.size[0] / 2, 0)},
+    )
+    assert [s.name for s in doc.slots] == ["shadow", "picture", "frame"]
+    assert doc.source.url.startswith(
+        "https://www.youtube.com/watch?v=abcdefghijk"
+    )  # the frame's
+    meta = json.loads((tmp_path / "framed" / "prop.json").read_text())
+    atts = meta["skins"]["default"]["slots"]
+    assert (
+        "bcdefghijkl" in atts["picture"]["picture"]["source"]["url"]
+    )  # the picture's own
+    assert "source" not in atts["frame"]["frame"]  # the prop's own covers it
+    assert (
+        PropDescriptor.model_validate_json(
+            (tmp_path / "framed" / "prop.json").read_text()
+        )
+        == doc
+    )

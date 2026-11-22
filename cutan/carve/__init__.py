@@ -70,6 +70,7 @@ from cutan.carve.mattes import (
     border_colours,
     register_matte,
 )
+from cutan.carve.framing import DropShadow, framed, nine_slice, open_frame
 from cutan.carve.parts import Part, PartSet, PartSpec, split_parts
 from cutan.carve.prop import STATE_SET, PropState, write_prop
 from cutan.carve.provenance import frame_source, youtube_id
@@ -88,8 +89,12 @@ __all__ = [
     "CarveQuality",
     "Carving",
     "Chroma",
+    "DropShadow",
     "Face",
     "FlatColour",
+    "framed",
+    "nine_slice",
+    "open_frame",
     "Focus",
     "GrabCut",
     "Hint",
