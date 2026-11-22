@@ -169,6 +169,24 @@ def test_every_impact_is_a_keyframe_at_its_exact_float(obj, kind, tmp_path):
         assert e.t_impact * 30 != round(e.t_impact * 30)  # genuinely sub-frame
 
 
+def test_the_truth_compiles_with_the_render_frame_samples(tmp_path, monkeypatch):
+    """The truth and the render key the camera at the same instants (cutan#200)."""
+    import an.stage.compile as compile_mod
+
+    seen = {}
+    real = compile_mod.compile_shot
+
+    def spy(*args, **kwargs):
+        seen.update(kwargs)
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(compile_mod, "compile_shot", spy)
+    spec = _jittery(kind="air", fps=24, exposure=0.5)
+    write_impact_clip(spec, tmp_path, render=False)
+    plan = plan_impact_clip(spec)
+    assert seen["frame_samples"] == tuple(f.samples for f in plan.frames)
+
+
 def test_the_sidecar_keeps_the_three_times_apart(tmp_path):
     spec = _jittery(kind="air", fps=24, exposure=0.5, timestamp_jitter_sd=0.004)
     clip = write_impact_clip(spec, tmp_path, render=False)
