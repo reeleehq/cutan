@@ -481,3 +481,34 @@ def test_a_shot_records_the_pixel_size_actually_on_disk(tmp_path):
             encode_png(np.zeros((h, w, 3), np.uint8))
         )
     assert distinct_png_sizes(mixed) == ((320, 240), (640, 480))
+
+
+def test_every_speaking_corpus_scene_ir_is_reproducible_from_its_md():
+    """The committed IR is exactly what ``scene.md`` and the offline providers make.
+
+    ``an``'s genre lane checks the same thing over this corpus, but only there, so a
+    change here that moves a content key (a provider's ``cache_version`` moves every
+    ``viseme_ref``) stayed green in this repository and turned ``an`` red on every
+    PR (an#841). Checking it here fails the PR that moves the key. Regenerate a
+    fixture's IR with its ``scene.md`` and ``produce_audio_for_scene``.
+    """
+    import json
+    from pathlib import Path
+
+    from an.audio.pipeline import produce_audio_for_scene
+    from an.genres import load
+    from an.ir.sync import markdown_to_ir
+
+    load()  # the offline lip-sync provider is this genre's (P7)
+    corpus = Path(__file__).resolve().parents[1] / "misc" / "bench" / "corpus"
+    checked = 0
+    for ir_path in sorted(corpus.glob("*/ir/scene.json")):
+        scene = markdown_to_ir((ir_path.parent.parent / "scene.md").read_text(encoding="utf-8"))
+        if not any(s.dialogue for s in scene.timeline):
+            continue
+        produce_audio_for_scene(scene)
+        regenerated = json.loads(scene.model_dump_json())
+        committed = json.loads(ir_path.read_text(encoding="utf-8"))
+        assert regenerated == committed, ir_path
+        checked += 1
+    assert checked, "no speaking corpus scene was checked: the glob is stale"
