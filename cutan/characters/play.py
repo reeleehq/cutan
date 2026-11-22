@@ -1024,7 +1024,8 @@ def facing_at(
                 (f.start + float(a.duration), order, "scale_x", a.to_value, exact)
             )
         elif isinstance(a, SetAction) and (
-            (exact and a.property in ("scale_x", view_set)) or a.property in sets
+            (exact and a.property in ("scale_x", view_set))
+            or (a.property in sets and (exact or a.property != view_set))
         ):
             stamped.append((f.start, order, a.property, a.value, exact))
     for time, _, prop, value, exact in sorted(stamped, key=lambda e: (e[0], e[1])):
@@ -1119,15 +1120,19 @@ def resolve_turns(
                 if faces_of is not None
                 else declared_faces(descriptor_of(entity))
             )
-            if faces is not None and "faces" not in args:
-                args["faces"] = faces
-                action = action.model_copy(update={"args": args})
-                out[i] = FlatAction(start=f.start, end=f.end, action=action)
+            if faces is not None:
+                args = {**args, "faces": args.get("faces", faces)}
             before = facing_at(
                 events(), entity, f.start, view_set=view_set, faces=faces
             )
-            if faces is not None and before.view is not None:
-                args.setdefault("from_view", before.view)
+            if faces is not None:
+                from_view = before.view or getattr(
+                    descriptor_of(entity), "rest_view", None
+                )
+                if from_view is not None:
+                    args.setdefault("from_view", from_view)
+                action = action.model_copy(update={"args": args})
+                out[i] = FlatAction(start=f.start, end=f.end, action=action)
             declared = args.get("from_direction")
             turns.append(TurnInference(i, f.start, entity, before, declared))
             if declared is None and before.direction is not None:

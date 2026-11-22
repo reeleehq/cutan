@@ -922,6 +922,7 @@ def face_toward(
     from_direction: str | None = None,
     duration: Seconds = DFLT_TURN_DURATION,
     mall: Mapping[str, Mapping] | None = None,
+    faces: Any = None,
 ) -> Action:
     """:func:`turn` ``who`` to ``view``, facing ``other`` — the direction read
     off the stage, so a profile looks at the other character wherever the
@@ -946,6 +947,7 @@ def face_toward(
         from_direction=from_direction,
         duration=duration,
         rest=poses[who],
+        faces=faces,  # the art's `metadata.faces` (an#818), so left-drawn art is not mirrored
     )
 
 
