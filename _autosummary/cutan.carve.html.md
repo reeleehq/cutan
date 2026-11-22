@@ -50,23 +50,26 @@ what is installed). Nothing here is imported by `import cutan`.
 
 ### Functions
 
-| [`as_matte`](#cutan.carve.as_matte)(matte)                                   | A [`Matte`](#cutan.carve.Matte) from a strategy's name, its recipe, a `Matte`, or any `(rgb, hint) -> alpha` callable.                             |
-|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`as_superres`](#cutan.carve.as_superres)(spec)                                 | A strategy from its name, its recipe, a [`SuperRes`](#cutan.carve.SuperRes), or any `rgb -> rgb` callable; `None` stays `None` (no super resolution). |
-| [`border_colours`](#cutan.carve.border_colours)(rgb, \*[, max_colours, ...])       | The dominant colours of the image's border: the backdrop of a flat frame.                                                                                                   |
-| [`carve`](#cutan.carve.carve)(image, \*[, matte, crop, box, point, ...])  | Cut a part out of `image`; every coordinate is in the source image's pixels.                                                                                                |
-| [`carve_head`](#cutan.carve.carve_head)(image, \*[, face, locate, pick, ...])  | A head cut out at the neck and normalised onto a `canvas`-px square.                                                                                                        |
-| [`check_requirements`](#cutan.carve.check_requirements)(\*[, verbose])                 | Which optional dependencies of carving are installed (printing how to get the rest).                                                                                        |
-| [`frame_source`](#cutan.carve.frame_source)(url, \*, license[, t, author, ...])  | The provenance of a part carved from `url` (a video at time `t`, or an image).                                                                                              |
-| [`grab_frame`](#cutan.carve.grab_frame)(video, t, \*[, ffmpeg])                | The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).                                                                                                    |
-| [`load_rgb`](#cutan.carve.load_rgb)(image)                                   | An `HxWx3` `uint8` RGB array from a path, a PIL image or an array.                                                                                                          |
-| [`neck_cut`](#cutan.carve.neck_cut)(shape, face, \*[, cut, neck, soft, ...]) | A `shape` mask, 1 above the neck cut and 0 below, with a soft edge.                                                                                                         |
-| [`pick_face`](#cutan.carve.pick_face)(faces[, pick])                          | One face of several: `largest`, `leftmost`, `rightmost` or `best` (score).                                                                                                  |
-| [`register_matte`](#cutan.carve.register_matte)(cls, \*[, name])                   | Make a third-party strategy nameable (`matte="<name>"`) and its recipes replayable: `register_matte(SamMatte)` (or as a class decorator).                                   |
-| [`register_superres`](#cutan.carve.register_superres)(name, factory)                  | Make `factory(**settings)` the strategy `name` (what its recipes replay by).                                                                                                |
-| [`split_parts`](#cutan.carve.split_parts)(carving, parts, \*[, paint_out, ...]) | Lift `parts` (`{name: PartSpec}`, in draw order) off `carving`.                                                                                                             |
-| [`write_prop`](#cutan.carve.write_prop)(carved, folder, \*[, name, unit, ...]) | Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.                                                                                           |
-| [`youtube_id`](#cutan.carve.youtube_id)(url)                                   | The video id of a YouTube URL, else `None`.                                                                                                                                 |
+| [`framed`](#cutan.carve.framed)(picture, frame, \*, opening[, source, ...])   | `picture` inside `frame`, the frame 9-sliced to the picture's size, as a part set.                                                                                          |
+|-------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`nine_slice`](#cutan.carve.nine_slice)(image, bands, inner)                      | `image` resized by 9-slice so the part inside `bands` is `inner` pixels: the corners as they are, the edges stretched along their length, the centre to `inner`.            |
+| [`open_frame`](#cutan.carve.open_frame)(frame, opening)                           | The frame's image with its opening cleared, and the moulding's band widths.                                                                                                 |
+| [`as_matte`](#cutan.carve.as_matte)(matte)                                      | A [`Matte`](#cutan.carve.Matte) from a strategy's name, its recipe, a `Matte`, or any `(rgb, hint) -> alpha` callable.                             |
+| [`as_superres`](#cutan.carve.as_superres)(spec)                                    | A strategy from its name, its recipe, a [`SuperRes`](#cutan.carve.SuperRes), or any `rgb -> rgb` callable; `None` stays `None` (no super resolution). |
+| [`border_colours`](#cutan.carve.border_colours)(rgb, \*[, max_colours, ...])          | The dominant colours of the image's border: the backdrop of a flat frame.                                                                                                   |
+| [`carve`](#cutan.carve.carve)(image, \*[, matte, crop, box, point, ...])     | Cut a part out of `image`; every coordinate is in the source image's pixels.                                                                                                |
+| [`carve_head`](#cutan.carve.carve_head)(image, \*[, face, locate, pick, ...])     | A head cut out at the neck and normalised onto a `canvas`-px square.                                                                                                        |
+| [`check_requirements`](#cutan.carve.check_requirements)(\*[, verbose])                    | Which optional dependencies of carving are installed (printing how to get the rest).                                                                                        |
+| [`frame_source`](#cutan.carve.frame_source)(url, \*, license[, t, author, ...])     | The provenance of a part carved from `url` (a video at time `t`, or an image).                                                                                              |
+| [`grab_frame`](#cutan.carve.grab_frame)(video, t, \*[, ffmpeg])                   | The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).                                                                                                    |
+| [`load_rgb`](#cutan.carve.load_rgb)(image)                                      | An `HxWx3` `uint8` RGB array from a path, a PIL image or an array.                                                                                                          |
+| [`neck_cut`](#cutan.carve.neck_cut)(shape, face, \*[, cut, neck, soft, ...])    | A `shape` mask, 1 above the neck cut and 0 below, with a soft edge.                                                                                                         |
+| [`pick_face`](#cutan.carve.pick_face)(faces[, pick])                             | One face of several: `largest`, `leftmost`, `rightmost` or `best` (score).                                                                                                  |
+| [`register_matte`](#cutan.carve.register_matte)(cls, \*[, name])                      | Make a third-party strategy nameable (`matte="<name>"`) and its recipes replayable: `register_matte(SamMatte)` (or as a class decorator).                                   |
+| [`register_superres`](#cutan.carve.register_superres)(name, factory)                     | Make `factory(**settings)` the strategy `name` (what its recipes replay by).                                                                                                |
+| [`split_parts`](#cutan.carve.split_parts)(carving, parts, \*[, paint_out, ...])    | Lift `parts` (`{name: PartSpec}`, in draw order) off `carving`.                                                                                                             |
+| [`write_prop`](#cutan.carve.write_prop)(carved, folder, \*[, name, unit, ...])    | Write `carved` to `folder` as `prop.json` + `parts/*.png`; return the descriptor.                                                                                           |
+| [`youtube_id`](#cutan.carve.youtube_id)(url)                                      | The video id of a YouTube URL, else `None`.                                                                                                                                 |
 
 ### Classes
 
@@ -74,6 +77,7 @@ what is installed). Nothing here is imported by `import cutan`.
 |----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
 | [`Carving`](#cutan.carve.Carving)(image, anchor, offset, scale, ...[, ...]) | A carved part.                                                                                                              |
 | [`Chroma`](#cutan.carve.Chroma)([hue, width, min_sat, min_val, ramp])      | Key out a saturated backdrop by its hue band (a stage drape, a green screen).                                               |
+| [`DropShadow`](#cutan.carve.DropShadow)([offset, blur, opacity, color])        | A soft shadow of the frame on the wall: its alpha, offset, blurred, at `opacity`.                                           |
 | [`Face`](#cutan.carve.Face)(box[, jaw, score, landmarks])                | A face in an image: its box and, when known, its jaw contour.                                                               |
 | [`FlatColour`](#cutan.carve.FlatColour)([colours, tolerance, softness, ...])   | Key out the backdrop's flat colours, where they are connected to the border.                                                |
 | [`Focus`](#cutan.carve.Focus)([window])                                   | The sharp region of an image whose background is out of focus.                                                              |
@@ -174,6 +178,12 @@ The hue band in degrees: the declared one, or the border’s.
 
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### *class* cutan.carve.DropShadow(offset=(10, 10), blur=4.0, opacity=0.35, color=(20, 24, 28))
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A soft shadow of the frame on the wall: its alpha, offset, blurred, at `opacity`.
 
 ### *class* cutan.carve.Face(box, jaw=None, score=1.0, landmarks=None)
 
@@ -311,11 +321,16 @@ Bases: [`ImportError`](https://docs.python.org/3/builtins/exceptions.html#Import
 
 An optional dependency of `cutan.carve` is not installed.
 
-### *class* cutan.carve.Part(name, image, pivot, origin, draw_order)
+### *class* cutan.carve.Part(name, image, pivot, origin, draw_order, source=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 One lifted part: its RGBA image, its pivot in that image, where it sits in the carving.
+
+`source`: the part’s own provenance when its pixels come from elsewhere than
+the carving’s source (a picture set in a carved frame, [`framed()`](#cutan.carve.framed));
+`None`, the carving’s. [`write_prop()`](#cutan.carve.write_prop) writes it on the part’s
+attachment, so `an credits` lists it beside the prop’s own.
 
 #### *property* anchor *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]*
 
@@ -649,6 +664,30 @@ in `extra.file`, no path anywhere; a `data:` URI is refused. `t`,
 * **Return type:**
   `AssetSource`
 
+### cutan.carve.framed(picture, frame, , opening, source=None, ours=False, frame_ours=False, moulding_scale=1.0, shadow=None, picture_part='picture', frame_part='frame', shadow_part='shadow')
+
+`picture` inside `frame`, the frame 9-sliced to the picture’s size, as a part set.
+
+* **Parameters:**
+  * **picture** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`Carving`](cutan.carve.core.html.md#cutan.carve.core.Carving), `Image`, `ndarray`]) – a [`Carving`](#cutan.carve.Carving) (its provenance is the picture’s), or an image
+    (`PIL.Image` or array) with `source=` (or `ours=True`).
+  * **frame** ([`Carving`](cutan.carve.core.html.md#cutan.carve.core.Carving)) – the carved frame, with the picture it held still inside.
+  * **opening** ([`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]) – the frame’s opening, in the frame carving’s source pixels.
+  * **source** ([`Any`](https://docs.python.org/3/library/typing.html#typing.Any)) – the picture’s provenance (overrides a carving’s).
+  * **ours** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – the picture’s pixels are the caller’s own (a typeset card).
+  * **frame_ours** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – the frame’s pixels are the caller’s own (a frame with no source).
+  * **moulding_scale** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – the moulding’s size against the frame carving’s pixels (a superres
+    frame is carved at 4x; a 1920 px picture wants a thicker frame than a 300 px one):
+    the opened frame is resized by it before the 9-slice.
+  * **shadow** ([`DropShadow`](cutan.carve.framing.html.md#cutan.carve.framing.DropShadow) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – a [`DropShadow`](#cutan.carve.DropShadow) part under the frame and the picture, or `None`; its
+    offset and blur are in the composite’s pixels.
+* **Return type:**
+  [`PartSet`](cutan.carve.parts.html.md#cutan.carve.parts.PartSet)
+
+The set’s carving is the whole composite (the parts in place), with the frame’s source as
+the prop’s own: write it with [`write_prop()`](#cutan.carve.write_prop), whose `landmarks` are then
+in the **composite’s** pixels, not a source’s (a hook at `(width / 2, 0)`).
+
 ### cutan.carve.grab_frame(video, t, , ffmpeg='ffmpeg')
 
 The frame of `video` at `t` seconds, as RGB (needs the `ffmpeg` binary).
@@ -687,6 +726,32 @@ source pixels) into the mask’s pixels.
 
 * **Return type:**
   `ndarray`
+
+### cutan.carve.nine_slice(image, bands, inner)
+
+`image` resized by 9-slice so the part inside `bands` is `inner` pixels: the corners
+as they are, the edges stretched along their length, the centre to `inner`.
+
+```pycon
+>>> im = Image.new("RGBA", (10, 10), (255, 0, 0, 255))
+>>> nine_slice(im, (2, 3, 2, 3), (20, 4)).size
+(24, 10)
+```
+
+* **Return type:**
+  `Image`
+
+### cutan.carve.open_frame(frame, opening)
+
+The frame’s image with its opening cleared, and the moulding’s band widths.
+
+`opening`: `(x0, y0, x1, y1)` in the frame carving’s SOURCE pixels (what it shows
+inside, which is not kept).
+
+* **Raises:**
+  [**ValueError**](https://docs.python.org/3/builtins/exceptions.html#ValueError) – the opening is not strictly inside the carved frame.
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[`Image`, [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int), [`int`](https://docs.python.org/3/builtins/functions.html#int)]]
 
 ### cutan.carve.pick_face(faces, pick='largest')
 
@@ -766,7 +831,8 @@ states: more drawings of the base, `{name: carving or PropState}`,
 
 A [`PartSet`](#cutan.carve.PartSet) is written with its carving’s provenance:
 build one with [`split_parts()`](#cutan.carve.split_parts) (its parts are cut from
-that carving), never by hand from other carvings’ parts.
+that carving) or [`framed()`](#cutan.carve.framed). A part whose pixels come from
+elsewhere carries its own `source`, written on its attachment.
 
 The root bone sits at the carving’s anchor, and the descriptor declares it
 the rig’s `origin`: the prop stands where it is put by its anchor, whatever
@@ -799,6 +865,7 @@ The video id of a YouTube URL, else `None`.
 | [`core`](cutan.carve.core.html.md#module-cutan.carve.core)             | The carve pipeline: an image (or a video frame) in, a matted, cleaned, provenance-carrying part out.   |
 |-------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
 | [`files`](cutan.carve.files.html.md#module-cutan.carve.files)           | Whole-or-nothing file writes for the carve and generate steps (cutan#188).                             |
+| [`framing`](cutan.carve.framing.html.md#module-cutan.carve.framing)       | A picture in a carved frame, the frame sized to the picture: one prop, both sources kept.              |
 | [`generate`](cutan.carve.generate.html.md#module-cutan.carve.generate)     | Generated art: a prompt in, a keyed, fitted, provenance-carrying plate or part out (cutan#100).        |
 | [`head`](cutan.carve.head.html.md#module-cutan.carve.head)             | Head mode: a face located, the neck cut under the jaw, the head normalised on a fixed canvas.          |
 | [`mattes`](cutan.carve.mattes.html.md#module-cutan.carve.mattes)         | Matte strategies: which pixels of an image are the subject.                                            |

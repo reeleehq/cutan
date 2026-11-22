@@ -1,0 +1,20 @@
+cutan.carve.framing
+===================
+
+.. automodule:: cutan.carve.framing
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      framed
+      nine_slice
+      open_frame
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DropShadow
+   

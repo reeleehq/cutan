@@ -276,7 +276,8 @@ carving itself as its <code class="docutils literal notranslate"><span class="pr
 </dl>
 <p>A <a class="reference internal" href="cutan.carve.html#cutan.carve.PartSet" title="cutan.carve.PartSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">PartSet</span></code></a> is written with its carving’s provenance:
 build one with <a class="reference internal" href="cutan.carve.html#cutan.carve.split_parts" title="cutan.carve.split_parts"><code class="xref py py-func docutils literal notranslate"><span class="pre">split_parts()</span></code></a> (its parts are cut from
-that carving), never by hand from other carvings’ parts.</p>
+that carving) or <a class="reference internal" href="cutan.carve.html#cutan.carve.framed" title="cutan.carve.framed"><code class="xref py py-func docutils literal notranslate"><span class="pre">framed()</span></code></a>. A part whose pixels come from
+elsewhere carries its own <code class="docutils literal notranslate"><span class="pre">source</span></code>, written on its attachment.</p>
 <p>The root bone sits at the carving’s anchor, and the descriptor declares it
 the rig’s <code class="docutils literal notranslate"><span class="pre">origin</span></code>: the prop stands where it is put by its anchor, whatever
 other bones (parts, landmarks) it has. A split prop gets one bone per
@@ -312,7 +313,7 @@ whole descriptor is valid.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=31bb835f"></script>
+<script src="../_static/documentation_options.js?v=06430935"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

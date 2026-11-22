@@ -124,7 +124,8 @@ states: more drawings of the base, `{name: carving or PropState}`,
 
 A [`PartSet`](cutan.carve.html.md#cutan.carve.PartSet) is written with its carving’s provenance:
 build one with [`split_parts()`](cutan.carve.html.md#cutan.carve.split_parts) (its parts are cut from
-that carving), never by hand from other carvings’ parts.
+that carving) or [`framed()`](cutan.carve.html.md#cutan.carve.framed). A part whose pixels come from
+elsewhere carries its own `source`, written on its attachment.
 
 The root bone sits at the carving’s anchor, and the descriptor declares it
 the rig’s `origin`: the prop stands where it is put by its anchor, whatever

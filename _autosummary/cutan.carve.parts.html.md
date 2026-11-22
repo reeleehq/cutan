@@ -41,11 +41,16 @@ True
 | [`PartSet`](#cutan.carve.parts.PartSet)(carving, base[, parts])                | A carving split into a base (`None` when every pixel went to a part) and parts.           |
 | [`PartSpec`](#cutan.carve.parts.PartSpec)(mask, pivot[, grow, reach])           | What to lift off a carving: a `mask` and the `pivot` it turns about.                      |
 
-### *class* cutan.carve.parts.Part(name, image, pivot, origin, draw_order)
+### *class* cutan.carve.parts.Part(name, image, pivot, origin, draw_order, source=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 One lifted part: its RGBA image, its pivot in that image, where it sits in the carving.
+
+`source`: the part’s own provenance when its pixels come from elsewhere than
+the carving’s source (a picture set in a carved frame, [`framed()`](cutan.carve.html.md#cutan.carve.framed));
+`None`, the carving’s. [`write_prop()`](cutan.carve.html.md#cutan.carve.write_prop) writes it on the part’s
+attachment, so `an credits` lists it beside the prop’s own.
 
 #### *property* anchor *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]*
 
