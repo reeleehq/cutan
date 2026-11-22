@@ -496,6 +496,9 @@ def write_impact_clip(
             width=spec.width,
             height=spec.height,
             strict_assets=True,
+            # the instants the render samples, so a follow or a dolly is keyed
+            # the same way in the truth as in the staged document (cutan#200)
+            frame_samples=tuple(f.samples for f in plan.frames),
         )
         header = {
             "generator": {
