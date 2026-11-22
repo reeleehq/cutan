@@ -63,6 +63,7 @@ from cutan.characters.methods import (
     check_declared_speech,
     check_walk_gaits,
 )
+from cutan.characters.feet import character_contacts
 from cutan.characters.hands import character_landmarks
 from cutan.characters.registration import CHARACTER, PLAY, character_specimen
 from cutan.characters.vocabulary import CUTOUT_VOCABULARY
@@ -190,6 +191,7 @@ CUTOUT = Genre(
             swap_checks=_checks.CharacterSwapChecks(),
             specimen=character_specimen,
             landmarks=character_landmarks,
+            contacts=character_contacts,
             shot_sizes=character_shot_sizes,
         ),
     ),
