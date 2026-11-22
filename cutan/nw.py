@@ -28,7 +28,10 @@ How the pieces map onto nw:
 - **Spend.** ``render`` is marked ``spends=True``: a voice whose document
   declares ``provider: elevenlabs`` is spoken by ElevenLabs (an#305), so a host
   must route it through its money approval. A project whose voices declare no
-  paid provider renders with no key and no bill.
+  paid provider renders with no key and no bill. ``render`` carries a ``quote``
+  (:func:`_quote_render`, nw's ``GenreOp.quote``) a host asks before running it:
+  ``$0`` when every voice speaks through a free provider, unknown (never free)
+  when any voice declares another; an prices no characters in dollars yet.
 
 **Import-safe and opt-in.** Only ``nw`` and ``dol`` at module top. ``an`` is
 imported inside the functions, and ``an/__init__.py`` does not import this module,
@@ -68,6 +71,12 @@ AN_PROJECT_MARKER = "an.toml"
 SCENE_TIER = "cutout-scene"
 SCENE_SCHEMA_URI = "annot://schema/cutout-scene/v1"
 FILM_TIER = "cutout-film"
+
+#: The speech providers a render can use without a bill: an's offline voice, macOS
+#: ``say``, and the recorded takes restored from the project's own store. Any other
+#: provider a voice declares (ElevenLabs, or a name an does not know) prices the
+#: render as unknown, never free.
+FREE_TTS_PROVIDERS: frozenset[str] = frozenset({"offline", "mac_say", "recorded"})
 FILM_SCHEMA_URI = "annot://schema/cutout-film/v1"
 #: The scene files whose bytes are the film's authored input. ``scene.json`` is
 #: the IR the renderer reads; ``scene.md`` is what a person edits.
@@ -306,6 +315,27 @@ def _render(
     return {"output_name": output_name, "path": film.body["path"]}
 
 
+def _quote_render(
+    project, *, output_name: str = "main", force_render: bool = False
+) -> Optional[float]:
+    """What :func:`_render` would bill now: ``0.0`` when every voice in the project
+    declares no provider or a free one (:data:`FREE_TTS_PROVIDERS`), else ``None``
+    (unknown, so the host asks for approval of an unknown price).
+
+    Takes ``_render``'s client parameters; neither changes the answer yet (a cached
+    line is never billed, but an does not count what is cached in dollars)."""
+    from an.audio.voices import declared_provider
+    from an.project import load
+
+    mall = load(Path(project.root), check_kinds=False).mall
+    voices = mall.get("voices") or {}
+    for voice_id in list(voices):
+        provider = declared_provider(mall, voice_id)
+        if provider is not None and provider not in FREE_TTS_PROVIDERS:
+            return None
+    return 0.0
+
+
 CUTOUT_ANIMATION_OPS: tuple[GenreOp, ...] = register_genre_ops(
     CUTOUT_ANIMATION_SLUG,
     [
@@ -322,6 +352,7 @@ CUTOUT_ANIMATION_OPS: tuple[GenreOp, ...] = register_genre_ops(
             effect="render",
             runs="job",
             spends=True,
+            quote=_quote_render,
             host_params=("should_cancel",),
         ),
     ],

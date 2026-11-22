@@ -132,3 +132,29 @@ def test_the_film_generator_id_follows_lacings_grammar():
     from cutan.nw import FILM_GENERATOR
 
     assert generator_id_findings(FILM_GENERATOR) == []
+
+
+def test_render_quotes_free_until_a_voice_declares_a_paid_provider(tmp_path):
+    """reelee#1010: a host prices ``render`` before running it. A project whose
+    voices speak through free providers renders for $0; one voice that declares
+    ElevenLabs (or a provider an does not know) makes the price unknown, never free."""
+    import nw
+    from an.stores.voices import VoicesStore
+
+    from cutan.nw import CUTOUT_ANIMATION_SLUG
+
+    nw.create_genre_project(CUTOUT_ANIMATION_SLUG, "u@x", "p", projects_dir=tmp_path)
+    proj = nw.Project(tmp_path / "p")
+    render = nw.genre_op(CUTOUT_ANIMATION_SLUG, "render")
+    assert render.spends and render.quote is not None
+
+    assert render.price(proj, {}).to_dict() == {"usd": 0.0, "status": "quoted"}
+    voices = VoicesStore(tmp_path / "p" / "assets" / "voices")
+    voices["narrator"] = {"provider": "offline"}
+    voices["kid"] = {"voice_id": "k1"}  # no provider: the offline default
+    assert render.price(proj, {"force_render": True}).total_usd == 0.0
+
+    voices["maya"] = {"provider": "ElevenLabs", "voice_id": "xyz"}
+    assert render.price(proj, {}).to_dict() == {"usd": None, "status": "unknown"}
+    voices["maya"] = {"provider": "some_new_tts"}
+    assert render.price(proj, {}).status == "unknown"
