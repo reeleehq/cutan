@@ -2531,7 +2531,9 @@ def _mug_svg(*, mirrored_lettering: bool) -> str:
     w, h = MUG_SIZE
     body_w = w - 34
     cx = body_w / 2
-    flip = f' transform="translate({2 * cx} 0) scale(-1 1)"' if mirrored_lettering else ""
+    flip = (
+        f' transform="translate({2 * cx} 0) scale(-1 1)"' if mirrored_lettering else ""
+    )
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}">'
         f'<path d="M{body_w - 6} 26 h18 a20 20 0 0 1 0 50 h-18" fill="none" stroke="#222" stroke-width="9"/>'
@@ -2548,7 +2550,9 @@ def _lettered_mug(project: Path, *, mirror_states: bool) -> None:
     d = project / "assets" / "props" / "mug"
     (d / "parts").mkdir(parents=True, exist_ok=True)
     for name, mirrored in (("lettered", False), ("lettered_mirror", True)):
-        (d / "parts" / f"{name}.svg").write_text(_mug_svg(mirrored_lettering=mirrored), encoding="utf-8")
+        (d / "parts" / f"{name}.svg").write_text(
+            _mug_svg(mirrored_lettering=mirrored), encoding="utf-8"
+        )
     metadata: dict = {"lettering": True}
     if mirror_states:
         metadata["mirror_states"] = {"lettered": "lettered_mirror"}
@@ -2565,14 +2569,30 @@ def _lettered_mug(project: Path, *, mirror_states: bool) -> None:
                     {"name": "root", "x": 200.0, "y": 200.0},
                     {"name": "grip", "parent": "root", "x": 0.0, "y": -55.0},
                 ],
-                "slots": [{"name": "body", "bone": "root", "draw_order": 0, "attachment": "lettered"}],
+                "slots": [
+                    {
+                        "name": "body",
+                        "bone": "root",
+                        "draw_order": 0,
+                        "attachment": "lettered",
+                    }
+                ],
                 "skins": {
                     "default": {
                         "name": "default",
-                        "slots": {"body": {n: drawing(n) for n in ("lettered", "lettered_mirror")}},
+                        "slots": {
+                            "body": {
+                                n: drawing(n) for n in ("lettered", "lettered_mirror")
+                            }
+                        },
                     }
                 },
-                "asset_sets": {"label": {"lettered": "lettered", "lettered_mirror": "lettered_mirror"}},
+                "asset_sets": {
+                    "label": {
+                        "lettered": "lettered",
+                        "lettered_mirror": "lettered_mirror",
+                    }
+                },
                 "metadata": metadata,
             }
         ),
@@ -2635,7 +2655,11 @@ def _build_lettered_prop(work: Path) -> Path:
         _hold_props(project)
         _lettered_mug(project, mirror_states=mirror_states)
         findings = _lettering_findings(project)
-        said = [f.description for f in findings if "has lettering and is drawn mirrored" in f.description]
+        said = [
+            f.description
+            for f in findings
+            if "has lettering and is drawn mirrored" in f.description
+        ]
         if mirror_states == bool(said):
             raise RuntimeError(
                 f"the {take!r} take's lettering check should {'not ' if mirror_states else ''}warn; it said {said!r}"
@@ -2644,10 +2668,22 @@ def _build_lettered_prop(work: Path) -> Path:
     out = work / "side_by_side.mp4"
     subprocess.run(
         [
-            "ffmpeg", "-v", "error", "-y",
-            "-i", str(clips[0]), "-i", str(clips[1]),
-            "-filter_complex", "[0:v][1:v]hstack=inputs=2",
-            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", str(out),
+            "ffmpeg",
+            "-v",
+            "error",
+            "-y",
+            "-i",
+            str(clips[0]),
+            "-i",
+            str(clips[1]),
+            "-filter_complex",
+            "[0:v][1:v]hstack=inputs=2",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-an",
+            str(out),
         ],
         check=True,
     )
@@ -3437,7 +3473,7 @@ DEMOS: tuple[Demo, ...] = (
         slug="lettered-prop",
         title="Lettering that reads after a turn: mirror states",
         shows=(
-            "Ned takes a \"BEST DAD\" mug off a crate, walks, turns round and walks back. "
+            'Ned takes a "BEST DAD" mug off a crate, walks, turns round and walks back. '
             "Twice, side by side: on the **left** the mug's art has no mirror state, so "
             "once Ned turns the mug is drawn mirrored with him and its lettering reads "
             "backwards (and `an validate` warns `has lettering and is drawn mirrored`); "
