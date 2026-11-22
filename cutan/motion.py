@@ -804,6 +804,8 @@ def turn(
     view_set: str = DFLT_TURN_SET,
     rest: Rest | None = None,
     step_hz: float | None = None,
+    faces: Any = None,
+    from_view: str | None = None,
 ) -> Action:
     """Turn a character to the view ``to`` — the classic cut-out turn (an#197).
 
@@ -825,6 +827,13 @@ def turn(
     (the back hides it, the profile keeps one eye). ``rest`` is the entity's:
     its ``scale_x`` magnitude is where the turn opens to.
 
+    ``faces`` is the art's ``metadata.faces`` declaration (an#818: ``left``, or
+    ``{swap set: {key: left|right}}``), which the compiler fills in when a turn
+    is played by name; ``from_view`` is the view the turn starts from (also
+    filled in), the one the declaration is read under for ``from_direction``.
+    Art drawn facing left is not mirrored to face left: ``scale_x`` is negative
+    exactly when the art's declared facing differs from ``direction``.
+
     ``step_hz`` is the shot's stepped timing (the compiler fills it in when a
     turn is played by name). A turn whose halves are shorter than one step
     cannot show its squash: its stepped frames would sample the edge-on scale,
@@ -840,18 +849,36 @@ def turn(
     >>> [(round(f.start, 3), f.action.property, lands(f.action))  # on twos at 24 fps
     ...  for f in flatten(turn("ned", to="side", duration=0.04, step_hz=12))]
     [(0.02, 'view', 'side'), (0.02, 'scale_x', 1.0)]
+    >>> [(round(f.start, 2), f.action.property, lands(f.action))  # art drawn facing left
+    ...  for f in flatten(turn("stu", to="side", direction="left", faces="left"))]
+    [(0.0, 'scale_x', 0.0), (0.15, 'view', 'side'), (0.15, 'scale_x', 1.0), (0.3, 'scale_x', 1.0)]
     """
     _positive(duration=duration)
     if not isinstance(to, str) or not to:
         raise ValueError(
             f"to must name a view (a key of the {view_set!r} set), got {to!r}"
         )
+    from cutan.characters.play import art_facing
+
     rest_sx = _rest(rest, "scale_x")
     s0 = abs(rest_sx)
+    art_before = art_facing(faces, {view_set: from_view} if from_view else None)
+    art_after = art_facing(faces, {view_set: to})
+
+    def sign(art: str, way: str) -> float:  # mirrored when the art faces the other way
+        return 1.0 if art == way else -1.0
+
+    for name, value in (("from_direction", from_direction), ("direction", direction)):
+        if value is not None:
+            _facing_sign(name, value)  # refuses anything but left/right
     if from_direction is None:
-        from_direction = "left" if rest_sx < 0 else "right"
-    before = _facing_sign("from_direction", from_direction) * s0
-    after = _facing_sign("direction", direction) * s0
+        from_direction = (
+            art_before
+            if rest_sx >= 0
+            else {"left": "right", "right": "left"}[art_before]
+        )
+    before = sign(art_before, from_direction) * s0
+    after = sign(art_after, direction) * s0
     half = duration / 2
     if step_hz is not None and step_hz > 0 and half < 1.0 / float(step_hz):
         return sequence(

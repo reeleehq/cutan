@@ -157,6 +157,8 @@ def test_views_are_additive_to_the_character_that_existed(tmp_path):
     a = json.loads((plain / "character.json").read_text("utf-8"))
     b = json.loads((views / "character.json").read_text("utf-8"))
     assert VIEW_CHANNEL not in a["asset_sets"] and not a["swap_poses"]
+    # the turnaround is drawn facing right, and says so (cutan#210)
+    assert b["metadata"]["faces"] == {VIEW_CHANNEL: {"side": "right", "three_quarter": "right"}}
     for key in ("bones", "slots", "animations", "gaze_travel", "face_overlay"):
         assert a[key] == b[key], key
     for slot, atts in a["skins"]["default"]["slots"].items():
@@ -166,7 +168,7 @@ def test_views_are_additive_to_the_character_that_existed(tmp_path):
         assert b["colour_roles"][part] == roles
     assert {k: v for k, v in b["asset_sets"].items() if k != VIEW_CHANNEL} == a["asset_sets"]
     # The recipe (an#292) records the parameters each was drawn with, which differ.
-    assert {k: v for k, v in b["metadata"].items() if k not in ("views", "factory")} == {
+    assert {k: v for k, v in b["metadata"].items() if k not in ("views", "faces", "factory")} == {
         k: v for k, v in a["metadata"].items() if k != "factory"
     }
 
@@ -752,3 +754,64 @@ def test_facing_ties_go_to_the_later_authored_action_and_bad_values_are_skipped(
     assert facing_at(res.events, "ned", 5.0).direction == "right"
     bad = flatten(set_("ned", "scale_x", "abc"))
     assert facing_at(bad, "ned", 1.0).direction is None
+
+
+# --- art that faces left (cutan#210, an#818) ---------------------------------
+
+
+def test_turn_of_left_facing_art_mirrors_only_to_face_right():
+    """``scale_x`` is negative when the declared art facing differs from ``direction``."""
+    from an.ir.compose import flatten
+
+    from cutan.characters.play import facing_at
+    from cutan.motion import turn
+
+    def lands(action):
+        return action.to_value if action.kind == "tween" else action.value
+
+    def sx_after(**kw):
+        return [
+            lands(f.action)
+            for f in flatten(turn("stu", to="side", **kw))
+            if f.action.property == "scale_x"
+        ][-1]
+
+    assert sx_after(direction="left", faces="left") == 1.0
+    assert sx_after(direction="right", faces="left") == -1.0
+    assert sx_after(direction="left") == -1.0  # undeclared art faces right
+    per_view = {"view": {"side": "left"}}
+    assert sx_after(direction="left", faces=per_view) == 1.0
+    flats = flatten(turn("stu", to="side", direction="left", faces=per_view))
+    assert facing_at(flats, "stu", 1.0, faces=per_view).direction == "left"
+
+
+def test_turn_resolution_reads_the_descriptors_declared_faces():
+    """A played turn gets the descriptor's ``metadata.faces`` and the view it opens from."""
+    from an.ir.compose import flatten, sequence
+
+    from cutan.characters.play import resolve_turns
+    from cutan.characters.registration import PlayAction
+    from cutan.characters.schema import CharacterDescriptor
+
+    desc = CharacterDescriptor.model_validate(
+        {"name": "stu", "metadata": {"faces": {"view": {"side": "left"}}}}
+    )
+    flats = flatten(
+        sequence(
+            PlayAction(
+                target="stu",
+                animation="turn",
+                args={"to": "side", "direction": "left"},
+            ),
+            PlayAction(target="stu", animation="turn", args={"to": "front"}),
+        )
+    )
+    res = resolve_turns(
+        flats,
+        descriptor_of=lambda e: desc,
+        rest_of=lambda p: {"scale_x": 1.0},
+    )
+    second = res.flats[1].action.args
+    assert second["from_direction"] == "left"
+    assert second["from_view"] == "side"
+    assert res.turns[1].before.direction == "left"

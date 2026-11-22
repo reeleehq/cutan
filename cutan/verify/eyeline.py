@@ -38,14 +38,14 @@ from dataclasses import dataclass
 from typing import Any, Callable, Optional, Sequence
 
 from cutan.characters.checks import _rig_document, _turns_of
-from cutan.characters.play import facing_at
+from cutan.characters.schema import DIRECTIONAL_VIEWS
+from cutan.characters.play import art_facing, declared_faces, facing_at
 from cutan.characters.schema import DFLT_VIEW, CharacterDescriptor
 
 #: What a character faces when nothing set it: the rig's rest (``scale_x`` > 0; the
 #: factory draws its profile facing the viewer's right).
 REST_DIRECTION: str = "right"
 #: The views that show a direction on screen; any other view is not judged.
-DIRECTIONAL_VIEWS: frozenset[str] = frozenset({"side", "three_quarter"})
 _OPPOSITE = {"left": "right", "right": "left"}
 
 
@@ -134,10 +134,15 @@ def _presence(
     rest_view: str,
     directional_views: frozenset[str],
     rest_direction: str,
+    faces: Any = None,
 ) -> Presence:
-    """``entity`` of a shot as the rules see it at ``t``."""
-    facing = facing_at(events, entity.id, t)
+    """``entity`` of a shot as the rules see it at ``t``. ``faces`` is its art's
+    ``metadata.faces`` declaration (an#818): art drawn facing left looks left
+    when unmirrored, so the direction is read through it."""
+    facing = facing_at(events, entity.id, t, faces=faces)
     view = facing.view or rest_view
+    if faces is not None and rest_direction == REST_DIRECTION:
+        rest_direction = art_facing(faces, {"view": view})
     at = entity.stage.at if entity.stage is not None else None
     return Presence(
         entity.id,
@@ -192,6 +197,15 @@ def check_eyeline(
         except Exception:  # noqa: BLE001 - a malformed descriptor is the play check's to report
             return DFLT_VIEW
 
+    def faces_of(entity: Any) -> Any:
+        doc = _rig_document(entity, ctx.stores)
+        try:
+            return (
+                declared_faces(CharacterDescriptor.model_validate(doc)) if doc else None
+            )
+        except Exception:  # noqa: BLE001 - a malformed descriptor is the play check's to report
+            return None
+
     def present_at(i: int, t: float, speaker: str) -> list[Presence]:
         return [
             _presence(
@@ -202,6 +216,7 @@ def check_eyeline(
                 rest_view=rest_view_of(e),
                 directional_views=directional_views,
                 rest_direction=rest_direction,
+                faces=faces_of(e),
             )
             for e in chars[i]
         ]
