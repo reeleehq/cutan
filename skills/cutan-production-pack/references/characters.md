@@ -118,7 +118,7 @@ Every parameter, with its default (generated from the code; never pass one that 
 | `nod` | `part` = `'head'`, `angle` = `0.18`, `duration` = `0.5`, `count` = `2` |
 | `point` | `angle` = `-1.3`, `raise_duration` = `0.25`, `hold` = `0.6`, `easing` = `(0.34, 1.56, 0.64, 1.0)` |
 | `waddle` | `steps` = `4`, `step_duration` = `0.3`, `angle` = `0.1`, `lift` = `6.0`, `travel` = `0.0` |
-| `turn` | `to` = `'back'`, `direction` = `'right'`, `from_direction`, `duration` = `0.3`, `view_set` = `'view'`, `step_hz` |
+| `turn` | `to` = `'back'`, `direction` = `'right'`, `from_direction`, `duration` = `0.3`, `view_set` = `'view'`, `step_hz`, `faces`, `from_view` |
 | `walk` | `to_x`, `distance`, `direction`, `steps`, `step_s`, `step_length`, `stride`, `lift`, `bob`, `arm_swing`, `rock`, `hem_tilt`, `hop_height`, `lean`, `view`, `gait`, `legs`, `arms`, `scale` |
 | `speech_pulse` | `beats` = `(0.0,)`, `strength` = `0.06`, `part` = `'head'`, `attack` = `0.06`, `release` = `0.1` |
 <!-- presets:end -->

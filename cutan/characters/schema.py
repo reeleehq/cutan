@@ -123,6 +123,9 @@ VIEW_CHANNEL: str = "view"
 #: facing the viewer's RIGHT at a positive ``scale_x``; a negative ``scale_x``
 #: (``cutan.motion.turn(direction="left")``) mirrors it to face left.
 VIEWS: tuple[str, ...] = ("front", "three_quarter", "side", "back")
+#: The views that show a direction (the profile and the three-quarter): a front
+#: or a back view faces the viewer, so the way it "faces" is not judged.
+DIRECTIONAL_VIEWS: frozenset[str] = frozenset({"side", "three_quarter"})
 
 #: The view a character shows at rest: its default attachments ARE this view.
 #: A descriptor whose art is drawn in another view says so in ``rest_view``.

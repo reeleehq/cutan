@@ -2441,6 +2441,7 @@ def add_views(char_dir: str | Path) -> Path:
     """
     from cutan.characters.schema import (
         DFLT_VIEW,
+        DIRECTIONAL_VIEWS,
         VIEW_CHANNEL,
         VIEWS,
     )
@@ -2557,6 +2558,13 @@ def add_views(char_dir: str | Path) -> Path:
     if desc.colour_roles:  # tagged like the front — never half-tagged
         desc.colour_roles.update(roles)
     meta["views"] = list(VIEWS)
+    # The turnaround is drawn facing the viewer's right (an#818, cutan#210): say
+    # so, for `turn`, `facing_at` and an's `facing_travel` check. A declaration
+    # already there (an illustrator's) is kept.
+    meta.setdefault(
+        "faces",
+        {VIEW_CHANNEL: {v: "right" for v in VIEWS if v in DIRECTIONAL_VIEWS}},
+    )
     write_descriptor(char_dir, desc)
     return stamp_factory_parts(
         char_dir,

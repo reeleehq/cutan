@@ -57,6 +57,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Callable, Iterable, Mapping
+from typing import Any
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Union
@@ -927,43 +928,122 @@ class TurnResolution:
     events: list
 
 
-def facing_at(events, entity: str, t: float, *, view_set: str = "view") -> Facing:
+#: Which way art faces when nothing declares it: the factory draws its side
+#: view facing the viewer's right (``metadata.faces``, an#818, says otherwise).
+DFLT_ART_FACING: str = "right"
+_OPPOSITE_FACING = {"left": "right", "right": "left"}
+
+
+def declared_faces(desc: CharacterDescriptor | None) -> Any:
+    """The ``metadata.faces`` declaration of a descriptor (an#818): ``"left"`` /
+    ``"right"``, or ``{swap_set: {key: left|right}}``; ``None`` when it says
+    nothing (the art faces right, as the factory draws it).
+
+    >>> declared_faces(None) is None
+    True
+    """
+    return (desc.metadata or {}).get("faces") if desc is not None else None
+
+
+def art_facing(faces: Any, pose: Mapping[str, Any] | None = None) -> str:
+    """The way the UNMIRRORED art faces under ``pose`` (``{swap set: key in
+    force}``): the declaration when it is one facing; else the facing of the
+    first listed set whose key in force it lists; else :data:`DFLT_ART_FACING`.
+
+    >>> art_facing(None), art_facing("left")
+    ('right', 'left')
+    >>> faces = {"face": {"dozy": "left"}, "view": {"side": "right"}}
+    >>> art_facing(faces, {"face": "dozy"}), art_facing(faces, {"view": "side"})
+    ('left', 'right')
+    >>> art_facing(faces, {"face": "smile"})
+    'right'
+    """
+    if isinstance(faces, str):
+        return faces if faces in _OPPOSITE_FACING else DFLT_ART_FACING
+    if isinstance(faces, Mapping):
+        for set_name, keys in faces.items():
+            key = (pose or {}).get(set_name)
+            if key is not None and isinstance(keys, Mapping):
+                way = {str(k): v for k, v in keys.items()}.get(str(key))
+                if way in _OPPOSITE_FACING:
+                    return way
+    return DFLT_ART_FACING
+
+
+def _faces_sets(faces: Any, view_set: str) -> frozenset[str]:
+    """The swap sets whose state ``faces`` depends on (always the view set)."""
+    return frozenset(faces) | {view_set} if isinstance(faces, Mapping) else frozenset()
+
+
+def facing_at(
+    events,
+    entity: str,
+    t: float,
+    *,
+    view_set: str = "view",
+    faces: Any = None,
+) -> Facing:
     """What ``entity`` shows at time ``t``: the latest ``view_set`` swap set
     on the entity and the sign of the latest ``scale_x`` it was given, at or
     before ``t`` (a tween counts from its END, when its value has landed; at
     one instant the one LATER in ``events`` wins — so pass them in authoring
     order, as :func:`resolve_turns` does).
 
+    ``direction`` is the way the figure faces ON THE SET: the sign of
+    ``scale_x`` when the art faces right (the default), flipped for art that
+    ``faces`` (the entity's ``metadata.faces`` declaration, an#818) says faces
+    left under the swap keys in force at ``t``.
+
     >>> from an.ir.compose import flatten, sequence
     >>> from cutan.motion import turn
     >>> flats = flatten(sequence(turn("ned", to="side", direction="left")))
     >>> facing_at(flats, "ned", 0.0), facing_at(flats, "ned", 1.0)
     (Facing(view=None, direction=None), Facing(view='side', direction='left'))
+    >>> flats = flatten(sequence(turn("stu", to="side", direction="left", faces="left")))
+    >>> facing_at(flats, "stu", 1.0, faces="left")
+    Facing(view='side', direction='left')
     """
     from an.ir.schema import SetAction, TweenAction
 
     view: str | None = None
     sx: float | None = None
+    pose: dict[str, Any] = {}
+    sets = _faces_sets(faces, view_set)
+    prefix = f"{entity}/"
     stamped = []
     for order, f in enumerate(events):
         a = f.action
-        if getattr(a, "target", None) != entity:
+        target = getattr(a, "target", None)
+        if target != entity and not (
+            sets and isinstance(target, str) and target.startswith(prefix)
+        ):
             continue
-        if isinstance(a, TweenAction) and a.property == "scale_x":
-            stamped.append((f.start + float(a.duration), order, "scale_x", a.to_value))
-        elif isinstance(a, SetAction) and a.property in ("scale_x", view_set):
-            stamped.append((f.start, order, a.property, a.value))
-    for time, _, prop, value in sorted(stamped, key=lambda e: (e[0], e[1])):
+        exact = target == entity
+        if exact and isinstance(a, TweenAction) and a.property == "scale_x":
+            stamped.append(
+                (f.start + float(a.duration), order, "scale_x", a.to_value, exact)
+            )
+        elif isinstance(a, SetAction) and (
+            (exact and a.property in ("scale_x", view_set))
+            or (a.property in sets and (exact or a.property != view_set))
+        ):
+            stamped.append((f.start, order, a.property, a.value, exact))
+    for time, _, prop, value, exact in sorted(stamped, key=lambda e: (e[0], e[1])):
         if time > t + _FACING_SLACK:
             break
-        if prop != "scale_x":
+        if prop in sets:
+            pose[prop] = value
+        if prop == "scale_x":
+            try:
+                sx = float(value)
+            except (TypeError, ValueError):
+                pass  # a value the compiler refuses; validate reports it elsewhere
+        elif prop == view_set and exact:
             view = value
-            continue
-        try:
-            sx = float(value)
-        except (TypeError, ValueError):
-            continue  # a value the compiler refuses; validate reports it elsewhere
     direction = None if not sx else ("left" if sx < 0 else "right")
+    if direction is not None and faces is not None:
+        if art_facing(faces, pose) == "left":
+            direction = _OPPOSITE_FACING[direction]
     return Facing(view=view, direction=direction)
 
 
@@ -972,6 +1052,7 @@ def resolve_turns(
     *,
     descriptor_of: Callable[[str], CharacterDescriptor | None],
     rest_of: Callable[[str], Mapping[str, float] | None],
+    faces_of: Callable[[str], Any] | None = None,
 ) -> TurnResolution:
     """Fill in each turn's ``from_direction`` from the timeline before it
     (an#203): a ``play`` of ``turn`` on an entity that does not pass one
@@ -984,6 +1065,11 @@ def resolve_turns(
     An explicit ``from_direction`` is kept — ``turns`` records it with the
     inferred state so ``an validate`` can say when the two disagree. A play
     that cannot resolve is left for :func:`play_problems` to report.
+
+    ``faces_of(entity)`` is the entity's ``metadata.faces`` declaration (an#818;
+    default: :func:`declared_faces` of its descriptor). Art that faces left
+    turns by the declared facing, not by the sign of ``scale_x``: the turn
+    is given ``faces`` and the view it starts from.
 
     >>> from an.ir.compose import flatten, sequence
     >>> from cutan.characters.registration import PlayAction
@@ -1028,12 +1114,25 @@ def resolve_turns(
         if action.animation == TURN_PRESET and action.target == entity:
             from cutan.motion import DFLT_TURN_SET
 
-            before = facing_at(
-                events(),
-                entity,
-                f.start,
-                view_set=str(args.get("view_set", DFLT_TURN_SET)),
+            view_set = str(args.get("view_set", DFLT_TURN_SET))
+            faces = (
+                faces_of(entity)
+                if faces_of is not None
+                else declared_faces(descriptor_of(entity))
             )
+            if faces is not None:
+                args = {**args, "faces": args.get("faces", faces)}
+            before = facing_at(
+                events(), entity, f.start, view_set=view_set, faces=faces
+            )
+            if faces is not None:
+                from_view = before.view or getattr(
+                    descriptor_of(entity), "rest_view", None
+                )
+                if from_view is not None:
+                    args.setdefault("from_view", from_view)
+                action = action.model_copy(update={"args": args})
+                out[i] = FlatAction(start=f.start, end=f.end, action=action)
             declared = args.get("from_direction")
             turns.append(TurnInference(i, f.start, entity, before, declared))
             if declared is None and before.direction is not None:
