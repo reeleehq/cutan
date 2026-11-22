@@ -23,18 +23,19 @@ picture frame reused around pictures of every aspect. :func:`framed` does it:
 >>> frame = carve(art, matte=Polygon([(10, 10), (70, 10), (70, 50), (10, 50)]), point=(40, 30),
 ...               keep="all", feather=0, despill=0, pad=0)
 >>> pic = np.zeros((100, 30, 3), np.uint8)                    # a tall new picture
->>> out = framed(pic, frame, opening=(20, 20, 60, 40), ours=True)
+>>> out = framed(pic, frame, opening=(20, 20, 60, 40), ours=True, frame_ours=True)
 >>> [p.name for p in out.parts], out.carving.size
 (['picture', 'frame'], (51, 121))
 """
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from typing import Any, Union
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageChops, ImageFilter
 
 from cutan.carve.core import Box, CarveQuality, Carving
 from cutan.carve.parts import Part, PartSet
@@ -110,21 +111,37 @@ def nine_slice(image: Image.Image, bands: Bands, inner: tuple[int, int]) -> Imag
     return out
 
 
+def _as_source(source: Any) -> Any:
+    """``source`` as an :class:`an.ir.assets.AssetSource` (a dict is validated)."""
+    if source is None or not isinstance(source, Mapping):
+        return source
+    from an.ir.assets import AssetSource
+
+    return AssetSource.model_validate(source)
+
+
 def _picture(picture: PictureLike, source, ours: bool) -> tuple[Image.Image, Any]:
-    """The picture's RGBA image and its provenance (a carving's own, else ``source``)."""
+    """The picture's RGBA image and its provenance (``source``, else a carving's own).
+
+    A picture with neither (an unsourced carving included) is refused unless ``ours``:
+    unsourced, its part would be covered by the frame's source and read as the frame's.
+    """
     if isinstance(picture, Carving):
-        return picture.image.convert("RGBA"), source or picture.provenance()
-    img = (
-        Image.fromarray(np.asarray(picture))
-        if isinstance(picture, np.ndarray)
-        else picture
-    )
-    if source is None and not ours:
-        raise ValueError(
-            "the picture has no provenance, and a part with no source reads as art you made: "
-            "pass source=frame_source(url, license=...) or ours=True if the pixels are yours"
+        img, prov = picture.image, _as_source(source) or picture.provenance()
+    else:
+        img = (
+            Image.fromarray(np.asarray(picture))
+            if isinstance(picture, np.ndarray)
+            else picture
         )
-    return img.convert("RGBA"), source
+        prov = _as_source(source)
+    if prov is None and not ours:
+        raise ValueError(
+            "the picture has no provenance, and a part with no source reads as the frame's "
+            "(or as art you made): pass source=frame_source(url, license=...), carve it with "
+            "source=..., or ours=True if the pixels are yours"
+        )
+    return img.convert("RGBA"), prov
 
 
 def framed(
@@ -134,6 +151,8 @@ def framed(
     opening: Box,
     source: Any = None,
     ours: bool = False,
+    frame_ours: bool = False,
+    moulding_scale: float = 1.0,
     shadow: DropShadow | None = None,
     picture_part: str = "picture",
     frame_part: str = "frame",
@@ -148,16 +167,33 @@ def framed(
         opening: the frame's opening, in the frame carving's source pixels.
         source: the picture's provenance (overrides a carving's).
         ours: the picture's pixels are the caller's own (a typeset card).
-        shadow: a :class:`DropShadow` part under the frame, or ``None``.
+        frame_ours: the frame's pixels are the caller's own (a frame with no source).
+        moulding_scale: the moulding's size against the frame carving's pixels (a superres
+            frame is carved at 4x; a 1920 px picture wants a thicker frame than a 300 px one):
+            the opened frame is resized by it before the 9-slice.
+        shadow: a :class:`DropShadow` part under the frame and the picture, or ``None``; its
+            offset and blur are in the composite's pixels.
 
     The set's carving is the whole composite (the parts in place), with the frame's source as
     the prop's own: write it with :func:`~cutan.carve.write_prop`, whose ``landmarks`` are then
-    in the composite's pixels (a hook at ``(width / 2, 0)``).
+    in the **composite's** pixels, not a source's (a hook at ``(width / 2, 0)``).
     """
-    if frame.source is None and not ours:
-        raise ValueError("the frame carving has no source: carve it with source=...")
+    if frame.source is None and not frame_ours:
+        raise ValueError(
+            "the frame carving has no source: carve it with source=..., or "
+            "frame_ours=True if its pixels are yours"
+        )
+    if moulding_scale <= 0:
+        raise ValueError(f"moulding_scale must be positive, not {moulding_scale}")
     pic, pic_source = _picture(picture, source, ours)
     frame_img, bands = open_frame(frame, opening)
+    if moulding_scale != 1:
+        fw, fh = frame_img.size
+        frame_img = frame_img.resize(
+            (max(1, round(fw * moulding_scale)), max(1, round(fh * moulding_scale))),
+            Image.LANCZOS,
+        )
+        bands = tuple(max(1, round(b * moulding_scale)) for b in bands)
     sized = nine_slice(frame_img, bands, pic.size)
     L, T, _, _ = bands
     W, H = sized.size
@@ -166,10 +202,17 @@ def framed(
     if shadow is not None:
         pad = int(np.ceil(3 * shadow.blur))
         sh = Image.new("RGBA", (W + 2 * pad, H + 2 * pad), (*shadow.color, 0))
-        alpha = Image.new("L", sh.size, 0)
-        alpha.paste(
-            sized.getchannel("A").point(lambda v: round(v * shadow.opacity)), (pad, pad)
+        # the whole framed picture casts it: the frame's alpha and the picture's in the
+        # opening (the frame's alone has a hole there, which shows as a notch)
+        cast = sized.getchannel("A").copy()
+        cast.paste(
+            ImageChops.lighter(
+                cast.crop((L, T, L + pic.width, T + pic.height)), pic.getchannel("A")
+            ),
+            (L, T),
         )
+        alpha = Image.new("L", sh.size, 0)
+        alpha.paste(cast.point(lambda v: round(v * shadow.opacity)), (pad, pad))
         sh.putalpha(alpha.filter(ImageFilter.GaussianBlur(shadow.blur)))
         ox, oy = shadow.offset[0] - pad, shadow.offset[1] - pad
         margin = (max(0, -ox), max(0, -oy))
@@ -210,7 +253,11 @@ def framed(
                 "picture_size": list(pic.size),
                 "bands": list(bands),
                 "shadow": asdict(shadow) if shadow else None,
+                "moulding_scale": moulding_scale,
                 "frame_recipe": frame.recipe,
+                # the frame's own crop facts (the composite's offset/scale are its own px)
+                "frame_region_in_source": frame.meta.get("region_in_source"),
+                "frame_source_to_part": frame.meta.get("source_to_part"),
             }
         },
         source=frame.source,

@@ -288,6 +288,8 @@ def write_prop(
             "x": 0.0,
             "y": 0.0,
         }
+        if isinstance(own, Mapping):
+            own = AssetSource.model_validate(own)
         if own is not None and own != prov:  # pixels from another source (an#220)
             att["source"] = own.model_dump(mode="json", exclude_none=True)
         attachments[slot] = {slot: att}

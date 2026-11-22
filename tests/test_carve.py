@@ -873,3 +873,108 @@ def test_a_framed_picture_is_one_prop_whose_parts_keep_both_sources(tmp_path):
         )
         == doc
     )
+
+
+def test_an_unsourced_picture_carving_is_refused_not_covered_by_the_frame():
+    from cutan.carve import framed
+
+    frame, opening = _gold_frame()
+    from cutan.carve.mattes import Polygon
+
+    unsourced = carve(
+        np.full((40, 30, 3), 90, np.uint8),
+        matte=Polygon([(0, 0), (30, 0), (30, 40), (0, 40)]),
+        point=(15, 20),
+        keep="all",
+        pad=0,
+    )
+    with pytest.raises(ValueError, match="no provenance"):
+        framed(unsourced, frame, opening=opening)
+    assert framed(unsourced, frame, opening=opening, ours=True).parts[0].source is None
+    with pytest.raises(ValueError, match="frame carving has no source"):
+        framed(
+            unsourced,
+            carve(
+                np.full((40, 40, 3), 200, np.uint8),
+                matte=Polygon([(0, 0), (40, 0), (40, 40), (0, 40)]),
+                point=(20, 20),
+            ),
+            opening=(10, 10, 30, 30),
+            ours=True,
+        )
+
+
+def test_the_shadow_is_cast_by_the_picture_too_no_notch_beside_the_frame():
+    from cutan.carve import DropShadow, framed
+
+    frame, opening = _gold_frame()
+    pic_src = frame_source(
+        "https://www.youtube.com/watch?v=bcdefghijkl",
+        t=9,
+        license="all-rights-reserved",
+    )
+    out = framed(
+        np.zeros((80, 80, 3), np.uint8),
+        frame,
+        opening=opening,
+        source=pic_src,
+        shadow=DropShadow(offset=(30, 30), blur=6.0),
+    )
+    sh, fr = out.parts[0], out.parts[2]
+    a = np.asarray(sh.image)[..., 3].astype(int)
+    # along a column just right of the frame, inside the shadow's flat stretch: no dip
+    x = fr.origin[0] + fr.image.width + 10 - sh.origin[0]
+    column = a[60 : fr.image.height, x]
+    assert column.max() - column.min() <= 3
+
+
+def test_negative_shadow_offsets_keep_every_part_on_the_canvas():
+    from cutan.carve import DropShadow, framed
+
+    frame, opening = _gold_frame()
+    out = framed(
+        np.zeros((10, 10, 3), np.uint8),
+        frame,
+        opening=opening,
+        ours=True,
+        shadow=DropShadow(offset=(-12, -5), blur=2.0),
+    )
+    w, h = out.carving.size
+    for p in out.parts:
+        assert p.origin[0] >= 0 and p.origin[1] >= 0
+        assert p.origin[0] + p.image.width <= w and p.origin[1] + p.image.height <= h
+
+
+def test_a_scaled_frame_maps_its_opening_and_scales_its_moulding():
+    """A superres frame is carved at k x the source: the opening still names source px, and
+    moulding_scale sizes the moulding against the picture."""
+    import dataclasses
+
+    from cutan.carve import framed, open_frame
+
+    frame, opening = _gold_frame()
+    k = 2
+    big = dataclasses.replace(
+        frame,
+        image=frame.image.resize((frame.size[0] * k, frame.size[1] * k)),
+        scale=frame.scale * k,
+    )
+    _, bands = open_frame(frame, opening)
+    _, big_bands = open_frame(big, opening)
+    assert big_bands == tuple(b * k for b in bands)
+    pic_src = frame_source(
+        "https://www.youtube.com/watch?v=bcdefghijkl",
+        t=9,
+        license="all-rights-reserved",
+    )
+    out = framed(
+        np.zeros((20, 20, 3), np.uint8),
+        big,
+        opening=opening,
+        source=pic_src,
+        moulding_scale=0.5,
+    )
+    assert out.parts[0].origin == (
+        bands[0],
+        bands[1],
+    )  # the picture sits at the halved band
