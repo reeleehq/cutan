@@ -76,7 +76,8 @@ PROJECT_STORE_RECORD: str = ".an/projects_store.json"
 #: Level 15: ``an.project.gitignore_matcher`` (an#725, cutan#185); also the first level
 #: after ``JsonSidecarStore.write_sidecar`` (an#688, cutan#181), ``phone_alphabet_of`` (an#721).
 #: Level 17: ``an.ir.world.planes_at_infinity`` (an#735), the far-plate critic's set (cutan#177).
-REQUIRED_AN_API_LEVEL: int = 17
+#: Level 18: ``EntityKind.contacts`` (an#519), a character's feet for the support check (cutan#201).
+REQUIRED_AN_API_LEVEL: int = 18
 
 
 def require_an() -> None:

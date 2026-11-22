@@ -25,7 +25,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-__all__ = ["HANDS", "character_landmarks"]
+__all__ = ["HANDS", "character_landmarks", "far_slot"]
 
 #: The hands the genre names, and the arm slot each one ends.
 HANDS: dict[str, str] = {"hand_l": "arm_l", "hand_r": "arm_r"}
@@ -41,6 +41,36 @@ def _field(doc: Any, name: str, default: Any = None) -> Any:
 
 def _named(entries: Any) -> dict[str, Any]:
     return {str(_field(e, "name")): e for e in entries or ()}
+
+
+def far_slot(bones: Mapping[str, Any], slots: Mapping[str, Any], limb: str) -> str:
+    """The slot at the far end of ``limb``'s chain: the deepest slot whose bone is
+    under the bone of the ``limb`` slot (``limb`` itself when none is).
+
+    >>> bones = {"a": {"name": "a"}, "b": {"name": "b", "parent": "a"}}
+    >>> slots = {"s": {"name": "s", "bone": "a"}, "t": {"name": "t", "bone": "b"}}
+    >>> far_slot(bones, slots, "s")
+    't'
+    """
+    root = str(_field(slots[limb], "bone"))
+
+    def depth_under(bone: str) -> int | None:
+        """How many links ``bone`` is below ``root`` (``None``: not under it)."""
+        d, cursor, seen = 0, bone, set()
+        while cursor is not None and cursor not in seen:
+            if cursor == root:
+                return d
+            seen.add(cursor)
+            d += 1
+            cursor = _field(bones.get(cursor), "parent") if cursor in bones else None
+        return None
+
+    best, best_depth = limb, 0
+    for name, slot in sorted(slots.items()):
+        depth = depth_under(str(_field(slot, "bone")))
+        if depth is not None and depth > best_depth:
+            best, best_depth = name, depth
+    return best
 
 
 def character_landmarks(desc: Any) -> dict[str, tuple[str, tuple[float, float] | None]]:
@@ -60,18 +90,6 @@ def character_landmarks(desc: Any) -> dict[str, tuple[str, tuple[float, float] |
     """
     bones = _named(_field(desc, "bones"))
     slots = _named(_field(desc, "slots"))
-
-    def depth_under(bone: str, root: str) -> int | None:
-        """How many links ``bone`` is below ``root`` (``None``: not under it)."""
-        d, cursor, seen = 0, bone, set()
-        while cursor is not None and cursor not in seen:
-            if cursor == root:
-                return d
-            seen.add(cursor)
-            d += 1
-            cursor = _field(bones.get(cursor), "parent") if cursor in bones else None
-        return None
-
     out: dict[str, tuple[str, tuple[float, float] | None]] = {}
     for hand, arm in HANDS.items():
         if hand in bones or arm not in slots:
@@ -79,11 +97,5 @@ def character_landmarks(desc: Any) -> dict[str, tuple[str, tuple[float, float] |
         if hand in slots:
             out[hand] = (hand, HAND_CENTRE)
             continue
-        arm_bone = str(_field(slots[arm], "bone"))
-        best, best_depth = arm, 0
-        for name, slot in sorted(slots.items()):
-            depth = depth_under(str(_field(slot, "bone")), arm_bone)
-            if depth is not None and depth > best_depth:
-                best, best_depth = name, depth
-        out[hand] = (best, None)
+        out[hand] = (far_slot(bones, slots, arm), None)
     return out
