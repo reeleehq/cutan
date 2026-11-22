@@ -37,7 +37,7 @@ from an.audio.tts import AudioClip
 
 # Reuse the offline char→viseme mapping so the two providers stay consistent.
 from cutan.audio.offline_lipsync import _CHAR_TO_VISEME, _REST_VISEME, clip_words
-from cutan.audio.phones import PhoneToViseme, phone_viseme, phones_track
+from an.audio.phones import PhoneToViseme, phone_viseme, phones_track
 
 _DEFAULT_MODEL_SIZE: str = "tiny"  # ~75 MB; "base" gives slightly better word-timing
 _DEFAULT_DEVICE: str = "cpu"

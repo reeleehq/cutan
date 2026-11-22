@@ -40,7 +40,9 @@ from an.audio.lipsync import (
     word_timings_to_visemes,
 )
 from cutan.audio.offline_lipsync import _CHAR_TO_VISEME, _REST_VISEME
+from an.audio.phones import phones_track
 from an.audio.tts import AudioClip
+from cutan.audio.phones import PHONES_CACHE_VERSION
 
 
 class StaticWordTimings:
@@ -80,6 +82,9 @@ class WordTimingsLipSync:
     """
 
     convention: str = "rhubarb"
+    #: A clip's phones are preferred now (an#491, an#727): tracks cached from its
+    #: words alone are re-aligned once.
+    cache_version: str = PHONES_CACHE_VERSION
 
     def __init__(
         self,
@@ -108,6 +113,16 @@ class WordTimingsLipSync:
     emits_word_timings: bool = True
 
     def align(self, audio: AudioClip, transcript: str) -> VisemeTrack:
+        # A take whose aligner said which sound is when: each phone's own shape
+        # (a word with no phones under it keeps its letters).
+        from_phones = phones_track(
+            audio,
+            char_to_viseme=self._mapping,
+            rest_viseme=self._rest,
+            convention=self.convention,
+        )
+        if from_phones is not None:
+            return from_phones
         words = list(self.provider.words_for(audio, transcript=transcript))
         return VisemeTrack(
             visemes=word_timings_to_visemes(

@@ -31,7 +31,8 @@ from typing import Iterable
 from an.audio.lipsync import Viseme, VisemeTrack, word_timings_to_visemes
 from an.audio.tts import AudioClip
 
-from cutan.audio.phones import PhoneToViseme, clip_timings, phone_viseme, phones_track
+from an.audio.phones import PhoneToViseme, clip_timings, phone_viseme, phones_track
+from cutan.audio.phones import PHONES_CACHE_VERSION
 
 # Map a single ASCII character (lowercased) to a Rhubarb viseme letter.
 # A=closed (P/B/M, rest), B=tight open (D/S/T/Z/N/L), C=eh, D=ah/wide,
@@ -96,6 +97,10 @@ class OfflineLipSync:
     #: may re-make a missing track in memory (an#311, cutan#29).
     repeatable: bool = True
     billed: bool = False
+    #: Tracks cached before this provider read a take's phones (an#491) are
+    #: re-aligned once, never re-synthesised: the core re-keys the cache by it
+    #: (``an.audio.lipsync.lipsync_cache_id``, an#727), the persisted ``name`` stays.
+    cache_version: str = PHONES_CACHE_VERSION
 
     def __init__(
         self,

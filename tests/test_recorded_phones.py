@@ -12,7 +12,7 @@ import pytest
 
 from an.audio.tts import AudioClip
 from cutan.audio.offline_lipsync import OfflineLipSync
-from cutan.audio.phones import (
+from an.audio.phones import (
     ARPABET_TO_VISEME,
     IPA_TO_VISEME,
     phone_alphabet,
@@ -265,3 +265,30 @@ def test_a_merged_consonant_and_vowel_keep_the_stronger_intensity():
         total_duration=0.3, alphabet="arpabet", intensity_of=TONGUE_ONLY_INTENSITY,
     )
     assert [(v.code, v.intensity) for v in got if v.code == "B"] == [("B", 1.0)]
+
+
+def test_one_copy_of_the_phone_tables_the_cores():
+    import an.audio.phones as core
+    import cutan.audio.phones as genre
+
+    assert genre.ARPABET_TO_VISEME is core.ARPABET_TO_VISEME
+    assert genre.phones_track is core.phones_track
+
+
+def test_word_timings_lipsync_prefers_the_clips_phones():
+    from cutan.audio.injectable_lipsync import StaticWordTimings, WordTimingsLipSync
+
+    provider = WordTimingsLipSync(StaticWordTimings(WORDS))
+    with_phones = provider.align(_clip(phones=ARPA), "mama")
+    assert _shapes(with_phones) == _shapes(OfflineLipSync().align(_clip(phones=ARPA), "mama"))
+    assert _shapes(with_phones) != _shapes(provider.align(_clip(), "mama"))
+
+
+def test_providers_that_read_phones_re_key_the_cache_once():
+    from an.audio.lipsync import lipsync_cache_id
+
+    from cutan.audio.injectable_lipsync import StaticWordTimings, WordTimingsLipSync
+
+    for provider in (OfflineLipSync(), WordTimingsLipSync(StaticWordTimings(WORDS))):
+        assert provider.name in lipsync_cache_id(provider)
+        assert lipsync_cache_id(provider) != provider.name  # a re-keyed track
