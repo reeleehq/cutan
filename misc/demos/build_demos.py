@@ -2514,6 +2514,146 @@ def _build_holds(work: Path) -> Path:
     return _render(project, strict_assets=True)
 
 
+#: The mug's lettering, and where on the mug's drawing it is centred (x).
+MUG_WORDS: str = "BEST DAD"
+MUG_SIZE: tuple[int, int] = (200, 100)
+
+
+def _mug_svg(*, mirrored_lettering: bool) -> str:
+    """The mug as one flat SVG: a body, a handle on its right, and MUG_WORDS.
+
+    Its mirror drawing (``mirrored_lettering``) is the same drawing with ONLY the
+    lettering flipped about its own centre, so a mug drawn mirrored (handle on
+    the left) still reads. Exact here because the lettering is its own SVG
+    element; for carved raster art the letter mask is where the lettered and
+    painted-out drawings differ, flipped onto the painted-out one as
+    ``x0 + x1 - x`` (cutan#212)."""
+    w, h = MUG_SIZE
+    body_w = w - 34
+    cx = body_w / 2
+    flip = f' transform="translate({2 * cx} 0) scale(-1 1)"' if mirrored_lettering else ""
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}">'
+        f'<path d="M{body_w - 6} 26 h18 a20 20 0 0 1 0 50 h-18" fill="none" stroke="#222" stroke-width="9"/>'
+        f'<rect x="2" y="2" width="{body_w}" height="{h - 4}" rx="12" fill="#f4efe3" stroke="#222" stroke-width="4"/>'
+        f'<g{flip}><text x="{cx}" y="{h / 2 + 8}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" '
+        f'font-weight="bold" font-size="24" fill="#c0392b">{MUG_WORDS}</text></g></svg>'
+    )
+
+
+def _lettered_mug(project: Path, *, mirror_states: bool) -> None:
+    """A mug with a ``label`` swap set of two drawings, ``lettered`` and
+    ``lettered_mirror``, declaring ``metadata.lettering`` and, when
+    ``mirror_states``, ``mirror_states: {lettered: lettered_mirror}`` (an#819)."""
+    d = project / "assets" / "props" / "mug"
+    (d / "parts").mkdir(parents=True, exist_ok=True)
+    for name, mirrored in (("lettered", False), ("lettered_mirror", True)):
+        (d / "parts" / f"{name}.svg").write_text(_mug_svg(mirrored_lettering=mirrored), encoding="utf-8")
+    metadata: dict = {"lettering": True}
+    if mirror_states:
+        metadata["mirror_states"] = {"lettered": "lettered_mirror"}
+    drawing = lambda name: {"path": f"parts/{name}.svg", "anchor": [0.5, 1.0]}  # noqa: E731
+    (d / "prop.json").write_text(
+        json.dumps(
+            {
+                "kind": "PropDescriptor",
+                "schema_version": "0.2.0",
+                "name": "mug",
+                "view_box": [0, 0, 400, 400],
+                "origin": [200.0, 200.0],
+                "bones": [
+                    {"name": "root", "x": 200.0, "y": 200.0},
+                    {"name": "grip", "parent": "root", "x": 0.0, "y": -55.0},
+                ],
+                "slots": [{"name": "body", "bone": "root", "draw_order": 0, "attachment": "lettered"}],
+                "skins": {
+                    "default": {
+                        "name": "default",
+                        "slots": {"body": {n: drawing(n) for n in ("lettered", "lettered_mirror")}},
+                    }
+                },
+                "asset_sets": {"label": {"lettered": "lettered", "lettered_mirror": "lettered_mirror"}},
+                "metadata": metadata,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+def _lettering_findings(project: Path) -> list:
+    """The ``lettering`` check's findings on ``project`` (what `an validate` says)."""
+    from an.project import load
+    from an.ir.validate import validate_semantic
+
+    loaded = load(project)
+    return list(
+        validate_semantic(
+            loaded.scene,
+            available_characters=loaded.mall["characters"],
+            available_props=loaded.mall["props"],
+            only={"lettering"},
+        ).findings
+    )
+
+
+def _build_lettered_prop(work: Path) -> Path:
+    """A lettered mug carried by a character who turns round, twice side by side:
+    without ``mirror_states`` on the left (the lettering reads backwards after the
+    turn, and `an validate` says so), with them on the right (it reads in every
+    frame). Refuses to build when the check does not say exactly that."""
+    from cutan.characters import new_character
+
+    s, g = HOLD_SCALE, HOLD_GROUND
+    md = (
+        _meta("A lettered mug carried round a turn", 4.2)
+        + "\n"
+        + f"## Shot mug (cutout)\n\n```yaml shot\nduration: 4.2\nsolve: {{ground: {g}}}\n```\n"
+        + "\n```yaml entities\n"
+        f"- {{kind: prop, id: crate, store: props, ref: crate, stage: {{at: [-105, {g - 150 * 345 / 400 * 0.4:.2f}], scale: 0.4}}}}\n"
+        f"- {{kind: character, id: ned, store: characters, ref: ned, stage: {{at: [-150, {g}], scale: {s}, after: crate}}}}\n"
+        "- {kind: prop, id: mug, store: props, ref: mug, stage: {at: [-105, 0], scale: 0.32, after: ned}, overrides: {held_by: crate@top}}\n"
+        "```\n"
+        "\n```yaml actions\n"
+        "- {kind: grasp, by: ned@hand_r, item: mug, start: 0.3, reach: 0.5}\n"
+        "- {kind: play, target: ned, animation: walk, args: {distance: 220, gait: glide}, start: 1.0, duration: 1.0}\n"
+        f"- {{kind: tween, target: ned, property: scale_x, from: {s}, to: {-s}, duration: 0.4, start: 2.1}}\n"
+        "- {kind: play, target: ned, animation: walk, args: {distance: -80, gait: glide}, start: 2.7, duration: 0.8}\n"
+        "```\n"
+    )
+    clips: list[Path] = []
+    for take, mirror_states in (("without", False), ("with", True)):
+        project = _project(work / take, scene_md=md, characters=())
+        for name in ("ned",):
+            new_character(
+                project / "assets" / "characters",
+                name=name,
+                seed=name,
+                use_dicebear=False,
+                overwrite=True,
+                feet_origin=True,
+            )
+        _hold_props(project)
+        _lettered_mug(project, mirror_states=mirror_states)
+        findings = _lettering_findings(project)
+        said = [f.description for f in findings if "has lettering and is drawn mirrored" in f.description]
+        if mirror_states == bool(said):
+            raise RuntimeError(
+                f"the {take!r} take's lettering check should {'not ' if mirror_states else ''}warn; it said {said!r}"
+            )
+        clips.append(_render(project, strict_assets=True))
+    out = work / "side_by_side.mp4"
+    subprocess.run(
+        [
+            "ffmpeg", "-v", "error", "-y",
+            "-i", str(clips[0]), "-i", str(clips[1]),
+            "-filter_complex", "[0:v][1:v]hstack=inputs=2",
+            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", str(out),
+        ],
+        check=True,
+    )
+    return out
+
+
 DEMOS: tuple[Demo, ...] = (
     Demo(
         slug="text-to-video",
@@ -3292,6 +3432,31 @@ DEMOS: tuple[Demo, ...] = (
             "`ned@hand_r` is named by `cutan.characters.hands`."
         ),
         build=_build_holds,
+    ),
+    Demo(
+        slug="lettered-prop",
+        title="Lettering that reads after a turn: mirror states",
+        shows=(
+            "Ned takes a \"BEST DAD\" mug off a crate, walks, turns round and walks back. "
+            "Twice, side by side: on the **left** the mug's art has no mirror state, so "
+            "once Ned turns the mug is drawn mirrored with him and its lettering reads "
+            "backwards (and `an validate` warns `has lettering and is drawn mirrored`); "
+            "on the **right** the art declares one, and the stage swaps to the mirror "
+            "drawing from the first frame the mug is mirrored, so the words read in every "
+            "frame while the handle still swaps sides. Narrower than it looks: the mirror "
+            "drawing is art someone supplies (here, the same SVG with only the lettering "
+            "flipped about its centre); the stage picks between drawings, it never "
+            "un-mirrors text by itself, and a sign seen edge-on mid-turn is not drawn."
+        ),
+        how=(
+            "In the mug's `prop.json`: a swap set `asset_sets: {label: {lettered: …, "
+            "lettered_mirror: …}}` and `metadata: {lettering: true, mirror_states: "
+            "{lettered: lettered_mirror}}`. Nothing in the scene names it: the core's "
+            "`mirror_states` compile pass (`an/stage/mirror_states.py`, an#819) writes the "
+            "swap wherever the drawing's net x scale is negative (held, placed, fallen, "
+            "flipped); the `lettering` check is `an/verify/constraints.py`."
+        ),
+        build=_build_lettered_prop,
     ),
 )
 
