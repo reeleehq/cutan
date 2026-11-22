@@ -69,13 +69,20 @@ class PartSpec:
 
 @dataclass
 class Part:
-    """One lifted part: its RGBA image, its pivot in that image, where it sits in the carving."""
+    """One lifted part: its RGBA image, its pivot in that image, where it sits in the carving.
+
+    ``source``: the part's own provenance when its pixels come from elsewhere than
+    the carving's source (a picture set in a carved frame, :func:`~cutan.carve.framed`);
+    ``None``, the carving's. :func:`~cutan.carve.write_prop` writes it on the part's
+    attachment, so ``an credits`` lists it beside the prop's own.
+    """
 
     name: str
     image: Image.Image
     pivot: Point
     origin: Point
     draw_order: int
+    source: Any = None
 
     @property
     def anchor(self) -> tuple[float, float]:
