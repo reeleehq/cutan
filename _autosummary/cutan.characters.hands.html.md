@@ -28,8 +28,9 @@ working when the rig gains hand bones.
 
 ### Functions
 
-| [`character_landmarks`](#cutan.characters.hands.character_landmarks)(desc)   | `{hand: (slot, point)}` for a character descriptor: the slot whose part holds things for that hand, and the point on it (a fraction of its drawing, or `None`: its far end).   |
-|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`character_landmarks`](#cutan.characters.hands.character_landmarks)(desc)    | `{hand: (slot, point)}` for a character descriptor: the slot whose part holds things for that hand, and the point on it (a fraction of its drawing, or `None`: its far end).   |
+|-------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`far_slot`](#cutan.characters.hands.far_slot)(bones, slots, limb) | The slot at the far end of `limb`'s chain: the deepest slot whose bone is under the bone of the `limb` slot (`limb` itself when none is).                                      |
 
 ### cutan.characters.hands.HANDS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'hand_l': 'arm_l', 'hand_r': 'arm_r'}*
 
@@ -55,3 +56,18 @@ or `None`: its far end).
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)]]
+
+### cutan.characters.hands.far_slot(bones, slots, limb)
+
+The slot at the far end of `limb`’s chain: the deepest slot whose bone is
+under the bone of the `limb` slot (`limb` itself when none is).
+
+```pycon
+>>> bones = {"a": {"name": "a"}, "b": {"name": "b", "parent": "a"}}
+>>> slots = {"s": {"name": "s", "bone": "a"}, "t": {"name": "t", "bone": "b"}}
+>>> far_slot(bones, slots, "s")
+'t'
+```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

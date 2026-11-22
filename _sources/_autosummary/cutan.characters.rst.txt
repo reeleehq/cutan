@@ -54,6 +54,7 @@ cutan.characters
    dicebear
    drawn
    factory
+   feet
    framing
    hands
    idle

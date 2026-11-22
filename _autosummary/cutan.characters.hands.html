@@ -171,6 +171,9 @@ working when the rig gains hand bones.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cutan.characters.hands.character_landmarks" title="cutan.characters.hands.character_landmarks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">character_landmarks</span></code></a>(desc)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{hand:</span> <span class="pre">(slot,</span> <span class="pre">point)}</span></code> for a character descriptor: the slot whose part holds things for that hand, and the point on it (a fraction of its drawing, or <code class="docutils literal notranslate"><span class="pre">None</span></code>: its far end).</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cutan.characters.hands.far_slot" title="cutan.characters.hands.far_slot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">far_slot</span></code></a>(bones, slots, limb)</p></td>
+<td><p>The slot at the far end of <code class="docutils literal notranslate"><span class="pre">limb</span></code>'s chain: the deepest slot whose bone is under the bone of the <code class="docutils literal notranslate"><span class="pre">limb</span></code> slot (<code class="docutils literal notranslate"><span class="pre">limb</span></code> itself when none is).</p></td>
+</tr>
 </tbody>
 </table>
 <dl class="py data">
@@ -201,12 +204,30 @@ or <code class="docutils literal notranslate"><span class="pre">None</span></cod
 </dd>
 </dl>
 </dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="cutan.characters.hands.far_slot">
+<span class="sig-prename descclassname"><span class="pre">cutan.characters.hands.</span></span><span class="sig-name descname"><span class="pre">far_slot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cutan/characters/hands.html#far_slot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.characters.hands.far_slot" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.characters.hands.far_slot'">¶</a></dt>
+<dd><p>The slot at the far end of <code class="docutils literal notranslate"><span class="pre">limb</span></code>’s chain: the deepest slot whose bone is
+under the bone of the <code class="docutils literal notranslate"><span class="pre">limb</span></code> slot (<code class="docutils literal notranslate"><span class="pre">limb</span></code> itself when none is).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">bones</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"a"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"a"</span><span class="p">},</span> <span class="s2">"b"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"parent"</span><span class="p">:</span> <span class="s2">"a"</span><span class="p">}}</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">slots</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"s"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"s"</span><span class="p">,</span> <span class="s2">"bone"</span><span class="p">:</span> <span class="s2">"a"</span><span class="p">},</span> <span class="s2">"t"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"t"</span><span class="p">,</span> <span class="s2">"bone"</span><span class="p">:</span> <span class="s2">"b"</span><span class="p">}}</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">far_slot</span><span class="p">(</span><span class="n">bones</span><span class="p">,</span> <span class="n">slots</span><span class="p">,</span> <span class="s2">"s"</span><span class="p">)</span>
+</span><span id="line-4"><span class="go">'t'</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
 <li><a :data-current="activeSection === '#cutan.characters.hands.HANDS'" class="reference internal" href="#cutan.characters.hands.HANDS"><code class="docutils literal notranslate"><span class="pre">HANDS</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.characters.hands.character_landmarks'" class="reference internal" href="#cutan.characters.hands.character_landmarks"><code class="docutils literal notranslate"><span class="pre">character_landmarks()</span></code></a></li>
+<li><a :data-current="activeSection === '#cutan.characters.hands.far_slot'" class="reference internal" href="#cutan.characters.hands.far_slot"><code class="docutils literal notranslate"><span class="pre">far_slot()</span></code></a></li>
 </ul>
 </div>
 </aside>
@@ -220,7 +241,7 @@ or <code class="docutils literal notranslate"><span class="pre">None</span></cod
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=cdca99f8"></script>
+<script src="../_static/documentation_options.js?v=fa321392"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

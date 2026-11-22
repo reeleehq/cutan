@@ -86,7 +86,7 @@ cutan#91). Pushed with the project, so it is a key of the store too.
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
-### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 17*
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 18*
 
 The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
 it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
@@ -113,6 +113,7 @@ Level 14: `EntityKind.shot_sizes` (cutan#106), the rig’s own bands for a viewp
 Level 15: `an.project.gitignore_matcher` (an#725, cutan#185); also the first level
 after `JsonSidecarStore.write_sidecar` (an#688, cutan#181), `phone_alphabet_of` (an#721).
 Level 17: `an.ir.world.planes_at_infinity` (an#735), the far-plate critic’s set (cutan#177).
+Level 18: `EntityKind.contacts` (an#519), a character’s feet for the support check (cutan#201).
 
 ### cutan.require_an()
 

@@ -15,4 +15,5 @@ cutan.characters.hands
    .. autosummary::
    
       character_landmarks
+      far_slot
    

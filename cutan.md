@@ -1,4 +1,4 @@
-> built 2026-11-22 11:19 UTC from 138764f (main) · cutan 0.0.121. Details: build_info.json
+> built 2026-11-22 11:38 UTC from 4753907 (main) · cutan 0.0.122. Details: build_info.json
 
 # index.html.md
 
@@ -859,7 +859,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'rect', 'mouth', 'eye', 'ellipse'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'rect', 'ellipse'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'mouth', 'rect', 'ellipse', 'eye'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -6018,6 +6018,77 @@ slots a rig has (a rig without the eye stack has no pupils to pose).
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), SlotPose]]
 
 
+# _autosummary/cutan.characters.feet.html.md
+
+# cutan.characters.feet
+
+A character’s feet as named points: `paul@foot_l` (an#519, cutan#201).
+
+The core’s support check (`{type: support, a: paul, b: ground}`, an#797) needs
+the points of a body that touch what it stands on. The core derives them from
+the rig’s origin or its ink when the genre names none; a cut-out character’s rig
+contract names them: its legs are the slots `leg_l` and `leg_r`, so the genre
+gives the core `foot_l` / `foot_r`
+(`an.genres.EntityKind.contacts`), as [`cutan.characters.hands`](_autosummary/cutan.characters.hands.html.md#module-cutan.characters.hands) gives
+it the hands:
+
+- a rig with a `foot_l` / `foot_r` BONE needs nothing from here (the core
+  reads a bone as a point first);
+- a rig with a `foot_l` / `foot_r` SLOT (a drawn shoe) stands on the bottom
+  centre of that drawing, its sole;
+- otherwise the foot is the far end of the last part of the leg’s chain, from
+  its pivot: the leg’s drawn bottom. A factory rig has no foot bone, so this is
+  its foot; for a leg that swings from the hip it sweeps an arc, so a hip-swing
+  walk’s feet leave the floor at the contact pose by `L * (1 - cos(stride))`
+  (the geometry of a cut-out walk, recorded in cutan#201).
+
+A rig with no leg slots gives nothing and the core falls to the rig’s origin.
+
+### Module Attributes
+
+| [`FEET`](_autosummary/cutan.characters.feet.html.md#cutan.characters.feet.FEET)      | The feet the genre names, and the leg slot each one ends (the rig contract's leg names, `cutan.motion.WALK_LEG_NAMES`).   |
+|------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| [`FOOT_SOLE`](_autosummary/cutan.characters.feet.html.md#cutan.characters.feet.FOOT_SOLE) | the bottom centre of its drawing, the sole.                                                                               |
+
+### Functions
+
+| [`character_contacts`](_autosummary/cutan.characters.feet.html.md#cutan.characters.feet.character_contacts)(desc)   | `{foot: (slot, point)}` for a character descriptor: the slot whose part touches the ground for that foot, and the point on it (a fraction of its drawing, or `None`: its far end from its pivot).   |
+|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+### cutan.characters.feet.FEET *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'foot_l': 'leg_l', 'foot_r': 'leg_r'}*
+
+The feet the genre names, and the leg slot each one ends (the rig contract’s
+leg names, `cutan.motion.WALK_LEG_NAMES`).
+
+### cutan.characters.feet.FOOT_SOLE *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]* *= (0.5, 1.0)*
+
+the bottom centre of its drawing, the sole.
+
+* **Type:**
+  Where a drawn foot stands
+
+### cutan.characters.feet.character_contacts(desc)
+
+`{foot: (slot, point)}` for a character descriptor: the slot whose part
+touches the ground for that foot, and the point on it (a fraction of its
+drawing, or `None`: its far end from its pivot).
+
+```pycon
+>>> rig = {"bones": [{"name": "root"}, {"name": "leg_l", "parent": "root"}],
+...        "slots": [{"name": "leg_l", "bone": "leg_l"}]}
+>>> character_contacts(rig)
+{'foot_l': ('leg_l', None)}
+>>> rig["slots"].append({"name": "foot_l", "bone": "leg_l"})
+>>> character_contacts(rig)["foot_l"]
+('foot_l', (0.5, 1.0))
+>>> character_contacts({"bones": [], "slots": []})
+{}
+```
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)]]
+
+
 # _autosummary/cutan.characters.framing.html.md
 
 # cutan.characters.framing
@@ -6111,8 +6182,9 @@ working when the rig gains hand bones.
 
 ### Functions
 
-| [`character_landmarks`](_autosummary/cutan.characters.hands.html.md#cutan.characters.hands.character_landmarks)(desc)   | `{hand: (slot, point)}` for a character descriptor: the slot whose part holds things for that hand, and the point on it (a fraction of its drawing, or `None`: its far end).   |
-|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`character_landmarks`](_autosummary/cutan.characters.hands.html.md#cutan.characters.hands.character_landmarks)(desc)    | `{hand: (slot, point)}` for a character descriptor: the slot whose part holds things for that hand, and the point on it (a fraction of its drawing, or `None`: its far end).   |
+|-------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`far_slot`](_autosummary/cutan.characters.hands.html.md#cutan.characters.hands.far_slot)(bones, slots, limb) | The slot at the far end of `limb`'s chain: the deepest slot whose bone is under the bone of the `limb` slot (`limb` itself when none is).                                      |
 
 ### cutan.characters.hands.HANDS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {'hand_l': 'arm_l', 'hand_r': 'arm_r'}*
 
@@ -6138,6 +6210,21 @@ or `None`: its far end).
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)]]
+
+### cutan.characters.hands.far_slot(bones, slots, limb)
+
+The slot at the far end of `limb`’s chain: the deepest slot whose bone is
+under the bone of the `limb` slot (`limb` itself when none is).
+
+```pycon
+>>> bones = {"a": {"name": "a"}, "b": {"name": "b", "parent": "a"}}
+>>> slots = {"s": {"name": "s", "bone": "a"}, "t": {"name": "t", "bone": "b"}}
+>>> far_slot(bones, slots, "s")
+'t'
+```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 
 # _autosummary/cutan.characters.html.md
@@ -6924,6 +7011,7 @@ namespace as the default, so the output is a valid standalone SVG.
 | [`dicebear`](_autosummary/cutan.characters.dicebear.html.md#module-cutan.characters.dicebear)           | DiceBear HTTP API client + best-effort post-processing.                                               |
 | [`drawn`](_autosummary/cutan.characters.drawn.html.md#module-cutan.characters.drawn)                 | What the character factory wrote, as it wrote it: the in-memory log behind its record of drawn bytes. |
 | [`factory`](_autosummary/cutan.characters.factory.html.md#module-cutan.characters.factory)             | High-level entry points: build and inspect a character.                                               |
+| [`feet`](_autosummary/cutan.characters.feet.html.md#module-cutan.characters.feet)                   | A character's feet as named points: `paul@foot_l` (an#519, cutan#201).                                |
 | [`framing`](_autosummary/cutan.characters.framing.html.md#module-cutan.characters.framing)             | Shot sizes from a character's own rig: where a close-up and a medium shot cut THIS build (cutan#106). |
 | [`hands`](_autosummary/cutan.characters.hands.html.md#module-cutan.characters.hands)                 | A character's hands as named points: `ned@hand_r` (an#502, reeleehq/cutan#104).                       |
 | [`idle`](_autosummary/cutan.characters.idle.html.md#module-cutan.characters.idle)                   | Idle animation factories: breath, blink, weight-shift.                                                |
@@ -12325,7 +12413,7 @@ cutan#91). Pushed with the project, so it is a key of the store too.
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
-### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 17*
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 18*
 
 The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
 it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
@@ -12352,6 +12440,7 @@ Level 14: `EntityKind.shot_sizes` (cutan#106), the rig’s own bands for a viewp
 Level 15: `an.project.gitignore_matcher` (an#725, cutan#185); also the first level
 after `JsonSidecarStore.write_sidecar` (an#688, cutan#181), `phone_alphabet_of` (an#721).
 Level 17: `an.ir.world.planes_at_infinity` (an#735), the far-plate critic’s set (cutan#177).
+Level 18: `EntityKind.contacts` (an#519), a character’s feet for the support check (cutan#201).
 
 ### cutan.require_an()
 
@@ -16446,7 +16535,7 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-11-22 11:19 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/138764fa0852bed781bdfde1ae8d3e8232e240ee"><code>138764f</code></a> on branch <code>main</code>, for **cutan 0.0.121** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 11:38 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/4753907f524d7f518adb8226a184e81f47d3aa6d"><code>4753907</code></a> on branch <code>main</code>, for **cutan 0.0.122** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -16455,7 +16544,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/138764fa0852bed781bdfde1ae8d3e8232e240ee"><code>138764fa0852bed781bdfde1ae8d3e8232e240ee</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/4753907f524d7f518adb8226a184e81f47d3aa6d"><code>4753907f524d7f518adb8226a184e81f47d3aa6d</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -16466,9 +16555,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/45015794861">45015794861</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/45017724717">45017724717</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>138764fa0852bed781bdfde1ae8d3e8232e240ee</code> (in the history of the built commit) |
+| Event commit | <code>4753907f524d7f518adb8226a184e81f47d3aa6d</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -16493,13 +16582,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.121/">0.0.121</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.122/">0.0.122</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 138764fa0852bed781bdfde1ae8d3e8232e240ee
+git checkout 4753907f524d7f518adb8226a184e81f47d3aa6d
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

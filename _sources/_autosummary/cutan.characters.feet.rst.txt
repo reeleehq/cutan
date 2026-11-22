@@ -1,0 +1,19 @@
+cutan.characters.feet
+=====================
+
+.. automodule:: cutan.characters.feet
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      FEET
+      FOOT_SOLE
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      character_contacts
+   
