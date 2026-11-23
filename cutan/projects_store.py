@@ -73,7 +73,6 @@ DEFAULT_PUSH_EXCLUDES: tuple[str, ...] = tuple(
 )
 
 
-
 @dataclass(frozen=True)
 class ProjectsStoreSettings:
     """Which backend holds the projects, and its S3 coordinates."""
