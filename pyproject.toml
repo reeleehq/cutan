@@ -32,6 +32,7 @@ classifiers = [
 dependencies = [
     "an",
     "dol",
+    "lacing>=0.0.120",  # lacing.id_slug: project ids and art names (lacing#165)
     "mixing>=0.0.111",
     "pyyaml",
     "numpy",

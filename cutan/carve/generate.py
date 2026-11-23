@@ -59,6 +59,7 @@ from PIL import Image
 from dol import atomic_write
 
 from an.ir.assets import AssetSource, license_class
+from lacing.id_slug import is_id_slug
 
 from cutan.carve.files import save_png
 
@@ -106,8 +107,6 @@ PROP_KEYS: tuple[str, ...] = _CARVE_KEYS + _WRITE_KEYS
 #: carve's ``keep`` values.
 _KEEPS: tuple[str, ...] = ("point", "largest", "all")
 _SIZE = re.compile(r"^([1-9]\d*x[1-9]\d*|auto)$")
-#: An art name is a file name: no folder, no hidden file.
-_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 Background = Literal["opaque", "transparent"]
 #: ``generator(prompt, *, size, background, quality, model) -> PIL image`` (or a
@@ -135,7 +134,9 @@ class ArtSpec:
     prop: Optional[Mapping[str, Any]] = None
 
     def __post_init__(self):
-        if not isinstance(self.name, str) or not _NAME.match(self.name):
+        # An art name is a file name, no folder and no hidden file: the federation
+        # id-slug rule (lacing#165).
+        if not is_id_slug(self.name):
             raise ValueError(
                 f"art {self.name!r}: a name is a file name (letters, digits, . _ -)"
             )

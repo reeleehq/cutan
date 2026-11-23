@@ -33,7 +33,6 @@ from dol import atomic_write
 import hashlib
 import json
 import os
-import re
 from collections.abc import MutableMapping
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -41,6 +40,7 @@ from pathlib import Path
 from typing import Iterable, Mapping, Optional
 
 from an.project import PROJECT_GITIGNORE, gitignore_matcher
+from lacing.id_slug import check_id_slug
 
 from . import LIBRARY_NAME, PROJECT_STORE_RECORD
 
@@ -72,8 +72,6 @@ DEFAULT_PUSH_EXCLUDES: tuple[str, ...] = tuple(
     )
 )
 
-#: A project id is one folder name (the rule of ``an.library.root.project_dir``).
-_PROJECT_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 
 
 @dataclass(frozen=True)
@@ -166,13 +164,11 @@ def _project_prefix(project_id: str) -> str:
     'alice-and-bob/'
     >>> _project_prefix("../escape")  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
-    ValueError: ...
+    lacing.id_slug.IdSlugError: ...
     """
-    if not _PROJECT_ID.fullmatch(project_id or ""):
-        raise ValueError(
-            f"project id {project_id!r} must be one folder name "
-            "(letters, digits, '.', '_' or '-'; no path separators)"
-        )
+    # A project id is one folder name: the federation id-slug rule (lacing#165),
+    # the one ``an.library.root.project_dir`` applies too.
+    check_id_slug(project_id, label="project id", reason="it is one folder name")
     return f"{project_id}/"
 
 

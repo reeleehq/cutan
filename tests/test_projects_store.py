@@ -61,6 +61,9 @@ def test_a_project_id_is_one_folder_name(tmp_path):
         push_project("a/b", folder=tmp_path, settings=S3, store={})
     with pytest.raises(ValueError, match="one folder name"):
         new_project_dir("", default=tmp_path, settings=ProjectsStoreSettings())
+    # the federation id-slug rule (lacing#165): a trailing newline is not a folder name
+    with pytest.raises(ValueError, match="one folder name"):
+        push_project("abc\n", folder=tmp_path, settings=S3, store={})
 
 
 def test_the_record_is_a_persisted_identifier():
