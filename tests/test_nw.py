@@ -132,3 +132,31 @@ def test_the_film_generator_id_follows_lacings_grammar():
     from cutan.nw import FILM_GENERATOR
 
     assert generator_id_findings(FILM_GENERATOR) == []
+
+
+def test_render_quotes_free_until_the_scene_speaks_with_a_paid_voice(tmp_path, monkeypatch):
+    """A host prices ``render`` before running it. The answer is an's: the scene's
+    lines, each with the provider the render would use."""
+    import nw
+
+    import an.audio
+    from cutan.nw import CUTOUT_ANIMATION_SLUG
+
+    nw.create_genre_project(CUTOUT_ANIMATION_SLUG, "u@x", "p", projects_dir=tmp_path)
+    proj = nw.Project(tmp_path / "p")
+    render = nw.genre_op(CUTOUT_ANIMATION_SLUG, "render")
+    assert render.spends and render.quote is not None
+    # the starter scene speaks with free voices (the quote itself first: price()
+    # reads any exception as unknown, which would hide why)
+    assert render.quote(proj) == 0.0
+    assert render.price(proj, {}).to_dict() == {"usd": 0.0, "status": "quoted"}
+
+    seen = []
+
+    def paid(scene, mall, **kw):
+        seen.append((len(scene.timeline), "voices" in mall))
+        return None
+
+    monkeypatch.setattr(an.audio, "speech_quote", paid)
+    assert render.price(proj, {"force_render": True}).to_dict() == {"usd": None, "status": "unknown"}
+    assert seen and seen[0][1]  # an was handed the project's own scene and mall
