@@ -72,6 +72,7 @@ from cutan.carve.mattes import (
 )
 from cutan.carve.framing import DropShadow, framed, nine_slice, open_frame
 from cutan.carve.parts import Part, PartSet, PartSpec, split_parts
+from cutan.carve.plate import FILLS, PlateQuality, plate
 from cutan.carve.prop import STATE_SET, PropState, write_prop
 from cutan.carve.provenance import frame_source, youtube_id
 from cutan.carve.superres import (
@@ -93,6 +94,7 @@ __all__ = [
     "Face",
     "FlatColour",
     "framed",
+    "plate",
     "nine_slice",
     "open_frame",
     "Focus",
@@ -102,8 +104,10 @@ __all__ = [
     "Levels",
     "Matte",
     "MissingDependencyError",
+    "FILLS",
     "Part",
     "PartSet",
+    "PlateQuality",
     "PartSpec",
     "Polygon",
     "RealESRGAN",
