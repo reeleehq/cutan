@@ -978,3 +978,161 @@ def test_a_scaled_frame_maps_its_opening_and_scales_its_moulding():
         bands[0],
         bands[1],
     )  # the picture sits at the halved band
+
+
+# --- a backdrop plate from frames a subject moves in front of (cutan#206) ------
+
+
+def _wall(h=40, w=60):
+    """A red wall with vertical darker folds every 6 px."""
+    back = np.zeros((h, w, 3), np.uint8)
+    back[:] = (200, 40, 40)
+    back[:, ::6] = (120, 20, 20)
+    return back
+
+
+def _walker(back, k, *, stay=None):
+    f = back.copy()
+    f[10:30, 6 * k : 6 * k + 10] = (30, 90, 220)  # a blue figure walking right
+    if stay is not None:
+        x0, x1 = stay
+        f[18:40, x0:x1] = (240, 240, 240)  # a white caption that never moves
+    return f
+
+
+def test_a_plate_is_the_backdrop_with_the_passer_by_gone():
+    from cutan.carve import plate
+
+    back = _wall()
+    p = plate([_walker(back, k) for k in range(7)])
+    assert (np.asarray(p.image)[..., :3] == back).all()
+    assert p.quality.filled_share == 0 and p.quality.warnings() == []
+    assert p.quality.as_dict()["frames_used"] == 7
+
+
+def test_what_no_frame_shows_is_filled_and_said_to_be():
+    from cutan.carve import plate
+
+    back = _wall()
+    frames = [_walker(back, k, stay=(24, 36)) for k in range(7)]
+
+    def red(rgb, hint):  # the backdrop: red-dominant
+        r, g, b = (rgb[..., i].astype(int) for i in range(3))
+        return ((r - g > 60) & (r - b > 60)).astype(np.float32)
+
+    cols = plate(frames, backdrop=red, grow=1, fill="columns")
+    filled = cols.meta["_filled"]
+    assert cols.meta["filled_box"] == [23, 17, 37, 40]  # the caption, grown by 1
+    assert filled[18:40, 24:36].all() and not filled[:12].any()
+    assert cols.quality.filled_share == pytest.approx(filled.mean())
+    assert any("no frame shows" in w for w in cols.quality.warnings())
+    # columns continues the folds: a fold column stays dark where it was filled
+    got = np.asarray(cols.image)[..., :3]
+    assert (got[25, 30] == back[25, 30]).all()  # x 30 is a fold
+    assert (got[25, 28] == back[25, 28]).all()
+
+    transparent = plate(frames, backdrop=red, grow=1, fill=None)
+    a = np.asarray(transparent.image)[..., 3]
+    assert (a[filled] == 0).all() and (a[~filled] == 255).all()
+
+    painted = plate(frames, backdrop=red, grow=1)  # inpaint, the default
+    assert np.asarray(painted.image)[..., 3].min() == 255
+    assert painted.quality.fill == "inpaint"
+
+
+def test_the_alignment_gate_turns_a_moved_camera_away():
+    from cutan.carve import plate
+
+    back = _wall()
+    frames = [_walker(back, k) for k in range(5)]
+    frames.append(np.roll(_wall(), 3, axis=1))  # the camera panned
+    p = plate(frames, align_box=(0, 32, 60, 40))
+    assert p.quality.frames_rejected == (5,) and p.quality.frames_used == 5
+    assert any("alignment gate" in w for w in p.quality.warnings())
+    with pytest.raises(ValueError, match="passed the alignment gate"):
+        plate(frames, align_box=(0, 32, 60, 40), min_frames=6)
+    with pytest.raises(ValueError, match="differ in size"):
+        plate([back, back[:20]])
+
+
+def test_a_plate_is_written_as_a_prop_with_its_provenance(tmp_path):
+    from cutan.carve import plate
+
+    back = _wall()
+    src = frame_source(
+        "https://www.youtube.com/watch?v=abcdefghijk",
+        t=2,
+        license="all-rights-reserved",
+    )
+    p = plate(
+        [_walker(back, k) for k in range(7)],
+        source=src,
+        crop=(0, 0, 60, 30),
+        point=(30, 0),
+    )
+    assert p.size == (60, 30) and p.anchor == (0.5, 0.0)
+    doc = write_prop(p, tmp_path / "wall", max_side=100)
+    carve_rec = doc.source.extra["carve"]
+    assert carve_rec["mode"] == "plate" and carve_rec["quality"]["frames_used"] == 7
+    assert carve_rec["recipe"]["plate"]["crop"] == [0, 0, 60, 30]
+    meta = json.loads((tmp_path / "wall" / "prop.json").read_text())["metadata"][
+        "carve"
+    ]
+    assert "_filled" not in meta and meta["filled_box"] is None
+
+
+def test_a_subject_matte_removes_what_it_marks_with_its_own_coordinates_and_crop():
+    """A subject= matte marks the subject (alpha 1), as every strategy does; its
+    coordinates are source px even when the plate is cropped."""
+    from cutan.carve import plate
+    from cutan.carve.mattes import Polygon
+
+    back = _wall()
+    frames = [_walker(back, k, stay=(24, 36)) for k in range(7)]
+    around_caption = Polygon([(23, 17), (37, 17), (37, 40), (23, 40)])
+    p = plate(
+        frames, subject=around_caption, grow=0, crop=(10, 0, 60, 40), fill="columns"
+    )
+    assert p.meta["filled_box"] == [13, 17, 27, 40]  # the caption, in the crop's pixels
+    got = np.asarray(p.image)[..., :3]
+    assert (got == back[:, 10:60]).all()  # walker outvoted, caption region continued
+    assert p.recipe["plate"]["subject"]["matte"] == "polygon"
+
+
+def test_a_column_no_frame_shows_is_inpainted_not_left_black():
+    from cutan.carve import plate
+
+    back = _wall()
+    frames = []
+    for k in range(5):
+        f = _walker(back, k)
+        f[:, 40:44] = (250, 250, 250)  # a full-height bar that never moves
+        frames.append(f)
+
+    def red(rgb, hint):
+        r, g, b = (rgb[..., i].astype(int) for i in range(3))
+        return ((r - g > 60) & (r - b > 60)).astype(np.float32)
+
+    p = plate(frames, backdrop=red, grow=0, fill="columns")
+    got = np.asarray(p.image)
+    assert got[:, 40:44, 3].min() == 255
+    assert got[:, 40:44, 0].min() > 60  # red-ish from its neighbours, not black
+
+
+def test_bad_references_crops_and_numpy_boxes():
+    from cutan.carve import plate
+
+    back = _wall()
+    frames = [_walker(back, k) for k in range(5)]
+    with pytest.raises(ValueError, match="reference=9"):
+        plate(frames, reference=9)
+    with pytest.raises(ValueError, match="crop"):
+        plate(frames, crop=(-10, 0, 30, 40))
+    with pytest.raises(ValueError, match="crop"):
+        plate(frames, crop=(0, 0, 100, 40))
+    with pytest.raises(ValueError, match="not both"):
+        plate(frames, backdrop=lambda r, h: r[..., 0] > 0, subject="chroma")
+    with pytest.raises(ValueError, match="min_frames=3"):
+        plate(frames[:2])
+    p = plate(frames, align_box=np.array([0, 32, 60, 40]), point=np.array([30.0, 0.0]))
+    json.dumps(p.recipe)  # numpy values come out plain

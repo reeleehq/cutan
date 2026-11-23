@@ -387,7 +387,8 @@ def write_prop(
                 "carve": {
                     "mode": carving.mode,
                     "anchor": list(carving.anchor),
-                    **carving.meta,
+                    # a key starting with "_" is in-memory only (a plate's mask)
+                    **{k: v for k, v in carving.meta.items() if not k.startswith("_")},
                 }
             },
         }
