@@ -20,6 +20,16 @@ path ``an`` measures its box by) and reading where its parts are drawn:
   limited by the subject's width gives every size one distance, in an:
   reeleehq/an#732.)
 
+**Columns (``an.genres.API_LEVEL`` 19, an#769, cutan#223).** Where the ``an`` in use
+accepts them, each band also names its own columns, ``(top, bottom, left, right)``,
+as fractions of the box's width from its left: the close-up the head's (with what is
+drawn under it), the medium the head's and the torso's together. ``an`` then frames
+that true width, centred on it, so a close-up stays on the head when an arm or a
+prop moves the box's centre, and it applies its own crop policy (a partial size
+stays a jump-cut step nearer than the next wider one, cropping only the sides), so
+the cap above is not applied. An older ``an`` drops 4-tuples, so it gets the
+2-tuples and the cap, as before.
+
 ``wide`` and ``full`` stay the table's (the whole figure). A rig with no part
 named ``head`` or ``torso`` (the art-package contract's names) gives no band for
 the size that needs it, and the table applies.
@@ -120,12 +130,54 @@ def _lowest(
     return max(ys) if ys else None
 
 
+#: The first ``an.genres.API_LEVEL`` that accepts a band's own columns (an#769).
+COLUMNS_API_LEVEL: int = 19
+
+
+def _an_takes_columns() -> bool:
+    import an.genres
+
+    return getattr(an.genres, "API_LEVEL", 0) >= COLUMNS_API_LEVEL
+
+
+def _columns(
+    parts: Mapping[str, tuple[float, float, float, float]],
+    names: tuple[tuple[str, bool], ...],
+    *,
+    x0: float,
+    width: float,
+) -> tuple[float, float] | None:
+    """``(left, right)`` as fractions of ``width`` from ``x0``: the horizontal extent of the
+    shallowest part of each ``(name, subtree)`` of ``names``, with everything drawn under
+    it when ``subtree`` (the head's, as for the chin) and alone otherwise (the torso's:
+    arms hang from it); ``None`` when none is drawn or the extent is empty."""
+    xs: list[tuple[float, float]] = []
+    for name, subtree in names:
+        paths = sorted((p for p in parts if name in p.split("/")), key=lambda p: p.count("/"))
+        if not paths:
+            continue
+        segments = paths[0].split("/")
+        root = "/".join(segments[: segments.index(name) + 1])
+        xs += [
+            (b[0], b[2])
+            for p, b in parts.items()
+            if p == root or (subtree and p.startswith(root + "/"))
+        ]
+    if not xs or width <= 0:
+        return None
+    left = min(max(0.0, (min(a for a, _ in xs) - x0) / width), 1.0)
+    right = min(max(0.0, (max(b for _, b in xs) - x0) / width), 1.0)
+    return (left, right) if right > left else None
+
+
 def character_shot_sizes(
     entity: Any, mall: Mapping[str, Any], box: tuple[float, float, float, float]
-) -> dict[str, tuple[float, float]] | None:
+) -> dict[str, tuple[float, ...]] | None:
     """``{size: (top, bottom)}`` for ``entity``'s rig, as fractions of ``box``'s
-    height from its top (``box``: its measured ``(x0, y0, x1, y1)``); ``None``
-    when the rig has neither a head nor a torso to measure."""
+    height from its top (``box``: its measured ``(x0, y0, x1, y1)``), and
+    ``(top, bottom, left, right)`` where the ``an`` in use takes columns
+    (:data:`COLUMNS_API_LEVEL`); ``None`` when the rig has neither a head nor a
+    torso to measure."""
     y0, y1 = float(box[1]), float(box[3])
     height = y1 - y0
     if height <= 0:
@@ -138,15 +190,21 @@ def character_shot_sizes(
     # the head with what is drawn under it; the torso alone (arms hang below it)
     chin = _lowest(parts, HEAD_PART, subtree=True)
     hips = _lowest(parts, TORSO_PART, subtree=False)
-    bands: dict[str, tuple[float, float]] = {}
+    columns = _an_takes_columns()
+    x0, width = float(box[0]), float(box[2]) - float(box[0])
+    head_cols = _columns(parts, ((HEAD_PART, True),), x0=x0, width=width) if columns else None
+    body_cols = (
+        _columns(parts, ((HEAD_PART, True), (TORSO_PART, False)), x0=x0, width=width) if columns else None
+    )
+    bands: dict[str, tuple[float, ...]] = {}
     if hips is not None:
-        bands["medium"] = (0.0, fraction(hips))
+        bands["medium"] = (0.0, fraction(hips)) + (body_cols or ())
     if chin is not None:
         bottom = fraction(chin)
-        if "medium" in bands:
+        if "medium" in bands and not columns:
             from an.verify.constraints import JUMP_CUT_SIZE_RATIO
 
             least = JUMP_CUT_SIZE_RATIO * (1 + SIZE_RATIO_MARGIN)
             bottom = min(bottom, bands["medium"][1] / least)
-        bands["close_up"] = (0.0, bottom)
+        bands["close_up"] = (0.0, bottom) + (head_cols or ())
     return {k: v for k, v in bands.items() if v[1] > v[0]} or None

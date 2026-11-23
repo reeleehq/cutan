@@ -17,6 +17,12 @@ from an.verify.constraints import JUMP_CUT_SIZE_RATIO
 from cutan.characters.framing import _part_boxes, character_shot_sizes
 
 
+def _takes_columns():
+    from cutan.characters.framing import _an_takes_columns
+
+    return _an_takes_columns()
+
+
 @pytest.fixture(scope="module")
 def project():
     with tempfile.TemporaryDirectory() as d:
@@ -45,8 +51,8 @@ def test_a_close_up_ends_at_the_chin_and_a_medium_shot_at_the_hips(project, name
     height = box[3] - box[1]
     chin = (max(b[3] for p, b in parts.items() if p == "head" or p.startswith("head/")) - box[1]) / height
     hips = (parts["torso"][3] - box[1]) / height
-    assert sizes["medium"] == (0.0, pytest.approx(hips))
-    top, bottom = sizes["close_up"]
+    assert sizes["medium"][:2] == (0.0, pytest.approx(hips))
+    top, bottom = sizes["close_up"][:2]
     assert top == 0.0 and bottom <= chin + 1e-9
     assert bottom == pytest.approx(chin) or hips / bottom == pytest.approx(JUMP_CUT_SIZE_RATIO)
     assert set(sizes) <= set(SHOT_SIZES)
@@ -55,10 +61,14 @@ def test_a_close_up_ends_at_the_chin_and_a_medium_shot_at_the_hips(project, name
 @pytest.mark.parametrize("name", ["reg", "tall", "squat", "capped"])
 def test_a_cut_from_medium_to_close_up_is_never_a_jump_cut(project, name):
     sizes = _sizes(project, name)[2]
+    if _takes_columns():  # an's own crop policy holds the step, from the columns (an#769)
+        pytest.skip("an keeps the step itself when bands carry columns")
     assert sizes["medium"][1] / sizes["close_up"][1] >= JUMP_CUT_SIZE_RATIO  # strictly, as an checks
 
 
 def test_a_big_head_hits_the_cap(project):
+    if _takes_columns():
+        pytest.skip("the cap is an's crop policy now, when bands carry columns")
     sizes = _sizes(project, "capped")[2]
     ref, box, _ = _sizes(project, "capped")
     parts = _part_boxes(ref, project.mall)
@@ -86,8 +96,8 @@ def test_the_hips_are_the_torso_part_not_the_arms_nested_under_it(monkeypatch, p
               "torso/head": (-30.0, -100.0, 30.0, -30.0), "torso/head/mouth": (-5.0, -40.0, 5.0, -20.0)}  # fmt: skip
     monkeypatch.setattr(framing, "_part_boxes", lambda entity, mall: nested)
     sizes = character_shot_sizes(ref, project.mall, (-60.0, -100.0, 60.0, 100.0))
-    assert sizes["medium"] == (0.0, 0.7), "the torso's bottom, not the hand's"
-    assert sizes["close_up"] == (0.0, 0.4), "the chin is the mouth below the head box"
+    assert sizes["medium"][:2] == (0.0, 0.7), "the torso's bottom, not the hand's"
+    assert sizes["close_up"][:2] == (0.0, 0.4), "the chin is the mouth below the head box"
 
 
 def test_a_rig_without_a_head_or_torso_leaves_those_sizes_to_the_table(project, monkeypatch):
@@ -98,4 +108,44 @@ def test_a_rig_without_a_head_or_torso_leaves_those_sizes_to_the_table(project, 
     monkeypatch.setattr(framing, "_part_boxes", lambda entity, mall: {})
     assert character_shot_sizes(ref, project.mall, box) is None
     monkeypatch.setattr(framing, "_part_boxes", lambda entity, mall: {"torso": (-40.0, -20.0, 40.0, 40.0)})
-    assert character_shot_sizes(ref, project.mall, box) == {"medium": (0.0, 0.7)}
+    assert {k: v[:2] for k, v in character_shot_sizes(ref, project.mall, box).items()} == {"medium": (0.0, 0.7)}
+
+
+NESTED = {"torso": (-40.0, -20.0, 40.0, 40.0), "torso/arm_l": (-90.0, -20.0, -40.0, 90.0),
+          "torso/head": (-30.0, -100.0, 30.0, -30.0), "torso/head/mouth": (-5.0, -40.0, 5.0, -20.0)}  # fmt: skip
+
+
+def test_the_bands_carry_the_head_s_and_the_body_s_columns(monkeypatch, project):
+    """The close-up is centred on the head and the medium on head and torso, not on the box
+    an arm widens (an#769, cutan#223); an older an gets the 2-tuples."""
+    from cutan.characters import framing
+
+    ref = AssetRef(kind="character", id="x", store="characters", ref="x")
+    monkeypatch.setattr(framing, "_part_boxes", lambda entity, mall: NESTED)
+    box = (-90.0, -100.0, 60.0, 100.0)  # 150 wide: the arm sticks out to the left
+    monkeypatch.setattr(framing, "_an_takes_columns", lambda: True)
+    sizes = character_shot_sizes(ref, project.mall, box)
+    assert sizes["close_up"] == (0.0, 0.4, pytest.approx(60 / 150), pytest.approx(120 / 150))
+    assert sizes["medium"] == (0.0, 0.7, pytest.approx(50 / 150), pytest.approx(130 / 150)), "head and torso, not the arm"
+    monkeypatch.setattr(framing, "_an_takes_columns", lambda: False)
+    old = character_shot_sizes(ref, project.mall, box)
+    assert all(len(v) == 2 for v in old.values())
+
+
+def test_a_real_character_s_close_up_stays_more_than_a_step_nearer_than_its_medium(project):
+    """The acceptance of an#769 from this side: framed by the real an, medium to close-up is no jump cut."""
+    if not _takes_columns():
+        pytest.skip("needs an.genres.API_LEVEL >= 19")
+    from an.ir.schema import Viewpoint, World, WorldMember as WM
+    from an.ir.world import resolve_viewpoint
+    from an.verify.constraints import jump_cut_between
+
+    for name in ("reg", "squat", "capped"):
+        ref, box, sizes = _sizes(project, name)
+        member = WM(kind="character", id=name, store="characters", ref=name, at=(0.0, 0.0, 10.0), height=3.0)
+        eyes = {
+            size: resolve_viewpoint(World(members=[member]), Viewpoint(subject=name, size=size, focal=900.0),
+                                    extents={name: box}, width=1080, height=1920, bands={name: sizes})
+            for size in ("medium", "close_up")
+        }  # fmt: skip
+        assert jump_cut_between(eyes["medium"], eyes["close_up"], [(0.0, 0.0, 10.0)]) is None
