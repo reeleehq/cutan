@@ -153,7 +153,9 @@ def _columns(
     arms hang from it); ``None`` when none is drawn or the extent is empty."""
     xs: list[tuple[float, float]] = []
     for name, subtree in names:
-        paths = sorted((p for p in parts if name in p.split("/")), key=lambda p: p.count("/"))
+        paths = sorted(
+            (p for p in parts if name in p.split("/")), key=lambda p: p.count("/")
+        )
         if not paths:
             continue
         segments = paths[0].split("/")
@@ -192,9 +194,13 @@ def character_shot_sizes(
     hips = _lowest(parts, TORSO_PART, subtree=False)
     columns = _an_takes_columns()
     x0, width = float(box[0]), float(box[2]) - float(box[0])
-    head_cols = _columns(parts, ((HEAD_PART, True),), x0=x0, width=width) if columns else None
+    head_cols = (
+        _columns(parts, ((HEAD_PART, True),), x0=x0, width=width) if columns else None
+    )
     body_cols = (
-        _columns(parts, ((HEAD_PART, True), (TORSO_PART, False)), x0=x0, width=width) if columns else None
+        _columns(parts, ((HEAD_PART, True), (TORSO_PART, False)), x0=x0, width=width)
+        if columns
+        else None
     )
     bands: dict[str, tuple[float, ...]] = {}
     if hips is not None:
