@@ -52,6 +52,7 @@ what is installed). Nothing here is imported by `import cutan`.
 
 | [`framed`](#cutan.carve.framed)(picture, frame, \*, opening[, source, ...])   | `picture` inside `frame`, the frame 9-sliced to the picture's size, as a part set.                                                                                          |
 |-------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`plate`](#cutan.carve.plate)(frames, \*[, backdrop, subject, ...])          | The backdrop behind whatever moves in front of it in `frames` (see the module docstring).                                                                                   |
 | [`nine_slice`](#cutan.carve.nine_slice)(image, bands, inner)                      | `image` resized by 9-slice so the part inside `bands` is `inner` pixels: the corners as they are, the edges stretched along their length, the centre to `inner`.            |
 | [`open_frame`](#cutan.carve.open_frame)(frame, opening)                           | The frame's image with its opening cleared, and the moulding's band widths.                                                                                                 |
 | [`as_matte`](#cutan.carve.as_matte)(matte)                                      | A [`Matte`](#cutan.carve.Matte) from a strategy's name, its recipe, a `Matte`, or any `(rgb, hint) -> alpha` callable.                             |
@@ -73,28 +74,29 @@ what is installed). Nothing here is imported by `import cutan`.
 
 ### Classes
 
-| [`CarveQuality`](#cutan.carve.CarveQuality)(coverage, rim_backdrop_share, ...)   | Signals worth reading before a part is used (cutan#10).                                                                     |
-|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| [`Carving`](#cutan.carve.Carving)(image, anchor, offset, scale, ...[, ...]) | A carved part.                                                                                                              |
-| [`Chroma`](#cutan.carve.Chroma)([hue, width, min_sat, min_val, ramp])      | Key out a saturated backdrop by its hue band (a stage drape, a green screen).                                               |
-| [`DropShadow`](#cutan.carve.DropShadow)([offset, blur, opacity, color])        | A soft shadow of the frame on the wall: its alpha, offset, blurred, at `opacity`.                                           |
-| [`Face`](#cutan.carve.Face)(box[, jaw, score, landmarks])                | A face in an image: its box and, when known, its jaw contour.                                                               |
-| [`FlatColour`](#cutan.carve.FlatColour)([colours, tolerance, softness, ...])   | Key out the backdrop's flat colours, where they are connected to the border.                                                |
-| [`Focus`](#cutan.carve.Focus)([window])                                   | The sharp region of an image whose background is out of focus.                                                              |
-| [`GrabCut`](#cutan.carve.GrabCut)([box, iterations, margin, seed])          | OpenCV's GrabCut inside a box around one object.                                                                            |
-| [`Hint`](#cutan.carve.Hint)([box, point, offset, scale])                 | Where the subject is, in the pixels of the image the matte is given.                                                        |
-| [`InsightFaceLocator`](#cutan.carve.InsightFaceLocator)(\*[, model, min_score, ...])   | Faces and their jaw contours from `insightface` (106 landmarks; 0–32 are the jaw).                                          |
-| [`Levels`](#cutan.carve.Levels)([of, lo, range])                           | Re-map another matte's alpha: `clip((alpha - lo) / range, 0, 1)`.                                                           |
-| [`Matte`](#cutan.carve.Matte)()                                           | Base of the shipped strategies: a name, a recipe, and `&`, `|`, `~`.                                                        |
-| [`Part`](#cutan.carve.Part)(name, image, pivot, origin, draw_order)      | One lifted part: its RGBA image, its pivot in that image, where it sits in the carving.                                     |
-| [`PartSet`](#cutan.carve.PartSet)(carving, base[, parts])                   | A carving split into a base (`None` when every pixel went to a part) and parts.                                             |
-| [`PartSpec`](#cutan.carve.PartSpec)(mask, pivot[, grow, reach])              | What to lift off a carving: a `mask` and the `pivot` it turns about.                                                        |
-| [`Polygon`](#cutan.carve.Polygon)([points, supersample])                    | A hand-given outline, `[(x, y), ...]` in the SOURCE image, anti-aliased.                                                    |
-| [`RealESRGAN`](#cutan.carve.RealESRGAN)([model, path, overlap, session, ...])  | Real-ESRGAN through ONNX Runtime, run in overlapping tiles.                                                                 |
-| [`Rembg`](#cutan.carve.Rembg)([model, post_process])                      | `rembg`'s neural background removal (`pip install "cutan[rembg]"`).                                                         |
-| [`Resample`](#cutan.carve.Resample)([factor, method])                        | Interpolate `factor``x (``cubic`, `linear` or `lanczos`): no new detail, but the matte's resolution is what the part keeps. |
-| [`SuperRes`](#cutan.carve.SuperRes)()                                        | Base of the shipped strategies: a `name`, a whole `factor` and a `recipe()`.                                                |
-| [`PropState`](#cutan.carve.PropState)(art[, unit])                            | One more drawing of a prop's base, for [`write_prop()`](#cutan.carve.write_prop)'s `states=`.           |
+| [`CarveQuality`](#cutan.carve.CarveQuality)(coverage, rim_backdrop_share, ...)   | Signals worth reading before a part is used (cutan#10).                                                                                                                     |
+|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`Carving`](#cutan.carve.Carving)(image, anchor, offset, scale, ...[, ...]) | A carved part.                                                                                                                                                              |
+| [`Chroma`](#cutan.carve.Chroma)([hue, width, min_sat, min_val, ramp])      | Key out a saturated backdrop by its hue band (a stage drape, a green screen).                                                                                               |
+| [`DropShadow`](#cutan.carve.DropShadow)([offset, blur, opacity, color])        | A soft shadow of the frame on the wall: its alpha, offset, blurred, at `opacity`.                                                                                           |
+| [`Face`](#cutan.carve.Face)(box[, jaw, score, landmarks])                | A face in an image: its box and, when known, its jaw contour.                                                                                                               |
+| [`FlatColour`](#cutan.carve.FlatColour)([colours, tolerance, softness, ...])   | Key out the backdrop's flat colours, where they are connected to the border.                                                                                                |
+| [`Focus`](#cutan.carve.Focus)([window])                                   | The sharp region of an image whose background is out of focus.                                                                                                              |
+| [`GrabCut`](#cutan.carve.GrabCut)([box, iterations, margin, seed])          | OpenCV's GrabCut inside a box around one object.                                                                                                                            |
+| [`Hint`](#cutan.carve.Hint)([box, point, offset, scale])                 | Where the subject is, in the pixels of the image the matte is given.                                                                                                        |
+| [`InsightFaceLocator`](#cutan.carve.InsightFaceLocator)(\*[, model, min_score, ...])   | Faces and their jaw contours from `insightface` (106 landmarks; 0–32 are the jaw).                                                                                          |
+| [`Levels`](#cutan.carve.Levels)([of, lo, range])                           | Re-map another matte's alpha: `clip((alpha - lo) / range, 0, 1)`.                                                                                                           |
+| [`Matte`](#cutan.carve.Matte)()                                           | Base of the shipped strategies: a name, a recipe, and `&`, `|`, `~`.                                                                                                        |
+| [`Part`](#cutan.carve.Part)(name, image, pivot, origin, draw_order)      | One lifted part: its RGBA image, its pivot in that image, where it sits in the carving.                                                                                     |
+| [`PartSet`](#cutan.carve.PartSet)(carving, base[, parts])                   | A carving split into a base (`None` when every pixel went to a part) and parts.                                                                                             |
+| [`PlateQuality`](#cutan.carve.PlateQuality)(coverage, rim_backdrop_share, ...)   | A plate's signals: a [`CarveQuality`](#cutan.carve.CarveQuality) (its matte signals are moot for a plate: the whole region is kept) plus how it was made. |
+| [`PartSpec`](#cutan.carve.PartSpec)(mask, pivot[, grow, reach])              | What to lift off a carving: a `mask` and the `pivot` it turns about.                                                                                                        |
+| [`Polygon`](#cutan.carve.Polygon)([points, supersample])                    | A hand-given outline, `[(x, y), ...]` in the SOURCE image, anti-aliased.                                                                                                    |
+| [`RealESRGAN`](#cutan.carve.RealESRGAN)([model, path, overlap, session, ...])  | Real-ESRGAN through ONNX Runtime, run in overlapping tiles.                                                                                                                 |
+| [`Rembg`](#cutan.carve.Rembg)([model, post_process])                      | `rembg`'s neural background removal (`pip install "cutan[rembg]"`).                                                                                                         |
+| [`Resample`](#cutan.carve.Resample)([factor, method])                        | Interpolate `factor``x (``cubic`, `linear` or `lanczos`): no new detail, but the matte's resolution is what the part keeps.                                                 |
+| [`SuperRes`](#cutan.carve.SuperRes)()                                        | Base of the shipped strategies: a `name`, a whole `factor` and a `recipe()`.                                                                                                |
+| [`PropState`](#cutan.carve.PropState)(art[, unit])                            | One more drawing of a prop's base, for [`write_prop()`](#cutan.carve.write_prop)'s `states=`.                                                           |
 
 ### Exceptions
 
@@ -357,6 +359,22 @@ carving px the mask is widened by before lifting (anti-aliased strokes).
 `reach`: keep only the mask’s pieces that come within this many source
 px of the pivot (a colour key also matches specks elsewhere: a tick’s grey
 edge).
+
+### *class* cutan.carve.PlateQuality(coverage, rim_backdrop_share, repainted_share, soft_interior_share, detached_pieces, attached_pieces, touches_edge, frames_used=0, frames_rejected=tuple(), filled_share=0.0, fill=None)
+
+Bases: [`CarveQuality`](cutan.carve.core.html.md#cutan.carve.core.CarveQuality)
+
+A plate’s signals: a [`CarveQuality`](#cutan.carve.CarveQuality) (its matte signals are moot
+for a plate: the whole region is kept) plus how it was made. `frames_used`: the
+frames that voted; `frames_rejected`: the indices the alignment gate turned away;
+`filled_share`: the share of the plate no frame showed, filled (derived).
+
+#### warnings()
+
+The signals that look wrong, in words.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### *class* cutan.carve.Polygon(points=(), supersample=4)
 
@@ -764,6 +782,34 @@ One face of several: `largest`, `leftmost`, `rightmost` or `best` (score).
 
 * **Return type:**
   [`Face`](cutan.carve.head.html.md#cutan.carve.head.Face)
+
+### cutan.carve.plate(frames, , backdrop=None, subject=None, align_box=None, align_tolerance=9.0, reference=0, grow=7, fill='inpaint', crop=None, point=None, min_frames=3, source=None)
+
+The backdrop behind whatever moves in front of it in `frames` (see the module docstring).
+
+* **Parameters:**
+  * **frames** ([`Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path) | `Image` | `ndarray`]) – images of one view (paths, arrays or PIL images), all the same size.
+  * **backdrop** ([`Any`](https://docs.python.org/3/library/typing.html#typing.Any)) – where a frame shows the backdrop, an `(rgb, hint) -> alpha` rule (1 =
+    backdrop), or `None`.
+  * **subject** ([`Any`](https://docs.python.org/3/library/typing.html#typing.Any)) – where a frame shows what stands in front (a [`cutan.carve`](#module-cutan.carve) strategy’s name,
+    a recipe, a [`Matte`](#cutan.carve.Matte); alpha 1 = subject), or `None`. Give at
+    most one of `backdrop` and `subject`. Their hint maps source px to the crop.
+  * **align_box** ([`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – a region of the backdrop nothing crosses, in source px, checked against
+    frame `reference`; `None`: no gate.
+  * **align_tolerance** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – the largest mean absolute difference (0..255) a frame’s region may have.
+  * **grow** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – px by which what is rejected is widened (outlines, anti-aliasing).
+  * **fill** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[`ndarray`, `ndarray`], `ndarray`], [`None`](https://docs.python.org/3/builtins/constants.html#None)]) – `"inpaint"`, `"columns"`, a callable `(plate, hole) -> rgb` (`plate` holds
+    NaN in the hole), or `None` to leave the unseen pixels transparent.
+  * **crop** ([`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – the plate’s region, in source px (default: the whole frame); must lie in it.
+  * **point** ([`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – the plate’s anchor, in source px (default: the crop’s centre).
+  * **min_frames** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – refuse a plate from fewer frames than this (after the gate): a median of
+    one or two frames cannot outvote a subject.
+  * **source** ([`Any`](https://docs.python.org/3/library/typing.html#typing.Any)) – the frames’ provenance ([`frame_source()`](#cutan.carve.frame_source)).
+* **Raises:**
+  [**ValueError**](https://docs.python.org/3/builtins/exceptions.html#ValueError) – frames of different sizes, an unknown fill, both or a bad reference, a crop
+      outside the frames, or too few frames.
+* **Return type:**
+  [`Carving`](cutan.carve.core.html.md#cutan.carve.core.Carving)
 
 ### cutan.carve.register_matte(cls, , name=None)
 

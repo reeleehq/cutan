@@ -9,6 +9,7 @@ cutan.carve
    .. autosummary::
    
       framed
+      plate
       nine_slice
       open_frame
       as_matte
@@ -46,6 +47,7 @@ cutan.carve
       Matte
       Part
       PartSet
+      PlateQuality
       PartSpec
       Polygon
       RealESRGAN
