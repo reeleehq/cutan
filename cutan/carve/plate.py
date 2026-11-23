@@ -7,14 +7,16 @@ character walks past. It takes frames of the same view and:
 1. **gates** them on alignment: with ``align_box`` (a region of the backdrop nothing crosses),
    a frame whose region differs from the reference frame's by more than ``align_tolerance``
    (mean absolute difference, 0..255) is rejected: the camera moved;
-2. takes the **per-pixel median** over the frames where ``keep`` says the pixel is backdrop
-   (a matte strategy or an ``(rgb, hint) -> alpha`` rule, e.g. "red-dominant"), with what it
-   rejects grown by ``grow`` px (outlines and anti-aliased edges). Without ``keep``, every
-   pixel of every frame votes, which is enough when the subject moves more than it stays;
+2. takes the **per-pixel median** over the frames that show the backdrop at that pixel: where
+   a ``backdrop`` rule says so (an ``(rgb, hint) -> alpha``, 1 = backdrop: "red-dominant"), or
+   where a ``subject`` matte does not (any :mod:`cutan.carve` strategy or matte, which give
+   alpha 1 to the subject: ``"rembg"``, ``Chroma(...)``, a ``Polygon`` around where it stands).
+   What is rejected is grown by ``grow`` px (outlines, anti-aliasing). With neither, every pixel
+   of every frame votes, which is enough when the subject moves more than it stays;
 3. **fills** what no frame shows: ``"inpaint"`` (OpenCV's Telea inpainting, the default),
    ``"columns"`` (each hole continued down its column between the pixels seen above and below
-   it: vertical folds, stripes), a callable ``(plate, hole) -> rgb``, or ``None`` (left
-   transparent).
+   it: vertical folds, stripes; a column no frame shows at all is inpainted), a callable
+   ``(plate, hole) -> rgb``, or ``None`` (left transparent).
 
 The result is an ordinary :class:`~cutan.carve.Carving` (write it with
 :func:`~cutan.carve.write_prop`) whose ``quality`` is a :class:`PlateQuality`: the frames used
@@ -100,9 +102,13 @@ class PlateQuality(CarveQuality):
 
 def _aligned(frames: list[np.ndarray], box: Box | None, reference: int, tol: float):
     """Indices of the frames whose ``box`` matches the reference frame's, and the others."""
+    if not 0 <= reference < len(frames):
+        raise ValueError(
+            f"reference={reference} is not one of the {len(frames)} frames"
+        )
     if box is None:
         return list(range(len(frames))), []
-    x0, y0, x1, y1 = (int(round(v)) for v in box)
+    x0, y0, x1, y1 = (int(round(float(v))) for v in box)
     ref = frames[reference][y0:y1, x0:x1].astype(np.int16)
     if ref.size == 0:
         raise ValueError(
@@ -117,17 +123,22 @@ def _aligned(frames: list[np.ndarray], box: Box | None, reference: int, tol: flo
 
 def _columns(plate_: np.ndarray, hole: np.ndarray) -> np.ndarray:
     """Each column's holes, linearly between the pixels seen above and below them (the
-    nearest seen one, where only one side is)."""
+    nearest seen one, where only one side is). A column no frame shows at all has nothing
+    to continue: it is inpainted from its neighbours."""
     out = plate_.copy()
     rows = np.arange(plate_.shape[0])
+    blind = np.zeros_like(hole)
     for x in np.nonzero(hole.any(axis=0))[0]:
         seen = ~hole[:, x]
         if not seen.any():
+            blind[:, x] = True
             continue
         for c in range(plate_.shape[2]):
             out[hole[:, x], x, c] = np.interp(
                 rows[hole[:, x]], rows[seen], plate_[seen, x, c]
             )
+    if blind.any():
+        out = np.where(blind[..., None], _inpaint(out, blind).astype(np.float32), out)
     return out
 
 
@@ -153,10 +164,16 @@ def _fill_name(fill: Fill) -> str | None:
     return getattr(fill, "__name__", repr(fill))
 
 
+#: Rows of the plate whose median is taken at once: bounds the NaN-masked copies a median
+#: over many full-HD frames would otherwise hold whole.
+MEDIAN_BAND_ROWS = 64
+
+
 def plate(
     frames: Sequence[ImageLike],
     *,
-    keep: Any = None,
+    backdrop: Any = None,
+    subject: Any = None,
     align_box: Box | None = None,
     align_tolerance: float = 9.0,
     reference: int = 0,
@@ -164,31 +181,40 @@ def plate(
     fill: Fill = "inpaint",
     crop: Box | None = None,
     point: tuple[float, float] | None = None,
-    min_frames: int = 1,
+    min_frames: int = 3,
     source: Any = None,
 ) -> Carving:
     """The backdrop behind whatever moves in front of it in ``frames`` (see the module docstring).
 
     Args:
         frames: images of one view (paths, arrays or PIL images), all the same size.
-        keep: where a frame shows the backdrop: a matte (a strategy's name, a recipe, a
-            :class:`~cutan.carve.Matte`) or an ``(rgb, hint) -> alpha`` rule; ``None``, everywhere.
+        backdrop: where a frame shows the backdrop, an ``(rgb, hint) -> alpha`` rule (1 =
+            backdrop), or ``None``.
+        subject: where a frame shows what stands in front (a :mod:`cutan.carve` strategy's name,
+            a recipe, a :class:`~cutan.carve.Matte`; alpha 1 = subject), or ``None``. Give at
+            most one of ``backdrop`` and ``subject``. Their hint maps source px to the crop.
         align_box: a region of the backdrop nothing crosses, in source px, checked against
             frame ``reference``; ``None``: no gate.
         align_tolerance: the largest mean absolute difference (0..255) a frame's region may have.
-        grow: px by which what ``keep`` rejects is widened (outlines, anti-aliasing).
+        grow: px by which what is rejected is widened (outlines, anti-aliasing).
         fill: ``"inpaint"``, ``"columns"``, a callable ``(plate, hole) -> rgb`` (``plate`` holds
             NaN in the hole), or ``None`` to leave the unseen pixels transparent.
-        crop: the plate's region, in source px (default: the whole frame).
+        crop: the plate's region, in source px (default: the whole frame); must lie in it.
         point: the plate's anchor, in source px (default: the crop's centre).
-        min_frames: refuse a plate from fewer frames than this (after the gate).
+        min_frames: refuse a plate from fewer frames than this (after the gate): a median of
+            one or two frames cannot outvote a subject.
         source: the frames' provenance (:func:`~cutan.carve.frame_source`).
 
     Raises:
-        ValueError: frames of different sizes, an unknown fill, or too few frames.
+        ValueError: frames of different sizes, an unknown fill, both or a bad reference, a crop
+            outside the frames, or too few frames.
     """
     if not frames:
         raise ValueError("plate() needs at least one frame")
+    if backdrop is not None and subject is not None:
+        raise ValueError(
+            "give backdrop= (what to keep) or subject= (what to remove), not both"
+        )
     rgbs = [load_rgb(f) for f in frames]
     shape = rgbs[0].shape
     if any(r.shape != shape for r in rgbs):
@@ -202,28 +228,48 @@ def plate(
             f"rejected: {rejected}"
         )
     h, w = shape[:2]
-    x0, y0, x1, y1 = (0, 0, w, h) if crop is None else (int(round(v)) for v in crop)
-    stack = np.stack([rgbs[i][y0:y1, x0:x1] for i in used]).astype(np.float32)
+    x0, y0, x1, y1 = (
+        (0, 0, w, h) if crop is None else (int(round(float(v))) for v in crop)
+    )
+    if not (0 <= x0 < x1 <= w and 0 <= y0 < y1 <= h):
+        raise ValueError(
+            f"crop {crop} is not a non-empty box inside the {w}x{h} frames"
+        )
+    pw, ph = x1 - x0, y1 - y0
 
-    matte = as_matte(keep) if keep is not None else None
+    # where each used frame shows the backdrop (bool, one plane per frame)
+    matte = backdrop if backdrop is not None else subject
+    matte = as_matte(matte) if matte is not None else None
+    valid = None
     if matte is not None:
         cv2 = _cv2()
-        kernel = np.ones((2 * grow + 1, 2 * grow + 1), np.uint8) if grow > 0 else None
-        valid = []
-        for frame in stack.astype(np.uint8):
-            ok = np.asarray(matte(frame, Hint()), np.float32) > 0.5
+        kernel = (
+            cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * grow + 1, 2 * grow + 1))
+            if grow > 0
+            else None
+        )
+        hint = Hint(offset=(float(x0), float(y0)), scale=1.0)
+        valid = np.empty((len(used), ph, pw), bool)
+        for n, i in enumerate(used):
+            alpha = np.asarray(matte(rgbs[i][y0:y1, x0:x1], hint), np.float32)
+            ok = alpha > 0.5 if backdrop is not None else alpha < 0.5
             if kernel is not None:
                 ok = ~cv2.dilate((~ok).astype(np.uint8), kernel).astype(bool)
-            valid.append(ok)
-        votes = np.where(np.stack(valid)[..., None], stack, np.nan)
-    else:
-        votes = stack
-    with np.errstate(all="ignore"):
-        import warnings
+            valid[n] = ok
 
+    med = np.empty((ph, pw, 3), np.float32)
+    import warnings
+
+    for r0 in range(0, ph, MEDIAN_BAND_ROWS):
+        r1 = min(ph, r0 + MEDIAN_BAND_ROWS)
+        band = np.stack([rgbs[i][y0 + r0 : y0 + r1, x0:x1] for i in used]).astype(
+            np.float32
+        )
+        if valid is not None:
+            band[~valid[:, r0:r1]] = np.nan
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)  # all-NaN pixels: the hole
-            med = np.nanmedian(votes, axis=0)
+            med[r0:r1] = np.nanmedian(band, axis=0)
     hole = np.isnan(med[..., 0])
 
     alpha = np.full(hole.shape, 255, np.uint8)
@@ -254,23 +300,32 @@ def plate(
         filled_share=filled_share,
         fill=_fill_name(fill) if hole.any() else None,
     )
-    px, py = point if point is not None else ((x0 + x1) / 2, (y0 + y1) / 2)
+    px, py = (
+        (float(v) for v in point)
+        if point is not None
+        else ((x0 + x1) / 2, (y0 + y1) / 2)
+    )
     return Carving(
         image=image,
-        anchor=((px - x0) / (x1 - x0), (py - y0) / (y1 - y0)),
+        anchor=((px - x0) / pw, (py - y0) / ph),
         offset=(float(x0), float(y0)),
         scale=1.0,
         quality=quality,
         recipe={
             "plate": {
                 "frames": len(rgbs),
-                "keep": matte.recipe() if matte is not None else None,
-                "align_box": list(align_box) if align_box is not None else None,
-                "align_tolerance": align_tolerance,
-                "reference": reference,
-                "grow": grow,
+                "backdrop": matte.recipe() if backdrop is not None else None,
+                "subject": matte.recipe() if subject is not None else None,
+                "align_box": [float(v) for v in align_box]
+                if align_box is not None
+                else None,
+                "align_tolerance": float(align_tolerance),
+                "reference": int(reference),
+                "grow": int(grow),
                 "fill": _fill_name(fill),
                 "crop": [x0, y0, x1, y1],
+                "point": [px, py],
+                "min_frames": int(min_frames),
             }
         },
         source=source,
