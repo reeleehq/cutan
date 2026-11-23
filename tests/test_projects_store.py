@@ -64,6 +64,9 @@ def test_a_project_id_is_one_folder_name(tmp_path):
     # the federation id-slug rule (lacing#165): a trailing newline is not a folder name
     with pytest.raises(ValueError, match="one folder name"):
         push_project("abc\n", folder=tmp_path, settings=S3, store={})
+    for refused in ("x" * 300, None):  # every refusal says what a project id is
+        with pytest.raises(ValueError, match="one folder name"):
+            push_project(refused, folder=tmp_path, settings=S3, store={})
 
 
 def test_the_record_is_a_persisted_identifier():

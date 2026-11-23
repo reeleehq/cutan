@@ -168,7 +168,12 @@ def _project_prefix(project_id: str) -> str:
     """
     # A project id is one folder name: the federation id-slug rule (lacing#165),
     # the one ``an.library.root.project_dir`` applies too.
-    check_id_slug(project_id, label="project id", reason="it is one folder name")
+    check_id_slug(
+        project_id,
+        label="project id",
+        reason="it is one folder name",
+        hint="A project id is one folder name.",
+    )
     return f"{project_id}/"
 
 

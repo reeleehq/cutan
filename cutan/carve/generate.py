@@ -107,6 +107,9 @@ PROP_KEYS: tuple[str, ...] = _CARVE_KEYS + _WRITE_KEYS
 #: carve's ``keep`` values.
 _KEEPS: tuple[str, ...] = ("point", "largest", "all")
 _SIZE = re.compile(r"^([1-9]\d*x[1-9]\d*|auto)$")
+#: An art name's cap: one path component (255) less the longest suffix it gets
+#: (``<name>.raw.png``), so a name that passes never fails as a file name.
+_MAX_ART_NAME_LENGTH = 255 - len(".raw.png")
 
 Background = Literal["opaque", "transparent"]
 #: ``generator(prompt, *, size, background, quality, model) -> PIL image`` (or a
@@ -135,8 +138,8 @@ class ArtSpec:
 
     def __post_init__(self):
         # An art name is a file name, no folder and no hidden file: the federation
-        # id-slug rule (lacing#165).
-        if not is_id_slug(self.name):
+        # id-slug rule (lacing#165), short enough for its longest file name.
+        if not is_id_slug(self.name, max_length=_MAX_ART_NAME_LENGTH):
             raise ValueError(
                 f"art {self.name!r}: a name is a file name (letters, digits, . _ -)"
             )

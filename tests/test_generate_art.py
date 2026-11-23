@@ -190,6 +190,8 @@ def test_the_spec_is_checked_before_anything_is_generated(tmp_path):
         ({"../x": {"prompt": "p"}}, "file name"),
         # the old ``^...$`` + re.match copy let a trailing newline through (lacing#165)
         ({"x\n": {"prompt": "p"}}, "file name"),
+        # <name>.raw.png must still fit one path component
+        ({"x" * 250: {"prompt": "p"}}, "file name"),
     ):
         with pytest.raises(ValueError, match=match):
             G.art_specs(bad)
