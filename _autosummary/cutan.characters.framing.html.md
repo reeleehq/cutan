@@ -22,6 +22,16 @@ path `an` measures its box by) and reading where its parts are drawn:
   limited by the subject’s width gives every size one distance, in an:
   reeleehq/an#732.)
 
+\*\*Columns (`an.genres.API_LEVEL` 19, an#769, cutan#223).\*\* Where the `an` in use
+accepts them, each band also names its own columns, `(top, bottom, left, right)`,
+as fractions of the box’s width from its left: the close-up the head’s (with what is
+drawn under it), the medium the head’s and the torso’s together. `an` then frames
+that true width, centred on it, so a close-up stays on the head when an arm or a
+prop moves the box’s centre, and it applies its own crop policy (a partial size
+stays a jump-cut step nearer than the next wider one, cropping only the sides), so
+the cap above is not applied. An older `an` drops 4-tuples, so it gets the
+2-tuples and the cap, as before.
+
 `wide` and `full` stay the table’s (the whole figure). A rig with no part
 named `head` or `torso` (the art-package contract’s names) gives no band for
 the size that needs it, and the table applies.
@@ -31,11 +41,16 @@ the size that needs it, and the table applies.
 | [`SPECIMEN_SIZE`](#cutan.characters.framing.SPECIMEN_SIZE)     | The canvas the specimen is compiled on.                                                                                                          |
 |--------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`SIZE_RATIO_MARGIN`](#cutan.characters.framing.SIZE_RATIO_MARGIN) | How far past an's jump-cut size ratio a capped close-up lands, so a ratio computed back from the frames is never a hair under it (1.2999999...). |
+| [`COLUMNS_API_LEVEL`](#cutan.characters.framing.COLUMNS_API_LEVEL) | The first `an.genres.API_LEVEL` that accepts a band's own columns (an#769).                                                                      |
 
 ### Functions
 
-| [`character_shot_sizes`](#cutan.characters.framing.character_shot_sizes)(entity, mall, box)   | `{size: (top, bottom)}` for `entity`'s rig, as fractions of `box`'s height from its top (`box`: its measured `(x0, y0, x1, y1)`); `None` when the rig has neither a head nor a torso to measure.   |
-|--------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`character_shot_sizes`](#cutan.characters.framing.character_shot_sizes)(entity, mall, box)   | `{size: (top, bottom)}` for `entity`'s rig, as fractions of `box`'s height from its top (`box`: its measured `(x0, y0, x1, y1)`), and `(top, bottom, left, right)` where the `an` in use takes columns ([`COLUMNS_API_LEVEL`](#cutan.characters.framing.COLUMNS_API_LEVEL)); `None` when the rig has neither a head nor a torso to measure.   |
+|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+### cutan.characters.framing.COLUMNS_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 19*
+
+The first `an.genres.API_LEVEL` that accepts a band’s own columns (an#769).
 
 ### cutan.characters.framing.SIZE_RATIO_MARGIN *: [float](https://docs.python.org/3/builtins/functions.html#float)* *= 1e-06*
 
@@ -50,8 +65,10 @@ relative to the placement point, which the canvas does not change.
 ### cutan.characters.framing.character_shot_sizes(entity, mall, box)
 
 `{size: (top, bottom)}` for `entity`’s rig, as fractions of `box`’s
-height from its top (`box`: its measured `(x0, y0, x1, y1)`); `None`
-when the rig has neither a head nor a torso to measure.
+height from its top (`box`: its measured `(x0, y0, x1, y1)`), and
+`(top, bottom, left, right)` where the `an` in use takes columns
+([`COLUMNS_API_LEVEL`](#cutan.characters.framing.COLUMNS_API_LEVEL)); `None` when the rig has neither a head nor a
+torso to measure.
 
 * **Return type:**
-  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)]] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]] | [`None`](https://docs.python.org/3/builtins/constants.html#None)

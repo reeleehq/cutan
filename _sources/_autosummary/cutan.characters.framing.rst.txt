@@ -10,6 +10,7 @@ cutan.characters.framing
    
       SPECIMEN_SIZE
       SIZE_RATIO_MARGIN
+      COLUMNS_API_LEVEL
    
    .. rubric:: Functions
 
