@@ -65,7 +65,9 @@ from nw.storage import PROJECT_FILE_NAME, json_docs
 # ``render`` declares a ``quote`` (nw's GenreOp.quote): an nw without it would fail
 # with a bare TypeError while registering, and the genre would lose every op.
 require_fields(
-    GenreOp, ("quote",), remedy="upgrade nw (cutan's `nw` extra) to one with GenreOp.quote"
+    GenreOp,
+    ("quote",),
+    remedy="upgrade nw (cutan's `nw` extra) to one with GenreOp.quote",
 )
 
 CUTOUT_ANIMATION_SLUG = "cutout_animation"
