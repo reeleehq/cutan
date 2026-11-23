@@ -30,8 +30,8 @@ How the pieces map onto nw:
   must route it through its money approval. A project whose voices declare no
   paid provider renders with no key and no bill. ``render`` carries a ``quote``
   (:func:`_quote_render`, nw's ``GenreOp.quote``) a host asks before running it:
-  ``$0`` when every voice speaks through a free provider, unknown (never free)
-  when any voice declares another; an prices no characters in dollars yet.
+  ``$0`` when every line the scene speaks has an unbilled provider, unknown (never
+  free) otherwise; the answer is an's (``an.audio.speech_quote``).
 
 **Import-safe and opt-in.** Only ``nw`` and ``dol`` at module top. ``an`` is
 imported inside the functions, and ``an/__init__.py`` does not import this module,
@@ -59,7 +59,14 @@ from nw import (
     register_genre_project_factory,
     register_project_storage,
 )
+from nw import require_fields
 from nw.storage import PROJECT_FILE_NAME, json_docs
+
+# ``render`` declares a ``quote`` (nw's GenreOp.quote): an nw without it would fail
+# with a bare TypeError while registering, and the genre would lose every op.
+require_fields(
+    GenreOp, ("quote",), remedy="upgrade nw (cutan's `nw` extra) to one with GenreOp.quote"
+)
 
 CUTOUT_ANIMATION_SLUG = "cutout_animation"
 
@@ -72,11 +79,6 @@ SCENE_TIER = "cutout-scene"
 SCENE_SCHEMA_URI = "annot://schema/cutout-scene/v1"
 FILM_TIER = "cutout-film"
 
-#: The speech providers a render can use without a bill: an's offline voice, macOS
-#: ``say``, and the recorded takes restored from the project's own store. Any other
-#: provider a voice declares (ElevenLabs, or a name an does not know) prices the
-#: render as unknown, never free.
-FREE_TTS_PROVIDERS: frozenset[str] = frozenset({"offline", "mac_say", "recorded"})
 FILM_SCHEMA_URI = "annot://schema/cutout-film/v1"
 #: The scene files whose bytes are the film's authored input. ``scene.json`` is
 #: the IR the renderer reads; ``scene.md`` is what a person edits.
@@ -318,22 +320,17 @@ def _render(
 def _quote_render(
     project, *, output_name: str = "main", force_render: bool = False
 ) -> Optional[float]:
-    """What :func:`_render` would bill now: ``0.0`` when every voice in the project
-    declares no provider or a free one (:data:`FREE_TTS_PROVIDERS`), else ``None``
-    (unknown, so the host asks for approval of an unknown price).
+    """What :func:`_render` would bill now: an's own answer for the scene's speech
+    (:func:`an.audio.speech_quote`, the providers chosen as the render chooses them):
+    ``0.0`` when every line is spoken by a provider that declares itself unbilled,
+    else ``None`` (unknown, so the host asks for approval of an unknown price).
 
-    Takes ``_render``'s client parameters; neither changes the answer yet (a cached
-    line is never billed, but an does not count what is cached in dollars)."""
-    from an.audio.voices import declared_provider
+    Takes ``_render``'s client parameters; neither changes the answer yet."""
+    from an.audio import speech_quote
     from an.project import load
 
-    mall = load(Path(project.root), check_kinds=False).mall
-    voices = mall.get("voices") or {}
-    for voice_id in list(voices):
-        provider = declared_provider(mall, voice_id)
-        if provider is not None and provider not in FREE_TTS_PROVIDERS:
-            return None
-    return 0.0
+    loaded = load(Path(project.root), check_kinds=False)
+    return speech_quote(loaded.scene, loaded.mall)
 
 
 CUTOUT_ANIMATION_OPS: tuple[GenreOp, ...] = register_genre_ops(
