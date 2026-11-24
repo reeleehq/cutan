@@ -126,7 +126,8 @@ class WhisperLipSync:
         if custom_phones:
             fn = self._phone_to_viseme
             parts.append(
-                "phones-" + f"{getattr(fn, '__module__', '')}.{getattr(fn, '__qualname__', repr(fn))}"
+                "phones-"
+                + f"{getattr(fn, '__module__', '')}.{getattr(fn, '__qualname__', repr(fn))}"
             )
         if ALIGN_VERSION is not None:
             parts.append(f"v{ALIGN_VERSION}")
