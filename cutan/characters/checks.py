@@ -27,6 +27,7 @@ from cutan.characters.play import (
     preset_target_problems,
     resolve_turns,
     slot_node_path,
+    with_entity_faces,
     swap_art_missing,
     swap_slots,
 )
@@ -481,9 +482,10 @@ def _turn_resolution(
         entity = rigs.get(entity_id)
         doc = _rig_document(entity, stores) if entity is not None else None
         try:
-            return CharacterDescriptor.model_validate(doc) if doc else None
+            desc = CharacterDescriptor.model_validate(doc) if doc else None
         except ValidationError:
             return None  # reported by the play check
+        return with_entity_faces(entity, desc)  # overrides.faces wins (cutan#227)
 
     all_rigs, unchecked = rig_scope(shot, stores)
     extent = play_extent_for(

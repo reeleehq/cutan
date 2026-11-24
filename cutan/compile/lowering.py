@@ -20,7 +20,7 @@ from an.ir.migrate import migrate
 from an.stage.compile import SCENE_PX_PER_VIEW_BOX, _track_root_of
 from an.stores._common import art_exists_for
 
-from cutan.characters.play import play_extent_for
+from cutan.characters.play import play_extent_for, with_entity_faces
 from cutan.characters.schema import CHARACTER_DOCUMENT_KIND, CharacterDescriptor
 from cutan.compile.passes import (
     POLICY_PRODUCT,
@@ -111,8 +111,11 @@ def character_swap_declaration(entity: Any, mall: Any) -> SwapDeclaration | None
         return None
     if not isinstance(data, dict) or data.get("kind") != CHARACTER_DOCUMENT_KIND.name:
         return None
-    desc = CharacterDescriptor.model_validate(
-        migrate(dict(data), kind=CHARACTER_DOCUMENT_KIND.name)
+    desc = with_entity_faces(  # the entity's overrides.faces wins (cutan#227)
+        entity,
+        CharacterDescriptor.model_validate(
+            migrate(dict(data), kind=CHARACTER_DOCUMENT_KIND.name)
+        ),
     )
     return SwapDeclaration(
         sets=desc.asset_sets,

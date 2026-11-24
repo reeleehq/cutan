@@ -815,3 +815,71 @@ def test_turn_resolution_reads_the_descriptors_declared_faces():
     assert second["from_direction"] == "left"
     assert second["from_view"] == "side"
     assert res.turns[1].before.direction == "left"
+
+
+# --- an entity's overrides.faces wins over the art's (cutan#227) -------------
+
+
+def test_an_entity_override_of_faces_wins_over_the_art():
+    from types import SimpleNamespace as NS
+
+    from cutan.characters.play import entity_faces, with_entity_faces
+    from cutan.characters.schema import CharacterDescriptor
+
+    desc = CharacterDescriptor.model_validate(
+        {"name": "stu", "metadata": {"faces": "right", "other": 1}}
+    )
+    flipped = with_entity_faces(NS(overrides={"faces": "left"}), desc)
+    assert flipped.metadata == {"faces": "left", "other": 1}
+    assert desc.metadata["faces"] == "right", "the store's descriptor is not touched"
+    cleared = with_entity_faces(NS(overrides={"faces": False}), desc)
+    assert "faces" not in cleared.metadata
+    assert with_entity_faces(NS(overrides=None), desc) is desc
+    assert entity_faces(NS(overrides={}), desc) == "right"
+
+
+def test_turn_resolution_reads_an_entity_override_of_faces():
+    """The same turn as above, with the facing declared on the entity rather
+    than the art: it resolves the same way."""
+    from types import SimpleNamespace as NS
+
+    from an.ir.compose import flatten, sequence
+
+    from cutan.characters.play import resolve_turns, with_entity_faces
+    from cutan.characters.registration import PlayAction
+    from cutan.characters.schema import CharacterDescriptor
+
+    art = CharacterDescriptor.model_validate({"name": "stu"})
+    stu = NS(overrides={"faces": {"view": {"side": "left"}}})
+    flats = flatten(
+        sequence(
+            PlayAction(
+                target="stu",
+                animation="turn",
+                args={"to": "side", "direction": "left"},
+            ),
+            PlayAction(target="stu", animation="turn", args={"to": "front"}),
+        )
+    )
+    res = resolve_turns(
+        flats,
+        descriptor_of=lambda e: with_entity_faces(stu, art),
+        rest_of=lambda p: {"scale_x": 1.0},
+    )
+    second = res.flats[1].action.args
+    assert second["from_direction"] == "left"
+    assert second["from_view"] == "side"
+
+
+def test_the_compilers_swap_declaration_carries_the_entity_override():
+    from types import SimpleNamespace as NS
+
+    from cutan.characters.schema import CHARACTER_DOCUMENT_KIND
+    from cutan.compile.lowering import character_swap_declaration
+
+    doc = {"kind": CHARACTER_DOCUMENT_KIND.name, "name": "stu"}
+    mall = {"characters": {"stu": doc}}
+    plain = character_swap_declaration(NS(ref="stu", overrides=None), mall)
+    assert "faces" not in plain.descriptor.metadata
+    left = character_swap_declaration(NS(ref="stu", overrides={"faces": "left"}), mall)
+    assert left.descriptor.metadata["faces"] == "left"

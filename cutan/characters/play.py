@@ -942,7 +942,59 @@ def declared_faces(desc: CharacterDescriptor | None) -> Any:
     >>> declared_faces(None) is None
     True
     """
-    return (desc.metadata or {}).get("faces") if desc is not None else None
+    return (desc.metadata or {}).get(FACES_KEY) if desc is not None else None
+
+
+#: The key of the facing declaration, on the art's ``metadata`` and on an entity's
+#: ``overrides`` (an#818; ``an.verify.staging.FACES_KEY``).
+FACES_KEY = "faces"
+
+
+def entity_faces(entity: Any, desc: CharacterDescriptor | None) -> Any:
+    """The facing declaration in force for ``entity``: its ``overrides.faces``
+    when it sets one, else its art's (:func:`declared_faces` of ``desc``).
+
+    The entity wins, as in ``an``'s ``facing_travel`` check (cutan#227), so the
+    turn, the facing reads and the eyeline check agree with it. An override of
+    ``false`` (``an``'s "do not judge this one") declares no facing here: the art
+    faces right, as the factory draws it.
+
+    >>> from types import SimpleNamespace as NS
+    >>> entity_faces(NS(overrides={"faces": "left"}), None)
+    'left'
+    >>> entity_faces(NS(overrides={"faces": False}), None) is None
+    True
+    >>> entity_faces(NS(overrides=None), None) is None
+    True
+    """
+    overrides = getattr(entity, "overrides", None) or {}
+    if FACES_KEY in overrides:
+        value = overrides[FACES_KEY]
+        return None if value is False else value
+    return declared_faces(desc)
+
+
+def with_entity_faces(
+    entity: Any, desc: CharacterDescriptor | None
+) -> CharacterDescriptor | None:
+    """``desc`` as ``entity`` plays it: its ``metadata.faces`` replaced by the
+    entity's ``overrides.faces`` when the entity sets one (:func:`entity_faces`).
+
+    Every reader of a descriptor's facing (the turn, :func:`facing_at`,
+    :func:`resolve_turns`, the eyeline check) then honours the override with no
+    second argument to thread through (cutan#227). ``desc`` itself when the
+    entity overrides nothing, or there is no descriptor.
+    """
+    overrides = getattr(entity, "overrides", None) or {}
+    if desc is None or FACES_KEY not in overrides:
+        return desc
+    metadata = dict(desc.metadata or {})
+    faces = entity_faces(entity, desc)
+    if faces is None:
+        metadata.pop(FACES_KEY, None)
+    else:
+        metadata[FACES_KEY] = faces
+    return desc.model_copy(update={"metadata": metadata})
 
 
 def art_facing(faces: Any, pose: Mapping[str, Any] | None = None) -> str:
@@ -1066,8 +1118,10 @@ def resolve_turns(
     inferred state so ``an validate`` can say when the two disagree. A play
     that cannot resolve is left for :func:`play_problems` to report.
 
-    ``faces_of(entity)`` is the entity's ``metadata.faces`` declaration (an#818;
-    default: :func:`declared_faces` of its descriptor). Art that faces left
+    ``faces_of(entity)`` is the entity's facing declaration (an#818: its
+    ``overrides.faces``, else its art's ``metadata.faces``, :func:`entity_faces`;
+    default: :func:`declared_faces` of its descriptor, for a caller with no
+    entities). Art that faces left
     turns by the declared facing, not by the sign of ``scale_x``: the turn
     is given ``faces`` and the view it starts from.
 
