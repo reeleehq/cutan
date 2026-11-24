@@ -98,3 +98,29 @@ def test_align_with_real_speech_via_elevenlabs():
     # Real speech → multiple words → multiple non-rest visemes.
     non_rest = [v for v in track.visemes if v.code != "X"]
     assert len(non_rest) >= 3
+
+
+def test_the_cache_key_keeps_legacy_tracks_and_separates_other_models():
+    """cutan#227: the default configuration keeps the bare ``whisper`` key every
+    cached track has (nothing re-runs); any other model, compute type or mapping
+    is stamped, so its tracks never answer for this one's."""
+    from an.audio.lipsync import lipsync_cache_id
+
+    from cutan.audio import whisper_lipsync as wl
+
+    assert lipsync_cache_id(wl.WhisperLipSync()) == "whisper"
+    base = lipsync_cache_id(wl.WhisperLipSync(model_size="base"))
+    assert base == "whisper@base-int8"
+    custom = wl.WhisperLipSync(char_to_viseme={"a": "A"})
+    assert lipsync_cache_id(custom).startswith("whisper@tiny-int8+chars-")
+    phones = wl.WhisperLipSync(phone_to_viseme=lambda p: None)
+    assert "+phones-" in lipsync_cache_id(phones)
+
+
+def test_bumping_the_align_version_rekeys_every_track(monkeypatch):
+    from an.audio.lipsync import lipsync_cache_id
+
+    from cutan.audio import whisper_lipsync as wl
+
+    monkeypatch.setattr(wl, "ALIGN_VERSION", "2")
+    assert lipsync_cache_id(wl.WhisperLipSync()) == "whisper@tiny-int8+v2"

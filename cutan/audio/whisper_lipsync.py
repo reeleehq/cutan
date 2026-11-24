@@ -46,6 +46,17 @@ _MIN_WORD_GAP_FOR_REST: float = (
     0.20  # seconds; insert rest viseme in gaps wider than this
 )
 
+#: The configuration every whisper track was cached under before the provider
+#: stated a ``cache_version`` (cutan#227): ``(model_size, compute_type)`` with the
+#: default letter and phone mappings. A provider in this configuration keeps the
+#: unversioned key, so those tracks stay served and nothing re-runs; any other
+#: configuration is stamped, so its tracks never answer for this one's.
+_LEGACY_CONFIG: tuple[str, str] = ("tiny", "int8")
+#: Bump (``None`` -> ``"2"`` -> ...) when how this provider aligns changes in a
+#: way a cached track must not survive: every key changes, and every take is
+#: re-aligned once. ``None`` keeps the legacy key in the legacy configuration.
+ALIGN_VERSION: str | None = None
+
 
 class WhisperLipSync:
     """faster-whisper word timestamps → visemes.
@@ -79,6 +90,47 @@ class WhisperLipSync:
         self._mapping = (
             dict(char_to_viseme) if char_to_viseme else dict(_CHAR_TO_VISEME)
         )
+
+    @property
+    def cache_version(self) -> str | None:
+        """What re-keys this provider's cached tracks (``an.audio.lipsync.
+        CACHE_VERSION_ATTR``, an#727): ``None`` (the bare ``whisper`` key every
+        existing track has) in the legacy configuration, else the model, the
+        compute type and any custom mapping, plus :data:`ALIGN_VERSION`.
+
+        So a change of model size no longer serves the other size's tracks, and a
+        code change that must invalidate bumps :data:`ALIGN_VERSION`; neither
+        re-runs a take cached under the configuration it was made with (cutan#227).
+
+        >>> WhisperLipSync().cache_version is None
+        True
+        >>> WhisperLipSync(model_size="base").cache_version
+        'base-int8'
+        """
+        custom_chars = self._mapping != _CHAR_TO_VISEME
+        custom_phones = self._phone_to_viseme is not phone_viseme
+        config = (self.model_size, self.compute_type)
+        if (
+            config == _LEGACY_CONFIG
+            and ALIGN_VERSION is None
+            and not custom_chars
+            and not custom_phones
+        ):
+            return None
+        parts = [f"{self.model_size}-{self.compute_type}"]
+        if custom_chars:
+            from hashlib import sha256
+
+            blob = repr(sorted(self._mapping.items())).encode()
+            parts.append("chars-" + sha256(blob).hexdigest()[:10])
+        if custom_phones:
+            fn = self._phone_to_viseme
+            parts.append(
+                "phones-" + f"{getattr(fn, '__module__', '')}.{getattr(fn, '__qualname__', repr(fn))}"
+            )
+        if ALIGN_VERSION is not None:
+            parts.append(f"v{ALIGN_VERSION}")
+        return "+".join(parts)
 
     def _get_model(self):
         if WhisperLipSync._model is not None:

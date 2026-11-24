@@ -39,7 +39,7 @@ from typing import Any, Callable, Optional, Sequence
 
 from cutan.characters.checks import _rig_document, _turns_of
 from cutan.characters.schema import DIRECTIONAL_VIEWS
-from cutan.characters.play import art_facing, declared_faces, facing_at
+from cutan.characters.play import art_facing, entity_faces, facing_at
 from cutan.characters.schema import DFLT_VIEW, CharacterDescriptor
 
 #: What a character faces when nothing set it: the rig's rest (``scale_x`` > 0; the
@@ -200,9 +200,8 @@ def check_eyeline(
     def faces_of(entity: Any) -> Any:
         doc = _rig_document(entity, ctx.stores)
         try:
-            return (
-                declared_faces(CharacterDescriptor.model_validate(doc)) if doc else None
-            )
+            desc = CharacterDescriptor.model_validate(doc) if doc else None
+            return entity_faces(entity, desc)  # overrides.faces wins (cutan#227)
         except Exception:  # noqa: BLE001 - a malformed descriptor is the play check's to report
             return None
 
