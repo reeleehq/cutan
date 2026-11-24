@@ -101,6 +101,24 @@ Implements the `LipSyncProvider` protocol. The model is lazy-loaded on
 the first call (subsequent calls in the same process reuse the instance
 via the class-level `_model` cache).
 
+#### *property* cache_version *: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+What re-keys this provider’s cached tracks (`an.audio.lipsync.
+CACHE_VERSION_ATTR`, an#727): `None` (the bare `whisper` key every
+existing track has) in the legacy configuration, else the model, the
+compute type and any custom mapping, plus `ALIGN_VERSION`.
+
+So a change of model size no longer serves the other size’s tracks, and a
+code change that must invalidate bumps `ALIGN_VERSION`; neither
+re-runs a take cached under the configuration it was made with (cutan#227).
+
+```pycon
+>>> WhisperLipSync().cache_version is None
+True
+>>> WhisperLipSync(model_size="base").cache_version
+'base-int8'
+```
+
 #### emits_word_timings *: [bool](https://docs.python.org/3/builtins/functions.html#bool)* *= True*
 
 Whisper aligns from words, so the track carries them (an#96).

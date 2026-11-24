@@ -4,6 +4,12 @@ cutan.audio.whisper\_lipsync
 .. automodule:: cutan.audio.whisper_lipsync
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      ALIGN_VERSION
+   
    .. rubric:: Classes
 
    .. autosummary::

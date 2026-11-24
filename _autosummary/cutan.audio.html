@@ -266,6 +266,23 @@ the first call (subsequent calls in the same process reuse the instance
 via the class-level <code class="docutils literal notranslate"><span class="pre">_model</span></code> cache).</p>
 <dl class="field-list simple">
 </dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="cutan.audio.WhisperLipSync.cache_version">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">cache_version</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">None</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.audio.WhisperLipSync.cache_version" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.audio.WhisperLipSync.cache_version'">¶</a></dt>
+<dd><p>What re-keys this provider’s cached tracks (<code class="docutils literal notranslate"><span class="pre">an.audio.lipsync.</span>
+<span class="pre">CACHE_VERSION_ATTR</span></code>, an#727): <code class="docutils literal notranslate"><span class="pre">None</span></code> (the bare <code class="docutils literal notranslate"><span class="pre">whisper</span></code> key every
+existing track has) in the legacy configuration, else the model, the
+compute type and any custom mapping, plus <code class="xref py py-data docutils literal notranslate"><span class="pre">ALIGN_VERSION</span></code>.</p>
+<p>So a change of model size no longer serves the other size’s tracks, and a
+code change that must invalidate bumps <code class="xref py py-data docutils literal notranslate"><span class="pre">ALIGN_VERSION</span></code>; neither
+re-runs a take cached under the configuration it was made with (cutan#227).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">WhisperLipSync</span><span class="p">()</span><span class="o">.</span><span class="n">cache_version</span> <span class="ow">is</span> <span class="kc">None</span>
+</span><span id="line-2"><span class="go">True</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">WhisperLipSync</span><span class="p">(</span><span class="n">model_size</span><span class="o">=</span><span class="s2">"base"</span><span class="p">)</span><span class="o">.</span><span class="n">cache_version</span>
+</span><span id="line-4"><span class="go">'base-int8'</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cutan.audio.WhisperLipSync.emits_word_timings">
 <span class="sig-name descname"><span class="pre">emits_word_timings</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">bool</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#cutan.audio.WhisperLipSync.emits_word_timings" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#cutan.audio.WhisperLipSync.emits_word_timings'">¶</a></dt>
@@ -381,6 +398,7 @@ words alone are re-aligned once.</p>
 </li>
 <li><a :data-current="activeSection === '#cutan.audio.StaticWordTimings'" class="reference internal" href="#cutan.audio.StaticWordTimings"><code class="docutils literal notranslate"><span class="pre">StaticWordTimings</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.audio.WhisperLipSync'" class="reference internal" href="#cutan.audio.WhisperLipSync"><code class="docutils literal notranslate"><span class="pre">WhisperLipSync</span></code></a><ul>
+<li><a :data-current="activeSection === '#cutan.audio.WhisperLipSync.cache_version'" class="reference internal" href="#cutan.audio.WhisperLipSync.cache_version"><code class="docutils literal notranslate"><span class="pre">WhisperLipSync.cache_version</span></code></a></li>
 <li><a :data-current="activeSection === '#cutan.audio.WhisperLipSync.emits_word_timings'" class="reference internal" href="#cutan.audio.WhisperLipSync.emits_word_timings"><code class="docutils literal notranslate"><span class="pre">WhisperLipSync.emits_word_timings</span></code></a></li>
 </ul>
 </li>
@@ -405,7 +423,7 @@ words alone are re-aligned once.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=0d7dcda5"></script>
+<script src="../_static/documentation_options.js?v=a90549bc"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

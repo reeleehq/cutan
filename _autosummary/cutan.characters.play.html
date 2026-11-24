@@ -782,8 +782,10 @@ the ones before it expanded. THE resolver the compiler expands with and
 <p>An explicit <code class="docutils literal notranslate"><span class="pre">from_direction</span></code> is kept — <code class="docutils literal notranslate"><span class="pre">turns</span></code> records it with the
 inferred state so <code class="docutils literal notranslate"><span class="pre">an</span> <span class="pre">validate</span></code> can say when the two disagree. A play
 that cannot resolve is left for <a class="reference internal" href="#cutan.characters.play.play_problems" title="cutan.characters.play.play_problems"><code class="xref py py-func docutils literal notranslate"><span class="pre">play_problems()</span></code></a> to report.</p>
-<p><code class="docutils literal notranslate"><span class="pre">faces_of(entity)</span></code> is the entity’s <code class="docutils literal notranslate"><span class="pre">metadata.faces</span></code> declaration (an#818;
-default: <code class="xref py py-func docutils literal notranslate"><span class="pre">declared_faces()</span></code> of its descriptor). Art that faces left
+<p><code class="docutils literal notranslate"><span class="pre">faces_of(entity)</span></code> is the entity’s facing declaration (an#818: its
+<code class="docutils literal notranslate"><span class="pre">overrides.faces</span></code>, else its art’s <code class="docutils literal notranslate"><span class="pre">metadata.faces</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">entity_faces()</span></code>;
+default: <code class="xref py py-func docutils literal notranslate"><span class="pre">declared_faces()</span></code> of its descriptor, for a caller with no
+entities). Art that faces left
 turns by the declared facing, not by the sign of <code class="docutils literal notranslate"><span class="pre">scale_x</span></code>: the turn
 is given <code class="docutils literal notranslate"><span class="pre">faces</span></code> and the view it starts from.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">an.ir.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten</span><span class="p">,</span> <span class="n">sequence</span>
@@ -942,7 +944,7 @@ The compile pass hands them to <code class="docutils literal notranslate"><span 
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=0d7dcda5"></script>
+<script src="../_static/documentation_options.js?v=a90549bc"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

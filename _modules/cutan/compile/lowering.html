@@ -208,7 +208,7 @@
 </span><span id="line-20"><span class="kn">from</span><span class="w"> </span><span class="nn">an.stage.compile</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCENE_PX_PER_VIEW_BOX</span><span class="p">,</span> <span class="n">_track_root_of</span>
 </span><span id="line-21"><span class="kn">from</span><span class="w"> </span><span class="nn">an.stores._common</span><span class="w"> </span><span class="kn">import</span> <span class="n">art_exists_for</span>
 </span><span id="line-22">
-</span><span id="line-23"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.play</span><span class="w"> </span><span class="kn">import</span> <span class="n">play_extent_for</span>
+</span><span id="line-23"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.play</span><span class="w"> </span><span class="kn">import</span> <span class="n">play_extent_for</span><span class="p">,</span> <span class="n">with_entity_faces</span>
 </span><span id="line-24"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.characters.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">CHARACTER_DOCUMENT_KIND</span><span class="p">,</span> <span class="n">CharacterDescriptor</span>
 </span><span id="line-25"><span class="kn">from</span><span class="w"> </span><span class="nn">cutan.compile.passes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span id="line-26">    <span class="n">POLICY_PRODUCT</span><span class="p">,</span>
@@ -322,15 +322,18 @@
 </span><span id="line-111">        <span class="k">return</span> <span class="kc">None</span>
 </span><span id="line-112">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">!=</span> <span class="n">CHARACTER_DOCUMENT_KIND</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
 </span><span id="line-113">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-114">    <span class="n">desc</span> <span class="o">=</span> <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
-</span><span id="line-115">        <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="n">CHARACTER_DOCUMENT_KIND</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-</span><span id="line-116">    <span class="p">)</span>
-</span><span id="line-117">    <span class="k">return</span> <span class="n">SwapDeclaration</span><span class="p">(</span>
-</span><span id="line-118">        <span class="n">sets</span><span class="o">=</span><span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">,</span>
-</span><span id="line-119">        <span class="n">descriptor</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span>
-</span><span id="line-120">        <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists_for</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">entity</span><span class="o">.</span><span class="n">ref</span><span class="p">),</span>
-</span><span id="line-121">        <span class="n">scale</span><span class="o">=</span><span class="n">SCENE_PX_PER_VIEW_BOX</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">desc</span><span class="o">.</span><span class="n">view_box</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">or</span> <span class="mi">1</span><span class="p">),</span>
-</span><span id="line-122">    <span class="p">)</span></div>
+</span><span id="line-114">    <span class="n">desc</span> <span class="o">=</span> <span class="n">with_entity_faces</span><span class="p">(</span>  <span class="c1"># the entity's overrides.faces wins (cutan#227)</span>
+</span><span id="line-115">        <span class="n">entity</span><span class="p">,</span>
+</span><span id="line-116">        <span class="n">CharacterDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
+</span><span id="line-117">            <span class="n">migrate</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="n">CHARACTER_DOCUMENT_KIND</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-118">        <span class="p">),</span>
+</span><span id="line-119">    <span class="p">)</span>
+</span><span id="line-120">    <span class="k">return</span> <span class="n">SwapDeclaration</span><span class="p">(</span>
+</span><span id="line-121">        <span class="n">sets</span><span class="o">=</span><span class="n">desc</span><span class="o">.</span><span class="n">asset_sets</span><span class="p">,</span>
+</span><span id="line-122">        <span class="n">descriptor</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span>
+</span><span id="line-123">        <span class="n">art_exists</span><span class="o">=</span><span class="n">art_exists_for</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">entity</span><span class="o">.</span><span class="n">ref</span><span class="p">),</span>
+</span><span id="line-124">        <span class="n">scale</span><span class="o">=</span><span class="n">SCENE_PX_PER_VIEW_BOX</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">desc</span><span class="o">.</span><span class="n">view_box</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">or</span> <span class="mi">1</span><span class="p">),</span>
+</span><span id="line-125">    <span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -345,7 +348,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=0d7dcda5"></script>
+    <script src="../../../_static/documentation_options.js?v=a90549bc"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

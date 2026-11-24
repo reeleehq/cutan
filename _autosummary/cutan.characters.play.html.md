@@ -511,8 +511,10 @@ An explicit `from_direction` is kept — `turns` records it with the
 inferred state so `an validate` can say when the two disagree. A play
 that cannot resolve is left for [`play_problems()`](#cutan.characters.play.play_problems) to report.
 
-`faces_of(entity)` is the entity’s `metadata.faces` declaration (an#818;
-default: `declared_faces()` of its descriptor). Art that faces left
+`faces_of(entity)` is the entity’s facing declaration (an#818: its
+`overrides.faces`, else its art’s `metadata.faces`, `entity_faces()`;
+default: `declared_faces()` of its descriptor, for a caller with no
+entities). Art that faces left
 turns by the declared facing, not by the sign of `scale_x`: the turn
 is given `faces` and the view it starts from.
 
