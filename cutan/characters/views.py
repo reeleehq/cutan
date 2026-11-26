@@ -79,7 +79,9 @@ def view_for_yaw(
     return None
 
 
-def _descriptor(entity: Any, mall: Mapping[str, Any] | None) -> CharacterDescriptor | None:
+def _descriptor(
+    entity: Any, mall: Mapping[str, Any] | None
+) -> CharacterDescriptor | None:
     """``entity``'s descriptor as it plays it (its ``overrides.faces`` applied), or
     ``None`` for a character with none (procedural, placeholder, unknown ref)."""
     if not mall:
