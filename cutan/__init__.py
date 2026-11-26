@@ -77,7 +77,8 @@ PROJECT_STORE_RECORD: str = ".an/projects_store.json"
 #: after ``JsonSidecarStore.write_sidecar`` (an#688, cutan#181), ``phone_alphabet_of`` (an#721).
 #: Level 17: ``an.ir.world.planes_at_infinity`` (an#735), the far-plate critic's set (cutan#177).
 #: Level 18: ``EntityKind.contacts`` (an#519), a character's feet for the support check (cutan#201).
-REQUIRED_AN_API_LEVEL: int = 18
+#: Level 20: ``EntityKind.view_for`` and ``WorldMember.facing`` (an#734), the rig view from the camera's yaw (cutan#173).
+REQUIRED_AN_API_LEVEL: int = 20
 
 
 def require_an() -> None:
