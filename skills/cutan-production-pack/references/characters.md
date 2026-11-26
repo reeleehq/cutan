@@ -70,6 +70,8 @@ Blinks and small eye movements happen on their own; you do not author them.
 
 Every factory character has four views: `front` (rest), `three_quarter`, `side` (a profile facing the **viewer's right**) and `back` (the face hidden).
 
+- **In a world shot, the view follows the camera** (cutan#173, an `an` with `EntityKind.view_for`): give a world member a `facing` (a yaw in degrees, 0 along +z, positive toward +x) and the character takes the `view` whose range holds the camera's angle about it (front to 22.5°, three-quarter to 67.5°, side to 112.5°, back past that), at t=0, ahead of your own `view` swaps, which win. A profile is given only on the side its art faces; on the other side it shows from the front or back until a mirror channel exists (reeleehq/an#868). A member with no `facing` is unchanged.
+
 - **A turn on screen:** `{kind: play, target: mara, animation: turn, args: {to: three_quarter, direction: left}, start: 5.6}`. `to` is the view; `direction: left` faces it to the viewer's left (by mirroring). It takes 0.3 s (`duration` changes that). Turns chain: each starts from where the previous left the character.
 - **Start a shot already turned:** `{kind: set, target: teo, property: view, value: side, at: 0.0}`, and to face left as well, `{kind: set, target: teo, property: scale_x, value: -1.1, at: 0.0}` (minus the character's stage scale).
 - **A view holds for its shot only.** Set it again at `at: 0.0` in the next shot.

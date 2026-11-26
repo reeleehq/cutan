@@ -56,6 +56,7 @@ from cutan.verify.body import (
     check_body_attachments,
 )
 from cutan.characters.framing import character_shot_sizes
+from cutan.characters.views import character_view_for
 from cutan.characters.methods import (
     CUTOUT_ASPECTS,
     CUTOUT_METHODS,
@@ -193,6 +194,7 @@ CUTOUT = Genre(
             landmarks=character_landmarks,
             contacts=character_contacts,
             shot_sizes=character_shot_sizes,
+            view_for=character_view_for,
         ),
     ),
     checks=(
