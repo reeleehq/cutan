@@ -799,4 +799,5 @@ namespace as the default, so the output is a valid standalone SVG.
 | [`silhouette`](cutan.characters.silhouette.html.md#module-cutan.characters.silhouette)       | Silhouette rendering and comparison for the silhouette test.                                          |
 | [`svg_utils`](cutan.characters.svg_utils.html.md#module-cutan.characters.svg_utils)         | SVG manipulation: namespace-aware DOM helpers using stdlib `xml.etree`.                               |
 | [`validate`](cutan.characters.validate.html.md#module-cutan.characters.validate)           | Whether an art package is one the compiler can actually render.                                       |
+| [`views`](cutan.characters.views.html.md#module-cutan.characters.views)                 | The rig view a character shows from where the camera sees it (cutan#173 part 1).                      |
 | [`vocabulary`](cutan.characters.vocabulary.html.md#module-cutan.characters.vocabulary)       | The cut-out genre's vocabulary entries: motion presets, expression presets, IR-field notes.           |

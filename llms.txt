@@ -61,6 +61,7 @@
 - [cutan.characters.silhouette](_autosummary/cutan.characters.silhouette.html.md): Silhouette rendering and comparison for the silhouette test.
 - [cutan.characters.svg_utils](_autosummary/cutan.characters.svg_utils.html.md): SVG manipulation: namespace-aware DOM helpers using stdlib &#96;xml.etree&#96;.
 - [cutan.characters.validate](_autosummary/cutan.characters.validate.html.md): Whether an art package is one the compiler can actually render.
+- [cutan.characters.views](_autosummary/cutan.characters.views.html.md): The rig view a character shows from where the camera sees it (cutan#173 part 1).
 - [cutan.characters.vocabulary](_autosummary/cutan.characters.vocabulary.html.md): The cut-out genre’s vocabulary entries: motion presets, expression presets, IR-field notes.
 - [cutan.compile](_autosummary/cutan.compile.html.md): The cut-out genre’s compile passes, their lowering hooks and the visuals of its runtime.
 - [cutan.compile.body](_autosummary/cutan.compile.body.html.md): Derive a body-attached prop’s placement from its character, in every shot.
@@ -103,7 +104,7 @@
 - [cutan.verify.regions](_autosummary/cutan.verify.regions.html.md): Mouth and body cadence apart: “mouths on ones, bodies on twos” made measurable (cutan#80).
 - [cutan.verify.style](_autosummary/cutan.verify.style.html.md): Style lint: measure a render’s cadence, cut rate and palette, and compare them to a style’s targets.
 - [For AI agents](ai-agents.html.md): &#96;cutan&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-24 01:53 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-26 17:52 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

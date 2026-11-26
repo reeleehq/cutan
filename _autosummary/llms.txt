@@ -59,6 +59,7 @@
 - [cutan.characters.silhouette](cutan.characters.silhouette.html.md): Silhouette rendering and comparison for the silhouette test.
 - [cutan.characters.svg_utils](cutan.characters.svg_utils.html.md): SVG manipulation: namespace-aware DOM helpers using stdlib &#96;xml.etree&#96;.
 - [cutan.characters.validate](cutan.characters.validate.html.md): Whether an art package is one the compiler can actually render.
+- [cutan.characters.views](cutan.characters.views.html.md): The rig view a character shows from where the camera sees it (cutan#173 part 1).
 - [cutan.characters.vocabulary](cutan.characters.vocabulary.html.md): The cut-out genre’s vocabulary entries: motion presets, expression presets, IR-field notes.
 - [cutan.compile](cutan.compile.html.md): The cut-out genre’s compile passes, their lowering hooks and the visuals of its runtime.
 - [cutan.compile.body](cutan.compile.body.html.md): Derive a body-attached prop’s placement from its character, in every shot.

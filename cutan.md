@@ -1,4 +1,4 @@
-> built 2026-11-24 01:53 UTC from 4b82399 (main) · cutan 0.0.131. Details: build_info.json
+> built 2026-11-26 17:52 UTC from 31e1043 (main) · cutan 0.0.132. Details: build_info.json
 
 # index.html.md
 
@@ -906,7 +906,7 @@ checkout of `cutan`:
 | [`run_bench`](_autosummary/cutan.bench.html.md#cutan.bench.run_bench)(\*\*kwargs)   | `an.bench.run.run_bench` over [`CUTOUT_FIXTURES`](_autosummary/cutan.bench.html.md#cutan.bench.CUTOUT_FIXTURES), rooted at this checkout.   |
 |--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 
-### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'eye', 'ellipse', 'rect', 'mouth'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
+### cutan.bench.CUTOUT_FIXTURES *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), Fixture]* *= {'aa_probe': Fixture(path='misc/bench/corpus/aa_probe', prepare=None, expect_visual_kinds=frozenset({'rect'}), golden_frames=(0.0, 0.25), golden_note='the fourth bar sweeping horizontally (4,200 px). The three angled bars are pinned and do not move — they are the AA subject.'), 'dialogue': Fixture(path='misc/bench/corpus/dialogue', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'eye', 'rect', 'mouth'}), golden_frames=(0.0, 0.6), golden_note="the mouth mid-line: frame 14 sits on the \`h\`/\`a\` of 'shape' and shows \`A\`, the winner of its 0.14 s window under the an#97 vote; the old drop-not-hold condenser showed \`C\` there, having dropped the \`D\` and \`A\` that followed inside the window. Frame 0 shows \`E\` — the winner of the first window, after the lead pulled the line's opening cues to 0 — where the old path showed the rest. The head is lifted 34 px above its rest by an absolute \`set\` so the placeholder rig's mouth clears the torso. The second golden sits INSIDE the spoken interval; \`single_character\`'s second golden samples after its line ends (its first, at t=0, is on the led first shape) and \`promote_demo\` renders mute in the bench (no visemes in its IR, by design). The visemes are the offline provider's, stamped into the committed ir/scene.json; the bench renders with auto_audio=False and reads them from there."), 'expressions': Fixture(path='misc/bench/corpus/expressions', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.125, 0.375, 0.625, 0.875, 1.125, 1.375, 1.625, 1.875), golden_note="eight 0.25 s shots of one silent synthesized character holding one expression preset each (neutral, happy, sad, angry, surprised, afraid, thinking, skeptical — the two presets whose faces differ only by a mouth form the silent rest does not show, disgusted and amused, are left out), sampled at each shot's mid-frame (an#98). What moves between goldens is the FACE SOLVER's output alone: brow height and angle, the eyelid key, and the mouth form's rest. The character is named \`face\` because its seeded blink phase puts no blink window inside any 0.25 s shot (the blink clock restarts per shot), so no golden straddles a blink; it is lowered by an absolute \`set face y\` so the head clears the frame's top edge at 320x240. Its rig is committed whole (parts and descriptor, \`viseme@happy\`/\`viseme@sad\` variants included) and, since an#99, the eye stack (sclera/pupil/lid slots, a filled closed lid, \`gaze_travel\`), so the pupils also make their seeded ambient saccades — sub-pixel at 320x240 and inside the face crop. The pairwise distinguishability test in tests/test_expression_goldens.py reads these same PNGs."), 'graded_field': Fixture(path='misc/bench/corpus/graded_field', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.1667), golden_note='the white marker sweeping across the gradient (6,270 px). Frame 4, not the obvious mid-scene frame 6: the marker advances by a sub-pixel step, so on frames 0, 1, 6, 8 and 11 it lands on an exact pixel boundary and AA-off changes ZERO pixels there. A blessed pair that no available mutation can move is a gate that cannot go red.'), 'multi_shot': Fixture(path='misc/bench/corpus/multi_shot', prepare=None, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 0.25), golden_note='the whole picture: 0.25s is the FIRST frame of the second shot, so the pair spans the concat boundary (75,050 px). A golden pair inside one shot would not notice a shot rendered in the wrong order.'), 'promote_demo': Fixture(path='examples/promote_demo', prepare=<function \_prepare_promote_demo>, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 2.9167), golden_note="a blink — the compiled eyelid swap shows the closed-eye art at t=2.9167 (an earlier note blamed 'the idle animation', which nothing on the render path consumes). Measured: frame 0 against duration/2 differs by exactly ZERO pixels here, so the obvious second time would have blessed one image twice."), 'saturated_outline': Fixture(path='misc/bench/corpus/saturated_outline', prepare=None, expect_visual_kinds=frozenset({'svg_sprite'}), golden_frames=(0.0, 0.25), golden_note='the head plate rotating through 0.3 rad (1,187 px).'), 'single_character': Fixture(path='examples/single_character', prepare=<function \_declare_procedural_rig.<locals>.prepare>, expect_visual_kinds=frozenset({'ellipse', 'rect'}), golden_frames=(0.0, 1.0), golden_note='a blink (the compiled scale_y squash on the procedural eyes) plus, since an#97, the mouth: 253 pixels differ, 172 from the blink and 81 from the mouth (frame 0 shows the led first shape of the 0.71 s line, frame 24 the closed rest after it, which the frame-ceiled window now samples). Blinks occupy 3.5% of frames, so before the lead frame 0 against duration/2 was a pixel-identical pair on this scene; the mouth now separates them by 81 px.')}*
 
 the descriptor
 (SVG-sprite) path is 12x more sensitive to a rasteriser flip than the
@@ -7317,6 +7317,7 @@ namespace as the default, so the output is a valid standalone SVG.
 | [`silhouette`](_autosummary/cutan.characters.silhouette.html.md#module-cutan.characters.silhouette)       | Silhouette rendering and comparison for the silhouette test.                                          |
 | [`svg_utils`](_autosummary/cutan.characters.svg_utils.html.md#module-cutan.characters.svg_utils)         | SVG manipulation: namespace-aware DOM helpers using stdlib `xml.etree`.                               |
 | [`validate`](_autosummary/cutan.characters.validate.html.md#module-cutan.characters.validate)           | Whether an art package is one the compiler can actually render.                                       |
+| [`views`](_autosummary/cutan.characters.views.html.md#module-cutan.characters.views)                 | The rig view a character shows from where the camera sees it (cutan#173 part 1).                      |
 | [`vocabulary`](_autosummary/cutan.characters.vocabulary.html.md#module-cutan.characters.vocabulary)       | The cut-out genre's vocabulary entries: motion presets, expression presets, IR-field notes.           |
 
 
@@ -10589,6 +10590,99 @@ True
   `VerificationReport`
 
 
+# _autosummary/cutan.characters.views.html.md
+
+# cutan.characters.views
+
+The rig view a character shows from where the camera sees it (cutan#173 part 1).
+
+`an` gives a world member a `facing` and asks its kind, per framed shot, what
+shows it from the camera’s angle (`EntityKind.view_for`, `an.genres.API_LEVEL`
+20, an#734). [`character_view_for()`](_autosummary/cutan.characters.views.html.md#cutan.characters.views.character_view_for) answers for a character: the view of its
+declared `view` swap set whose yaw range holds the camera’s angle about the
+character, as a `set` of that swap at `t=0`. `an` puts it ahead of the shot’s
+own actions, so an author’s explicit `view` swap wins.
+
+The angle is the camera’s yaw relative to where the character faces: `0` the
+camera is in front of it, `±180` behind, positive when it faces screen-right.
+[`VIEW_YAW_RANGES`](_autosummary/cutan.characters.views.html.md#cutan.characters.views.VIEW_YAW_RANGES) says which view serves which `|yaw|`. A view the
+character does not draw (no `view` set, or a set without that key) is not asked
+for: it keeps the view it has. A character drawn with only a front and a side view,
+say, shows the side from a quarter turn on and the front before it, rather than a
+key it has no art for.
+
+**Which way a profile faces.** A directional drawing (`side`, `three_quarter`)
+faces the way its art says (`metadata.faces`, right by default); mirroring it is
+a negative `scale_x`, which a view’s actions cannot give yet (it would replace the
+world’s scale: reeleehq/an#868). So a profile is given only on the side its art
+faces; on the other side the character is shown from the front (or the back, past a
+quarter turn away). The same gap means a character the author mirrors by hand at
+`t=0` is not looked at: it keeps its mirror.
+
+### Module Attributes
+
+| [`VIEW_YAW_RANGES`](_autosummary/cutan.characters.views.html.md#cutan.characters.views.VIEW_YAW_RANGES)   | the first whose bound is not under the yaw serves it; the last bound must be 180.   |
+|--------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+
+### Functions
+
+| [`character_view_for`](_autosummary/cutan.characters.views.html.md#cutan.characters.views.character_view_for)(entity, mall, relative_yaw)   | `EntityKind.view_for` for a character (an#734): a `set` of its `view` swap at `t=0` to the view that shows it from the camera's angle, or `None` when it draws no `view` set, or the view in force is already the one.   |
+|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`view_for_yaw`](_autosummary/cutan.characters.views.html.md#cutan.characters.views.view_for_yaw)(relative_yaw, \*[, available, ...]) | The view for a camera at `relative_yaw` degrees about a character, among the `available` ones; `None` when it draws none of them.                                                                                        |
+
+### cutan.characters.views.VIEW_YAW_RANGES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [str](https://docs.python.org/3/builtins/stdtypes.html#str)], ...]* *= ((22.5, 'front'), (67.5, 'three_quarter'), (112.5, 'side'), (180.0, 'back'))*
+
+the first whose
+bound is not under the yaw serves it; the last bound must be 180. The
+bounds split each step between two drawn views in half (front 0, three-quarter
+45, side 90, back 180: the back from behind-three-quarters on, which the rig
+does not draw separately).
+
+* **Type:**
+  `(upper bound of |relative yaw| in degrees, view)`, in order
+
+### cutan.characters.views.character_view_for(entity, mall, relative_yaw)
+
+`EntityKind.view_for` for a character (an#734): a `set` of its `view`
+swap at `t=0` to the view that shows it from the camera’s angle, or `None`
+when it draws no `view` set, or the view in force is already the one.
+
+A directional view is given only when its art faces the side the camera sees
+the character face (`cutan.characters.play.art_facing()`: right for
+`+yaw`, left for `-yaw`); otherwise the character is shown from the front
+(or the back, past a quarter turn away), which needs no mirror.
+
+```pycon
+>>> from an.ir.schema import AssetRef
+>>> ghost = AssetRef(kind="character", id="ned", store="characters", ref="ned")
+>>> character_view_for(ghost, {}, 0.0) is None
+True
+```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Any`](https://docs.python.org/3/library/typing.html#typing.Any)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### cutan.characters.views.view_for_yaw(relative_yaw, , available=('front', 'three_quarter', 'side', 'back'), ranges=((22.5, 'front'), (67.5, 'three_quarter'), (112.5, 'side'), (180.0, 'back')))
+
+The view for a camera at `relative_yaw` degrees about a character, among
+the `available` ones; `None` when it draws none of them.
+
+A range whose view is not drawn falls to the nearest drawn view toward the
+front (a character with no three-quarter shows its front until the side).
+
+```pycon
+>>> view_for_yaw(0.0), view_for_yaw(-40.0), view_for_yaw(90.0), view_for_yaw(180.0)
+('front', 'three_quarter', 'side', 'back')
+>>> view_for_yaw(40.0, available=("front", "side"))
+'front'
+>>> view_for_yaw(10.0, available=("side",)) is None
+True
+```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+
 # _autosummary/cutan.characters.vocabulary.html.md
 
 # cutan.characters.vocabulary
@@ -12702,7 +12796,7 @@ cutan#91). Pushed with the project, so it is a key of the store too.
 
 The persisted renderer name of cut-out shots (`an.stage` claims it).
 
-### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 18*
+### cutan.REQUIRED_AN_API_LEVEL *: [int](https://docs.python.org/3/builtins/functions.html#int)* *= 20*
 
 The lowest `an.genres.API_LEVEL` this `cutan` runs against (“the lowest `an`
 it supports”, ADR 0001 decision 8, said without a version pin: `an`’s version is
@@ -12730,6 +12824,7 @@ Level 15: `an.project.gitignore_matcher` (an#725, cutan#185); also the first lev
 after `JsonSidecarStore.write_sidecar` (an#688, cutan#181), `phone_alphabet_of` (an#721).
 Level 17: `an.ir.world.planes_at_infinity` (an#735), the far-plate critic’s set (cutan#177).
 Level 18: `EntityKind.contacts` (an#519), a character’s feet for the support check (cutan#201).
+Level 20: `EntityKind.view_for` and `WorldMember.facing` (an#734), the rig view from the camera’s yaw (cutan#173).
 
 ### cutan.require_an()
 
@@ -16824,16 +16919,18 @@ the caller’s error, not the video’s.
 
 # About this build
 
-This documentation was built on **2026-11-24 01:53 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/4b823994deb44545965fdcf7895cb7ff94cf5101"><code>4b82399</code></a> on branch <code>main</code>, for **cutan 0.0.131** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-26 17:52 UTC** from commit <a href="https://github.com/reeleehq/cutan/commit/31e1043fda6971b2c51ba16a687e79dae327cc0d"><code>31e1043</code></a> on branch <code>main</code>, for **cutan 0.0.132** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.132) is behind the latest release on PyPI (0.0.133): `pip install cutan` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/cutan/commit/4b823994deb44545965fdcf7895cb7ff94cf5101"><code>4b823994deb44545965fdcf7895cb7ff94cf5101</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/cutan/commit/31e1043fda6971b2c51ba16a687e79dae327cc0d"><code>31e1043fda6971b2c51ba16a687e79dae327cc0d</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
 | Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
@@ -16844,9 +16941,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/cutan</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/45307522590">45307522590</a>       |
+| Run          | <a href="https://github.com/reeleehq/cutan/actions/runs/45870414543">45870414543</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>4b823994deb44545965fdcf7895cb7ff94cf5101</code> (in the history of the built commit) |
+| Event commit | <code>31e1043fda6971b2c51ba16a687e79dae327cc0d</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -16871,13 +16968,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/cutan/0.0.131/">0.0.131</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/cutan/0.0.133/">0.0.133</a>, newer than the documented version (0.0.132).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/cutan && cd cutan
-git checkout 4b823994deb44545965fdcf7895cb7ff94cf5101
+git checkout 31e1043fda6971b2c51ba16a687e79dae327cc0d
 pip install "epythet==0.2.25"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -73,4 +73,5 @@ cutan.characters
    silhouette
    svg_utils
    validate
+   views
    vocabulary

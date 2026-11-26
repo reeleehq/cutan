@@ -1,0 +1,19 @@
+cutan.characters.views
+======================
+
+.. automodule:: cutan.characters.views
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      VIEW_YAW_RANGES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      character_view_for
+      view_for_yaw
+   
